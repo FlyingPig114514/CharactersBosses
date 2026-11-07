@@ -30,7 +30,7 @@
     "BOSS_COOLANT_POWER.title":  "Coolant",
     "BOSS_COOLANT_POWER.description":  "At the start of combat, add 2 Luminesce to your draw pile and hand.\nAt the end of your turn, if a Luminesce is still in your hand, none of the Defect's Dark orbs trigger their passive this turn.",
     "BOSS_RAINBOW_POWER.title":  "Rainbow",
-    "BOSS_RAINBOW_POWER.description":  "Rainbow\nEvery 5 orbs the Defect channels, it gains 1 Focus. Its Dark orbs never trigger their passive.\nWARNING: Glass orbs and Metronome deal sourceless damage - a summon with \"Die for You\" will not absorb it for you.",
+    "BOSS_RAINBOW_POWER.description":  "Every 5 orbs the Defect channels, it gains 1 Focus. Its Dark orbs never trigger their passive.\nWARNING: Glass orbs and Metronome deal sourceless damage - a summon with \"Die for You\" will not absorb it for you.",
     "GO_FOR_THE_EYES_AIM_POWER.title":  "Go for the Eyes",
     "GO_FOR_THE_EYES_AIM_POWER.description":  "The Defect will play Go for the Eyes this turn. If you play an Attack card (or an AoE that hits it), that Go for the Eyes also applies 1 Weak.",
     "SHARED_FATE_POWER.title":  "Shared Fate",

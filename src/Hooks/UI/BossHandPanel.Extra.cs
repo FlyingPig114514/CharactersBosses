@@ -174,6 +174,15 @@ public partial class BossHandPanel
         if (damages.Count == 0) return;
 
         _extraIntents = BuildIntentRow(ExtraIntentsName, damages, boss);
+        // ★ v0.2.473（用户 2026-11-07：「第 7、12 回合最右侧显示充能球被动和寒冰风暴的地方还是看不见」）：
+        //   这一行是**独立**的（`_extraIntents`），不和卡面下方那排意图一起挪 ⇒ 单独再左移一次。
+        try
+        {
+            int shift = Core.RainbowMimic.IntentShiftFor(boss);
+            if (shift > 0 && _extraIntents != null)
+                _extraIntents.Position = new Vector2(_extraIntents.Position.X - shift, _extraIntents.Position.Y);
+        }
+        catch { /* 忽略 */ }
     }
 
     /// <summary>
@@ -427,6 +436,31 @@ private static int OrbPassiveDamageCore(CharBossMonster boss, bool quiet, ref in
             }
             catch { /* 忽略：算不出来就当没有 */ }
 
+            // ★ v0.2.473（用户 2026-11-07：「电球和玻璃球的被动预览都没考虑特殊效果『彩虹』带来的集中提升」）：
+            //   彩虹机每生成 **5 颗**充能球 ⇒ +1 集中。本回合计划里会新生成几颗球，这里就按 /5 折算成集中。
+            //   （她身上的 `BossRainbowPower` 才认这条，别的故障机器人一点不受影响。）
+            try
+            {
+                if (boss.Creature?.GetPower<CharacterBosses.Powers.BossRainbowPower>() != null)
+                {
+                    int channeled = 0;
+                    foreach (var (previewCard, px) in cards)
+                    {
+                        if (previewCard == null) continue;
+                        string entryNow;
+                        try { entryNow = previewCard.Id.Entry; } catch { continue; }
+                        if (entryNow == "RAINBOW") { channeled += 3; continue; }   // 电+冰+暗
+                        if (Core.BossOrbMath.TryChannels(previewCard, px, out _, out int n2)) channeled += n2;
+                    }
+                    int rainbowFocus = channeled / 5;
+                    if (rainbowFocus != 0)
+                    {
+                        focusDelta += rainbowFocus;
+                        if (!quiet) Logger.Log($"[CharBoss] 球被动预告：特殊效果「彩虹」本回合生成 {channeled} 颗球 ⇒ +{rainbowFocus} 集中");
+                    }
+                }
+            }
+            catch { /* 忽略 */ }
             bool cables = HasRelic(boss, "GOLD_PLATED_CABLES");
             // 诊断（用户 2026-11-05：被动总伤显示 30/35，对一颗闪电球明显不对）：
             // 把「每颗球各自多少、集中补了多少、缆线翻倍没」都打出来，下次一跑就知道数从哪来。
@@ -450,8 +484,12 @@ private static int OrbPassiveDamageCore(CharBossMonster boss, bool quiet, ref in
                 int per = PassiveDamageOf(orbs[i]);
                 // ★ 2026-11-06（用户：「充能球被动虚高 20 —— 你把冰球也算成电球了？」）：
                 //   兜底**只给会打伤害的球**（闪电 / 玻璃）；冰球被动是格挡，绝不能算成 3 点伤害。
-                bool damagerOrb = orbs[i] is LightningOrb || orbs[i] is GlassOrb;
-                if (per <= 0 && damagerOrb) per = 3 + focusNow;
+                bool isGlass = orbs[i] is GlassOrb;
+                bool damagerOrb = orbs[i] is LightningOrb || isGlass;
+                // ★ v0.2.473（用户 2026-11-07：「将要生成的玻璃球的被动的伤害预览好像没考虑集中」）：
+                //   反编译 `GlassOrb`：`_passiveVal = 4`、`EvokeVal = PassiveVal × 2`，
+                //   而 `PassiveVal => ModifyOrbValue(_passiveVal)` ⇒ 玻璃球被动 = **4 + 集中**（不是闪电球的 3）。
+                if (per <= 0 && damagerOrb) per = (isGlass ? 4 : 3) + focusNow;
                 if (per <= 0) continue;
                 per = Math.Max(0, per + focusDelta);                 // 集中是加法（加在每颗球上）
                 int triggers = 1 + ((cables && i == 0) ? 1 : 0);     // Orbs[0] = 最右侧那颗
@@ -668,7 +706,7 @@ private static int OrbPassiveDamageCore(CharBossMonster boss, bool quiet, ref in
             float centerX = BossStatusRow.EnergyCenterX(_statusRow);
 
             _extraIntents.Size = new Vector2(w, h);
-            _extraIntents.Position = new Vector2(centerX - w * 0.5f, intentTop + IntentShiftY * cardW);
+            _extraIntents.Position = new Vector2(centerX - w * 0.5f - Core.RainbowMimic.IntentShiftFor(boss), intentTop + IntentShiftY * cardW);
         }
 
         PlaceLeftIntent(intentTop, cardW);

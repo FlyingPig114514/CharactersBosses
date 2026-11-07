@@ -818,7 +818,12 @@ public static class BossDamagePredictor
                 try { id = orb.Id.Entry; } catch { continue; }
                 kinds.Add(id);
             }
-            return kinds.Count;
+            // ★ v0.2.473（用户 2026-11-07：「进阶 9～10 时同步是升级的」）：
+            //   反编译 `Synchronize`：`CalculatedFocus` 的乘数是「不同球种类数」，
+            //   `OnUpgrade` 里 `CalculationExtra.UpgradeValueBy(1)` ⇒ 升级后**每种球 2 点集中**。
+            int perKind = 1;
+            try { if (card.IsUpgraded) perKind = 2; } catch { perKind = 1; }
+            return kinds.Count * perKind;
         }
         catch { return 0; }
     }

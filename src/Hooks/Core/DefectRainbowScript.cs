@@ -49,7 +49,7 @@ public static class DefectRainbowScript
                 Note = "1. 启动流程、彩虹+、碎片整理（单人）/ 模仿学习（多人）",
                 Cards = new List<ScriptCard>
                 {
-                    C<BootSequence>(), C<Rainbow>(true), C<Defragment>(),
+                    C<BootSequence>(), C<Rainbow>(true), C<Defragment>(),   // 顺序：先彩虹+，再碎片整理/模仿学习（用户 2026-11-07）
                 },
             },
 
@@ -85,7 +85,7 @@ public static class DefectRainbowScript
                     C<TeslaCoil>(), C<SovereignBlade>(), C<DefendDefect>(), C<DefendDefect>(),
                 },
                 Energy = 6,
-                IntentShiftLeft = 120,      // 意图太多：这一回合的意图栏整体左移，别被屏幕边缘切掉
+                IntentShiftLeft = 260,      // 意图太多：这一回合的意图栏整体左移，别被屏幕边缘切掉
             },
 
             // 8：彩虹+(2) + 聚变(1) + 玻璃工艺(1) = 4 费（正好花完）
@@ -106,8 +106,9 @@ public static class DefectRainbowScript
             },
 
             // 9：热修复+(0) + 全息影像+(1) + 防御(1)
-            Turn("9. 热修复+、全息影像+、防御", 9,
-                C<Hotfix>(true), C<Hologram>(true), C<DefendDefect>()),
+            // 用户 2026-11-07：第 9 回合改成「热修复+、全息影像+、热修复+、防御」
+            Turn("9. 热修复+、全息影像+、热修复+、防御", 9,
+                C<Hotfix>(true), C<Hologram>(true), C<Hotfix>(true), C<DefendDefect>()),
 
             // 10：同步(1) + 疑虑（诅咒）+ 防御(1)
             Turn("10. 同步、疑虑（诅咒，打不出）、防御", 10,
@@ -127,7 +128,7 @@ public static class DefectRainbowScript
                     C<TeslaCoil>(), C<SovereignBlade>(), C<DefendDefect>(), C<DefendDefect>(),
                 },
                 Energy = 6,
-                IntentShiftLeft = 120,
+                IntentShiftLeft = 260,
             },
         };
 
