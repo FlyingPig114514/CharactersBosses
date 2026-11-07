@@ -151,7 +151,7 @@ public partial class BossHandPanel
             int bomb = BombDamage(boss);
             if (bomb > 0) damages.Add((bomb, "炸弹"));
 
-            int orbs = OrbPassiveDamage(boss);
+            int orbs = OrbPassiveDamage(boss, quiet: false, out int orbsAoe);
             // ⚠ 球被动是**单体随机**伤害（用户 2026-10-29）：
             //   闪电/玻璃球的被动每次只打 `HittableEnemies` 里随机一个，而她在出手时那份列表被收窄成
             //   被锁定的那位 ⇒ **只有那名玩家会挨**。所以本地玩家不是被锁的人时，这条要显示 0。
@@ -162,7 +162,9 @@ public partial class BossHandPanel
                            "（球被动是单体随机，她锁的不是本机玩家）");
                 orbs = 0;
             }
-            if (orbs > 0) damages.Add((orbs, "充能球被动"));
+            if (orbs > 0) damages.Add((orbs, "充能球被动（单体）"));
+            // 玻璃球被动是**群体**：另起一条，不和单体那个数字混在一起
+            if (orbsAoe > 0) damages.Add((orbsAoe, "充能球被动（群体）"));
         }
         catch (Exception e)
         {
@@ -342,6 +344,27 @@ public partial class BossHandPanel
     /// 薄荷尖塔每刷一次血条就会问一次，那边传 <c>quiet: true</c> 避免日志被这条重复刷屏。
 
     internal static int OrbPassiveDamage(CharBossMonster boss, bool quiet = false)
+    => OrbPassiveDamage(boss, quiet, out _);
+
+/// <summary>
+/// 同 <see cref="OrbPassiveDamage(CharBossMonster, bool)"/>，另外把**群体**那部分单独返回。
+///
+/// ★ v0.2.472（用户 2026-11-07：「充能球被动似乎没有计算将要生成的玻璃球被动
+///   （注意玻璃球是群伤，最好分开显示）」）：
+///   · 闪电球被动 = **单体随机**，玻璃球被动 = **群体**（`GlassOrb.Passive` 打 `HittableEnemies` 全体）
+///     ⇒ 两笔性质完全不同，混成一个数字会让「只有你会挨」和「所有人都挨」看起来一样；
+///   · 所以这里把玻璃球那部分单独算出来（`aoe`），调用方决定怎么显示。
+///   · 顺带确认：`OrbsAfter` 已经把**本回合剧本里还没打出的牌**将要生成的球算进队列了
+///     （玻璃工艺 / 聚变 / 彩虹 都在 `BossOrbMath.TryChannels` 里），所以「将要生成的玻璃球」本来就在循环里，
+///     以前只是被合并进单体那一个数字。
+/// </summary>
+internal static int OrbPassiveDamage(CharBossMonster boss, bool quiet, out int aoe)
+{
+    aoe = 0;
+    return OrbPassiveDamageCore(boss, quiet, ref aoe);
+}
+
+private static int OrbPassiveDamageCore(CharBossMonster boss, bool quiet, ref int aoe)
     {
         try
         {
@@ -432,7 +455,9 @@ public partial class BossHandPanel
                 if (per <= 0) continue;
                 per = Math.Max(0, per + focusDelta);                 // 集中是加法（加在每颗球上）
                 int triggers = 1 + ((cables && i == 0) ? 1 : 0);     // Orbs[0] = 最右侧那颗
-                total += per * triggers;
+                // ★ v0.2.472：玻璃球是**群伤**，单独记一笔（用户要求分开显示）
+                if (orbs[i] is GlassOrb) aoe += per * triggers;
+                else total += per * triggers;
             }
             // ★ v0.2.358（用户 2026-11-04：「第二回合对他造成伤害使他的情感芯片生效的时候，
             //   没有标注开始时闪电充能球被动会造成的伤害」）：

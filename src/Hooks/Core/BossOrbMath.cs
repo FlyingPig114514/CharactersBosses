@@ -93,7 +93,8 @@ public static class BossOrbMath
             ["FUSION"] = (typeof(PlasmaOrb), 1),
             ["METEOR_STRIKE"] = (typeof(PlasmaOrb), 3),
             ["ICE_LANCE"] = (typeof(FrostOrb), 3),      // DynamicVars.Repeat
-            ["RAINBOW"] = (typeof(LightningOrb), 1),    // 实际是 冰→电→暗 各 1，这里只按「会生成球」记账
+            ["GLASSWORK"] = (typeof(GlassOrb), 1),        // 玻璃工艺：5 格挡 + 1 个玻璃充能球（v0.2.472 补，之前漏了 ⇒ 预览里没有它）
+            // RAINBOW 见 BossOrbSim.Predict 的特殊分支（要生成 电+冰+暗 三种球，一个 (type,count) 表示不了）
         };
 
     /// <summary>这张牌会不会生成球、生成哪种、几个。</summary>

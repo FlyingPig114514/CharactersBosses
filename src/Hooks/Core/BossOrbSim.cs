@@ -93,7 +93,16 @@ internal sealed class BossOrbSim
             OwnEvokes(card, result);
 
             // ② 牌自己生成的球（满了就先激发队首）
-            if (BossOrbMath.TryChannels(card, xEnergy, out var orbType, out int channelCount))
+            // ★ v0.2.472（用户 2026-11-07）：**彩虹**要生成 **电 + 冰 + 暗** 各 1 颗，
+            //   一张牌对应一种球的那张表表示不了 ⇒ 这里单独处理（以前只按 1 颗电球记账，
+            //   于是「同步」「冰雹风暴」「球被动」三项都少算了）。
+            if (Entry(card) == "RAINBOW")
+            {
+                Channel(typeof(LightningOrb), 1, result);
+                Channel(typeof(FrostOrb), 1, result);
+                Channel(typeof(DarkOrb), 1, result);
+            }
+            else if (BossOrbMath.TryChannels(card, xEnergy, out var orbType, out int channelCount))
             {
                 Channel(orbType, channelCount, result);
             }
