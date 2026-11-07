@@ -127,11 +127,23 @@ public static partial class BossHandCard
         // ★ 彩虹机（用户 2026-11-07）：「会触发节拍器的那张牌」下面再标一条**30 无来源群伤**。
         //   游戏里这 30 点确实会打出来（节拍器第 5 颗球），以前意图上完全看不见。
         try { AddExtraAoeLabel(boss, planned, row); } catch (Exception e) { Logger.Log("[CharBoss] 额外群伤标记失败: " + e.Message); }
+        try { ApplyIntentShift(boss, row); } catch { /* 忽略 */ }
 
         // 激发球的意图（攻势 / `伤害×次数` / 守势）已经在计划阶段由 BossOrbSim 算好并塞进 Intents，
         // 这里不再自己拼 —— 顺序才是对的（先牌本身的意图，再激发的意图）。
     }
 
+    /// <summary>这一回合的意图栏整体左移（用户 2026-11-07：彩虹机第 7/12 回合意图太多被屏幕边缘切掉）。</summary>
+    private static void ApplyIntentShift(CharBossMonster boss, Control row)
+    {
+        try
+        {
+            int shift = Core.RainbowMimic.IntentShiftFor(boss);
+            if (shift <= 0) return;
+            row.Position = new Vector2(row.Position.X - shift, row.Position.Y);
+        }
+        catch { /* 忽略：挪不动就按原位显示 */ }
+    }
     /// <summary>
     /// 「这张牌还会额外造成 N 点**无来源群体伤害**」的小标记（当前只有彩虹机第 8 回合那张「彩虹+」）。
     /// 画成红底小方块 + 数字，并带悬停说明；位置照旧在卡面下方那一行的末尾。
@@ -144,10 +156,14 @@ public static partial class BossHandCard
         {
             Text = aoe.ToString(),
             MouseFilter = Control.MouseFilterEnum.Stop,
-            TooltipText = "无来源群体伤害（节拍器）：对[所有敌人]造成 " + aoe + " 点伤害，不吃力量/集中，也不会被「为你而死」吸收",
+            TooltipText = "无来源群体伤害（节拍器）：对所有敌人造成 " + aoe + " 点伤害，"
+                        + "不吃力量/集中，也不会被「为你而死」吸收",
             VerticalAlignment = VerticalAlignment.Center,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            CustomMinimumSize = new Vector2(30f, 0f),        // 不给最小宽度的话会被压成 0 宽 ⇒ 看不见
         };
         label.AddThemeColorOverride("font_color", new Color(1f, 0.32f, 0.32f));
+        label.AddThemeFontSizeOverride("font_size", 22);      // 默认字号太小，和意图图标不搭
         row.AddChild(label);
     }
 

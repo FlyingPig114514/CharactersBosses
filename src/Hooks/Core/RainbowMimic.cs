@@ -78,6 +78,20 @@ internal static class RainbowMimic
     }
 
     /// <summary>
+    /// 这一回合的意图栏要不要左移（像素；0 = 不动）。
+    /// 数据来自剧本的 `BossTurn.IntentShiftLeft`（只有彩虹机第 7 / 12 回合写 120）。
+    /// </summary>
+    internal static int IntentShiftFor(CharBossMonster boss)
+    {
+        try
+        {
+            if (boss?.Def == null) return 0;
+            var turn = boss.Def.ScriptForAct(boss.ActIndex)?.TurnAt(boss.TurnNumber);
+            return turn?.IntentShiftLeft ?? 0;
+        }
+        catch { return 0; }
+    }
+    /// <summary>
     /// 这张牌在本回合会不会**额外造成无来源群体伤害**（0 = 不会）。
     /// 数据来自剧本的 <c>ScriptCard.ExtraAoe</c>（目前只有彩虹机第 8 回合那张「彩虹+」= 30，
     /// 因为那一下会踩到遗物「节拍器」的第 5 颗球）。

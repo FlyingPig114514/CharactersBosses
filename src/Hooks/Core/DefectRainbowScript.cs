@@ -74,9 +74,19 @@ public static class DefectRainbowScript
                 C<Synchronize>(), C<Barrage>(), C<DefendDefect>()),
 
             // 7：编译冲击（抽 5）+ 放血 + 残影 + 战火铸就 + 违逆 + 特斯拉线圈 + 君王之剑 + 防御×2（没费）
-            Turn("7. 编译冲击（抽5）、放血、残影、战火铸就、违逆、特斯拉线圈、君王之剑、防御×2（没费）", 7,
-                C<CompileDriver>(), C<Bloodletting>(), C<Blur>(), C<WroughtInWar>(), C<Defy>(),
-                C<TeslaCoil>(), C<SovereignBlade>(), C<DefendDefect>(), C<DefendDefect>()),
+            // 能量账（用户 2026-11-07）：3 基础 − 1 涅奥 + 1 棱彩宝石 + 1（本回合额外那点）+ 2（放血）= **6 费**，
+            // 编译冲击1 + 残影1 + 战火铸就2 + 违逆0 + 君王之剑2 刚好花完 ⇒ 两张防御都打不出。
+            new BossTurn
+            {
+                Note = "7. 编译冲击（抽5）、放血、残影、战火铸就、违逆、特斯拉线圈、君王之剑、防御×2（没费）",
+                Cards = new List<ScriptCard>
+                {
+                    C<CompileDriver>(), C<Bloodletting>(), C<Blur>(), C<WroughtInWar>(), C<Defy>(),
+                    C<TeslaCoil>(), C<SovereignBlade>(), C<DefendDefect>(), C<DefendDefect>(),
+                },
+                Energy = 6,
+                IntentShiftLeft = 120,      // 意图太多：这一回合的意图栏整体左移，别被屏幕边缘切掉
+            },
 
             // 8：彩虹+(2) + 聚变(1) + 玻璃工艺(1) = 4 费（正好花完）
             //   ★ 这一张「彩虹+」会踩到「节拍器」的第 5 颗球 ⇒ 额外 30 点**无来源**群伤
@@ -90,7 +100,7 @@ public static class DefectRainbowScript
                 {
                     // ExtraAoe = 30 ⇒ 手牌栏会在这张牌下面标一条「30 无来源群伤」（用户 2026-11-07）
                     new() { Card = typeof(Rainbow), Upgraded = true, From = "deck", ExtraAoe = 30 },
-                    C<Fusion>(), C<Glasswork>(),
+                    C<Fusion>(true), C<Glasswork>(),
                 },
                 Energy = TurnEnergy,
             },
@@ -108,9 +118,17 @@ public static class DefectRainbowScript
                 C<Barrage>(), C<DefendDefect>(), C<Greed>()),
 
             // 12：同第 7 回合
-            Turn("12. 编译冲击（抽5）、放血、残影、战火铸就、违逆、特斯拉线圈、君王之剑、防御×2（没费）", 12,
-                C<CompileDriver>(), C<Bloodletting>(), C<Blur>(), C<WroughtInWar>(), C<Defy>(),
-                C<TeslaCoil>(), C<SovereignBlade>(), C<DefendDefect>(), C<DefendDefect>()),
+            new BossTurn
+            {
+                Note = "12. 编译冲击（抽5）、放血、残影、战火铸就、违逆、特斯拉线圈、君王之剑、防御×2（没费）",
+                Cards = new List<ScriptCard>
+                {
+                    C<CompileDriver>(), C<Bloodletting>(), C<Blur>(), C<WroughtInWar>(), C<Defy>(),
+                    C<TeslaCoil>(), C<SovereignBlade>(), C<DefendDefect>(), C<DefendDefect>(),
+                },
+                Energy = 6,
+                IntentShiftLeft = 120,
+            },
         };
 
         return new BossScript
@@ -146,7 +164,7 @@ public static class DefectRainbowScript
         typeof(WroughtInWar), typeof(WroughtInWar),
         typeof(Defy), typeof(Defy),
         typeof(TeslaCoil), typeof(TeslaCoil),
-        typeof(SovereignBlade), typeof(SovereignBlade),
+        typeof(SovereignBlade),        // 只铸一把：剧本第 7/12 回合打的是同一把（TakeExistingBlade）
         typeof(DefendDefect), typeof(DefendDefect), typeof(DefendDefect), typeof(DefendDefect),
         typeof(DefendDefect), typeof(DefendDefect), typeof(DefendDefect),
         typeof(Greed), typeof(Greed), typeof(Doubt),

@@ -793,6 +793,35 @@ public static class BossDamagePredictor
         return amount;                              // 热修复 / 碎片整理这类：本回合或永久获得
     }
 
+    /// <summary>
+    /// 同 <see cref="FocusDeltaOf(CardModel)"/>，但**认得「同步」**：它没有固定的集中变量，
+    /// 效果是「每有一种不同的充能球，本回合 +1 集中」⇒ 要按她当前球堆里的**球种类数**算。
+    ///
+    /// 用户 2026-11-07：「没有计算同步带来的临时集中对充能球被动的增幅」。
+    /// </summary>
+    public static int FocusDeltaOf(CardModel card, MegaCrit.Sts2.Core.Entities.Players.PlayerCombatState? pcs)
+    {
+        int plain = FocusDeltaOf(card);
+        if (plain != 0) return plain;
+
+        string entry = SafeEntryOf(card);
+        if (entry != "SYNCHRONIZE") return 0;
+
+        try
+        {
+            if (pcs == null) return 0;
+            var kinds = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var orb in pcs.OrbQueue.Orbs)
+            {
+                if (orb == null) continue;
+                string id;
+                try { id = orb.Id.Entry; } catch { continue; }
+                kinds.Add(id);
+            }
+            return kinds.Count;
+        }
+        catch { return 0; }
+    }
     /// <summary>牌面上「集中」那个变量的数值（不分正负）。</summary>
     private static int RawFocusVarOf(CardModel card)
     {

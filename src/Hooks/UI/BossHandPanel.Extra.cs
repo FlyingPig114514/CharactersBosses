@@ -387,7 +387,7 @@ public partial class BossHandPanel
                     if (card == null) continue;
                     if (pcs != null && !pcs.Hand.Cards.Contains(card)) continue;   // 已经打出去的别再算一次
 
-                    int delta = Core.BossDamagePredictor.FocusDeltaOf(card);
+                    int delta = Core.BossDamagePredictor.FocusDeltaOf(card, boss?.Shadow?.PlayerCombatState);
                     if (delta == 0) continue;
                     if (delta < 0 && artifact > 0)
                     {

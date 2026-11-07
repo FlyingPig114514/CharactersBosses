@@ -298,6 +298,14 @@ public sealed class BossTurn
     /// 所向无敌 <c>I_AM_INVINCIBLE</c> 在他回合结束时正好躺在抽牌堆顶 → 0 费打出）。
     /// 只在这个标记为 true 的回合生效，否则那张牌会每回合都被白打一次。
     /// </summary>
+    /// <summary>
+    /// 这一回合的**意图栏整体左移多少像素**（0 = 不动）。
+    ///
+    /// 用途（用户 2026-11-07 的彩虹机）：第 7 / 12 回合要打 9 张牌，卡面下方的意图行加起来会顶到屏幕右边缘，
+    /// 最右边那几条（防御）直接被切掉看不见。把**这两个回合**的意图行整体往左挪 120px 就都露出来了；
+    /// 其它回合为 0 ⇒ 不受影响，也不会波及别的 Boss。
+    /// </summary>
+    public int IntentShiftLeft { get; init; }
     public string? FreePlayTopEntry { get; init; }
 
     /// <summary>
