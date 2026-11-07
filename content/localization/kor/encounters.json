@@ -31,6 +31,8 @@
 
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "디펙트",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character}는 [gold]디펙트[/gold]의 파괴광선에 소멸했습니다.",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title": "무지개",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss": "{character}이(가) [gold]디펙트[/gold]의 무지개에 소멸했습니다.",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "네크로바인더",
   "NECROBINDER_BOSS_ENCOUNTER.loss": "{character}의 영혼은 [gold]네크로바인더[/gold]에게 거두어졌습니다.",

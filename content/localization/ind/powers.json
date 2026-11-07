@@ -29,6 +29,8 @@
     "BREW_MOD_POWER.description": "Slot [gold]Ramuan[/gold] awal Si Silent tidak dihapus dan dia menggunakan ramuan dalam perlawanan.\nSetiap kali dia akan kehilangan HP saat memiliki [gold]Blok[/gold], dia kehilangan [gold]Blok[/gold] sebanyak itu sebagai gantinya.\nSaat [gold]Peri dalam Botol[/gold] miliknya terpicu, semua efek negatif padanya dihapus.\nPERINGATAN: [gold]Ampul Peledak[/gold] dan [gold]Wujud Ular[/gold] memberikan kerusakan tanpa sumber - makhluk panggilan dengan “Mati Buatmu” tidak akan menahan kerusakan itu untukmu.",
     "BOSS_COOLANT_POWER.title": "Pendingin",
     "BOSS_COOLANT_POWER.description":  "Pada awal perlawanan, tambahkan 2 [gold]Cerah[/gold] ke [gold]Tumpukan Ambil[/gold] dan [gold]Tangan[/gold]mu.\nPada akhir giliranmu, jika masih ada [gold]Cerah[/gold] di [gold]Tangan[/gold]mu, tidak ada Bola [gold]Kegelapan[/gold] milik Si Defect yang memicu efek pasif giliran ini.",
+    "BOSS_RAINBOW_POWER.title":  "Pelangi",
+    "BOSS_RAINBOW_POWER.description":  "Setiap kali Defect menyalurkan 5 orb, ia memperoleh 1 Fokus. Orb Gelap-nya tidak pernah memicu efek pasifnya.\\nPERINGATAN: orb Kaca memberikan kerusakan tanpa sumber — panggilan dengan «Mati untukmu» tidak akan menyerapnya.\\nPERINGATAN: Metronom memberikan 30 kerusakan tanpa sumber ke semua musuh setiap 5 orb yang disalurkan — panggilan dengan «Mati untukmu» tidak akan menyerapnya.",
     "GO_FOR_THE_EYES_AIM_POWER.title": "Sasar Mata",
     "GO_FOR_THE_EYES_AIM_POWER.description": "Giliran ini Si Defect akan memainkan [gold]Sasar Mata[/gold]. Jika kamu memainkan kartu Serangan padanya (atau serangan area mengenainya), [gold]Sasar Mata[/gold] itu juga memberikan 1 [gold]Lemah[/gold] tambahan.",
     "SHARED_FATE_POWER.title": "Nasib Bersama",

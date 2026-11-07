@@ -31,6 +31,8 @@
 
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "O Defeituoso",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character} foi aniquilado pelo [gold]Hiper Raio[/gold] de [gold]O Defeituoso[/gold].",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title": "Arco-íris",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss": "{character} foi aniquilado pelo [gold]Defeito[/gold] com um Arco-íris.",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "A Necroartífice",
   "NECROBINDER_BOSS_ENCOUNTER.loss": "[gold]A Necroartífice[/gold] tomou a alma de {character}.",

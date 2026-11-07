@@ -31,6 +31,8 @@
 
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "Si Defect",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character} dilenyapkan oleh [gold]Sinar Hyper[/gold] milik [gold]Si Defect[/gold].",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title": "Pelangi",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss": "{character} dimusnahkan oleh [gold]Defect[/gold] dengan Pelangi.",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "Si Necrobinder",
   "NECROBINDER_BOSS_ENCOUNTER.loss": "Jiwa {character} diambil oleh [gold]Si Necrobinder[/gold].",

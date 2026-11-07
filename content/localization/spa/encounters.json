@@ -31,6 +31,8 @@
 
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "El Defectuoso",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character} fue aniquilado por el [gold]Hiperrayo[/gold] de [gold]El Defectuoso[/gold].",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title": "Arcoíris",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss": "{character} fue aniquilado por el [gold]Defecto[/gold] con un Arcoíris.",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "La Vinculahuesos",
   "NECROBINDER_BOSS_ENCOUNTER.loss": "[gold]La Vinculahuesos[/gold] se llevó el alma de {character}.",

@@ -31,6 +31,8 @@
 
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "Defekt",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character} został unicestwiony „Hiperpromieniem” [gold]Defekta[/gold].",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title": "Tęcza",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss": "{character} został unicestwiony przez [gold]Defekta[/gold] i Tęczę.",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "Nekromantka",
   "NECROBINDER_BOSS_ENCOUNTER.loss": "Duszę {character} zagarnęła [gold]Nekromantka[/gold].",

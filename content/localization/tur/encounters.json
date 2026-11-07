@@ -31,6 +31,8 @@
 
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "Arıza",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character}, [gold]Arıza[/gold]'nın [gold]Hiper Işın[/gold]'ıyla yok edildi.",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title": "Gökkuşağı",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss": "{character}, [gold]Defekt[/gold] ve Gökkuşağı tarafından yok edildi.",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "Ölübağlayan",
   "NECROBINDER_BOSS_ENCOUNTER.loss": "{character}'ın ruhu [gold]Ölübağlayan[/gold] tarafından alındı.",

@@ -31,6 +31,8 @@
 
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "ディフェクト",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character}は[gold]ディフェクト[/gold]の[gold]ハイパービーム[/gold]に消し飛ばされた。",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title": "虹",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss": "{character}は[gold]ディフェクト[/gold]の虹に消し去られた。",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "ネクロバインダー",
   "NECROBINDER_BOSS_ENCOUNTER.loss": "{character}の魂は[gold]ネクロバインダー[/gold]に奪われた。",
