@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.468 / 2026-11-07（联机设置**以房主为准**：客人端不再读本机的「地图替换开关」「共用匹配池」「进阶10第三幕一场原本一场角色」—— 这三项以前是各机读自己的 cfg，房主开着客人关着就会一台替换一台不替换、轮次 1 立刻分叉。现在客人一律跟随房主的同步槽位（act.BossEncounter / SecondBossEncounter），槽位还没同步时用默认值兜底并记一行日志。0.2.467：奥斯提召唤守卫；0.2.466：追踪类日志不进表；0.2.465：手牌效果快照等）";
+    public const string Tag = "v0.2.469 / 2026-11-07（新增二层故障机器人第二套设计「彩虹机」DEFECT_RAINBOW：充能球/集中轴，12 回合剧本（第 8～12 循环）、遗物 破损核心+涅奥的祝福+节拍器+棱彩宝石+战纹涂料、进阶 8 升启动流程/冷却剂、进阶 9 升冰雹风暴/同步、特殊效果「彩虹」= 每生成 5 个球 +1 集中且黑暗球从不过被动（BossRainbowPower + DarkPassiveSuppressed 恒真）、多人把第 1 回合的「碎片整理」换成「模仿学习」、藏品=陨石打击。待办：模仿学习的目标优先级与「拿到无尽刀刃后每回合打一张小刀」、节拍器那 30 点群伤的意图标记、16 语言只剩 zhs/eng/zht 有文案）；";
 
     private static bool _logged;
 

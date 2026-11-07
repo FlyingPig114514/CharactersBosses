@@ -56,6 +56,7 @@ internal static class BossKeys
         new("SILENT_ENVENOM",       1, 1, 1, typeof(SilentBoss)),          // 猎人 1 号：涂毒猎
         new("SILENT_SNECKO",        1, 1, 2, typeof(SilentBoss)),          // 猎人 2 号：蛇眼猎
         new("DEFECT_CLAW",          2, 1, 1, typeof(DefectBoss)),          // 故障 1 号：物理机
+        new("DEFECT_RAINBOW",       2, 1, 2, typeof(DefectBoss)),          // 故障 2 号：彩虹机（用户 2026-11-07）
         new("NECROBINDER_SOUL",     3, 1, 1, typeof(NecrobinderBoss)),     // 亡灵 1 号：灵魂骨
         new("REGENT_FORGE",         4, 1, 1, typeof(RegentBoss)),          // 储君 1 号：铸剑储君
         new("REGENT_KING",          4, 1, 2, typeof(RegentBoss)),          // 储君 2 号：王储
@@ -113,13 +114,14 @@ internal static class BossKeys
                 "IRONCLAD_BOULDER",     // 3 层 11 号
             };
         }
-        if (act == 1)   // 第二幕：9 个（猎 2 / 机 1 / 骨 1 / 储 3 / 战 2）
+        if (act == 1)   // 第二幕：10 个（猎 2 / 机 2 / 骨 1 / 储 3 / 战 2）
         {
             return new[]
             {
                 "SILENT_ENVENOM",       // 二层 猎人 1 号：涂毒猎
                 "SILENT_SNECKO",        // 二层 猎人 2 号：蛇眼猎
                 "DEFECT_CLAW",          // 二层 故障 1 号：物理机
+                "DEFECT_RAINBOW",       // 二层 故障 2 号：彩虹机（用户 2026-11-07）
                 "NECROBINDER_SOUL",     // 二层 亡灵 1 号：灵魂骨
                 "REGENT_FORGE",         // 二层 储君 1 号：铸剑储君
                 "REGENT_KING",          // 二层 储君 2 号：王储
@@ -190,6 +192,7 @@ internal static class BossKeys
         ["SILENT_SNECKO"] = "蛇眼猎",
         ["NECROBINDER_SOUL"] = "灵魂骨",
         ["DEFECT_CLAW"] = "物理机",
+        ["DEFECT_RAINBOW"] = "彩虹机",
         ["IRONCLAD_BLOOD"] = "放血战",
         ["IRONCLAD_JUGGLER"] = "杂耍战",
         ["REGENT_FORGE"] = "铸剑储",
@@ -279,6 +282,9 @@ internal static class BossKeys
             // 一层故障机器人的一对（黑球机 / 电球机）
             case "DEFECT_DARK": return "DEFECT_THUNDER";
             case "DEFECT_THUNDER": return "DEFECT_DARK";
+            // 二层故障机器人的一对（物理机 / 彩虹机，用户 2026-11-07）
+            case "DEFECT_CLAW": return "DEFECT_RAINBOW";
+            case "DEFECT_RAINBOW": return "DEFECT_CLAW";
             // 二层储君的第三套（仆从储）← 王储（REGENT_KING）才是它的互补
             case "REGENT_MINION": return "REGENT_KING";
             // 一层储君的一对（碎屑储君 / 轰击储）
@@ -311,6 +317,7 @@ internal static class BossKeys
             case "SILENT_BREWER": return ModelDb.Encounter<SilentBrewerBossEncounter>();
             case "DEFECT_AI": return ModelDb.Encounter<DefectAiBossEncounter>();
             case "DEFECT_CLAW": return ModelDb.Encounter<DefectClawBossEncounter>();
+            case "DEFECT_RAINBOW": return ModelDb.Encounter<DefectRainbowBossEncounter>();
             case "REGENT_DEBRIS": return ModelDb.Encounter<RegentDebrisBossEncounter>();
             case "REGENT_FORGE": return ModelDb.Encounter<RegentForgeBossEncounter>();
             case "REGENT_KING": return ModelDb.Encounter<RegentKingBossEncounter>();

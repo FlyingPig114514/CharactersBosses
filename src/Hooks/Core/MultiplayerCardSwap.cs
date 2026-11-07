@@ -42,6 +42,13 @@ public static class MultiplayerCardSwap
         (1, typeof(DefectBoss), typeof(Coolant), typeof(OneForAll)),   // 冷却剂 → 一心化万（107 没这张牌 ⇒ 不换）
 #endif
 
+        // A9. 彩虹机（二层故障机器人·充能球轴，用户 2026-11-07 设计）：
+        //     第 1 回合「碎片整理（单人）/ 模仿学习（多人）」—— 单人没有别的玩家可模仿，
+        //     所以只在**多人**换成「模仿学习」。两张都是 1 费，能量账不变。
+#if STS2_111   // 0.107 没有「模仿学习」⇒ 不在换牌表里
+        (1, typeof(DefectBoss), typeof(Defragment), typeof(ImitationLearning)),
+#endif
+
         // A5. 奇巧猎（第一幕静默猎手·奇巧轴，用户 2026-10-26 设计）：
         //     手里那张稀有牌 余像（单人，1 费打出）→ 鬼祟+（多人，2 费打不起，靠奇巧被丢弃后免费打出）。
         //     「鬼祟+」的升级由下面的 <see cref="UpgradeRows"/> 负责。

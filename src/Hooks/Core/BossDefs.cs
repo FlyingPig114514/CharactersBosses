@@ -415,7 +415,27 @@ public static class BossDefs
             //   `VariantsForAct(2)` 读到的是 `VariantsByAct[2] == null` ⇒ 事件机**连判定都不会被问**，
             //   三层故障永远落回主设计（能力机）。静默猎手那边 v0.2.337 犯过一模一样的错。
             //   现在只有**一个** null（第二幕 = 物理机没有备选设计），事件机回到下标 2。
-            null,       // 第二幕（下标 1）：主设计「物理机」，没有备选设计
+            // ★ 二层故障机器人的**第二套设计「彩虹机」**（Key `DEFECT_RAINBOW`，用户 2026-11-07）：
+            //   充能球 / 集中轴；特殊效果「彩虹」见 Powers/BossRainbowPower.cs，
+            //   剧本见 Core/DefectRainbowScript.cs。
+            new BossVariant
+            {
+                Key = "DEFECT_RAINBOW",
+                Enabled = Core.BossLineups.RainbowActive,
+                Deck = Core.DefectRainbowScript.Deck(),
+                Relics = Core.DefectRainbowScript.Relics(),
+                Script = Core.DefectRainbowScript.Build(),
+                SpecialLoc = "DEFECT_BOSS.rainbow",
+                SpecialPower = typeof(Powers.BossRainbowPower),
+                // 用户 2026-11-07：进阶 8 = 升级启动流程、冷却剂；进阶 9 = 升级冰雹风暴、同步。
+                AscensionUpgrades = new List<(int, Type)>
+                {
+                    (8, typeof(BootSequence)),
+                    (8, typeof(Coolant)),
+                    (9, typeof(Hailstorm)),
+                    (9, typeof(Synchronize)),
+                },
+            },
             // 三层故障机器人的**第二套设计「事件机」**（Key `DEFECT_EVENT`，用户 2026-11-03；
             // 第一套是「能力机」`DefectScript`）。
             // 特殊效果「**一心化万**」：万物一心只返 0 费**攻击**牌，且每返一张 ⇒ **所有单位** +1 力量。

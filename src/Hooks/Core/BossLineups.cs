@@ -899,6 +899,37 @@ internal static class BossLineups
     /// <summary>一层故障机器人用哪套设计：黑球机（主）还是**电球机**（用户 2026-11-05）。</summary>
     internal static bool ThunderActive() => Latched("DEFECT_THUNDER", ComputeThunder);
 
+    /// <summary>二层故障机器人用哪套设计：物理机（主）还是**彩虹机**（用户 2026-11-07）。</summary>
+    internal static bool RainbowActive() => Latched("DEFECT_RAINBOW", ComputeRainbow);
+
+    private static (bool Value, bool Decisive) ComputeRainbow()
+    {
+        try
+        {
+            string? entry = CurrentEncounterEntry();
+            if (!string.IsNullOrEmpty(entry))
+            {
+                if (entry == "DEFECT_RAINBOW_BOSS_ENCOUNTER") return (true, true);
+                if (entry == "DEFECT_CLAW_BOSS_ENCOUNTER") return (false, true);
+            }
+        }
+        catch { /* 继续往下判断 */ }
+        try
+        {
+            var lineup = CurrentFightLineup();
+            if (lineup != null)
+            {
+                foreach (var k in lineup)
+                {
+                    if (k == "DEFECT_RAINBOW") return (true, true);
+                    if (k == "DEFECT_CLAW") return (false, true);
+                }
+            }
+        }
+        catch { /* 继续兜底 */ }
+        try { return (Roll(0, 61, 2) == 1, false); } catch { return (false, false); }
+    }
+
     private static (bool Value, bool Decisive) ComputeThunder()
     {
         try

@@ -119,6 +119,15 @@ public sealed class DefectThunderBossEncounter : DefectBossEncounter
 }
 
 /// <summary>
+/// 第二幕故障机器人的**第二套设计「彩虹机」**（Key `DEFECT_RAINBOW`，用户 2026-11-07）。
+/// 特殊效果「彩虹」见 <c>Powers/BossRainbowPower.cs</c>，剧本见 <c>Core/DefectRainbowScript.cs</c>。
+/// </summary>
+public sealed class DefectRainbowBossEncounter : DefectBossEncounter
+{
+    public override int? TierAct => 1;
+}
+
+/// <summary>
 /// 二层储君的**第三套设计「仆从储」**（Key `REGENT_MINION`，用户 2026-11-05）。
 /// 特殊效果「征召上前」见 <c>Powers/BossCallToArmsPower.cs</c>，剧本见 <c>Core/RegentMinionScript.cs</c>。
 /// </summary>

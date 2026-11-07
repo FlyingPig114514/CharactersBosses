@@ -889,6 +889,10 @@ case "REGENT_STAR_BOSS_ENCOUNTER":         // 三层 辉星储
                     cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.Guards);
                     upgraded = false;
                     return true;
+                case "DEFECT_RAINBOW_BOSS_ENCOUNTER":  // 二层 彩虹机（用户 2026-11-07 指定：藏品 = 陨石打击）
+                    cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.MeteorStrike);
+                    upgraded = false;
+                    return true;
                 case "DEFECT_STATUS_BOSS_ENCOUNTER":     // 三层 状态机（用户 2026-11-05 指定：藏品 = 散射炮）
                     cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.FlakCannon);
                     upgraded = false;

@@ -368,12 +368,27 @@ public abstract partial class CharBossMonster : MonsterModel
         }
     }
 
+    private bool _darkPassiveSuppressed;
+
     /// <summary>
     /// 「本回合她的**暗黑充能球不使用被动**」（一层「黑球机」的冷却剂：玩家打出「冷光」时置位）。
     /// 由 <c>Powers/CoolantPower</c> 置位、她那回合结束时清零，
     /// 拦截点在 <c>Patches/DarkOrbPassiveSuppressPatch</c>（`DarkOrb.BeforeTurnEndOrbTrigger` 前缀）。
+    ///
+    /// ★ v0.2.469（用户 2026-11-07 的「彩虹机」设计：「**黑暗充能球的被动不会触发**」）：
+    ///   这一幕挂着 `BossRainbowPower` 时**恒为 true** —— 即她的黑暗球整场不打被动，
+    ///   不再需要等玩家打冷光。
     /// </summary>
-    internal bool DarkPassiveSuppressed;
+    internal bool DarkPassiveSuppressed
+    {
+        get
+        {
+            if (_darkPassiveSuppressed) return true;
+            try { return Def?.SpecialPowerForAct(ActIndex) == typeof(Powers.BossRainbowPower); }
+            catch { return false; }
+        }
+        set => _darkPassiveSuppressed = value;
+    }
 
     /// <summary>
     /// 正在打出的这张牌**要不要拦掉它自己的抽牌**（用户 2026-10-27：三层「巨石战」的「战斗专注」）。

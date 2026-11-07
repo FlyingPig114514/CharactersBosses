@@ -31,6 +31,8 @@
 
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "The Defect",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character} was annihilated by the [gold]Defect[/gold]'s Hyper Beam.",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title": "The Defect",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss": "{character} was annihilated by [gold]The Defect[/gold]'s Rainbow.",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "The Necrobinder",
   "NECROBINDER_BOSS_ENCOUNTER.loss": "{character}'s soul was claimed by the [gold]Necrobinder[/gold].",

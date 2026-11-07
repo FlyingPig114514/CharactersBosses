@@ -411,6 +411,7 @@ public static class CharBossEncounters
         ModelDb.Encounter<DefectEventBossEncounter>(),
         ModelDb.Encounter<DefectClawBossEncounter>(),
         ModelDb.Encounter<DefectStatusBossEncounter>(),      // 三层故障机器人第三套设计「状态机」        ModelDb.Encounter<DefectThunderBossEncounter>(),     // 一层故障机器人第二套设计「电球机」（用户 2026-11-05）
+        ModelDb.Encounter<DefectRainbowBossEncounter>(),     // 二层故障机器人第二套设计「彩虹机」（用户 2026-11-07）
         ModelDb.Encounter<RegentMinionBossEncounter>(),      // 二层储君第三套设计「仆从储」（用户 2026-11-05）
         ModelDb.Encounter<NecrobinderDoomBossEncounter>(),
         ModelDb.Encounter<NecrobinderSoulBossEncounter>(),

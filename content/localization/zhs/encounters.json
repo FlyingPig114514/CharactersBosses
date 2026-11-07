@@ -31,6 +31,8 @@
 
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "故障机器人",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character}被[gold]故障机器人[/gold]的超能光束湮灭了。",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title": "故障机器人",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss": "{character}被[gold]故障机器人[/gold]的彩虹湮灭了。",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "亡灵契约师",
   "NECROBINDER_BOSS_ENCOUNTER.loss": "{character} 的灵魂被[gold]亡灵契约师[/gold]收走了。",
