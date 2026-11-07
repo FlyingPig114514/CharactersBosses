@@ -1,0 +1,11 @@
+{
+  "openwolf": {
+    "context": {
+      "sessionDigestBudgetTokens": 1500
+    },
+    "anatomy": {
+      "rescanIntervalHours": 6,
+      "symbolThresholdTokens": 500
+    }
+  }
+}

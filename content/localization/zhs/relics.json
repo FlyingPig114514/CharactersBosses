@@ -1,0 +1,6 @@
+{
+  "NEOW_BLESSING.title": "涅奥的祝福",
+  "NEOW_BLESSING.description": "拾起时，获得[blue]120[/blue]点最大生命值。\n失去所有药水栏位。\n每回合开始时少抽[blue]2[/blue]张牌并失去[blue]1[/blue]点能量。\n每当你进入新的一幕时，获得[blue]180[/blue]点最大生命值。\n战斗开始时获得一个特殊效果。",
+  "NEOW_BLESSING.eventDescription": "[gold]涅奥的祝福[/gold]：获得[blue]120[/blue]点最大生命值，为夸张的血量给出一个说法 —— 代价是你的回合会变小。",
+  "NEOW_BLESSING.flavor": "以血与克制为代价的祝福。"
+}

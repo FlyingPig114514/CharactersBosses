@@ -1,0 +1,6 @@
+{
+  "NEOW_BLESSING.title": "Neows Segen",
+  "NEOW_BLESSING.description": "Beim Aufheben: Erhöhe deine max. TP um [blue]120[/blue].\nVerliere alle Trankslots.\nZiehe zu Beginn jedes Zuges [blue]2[/blue] Karten weniger und verliere [blue]1[/blue] [gold]Energie[/gold].\nJedes Mal, wenn du einen neuen Akt betrittst, erhöhe deine max. TP um [blue]180[/blue].\nErhalte zu Beginn des Kampfes einen besonderen Effekt.",
+  "NEOW_BLESSING.eventDescription": "[gold]Neows Segen[/gold]: Erhöhe deine max. TP um [blue]120[/blue] und gib deinem enormen Lebenspolster einen Grund – der Preis ist, dass deine Züge kleiner werden.",
+  "NEOW_BLESSING.flavor": "Ein Segen, bezahlt mit Blut und Verzicht."
+}

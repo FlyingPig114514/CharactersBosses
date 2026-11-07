@@ -1,0 +1,103 @@
+{
+  "IRONCLAD_BOSS_ENCOUNTER.title": "Le Soldat de Fer",
+  "IRONCLAD_BOSS_ENCOUNTER.loss": "Le [gold]Soldat de Fer[/gold] a brisé {character}.",
+
+  "IRONCLAD_ANGER_BOSS_ENCOUNTER.title": "Le Soldat de Fer",
+  "IRONCLAD_ANGER_BOSS_ENCOUNTER.loss": "La rage du [gold]Soldat de Fer[/gold] a réduit {character} en cendres.",
+
+  "IRONCLAD_VULN_BOSS_ENCOUNTER.title": "Le Soldat de Fer",
+  "IRONCLAD_VULN_BOSS_ENCOUNTER.loss": "Le [gold]Soldat de Fer[/gold] a ouvert {character} plaie après plaie.",
+
+  "SILENT_BOSS_ENCOUNTER.title": "La Silencieuse",
+  "SILENT_BOSS_ENCOUNTER.loss": "{character} n'a jamais vu venir la [gold]Silencieuse[/gold].",
+
+  "SILENT_ENVENOM_BOSS_ENCOUNTER.title": "La Silencieuse",
+  "SILENT_ENVENOM_BOSS_ENCOUNTER.loss": "Le [gold]Poison[/gold] de la [gold]Silencieuse[/gold] a consumé {character} jusqu'au bout.",
+
+  "SILENT_SHIV_BOSS_ENCOUNTER.title": "La Silencieuse",
+  "SILENT_SHIV_BOSS_ENCOUNTER.loss": "La pluie de [gold]Surins[/gold] de la [gold]Silencieuse[/gold] a submergé {character}.",
+
+  "SILENT_SLY_BOSS_ENCOUNTER.title": "La Silencieuse",
+  "SILENT_SLY_BOSS_ENCOUNTER.loss": "La [gold]Silencieuse[/gold] a jeté {character} à la [gold]Défausse[/gold].",
+
+  "SILENT_BREWER_BOSS_ENCOUNTER.title": "La Silencieuse",
+  "SILENT_BREWER_BOSS_ENCOUNTER.loss": "{character} n'a pas pu percer la barrière de potions de la [gold]Silencieuse[/gold].",
+
+  "DEFECT_BOSS_ENCOUNTER.title": "Le Défectueux",
+  "DEFECT_BOSS_ENCOUNTER.loss": "Le [gold]Défectueux[/gold] a analysé puis supprimé {character}.",
+
+  "DEFECT_AI_BOSS_ENCOUNTER.title": "Le Défectueux",
+  "DEFECT_AI_BOSS_ENCOUNTER.loss": "Chaque carte de {character} a été intégrée au modèle du [gold]Défectueux[/gold].",
+
+  "DEFECT_CLAW_BOSS_ENCOUNTER.title": "Le Défectueux",
+  "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "L'[gold]Ultralaser[/gold] du [gold]Défectueux[/gold] a anéanti {character}.",
+
+  "NECROBINDER_BOSS_ENCOUNTER.title": "La Tisse-Mort",
+  "NECROBINDER_BOSS_ENCOUNTER.loss": "La [gold]Tisse-Mort[/gold] a ravi l'âme de {character}.",
+
+  "NECROBINDER_DOOM_BOSS_ENCOUNTER.title": "La Tisse-Mort",
+  "NECROBINDER_DOOM_BOSS_ENCOUNTER.loss": "[gold]La Tisse-Mort[/gold] a convié {character} au terme de la [gold]Fatalité[/gold].",
+
+  "NECROBINDER_SOUL_BOSS_ENCOUNTER.title": "La Tisse-Mort",
+  "NECROBINDER_SOUL_BOSS_ENCOUNTER.loss": "La [gold]Tisse-Mort[/gold] a ravi l'âme de {character}.",
+
+  "NECROBINDER_ERADICATE_BOSS_ENCOUNTER.title": "La Tisse-Mort",
+  "NECROBINDER_ERADICATE_BOSS_ENCOUNTER.loss": "La [gold]Tisse-Mort[/gold] a éradiqué {character}, souvenirs compris.",
+
+  "REGENT_BOSS_ENCOUNTER.title": "Le Régent",
+  "REGENT_BOSS_ENCOUNTER.loss": "Le [gold]Régent[/gold] a condamné {character}.",
+
+  "REGENT_DEBRIS_BOSS_ENCOUNTER.title": "Le Régent",
+  "REGENT_DEBRIS_BOSS_ENCOUNTER.loss": "Le [gold]Régent[/gold] a enseveli {character} sous ses [gold]Débris[/gold].",
+
+  "REGENT_FORGE_BOSS_ENCOUNTER.title": "Le Régent",
+  "REGENT_FORGE_BOSS_ENCOUNTER.loss": "La lame du [gold]Régent[/gold] ne garde de {character} qu'une entaille.",
+
+  "REGENT_COLORLESS_BOSS_ENCOUNTER.title": "Le Régent",
+  "REGENT_COLORLESS_BOSS_ENCOUNTER.loss": "Le [gold]Régent[/gold] a privé {character} de toute couleur.",
+
+  "REGENT_STAR_BOSS_ENCOUNTER.title": "Le Régent",
+  "REGENT_STAR_BOSS_ENCOUNTER.loss": "Les étoiles étincelantes du [gold]Régent[/gold] ont réduit {character} en poussière.",
+
+  "REGENT_KING_BOSS_ENCOUNTER.title": "Le Régent",
+  "REGENT_KING_BOSS_ENCOUNTER.loss": "Le [gold]Régent[/gold] a écrasé {character} sous sa couronne.",
+
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.title": "Le Soldat de Fer",
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "La [gold]Force[/gold] grandissante du [gold]Soldat de Fer[/gold] a écrasé {character}.",
+
+    "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.title": "Le Soldat de Fer",
+  "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss": "Le [gold]Soldat de Fer[/gold] a fait jongler {character} jusqu'à ce que ses propres copies l'engloutissent.",
+"IRONCLAD_BOULDER_BOSS_ENCOUNTER.title": "Le Soldat de Fer",
+  "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss": "Les [gold]Rochers gigantesques[/gold] du [gold]Soldat de Fer[/gold] ont réduit {character} en miettes.",
+
+  "DEFECT_DARK_BOSS_ENCOUNTER.title": "Le Défectueux",
+  "DEFECT_DARK_BOSS_ENCOUNTER.loss": "Les [gold]Orbes ténébreux[/gold] du [gold]Défectueux[/gold] ont englouti {character}.",
+
+  "IRONCLAD_BOSS_NORMAL_ENCOUNTER.title": "Le Soldat de Fer",
+  "IRONCLAD_BOSS_NORMAL_ENCOUNTER.loss": "Le [gold]Soldat de Fer[/gold] a brisé {character}.",
+  "SILENT_BOSS_NORMAL_ENCOUNTER.title": "La Silencieuse",
+  "SILENT_BOSS_NORMAL_ENCOUNTER.loss": "{character} n'a jamais vu venir la [gold]Silencieuse[/gold].",
+  "SILENT_ENVENOM_BOSS_NORMAL_ENCOUNTER.title": "La Silencieuse",
+  "SILENT_ENVENOM_BOSS_NORMAL_ENCOUNTER.loss": "Le [gold]Poison[/gold] de la [gold]Silencieuse[/gold] a consumé {character} jusqu'au bout.",
+  "SILENT_SLY_BOSS_NORMAL_ENCOUNTER.title": "La Silencieuse",
+  "SILENT_SLY_BOSS_NORMAL_ENCOUNTER.loss": "La [gold]Silencieuse[/gold] a jeté {character} à la [gold]Défausse[/gold].",
+  "SILENT_SHIV_BOSS_NORMAL_ENCOUNTER.title": "La Silencieuse",
+  "SILENT_SHIV_BOSS_NORMAL_ENCOUNTER.loss": "La pluie de [gold]Surins[/gold] de la [gold]Silencieuse[/gold] a submergé {character}.",
+  "DEFECT_BOSS_NORMAL_ENCOUNTER.title": "Le Défectueux",
+  "DEFECT_BOSS_NORMAL_ENCOUNTER.loss": "Le [gold]Défectueux[/gold] a analysé puis supprimé {character}.",
+  "NECROBINDER_BOSS_NORMAL_ENCOUNTER.title": "La Tisse-Mort",
+  "NECROBINDER_BOSS_NORMAL_ENCOUNTER.loss": "La [gold]Tisse-Mort[/gold] a ravi l'âme de {character}.",
+  "REGENT_BOSS_NORMAL_ENCOUNTER.title": "Le Régent",
+  "REGENT_BOSS_NORMAL_ENCOUNTER.loss": "Le [gold]Régent[/gold] a condamné {character}.",
+
+  "TELEMETRY_PROMPT_HEADER": "Envoyer les données de jeu (CharacterBosses)",
+  "TELEMETRY_PROMPT_BODY": "Ce mod souhaite collecter quelques données de jeu pour corriger des bugs et équilibrer les boss :\nle résultat, l'acte/le combat, l'Ascension, le nombre de joueurs, les PV du boss, le nombre de tours et la graine de chaque combat de boss, ainsi que les lignes d'erreur de ce mod.\n\nLes données sont d'abord enregistrées dans un [b]fichier local[/b] ; si l'auteur a configuré un serveur de collecte, ces mêmes données anonymes sont [b]également envoyées[/b] à l'auteur.\n\nAucune information personnelle n'est collectée (pas d'ID Steam, pas de pseudo).\n\nModifiable à tout moment dans « Configuration des mods → CharacterBosses → A5 ». Activer maintenant ?",
+  "TELEMETRY_PROMPT_YES": "Activer",
+  "TELEMETRY_PROMPT_NO": "Laisser désactivé",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.title":  "The Necrobinder",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character} was dragged into the grave by the [gold]Necrobinder[/gold]\u0027s Osty.",
+    "SILENT_SNECKO_BOSS_ENCOUNTER.title":  "The Silent",
+    "SILENT_SNECKO_BOSS_ENCOUNTER.loss":  "{character} was sent to the grave by the [gold]Silent[/gold]\u0027s dice.",
+  "DEFECT_EVENT_BOSS_ENCOUNTER.loss": "{character} a été ressorti de la défausse par [gold]le Défectueux[/gold].",
+  "DEFECT_EVENT_BOSS_ENCOUNTER.title": "Le Défectueux"
+}

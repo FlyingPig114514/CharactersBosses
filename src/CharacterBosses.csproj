@@ -1,0 +1,68 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GameDir>D:\SteamLibrary\steamapps\common\Slay the Spire 2</GameDir>
+
+    <!--
+      ★ 双版本目标（用户 2026-11-05）：v0.107 正式版 与 v0.111 beta。
+
+      两版的 API 有**不兼容的签名变化**（例如 Hook.ModifyDamage 新版多一个 CardPlay 参数），
+      再加上 107 里根本没有 OneForAll / BladeSymphony / Hibernate / CardLocation 等类型，
+      ⇒ 同一份源码**不可能**一次编译同时适配。所以用条件编译出两个 dll：
+        dotnet build -p:Sts2Target=107     →  STS2_107 定义 + 引用 .refs\sts2_107.dll
+        dotnet build -p:Sts2Target=111     →  STS2_111 定义 + 引用 .refs\sts2_111.dll
+      源码里所有版本差异都用 `#if STS2_107 / #if STS2_111` 包起来。
+
+      ⚠ 参考程序集放在 **.refs\** 而不是 references\：两个文件都叫 sts2（程序集简单名相同），
+        放在同一个目录里会让 MSBuild 的 ResolveAssemblyReference 抓错文件（踩过：编译期“看得见”
+        107 没有的类型，直到运行时才炸 TypeLoadException）。
+    -->
+    <!-- ⚠ `BaseIntermediateOutputPath` 移到了 src\Directory.Build.props（必须在 Common.props 之前设） -->
+    <Sts2RefDir>$(MSBuildThisFileDirectory)..\.refs\</Sts2RefDir>
+
+    <DefineConstants Condition="'$(Sts2Target)' == '107'">$(DefineConstants);STS2_107</DefineConstants>
+    <DefineConstants Condition="'$(Sts2Target)' == '111'">$(DefineConstants);STS2_111</DefineConstants>
+
+    <Sts2Assembly Condition="'$(Sts2Target)' == '107'">$(Sts2RefDir)sts2_107.dll</Sts2Assembly>
+    <Sts2Assembly Condition="'$(Sts2Target)' == '111'">$(Sts2RefDir)sts2_111.dll</Sts2Assembly>
+
+    <!-- ★ 双版本外壳方案：实现 dll 按目标版本命名（游戏只加载外壳 CharacterBosses.dll） -->
+    <AssemblyName>CharacterBosses.Impl$(Sts2Target)</AssemblyName>
+    <OutputPath>bin\$(Configuration)-$(Sts2Target)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <!--
+      ⚠ 两个目标的中间目录是 obj\107 / obj\111，而 SDK 只会排除**当前**那个
+      ⇒ 另一个目标生成的 AssemblyInfo.cs 会被默认通配当成源码编进来，报一堆 CS0579「特性重复」。
+      这里把 obj / bin 整体排除掉。
+    -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);obj\**;bin\**</DefaultItemExcludes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="sts2">
+      <HintPath>$(Sts2Assembly)</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="0Harmony">
+      <HintPath>..\references\0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="GodotSharp">
+      <HintPath>..\references\GodotSharp.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <!--
+      BaseLib：**可选**依赖（配置界面用它的「模组配置」子菜单，见 Hooks/Config/）。
+      Private=false = 不随本模组打包（BaseLib 由玩家环境提供，崩坠那一系都会带）。
+      运行期先检查程序集是否存在再碰它的类型（BossConfigBaseLibBootstrap），
+      所以没装 BaseLib 的玩家照常能玩，只是没有图形化配置界面。
+    -->
+    <Reference Include="BaseLib">
+      <HintPath>..\references\BaseLib.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+</Project>

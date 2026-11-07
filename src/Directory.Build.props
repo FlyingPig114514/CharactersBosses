@@ -1,0 +1,15 @@
+<Project>
+
+  <!--
+    双版本构建（v0.107 正式版 / v0.111 beta）见 docs/plans/dual-version.md。
+
+    ⚠ `BaseIntermediateOutputPath` 必须在导入 Microsoft.Common.props **之前**设置，
+    否则 MSBuild 报 MSB3539「属性在 MSBuild 使用它后被修改，可能导致意外的生成结果」。
+    Directory.Build.props 正好是那个时机（SDK 会在项目文件之前自动导入它）。
+  -->
+  <PropertyGroup>
+    <Sts2Target Condition="'$(Sts2Target)' == ''">111</Sts2Target>
+    <BaseIntermediateOutputPath>obj\$(Sts2Target)\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+
+</Project>

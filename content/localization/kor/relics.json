@@ -1,0 +1,6 @@
+{
+  "NEOW_BLESSING.title": "니오우의 축복",
+  "NEOW_BLESSING.description": "획득 시, 최대 체력을 [blue]120[/blue] 얻습니다.\n모든 포션 슬롯을 잃습니다.\n매 턴 시작 시 카드를 [blue]2[/blue]장 적게 뽑고 [blue]1[/blue]의 에너지를 잃습니다.\n새로운 막에 진입할 때마다 최대 체력을 [blue]180[/blue] 얻습니다.\n전투 시작 시 특수 효과를 하나 얻습니다.",
+  "NEOW_BLESSING.eventDescription": "[gold]니오우의 축복[/gold]: 최대 체력을 [blue]120[/blue] 얻습니다. 터무니없이 큰 체력에 어울리는 명분을 얻는 대신, 당신의 턴이 작아집니다.",
+  "NEOW_BLESSING.flavor": "피와 절제를 대가로 받는 축복."
+}

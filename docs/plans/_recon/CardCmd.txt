@@ -1,0 +1,2520 @@
+﻿// ===== MegaCrit.Sts2.Core.Commands.CardCmd =====
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using Godot;
+using MegaCrit.Sts2.Core.Combat;
+using MegaCrit.Sts2.Core.Context;
+using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.Extensions;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Helpers;
+using MegaCrit.Sts2.Core.Hooks;
+using MegaCrit.Sts2.Core.Localization;
+using MegaCrit.Sts2.Core.Logging;
+using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Nodes;
+using MegaCrit.Sts2.Core.Nodes.Cards;
+using MegaCrit.Sts2.Core.Nodes.Combat;
+using MegaCrit.Sts2.Core.Nodes.CommonUi;
+using MegaCrit.Sts2.Core.Nodes.Rooms;
+using MegaCrit.Sts2.Core.Nodes.Vfx;
+using MegaCrit.Sts2.Core.Nodes.Vfx.Cards;
+using MegaCrit.Sts2.Core.Random;
+using MegaCrit.Sts2.Core.Runs;
+using MegaCrit.Sts2.Core.Runs.History;
+using MegaCrit.Sts2.Core.TestSupport;
+
+namespace MegaCrit.Sts2.Core.Commands;
+
+public static class CardCmd
+{
+	[CompilerGenerated]
+	private sealed class <>c__DisplayClass0_0
+	{
+		public CardModel card;
+
+		internal bool <AutoPlay>b__0(Creature c)
+		{
+			if (c != null && c.IsAlive && c.IsPlayer)
+			{
+				return c != card.Owner.Creature;
+			}
+			return false;
+		}
+	}
+
+	[CompilerGenerated]
+	private sealed class <>c__DisplayClass17_0<T> where T : notnull, AfflictionModel
+	{
+		public List<CardModel> cardList;
+
+		internal bool <AfflictAndPreview>b__0(CardModel c)
+		{
+			return c.Owner != cardList[0].Owner;
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <Afflict>d__18<T> : IAsyncStateMachine where T : notnull, AfflictionModel
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder<T> <>t__builder;
+
+		public CardModel card;
+
+		public decimal amount;
+
+		private TaskAwaiter<AfflictionModel?> <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			T result2;
+			try
+			{
+				TaskAwaiter<AfflictionModel> val;
+				if (num != 0)
+				{
+					val = Afflict(ModelDb.Affliction<T>().ToMutable(), card, amount).GetAwaiter();
+					if (!val.IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter<AfflictionModel>, <Afflict>d__18<T>>(ref val, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter<AfflictionModel>);
+					num = (<>1__state = -1);
+				}
+				AfflictionModel result = val.GetResult();
+				result2 = result as T;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<>t__builder.SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<>t__builder.SetResult(result2);
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			<>t__builder.SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <AfflictAndPreview>d__17<T> : IAsyncStateMachine where T : notnull, AfflictionModel
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder<System.Collections.Generic.IEnumerable<T>> <>t__builder;
+
+		public System.Collections.Generic.IEnumerable<CardModel> cards;
+
+		public decimal amount;
+
+		private <>c__DisplayClass17_0<T> <>8__1;
+
+		public CardPreviewStyle style;
+
+		private List<T> <afflictions>5__2;
+
+		private System.Collections.Generic.IEnumerator<CardModel> <>7__wrap2;
+
+		private CardModel <card>5__4;
+
+		private TaskAwaiter<T?> <>u__1;
+
+		private TaskAwaiter <>u__2;
+
+		private void MoveNext()
+		{
+			//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0179: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			System.Collections.Generic.IEnumerable<T> result2;
+			try
+			{
+				TaskAwaiter val;
+				if (num != 0)
+				{
+					if (num == 1)
+					{
+						val = <>u__2;
+						<>u__2 = default(TaskAwaiter);
+						num = (<>1__state = -1);
+						goto IL_020b;
+					}
+					<>8__1 = new <>c__DisplayClass17_0<T>();
+					<afflictions>5__2 = new List<T>();
+					<>8__1.cardList = new List<CardModel>();
+					<>7__wrap2 = cards.GetEnumerator();
+				}
+				try
+				{
+					if (num != 0)
+					{
+						goto IL_00ff;
+					}
+					TaskAwaiter<T> val2 = <>u__1;
+					<>u__1 = default(TaskAwaiter<T>);
+					num = (<>1__state = -1);
+					goto IL_00c4;
+					IL_00c4:
+					T result = val2.GetResult();
+					T val3 = result;
+					if (val3 != null)
+					{
+						<afflictions>5__2.Add(val3);
+						<>8__1.cardList.Add(<card>5__4);
+					}
+					<card>5__4 = null;
+					goto IL_00ff;
+					IL_00ff:
+					if (((System.Collections.IEnumerator)<>7__wrap2).MoveNext())
+					{
+						<card>5__4 = <>7__wrap2.Current;
+						val2 = Afflict<T>(<card>5__4, amount).GetAwaiter();
+						if (!val2.IsCompleted)
+						{
+							num = (<>1__state = 0);
+							<>u__1 = val2;
+							System.Runtime.CompilerServices.Unsafe.As<AsyncTaskMethodBuilder<System.Collections.Generic.IEnumerable<T>>, AsyncTaskMethodBuilder<System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<T>>>>(ref <>t__builder).AwaitUnsafeOnCompleted<TaskAwaiter<T>, <AfflictAndPreview>d__17<T>>(ref val2, ref this);
+							return;
+						}
+						goto IL_00c4;
+					}
+				}
+				finally
+				{
+					if (num < 0 && <>7__wrap2 != null)
+					{
+						((System.IDisposable)<>7__wrap2).Dispose();
+					}
+				}
+				<>7__wrap2 = null;
+				if (<>8__1.cardList.Count > 0 && style != CardPreviewStyle.None)
+				{
+					if (Enumerable.Any<CardModel>((System.Collections.Generic.IEnumerable<CardModel>)<>8__1.cardList, (Func<CardModel, bool>)((CardModel c) => c.Owner != <>8__1.cardList[0].Owner)))
+					{
+						throw new InvalidOperationException("All cards passed to AfflictAndPreview must have the same owner!");
+					}
+					if (LocalContext.IsMine(<>8__1.cardList[0]))
+					{
+						Preview((System.Collections.Generic.IReadOnlyList<CardModel>)<>8__1.cardList, 1.2f, style);
+						val = Cmd.Wait(1.25f).GetAwaiter();
+						if (!((TaskAwaiter)(ref val)).IsCompleted)
+						{
+							num = (<>1__state = 1);
+							<>u__2 = val;
+							System.Runtime.CompilerServices.Unsafe.As<AsyncTaskMethodBuilder<System.Collections.Generic.IEnumerable<T>>, AsyncTaskMethodBuilder<System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<T>>>>(ref <>t__builder).AwaitUnsafeOnCompleted<TaskAwaiter, <AfflictAndPreview>d__17<T>>(ref val, ref this);
+							return;
+						}
+						goto IL_020b;
+					}
+				}
+				goto IL_0212;
+				IL_020b:
+				((TaskAwaiter)(ref val)).GetResult();
+				goto IL_0212;
+				IL_0212:
+				result2 = (System.Collections.Generic.IEnumerable<T>)<afflictions>5__2;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<>8__1 = null;
+				<afflictions>5__2 = null;
+				System.Runtime.CompilerServices.Unsafe.As<AsyncTaskMethodBuilder<System.Collections.Generic.IEnumerable<T>>, AsyncTaskMethodBuilder<System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<T>>>>(ref <>t__builder).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<>8__1 = null;
+			<afflictions>5__2 = null;
+			System.Runtime.CompilerServices.Unsafe.As<AsyncTaskMethodBuilder<System.Collections.Generic.IEnumerable<T>>, AsyncTaskMethodBuilder<System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<T>>>>(ref <>t__builder).SetResult((System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<T>>)result2);
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			System.Runtime.CompilerServices.Unsafe.As<AsyncTaskMethodBuilder<System.Collections.Generic.IEnumerable<T>>, AsyncTaskMethodBuilder<System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<T>>>>(ref <>t__builder).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <AutoPlay>d__0 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public CardModel card;
+
+		public PlayerChoiceContext choiceContext;
+
+		public AutoPlayType type;
+
+		private <>c__DisplayClass0_0 <>8__1;
+
+		public Creature target;
+
+		public bool skipXCapture;
+
+		public bool skipCardPileVisuals;
+
+		private ICombatState <combatState>5__2;
+
+		private AbstractModel <preventer>5__3;
+
+		private TaskAwaiter <>u__1;
+
+		private TaskAwaiter<CardPileAddResult> <>u__2;
+
+		private void MoveNext()
+		{
+			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0118: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0588: Unknown result type (might be due to invalid IL or missing references)
+			//IL_058d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0595: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0655: Unknown result type (might be due to invalid IL or missing references)
+			//IL_065a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0662: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0623: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0628: Unknown result type (might be due to invalid IL or missing references)
+			//IL_063d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_063f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0553: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0558: Unknown result type (might be due to invalid IL or missing references)
+			//IL_056d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_056f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0170: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0389: Unknown result type (might be due to invalid IL or missing references)
+			//IL_038e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d0: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			try
+			{
+				TaskAwaiter val7;
+				TaskAwaiter val6;
+				TaskAwaiter val5;
+				TaskAwaiter val4;
+				TaskAwaiter<CardPileAddResult> val3;
+				TaskAwaiter val2;
+				TaskAwaiter val;
+				ResourceInfo resources;
+				LocString playerDialogueLine;
+				switch (num)
+				{
+				default:
+					<>8__1 = new <>c__DisplayClass0_0();
+					<>8__1.card = card;
+					if (!CombatManager.Instance.IsOverOrEnding && !<>8__1.card.Owner.Creature.IsDead)
+					{
+						<combatState>5__2 = <>8__1.card.CombatState ?? <>8__1.card.Owner.Creature.CombatState;
+						if (<>8__1.card.Keywords.Contains(CardKeyword.Unplayable))
+						{
+							val7 = MoveToResultPileWithoutPlaying(choiceContext, <>8__1.card).GetAwaiter();
+							if (!((TaskAwaiter)(ref val7)).IsCompleted)
+							{
+								num = (<>1__state = 0);
+								<>u__1 = val7;
+								((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <AutoPlay>d__0>(ref val7, ref this);
+								return;
+							}
+							goto IL_0127;
+						}
+						if (!Hook.ShouldPlay(<combatState>5__2, <>8__1.card, out <preventer>5__3, type))
+						{
+							val6 = MoveToResultPileWithoutPlaying(choiceContext, <>8__1.card).GetAwaiter();
+							if (!((TaskAwaiter)(ref val6)).IsCompleted)
+							{
+								num = (<>1__state = 1);
+								<>u__1 = val6;
+								((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <AutoPlay>d__0>(ref val6, ref this);
+								return;
+							}
+							goto IL_01c1;
+						}
+						if (<>8__1.card.TargetType == TargetType.AnyEnemy)
+						{
+							if (target == null)
+							{
+								target = <>8__1.card.Owner.RunState.Rng.CombatTargets.NextItem((System.Collections.Generic.IEnumerable<Creature>)<combatState>5__2.HittableEnemies);
+							}
+							if (target == null)
+							{
+								val5 = MoveToResultPileWithoutPlaying(choiceContext, <>8__1.card).GetAwaiter();
+								if (!((TaskAwaiter)(ref val5)).IsCompleted)
+								{
+									num = (<>1__state = 2);
+									<>u__1 = val5;
+									((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <AutoPlay>d__0>(ref val5, ref this);
+									return;
+								}
+								goto IL_02f2;
+							}
+						}
+						if (<>8__1.card.TargetType == TargetType.AnyAlly)
+						{
+							System.Collections.Generic.IEnumerable<Creature> items = Enumerable.Where<Creature>((System.Collections.Generic.IEnumerable<Creature>)<combatState>5__2.Allies, (Func<Creature, bool>)((Creature c) => c != null && c.IsAlive && c.IsPlayer && c != <>8__1.card.Owner.Creature));
+							if (target == null)
+							{
+								target = <>8__1.card.Owner.RunState.Rng.CombatTargets.NextItem(items);
+							}
+							if (target == null)
+							{
+								val4 = MoveToResultPileWithoutPlaying(choiceContext, <>8__1.card).GetAwaiter();
+								if (!((TaskAwaiter)(ref val4)).IsCompleted)
+								{
+									num = (<>1__state = 3);
+									<>u__1 = val4;
+									((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <AutoPlay>d__0>(ref val4, ref this);
+									return;
+								}
+								goto IL_03da;
+							}
+						}
+						PlayerCombatState playerCombatState = <>8__1.card.Owner.PlayerCombatState;
+						if (<>8__1.card.EnergyCost.CostsX && !skipXCapture)
+						{
+							<>8__1.card.EnergyCost.CapturedXValue = playerCombatState.Energy;
+						}
+						if (!skipXCapture)
+						{
+							if (<>8__1.card.HasStarCostX)
+							{
+								<>8__1.card.LastStarsSpent = playerCombatState.Stars;
+							}
+							else
+							{
+								<>8__1.card.LastStarsSpent = Math.Max(0, <>8__1.card.GetStarCostWithModifiers());
+							}
+						}
+						if (<>8__1.card.Pile == null)
+						{
+							val3 = CardPileCmd.Add(<>8__1.card, PileType.Play).GetAwaiter();
+							if (!val3.IsCompleted)
+							{
+								num = (<>1__state = 4);
+								<>u__2 = val3;
+								((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter<CardPileAddResult>, <AutoPlay>d__0>(ref val3, ref this);
+								return;
+							}
+							goto IL_0505;
+						}
+						goto IL_050d;
+					}
+					goto end_IL_0007;
+				case 0:
+					val7 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_0127;
+				case 1:
+					val6 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_01c1;
+				case 2:
+					val5 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_02f2;
+				case 3:
+					val4 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_03da;
+				case 4:
+					val3 = <>u__2;
+					<>u__2 = default(TaskAwaiter<CardPileAddResult>);
+					num = (<>1__state = -1);
+					goto IL_0505;
+				case 5:
+					val2 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_05a4;
+				case 6:
+					{
+						val = <>u__1;
+						<>u__1 = default(TaskAwaiter);
+						num = (<>1__state = -1);
+						break;
+					}
+					IL_05a4:
+					((TaskAwaiter)(ref val2)).GetResult();
+					resources = new ResourceInfo
+					{
+						EnergySpent = 0,
+						EnergyValue = <>8__1.card.EnergyCost.GetAmountToSpend(),
+						StarsSpent = 0,
+						StarValue = Math.Max(0, <>8__1.card.GetStarCostWithModifiers())
+					};
+					val = <>8__1.card.OnPlayWrapper(choiceContext, target, isAutoPlay: true, resources, skipCardPileVisuals).GetAwaiter();
+					if (!((TaskAwaiter)(ref val)).IsCompleted)
+					{
+						num = (<>1__state = 6);
+						<>u__1 = val;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <AutoPlay>d__0>(ref val, ref this);
+						return;
+					}
+					break;
+					IL_03da:
+					((TaskAwaiter)(ref val4)).GetResult();
+					goto end_IL_0007;
+					IL_01c1:
+					((TaskAwaiter)(ref val6)).GetResult();
+					playerDialogueLine = UnplayableReason.BlockedByHook.GetPlayerDialogueLine(<preventer>5__3);
+					if (playerDialogueLine != null)
+					{
+						<>8__1.card.Owner.Creature.GetVfxContainer()?.AddChildSafely(NThoughtBubbleVfx.Create(playerDialogueLine.GetFormattedText(), <>8__1.card.Owner.Creature, 1.0));
+					}
+					goto end_IL_0007;
+					IL_02f2:
+					((TaskAwaiter)(ref val5)).GetResult();
+					goto end_IL_0007;
+					IL_050d:
+					if (!skipCardPileVisuals)
+					{
+						TaskHelper.RunSafely(<>8__1.card.OnEnqueuePlayVfx(target));
+					}
+					val2 = Hook.BeforeCardAutoPlayed(<combatState>5__2, <>8__1.card, target, type).GetAwaiter();
+					if (!((TaskAwaiter)(ref val2)).IsCompleted)
+					{
+						num = (<>1__state = 5);
+						<>u__1 = val2;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <AutoPlay>d__0>(ref val2, ref this);
+						return;
+					}
+					goto IL_05a4;
+					IL_0505:
+					val3.GetResult();
+					goto IL_050d;
+					IL_0127:
+					((TaskAwaiter)(ref val7)).GetResult();
+					goto end_IL_0007;
+				}
+				((TaskAwaiter)(ref val)).GetResult();
+				end_IL_0007:;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<>8__1 = null;
+				<combatState>5__2 = null;
+				<preventer>5__3 = null;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<>8__1 = null;
+			<combatState>5__2 = null;
+			<preventer>5__3 = null;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <Discard>d__2 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public PlayerChoiceContext choiceContext;
+
+		public CardModel card;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			try
+			{
+				TaskAwaiter val;
+				if (num != 0)
+				{
+					val = Discard(choiceContext, new global::<>z__ReadOnlySingleElementList<CardModel>(card)).GetAwaiter();
+					if (!((TaskAwaiter)(ref val)).IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <Discard>d__2>(ref val, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+				}
+				((TaskAwaiter)(ref val)).GetResult();
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <Discard>d__3 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public PlayerChoiceContext choiceContext;
+
+		public System.Collections.Generic.IEnumerable<CardModel> cards;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			try
+			{
+				TaskAwaiter val;
+				if (num != 0)
+				{
+					val = DiscardAndDraw(choiceContext, cards, 0).GetAwaiter();
+					if (!((TaskAwaiter)(ref val)).IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <Discard>d__3>(ref val, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+				}
+				((TaskAwaiter)(ref val)).GetResult();
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <DiscardAndDraw>d__4 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public System.Collections.Generic.IEnumerable<CardModel> cardsToDiscard;
+
+		public PlayerChoiceContext choiceContext;
+
+		public int cardsToDraw;
+
+		private List<CardModel> <discardCards>5__2;
+
+		private ICombatState <combatState>5__3;
+
+		private List<CardModel> <slyCards>5__4;
+
+		private CardPile <discardPile>5__5;
+
+		private Enumerator<CardModel> <>7__wrap5;
+
+		private CardModel <card>5__7;
+
+		private TaskAwaiter<CardPileAddResult> <>u__1;
+
+		private TaskAwaiter <>u__2;
+
+		private TaskAwaiter<System.Collections.Generic.IEnumerable<CardModel>> <>u__3;
+
+		private void MoveNext()
+		{
+			//IL_029d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0155: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0330: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0338: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0310: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0312: Unknown result type (might be due to invalid IL or missing references)
+			//IL_037c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0228: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0130: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0283: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0284: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			try
+			{
+				TaskAwaiter<System.Collections.Generic.IEnumerable<CardModel>> val;
+				switch (num)
+				{
+				default:
+					if (!CombatManager.Instance.IsOverOrEnding)
+					{
+						<discardCards>5__2 = Enumerable.ToList<CardModel>(cardsToDiscard);
+						if (<discardCards>5__2.Count != 0)
+						{
+							<combatState>5__3 = <discardCards>5__2[0].CombatState ?? <discardCards>5__2[0].Owner.Creature.CombatState;
+							<slyCards>5__4 = new List<CardModel>();
+							<discardPile>5__5 = PileType.Discard.GetPile(<discardCards>5__2[0].Owner);
+							<>7__wrap5 = <discardCards>5__2.GetEnumerator();
+							goto case 0;
+						}
+					}
+					goto end_IL_0007;
+				case 0:
+				case 1:
+					try
+					{
+						TaskAwaiter val2;
+						if (num != 0)
+						{
+							if (num != 1)
+							{
+								goto IL_01fa;
+							}
+							val2 = <>u__2;
+							<>u__2 = default(TaskAwaiter);
+							num = (<>1__state = -1);
+							goto IL_01ec;
+						}
+						TaskAwaiter<CardPileAddResult> val3 = <>u__1;
+						<>u__1 = default(TaskAwaiter<CardPileAddResult>);
+						num = (<>1__state = -1);
+						goto IL_0164;
+						IL_0164:
+						val3.GetResult();
+						CombatManager.Instance.History.CardDiscarded(<combatState>5__3, <card>5__7);
+						val2 = Hook.AfterCardDiscarded(<combatState>5__3, choiceContext, <card>5__7).GetAwaiter();
+						if (!((TaskAwaiter)(ref val2)).IsCompleted)
+						{
+							num = (<>1__state = 1);
+							<>u__2 = val2;
+							((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <DiscardAndDraw>d__4>(ref val2, ref this);
+							return;
+						}
+						goto IL_01ec;
+						IL_01fa:
+						if (<>7__wrap5.MoveNext())
+						{
+							<card>5__7 = <>7__wrap5.Current;
+							if (<card>5__7.IsSlyThisTurn)
+							{
+								<slyCards>5__4.Add(<card>5__7);
+							}
+							val3 = CardPileCmd.Add(<card>5__7, <discardPile>5__5).GetAwaiter();
+							if (!val3.IsCompleted)
+							{
+								num = (<>1__state = 0);
+								<>u__1 = val3;
+								((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter<CardPileAddResult>, <DiscardAndDraw>d__4>(ref val3, ref this);
+								return;
+							}
+							goto IL_0164;
+						}
+						goto end_IL_00c1;
+						IL_01ec:
+						((TaskAwaiter)(ref val2)).GetResult();
+						<card>5__7 = null;
+						goto IL_01fa;
+						end_IL_00c1:;
+					}
+					finally
+					{
+						if (num < 0)
+						{
+							((System.IDisposable)<>7__wrap5/*cast due to .constrained prefix*/).Dispose();
+						}
+					}
+					<>7__wrap5 = default(Enumerator<CardModel>);
+					<discardPile>5__5.InvokeContentsChanged();
+					if (cardsToDraw > 0)
+					{
+						val = CardPileCmd.Draw(choiceContext, decimal.op_Implicit(cardsToDraw), <discardCards>5__2[0].Owner).GetAwaiter();
+						if (!val.IsCompleted)
+						{
+							num = (<>1__state = 2);
+							<>u__3 = val;
+							((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter<System.Collections.Generic.IEnumerable<CardModel>>, <DiscardAndDraw>d__4>(ref val, ref this);
+							return;
+						}
+						goto IL_02b8;
+					}
+					goto IL_02c0;
+				case 2:
+					val = <>u__3;
+					<>u__3 = default(TaskAwaiter<System.Collections.Generic.IEnumerable<CardModel>>);
+					num = (<>1__state = -1);
+					goto IL_02b8;
+				case 3:
+					break;
+					IL_02c0:
+					<>7__wrap5 = <slyCards>5__4.GetEnumerator();
+					break;
+					IL_02b8:
+					val.GetResult();
+					goto IL_02c0;
+				}
+				try
+				{
+					if (num != 3)
+					{
+						goto IL_034e;
+					}
+					TaskAwaiter val4 = <>u__2;
+					<>u__2 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_0347;
+					IL_0347:
+					((TaskAwaiter)(ref val4)).GetResult();
+					goto IL_034e;
+					IL_034e:
+					if (<>7__wrap5.MoveNext())
+					{
+						CardModel current = <>7__wrap5.Current;
+						val4 = AutoPlay(choiceContext, current, null, AutoPlayType.SlyDiscard).GetAwaiter();
+						if (!((TaskAwaiter)(ref val4)).IsCompleted)
+						{
+							num = (<>1__state = 3);
+							<>u__2 = val4;
+							((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <DiscardAndDraw>d__4>(ref val4, ref this);
+							return;
+						}
+						goto IL_0347;
+					}
+				}
+				finally
+				{
+					if (num < 0)
+					{
+						((System.IDisposable)<>7__wrap5/*cast due to .constrained prefix*/).Dispose();
+					}
+				}
+				<>7__wrap5 = default(Enumerator<CardModel>);
+				end_IL_0007:;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<discardCards>5__2 = null;
+				<combatState>5__3 = null;
+				<slyCards>5__4 = null;
+				<discardPile>5__5 = null;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<discardCards>5__2 = null;
+			<combatState>5__3 = null;
+			<slyCards>5__4 = null;
+			<discardPile>5__5 = null;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <Exhaust>d__6 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder<CardPileAddResult?> <>t__builder;
+
+		public CardModel card;
+
+		public bool skipVisuals;
+
+		public PlayerChoiceContext choiceContext;
+
+		public bool causedByEthereal;
+
+		private ICombatState <combatState>5__2;
+
+		private CardPileAddResult <result>5__3;
+
+		private TaskAwaiter<CardPileAddResult> <>u__1;
+
+		private TaskAwaiter <>u__2;
+
+		private void MoveNext()
+		{
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0135: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0142: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			CardPileAddResult? result;
+			try
+			{
+				TaskAwaiter<CardPileAddResult> val;
+				if (num == 0)
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter<CardPileAddResult>);
+					num = (<>1__state = -1);
+					goto IL_00b9;
+				}
+				TaskAwaiter val2;
+				if (num == 1)
+				{
+					val2 = <>u__2;
+					<>u__2 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_0151;
+				}
+				if (!CombatManager.Instance.IsOverOrEnding)
+				{
+					<combatState>5__2 = card.CombatState ?? card.Owner.Creature.CombatState;
+					val = CardPileCmd.Add(card, PileType.Exhaust, CardPilePosition.Bottom, null, skipVisuals).GetAwaiter();
+					if (!val.IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter<CardPileAddResult>, <Exhaust>d__6>(ref val, ref this);
+						return;
+					}
+					goto IL_00b9;
+				}
+				result = null;
+				goto end_IL_0007;
+				IL_00b9:
+				CardPileAddResult result2 = val.GetResult();
+				<result>5__3 = result2;
+				CombatManager.Instance.History.CardExhausted(<combatState>5__2, card);
+				val2 = Hook.AfterCardExhausted(<combatState>5__2, choiceContext, card, causedByEthereal).GetAwaiter();
+				if (!((TaskAwaiter)(ref val2)).IsCompleted)
+				{
+					num = (<>1__state = 1);
+					<>u__2 = val2;
+					<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <Exhaust>d__6>(ref val2, ref this);
+					return;
+				}
+				goto IL_0151;
+				IL_0151:
+				((TaskAwaiter)(ref val2)).GetResult();
+				result = <result>5__3;
+				end_IL_0007:;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<combatState>5__2 = null;
+				<result>5__3 = default(CardPileAddResult);
+				<>t__builder.SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<combatState>5__2 = null;
+			<result>5__3 = default(CardPileAddResult);
+			<>t__builder.SetResult(result);
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			<>t__builder.SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <MoveToResultPileWithoutPlaying>d__1 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public CardModel card;
+
+		public PlayerChoiceContext choiceContext;
+
+		private TaskAwaiter<CardPileAddResult> <>u__1;
+
+		private TaskAwaiter <>u__2;
+
+		private void MoveNext()
+		{
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			try
+			{
+				TaskAwaiter val;
+				TaskAwaiter<CardPileAddResult> val2;
+				if (num != 0)
+				{
+					if (num == 1)
+					{
+						val = <>u__2;
+						<>u__2 = default(TaskAwaiter);
+						num = (<>1__state = -1);
+						goto IL_00d2;
+					}
+					val2 = CardPileCmd.Add(card, PileType.Play).GetAwaiter();
+					if (!val2.IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val2;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter<CardPileAddResult>, <MoveToResultPileWithoutPlaying>d__1>(ref val2, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val2 = <>u__1;
+					<>u__1 = default(TaskAwaiter<CardPileAddResult>);
+					num = (<>1__state = -1);
+				}
+				val2.GetResult();
+				val = card.MoveToResultPileWithoutPlaying(choiceContext).GetAwaiter();
+				if (!((TaskAwaiter)(ref val)).IsCompleted)
+				{
+					num = (<>1__state = 1);
+					<>u__2 = val;
+					((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <MoveToResultPileWithoutPlaying>d__1>(ref val, ref this);
+					return;
+				}
+				goto IL_00d2;
+				IL_00d2:
+				((TaskAwaiter)(ref val)).GetResult();
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <Transform>d__11 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder<CardPileAddResult?> <>t__builder;
+
+		public CardModel original;
+
+		public CardModel replacement;
+
+		public CardPreviewStyle style;
+
+		private TaskAwaiter<System.Collections.Generic.IEnumerable<CardPileAddResult>> <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			CardPileAddResult? result2;
+			try
+			{
+				TaskAwaiter<System.Collections.Generic.IEnumerable<CardPileAddResult>> val;
+				if (num != 0)
+				{
+					val = Transform(new CardTransformation(original, replacement).Yield(), null, style).GetAwaiter();
+					if (!val.IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter<System.Collections.Generic.IEnumerable<CardPileAddResult>>, <Transform>d__11>(ref val, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter<System.Collections.Generic.IEnumerable<CardPileAddResult>>);
+					num = (<>1__state = -1);
+				}
+				System.Collections.Generic.IEnumerable<CardPileAddResult> result = val.GetResult();
+				System.Collections.Generic.IEnumerable<CardPileAddResult> enumerable = result;
+				result2 = Enumerable.FirstOrDefault<CardPileAddResult>(enumerable);
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<>t__builder.SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<>t__builder.SetResult(result2);
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			<>t__builder.SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <Transform>d__13 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder<System.Collections.Generic.IEnumerable<CardPileAddResult>> <>t__builder;
+
+		public System.Collections.Generic.IEnumerable<CardTransformation> transformations;
+
+		public Rng rng;
+
+		public CardPreviewStyle style;
+
+		private CardTransformation[] <transformationsArr>5__2;
+
+		private ICombatState <combatState>5__3;
+
+		private List<ValueTuple<CardTransformation, CardPile, int, CardModel>> <transformationsWithOriginalData>5__4;
+
+		private List<CardPileAddResult> <results>5__5;
+
+		private List<System.Threading.Tasks.Task> <vfxTasks>5__6;
+
+		private Enumerator<ValueTuple<CardTransformation, CardPile, int, CardModel>> <>7__wrap6;
+
+		private CardPile <pile>5__8;
+
+		private CardModel <original>5__9;
+
+		private IRunState <runState>5__10;
+
+		private CardModel <replacement>5__11;
+
+		private CardPileAddResult <result>5__12;
+
+		private TaskAwaiter <>u__1;
+
+		private int <i>5__13;
+
+		private void MoveNext()
+		{
+			//IL_0712: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0717: Unknown result type (might be due to invalid IL or missing references)
+			//IL_071f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0915: Unknown result type (might be due to invalid IL or missing references)
+			//IL_091a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0922: Unknown result type (might be due to invalid IL or missing references)
+			//IL_09d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_09d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_09e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0456: Unknown result type (might be due to invalid IL or missing references)
+			//IL_045b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0463: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0a03: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0a08: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_049c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0205: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0216: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0222: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_099f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_09a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_057c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_09b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_09bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0193: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0172: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0421: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0426: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0675: Unknown result type (might be due to invalid IL or missing references)
+			//IL_043b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_043d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_086d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06f9: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			System.Collections.Generic.IEnumerable<CardPileAddResult> result;
+			try
+			{
+				TaskAwaiter val3;
+				TaskAwaiter val2;
+				TaskAwaiter val;
+				switch (num)
+				{
+				default:
+				{
+					if (CombatManager.Instance.IsEnding)
+					{
+						result = System.Array.Empty<CardPileAddResult>();
+						break;
+					}
+					<transformationsArr>5__2 = Enumerable.ToArray<CardTransformation>(transformations);
+					if (<transformationsArr>5__2.Length == 0)
+					{
+						result = System.Array.Empty<CardPileAddResult>();
+						break;
+					}
+					<combatState>5__3 = <transformationsArr>5__2[0].Original.CombatState;
+					<transformationsWithOriginalData>5__4 = new List<ValueTuple<CardTransformation, CardPile, int, CardModel>>();
+					CardTransformation[] array = <transformationsArr>5__2;
+					for (int i = 0; i < array.Length; i++)
+					{
+						CardTransformation cardTransformation = array[i];
+						cardTransformation.Original.AssertMutable();
+						if (!cardTransformation.Original.IsTransformable)
+						{
+							throw new InvalidOperationException("Can't transform " + cardTransformation.Original.Id.Entry + " because it's un-transformable.");
+						}
+						CardPile pile = cardTransformation.Original.Pile;
+						if (pile == null)
+						{
+							throw new InvalidOperationException("Can't transform " + cardTransformation.Original.Id.Entry + " because it has no pile.");
+						}
+						int num2 = pile.Cards.IndexOf(cardTransformation.Original);
+						CardModel replacement = cardTransformation.GetReplacement(rng);
+						if (replacement == null)
+						{
+							throw new InvalidOperationException($"Attempting to transform un-transformable card {cardTransformation.Original}!");
+						}
+						cardTransformation.Original.RemoveFromCurrentPile();
+						<transformationsWithOriginalData>5__4.Add(new ValueTuple<CardTransformation, CardPile, int, CardModel>(cardTransformation, pile, num2, replacement));
+					}
+					<transformationsWithOriginalData>5__4.Sort((Comparison<ValueTuple<CardTransformation, CardPile, int, CardModel>>)PileIndexSort);
+					<results>5__5 = new List<CardPileAddResult>();
+					<>7__wrap6 = <transformationsWithOriginalData>5__4.GetEnumerator();
+					goto case 0;
+				}
+				case 0:
+				case 1:
+					try
+					{
+						TaskAwaiter val4;
+						if (num != 0)
+						{
+							if (num != 1)
+							{
+								goto IL_054e;
+							}
+							val4 = <>u__1;
+							<>u__1 = default(TaskAwaiter);
+							num = (<>1__state = -1);
+							goto IL_04ed;
+						}
+						TaskAwaiter val5 = <>u__1;
+						<>u__1 = default(TaskAwaiter);
+						num = (<>1__state = -1);
+						goto IL_0472;
+						IL_0472:
+						((TaskAwaiter)(ref val5)).GetResult();
+						goto IL_0479;
+						IL_0479:
+						val4 = Hook.AfterCardChangedPiles(<runState>5__10, <combatState>5__3, <replacement>5__11, <pile>5__8.Type, null).GetAwaiter();
+						if (!((TaskAwaiter)(ref val4)).IsCompleted)
+						{
+							num = (<>1__state = 1);
+							<>u__1 = val4;
+							<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <Transform>d__13>(ref val4, ref this);
+							return;
+						}
+						goto IL_04ed;
+						IL_04ed:
+						((TaskAwaiter)(ref val4)).GetResult();
+						<pile>5__8.InvokeCardAddFinished();
+						<original>5__9.AfterTransformedFrom();
+						<replacement>5__11.AfterTransformedTo();
+						<results>5__5.Add(<result>5__12);
+						<original>5__9 = null;
+						<runState>5__10 = null;
+						<replacement>5__11 = null;
+						<result>5__12 = default(CardPileAddResult);
+						<pile>5__8 = null;
+						goto IL_054e;
+						IL_054e:
+						if (<>7__wrap6.MoveNext())
+						{
+							ValueTuple<CardTransformation, CardPile, int, CardModel> current = <>7__wrap6.Current;
+							CardTransformation item = current.Item1;
+							<pile>5__8 = current.Item2;
+							int item2 = current.Item3;
+							CardModel item3 = current.Item4;
+							<original>5__9 = item.Original;
+							<runState>5__10 = <original>5__9.Owner.RunState;
+							<replacement>5__11 = item3;
+							<replacement>5__11.AssertMutable();
+							<result>5__12 = new CardPileAddResult
+							{
+								success = true,
+								cardAdded = <replacement>5__11,
+								modifyingModels = null
+							};
+							if (<replacement>5__11.Owner != <original>5__9.Owner)
+							{
+								throw new InvalidOperationException($"Attempting to transform card {<original>5__9} to {<replacement>5__11}, but the replacement has a different owner!");
+							}
+							if (<pile>5__8.Type == PileType.Deck)
+							{
+								List<AbstractModel> modifyingModels;
+								CardModel cardModel = Hook.ModifyCardBeingAddedToDeck(<runState>5__10, <replacement>5__11, out modifyingModels);
+								<replacement>5__11 = cardModel;
+								<result>5__12.cardAdded = <replacement>5__11;
+								<result>5__12.modifyingModels = modifyingModels;
+								<replacement>5__11.FloorAddedToDeck = <runState>5__10.TotalFloor;
+								<runState>5__10.CurrentMapPointHistoryEntry?.GetEntry(<original>5__9.Owner.NetId).CardsTransformed.Add(new CardTransformationHistoryEntry(<original>5__9, <replacement>5__11));
+							}
+							PileType type = <pile>5__8.Type;
+							if (type == PileType.Deck)
+							{
+								<pile>5__8.AddInternal(<replacement>5__11);
+								goto IL_0479;
+							}
+							<pile>5__8.AddInternal(<replacement>5__11, item2);
+							CombatManager.Instance.History.CardGenerated(<combatState>5__3, <replacement>5__11, <replacement>5__11.Owner);
+							val5 = Hook.AfterCardEnteredCombat(<combatState>5__3, <replacement>5__11).GetAwaiter();
+							if (!((TaskAwaiter)(ref val5)).IsCompleted)
+							{
+								num = (<>1__state = 0);
+								<>u__1 = val5;
+								<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <Transform>d__13>(ref val5, ref this);
+								return;
+							}
+							goto IL_0472;
+						}
+					}
+					finally
+					{
+						if (num < 0)
+						{
+							((System.IDisposable)<>7__wrap6/*cast due to .constrained prefix*/).Dispose();
+						}
+					}
+					<>7__wrap6 = default(Enumerator<ValueTuple<CardTransformation, CardPile, int, CardModel>>);
+					<vfxTasks>5__6 = new List<System.Threading.Tasks.Task>();
+					<i>5__13 = 0;
+					goto IL_08bf;
+				case 2:
+					val3 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_072e;
+				case 3:
+					val2 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_0931;
+				case 4:
+					{
+						val = <>u__1;
+						<>u__1 = default(TaskAwaiter);
+						num = (<>1__state = -1);
+						goto IL_09f0;
+					}
+					IL_09f7:
+					<transformationsWithOriginalData>5__4[<i>5__13].Item1.Original.RemoveFromState();
+					<i>5__13++;
+					goto IL_0a2d;
+					IL_08bf:
+					if (<i>5__13 < <results>5__5.Count)
+					{
+						CardModel original = <transformationsWithOriginalData>5__4[<i>5__13].Item1.Original;
+						CardModel cardAdded = <results>5__5[<i>5__13].cardAdded;
+						if (LocalContext.IsMine(cardAdded))
+						{
+							if (cardAdded.Pile.Type == PileType.Hand)
+							{
+								if (!TestMode.IsOn)
+								{
+									NCardPlayQueue playQueue = NCombatRoom.Instance.Ui.PlayQueue;
+									NPlayerHand hand = NCombatRoom.Instance.Ui.Hand;
+									NCard nCard = NCard.FindOnTable(original, PileType.Hand);
+									if (nCard == null)
+									{
+										throw new InvalidOperationException($"Couldn't get hand node for original card {<transformationsArr>5__2[<i>5__13].Original}!");
+									}
+									if (playQueue.IsAncestorOf(nCard))
+									{
+										playQueue.RemoveCardFromQueueForCancellation(nCard, forceReturnToHand: true);
+									}
+									hand.TryCancelCardPlay(original);
+									NCardTransformShineVfx nCardTransformShineVfx = NCardTransformShineVfx.Create(nCard, cardAdded, System.Array.Empty<RelicModel>());
+									if (nCardTransformShineVfx != null)
+									{
+										<vfxTasks>5__6.Add(nCardTransformShineVfx.PlayAnimationWithoutWaitingForEnd());
+										val3 = Cmd.CustomScaledWait(0.1f, 0.25f).GetAwaiter();
+										if (!((TaskAwaiter)(ref val3)).IsCompleted)
+										{
+											num = (<>1__state = 2);
+											<>u__1 = val3;
+											<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <Transform>d__13>(ref val3, ref this);
+											return;
+										}
+										goto IL_072e;
+									}
+								}
+							}
+							else if (style != CardPreviewStyle.None && TestMode.IsOff)
+							{
+								Control control = style switch
+								{
+									CardPreviewStyle.EventLayout => NRun.Instance?.GlobalUi.EventCardPreviewContainer, 
+									CardPreviewStyle.GridLayout => NRun.Instance?.GlobalUi.GridCardPreviewContainer, 
+									CardPreviewStyle.HorizontalLayout => NCombatRoom.Instance?.Ui.CardPreviewContainer ?? NRun.Instance?.GlobalUi.CardPreviewContainer, 
+									CardPreviewStyle.MessyLayout => NCombatRoom.Instance?.Ui.MessyCardPreviewContainer ?? NRun.Instance?.GlobalUi.MessyCardPreviewContainer, 
+									_ => throw new ArgumentOutOfRangeException("style", $"Unexpected {"CardPreviewStyle"} {style}!"), 
+								};
+								if (control != null)
+								{
+									List<AbstractModel>? modifyingModels2 = <results>5__5[<i>5__13].modifyingModels;
+									control.AddChildSafely(NCardTransformVfx.Create(original, cardAdded, (modifyingModels2 != null) ? Enumerable.OfType<RelicModel>((System.Collections.IEnumerable)modifyingModels2) : null));
+								}
+							}
+						}
+						goto IL_08ad;
+					}
+					val2 = System.Threading.Tasks.Task.WhenAll((System.Collections.Generic.IEnumerable<System.Threading.Tasks.Task>)<vfxTasks>5__6).GetAwaiter();
+					if (!((TaskAwaiter)(ref val2)).IsCompleted)
+					{
+						num = (<>1__state = 3);
+						<>u__1 = val2;
+						<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <Transform>d__13>(ref val2, ref this);
+						return;
+					}
+					goto IL_0931;
+					IL_072e:
+					((TaskAwaiter)(ref val3)).GetResult();
+					goto IL_08ad;
+					IL_08ad:
+					<i>5__13++;
+					goto IL_08bf;
+					IL_0931:
+					((TaskAwaiter)(ref val2)).GetResult();
+					<i>5__13 = 0;
+					goto IL_0a2d;
+					IL_09f0:
+					((TaskAwaiter)(ref val)).GetResult();
+					goto IL_09f7;
+					IL_0a2d:
+					if (<i>5__13 < <results>5__5.Count)
+					{
+						CardPileAddResult cardPileAddResult = <results>5__5[<i>5__13];
+						if (cardPileAddResult.success && cardPileAddResult.cardAdded.Pile.Type.IsCombatPile())
+						{
+							val = Hook.AfterCardGeneratedForCombat(cardPileAddResult.cardAdded.CombatState, cardPileAddResult.cardAdded, cardPileAddResult.cardAdded.Owner).GetAwaiter();
+							if (!((TaskAwaiter)(ref val)).IsCompleted)
+							{
+								num = (<>1__state = 4);
+								<>u__1 = val;
+								<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <Transform>d__13>(ref val, ref this);
+								return;
+							}
+							goto IL_09f0;
+						}
+						goto IL_09f7;
+					}
+					result = (System.Collections.Generic.IEnumerable<CardPileAddResult>)<results>5__5;
+					break;
+				}
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<transformationsArr>5__2 = null;
+				<combatState>5__3 = null;
+				<transformationsWithOriginalData>5__4 = null;
+				<results>5__5 = null;
+				<vfxTasks>5__6 = null;
+				<>t__builder.SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<transformationsArr>5__2 = null;
+			<combatState>5__3 = null;
+			<transformationsWithOriginalData>5__4 = null;
+			<results>5__5 = null;
+			<vfxTasks>5__6 = null;
+			<>t__builder.SetResult(result);
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			<>t__builder.SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <TransformTo>d__10<T> : IAsyncStateMachine where T : notnull, CardModel
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder<CardPileAddResult?> <>t__builder;
+
+		public CardModel original;
+
+		public CardPreviewStyle style;
+
+		private TaskAwaiter<CardPileAddResult?> <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			CardPileAddResult? result2;
+			try
+			{
+				TaskAwaiter<CardPileAddResult?> val;
+				if (num != 0)
+				{
+					CardModel replacement = original.CardScope.CreateCard<T>(original.Owner);
+					val = Transform(original, replacement, style).GetAwaiter();
+					if (!val.IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter<CardPileAddResult?>, <TransformTo>d__10<T>>(ref val, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter<CardPileAddResult?>);
+					num = (<>1__state = -1);
+				}
+				CardPileAddResult? result = val.GetResult();
+				result2 = result;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<>t__builder.SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<>t__builder.SetResult(result2);
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			<>t__builder.SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <TransformToRandom>d__9 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder<CardPileAddResult> <>t__builder;
+
+		public CardModel original;
+
+		public Rng rng;
+
+		public CardPreviewStyle style;
+
+		private TaskAwaiter<System.Collections.Generic.IEnumerable<CardPileAddResult>> <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			CardPileAddResult result2;
+			try
+			{
+				TaskAwaiter<System.Collections.Generic.IEnumerable<CardPileAddResult>> val;
+				if (num != 0)
+				{
+					val = Transform(new CardTransformation(original).Yield(), rng, style).GetAwaiter();
+					if (!val.IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter<System.Collections.Generic.IEnumerable<CardPileAddResult>>, <TransformToRandom>d__9>(ref val, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter<System.Collections.Generic.IEnumerable<CardPileAddResult>>);
+					num = (<>1__state = -1);
+				}
+				System.Collections.Generic.IEnumerable<CardPileAddResult> result = val.GetResult();
+				System.Collections.Generic.IEnumerable<CardPileAddResult> enumerable = result;
+				result2 = Enumerable.First<CardPileAddResult>(enumerable);
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<>t__builder.SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<>t__builder.SetResult(result2);
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			<>t__builder.SetStateMachine(stateMachine);
+		}
+	}
+
+	[AsyncStateMachine(typeof(<AutoPlay>d__0))]
+	public static System.Threading.Tasks.Task AutoPlay(PlayerChoiceContext choiceContext, CardModel card, Creature? target, AutoPlayType type = AutoPlayType.Default, bool skipXCapture = false, bool skipCardPileVisuals = false)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<AutoPlay>d__0 <AutoPlay>d__1 = default(<AutoPlay>d__0);
+		<AutoPlay>d__1.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<AutoPlay>d__1.choiceContext = choiceContext;
+		<AutoPlay>d__1.card = card;
+		<AutoPlay>d__1.target = target;
+		<AutoPlay>d__1.type = type;
+		<AutoPlay>d__1.skipXCapture = skipXCapture;
+		<AutoPlay>d__1.skipCardPileVisuals = skipCardPileVisuals;
+		<AutoPlay>d__1.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <AutoPlay>d__1.<>t__builder)).Start<<AutoPlay>d__0>(ref <AutoPlay>d__1);
+		return ((AsyncTaskMethodBuilder)(ref <AutoPlay>d__1.<>t__builder)).Task;
+	}
+
+	[AsyncStateMachine(typeof(<MoveToResultPileWithoutPlaying>d__1))]
+	private static System.Threading.Tasks.Task MoveToResultPileWithoutPlaying(PlayerChoiceContext choiceContext, CardModel card)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<MoveToResultPileWithoutPlaying>d__1 <MoveToResultPileWithoutPlaying>d__2 = default(<MoveToResultPileWithoutPlaying>d__1);
+		<MoveToResultPileWithoutPlaying>d__2.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<MoveToResultPileWithoutPlaying>d__2.choiceContext = choiceContext;
+		<MoveToResultPileWithoutPlaying>d__2.card = card;
+		<MoveToResultPileWithoutPlaying>d__2.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <MoveToResultPileWithoutPlaying>d__2.<>t__builder)).Start<<MoveToResultPileWithoutPlaying>d__1>(ref <MoveToResultPileWithoutPlaying>d__2);
+		return ((AsyncTaskMethodBuilder)(ref <MoveToResultPileWithoutPlaying>d__2.<>t__builder)).Task;
+	}
+
+	[AsyncStateMachine(typeof(<Discard>d__2))]
+	public static System.Threading.Tasks.Task Discard(PlayerChoiceContext choiceContext, CardModel card)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<Discard>d__2 <Discard>d__4 = default(<Discard>d__2);
+		<Discard>d__4.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<Discard>d__4.choiceContext = choiceContext;
+		<Discard>d__4.card = card;
+		<Discard>d__4.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <Discard>d__4.<>t__builder)).Start<<Discard>d__2>(ref <Discard>d__4);
+		return ((AsyncTaskMethodBuilder)(ref <Discard>d__4.<>t__builder)).Task;
+	}
+
+	[AsyncStateMachine(typeof(<Discard>d__3))]
+	public static System.Threading.Tasks.Task Discard(PlayerChoiceContext choiceContext, System.Collections.Generic.IEnumerable<CardModel> cards)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<Discard>d__3 <Discard>d__4 = default(<Discard>d__3);
+		<Discard>d__4.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<Discard>d__4.choiceContext = choiceContext;
+		<Discard>d__4.cards = cards;
+		<Discard>d__4.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <Discard>d__4.<>t__builder)).Start<<Discard>d__3>(ref <Discard>d__4);
+		return ((AsyncTaskMethodBuilder)(ref <Discard>d__4.<>t__builder)).Task;
+	}
+
+	[AsyncStateMachine(typeof(<DiscardAndDraw>d__4))]
+	public static System.Threading.Tasks.Task DiscardAndDraw(PlayerChoiceContext choiceContext, System.Collections.Generic.IEnumerable<CardModel> cardsToDiscard, int cardsToDraw)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<DiscardAndDraw>d__4 <DiscardAndDraw>d__5 = default(<DiscardAndDraw>d__4);
+		<DiscardAndDraw>d__5.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<DiscardAndDraw>d__5.choiceContext = choiceContext;
+		<DiscardAndDraw>d__5.cardsToDiscard = cardsToDiscard;
+		<DiscardAndDraw>d__5.cardsToDraw = cardsToDraw;
+		<DiscardAndDraw>d__5.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <DiscardAndDraw>d__5.<>t__builder)).Start<<DiscardAndDraw>d__4>(ref <DiscardAndDraw>d__5);
+		return ((AsyncTaskMethodBuilder)(ref <DiscardAndDraw>d__5.<>t__builder)).Task;
+	}
+
+	public static void Downgrade(CardModel card)
+	{
+		if (!CombatManager.Instance.IsEnding)
+		{
+			CardPile pile = card.Pile;
+			if (pile != null && pile.Type == PileType.Deck)
+			{
+				card.Owner.RunState.CurrentMapPointHistoryEntry?.GetEntry(card.Owner.NetId).DowngradedCards.Add(card.Id);
+			}
+			card.DowngradeInternal();
+		}
+	}
+
+	[AsyncStateMachine(typeof(<Exhaust>d__6))]
+	public static async System.Threading.Tasks.Task<CardPileAddResult?> Exhaust(PlayerChoiceContext choiceContext, CardModel card, bool causedByEthereal = false, bool skipVisuals = false)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		if (CombatManager.Instance.IsOverOrEnding)
+		{
+			return null;
+		}
+		ICombatState combatState = card.CombatState ?? card.Owner.Creature.CombatState;
+		CardPileAddResult result = await CardPileCmd.Add(card, PileType.Exhaust, CardPilePosition.Bottom, null, skipVisuals);
+		CombatManager.Instance.History.CardExhausted(combatState, card);
+		await Hook.AfterCardExhausted(combatState, choiceContext, card, causedByEthereal);
+		return result;
+	}
+
+	public static void Upgrade(CardModel card, CardPreviewStyle style = CardPreviewStyle.HorizontalLayout)
+	{
+		Upgrade(new global::<>z__ReadOnlySingleElementList<CardModel>(card), style);
+	}
+
+	public static void Upgrade(System.Collections.Generic.IEnumerable<CardModel> cards, CardPreviewStyle style)
+	{
+		//IL_0180: Unknown result type (might be due to invalid IL or missing references)
+		if (CombatManager.Instance.IsEnding)
+		{
+			return;
+		}
+		System.Collections.Generic.IEnumerator<CardModel> enumerator = cards.GetEnumerator();
+		try
+		{
+			while (((System.Collections.IEnumerator)enumerator).MoveNext())
+			{
+				CardModel current = enumerator.Current;
+				if (!current.IsUpgradable)
+				{
+					continue;
+				}
+				CardPile pile = current.Pile;
+				if (pile != null && pile.Type == PileType.Deck)
+				{
+					current.Owner.RunState.CurrentMapPointHistoryEntry?.GetEntry(current.Owner.NetId).UpgradedCards.Add(current.Id);
+				}
+				current.UpgradeInternal();
+				current.FinalizeUpgradeInternal();
+				if (!LocalContext.IsMine(current))
+				{
+					continue;
+				}
+				pile = current.Pile;
+				if (pile != null && pile.Type == PileType.Deck)
+				{
+					Control control;
+					switch (style)
+					{
+					case CardPreviewStyle.EventLayout:
+						control = NRun.Instance?.GlobalUi.EventCardPreviewContainer;
+						break;
+					case CardPreviewStyle.HorizontalLayout:
+						control = NRun.Instance?.GlobalUi.CardPreviewContainer;
+						break;
+					case CardPreviewStyle.MessyLayout:
+						control = NRun.Instance?.GlobalUi.MessyCardPreviewContainer;
+						break;
+					case CardPreviewStyle.GridLayout:
+						control = NRun.Instance?.GlobalUi.GridCardPreviewContainer;
+						break;
+					default:
+						throw new ArgumentOutOfRangeException("style", $"Unexpected {"CardPreviewStyle"} {style}!");
+					case CardPreviewStyle.None:
+						continue;
+					}
+					control?.AddChildSafely(NCardUpgradeVfx.Create(current));
+				}
+			}
+		}
+		finally
+		{
+			((System.IDisposable)enumerator)?.Dispose();
+		}
+	}
+
+	[AsyncStateMachine(typeof(<TransformToRandom>d__9))]
+	public static async System.Threading.Tasks.Task<CardPileAddResult> TransformToRandom(CardModel original, Rng rng, CardPreviewStyle style = CardPreviewStyle.HorizontalLayout)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		return Enumerable.First<CardPileAddResult>(await Transform(new CardTransformation(original).Yield(), rng, style));
+	}
+
+	[AsyncStateMachine(typeof(<TransformTo>d__10<>))]
+	public static async System.Threading.Tasks.Task<CardPileAddResult?> TransformTo<T>(CardModel original, CardPreviewStyle style = CardPreviewStyle.HorizontalLayout) where T : CardModel
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		CardModel replacement = original.CardScope.CreateCard<T>(original.Owner);
+		return await Transform(original, replacement, style);
+	}
+
+	[AsyncStateMachine(typeof(<Transform>d__11))]
+	public static async System.Threading.Tasks.Task<CardPileAddResult?> Transform(CardModel original, CardModel replacement, CardPreviewStyle style = CardPreviewStyle.HorizontalLayout)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		return Enumerable.FirstOrDefault<CardPileAddResult>(await Transform(new CardTransformation(original, replacement).Yield(), null, style));
+	}
+
+	private static int PileIndexSort(ValueTuple<CardTransformation, CardPile, int, CardModel> value1, ValueTuple<CardTransformation, CardPile, int, CardModel> value2)
+	{
+		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+		if (value1.Item2.Type != value2.Item2.Type)
+		{
+			return ((System.Enum)value1.Item2.Type/*cast due to .constrained prefix*/).CompareTo((object)value2.Item2.Type);
+		}
+		return value1.Item3.CompareTo(value2.Item3);
+	}
+
+	[AsyncStateMachine(typeof(<Transform>d__13))]
+	public static async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<CardPileAddResult>> Transform(System.Collections.Generic.IEnumerable<CardTransformation> transformations, Rng? rng, CardPreviewStyle style = CardPreviewStyle.HorizontalLayout)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		if (CombatManager.Instance.IsEnding)
+		{
+			return System.Array.Empty<CardPileAddResult>();
+		}
+		CardTransformation[] transformationsArr = Enumerable.ToArray<CardTransformation>(transformations);
+		if (transformationsArr.Length == 0)
+		{
+			return System.Array.Empty<CardPileAddResult>();
+		}
+		ICombatState combatState = transformationsArr[0].Original.CombatState;
+		List<ValueTuple<CardTransformation, CardPile, int, CardModel>> transformationsWithOriginalData = new List<ValueTuple<CardTransformation, CardPile, int, CardModel>>();
+		CardTransformation[] array = transformationsArr;
+		for (int i = 0; i < array.Length; i++)
+		{
+			CardTransformation cardTransformation = array[i];
+			cardTransformation.Original.AssertMutable();
+			if (!cardTransformation.Original.IsTransformable)
+			{
+				throw new InvalidOperationException("Can't transform " + cardTransformation.Original.Id.Entry + " because it's un-transformable.");
+			}
+			CardPile pile = cardTransformation.Original.Pile;
+			if (pile == null)
+			{
+				throw new InvalidOperationException("Can't transform " + cardTransformation.Original.Id.Entry + " because it has no pile.");
+			}
+			int num = pile.Cards.IndexOf(cardTransformation.Original);
+			CardModel replacement = cardTransformation.GetReplacement(rng);
+			if (replacement == null)
+			{
+				throw new InvalidOperationException($"Attempting to transform un-transformable card {cardTransformation.Original}!");
+			}
+			cardTransformation.Original.RemoveFromCurrentPile();
+			transformationsWithOriginalData.Add(new ValueTuple<CardTransformation, CardPile, int, CardModel>(cardTransformation, pile, num, replacement));
+		}
+		transformationsWithOriginalData.Sort((Comparison<ValueTuple<CardTransformation, CardPile, int, CardModel>>)PileIndexSort);
+		List<CardPileAddResult> results = new List<CardPileAddResult>();
+		Enumerator<ValueTuple<CardTransformation, CardPile, int, CardModel>> enumerator = transformationsWithOriginalData.GetEnumerator();
+		try
+		{
+			while (enumerator.MoveNext())
+			{
+				ValueTuple<CardTransformation, CardPile, int, CardModel> current = enumerator.Current;
+				CardTransformation item = current.Item1;
+				CardPile pile2 = current.Item2;
+				int item2 = current.Item3;
+				CardModel item3 = current.Item4;
+				CardModel original = item.Original;
+				IRunState runState = original.Owner.RunState;
+				CardModel replacement2 = item3;
+				replacement2.AssertMutable();
+				CardPileAddResult result = new CardPileAddResult
+				{
+					success = true,
+					cardAdded = replacement2,
+					modifyingModels = null
+				};
+				if (replacement2.Owner != original.Owner)
+				{
+					throw new InvalidOperationException($"Attempting to transform card {original} to {replacement2}, but the replacement has a different owner!");
+				}
+				if (pile2.Type == PileType.Deck)
+				{
+					List<AbstractModel> modifyingModels;
+					CardModel cardAdded = Hook.ModifyCardBeingAddedToDeck(runState, replacement2, out modifyingModels);
+					replacement2 = (result.cardAdded = cardAdded);
+					result.modifyingModels = modifyingModels;
+					replacement2.FloorAddedToDeck = runState.TotalFloor;
+					runState.CurrentMapPointHistoryEntry?.GetEntry(original.Owner.NetId).CardsTransformed.Add(new CardTransformationHistoryEntry(original, replacement2));
+				}
+				PileType type = pile2.Type;
+				if (type == PileType.Deck)
+				{
+					pile2.AddInternal(replacement2);
+				}
+				else
+				{
+					pile2.AddInternal(replacement2, item2);
+					CombatManager.Instance.History.CardGenerated(combatState, replacement2, replacement2.Owner);
+					await Hook.AfterCardEnteredCombat(combatState, replacement2);
+				}
+				await Hook.AfterCardChangedPiles(runState, combatState, replacement2, pile2.Type, null);
+				pile2.InvokeCardAddFinished();
+				original.AfterTransformedFrom();
+				replacement2.AfterTransformedTo();
+				results.Add(result);
+			}
+		}
+		finally
+		{
+			((System.IDisposable)enumerator/*cast due to .constrained prefix*/).Dispose();
+		}
+		List<System.Threading.Tasks.Task> vfxTasks = new List<System.Threading.Tasks.Task>();
+		for (int j = 0; j < results.Count; j++)
+		{
+			CardModel original2 = transformationsWithOriginalData[j].Item1.Original;
+			CardModel cardAdded2 = results[j].cardAdded;
+			if (!LocalContext.IsMine(cardAdded2))
+			{
+				continue;
+			}
+			if (cardAdded2.Pile.Type == PileType.Hand)
+			{
+				if (!TestMode.IsOn)
+				{
+					NCardPlayQueue playQueue = NCombatRoom.Instance.Ui.PlayQueue;
+					NPlayerHand hand = NCombatRoom.Instance.Ui.Hand;
+					NCard nCard = NCard.FindOnTable(original2, PileType.Hand);
+					if (nCard == null)
+					{
+						throw new InvalidOperationException($"Couldn't get hand node for original card {transformationsArr[j].Original}!");
+					}
+					if (playQueue.IsAncestorOf(nCard))
+					{
+						playQueue.RemoveCardFromQueueForCancellation(nCard, forceReturnToHand: true);
+					}
+					hand.TryCancelCardPlay(original2);
+					NCardTransformShineVfx nCardTransformShineVfx = NCardTransformShineVfx.Create(nCard, cardAdded2, System.Array.Empty<RelicModel>());
+					if (nCardTransformShineVfx != null)
+					{
+						vfxTasks.Add(nCardTransformShineVfx.PlayAnimationWithoutWaitingForEnd());
+						await Cmd.CustomScaledWait(0.1f, 0.25f);
+					}
+				}
+			}
+			else if (style != CardPreviewStyle.None && TestMode.IsOff)
+			{
+				Control control = style switch
+				{
+					CardPreviewStyle.EventLayout => NRun.Instance?.GlobalUi.EventCardPreviewContainer, 
+					CardPreviewStyle.GridLayout => NRun.Instance?.GlobalUi.GridCardPreviewContainer, 
+					CardPreviewStyle.HorizontalLayout => NCombatRoom.Instance?.Ui.CardPreviewContainer ?? NRun.Instance?.GlobalUi.CardPreviewContainer, 
+					CardPreviewStyle.MessyLayout => NCombatRoom.Instance?.Ui.MessyCardPreviewContainer ?? NRun.Instance?.GlobalUi.MessyCardPreviewContainer, 
+					_ => throw new ArgumentOutOfRangeException("style", $"Unexpected {"CardPreviewStyle"} {style}!"), 
+				};
+				if (control != null)
+				{
+					List<AbstractModel>? modifyingModels2 = results[j].modifyingModels;
+					control.AddChildSafely(NCardTransformVfx.Create(original2, cardAdded2, (modifyingModels2 != null) ? Enumerable.OfType<RelicModel>((System.Collections.IEnumerable)modifyingModels2) : null));
+				}
+			}
+		}
+		await System.Threading.Tasks.Task.WhenAll((System.Collections.Generic.IEnumerable<System.Threading.Tasks.Task>)vfxTasks);
+		for (int j = 0; j < results.Count; j++)
+		{
+			CardPileAddResult cardPileAddResult = results[j];
+			if (cardPileAddResult.success && cardPileAddResult.cardAdded.Pile.Type.IsCombatPile())
+			{
+				await Hook.AfterCardGeneratedForCombat(cardPileAddResult.cardAdded.CombatState, cardPileAddResult.cardAdded, cardPileAddResult.cardAdded.Owner);
+			}
+			transformationsWithOriginalData[j].Item1.Original.RemoveFromState();
+		}
+		return (System.Collections.Generic.IEnumerable<CardPileAddResult>)results;
+	}
+
+	public static T? Enchant<T>(CardModel card, decimal amount) where T : EnchantmentModel
+	{
+		return Enchant(ModelDb.Enchantment<T>().ToMutable(), card, amount) as T;
+	}
+
+	public static EnchantmentModel? Enchant(EnchantmentModel enchantment, CardModel card, decimal amount)
+	{
+		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011e: Unknown result type (might be due to invalid IL or missing references)
+		enchantment.AssertMutable();
+		if (!enchantment.CanEnchant(card))
+		{
+			throw new InvalidOperationException($"Cannot enchant {card.Id} with {enchantment.Id}.");
+		}
+		if (card.Enchantment == null)
+		{
+			card.EnchantInternal(enchantment, amount);
+			enchantment.ModifyCard();
+		}
+		else
+		{
+			if (!(((object)card.Enchantment).GetType() == ((object)enchantment).GetType()))
+			{
+				throw new InvalidOperationException($"Cannot enchant {card.Id} with {enchantment.Id} because it already has enchantment {card.Enchantment.Id}.");
+			}
+			card.Enchantment.Amount += (int)amount;
+		}
+		card.FinalizeUpgradeInternal();
+		CardPile pile = card.Pile;
+		if (pile != null && pile.Type == PileType.Deck)
+		{
+			card.Owner.RunState.CurrentMapPointHistoryEntry?.GetEntry(card.Owner.NetId).CardsEnchanted.Add(new CardEnchantmentHistoryEntry(card, enchantment.Id));
+		}
+		return card.Enchantment;
+	}
+
+	public static void ClearEnchantment(CardModel card)
+	{
+		card.ClearEnchantmentInternal();
+	}
+
+	[AsyncStateMachine(typeof(<AfflictAndPreview>d__17<>))]
+	public static async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<T>> AfflictAndPreview<T>(System.Collections.Generic.IEnumerable<CardModel> cards, decimal amount, CardPreviewStyle style = CardPreviewStyle.HorizontalLayout) where T : AfflictionModel
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		List<T> afflictions = new List<T>();
+		List<CardModel> cardList = new List<CardModel>();
+		System.Collections.Generic.IEnumerator<CardModel> enumerator = cards.GetEnumerator();
+		try
+		{
+			while (((System.Collections.IEnumerator)enumerator).MoveNext())
+			{
+				CardModel card = enumerator.Current;
+				T val = await Afflict<T>(card, amount);
+				if (val != null)
+				{
+					afflictions.Add(val);
+					cardList.Add(card);
+				}
+			}
+		}
+		finally
+		{
+			((System.IDisposable)enumerator)?.Dispose();
+		}
+		if (cardList.Count > 0 && style != CardPreviewStyle.None)
+		{
+			if (Enumerable.Any<CardModel>((System.Collections.Generic.IEnumerable<CardModel>)cardList, (Func<CardModel, bool>)((CardModel c) => c.Owner != cardList[0].Owner)))
+			{
+				throw new InvalidOperationException("All cards passed to AfflictAndPreview must have the same owner!");
+			}
+			if (LocalContext.IsMine(cardList[0]))
+			{
+				Preview((System.Collections.Generic.IReadOnlyList<CardModel>)cardList, 1.2f, style);
+				await Cmd.Wait(1.25f);
+			}
+		}
+		return (System.Collections.Generic.IEnumerable<T>)afflictions;
+	}
+
+	[AsyncStateMachine(typeof(<Afflict>d__18<>))]
+	public static async System.Threading.Tasks.Task<T?> Afflict<T>(CardModel card, decimal amount) where T : AfflictionModel
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		return (await Afflict(ModelDb.Affliction<T>().ToMutable(), card, amount)) as T;
+	}
+
+	public static System.Threading.Tasks.Task<AfflictionModel?> Afflict(AfflictionModel affliction, CardModel card, decimal amount)
+	{
+		//IL_0124: Unknown result type (might be due to invalid IL or missing references)
+		if (CombatManager.Instance.IsOverOrEnding)
+		{
+			CardPile pile = card.Pile;
+			if (pile != null && pile.IsCombatPile)
+			{
+				return System.Threading.Tasks.Task.FromResult<AfflictionModel>((AfflictionModel)null);
+			}
+		}
+		affliction.AssertMutable();
+		ICombatState combatState = card.CombatState ?? card.Owner.Creature.CombatState;
+		if (combatState == null || !Hook.ShouldAfflict(combatState, card, affliction))
+		{
+			return System.Threading.Tasks.Task.FromResult<AfflictionModel>((AfflictionModel)null);
+		}
+		if (!affliction.CanAfflict(card))
+		{
+			return System.Threading.Tasks.Task.FromResult<AfflictionModel>((AfflictionModel)null);
+		}
+		if (card.Affliction == null)
+		{
+			card.AfflictInternal(affliction, amount);
+			affliction.AfterApplied();
+		}
+		else
+		{
+			if (!(((object)card.Affliction).GetType() == ((object)affliction).GetType()))
+			{
+				throw new InvalidOperationException($"Cannot afflict {card.Id} with {affliction.Id} because it already has affliction {card.Affliction.Id}.");
+			}
+			card.Affliction.Amount += (int)amount;
+		}
+		CombatManager.Instance.History.CardAfflicted(combatState, card, affliction);
+		return System.Threading.Tasks.Task.FromResult<AfflictionModel>(card.Affliction);
+	}
+
+	public static void ClearAffliction(CardModel card)
+	{
+		card.ClearAfflictionInternal();
+	}
+
+	public static void ApplyKeyword(CardModel card, params CardKeyword[] keywords)
+	{
+		foreach (CardKeyword keyword in keywords)
+		{
+			card.AddKeyword(keyword);
+		}
+		NCard.FindOnTable(card)?.UpdateVisuals(card.Pile.Type, CardPreviewMode.Normal);
+	}
+
+	public static void RemoveKeyword(CardModel card, params CardKeyword[] keywords)
+	{
+		foreach (CardKeyword keyword in keywords)
+		{
+			card.RemoveKeyword(keyword);
+		}
+		NCard.FindOnTable(card)?.UpdateVisuals(card.Pile.Type, CardPreviewMode.Normal);
+	}
+
+	public static void ApplySingleTurnSly(CardModel card)
+	{
+		card.GiveSingleTurnSly();
+		NCard.FindOnTable(card)?.UpdateVisuals(card.Pile.Type, CardPreviewMode.Normal);
+	}
+
+	public static void ApplySingleTurnRetain(CardModel card)
+	{
+		card.GiveSingleTurnRetain();
+		NCard.FindOnTable(card)?.UpdateVisuals(card.Pile.Type, CardPreviewMode.Normal);
+	}
+
+	public static TaskCompletionSource? Preview(CardModel card, float time = 1.2f, CardPreviewStyle style = CardPreviewStyle.HorizontalLayout)
+	{
+		return PreviewInternal(card, isAddingCardsToPile: false, null, time, style);
+	}
+
+	public static void Preview(System.Collections.Generic.IReadOnlyList<CardModel> cards, float time = 1.2f, CardPreviewStyle style = CardPreviewStyle.HorizontalLayout)
+	{
+		if (TestMode.IsOn || CombatManager.Instance.IsEnding)
+		{
+			return;
+		}
+		System.Collections.Generic.IEnumerator<CardModel> enumerator = ((System.Collections.Generic.IEnumerable<CardModel>)cards).GetEnumerator();
+		try
+		{
+			while (((System.Collections.IEnumerator)enumerator).MoveNext())
+			{
+				CardModel current = enumerator.Current;
+				PreviewInternal(current, isAddingCardsToPile: false, null, time, style);
+			}
+		}
+		finally
+		{
+			((System.IDisposable)enumerator)?.Dispose();
+		}
+	}
+
+	public static void PreviewCardPileAdd(CardPileAddResult result, float time = 1.2f, CardPreviewStyle style = CardPreviewStyle.HorizontalLayout)
+	{
+		if (!TestMode.IsOn && !CombatManager.Instance.IsEnding && result.success && LocalContext.IsMine(result.cardAdded))
+		{
+			CardModel cardAdded = result.cardAdded;
+			List<AbstractModel>? modifyingModels = result.modifyingModels;
+			PreviewInternal(cardAdded, isAddingCardsToPile: true, ((modifyingModels != null) ? Enumerable.OfType<RelicModel>((System.Collections.IEnumerable)modifyingModels) : null) ?? null, time, style);
+		}
+	}
+
+	public static void PreviewCardPileAdd(System.Collections.Generic.IReadOnlyList<CardPileAddResult> results, float time = 1.2f, CardPreviewStyle style = CardPreviewStyle.HorizontalLayout)
+	{
+		if (TestMode.IsOn || CombatManager.Instance.IsEnding)
+		{
+			return;
+		}
+		if (((System.Collections.Generic.IReadOnlyCollection<CardPileAddResult>)results).Count > 5 && style == CardPreviewStyle.HorizontalLayout)
+		{
+			Log.Warn("Horizontal layout is being used with more than five cards! They will go offscreen");
+		}
+		System.Collections.Generic.IEnumerator<CardPileAddResult> enumerator = ((System.Collections.Generic.IEnumerable<CardPileAddResult>)results).GetEnumerator();
+		try
+		{
+			while (((System.Collections.IEnumerator)enumerator).MoveNext())
+			{
+				CardPileAddResult current = enumerator.Current;
+				if (current.success && LocalContext.IsMine(current.cardAdded))
+				{
+					CardModel cardAdded = current.cardAdded;
+					List<AbstractModel>? modifyingModels = current.modifyingModels;
+					PreviewInternal(cardAdded, isAddingCardsToPile: true, ((modifyingModels != null) ? Enumerable.OfType<RelicModel>((System.Collections.IEnumerable)modifyingModels) : null) ?? null, time, style);
+				}
+			}
+		}
+		finally
+		{
+			((System.IDisposable)enumerator)?.Dispose();
+		}
+	}
+
+	private static TaskCompletionSource? PreviewInternal(CardModel card, bool isAddingCardsToPile, System.Collections.Generic.IEnumerable<RelicModel>? relicsToFlash = null, float time = 1.2f, CardPreviewStyle style = CardPreviewStyle.HorizontalLayout)
+	{
+		//IL_0128: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0159: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0236: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0240: Expected O, but got Unknown
+		//IL_029b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02a5: Expected O, but got Unknown
+		//IL_02b3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02bd: Expected O, but got Unknown
+		if (card.Pile == null)
+		{
+			return null;
+		}
+		if (TestMode.IsOn)
+		{
+			return null;
+		}
+		if (CombatManager.Instance.IsEnding)
+		{
+			return null;
+		}
+		if (!LocalContext.IsMine(card))
+		{
+			return null;
+		}
+		PileType pileType = card.Pile.Type;
+		if (GetTotalCardsBeingPreviewed() > 50)
+		{
+			return null;
+		}
+		Control control;
+		switch (style)
+		{
+		case CardPreviewStyle.HorizontalLayout:
+			control = (pileType.IsCombatPile() ? NCombatRoom.Instance.Ui.CardPreviewContainer : NRun.Instance?.GlobalUi.CardPreviewContainer);
+			break;
+		case CardPreviewStyle.MessyLayout:
+			control = (pileType.IsCombatPile() ? NCombatRoom.Instance.Ui.MessyCardPreviewContainer : NRun.Instance?.GlobalUi.MessyCardPreviewContainer);
+			break;
+		case CardPreviewStyle.EventLayout:
+			if (pileType.IsCombatPile())
+			{
+				throw new InvalidOperationException();
+			}
+			control = NRun.Instance?.GlobalUi.EventCardPreviewContainer;
+			break;
+		case CardPreviewStyle.GridLayout:
+			if (pileType.IsCombatPile())
+			{
+				throw new InvalidOperationException();
+			}
+			control = NRun.Instance?.GlobalUi.GridCardPreviewContainer;
+			break;
+		default:
+			throw new ArgumentOutOfRangeException("style", $"Unexpected {"CardPreviewStyle"} {style}!");
+		}
+		Control control2 = control;
+		if (control2 == null)
+		{
+			return null;
+		}
+		if (style == CardPreviewStyle.HorizontalLayout && control2.GetChildCount() > 5)
+		{
+			control2 = (pileType.IsCombatPile() ? NCombatRoom.Instance.Ui.MessyCardPreviewContainer : NRun.Instance?.GlobalUi.MessyCardPreviewContainer);
+		}
+		NCard node = NCard.Create(card);
+		control2?.AddChildSafely(node);
+		node.UpdateVisuals(pileType, CardPreviewMode.Normal);
+		TaskCompletionSource source = new TaskCompletionSource();
+		Tween tween = node.CreateTween();
+		tween.TweenProperty(node, "scale", Vector2.One, 0.25).From(Vector2.Zero).SetEase(Tween.EaseType.Out)
+			.SetTrans(Tween.TransitionType.Cubic);
+		tween.TweenCallback(Callable.From((Action)delegate
+		{
+			TaskHelper.RunSafely(FlashRelics(node, relicsToFlash));
+		}));
+		tween.TweenCallback(Callable.From((Action)delegate
+		{
+			NCardFlyVfx nCardFlyVfx = null;
+			Node node2 = ((pileType != PileType.Deck) ? card.Owner.Creature.GetVfxContainer() : NRun.Instance?.GlobalUi.TopBar.TrailContainer);
+			if (node2 != null)
+			{
+				PileType pileType2 = ((card.Pile != null) ? card.Pile.Type : pileType);
+				nCardFlyVfx = NCardFlyVfx.Create(node, pileType2, isAddingCardsToPile, card.Owner.Character.TrailPath);
+			}
+			if (nCardFlyVfx != null && node2 != null)
+			{
+				node2.AddChildSafely(nCardFlyVfx);
+				TaskHelper.RunSafely(nCardFlyVfx.SwooshAwayCompletion.Task.ContinueWith((Action<System.Threading.Tasks.Task>)delegate
+				{
+					source.SetResult();
+				}));
+			}
+			else
+			{
+				node.QueueFreeSafely();
+				source.SetResult();
+			}
+		})).SetDelay(time);
+		return source;
+	}
+
+	private static int GetTotalCardsBeingPreviewed()
+	{
+		int num = 0;
+		if (NCombatRoom.Instance != null)
+		{
+			num = NCombatRoom.Instance.Ui.CardPreviewContainer.GetChildCount();
+			num += NCombatRoom.Instance.Ui.MessyCardPreviewContainer.GetChildCount();
+		}
+		if (NRun.Instance != null)
+		{
+			num += NRun.Instance.GlobalUi.CardPreviewContainer.GetChildCount();
+			num += NRun.Instance.GlobalUi.MessyCardPreviewContainer.GetChildCount();
+			num += NRun.Instance.GlobalUi.EventCardPreviewContainer.GetChildCount();
+			num += NRun.Instance.GlobalUi.GridCardPreviewContainer.GetChildCount();
+		}
+		return num;
+	}
+
+	private static System.Threading.Tasks.Task FlashRelics(NCard node, System.Collections.Generic.IEnumerable<RelicModel>? relicsToFlash)
+	{
+		if (relicsToFlash == null)
+		{
+			return System.Threading.Tasks.Task.CompletedTask;
+		}
+		System.Collections.Generic.IEnumerator<RelicModel> enumerator = relicsToFlash.GetEnumerator();
+		try
+		{
+			while (((System.Collections.IEnumerator)enumerator).MoveNext())
+			{
+				RelicModel current = enumerator.Current;
+				current.Flash();
+				node.FlashRelicOnCard(current);
+			}
+		}
+		finally
+		{
+			((System.IDisposable)enumerator)?.Dispose();
+		}
+		return System.Threading.Tasks.Task.CompletedTask;
+	}
+}
+

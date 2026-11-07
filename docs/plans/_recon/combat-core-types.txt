@@ -1,0 +1,13 @@
+﻿MegaCrit.Sts2.Core.Combat.CombatId
+MegaCrit.Sts2.Core.Combat.CombatManager
+MegaCrit.Sts2.Core.Combat.CombatSide
+MegaCrit.Sts2.Core.Combat.CombatSideExtensions
+MegaCrit.Sts2.Core.Combat.CombatState
+MegaCrit.Sts2.Core.Combat.CombatStateTracker
+MegaCrit.Sts2.Core.Combat.EndTurnSignal
+MegaCrit.Sts2.Core.Combat.PendingLossState
+MegaCrit.Sts2.Core.Combat.CombatTurnState
+MegaCrit.Sts2.Core.Combat.ICombatState
+MegaCrit.Sts2.Core.Combat.NullCombatState
+MegaCrit.Sts2.Core.Combat.PlayerTurnPhase
+MegaCrit.Sts2.Core.Combat.StuckCombatException

@@ -1,0 +1,1143 @@
+﻿// ===== MegaCrit.Sts2.Core.Commands.Builders.AttackCommand =====
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using Godot;
+using MegaCrit.Sts2.Core.Audio.Debug;
+using MegaCrit.Sts2.Core.Combat;
+using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Helpers;
+using MegaCrit.Sts2.Core.Hooks;
+using MegaCrit.Sts2.Core.Localization.DynamicVars;
+using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Monsters;
+using MegaCrit.Sts2.Core.Random;
+using MegaCrit.Sts2.Core.ValueProps;
+
+namespace MegaCrit.Sts2.Core.Commands.Builders;
+
+public class AttackCommand
+{
+	private enum SourceType
+	{
+		None,
+		Card,
+		Monster
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <CreateContextAsync>d__89 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder<AttackContext> <>t__builder;
+
+		public ICombatState combatState;
+
+		public PlayerChoiceContext choiceContext;
+
+		public CardPlay cardPlay;
+
+		private TaskAwaiter<AttackContext> <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			AttackContext result2;
+			try
+			{
+				TaskAwaiter<AttackContext> val;
+				if (num != 0)
+				{
+					val = AttackContext.CreateAsync(combatState, choiceContext, cardPlay).GetAwaiter();
+					if (!val.IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter<AttackContext>, <CreateContextAsync>d__89>(ref val, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter<AttackContext>);
+					num = (<>1__state = -1);
+				}
+				AttackContext result = val.GetResult();
+				result2 = result;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<>t__builder.SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<>t__builder.SetResult(result2);
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			<>t__builder.SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <Execute>d__90 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder<AttackCommand> <>t__builder;
+
+		public AttackCommand <>4__this;
+
+		public PlayerChoiceContext choiceContext;
+
+		private ICombatState <combatState>5__2;
+
+		private decimal <attackCount>5__3;
+
+		private TaskAwaiter <>u__1;
+
+		private int <i>5__4;
+
+		private List<Creature> <validTargets>5__5;
+
+		private Creature <singleTarget>5__6;
+
+		private TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>> <>u__2;
+
+		private void MoveNext()
+		{
+			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_033d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0342: Unknown result type (might be due to invalid IL or missing references)
+			//IL_034a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_069f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0771: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0776: Unknown result type (might be due to invalid IL or missing references)
+			//IL_077e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0870: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0875: Unknown result type (might be due to invalid IL or missing references)
+			//IL_087d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_050d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0512: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0308: Unknown result type (might be due to invalid IL or missing references)
+			//IL_030d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0322: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0324: Unknown result type (might be due to invalid IL or missing references)
+			//IL_083e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0843: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0858: Unknown result type (might be due to invalid IL or missing references)
+			//IL_085a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0555: Unknown result type (might be due to invalid IL or missing references)
+			//IL_055a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_073c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0741: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_066a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_066f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0756: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0758: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0684: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0686: Unknown result type (might be due to invalid IL or missing references)
+			//IL_029d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b9: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			AttackCommand CS$<>8__locals67 = <>4__this;
+			AttackCommand result;
+			try
+			{
+				TaskAwaiter val7;
+				TaskAwaiter val6;
+				TaskAwaiter val5;
+				TaskAwaiter val4;
+				TaskAwaiter val3;
+				TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>> val2;
+				TaskAwaiter val;
+				System.Collections.Generic.IEnumerable<DamageResult> result2;
+				decimal amount;
+				PlayerChoiceContext obj;
+				List<Creature> obj2;
+				Enumerator<Func<Creature, Node2D>> enumerator2;
+				switch (num)
+				{
+				default:
+					<combatState>5__2 = CS$<>8__locals67.Attacker?.CombatState;
+					if (CS$<>8__locals67.Attacker == null)
+					{
+						throw new InvalidOperationException("No attacker set.");
+					}
+					if (CombatManager.Instance.IsOverOrEnding && (<combatState>5__2 == null || <combatState>5__2.IsLiveCombat()))
+					{
+						result = CS$<>8__locals67;
+					}
+					else
+					{
+						if (<combatState>5__2 == null)
+						{
+							throw new InvalidOperationException("No combat state even though combat is not over.");
+						}
+						if (!CS$<>8__locals67.Attacker.IsDead)
+						{
+							if (!CS$<>8__locals67.IsSingleTargeted && !CS$<>8__locals67.IsMultiTargeted)
+							{
+								throw new InvalidOperationException("No targets set.");
+							}
+							val7 = Hook.BeforeAttack(<combatState>5__2, CS$<>8__locals67).GetAwaiter();
+							if (!((TaskAwaiter)(ref val7)).IsCompleted)
+							{
+								num = (<>1__state = 0);
+								<>u__1 = val7;
+								<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <Execute>d__90>(ref val7, ref this);
+								return;
+							}
+							goto IL_011f;
+						}
+						result = CS$<>8__locals67;
+					}
+					goto end_IL_000e;
+				case 0:
+					val7 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_011f;
+				case 1:
+					val6 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_02ee;
+				case 2:
+					val5 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_0359;
+				case 3:
+					val4 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_0500;
+				case 4:
+					val3 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_06bb;
+				case 5:
+					val2 = <>u__2;
+					<>u__2 = default(TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>>);
+					num = (<>1__state = -1);
+					goto IL_078d;
+				case 6:
+					{
+						val = <>u__1;
+						<>u__1 = default(TaskAwaiter);
+						num = (<>1__state = -1);
+						break;
+					}
+					IL_02ee:
+					((TaskAwaiter)(ref val6)).GetResult();
+					goto IL_02f5;
+					IL_078d:
+					result2 = val2.GetResult();
+					CS$<>8__locals67.AddResultsInternal(result2);
+					<validTargets>5__5 = null;
+					<singleTarget>5__6 = null;
+					<i>5__4++;
+					goto IL_07be;
+					IL_0500:
+					((TaskAwaiter)(ref val4)).GetResult();
+					goto IL_0507;
+					IL_0360:
+					if (<validTargets>5__5.Count > 0)
+					{
+						if (CS$<>8__locals67.HitSfx != null)
+						{
+							SfxCmd.Play(CS$<>8__locals67.HitSfx);
+						}
+						else if (CS$<>8__locals67.TmpHitSfx != null)
+						{
+							NDebugAudioManager.Instance?.Play(CS$<>8__locals67.TmpHitSfx);
+						}
+					}
+					if (CS$<>8__locals67.IsRandomlyTargeted)
+					{
+						if (!CS$<>8__locals67._doesRandomTargetingAllowDuplicates)
+						{
+							<validTargets>5__5 = Enumerable.ToList<Creature>(Enumerable.Where<Creature>((System.Collections.Generic.IEnumerable<Creature>)<validTargets>5__5, (Func<Creature, bool>)([CompilerGenerated] (Creature c) => Enumerable.All<DamageResult>(Enumerable.SelectMany<List<DamageResult>, DamageResult>((System.Collections.Generic.IEnumerable<List<DamageResult>>)CS$<>8__locals67._results, (Func<List<DamageResult>, System.Collections.Generic.IEnumerable<DamageResult>>)((List<DamageResult> r) => (System.Collections.Generic.IEnumerable<DamageResult>)r)), (Func<DamageResult, bool>)((DamageResult r) => r.Receiver != c)))));
+							if (<validTargets>5__5.Count == 0)
+							{
+								throw new InvalidOperationException("No valid targets for attack with duplicates disallowed. If you're in a test, you probably need to add more enemies. If you're in real gameplay, something is wrong.");
+							}
+						}
+						Rng combatTargets = (CS$<>8__locals67.Attacker.Player ?? CS$<>8__locals67.Attacker.PetOwner).RunState.Rng.CombatTargets;
+						<singleTarget>5__6 = combatTargets.NextItem((System.Collections.Generic.IEnumerable<Creature>)<validTargets>5__5);
+					}
+					else if (<validTargets>5__5.Count == 1)
+					{
+						<singleTarget>5__6 = <validTargets>5__5[0];
+					}
+					else
+					{
+						<singleTarget>5__6 = null;
+					}
+					if (Enumerable.Any<float>((System.Collections.Generic.IEnumerable<float>)CS$<>8__locals67._waitBeforeHit, (Func<float, bool>)((float w) => w > 0f)))
+					{
+						val4 = Cmd.CustomScaledWait(CS$<>8__locals67._waitBeforeHit[0], CS$<>8__locals67._waitBeforeHit[1]).GetAwaiter();
+						if (!((TaskAwaiter)(ref val4)).IsCompleted)
+						{
+							num = (<>1__state = 3);
+							<>u__1 = val4;
+							<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <Execute>d__90>(ref val4, ref this);
+							return;
+						}
+						goto IL_0500;
+					}
+					goto IL_0507;
+					IL_0359:
+					((TaskAwaiter)(ref val5)).GetResult();
+					goto IL_0360;
+					IL_011f:
+					((TaskAwaiter)(ref val7)).GetResult();
+					<attackCount>5__3 = Hook.ModifyAttackHitCount(<combatState>5__2, CS$<>8__locals67, CS$<>8__locals67._hitCount);
+					<i>5__4 = 0;
+					goto IL_07be;
+					IL_06bb:
+					((TaskAwaiter)(ref val3)).GetResult();
+					goto IL_06c2;
+					IL_07be:
+					if (decimal.op_Implicit(<i>5__4) < <attackCount>5__3 && !CS$<>8__locals67.Attacker.IsDead)
+					{
+						<validTargets>5__5 = Enumerable.ToList<Creature>(Enumerable.Where<Creature>((System.Collections.Generic.IEnumerable<Creature>)CS$<>8__locals67.GetPossibleTargets(), (Func<Creature, bool>)((Creature c) => c.IsAlive)));
+						if (<validTargets>5__5.Count != 0 || !<combatState>5__2.IsLiveCombat())
+						{
+							if (CS$<>8__locals67._playOnEveryHit || <i>5__4 == 0)
+							{
+								if (CS$<>8__locals67._attackerVfx != null)
+								{
+									VfxCmd.PlayOnCreatureCenter(CS$<>8__locals67.Attacker, CS$<>8__locals67._attackerVfx);
+								}
+								Enumerator<Func<Node2D>> enumerator = CS$<>8__locals67._customAttackerVfxNodes.GetEnumerator();
+								try
+								{
+									while (enumerator.MoveNext())
+									{
+										Func<Node2D> current = enumerator.Current;
+										CS$<>8__locals67.Attacker.GetVfxContainer()?.AddChildSafely(current.Invoke());
+									}
+								}
+								finally
+								{
+									if (num < 0)
+									{
+										((System.IDisposable)enumerator/*cast due to .constrained prefix*/).Dispose();
+									}
+								}
+								if (CS$<>8__locals67._attackerSfx != null)
+								{
+									SfxCmd.Play(CS$<>8__locals67._attackerSfx);
+								}
+								else if (CS$<>8__locals67._tmpAttackerSfx != null)
+								{
+									NDebugAudioManager.Instance?.Play(CS$<>8__locals67._tmpAttackerSfx);
+								}
+								if (CS$<>8__locals67._attackerAnimName != null && CS$<>8__locals67._shouldPlayAnimation)
+								{
+									val6 = CreatureCmd.TriggerAnim(CS$<>8__locals67._visualAttacker ?? CS$<>8__locals67.Attacker, CS$<>8__locals67._attackerAnimName, CS$<>8__locals67._attackerAnimDelay).GetAwaiter();
+									if (!((TaskAwaiter)(ref val6)).IsCompleted)
+									{
+										num = (<>1__state = 1);
+										<>u__1 = val6;
+										<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <Execute>d__90>(ref val6, ref this);
+										return;
+									}
+									goto IL_02ee;
+								}
+								goto IL_02f5;
+							}
+							goto IL_0360;
+						}
+					}
+					CombatManager.Instance.History.CreatureAttacked(<combatState>5__2, CS$<>8__locals67.Attacker, (System.Collections.Generic.IReadOnlyList<DamageResult>)Enumerable.ToList<DamageResult>(Enumerable.SelectMany<List<DamageResult>, DamageResult>((System.Collections.Generic.IEnumerable<List<DamageResult>>)CS$<>8__locals67._results, (Func<List<DamageResult>, System.Collections.Generic.IEnumerable<DamageResult>>)((List<DamageResult> r) => (System.Collections.Generic.IEnumerable<DamageResult>)r))));
+					val = Hook.AfterAttack(<combatState>5__2, choiceContext ?? new BlockingPlayerChoiceContext(), CS$<>8__locals67).GetAwaiter();
+					if (!((TaskAwaiter)(ref val)).IsCompleted)
+					{
+						num = (<>1__state = 6);
+						<>u__1 = val;
+						<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <Execute>d__90>(ref val, ref this);
+						return;
+					}
+					break;
+					IL_06c2:
+					amount = ((CS$<>8__locals67._calculatedDamageVar == null) ? CS$<>8__locals67._damagePerHit : CS$<>8__locals67._calculatedDamageVar.Calculate(<singleTarget>5__6));
+					obj = choiceContext ?? new BlockingPlayerChoiceContext();
+					if (<singleTarget>5__6 == null)
+					{
+						obj2 = <validTargets>5__5;
+					}
+					else
+					{
+						obj2 = new List<Creature>(1);
+						obj2.Add(<singleTarget>5__6);
+					}
+					val2 = CreatureCmd.Damage(obj, (System.Collections.Generic.IEnumerable<Creature>?)obj2, amount, CS$<>8__locals67.DamageProps, CS$<>8__locals67.Attacker, CS$<>8__locals67.ModelSource as CardModel, CS$<>8__locals67.CardPlay).GetAwaiter();
+					if (!val2.IsCompleted)
+					{
+						num = (<>1__state = 5);
+						<>u__2 = val2;
+						<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>>, <Execute>d__90>(ref val2, ref this);
+						return;
+					}
+					goto IL_078d;
+					IL_02f5:
+					if (CS$<>8__locals67._afterAttackerAnim != null)
+					{
+						val5 = CS$<>8__locals67._afterAttackerAnim.Invoke().GetAwaiter();
+						if (!((TaskAwaiter)(ref val5)).IsCompleted)
+						{
+							num = (<>1__state = 2);
+							<>u__1 = val5;
+							<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <Execute>d__90>(ref val5, ref this);
+							return;
+						}
+						goto IL_0359;
+					}
+					goto IL_0360;
+					IL_0507:
+					enumerator2 = CS$<>8__locals67._customHitVfxNodes.GetEnumerator();
+					try
+					{
+						while (enumerator2.MoveNext())
+						{
+							Func<Creature, Node2D> current2 = enumerator2.Current;
+							if (<singleTarget>5__6 != null)
+							{
+								<singleTarget>5__6.GetVfxContainer()?.AddChildSafely(current2.Invoke(<singleTarget>5__6));
+								continue;
+							}
+							Enumerator<Creature> enumerator3 = <validTargets>5__5.GetEnumerator();
+							try
+							{
+								while (enumerator3.MoveNext())
+								{
+									Creature current3 = enumerator3.Current;
+									current3.GetVfxContainer()?.AddChildSafely(current2.Invoke(current3));
+								}
+							}
+							finally
+							{
+								if (num < 0)
+								{
+									((System.IDisposable)enumerator3/*cast due to .constrained prefix*/).Dispose();
+								}
+							}
+						}
+					}
+					finally
+					{
+						if (num < 0)
+						{
+							((System.IDisposable)enumerator2/*cast due to .constrained prefix*/).Dispose();
+						}
+					}
+					if (CS$<>8__locals67.HitVfx != null)
+					{
+						if (<singleTarget>5__6 != null)
+						{
+							if (CS$<>8__locals67._spawnVfxOnCreatureCenter)
+							{
+								VfxCmd.PlayOnCreatureCenter(<singleTarget>5__6, CS$<>8__locals67.HitVfx);
+							}
+							else
+							{
+								VfxCmd.PlayOnCreature(<singleTarget>5__6, CS$<>8__locals67.HitVfx);
+							}
+						}
+						else if (CS$<>8__locals67._spawnVfxOnEachCreature)
+						{
+							if (CS$<>8__locals67._spawnVfxOnCreatureCenter)
+							{
+								VfxCmd.PlayOnCreatureCenters((System.Collections.Generic.IEnumerable<Creature>)<validTargets>5__5, CS$<>8__locals67.HitVfx);
+							}
+							else
+							{
+								VfxCmd.PlayOnCreatures((System.Collections.Generic.IEnumerable<Creature>)<validTargets>5__5, CS$<>8__locals67.HitVfx);
+							}
+						}
+						else
+						{
+							VfxCmd.PlayOnSide(CS$<>8__locals67.Attacker.Side.GetOppositeSide(), CS$<>8__locals67.HitVfx, <combatState>5__2);
+						}
+					}
+					if (CS$<>8__locals67._beforeDamage != null)
+					{
+						val3 = CS$<>8__locals67._beforeDamage.Invoke().GetAwaiter();
+						if (!((TaskAwaiter)(ref val3)).IsCompleted)
+						{
+							num = (<>1__state = 4);
+							<>u__1 = val3;
+							<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <Execute>d__90>(ref val3, ref this);
+							return;
+						}
+						goto IL_06bb;
+					}
+					goto IL_06c2;
+				}
+				((TaskAwaiter)(ref val)).GetResult();
+				result = CS$<>8__locals67;
+				end_IL_000e:;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<combatState>5__2 = null;
+				<>t__builder.SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<combatState>5__2 = null;
+			<>t__builder.SetResult(result);
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			<>t__builder.SetStateMachine(stateMachine);
+		}
+	}
+
+	private readonly decimal _damagePerHit;
+
+	private readonly CalculatedDamageVar? _calculatedDamageVar;
+
+	private int _hitCount = 1;
+
+	private SourceType _sourceType;
+
+	private ICombatState? _combatState;
+
+	private Creature? _singleTarget;
+
+	private bool _spawnVfxOnEachCreature;
+
+	private bool _spawnVfxOnCreatureCenter = true;
+
+	private bool _doesRandomTargetingAllowDuplicates = true;
+
+	private bool _shouldPlayAnimation = true;
+
+	private readonly List<List<DamageResult>> _results = new List<List<DamageResult>>();
+
+	private string? _attackerAnimName;
+
+	private float _attackerAnimDelay;
+
+	private Creature? _visualAttacker;
+
+	private bool _playOnEveryHit = true;
+
+	private string? _attackerVfx;
+
+	private string? _attackerSfx;
+
+	private string? _tmpAttackerSfx;
+
+	private readonly float[] _waitBeforeHit = new float[2] { -1f, -1f };
+
+	private readonly List<Func<Node2D?>> _customAttackerVfxNodes = new List<Func<Node2D>>();
+
+	private readonly List<Func<Creature, Node2D?>> _customHitVfxNodes = new List<Func<Creature, Node2D>>();
+
+	private Func<System.Threading.Tasks.Task>? _afterAttackerAnim;
+
+	private Func<System.Threading.Tasks.Task>? _beforeDamage;
+
+	[field: CompilerGenerated]
+	public Creature? Attacker
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public AbstractModel? ModelSource
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public CardPlay? CardPlay
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public CombatSide TargetSide
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public ValueProp DamageProps
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	} = ValueProp.Move;
+
+	public bool IsSingleTargeted => _singleTarget != null;
+
+	public bool IsMultiTargeted => _combatState != null;
+
+	[field: CompilerGenerated]
+	public bool IsRandomlyTargeted
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	public System.Collections.Generic.IEnumerable<List<DamageResult>> Results => (System.Collections.Generic.IEnumerable<List<DamageResult>>)_results;
+
+	[field: CompilerGenerated]
+	public string? HitSfx
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public string? TmpHitSfx
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public string? HitVfx
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	private System.Collections.Generic.IReadOnlyList<Creature> GetPossibleTargets()
+	{
+		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+		if (IsSingleTargeted)
+		{
+			return new global::<>z__ReadOnlySingleElementList<Creature>(_singleTarget);
+		}
+		if (IsMultiTargeted)
+		{
+			if (_sourceType == SourceType.Monster)
+			{
+				return _combatState.PlayerCreatures;
+			}
+			if (Attacker == null)
+			{
+				throw new InvalidOperationException("We require an attacker to be able to grab its opponents");
+			}
+			return _combatState.GetOpponentsOf(Attacker);
+		}
+		throw new InvalidOperationException("No targets set, a Targeting method must be called before Execute");
+	}
+
+	public AttackCommand(decimal damagePerHit)
+	{
+		_damagePerHit = damagePerHit;
+		_calculatedDamageVar = null;
+	}
+
+	public AttackCommand(CalculatedDamageVar calculatedDamageVar)
+	{
+		_damagePerHit = -1m;
+		_calculatedDamageVar = calculatedDamageVar;
+	}
+
+	public AttackCommand FromCard(CardModel card, CardPlay? cardPlay)
+	{
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+		if (Attacker != null)
+		{
+			throw new InvalidOperationException("Attacker has already been set.");
+		}
+		if (ModelSource != null)
+		{
+			throw new InvalidOperationException("ModelSource has already been set.");
+		}
+		if (cardPlay != null && CardPlay != null)
+		{
+			throw new InvalidOperationException("CardPlay has already been set.");
+		}
+		Player owner = card.Owner;
+		Attacker = owner.Creature;
+		_attackerAnimName = "Attack";
+		_attackerAnimDelay = owner.Character.AttackAnimDelay;
+		ModelSource = card;
+		CardPlay = cardPlay;
+		_sourceType = SourceType.Card;
+		return this;
+	}
+
+	public AttackCommand FromOsty(Creature osty, CardModel card, CardPlay? cardPlay)
+	{
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+		if (!(osty.Monster is Osty))
+		{
+			throw new ArgumentException("Creature is not Osty");
+		}
+		Attacker = osty;
+		ModelSource = card;
+		CardPlay = cardPlay;
+		_attackerAnimName = "Attack";
+		_attackerAnimDelay = 0.3f;
+		_sourceType = SourceType.Card;
+		return WithAttackerFx(null, "event:/sfx/characters/osty/osty_attack");
+	}
+
+	public AttackCommand FromMonster(MonsterModel monster)
+	{
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		if (Attacker != null)
+		{
+			throw new InvalidOperationException("Attacker has already been set.");
+		}
+		Attacker = monster.Creature;
+		_attackerAnimName = "Attack";
+		_sourceType = SourceType.Monster;
+		return TargetingAllOpponents(monster.Creature.CombatState);
+	}
+
+	public AttackCommand Targeting(Creature target)
+	{
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+		if (_singleTarget != null)
+		{
+			throw new InvalidOperationException("Targets already set.");
+		}
+		if (_combatState != null)
+		{
+			throw new InvalidOperationException("Already set to target opponents of attacker");
+		}
+		_singleTarget = target;
+		TargetSide = target.Side;
+		return this;
+	}
+
+	public AttackCommand TargetingAllOpponents(ICombatState combatState)
+	{
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+		if (_singleTarget != null)
+		{
+			throw new InvalidOperationException("Targets already set.");
+		}
+		if (_combatState != null)
+		{
+			throw new InvalidOperationException("Already set to target opponents of attacker");
+		}
+		if (Attacker == null)
+		{
+			throw new InvalidOperationException("We require an attacker to be able to grab its opponents");
+		}
+		_combatState = combatState;
+		TargetSide = ((Attacker.Side == CombatSide.Enemy) ? CombatSide.Player : CombatSide.Enemy);
+		return this;
+	}
+
+	public AttackCommand TargetingRandomOpponents(ICombatState combatState, bool allowDuplicates = true)
+	{
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+		if (_singleTarget != null)
+		{
+			throw new InvalidOperationException("Targets already set.");
+		}
+		if (_combatState != null)
+		{
+			throw new InvalidOperationException("Already set to target opponents of attacker");
+		}
+		if (Attacker == null)
+		{
+			throw new InvalidOperationException("We require an attacker to be able to grab its opponents");
+		}
+		_combatState = combatState;
+		IsRandomlyTargeted = true;
+		_doesRandomTargetingAllowDuplicates = allowDuplicates;
+		return this;
+	}
+
+	public AttackCommand Unpowered()
+	{
+		DamageProps |= ValueProp.Unpowered;
+		return this;
+	}
+
+	public AttackCommand WithAttackerAnim(string? animName, float delay, Creature? visualAttacker = null)
+	{
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		if (_attackerAnimName == null)
+		{
+			throw new InvalidOperationException("WithAttackerAnim was called before FromCard/FromMonster/FromOsty, should be called after.");
+		}
+		_attackerAnimName = animName;
+		_attackerAnimDelay = delay;
+		_visualAttacker = visualAttacker;
+		return this;
+	}
+
+	public AttackCommand WithNoAttackerAnim()
+	{
+		_shouldPlayAnimation = false;
+		return this;
+	}
+
+	public AttackCommand AfterAttackerAnim(Func<System.Threading.Tasks.Task> afterAttackerAnim)
+	{
+		_afterAttackerAnim = afterAttackerAnim;
+		return this;
+	}
+
+	public AttackCommand WithAttackerFx(string? vfx = null, string? sfx = null, string? tmpSfx = null)
+	{
+		_attackerVfx = vfx;
+		_attackerSfx = sfx;
+		_tmpAttackerSfx = tmpSfx;
+		return this;
+	}
+
+	public AttackCommand WithAttackerFx(Func<Node2D?> createAttackerVfx)
+	{
+		_customAttackerVfxNodes.Add(createAttackerVfx);
+		return this;
+	}
+
+	public AttackCommand WithWaitBeforeHit(float fastSeconds, float standardSeconds)
+	{
+		_waitBeforeHit[0] = fastSeconds;
+		_waitBeforeHit[1] = standardSeconds;
+		return this;
+	}
+
+	public AttackCommand WithHitFx(string? vfx = null, string? sfx = null, string? tmpSfx = null)
+	{
+		HitVfx = vfx;
+		HitSfx = sfx;
+		TmpHitSfx = tmpSfx;
+		return this;
+	}
+
+	public AttackCommand SpawningHitVfxOnEachCreature()
+	{
+		_spawnVfxOnEachCreature = true;
+		return this;
+	}
+
+	public AttackCommand WithHitVfxSpawnedAtBase()
+	{
+		_spawnVfxOnCreatureCenter = false;
+		return this;
+	}
+
+	public AttackCommand WithHitVfxNode(Func<Creature, Node2D?> createHitVfxNode)
+	{
+		_customHitVfxNodes.Add(createHitVfxNode);
+		return this;
+	}
+
+	public AttackCommand OnlyPlayAnimOnce()
+	{
+		_playOnEveryHit = false;
+		return this;
+	}
+
+	public AttackCommand WithHitCount(int hitCount)
+	{
+		_hitCount = hitCount;
+		return this;
+	}
+
+	public AttackCommand BeforeDamage(Func<System.Threading.Tasks.Task> beforeDamage)
+	{
+		_beforeDamage = beforeDamage;
+		return this;
+	}
+
+	[AsyncStateMachine(typeof(<CreateContextAsync>d__89))]
+	public static async System.Threading.Tasks.Task<AttackContext> CreateContextAsync(ICombatState combatState, PlayerChoiceContext choiceContext, CardPlay cardPlay)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		return await AttackContext.CreateAsync(combatState, choiceContext, cardPlay);
+	}
+
+	[AsyncStateMachine(typeof(<Execute>d__90))]
+	public async System.Threading.Tasks.Task<AttackCommand> Execute(PlayerChoiceContext? choiceContext)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		ICombatState combatState = Attacker?.CombatState;
+		if (Attacker == null)
+		{
+			throw new InvalidOperationException("No attacker set.");
+		}
+		if (CombatManager.Instance.IsOverOrEnding && (combatState == null || combatState.IsLiveCombat()))
+		{
+			return this;
+		}
+		if (combatState == null)
+		{
+			throw new InvalidOperationException("No combat state even though combat is not over.");
+		}
+		if (Attacker.IsDead)
+		{
+			return this;
+		}
+		if (!IsSingleTargeted && !IsMultiTargeted)
+		{
+			throw new InvalidOperationException("No targets set.");
+		}
+		await Hook.BeforeAttack(combatState, this);
+		decimal attackCount = Hook.ModifyAttackHitCount(combatState, this, _hitCount);
+		for (int i = 0; decimal.op_Implicit(i) < attackCount; i++)
+		{
+			if (Attacker.IsDead)
+			{
+				break;
+			}
+			List<Creature> validTargets = Enumerable.ToList<Creature>(Enumerable.Where<Creature>((System.Collections.Generic.IEnumerable<Creature>)GetPossibleTargets(), (Func<Creature, bool>)((Creature c) => c.IsAlive)));
+			if (validTargets.Count == 0 && combatState.IsLiveCombat())
+			{
+				break;
+			}
+			if (_playOnEveryHit || i == 0)
+			{
+				if (_attackerVfx != null)
+				{
+					VfxCmd.PlayOnCreatureCenter(Attacker, _attackerVfx);
+				}
+				Enumerator<Func<Node2D>> enumerator = _customAttackerVfxNodes.GetEnumerator();
+				try
+				{
+					while (enumerator.MoveNext())
+					{
+						Func<Node2D> current = enumerator.Current;
+						Attacker.GetVfxContainer()?.AddChildSafely(current.Invoke());
+					}
+				}
+				finally
+				{
+					((System.IDisposable)enumerator/*cast due to .constrained prefix*/).Dispose();
+				}
+				if (_attackerSfx != null)
+				{
+					SfxCmd.Play(_attackerSfx);
+				}
+				else if (_tmpAttackerSfx != null)
+				{
+					NDebugAudioManager.Instance?.Play(_tmpAttackerSfx);
+				}
+				if (_attackerAnimName != null && _shouldPlayAnimation)
+				{
+					await CreatureCmd.TriggerAnim(_visualAttacker ?? Attacker, _attackerAnimName, _attackerAnimDelay);
+				}
+				if (_afterAttackerAnim != null)
+				{
+					await _afterAttackerAnim.Invoke();
+				}
+			}
+			if (validTargets.Count > 0)
+			{
+				if (HitSfx != null)
+				{
+					SfxCmd.Play(HitSfx);
+				}
+				else if (TmpHitSfx != null)
+				{
+					NDebugAudioManager.Instance?.Play(TmpHitSfx);
+				}
+			}
+			Creature singleTarget;
+			if (!IsRandomlyTargeted)
+			{
+				singleTarget = ((validTargets.Count != 1) ? null : validTargets[0]);
+			}
+			else
+			{
+				if (!_doesRandomTargetingAllowDuplicates)
+				{
+					validTargets = Enumerable.ToList<Creature>(Enumerable.Where<Creature>((System.Collections.Generic.IEnumerable<Creature>)validTargets, (Func<Creature, bool>)([CompilerGenerated] (Creature c) => Enumerable.All<DamageResult>(Enumerable.SelectMany<List<DamageResult>, DamageResult>((System.Collections.Generic.IEnumerable<List<DamageResult>>)_results, (Func<List<DamageResult>, System.Collections.Generic.IEnumerable<DamageResult>>)((List<DamageResult> r) => (System.Collections.Generic.IEnumerable<DamageResult>)r)), (Func<DamageResult, bool>)((DamageResult r) => r.Receiver != c)))));
+					if (validTargets.Count == 0)
+					{
+						throw new InvalidOperationException("No valid targets for attack with duplicates disallowed. If you're in a test, you probably need to add more enemies. If you're in real gameplay, something is wrong.");
+					}
+				}
+				Rng combatTargets = (Attacker.Player ?? Attacker.PetOwner).RunState.Rng.CombatTargets;
+				singleTarget = combatTargets.NextItem((System.Collections.Generic.IEnumerable<Creature>)validTargets);
+			}
+			if (Enumerable.Any<float>((System.Collections.Generic.IEnumerable<float>)_waitBeforeHit, (Func<float, bool>)((float w) => w > 0f)))
+			{
+				await Cmd.CustomScaledWait(_waitBeforeHit[0], _waitBeforeHit[1]);
+			}
+			Enumerator<Func<Creature, Node2D>> enumerator2 = _customHitVfxNodes.GetEnumerator();
+			try
+			{
+				while (enumerator2.MoveNext())
+				{
+					Func<Creature, Node2D> current2 = enumerator2.Current;
+					if (singleTarget != null)
+					{
+						singleTarget.GetVfxContainer()?.AddChildSafely(current2.Invoke(singleTarget));
+						continue;
+					}
+					Enumerator<Creature> enumerator3 = validTargets.GetEnumerator();
+					try
+					{
+						while (enumerator3.MoveNext())
+						{
+							Creature current3 = enumerator3.Current;
+							current3.GetVfxContainer()?.AddChildSafely(current2.Invoke(current3));
+						}
+					}
+					finally
+					{
+						((System.IDisposable)enumerator3/*cast due to .constrained prefix*/).Dispose();
+					}
+				}
+			}
+			finally
+			{
+				((System.IDisposable)enumerator2/*cast due to .constrained prefix*/).Dispose();
+			}
+			if (HitVfx != null)
+			{
+				if (singleTarget != null)
+				{
+					if (_spawnVfxOnCreatureCenter)
+					{
+						VfxCmd.PlayOnCreatureCenter(singleTarget, HitVfx);
+					}
+					else
+					{
+						VfxCmd.PlayOnCreature(singleTarget, HitVfx);
+					}
+				}
+				else if (_spawnVfxOnEachCreature)
+				{
+					if (_spawnVfxOnCreatureCenter)
+					{
+						VfxCmd.PlayOnCreatureCenters((System.Collections.Generic.IEnumerable<Creature>)validTargets, HitVfx);
+					}
+					else
+					{
+						VfxCmd.PlayOnCreatures((System.Collections.Generic.IEnumerable<Creature>)validTargets, HitVfx);
+					}
+				}
+				else
+				{
+					VfxCmd.PlayOnSide(Attacker.Side.GetOppositeSide(), HitVfx, combatState);
+				}
+			}
+			if (_beforeDamage != null)
+			{
+				await _beforeDamage.Invoke();
+			}
+			decimal amount = ((_calculatedDamageVar == null) ? _damagePerHit : _calculatedDamageVar.Calculate(singleTarget));
+			PlayerChoiceContext? choiceContext2 = choiceContext ?? new BlockingPlayerChoiceContext();
+			List<Creature> obj;
+			if (singleTarget == null)
+			{
+				obj = validTargets;
+			}
+			else
+			{
+				obj = new List<Creature>(1);
+				obj.Add(singleTarget);
+			}
+			AddResultsInternal(await CreatureCmd.Damage(choiceContext2, (System.Collections.Generic.IEnumerable<Creature>?)obj, amount, DamageProps, Attacker, ModelSource as CardModel, CardPlay));
+		}
+		CombatManager.Instance.History.CreatureAttacked(combatState, Attacker, (System.Collections.Generic.IReadOnlyList<DamageResult>)Enumerable.ToList<DamageResult>(Enumerable.SelectMany<List<DamageResult>, DamageResult>((System.Collections.Generic.IEnumerable<List<DamageResult>>)_results, (Func<List<DamageResult>, System.Collections.Generic.IEnumerable<DamageResult>>)((List<DamageResult> r) => (System.Collections.Generic.IEnumerable<DamageResult>)r))));
+		await Hook.AfterAttack(combatState, choiceContext ?? new BlockingPlayerChoiceContext(), this);
+		return this;
+	}
+
+	public void IncrementHitsInternal()
+	{
+		_hitCount++;
+	}
+
+	public void AddResultsInternal(System.Collections.Generic.IEnumerable<DamageResult> results)
+	{
+		_results.Add(Enumerable.ToList<DamageResult>(results));
+	}
+}
+

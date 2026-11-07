@@ -1,0 +1,103 @@
+{
+  "IRONCLAD_BOSS_ENCOUNTER.title": "El Blindado",
+  "IRONCLAD_BOSS_ENCOUNTER.loss": "{character} fue destrozado por [gold]El Blindado[/gold].",
+
+  "IRONCLAD_ANGER_BOSS_ENCOUNTER.title": "El Blindado",
+  "IRONCLAD_ANGER_BOSS_ENCOUNTER.loss": "{character} quedó reducido a cenizas por la furia de [gold]El Blindado[/gold].",
+
+  "IRONCLAD_VULN_BOSS_ENCOUNTER.title": "El Blindado",
+  "IRONCLAD_VULN_BOSS_ENCOUNTER.loss": "[gold]El Blindado[/gold] le abrió las heridas a {character} capa por capa.",
+
+  "SILENT_BOSS_ENCOUNTER.title": "La Silenciosa",
+  "SILENT_BOSS_ENCOUNTER.loss": "{character} murió sin llegar a ver a [gold]La Silenciosa[/gold].",
+
+  "SILENT_ENVENOM_BOSS_ENCOUNTER.title": "La Silenciosa",
+  "SILENT_ENVENOM_BOSS_ENCOUNTER.loss": "{character} se consumió con el veneno de [gold]La Silenciosa[/gold].",
+
+  "SILENT_SHIV_BOSS_ENCOUNTER.title": "La Silenciosa",
+  "SILENT_SHIV_BOSS_ENCOUNTER.loss": "{character} quedó sepultado bajo la lluvia de cuchillas de [gold]La Silenciosa[/gold].",
+
+  "SILENT_SLY_BOSS_ENCOUNTER.title": "La Silenciosa",
+  "SILENT_SLY_BOSS_ENCOUNTER.loss": "[gold]La Silenciosa[/gold] arrojó a {character} a la pila de descarte.",
+
+  "SILENT_BREWER_BOSS_ENCOUNTER.title": "La Silenciosa",
+  "SILENT_BREWER_BOSS_ENCOUNTER.loss": "{character} no logró atravesar la barrera de pociones de [gold]La Silenciosa[/gold].",
+
+  "DEFECT_BOSS_ENCOUNTER.title": "El Defectuoso",
+  "DEFECT_BOSS_ENCOUNTER.loss": "{character} fue analizado y borrado por [gold]El Defectuoso[/gold].",
+
+  "DEFECT_AI_BOSS_ENCOUNTER.title": "El Defectuoso",
+  "DEFECT_AI_BOSS_ENCOUNTER.loss": "[gold]El Defectuoso[/gold] metió cada carta de {character} en su modelo.",
+
+  "DEFECT_CLAW_BOSS_ENCOUNTER.title": "El Defectuoso",
+  "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character} fue aniquilado por el [gold]Hiperrayo[/gold] de [gold]El Defectuoso[/gold].",
+
+  "NECROBINDER_BOSS_ENCOUNTER.title": "La Necrodescarte",
+  "NECROBINDER_BOSS_ENCOUNTER.loss": "[gold]La Necrodescarte[/gold] se llevó el alma de {character}.",
+
+  "NECROBINDER_DOOM_BOSS_ENCOUNTER.title": "La Necrodescarte",
+  "NECROBINDER_DOOM_BOSS_ENCOUNTER.loss": "[gold]La Necrodescarte[/gold] arrastró a {character} hasta el final de la [gold]condena[/gold].",
+
+  "NECROBINDER_SOUL_BOSS_ENCOUNTER.title": "La Necrodescarte",
+  "NECROBINDER_SOUL_BOSS_ENCOUNTER.loss": "[gold]La Necrodescarte[/gold] se llevó el alma de {character}.",
+
+  "NECROBINDER_ERADICATE_BOSS_ENCOUNTER.title": "La Necrodescarte",
+  "NECROBINDER_ERADICATE_BOSS_ENCOUNTER.loss": "{character} fue erradicado, recuerdos incluidos, por [gold]La Necrodescarte[/gold].",
+
+  "REGENT_BOSS_ENCOUNTER.title": "El Monarca",
+  "REGENT_BOSS_ENCOUNTER.loss": "[gold]El Monarca[/gold] dictó sentencia contra {character}.",
+
+  "REGENT_DEBRIS_BOSS_ENCOUNTER.title": "El Monarca",
+  "REGENT_DEBRIS_BOSS_ENCOUNTER.loss": "{character} quedó sepultado bajo los [gold]Escombros[/gold] de [gold]El Monarca[/gold].",
+
+  "REGENT_FORGE_BOSS_ENCOUNTER.title": "El Monarca",
+  "REGENT_FORGE_BOSS_ENCOUNTER.loss": "{character} se convirtió en una muesca en la hoja de [gold]El Monarca[/gold].",
+
+  "REGENT_COLORLESS_BOSS_ENCOUNTER.title": "El Monarca",
+  "REGENT_COLORLESS_BOSS_ENCOUNTER.loss": "[gold]El Monarca[/gold] le arrancó todo el color a {character}.",
+
+  "REGENT_STAR_BOSS_ENCOUNTER.title": "El Monarca",
+  "REGENT_STAR_BOSS_ENCOUNTER.loss": "{character} fue molido hasta volverse polvo por las estrellas de [gold]El Monarca[/gold].",
+
+  "REGENT_KING_BOSS_ENCOUNTER.title": "El Monarca",
+  "REGENT_KING_BOSS_ENCOUNTER.loss": "{character} fue aplastado bajo la corona de [gold]El Monarca[/gold].",
+
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.title": "El Blindado",
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "{character} fue aplastado por la [gold]fuerza[/gold] creciente de [gold]El Blindado[/gold].",
+
+    "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.title": "El Blindado",
+  "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss": "[gold]El Blindado[/gold] tuvo a {character} dando vueltas hasta ahogarlo bajo sus propias copias.",
+"IRONCLAD_BOULDER_BOSS_ENCOUNTER.title": "El Blindado",
+  "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss": "[gold]El Blindado[/gold] redujo a {character} a pedazos con sus rocas.",
+
+  "DEFECT_DARK_BOSS_ENCOUNTER.title": "El Defectuoso",
+  "DEFECT_DARK_BOSS_ENCOUNTER.loss": "{character} fue devorado por los orbes de [gold]oscuridad[/gold] de [gold]El Defectuoso[/gold].",
+
+  "IRONCLAD_BOSS_NORMAL_ENCOUNTER.title": "El Blindado",
+  "IRONCLAD_BOSS_NORMAL_ENCOUNTER.loss": "{character} fue destrozado por [gold]El Blindado[/gold].",
+  "SILENT_BOSS_NORMAL_ENCOUNTER.title": "La Silenciosa",
+  "SILENT_BOSS_NORMAL_ENCOUNTER.loss": "{character} murió sin llegar a ver a [gold]La Silenciosa[/gold].",
+  "SILENT_ENVENOM_BOSS_NORMAL_ENCOUNTER.title": "La Silenciosa",
+  "SILENT_ENVENOM_BOSS_NORMAL_ENCOUNTER.loss": "{character} se consumió con el veneno de [gold]La Silenciosa[/gold].",
+  "SILENT_SLY_BOSS_NORMAL_ENCOUNTER.title": "La Silenciosa",
+  "SILENT_SLY_BOSS_NORMAL_ENCOUNTER.loss": "[gold]La Silenciosa[/gold] arrojó a {character} a la pila de descarte.",
+  "SILENT_SHIV_BOSS_NORMAL_ENCOUNTER.title": "La Silenciosa",
+  "SILENT_SHIV_BOSS_NORMAL_ENCOUNTER.loss": "{character} quedó sepultado bajo la lluvia de cuchillas de [gold]La Silenciosa[/gold].",
+  "DEFECT_BOSS_NORMAL_ENCOUNTER.title": "El Defectuoso",
+  "DEFECT_BOSS_NORMAL_ENCOUNTER.loss": "{character} fue analizado y borrado por [gold]El Defectuoso[/gold].",
+  "NECROBINDER_BOSS_NORMAL_ENCOUNTER.title": "La Necrodescarte",
+  "NECROBINDER_BOSS_NORMAL_ENCOUNTER.loss": "[gold]La Necrodescarte[/gold] se llevó el alma de {character}.",
+  "REGENT_BOSS_NORMAL_ENCOUNTER.title": "El Monarca",
+  "REGENT_BOSS_NORMAL_ENCOUNTER.loss": "[gold]El Monarca[/gold] dictó sentencia contra {character}.",
+
+  "TELEMETRY_PROMPT_HEADER": "Subir datos de juego (CharacterBosses)",
+  "TELEMETRY_PROMPT_BODY": "Este mod quiere recopilar algunos datos de partida para corregir errores y como base para equilibrar la fuerza de los jefes:\nresultado, acto/combate, ascensión, número de jugadores, PV del jefe, turnos y semilla de cada combate contra un jefe, además de las líneas de error de este propio mod.\n\nLos datos se guardan primero en un [b]archivo local[/b]; si el autor ha configurado un servidor de recogida, esos mismos datos anónimos [b]también se suben[/b] al autor.\n\nNo se recopila ninguna información personal (ni SteamID ni apodo).\n\nPuedes cambiarlo cuando quieras en «Configuración de mods → CharacterBosses → A5». ¿Quieres activarlo ahora?",
+  "TELEMETRY_PROMPT_YES": "Activar",
+  "TELEMETRY_PROMPT_NO": "Mantenerlo desactivado",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.title":  "The Necrobinder",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character} was dragged into the grave by the [gold]Necrobinder[/gold]\u0027s Osty.",
+    "SILENT_SNECKO_BOSS_ENCOUNTER.title":  "The Silent",
+    "SILENT_SNECKO_BOSS_ENCOUNTER.loss":  "{character} was sent to the grave by the [gold]Silent[/gold]\u0027s dice.",
+  "DEFECT_EVENT_BOSS_ENCOUNTER.loss": "[gold]El Defectuoso[/gold] sacó a {character} de la pila de descarte.",
+  "DEFECT_EVENT_BOSS_ENCOUNTER.title": "El Defectuoso"
+}

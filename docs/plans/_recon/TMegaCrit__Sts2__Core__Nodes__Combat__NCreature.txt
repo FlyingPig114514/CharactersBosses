@@ -1,0 +1,4072 @@
+﻿// ===== MegaCrit.Sts2.Core.Nodes.Combat.NCreature =====
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
+using Godot;
+using Godot.Bridge;
+using Godot.NativeInterop;
+using MegaCrit.Sts2.Core.Animation;
+using MegaCrit.Sts2.Core.Assets;
+using MegaCrit.Sts2.Core.Bindings.MegaSpine;
+using MegaCrit.Sts2.Core.Combat;
+using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Context;
+using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.Entities.Powers;
+using MegaCrit.Sts2.Core.Entities.UI;
+using MegaCrit.Sts2.Core.Helpers;
+using MegaCrit.Sts2.Core.HoverTips;
+using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Monsters;
+using MegaCrit.Sts2.Core.MonsterMoves.Intents;
+using MegaCrit.Sts2.Core.Nodes.CommonUi;
+using MegaCrit.Sts2.Core.Nodes.GodotExtensions;
+using MegaCrit.Sts2.Core.Nodes.HoverTips;
+using MegaCrit.Sts2.Core.Nodes.Multiplayer;
+using MegaCrit.Sts2.Core.Nodes.Orbs;
+using MegaCrit.Sts2.Core.Nodes.Rooms;
+using MegaCrit.Sts2.Core.Nodes.Screens.ScreenContext;
+using MegaCrit.Sts2.Core.Nodes.Vfx;
+using MegaCrit.Sts2.Core.Nodes.Vfx.Ui;
+using MegaCrit.Sts2.Core.Random;
+using MegaCrit.Sts2.Core.Rooms;
+using MegaCrit.Sts2.Core.Runs;
+using MegaCrit.Sts2.Core.Saves;
+using MegaCrit.Sts2.Core.Settings;
+using MegaCrit.Sts2.Core.TestSupport;
+
+namespace MegaCrit.Sts2.Core.Nodes.Combat;
+
+[ScriptPath("res://src/Core/Nodes/Combat/NCreature.cs")]
+public class NCreature : Control
+{
+	public new class MethodName : Control.MethodName
+	{
+		public new static readonly StringName _Ready = "_Ready";
+
+		public new static readonly StringName _EnterTree = "_EnterTree";
+
+		public new static readonly StringName _ExitTree = "_ExitTree";
+
+		public static readonly StringName ConnectSpineAnimatorSignals = "ConnectSpineAnimatorSignals";
+
+		public static readonly StringName UpdateBounds = "UpdateBounds";
+
+		public static readonly StringName UpdatePhobiaMode = "UpdatePhobiaMode";
+
+		public static readonly StringName UpdateNavigation = "UpdateNavigation";
+
+		public static readonly StringName OnFocus = "OnFocus";
+
+		public static readonly StringName OnUnfocus = "OnUnfocus";
+
+		public static readonly StringName OnTargetingStarted = "OnTargetingStarted";
+
+		public static readonly StringName SetRemotePlayerFocused = "SetRemotePlayerFocused";
+
+		public static readonly StringName HideHoverTips = "HideHoverTips";
+
+		public static readonly StringName SetAnimationTrigger = "SetAnimationTrigger";
+
+		public static readonly StringName GetCurrentAnimationLength = "GetCurrentAnimationLength";
+
+		public static readonly StringName GetCurrentAnimationTimeRemaining = "GetCurrentAnimationTimeRemaining";
+
+		public static readonly StringName ToggleIsInteractable = "ToggleIsInteractable";
+
+		public static readonly StringName DisableInteractionForDeath = "DisableInteractionForDeath";
+
+		public static readonly StringName AnimDisableUi = "AnimDisableUi";
+
+		public static readonly StringName AnimEnableUi = "AnimEnableUi";
+
+		public static readonly StringName StartDeathAnim = "StartDeathAnim";
+
+		public static readonly StringName StartReviveAnim = "StartReviveAnim";
+
+		public static readonly StringName AnimTempRevive = "AnimTempRevive";
+
+		public static readonly StringName ImmediatelySetIdle = "ImmediatelySetIdle";
+
+		public static readonly StringName AnimHideIntent = "AnimHideIntent";
+
+		public static readonly StringName SetScaleAndHue = "SetScaleAndHue";
+
+		public static readonly StringName ScaleTo = "ScaleTo";
+
+		public static readonly StringName SetDefaultScaleTo = "SetDefaultScaleTo";
+
+		public static readonly StringName OstyScaleToSize = "OstyScaleToSize";
+
+		public static readonly StringName AnimShake = "AnimShake";
+
+		public static readonly StringName DoScaleTween = "DoScaleTween";
+
+		public static readonly StringName SetOrbManagerPosition = "SetOrbManagerPosition";
+
+		public static readonly StringName GetTopOfHitbox = "GetTopOfHitbox";
+
+		public static readonly StringName GetBottomOfHitbox = "GetBottomOfHitbox";
+
+		public static readonly StringName ShowMultiselectReticle = "ShowMultiselectReticle";
+
+		public static readonly StringName HideMultiselectReticle = "HideMultiselectReticle";
+
+		public static readonly StringName ShowSingleSelectReticle = "ShowSingleSelectReticle";
+
+		public static readonly StringName HideSingleSelectReticle = "HideSingleSelectReticle";
+
+		public static readonly StringName SetupForBestiary = "SetupForBestiary";
+
+		public static readonly StringName StartSfxLoop = "StartSfxLoop";
+
+		public static readonly StringName StopSfxLoop = "StopSfxLoop";
+
+		public static readonly StringName StopAllSfxLoops = "StopAllSfxLoops";
+	}
+
+	public new class PropertyName : Control.PropertyName
+	{
+		public static readonly StringName Hitbox = "Hitbox";
+
+		public static readonly StringName OrbManager = "OrbManager";
+
+		public static readonly StringName IsInteractable = "IsInteractable";
+
+		public static readonly StringName VfxSpawnPosition = "VfxSpawnPosition";
+
+		public static readonly StringName PowerAppliedVfxSpawnPosition = "PowerAppliedVfxSpawnPosition";
+
+		public static readonly StringName Visuals = "Visuals";
+
+		public static readonly StringName Body = "Body";
+
+		public static readonly StringName IntentContainer = "IntentContainer";
+
+		public static readonly StringName IsPlayingDeathAnimation = "IsPlayingDeathAnimation";
+
+		public static readonly StringName HasSpineAnimation = "HasSpineAnimation";
+
+		public static readonly StringName IsFocused = "IsFocused";
+
+		public static readonly StringName PlayerIntentHandler = "PlayerIntentHandler";
+
+		public static readonly StringName _stateDisplay = "_stateDisplay";
+
+		public static readonly StringName _intentFadeTween = "_intentFadeTween";
+
+		public static readonly StringName _shakeTween = "_shakeTween";
+
+		public static readonly StringName _isRemotePlayerOrPet = "_isRemotePlayerOrPet";
+
+		public static readonly StringName _isInBestiary = "_isInBestiary";
+
+		public static readonly StringName _tempScale = "_tempScale";
+
+		public static readonly StringName _scaleTween = "_scaleTween";
+
+		public static readonly StringName _isInMultiselect = "_isInMultiselect";
+
+		public static readonly StringName _selectionReticle = "_selectionReticle";
+	}
+
+	public new class SignalName : Control.SignalName
+	{
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <AnimDie>d__106 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public NCreature <>4__this;
+
+		public bool shouldRemove;
+
+		public CancellationToken cancelToken;
+
+		private Tween <disableUiTween>5__2;
+
+		private TaskAwaiter <>u__1;
+
+		private System.Threading.Tasks.Task <fadeVfx>5__3;
+
+		private TaskAwaiter<bool> <>u__2;
+
+		private System.Collections.Generic.IEnumerator<IDeathDelayer> <>7__wrap3;
+
+		private void MoveNext()
+		{
+			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0159: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0166: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0283: Unknown result type (might be due to invalid IL or missing references)
+			//IL_028b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_030d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0312: Unknown result type (might be due to invalid IL or missing references)
+			//IL_031a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0119: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0124: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0129: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
+			//IL_036c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0371: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0386: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0388: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0249: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0263: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0265: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			NCreature nCreature = <>4__this;
+			try
+			{
+				TaskAwaiter val4;
+				TaskAwaiter val3;
+				TaskAwaiter<bool> val2;
+				TaskAwaiter val;
+				switch (num)
+				{
+				default:
+				{
+					<disableUiTween>5__2 = nCreature.AnimDisableUi();
+					if (!RunManager.Instance.IsSingleplayerOrFakeMultiplayer)
+					{
+						nCreature.OrbManager?.ClearOrbs();
+					}
+					if (shouldRemove)
+					{
+						nCreature.AnimHideIntent();
+					}
+					if (nCreature._spineAnimator != null)
+					{
+						float seconds = Math.Min(nCreature.GetCurrentAnimationTimeRemaining() + 0.5f, 20f);
+						val4 = Cmd.Wait(seconds, cancelToken, ignoreCombatEnd: true).GetAwaiter();
+						if (!((TaskAwaiter)(ref val4)).IsCompleted)
+						{
+							num = (<>1__state = 0);
+							<>u__1 = val4;
+							((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <AnimDie>d__106>(ref val4, ref this);
+							return;
+						}
+						goto IL_00e2;
+					}
+					MonsterModel monster = nCreature.Entity.Monster;
+					if (monster != null && monster.HasDeathAnimLengthOverride)
+					{
+						val3 = Cmd.Wait(nCreature.Entity.Monster.DeathAnimLengthOverride, cancelToken, ignoreCombatEnd: true).GetAwaiter();
+						if (!((TaskAwaiter)(ref val3)).IsCompleted)
+						{
+							num = (<>1__state = 1);
+							<>u__1 = val3;
+							((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <AnimDie>d__106>(ref val3, ref this);
+							return;
+						}
+						goto IL_0175;
+					}
+					goto IL_017c;
+				}
+				case 0:
+					val4 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_00e2;
+				case 1:
+					val3 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_0175;
+				case 2:
+					val2 = <>u__2;
+					<>u__2 = default(TaskAwaiter<bool>);
+					num = (<>1__state = -1);
+					goto IL_029a;
+				case 3:
+					try
+					{
+						if (num != 3)
+						{
+							goto IL_0330;
+						}
+						TaskAwaiter val5 = <>u__1;
+						<>u__1 = default(TaskAwaiter);
+						num = (<>1__state = -1);
+						goto IL_0329;
+						IL_0329:
+						((TaskAwaiter)(ref val5)).GetResult();
+						goto IL_0330;
+						IL_0330:
+						if (((System.Collections.IEnumerator)<>7__wrap3).MoveNext())
+						{
+							IDeathDelayer current = <>7__wrap3.Current;
+							val5 = current.GetDelayTask().GetAwaiter();
+							if (!((TaskAwaiter)(ref val5)).IsCompleted)
+							{
+								num = (<>1__state = 3);
+								<>u__1 = val5;
+								((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <AnimDie>d__106>(ref val5, ref this);
+								return;
+							}
+							goto IL_0329;
+						}
+					}
+					finally
+					{
+						if (num < 0 && <>7__wrap3 != null)
+						{
+							((System.IDisposable)<>7__wrap3).Dispose();
+						}
+					}
+					<>7__wrap3 = null;
+					goto IL_035e;
+				case 4:
+					{
+						val = <>u__1;
+						<>u__1 = default(TaskAwaiter);
+						num = (<>1__state = -1);
+						goto IL_03bd;
+					}
+					IL_035e:
+					if (<fadeVfx>5__3 != null)
+					{
+						val = <fadeVfx>5__3.GetAwaiter();
+						if (!((TaskAwaiter)(ref val)).IsCompleted)
+						{
+							num = (<>1__state = 4);
+							<>u__1 = val;
+							((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <AnimDie>d__106>(ref val, ref this);
+							return;
+						}
+						goto IL_03bd;
+					}
+					goto IL_03c4;
+					IL_03bd:
+					((TaskAwaiter)(ref val)).GetResult();
+					goto IL_03c4;
+					IL_03c4:
+					nCreature.QueueFreeSafely();
+					break;
+					IL_017c:
+					if (((CancellationToken)(ref cancelToken)).IsCancellationRequested)
+					{
+						break;
+					}
+					if (shouldRemove)
+					{
+						<fadeVfx>5__3 = null;
+						MonsterModel monster = nCreature.Entity.Monster;
+						if (monster != null && monster.ShouldFadeAfterDeath && nCreature.Body.IsVisibleInTree())
+						{
+							NMonsterDeathVfx nMonsterDeathVfx = NMonsterDeathVfx.Create(nCreature, cancelToken);
+							Node parent = nCreature.GetParent();
+							parent.AddChildSafely(nMonsterDeathVfx);
+							if (nMonsterDeathVfx != null)
+							{
+								parent.MoveChildSafely(nMonsterDeathVfx, nCreature.GetIndex());
+							}
+							<fadeVfx>5__3 = nMonsterDeathVfx?.PlayVfx();
+						}
+						if (SaveManager.Instance.PrefsSave.FastMode != FastModeType.Instant)
+						{
+							if (<disableUiTween>5__2.IsValid() && <disableUiTween>5__2.IsRunning())
+							{
+								val2 = <disableUiTween>5__2.AwaitFinished((Node)nCreature).GetAwaiter();
+								if (!val2.IsCompleted)
+								{
+									num = (<>1__state = 2);
+									<>u__2 = val2;
+									((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter<bool>, <AnimDie>d__106>(ref val2, ref this);
+									return;
+								}
+								goto IL_029a;
+							}
+							goto IL_02ac;
+						}
+						goto IL_035e;
+					}
+					if (nCreature.Entity.Monster is Osty)
+					{
+						nCreature.OstyScaleToSize(0f, 0.75);
+					}
+					break;
+					IL_0175:
+					((TaskAwaiter)(ref val3)).GetResult();
+					goto IL_017c;
+					IL_029a:
+					if (!val2.GetResult())
+					{
+						break;
+					}
+					goto IL_02ac;
+					IL_00e2:
+					((TaskAwaiter)(ref val4)).GetResult();
+					goto IL_017c;
+					IL_02ac:
+					<>7__wrap3 = nCreature.GetChildrenRecursive<IDeathDelayer>().GetEnumerator();
+					goto case 3;
+				}
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<disableUiTween>5__2 = null;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<disableUiTween>5__2 = null;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <PerformIntent>d__78 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public NCreature <>4__this;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			NCreature nCreature = <>4__this;
+			try
+			{
+				TaskAwaiter val;
+				if (num == 0)
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_012c;
+				}
+				System.Collections.Generic.IEnumerator<NIntent> enumerator = Enumerable.OfType<NIntent>((System.Collections.IEnumerable)nCreature.IntentContainer.GetChildren()).GetEnumerator();
+				try
+				{
+					while (((System.Collections.IEnumerator)enumerator).MoveNext())
+					{
+						NIntent current = enumerator.Current;
+						current.PlayPerform();
+						current.SetFrozen(isFrozen: true);
+					}
+				}
+				finally
+				{
+					if (num < 0)
+					{
+						((System.IDisposable)enumerator)?.Dispose();
+					}
+				}
+				if (SaveManager.Instance.PrefsSave.FastMode != FastModeType.Instant)
+				{
+					nCreature.AnimHideIntent(0.4);
+					val = Cmd.CustomScaledWait(0.25f, 0.4f).GetAwaiter();
+					if (!((TaskAwaiter)(ref val)).IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <PerformIntent>d__78>(ref val, ref this);
+						return;
+					}
+					goto IL_012c;
+				}
+				nCreature.IntentContainer.Modulate = new Color(nCreature.IntentContainer.Modulate.R, nCreature.IntentContainer.Modulate.G, nCreature.IntentContainer.Modulate.B, 0f);
+				goto end_IL_000e;
+				IL_012c:
+				((TaskAwaiter)(ref val)).GetResult();
+				end_IL_000e:;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <RefreshIntents>d__79 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public NCreature <>4__this;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			NCreature nCreature = <>4__this;
+			try
+			{
+				TaskAwaiter val;
+				TaskAwaiter val2;
+				if (num != 0)
+				{
+					if (num == 1)
+					{
+						val = <>u__1;
+						<>u__1 = default(TaskAwaiter);
+						num = (<>1__state = -1);
+						goto IL_00f8;
+					}
+					val2 = nCreature.UpdateIntent(Enumerable.Select<Player, Creature>((System.Collections.Generic.IEnumerable<Player>)nCreature.Entity.CombatState.Players, (Func<Player, Creature>)((Player p) => p.Creature))).GetAwaiter();
+					if (!((TaskAwaiter)(ref val2)).IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val2;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <RefreshIntents>d__79>(ref val2, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val2 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+				}
+				((TaskAwaiter)(ref val2)).GetResult();
+				val = nCreature.RevealIntents().GetAwaiter();
+				if (!((TaskAwaiter)(ref val)).IsCompleted)
+				{
+					num = (<>1__state = 1);
+					<>u__1 = val;
+					((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <RefreshIntents>d__79>(ref val, ref this);
+					return;
+				}
+				goto IL_00f8;
+				IL_00f8:
+				((TaskAwaiter)(ref val)).GetResult();
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	private static readonly string _scenePath = SceneHelper.GetScenePath("combat/creature");
+
+	private NCreatureStateDisplay _stateDisplay;
+
+	private Tween? _intentFadeTween;
+
+	private Tween? _shakeTween;
+
+	private CreatureAnimator? _spineAnimator;
+
+	private bool _isRemotePlayerOrPet;
+
+	private bool _isInBestiary;
+
+	private float _tempScale = 1f;
+
+	private Tween? _scaleTween;
+
+	private bool _isInMultiselect;
+
+	private NSelectionReticle _selectionReticle;
+
+	private readonly Dictionary<string, ValueTuple<string, float>> _sfxLoops = new Dictionary<string, ValueTuple<string, float>>();
+
+	public static System.Collections.Generic.IEnumerable<string> AssetPaths => new global::<>z__ReadOnlySingleElementList<string>(_scenePath);
+
+	public static Vector2 PowerAppliedVfxPositionOffset => new Vector2(0f, -200f);
+
+	[field: CompilerGenerated]
+	public System.Threading.Tasks.Task? DeathAnimationTask
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		set;
+	}
+
+	[field: CompilerGenerated]
+	public CancellationTokenSource DeathAnimCancelToken
+	{
+		[CompilerGenerated]
+		get;
+	} = new CancellationTokenSource();
+
+	[field: CompilerGenerated]
+	public Control Hitbox
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public NOrbManager? OrbManager
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public bool IsInteractable
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	} = true;
+
+	[field: CompilerGenerated]
+	public Creature Entity
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	public Vector2 VfxSpawnPosition => Visuals.VfxSpawnPosition.GlobalPosition;
+
+	public Vector2 PowerAppliedVfxSpawnPosition => VfxSpawnPosition + PowerAppliedVfxPositionOffset;
+
+	[field: CompilerGenerated]
+	public NCreatureVisuals Visuals
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	public Node2D Body => Visuals.GetCurrentBody();
+
+	[field: CompilerGenerated]
+	public Control IntentContainer
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	public bool IsPlayingDeathAnimation => DeathAnimationTask != null;
+
+	public bool HasSpineAnimation => Visuals.HasSpineAnimation;
+
+	public SpineAnimationAccess SpineAnimation => Visuals.SpineAnimation;
+
+	[field: CompilerGenerated]
+	public bool IsFocused
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public NMultiplayerPlayerIntentHandler? PlayerIntentHandler
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	public T? GetSpecialNode<T>(string name) where T : Node
+	{
+		return Visuals.GetNodeOrNull<T>(name);
+	}
+
+	public static NCreature? Create(Creature entity)
+	{
+		if (TestMode.IsOn)
+		{
+			return null;
+		}
+		NCreature nCreature = PreloadManager.Cache.GetScene(_scenePath).Instantiate<NCreature>(PackedScene.GenEditState.Disabled);
+		nCreature.Entity = entity;
+		nCreature.Visuals = entity.CreateVisuals();
+		return nCreature;
+	}
+
+	public override void _Ready()
+	{
+		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0074: Expected O, but got Unknown
+		//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0097: Expected O, but got Unknown
+		//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ba: Expected O, but got Unknown
+		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00dd: Expected O, but got Unknown
+		_stateDisplay = GetNode<NCreatureStateDisplay>("%HealthBar");
+		IntentContainer = GetNode<Control>("%Intents");
+		Hitbox = GetNode<Control>("%Hitbox");
+		_selectionReticle = GetNode<NSelectionReticle>("%SelectionReticle");
+		Hitbox.Connect(Control.SignalName.FocusEntered, Callable.From(new Action(OnFocus)));
+		Hitbox.Connect(Control.SignalName.FocusExited, Callable.From(new Action(OnUnfocus)));
+		Hitbox.Connect(Control.SignalName.MouseEntered, Callable.From(new Action(OnFocus)));
+		Hitbox.Connect(Control.SignalName.MouseExited, Callable.From(new Action(OnUnfocus)));
+		if (Entity.IsPlayer)
+		{
+			OrbManager = NOrbManager.Create(this, LocalContext.IsMe(Entity));
+			this.AddChildSafely(OrbManager);
+			UpdateNavigation();
+		}
+		if (Entity.IsPlayer)
+		{
+			ICombatState? combatState = Entity.CombatState;
+			if (combatState != null && ((System.Collections.Generic.IReadOnlyCollection<Player>)combatState.RunState.Players).Count > 1)
+			{
+				PlayerIntentHandler = NMultiplayerPlayerIntentHandler.Create(Entity.Player);
+				if (PlayerIntentHandler != null)
+				{
+					IntentContainer.AddChildSafely(PlayerIntentHandler);
+					IntentContainer.Modulate = Colors.White;
+				}
+			}
+		}
+		this.AddChildSafely(Visuals);
+		this.MoveChildSafely(Visuals, 0);
+		Visuals.Position = Vector2.Zero;
+		_stateDisplay.SetCreature(Entity);
+		bool flag = Entity.PetOwner != null && !LocalContext.IsMe(Entity.PetOwner);
+		bool flag2 = Entity.IsPlayer && !LocalContext.IsMe(Entity);
+		_isRemotePlayerOrPet = flag2 || flag;
+		if (_isRemotePlayerOrPet)
+		{
+			_stateDisplay.HideImmediately();
+		}
+		else
+		{
+			bool flag3 = NCombatRoom.Instance != null && Time.GetTicksMsec() - NCombatRoom.Instance.CreatedMsec < 1000;
+			_stateDisplay.AnimateIn(flag3 ? HealthBarAnimMode.SpawnedAtCombatStart : HealthBarAnimMode.SpawnedDuringCombat);
+		}
+		if (HasSpineAnimation)
+		{
+			if (Entity.Player != null)
+			{
+				_spineAnimator = Entity.Player.Character.GenerateAnimator(Visuals.SpineBody, Entity);
+			}
+			else
+			{
+				_spineAnimator = Entity.Monster.GenerateAnimator(Visuals.SpineBody);
+				Visuals.SetUpSkin(Entity.Monster);
+			}
+			ConnectSpineAnimatorSignals();
+			if (Entity.IsDead)
+			{
+				SetAnimationTrigger("Dead");
+				using MegaTrackEntry megaTrackEntry = SpineAnimation.GetCurrentTrack();
+				megaTrackEntry?.SetTrackTime(megaTrackEntry.GetAnimationEnd());
+			}
+		}
+		SetOrbManagerPosition();
+		if (Entity.Monster != null)
+		{
+			ToggleIsInteractable(Entity.Monster.IsHealthBarVisible);
+		}
+		UpdateBounds(Visuals);
+		UpdatePhobiaMode();
+	}
+
+	public override void _EnterTree()
+	{
+		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0027: Expected O, but got Unknown
+		base._EnterTree();
+		NGame.Instance?.Connect(NGame.SignalName.PhobiaModeToggled, Callable.From(new Action(UpdatePhobiaMode)));
+		CombatManager.Instance.CombatEnded += OnCombatEnded;
+		Entity.PowerApplied += OnPowerApplied;
+		Entity.PowerRemoved += OnPowerRemoved;
+		Entity.PowerIncreased += OnPowerIncreased;
+		System.Collections.Generic.IEnumerator<PowerModel> enumerator = ((System.Collections.Generic.IEnumerable<PowerModel>)Entity.Powers).GetEnumerator();
+		try
+		{
+			while (((System.Collections.IEnumerator)enumerator).MoveNext())
+			{
+				PowerModel current = enumerator.Current;
+				SubscribeToPower(current);
+			}
+		}
+		finally
+		{
+			((System.IDisposable)enumerator)?.Dispose();
+		}
+		ConnectSpineAnimatorSignals();
+	}
+
+	public override void _ExitTree()
+	{
+		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0038: Expected O, but got Unknown
+		base._ExitTree();
+		StopAllSfxLoops();
+		DeathAnimCancelToken.Cancel();
+		NGame.Instance?.Disconnect(NGame.SignalName.PhobiaModeToggled, Callable.From(new Action(UpdatePhobiaMode)));
+		CombatManager.Instance.CombatEnded -= OnCombatEnded;
+		Entity.PowerApplied -= OnPowerApplied;
+		Entity.PowerRemoved -= OnPowerRemoved;
+		Entity.PowerIncreased -= OnPowerIncreased;
+		System.Collections.Generic.IEnumerator<PowerModel> enumerator = ((System.Collections.Generic.IEnumerable<PowerModel>)Entity.Powers).GetEnumerator();
+		try
+		{
+			while (((System.Collections.IEnumerator)enumerator).MoveNext())
+			{
+				PowerModel current = enumerator.Current;
+				UnsubscribeFromPower(current);
+			}
+		}
+		finally
+		{
+			((System.IDisposable)enumerator)?.Dispose();
+		}
+		if (_spineAnimator != null)
+		{
+			_spineAnimator.BoundsUpdated -= UpdateBounds;
+		}
+		CombatManager.Instance.StateTracker.CombatStateChanged -= ShowCreatureHoverTips;
+	}
+
+	private void ConnectSpineAnimatorSignals()
+	{
+		if (_spineAnimator != null)
+		{
+			_spineAnimator.BoundsUpdated -= UpdateBounds;
+			_spineAnimator.BoundsUpdated += UpdateBounds;
+		}
+	}
+
+	private void UpdateBounds(string boundsNodeName)
+	{
+		UpdateBounds(Visuals.GetNode<Control>(boundsNodeName));
+	}
+
+	private void UpdatePhobiaMode()
+	{
+		Visuals.UpdatePhobiaMode(Entity.Monster);
+	}
+
+	private void UpdateBounds(Node boundsContainer)
+	{
+		Control node = boundsContainer.GetNode<Control>("%Bounds");
+		Vector2 size = node.Size * Visuals.Scale / _tempScale;
+		Vector2 vector = (node.GlobalPosition - base.GlobalPosition) / _tempScale;
+		Hitbox.Size = size;
+		Hitbox.GlobalPosition = base.GlobalPosition + vector;
+		_selectionReticle.Size = size;
+		_selectionReticle.GlobalPosition = base.GlobalPosition + vector;
+		_selectionReticle.PivotOffset = _selectionReticle.Size * 0.5f;
+		IntentContainer.Position = boundsContainer.GetNode<Marker2D>("IntentPos").Position - IntentContainer.Size * 0.5f;
+		IntentContainer.Position = new Vector2(IntentContainer.Position.X, IntentContainer.Position.Y * Visuals.Scale.X);
+		_stateDisplay.SetCreatureBounds(Hitbox);
+	}
+
+	public void UpdateNavigation()
+	{
+		if (OrbManager != null)
+		{
+			Hitbox.FocusNeighborTop = OrbManager.DefaultFocusOwner.GetPath();
+		}
+	}
+
+	public System.Threading.Tasks.Task UpdateIntent(System.Collections.Generic.IEnumerable<Creature> targets)
+	{
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+		if (Entity.Monster == null)
+		{
+			throw new InvalidOperationException("Only valid on monsters.");
+		}
+		System.Collections.Generic.IReadOnlyList<AbstractIntent> intents = Entity.Monster.NextMove.Intents;
+		int i;
+		for (i = 0; i < ((System.Collections.Generic.IReadOnlyCollection<AbstractIntent>)intents).Count && i < IntentContainer.GetChildCount(); i++)
+		{
+			NIntent child = IntentContainer.GetChild<NIntent>(i);
+			child.SetFrozen(isFrozen: false);
+			child.UpdateIntent(intents[i], targets, Entity);
+		}
+		float num = (float)((object)this).GetHashCode() * 0.01f;
+		for (; i < ((System.Collections.Generic.IReadOnlyCollection<AbstractIntent>)intents).Count; i++)
+		{
+			NIntent nIntent = NIntent.Create(num + (float)i * 0.3f);
+			IntentContainer.AddChildSafely(nIntent);
+			nIntent.UpdateIntent(intents[i], targets, Entity);
+		}
+		List<Node> val = Enumerable.ToList<Node>(Enumerable.TakeLast<Node>((System.Collections.Generic.IEnumerable<Node>)IntentContainer.GetChildren(), IntentContainer.GetChildCount() - i));
+		Enumerator<Node> enumerator = val.GetEnumerator();
+		try
+		{
+			while (enumerator.MoveNext())
+			{
+				Node current = enumerator.Current;
+				IntentContainer.RemoveChildSafely(current);
+				current.QueueFreeSafely();
+			}
+		}
+		finally
+		{
+			((System.IDisposable)enumerator/*cast due to .constrained prefix*/).Dispose();
+		}
+		return System.Threading.Tasks.Task.CompletedTask;
+	}
+
+	[AsyncStateMachine(typeof(<PerformIntent>d__78))]
+	public System.Threading.Tasks.Task PerformIntent()
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<PerformIntent>d__78 <PerformIntent>d__79 = default(<PerformIntent>d__78);
+		<PerformIntent>d__79.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<PerformIntent>d__79.<>4__this = this;
+		<PerformIntent>d__79.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <PerformIntent>d__79.<>t__builder)).Start<<PerformIntent>d__78>(ref <PerformIntent>d__79);
+		return ((AsyncTaskMethodBuilder)(ref <PerformIntent>d__79.<>t__builder)).Task;
+	}
+
+	[AsyncStateMachine(typeof(<RefreshIntents>d__79))]
+	public System.Threading.Tasks.Task RefreshIntents()
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<RefreshIntents>d__79 <RefreshIntents>d__80 = default(<RefreshIntents>d__79);
+		<RefreshIntents>d__80.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<RefreshIntents>d__80.<>4__this = this;
+		<RefreshIntents>d__80.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <RefreshIntents>d__80.<>t__builder)).Start<<RefreshIntents>d__79>(ref <RefreshIntents>d__80);
+		return ((AsyncTaskMethodBuilder)(ref <RefreshIntents>d__80.<>t__builder)).Task;
+	}
+
+	private System.Threading.Tasks.Task RevealIntents()
+	{
+		IntentContainer.Modulate = Colors.Transparent;
+		_intentFadeTween?.Kill();
+		_intentFadeTween = CreateTween().SetParallel();
+		_intentFadeTween.TweenProperty(IntentContainer, "modulate:a", 1f, 1.0).SetDelay(Rng.Chaotic.NextFloat(0f, 0.3f));
+		return System.Threading.Tasks.Task.CompletedTask;
+	}
+
+	private void OnFocus()
+	{
+		if (IsFocused || _isInBestiary)
+		{
+			return;
+		}
+		IsFocused = true;
+		if (_isRemotePlayerOrPet)
+		{
+			_stateDisplay.AnimateIn(HealthBarAnimMode.FromHidden);
+			_stateDisplay.ZIndex = 1;
+			Player me = LocalContext.GetMe(Entity.CombatState);
+			NCombatRoom.Instance?.GetCreatureNode(me?.Creature)?.SetRemotePlayerFocused(remotePlayerFocused: true);
+		}
+		else
+		{
+			_stateDisplay.ShowNameplate();
+		}
+		NRun.Instance.GlobalUi.MultiplayerPlayerContainer.HighlightPlayer(Entity.Player);
+		if (NTargetManager.Instance.IsInSelection)
+		{
+			NTargetManager.Instance.OnNodeHovered(this);
+			return;
+		}
+		if (NControllerManager.Instance.IsUsingDirectionalNavigation)
+		{
+			ShowSingleSelectReticle();
+		}
+		ShowHoverTips(Entity.HoverTips);
+		CombatManager.Instance.StateTracker.CombatStateChanged += ShowCreatureHoverTips;
+	}
+
+	private void OnUnfocus()
+	{
+		if (!_isInBestiary)
+		{
+			IsFocused = false;
+			HideSingleSelectReticle();
+			if (_isRemotePlayerOrPet)
+			{
+				_stateDisplay.AnimateOut();
+				Player me = LocalContext.GetMe(Entity.CombatState);
+				NCombatRoom.Instance?.GetCreatureNode(me?.Creature)?.SetRemotePlayerFocused(remotePlayerFocused: false);
+			}
+			else
+			{
+				_stateDisplay.HideNameplate();
+			}
+			NRun.Instance.GlobalUi.MultiplayerPlayerContainer.UnhighlightPlayer(Entity.Player);
+			NTargetManager.Instance.OnNodeUnhovered(this);
+			CombatManager.Instance.StateTracker.CombatStateChanged -= ShowCreatureHoverTips;
+			HideHoverTips();
+		}
+	}
+
+	public void OnTargetingStarted()
+	{
+		if (IsFocused)
+		{
+			NTargetManager.Instance.OnNodeHovered(this);
+			CombatManager.Instance.StateTracker.CombatStateChanged -= ShowCreatureHoverTips;
+			HideHoverTips();
+		}
+	}
+
+	private void ShowCreatureHoverTips(CombatState _)
+	{
+		if (Entity.CombatState != null)
+		{
+			ShowHoverTips(Entity.HoverTips);
+		}
+	}
+
+	public void ShowHoverTips(System.Collections.Generic.IEnumerable<IHoverTip> hoverTips)
+	{
+		if (!NCombatRoom.Instance.Ui.Hand.InCardPlay)
+		{
+			HideHoverTips();
+			NHoverTipSet.CreateAndShow(Hitbox, hoverTips, HoverTip.GetHoverTipAlignment(this, 0.5f));
+		}
+	}
+
+	public void SetRemotePlayerFocused(bool remotePlayerFocused)
+	{
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+		if (!LocalContext.IsMe(Entity))
+		{
+			throw new InvalidOperationException("This should only be called on the local player's creature node!");
+		}
+		if (remotePlayerFocused)
+		{
+			_stateDisplay.AnimateOut();
+		}
+		else if (Entity.IsAlive)
+		{
+			_stateDisplay.AnimateIn(HealthBarAnimMode.FromHidden);
+		}
+	}
+
+	public void HideHoverTips()
+	{
+		NHoverTipSet.Remove(Hitbox);
+	}
+
+	private void SubscribeToPower(PowerModel power)
+	{
+		power.Flashed += OnPowerFlashed;
+	}
+
+	private void UnsubscribeFromPower(PowerModel power)
+	{
+		power.Flashed -= OnPowerFlashed;
+	}
+
+	private void OnPowerApplied(PowerModel power)
+	{
+		SubscribeToPower(power);
+	}
+
+	private void OnPowerIncreased(PowerModel power, int amount, bool silent)
+	{
+		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00aa: Expected O, but got Unknown
+		//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0070: Expected O, but got Unknown
+		//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c8: Expected O, but got Unknown
+		if (silent || !CombatManager.Instance.IsInProgress)
+		{
+			return;
+		}
+		bool flag = power.GetTypeForAmount(decimal.op_Implicit(power.Amount)) == PowerType.Buff;
+		NPowerAppliedVfx vfx = NPowerAppliedVfx.Create(power, amount, flag);
+		if (vfx != null)
+		{
+			if (flag)
+			{
+				NPowerAppliedBuffVfx buffVfx = NPowerAppliedBuffVfx.Create(PowerAppliedVfxSpawnPosition);
+				Callable.From((Action)delegate
+				{
+					NCombatRoom.Instance?.CombatVfxContainer.AddChildSafely(buffVfx);
+				}).CallDeferred();
+			}
+			else
+			{
+				NPowerAppliedDebuffVfx debuffVfx = NPowerAppliedDebuffVfx.Create(PowerAppliedVfxSpawnPosition);
+				Callable.From((Action)delegate
+				{
+					NCombatRoom.Instance?.CombatVfxContainer.AddChildSafely(debuffVfx);
+				}).CallDeferred();
+			}
+			Callable.From((Action)delegate
+			{
+				NCombatRoom.Instance?.CombatVfxContainer.AddChildSafely(vfx);
+			}).CallDeferred();
+		}
+		if (power.ShouldPlayVfx)
+		{
+			SfxCmd.Play(flag ? "event:/sfx/buff" : "event:/sfx/debuff");
+		}
+		if (!flag)
+		{
+			AnimShake();
+		}
+	}
+
+	private void OnPowerRemoved(PowerModel power)
+	{
+		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002b: Expected O, but got Unknown
+		NPowerRemovedVfx vfx = NPowerRemovedVfx.Create(power);
+		if (vfx != null)
+		{
+			Callable.From((Action)delegate
+			{
+				NCombatRoom.Instance?.CombatVfxContainer.AddChildSafely(vfx);
+			}).CallDeferred();
+		}
+		UnsubscribeFromPower(power);
+	}
+
+	private void OnPowerFlashed(PowerModel power)
+	{
+		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002b: Expected O, but got Unknown
+		NPowerFlashVfx vfx = NPowerFlashVfx.Create(power);
+		if (vfx != null)
+		{
+			Callable.From((Action)delegate
+			{
+				NCombatRoom.Instance?.CombatVfxContainer.AddChildSafely(vfx);
+			}).CallDeferred();
+		}
+	}
+
+	private void OnCombatEnded(CombatRoom _)
+	{
+		AnimHideIntent();
+		OrbManager?.ClearOrbs();
+	}
+
+	public void SetAnimationTrigger(string trigger)
+	{
+		_spineAnimator?.SetTrigger(trigger);
+	}
+
+	public float GetCurrentAnimationLength()
+	{
+		return SpineAnimation.GetCurrentAnimationDuration().GetValueOrDefault();
+	}
+
+	public float GetCurrentAnimationTimeRemaining()
+	{
+		using MegaTrackEntry megaTrackEntry = SpineAnimation.GetCurrentTrack();
+		if (megaTrackEntry == null)
+		{
+			return 0f;
+		}
+		return megaTrackEntry.GetTrackComplete() - megaTrackEntry.GetTrackTime();
+	}
+
+	public void ToggleIsInteractable(bool on)
+	{
+		IsInteractable = on;
+		_stateDisplay.Visible = !NCombatUi.IsDebugHidingHpBar && on;
+		Hitbox.MouseFilter = (MouseFilterEnum)(on ? 0 : 2);
+		Hitbox.FocusMode = (FocusModeEnum)(on ? 2 : 0);
+	}
+
+	public void DisableInteractionForDeath()
+	{
+		if (Hitbox.HasFocus())
+		{
+			ActiveScreenContext.Instance.FocusOnDefaultControl();
+		}
+		Hitbox.FocusMode = FocusModeEnum.None;
+		Hitbox.MouseFilter = MouseFilterEnum.Ignore;
+	}
+
+	public Tween AnimDisableUi()
+	{
+		Tween tween = CreateTween();
+		if (!IsNodeReady())
+		{
+			tween.TweenInterval(0.0);
+			return tween;
+		}
+		tween.TweenProperty(_stateDisplay, "modulate:a", 0f, 0.5).SetDelay(0.5).SetEase(Tween.EaseType.Out)
+			.SetTrans(Tween.TransitionType.Expo);
+		return tween;
+	}
+
+	public Tween AnimEnableUi()
+	{
+		Tween tween = CreateTween();
+		tween.TweenProperty(_stateDisplay, "modulate:a", 1f, 0.5).SetDelay(0.5).SetEase(Tween.EaseType.Out)
+			.SetTrans(Tween.TransitionType.Expo);
+		return tween;
+	}
+
+	public float StartDeathAnim(bool shouldRemove)
+	{
+		//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+		DisableInteractionForDeath();
+		System.Collections.Generic.IEnumerator<NIntent> enumerator = Enumerable.OfType<NIntent>((System.Collections.IEnumerable)IntentContainer.GetChildren()).GetEnumerator();
+		try
+		{
+			while (((System.Collections.IEnumerator)enumerator).MoveNext())
+			{
+				NIntent current = enumerator.Current;
+				current.SetFrozen(isFrozen: true);
+			}
+		}
+		finally
+		{
+			((System.IDisposable)enumerator)?.Dispose();
+		}
+		System.Threading.Tasks.Task deathAnimationTask = DeathAnimationTask;
+		if (deathAnimationTask != null && !deathAnimationTask.IsCompleted)
+		{
+			return 0f;
+		}
+		float a = 0f;
+		if (_spineAnimator != null)
+		{
+			MonsterModel? monster = Entity.Monster;
+			if (monster != null && monster.HasDeathSfx)
+			{
+				SfxCmd.PlayDeath(Entity.Monster);
+			}
+			if (Entity.Player != null)
+			{
+				SfxCmd.PlayDeath(Entity.Player);
+				Visuals.RemoveFormVfx();
+			}
+			SetAnimationTrigger("Dead");
+			a = GetCurrentAnimationLength();
+		}
+		DeathAnimationTask = AnimDie(shouldRemove, DeathAnimCancelToken.Token);
+		TaskHelper.RunSafely(DeathAnimationTask);
+		MonsterModel monster2 = Entity.Monster;
+		if (monster2 != null && monster2.HasDeathAnimLengthOverride)
+		{
+			return Entity.Monster.DeathAnimLengthOverride;
+		}
+		return Mathf.Min(a, 30f);
+	}
+
+	public void StartReviveAnim()
+	{
+		CreatureAnimator? spineAnimator = _spineAnimator;
+		if (spineAnimator != null && spineAnimator.HasTrigger("Revive"))
+		{
+			SetAnimationTrigger("Revive");
+		}
+		else if (Entity.IsPlayer)
+		{
+			AnimTempRevive();
+		}
+		if (!_isRemotePlayerOrPet)
+		{
+			AnimEnableUi();
+		}
+		Hitbox.MouseFilter = MouseFilterEnum.Stop;
+	}
+
+	private void AnimTempRevive()
+	{
+		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0043: Expected O, but got Unknown
+		Tween tween = CreateTween();
+		tween.TweenProperty(Visuals, "modulate:a", 0f, 0.2);
+		tween.TweenCallback(Callable.From(new Action(ImmediatelySetIdle)));
+		tween.TweenProperty(Visuals, "modulate:a", 1f, 0.2);
+	}
+
+	private void ImmediatelySetIdle()
+	{
+		_spineAnimator?.SetTrigger("Idle");
+		using MegaTrackEntry megaTrackEntry = SpineAnimation.GetCurrentTrack();
+		if (megaTrackEntry != null)
+		{
+			megaTrackEntry.SetMixDuration(0f);
+			megaTrackEntry.SetTrackTime(megaTrackEntry.GetAnimationEnd());
+		}
+	}
+
+	[AsyncStateMachine(typeof(<AnimDie>d__106))]
+	private System.Threading.Tasks.Task AnimDie(bool shouldRemove, CancellationToken cancelToken)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+		<AnimDie>d__106 <AnimDie>d__107 = default(<AnimDie>d__106);
+		<AnimDie>d__107.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<AnimDie>d__107.<>4__this = this;
+		<AnimDie>d__107.shouldRemove = shouldRemove;
+		<AnimDie>d__107.cancelToken = cancelToken;
+		<AnimDie>d__107.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <AnimDie>d__107.<>t__builder)).Start<<AnimDie>d__106>(ref <AnimDie>d__107);
+		return ((AsyncTaskMethodBuilder)(ref <AnimDie>d__107.<>t__builder)).Task;
+	}
+
+	public void AnimHideIntent(double delay = 0.0)
+	{
+		_intentFadeTween?.Kill();
+		_intentFadeTween = CreateTween().SetParallel();
+		PropertyTweener propertyTweener = _intentFadeTween.TweenProperty(IntentContainer, "modulate:a", 0f, 0.5);
+		if (delay > 0.0)
+		{
+			propertyTweener.SetDelay(delay);
+		}
+	}
+
+	public void SetScaleAndHue(float scale, float hue)
+	{
+		Visuals.SetScaleAndHue(scale, hue);
+		UpdateBounds(Visuals);
+	}
+
+	public void ScaleTo(float size, double duration)
+	{
+		if (!Entity.IsMonster || Entity.Monster.CanChangeScale)
+		{
+			_tempScale = size;
+			_scaleTween?.Kill();
+			_scaleTween = CreateTween();
+			_scaleTween.TweenMethod(Callable.From<Vector2>((Action<Vector2>)DoScaleTween), Visuals.Scale, Vector2.One * _tempScale * Visuals.DefaultScale, duration).SetEase(Tween.EaseType.InOut).SetTrans(Tween.TransitionType.Sine);
+		}
+	}
+
+	public void SetDefaultScaleTo(float size, float duration)
+	{
+		if (!Entity.IsMonster || Entity.Monster.CanChangeScale)
+		{
+			Visuals.DefaultScale = size;
+			ScaleTo(_tempScale, duration);
+		}
+	}
+
+	public void OstyScaleToSize(float ostyHealth, double duration)
+	{
+		//IL_0153: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015d: Expected O, but got Unknown
+		float num = Mathf.Lerp(Osty.ScaleRange.X, Osty.ScaleRange.Y, Mathf.Clamp(ostyHealth / 150f, 0f, 1f));
+		NCreature nCreature = NCombatRoom.Instance?.GetCreatureNode(Entity.PetOwner.Creature);
+		_scaleTween = CreateTween();
+		Vector2 vector = Vector2.One * num * Visuals.DefaultScale;
+		if (NCombatRoom.Instance != null && !NCombatRoom.Instance.SceneContainer.IsAncestorOf(Visuals))
+		{
+			ICombatState combatState = Entity.CombatState;
+			if (combatState != null && combatState.Encounter != null)
+			{
+				vector *= Entity.CombatState.Encounter.GetCameraScaling();
+			}
+		}
+		_scaleTween.TweenProperty(Visuals, "scale", vector, duration).SetEase(Tween.EaseType.InOut).SetTrans(Tween.TransitionType.Sine);
+		if (LocalContext.IsMe(Entity.PetOwner))
+		{
+			_scaleTween.Parallel().TweenProperty(this, "position", nCreature.Position + GetOstyOffsetFromPlayer(Entity), duration);
+		}
+		_scaleTween.TweenCallback(Callable.From((Action)([CompilerGenerated] () =>
+		{
+			UpdateBounds(Visuals);
+		})));
+	}
+
+	public static Vector2 GetOstyOffsetFromPlayer(Creature osty)
+	{
+		NCreature nCreature = NCombatRoom.Instance?.GetCreatureNode(osty.PetOwner.Creature);
+		return Vector2.Right * nCreature.Hitbox.Size.X * 0.5f + Osty.MinOffset.Lerp(Osty.MaxOffset, Mathf.Clamp((float)osty.MaxHp / 150f, 0f, 1f));
+	}
+
+	public void AnimShake()
+	{
+		if (IsInsideTree() && (_shakeTween == null || !_shakeTween.IsRunning()) && !Visuals.IsPlayingHurtAnimation())
+		{
+			Visuals.Position = Vector2.Zero;
+			_shakeTween = CreateTween();
+			_shakeTween.TweenMethod(Callable.From<float>((Action<float>)([CompilerGenerated] (float t) =>
+			{
+				Visuals.Position = Vector2.Right * 10f * Mathf.Sin(t * 4f) * Mathf.Sin(t * 0.5f);
+			})), 0f, (float)Math.PI * 2f, 1.0).SetEase(Tween.EaseType.Out).SetTrans(Tween.TransitionType.Cubic);
+		}
+	}
+
+	private void DoScaleTween(Vector2 scale)
+	{
+		Visuals.Scale = scale;
+		SetOrbManagerPosition();
+	}
+
+	private void SetOrbManagerPosition()
+	{
+		if (OrbManager != null)
+		{
+			OrbManager.Scale = ((Visuals.Scale.X > 1f) ? Vector2.One : Visuals.Scale.Lerp(Vector2.One, 0.5f));
+			OrbManager.Position = Visuals.OrbPosition.Position * Mathf.Min(Visuals.Scale.X, 1.25f);
+			if (!OrbManager.IsLocal)
+			{
+				OrbManager.Position += Vector2.Up * 50f;
+			}
+		}
+	}
+
+	public Vector2 GetTopOfHitbox()
+	{
+		return Hitbox.GlobalPosition + new Vector2(Hitbox.Size.X * 0.5f, 0f);
+	}
+
+	public Vector2 GetBottomOfHitbox()
+	{
+		return Hitbox.GlobalPosition + new Vector2(Hitbox.Size.X * 0.5f, Hitbox.Size.Y);
+	}
+
+	public void TrackBlockStatus(Creature creature)
+	{
+		_stateDisplay.TrackBlockStatus(creature);
+	}
+
+	public void ShowMultiselectReticle()
+	{
+		_isInMultiselect = true;
+		ShowSingleSelectReticle();
+	}
+
+	public void HideMultiselectReticle()
+	{
+		_isInMultiselect = false;
+		HideSingleSelectReticle();
+	}
+
+	public void ShowSingleSelectReticle()
+	{
+		_selectionReticle.OnSelect();
+	}
+
+	public void HideSingleSelectReticle()
+	{
+		if (!_isInMultiselect)
+		{
+			_selectionReticle.OnDeselect();
+		}
+	}
+
+	public void SetupForBestiary()
+	{
+		_stateDisplay.Visible = false;
+		IntentContainer.Visible = false;
+		_isInBestiary = true;
+	}
+
+	public void StartSfxLoop(string sfxName)
+	{
+		StartSfxLoop(sfxName, "loop", 1f);
+	}
+
+	public void StartSfxLoop(string sfxName, string loopParam, float loopStopValue)
+	{
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+		if (!_sfxLoops.ContainsKey(sfxName))
+		{
+			_sfxLoops.Add(sfxName, new ValueTuple<string, float>(loopParam, loopStopValue));
+			SfxCmd.PlayLoop(sfxName, usesLoopParam: false);
+		}
+	}
+
+	public void StopSfxLoop(string sfxName)
+	{
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+		ValueTuple<string, float> val = default(ValueTuple<string, float>);
+		if (_sfxLoops.TryGetValue(sfxName, ref val))
+		{
+			SfxCmd.SetParam(sfxName, val.Item1, val.Item2);
+			SfxCmd.StopLoop(sfxName);
+			_sfxLoops.Remove(sfxName);
+		}
+	}
+
+	public void StopAllSfxLoops()
+	{
+		//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		List<string> val = Enumerable.ToList<string>((System.Collections.Generic.IEnumerable<string>)_sfxLoops.Keys);
+		Enumerator<string> enumerator = val.GetEnumerator();
+		try
+		{
+			while (enumerator.MoveNext())
+			{
+				string current = enumerator.Current;
+				StopSfxLoop(current);
+			}
+		}
+		finally
+		{
+			((System.IDisposable)enumerator/*cast due to .constrained prefix*/).Dispose();
+		}
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	internal static List<MethodInfo> GetGodotMethodList()
+	{
+		List<MethodInfo> val = new List<MethodInfo>(42);
+		val.Add(new MethodInfo(MethodName._Ready, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName._EnterTree, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName._ExitTree, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.ConnectSpineAnimatorSignals, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		StringName updateBounds = MethodName.UpdateBounds;
+		PropertyInfo returnVal = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags = 1L;
+		List<PropertyInfo> obj = new List<PropertyInfo>();
+		obj.Add(new PropertyInfo(Variant.Type.String, "boundsNodeName", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		val.Add(new MethodInfo(updateBounds, returnVal, (MethodFlags)flags, obj, null));
+		val.Add(new MethodInfo(MethodName.UpdatePhobiaMode, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.UpdateNavigation, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.OnFocus, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.OnUnfocus, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.OnTargetingStarted, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		StringName setRemotePlayerFocused = MethodName.SetRemotePlayerFocused;
+		PropertyInfo returnVal2 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags2 = 1L;
+		List<PropertyInfo> obj2 = new List<PropertyInfo>();
+		obj2.Add(new PropertyInfo(Variant.Type.Bool, "remotePlayerFocused", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		val.Add(new MethodInfo(setRemotePlayerFocused, returnVal2, (MethodFlags)flags2, obj2, null));
+		val.Add(new MethodInfo(MethodName.HideHoverTips, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		StringName setAnimationTrigger = MethodName.SetAnimationTrigger;
+		PropertyInfo returnVal3 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags3 = 1L;
+		List<PropertyInfo> obj3 = new List<PropertyInfo>();
+		obj3.Add(new PropertyInfo(Variant.Type.String, "trigger", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		val.Add(new MethodInfo(setAnimationTrigger, returnVal3, (MethodFlags)flags3, obj3, null));
+		val.Add(new MethodInfo(MethodName.GetCurrentAnimationLength, new PropertyInfo(Variant.Type.Float, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.GetCurrentAnimationTimeRemaining, new PropertyInfo(Variant.Type.Float, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		StringName toggleIsInteractable = MethodName.ToggleIsInteractable;
+		PropertyInfo returnVal4 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags4 = 1L;
+		List<PropertyInfo> obj4 = new List<PropertyInfo>();
+		obj4.Add(new PropertyInfo(Variant.Type.Bool, "on", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		val.Add(new MethodInfo(toggleIsInteractable, returnVal4, (MethodFlags)flags4, obj4, null));
+		val.Add(new MethodInfo(MethodName.DisableInteractionForDeath, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.AnimDisableUi, new PropertyInfo(Variant.Type.Object, "", PropertyHint.None, "", PropertyUsageFlags.Default, new StringName("Tween"), exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.AnimEnableUi, new PropertyInfo(Variant.Type.Object, "", PropertyHint.None, "", PropertyUsageFlags.Default, new StringName("Tween"), exported: false), MethodFlags.Normal, null, null));
+		StringName startDeathAnim = MethodName.StartDeathAnim;
+		PropertyInfo returnVal5 = new PropertyInfo(Variant.Type.Float, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags5 = 1L;
+		List<PropertyInfo> obj5 = new List<PropertyInfo>();
+		obj5.Add(new PropertyInfo(Variant.Type.Bool, "shouldRemove", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		val.Add(new MethodInfo(startDeathAnim, returnVal5, (MethodFlags)flags5, obj5, null));
+		val.Add(new MethodInfo(MethodName.StartReviveAnim, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.AnimTempRevive, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.ImmediatelySetIdle, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		StringName animHideIntent = MethodName.AnimHideIntent;
+		PropertyInfo returnVal6 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags6 = 1L;
+		List<PropertyInfo> obj6 = new List<PropertyInfo>();
+		obj6.Add(new PropertyInfo(Variant.Type.Float, "delay", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		val.Add(new MethodInfo(animHideIntent, returnVal6, (MethodFlags)flags6, obj6, null));
+		StringName setScaleAndHue = MethodName.SetScaleAndHue;
+		PropertyInfo returnVal7 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags7 = 1L;
+		List<PropertyInfo> obj7 = new List<PropertyInfo>();
+		obj7.Add(new PropertyInfo(Variant.Type.Float, "scale", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		obj7.Add(new PropertyInfo(Variant.Type.Float, "hue", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		val.Add(new MethodInfo(setScaleAndHue, returnVal7, (MethodFlags)flags7, obj7, null));
+		StringName scaleTo = MethodName.ScaleTo;
+		PropertyInfo returnVal8 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags8 = 1L;
+		List<PropertyInfo> obj8 = new List<PropertyInfo>();
+		obj8.Add(new PropertyInfo(Variant.Type.Float, "size", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		obj8.Add(new PropertyInfo(Variant.Type.Float, "duration", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		val.Add(new MethodInfo(scaleTo, returnVal8, (MethodFlags)flags8, obj8, null));
+		StringName setDefaultScaleTo = MethodName.SetDefaultScaleTo;
+		PropertyInfo returnVal9 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags9 = 1L;
+		List<PropertyInfo> obj9 = new List<PropertyInfo>();
+		obj9.Add(new PropertyInfo(Variant.Type.Float, "size", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		obj9.Add(new PropertyInfo(Variant.Type.Float, "duration", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		val.Add(new MethodInfo(setDefaultScaleTo, returnVal9, (MethodFlags)flags9, obj9, null));
+		StringName ostyScaleToSize = MethodName.OstyScaleToSize;
+		PropertyInfo returnVal10 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags10 = 1L;
+		List<PropertyInfo> obj10 = new List<PropertyInfo>();
+		obj10.Add(new PropertyInfo(Variant.Type.Float, "ostyHealth", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		obj10.Add(new PropertyInfo(Variant.Type.Float, "duration", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		val.Add(new MethodInfo(ostyScaleToSize, returnVal10, (MethodFlags)flags10, obj10, null));
+		val.Add(new MethodInfo(MethodName.AnimShake, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		StringName doScaleTween = MethodName.DoScaleTween;
+		PropertyInfo returnVal11 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags11 = 1L;
+		List<PropertyInfo> obj11 = new List<PropertyInfo>();
+		obj11.Add(new PropertyInfo(Variant.Type.Vector2, "scale", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		val.Add(new MethodInfo(doScaleTween, returnVal11, (MethodFlags)flags11, obj11, null));
+		val.Add(new MethodInfo(MethodName.SetOrbManagerPosition, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.GetTopOfHitbox, new PropertyInfo(Variant.Type.Vector2, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.GetBottomOfHitbox, new PropertyInfo(Variant.Type.Vector2, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.ShowMultiselectReticle, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.HideMultiselectReticle, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.ShowSingleSelectReticle, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.HideSingleSelectReticle, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.SetupForBestiary, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		StringName startSfxLoop = MethodName.StartSfxLoop;
+		PropertyInfo returnVal12 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags12 = 1L;
+		List<PropertyInfo> obj12 = new List<PropertyInfo>();
+		obj12.Add(new PropertyInfo(Variant.Type.String, "sfxName", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		val.Add(new MethodInfo(startSfxLoop, returnVal12, (MethodFlags)flags12, obj12, null));
+		StringName startSfxLoop2 = MethodName.StartSfxLoop;
+		PropertyInfo returnVal13 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags13 = 1L;
+		List<PropertyInfo> obj13 = new List<PropertyInfo>();
+		obj13.Add(new PropertyInfo(Variant.Type.String, "sfxName", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		obj13.Add(new PropertyInfo(Variant.Type.String, "loopParam", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		obj13.Add(new PropertyInfo(Variant.Type.Float, "loopStopValue", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		val.Add(new MethodInfo(startSfxLoop2, returnVal13, (MethodFlags)flags13, obj13, null));
+		StringName stopSfxLoop = MethodName.StopSfxLoop;
+		PropertyInfo returnVal14 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags14 = 1L;
+		List<PropertyInfo> obj14 = new List<PropertyInfo>();
+		obj14.Add(new PropertyInfo(Variant.Type.String, "sfxName", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		val.Add(new MethodInfo(stopSfxLoop, returnVal14, (MethodFlags)flags14, obj14, null));
+		val.Add(new MethodInfo(MethodName.StopAllSfxLoops, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		return val;
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool InvokeGodotClassMethod(in godot_string_name method, NativeVariantPtrArgs args, out godot_variant ret)
+	{
+		if (method == MethodName._Ready && args.Count == 0)
+		{
+			_Ready();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName._EnterTree && args.Count == 0)
+		{
+			_EnterTree();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName._ExitTree && args.Count == 0)
+		{
+			_ExitTree();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.ConnectSpineAnimatorSignals && args.Count == 0)
+		{
+			ConnectSpineAnimatorSignals();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.UpdateBounds && args.Count == 1)
+		{
+			UpdateBounds(VariantUtils.ConvertTo<string>(in args[0]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.UpdatePhobiaMode && args.Count == 0)
+		{
+			UpdatePhobiaMode();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.UpdateNavigation && args.Count == 0)
+		{
+			UpdateNavigation();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.OnFocus && args.Count == 0)
+		{
+			OnFocus();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.OnUnfocus && args.Count == 0)
+		{
+			OnUnfocus();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.OnTargetingStarted && args.Count == 0)
+		{
+			OnTargetingStarted();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.SetRemotePlayerFocused && args.Count == 1)
+		{
+			SetRemotePlayerFocused(VariantUtils.ConvertTo<bool>(in args[0]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.HideHoverTips && args.Count == 0)
+		{
+			HideHoverTips();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.SetAnimationTrigger && args.Count == 1)
+		{
+			SetAnimationTrigger(VariantUtils.ConvertTo<string>(in args[0]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.GetCurrentAnimationLength && args.Count == 0)
+		{
+			ret = VariantUtils.CreateFrom<float>(GetCurrentAnimationLength());
+			return true;
+		}
+		if (method == MethodName.GetCurrentAnimationTimeRemaining && args.Count == 0)
+		{
+			ret = VariantUtils.CreateFrom<float>(GetCurrentAnimationTimeRemaining());
+			return true;
+		}
+		if (method == MethodName.ToggleIsInteractable && args.Count == 1)
+		{
+			ToggleIsInteractable(VariantUtils.ConvertTo<bool>(in args[0]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.DisableInteractionForDeath && args.Count == 0)
+		{
+			DisableInteractionForDeath();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.AnimDisableUi && args.Count == 0)
+		{
+			ret = VariantUtils.CreateFrom<Tween>(AnimDisableUi());
+			return true;
+		}
+		if (method == MethodName.AnimEnableUi && args.Count == 0)
+		{
+			ret = VariantUtils.CreateFrom<Tween>(AnimEnableUi());
+			return true;
+		}
+		if (method == MethodName.StartDeathAnim && args.Count == 1)
+		{
+			ret = VariantUtils.CreateFrom<float>(StartDeathAnim(VariantUtils.ConvertTo<bool>(in args[0])));
+			return true;
+		}
+		if (method == MethodName.StartReviveAnim && args.Count == 0)
+		{
+			StartReviveAnim();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.AnimTempRevive && args.Count == 0)
+		{
+			AnimTempRevive();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.ImmediatelySetIdle && args.Count == 0)
+		{
+			ImmediatelySetIdle();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.AnimHideIntent && args.Count == 1)
+		{
+			AnimHideIntent(VariantUtils.ConvertTo<double>(in args[0]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.SetScaleAndHue && args.Count == 2)
+		{
+			SetScaleAndHue(VariantUtils.ConvertTo<float>(in args[0]), VariantUtils.ConvertTo<float>(in args[1]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.ScaleTo && args.Count == 2)
+		{
+			ScaleTo(VariantUtils.ConvertTo<float>(in args[0]), VariantUtils.ConvertTo<double>(in args[1]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.SetDefaultScaleTo && args.Count == 2)
+		{
+			SetDefaultScaleTo(VariantUtils.ConvertTo<float>(in args[0]), VariantUtils.ConvertTo<float>(in args[1]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.OstyScaleToSize && args.Count == 2)
+		{
+			OstyScaleToSize(VariantUtils.ConvertTo<float>(in args[0]), VariantUtils.ConvertTo<double>(in args[1]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.AnimShake && args.Count == 0)
+		{
+			AnimShake();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.DoScaleTween && args.Count == 1)
+		{
+			DoScaleTween(VariantUtils.ConvertTo<Vector2>(in args[0]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.SetOrbManagerPosition && args.Count == 0)
+		{
+			SetOrbManagerPosition();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.GetTopOfHitbox && args.Count == 0)
+		{
+			ret = VariantUtils.CreateFrom<Vector2>(GetTopOfHitbox());
+			return true;
+		}
+		if (method == MethodName.GetBottomOfHitbox && args.Count == 0)
+		{
+			ret = VariantUtils.CreateFrom<Vector2>(GetBottomOfHitbox());
+			return true;
+		}
+		if (method == MethodName.ShowMultiselectReticle && args.Count == 0)
+		{
+			ShowMultiselectReticle();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.HideMultiselectReticle && args.Count == 0)
+		{
+			HideMultiselectReticle();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.ShowSingleSelectReticle && args.Count == 0)
+		{
+			ShowSingleSelectReticle();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.HideSingleSelectReticle && args.Count == 0)
+		{
+			HideSingleSelectReticle();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.SetupForBestiary && args.Count == 0)
+		{
+			SetupForBestiary();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.StartSfxLoop && args.Count == 1)
+		{
+			StartSfxLoop(VariantUtils.ConvertTo<string>(in args[0]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.StartSfxLoop && args.Count == 3)
+		{
+			StartSfxLoop(VariantUtils.ConvertTo<string>(in args[0]), VariantUtils.ConvertTo<string>(in args[1]), VariantUtils.ConvertTo<float>(in args[2]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.StopSfxLoop && args.Count == 1)
+		{
+			StopSfxLoop(VariantUtils.ConvertTo<string>(in args[0]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.StopAllSfxLoops && args.Count == 0)
+		{
+			StopAllSfxLoops();
+			ret = default(godot_variant);
+			return true;
+		}
+		return base.InvokeGodotClassMethod(in method, args, out ret);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool HasGodotClassMethod(in godot_string_name method)
+	{
+		if (method == MethodName._Ready)
+		{
+			return true;
+		}
+		if (method == MethodName._EnterTree)
+		{
+			return true;
+		}
+		if (method == MethodName._ExitTree)
+		{
+			return true;
+		}
+		if (method == MethodName.ConnectSpineAnimatorSignals)
+		{
+			return true;
+		}
+		if (method == MethodName.UpdateBounds)
+		{
+			return true;
+		}
+		if (method == MethodName.UpdatePhobiaMode)
+		{
+			return true;
+		}
+		if (method == MethodName.UpdateNavigation)
+		{
+			return true;
+		}
+		if (method == MethodName.OnFocus)
+		{
+			return true;
+		}
+		if (method == MethodName.OnUnfocus)
+		{
+			return true;
+		}
+		if (method == MethodName.OnTargetingStarted)
+		{
+			return true;
+		}
+		if (method == MethodName.SetRemotePlayerFocused)
+		{
+			return true;
+		}
+		if (method == MethodName.HideHoverTips)
+		{
+			return true;
+		}
+		if (method == MethodName.SetAnimationTrigger)
+		{
+			return true;
+		}
+		if (method == MethodName.GetCurrentAnimationLength)
+		{
+			return true;
+		}
+		if (method == MethodName.GetCurrentAnimationTimeRemaining)
+		{
+			return true;
+		}
+		if (method == MethodName.ToggleIsInteractable)
+		{
+			return true;
+		}
+		if (method == MethodName.DisableInteractionForDeath)
+		{
+			return true;
+		}
+		if (method == MethodName.AnimDisableUi)
+		{
+			return true;
+		}
+		if (method == MethodName.AnimEnableUi)
+		{
+			return true;
+		}
+		if (method == MethodName.StartDeathAnim)
+		{
+			return true;
+		}
+		if (method == MethodName.StartReviveAnim)
+		{
+			return true;
+		}
+		if (method == MethodName.AnimTempRevive)
+		{
+			return true;
+		}
+		if (method == MethodName.ImmediatelySetIdle)
+		{
+			return true;
+		}
+		if (method == MethodName.AnimHideIntent)
+		{
+			return true;
+		}
+		if (method == MethodName.SetScaleAndHue)
+		{
+			return true;
+		}
+		if (method == MethodName.ScaleTo)
+		{
+			return true;
+		}
+		if (method == MethodName.SetDefaultScaleTo)
+		{
+			return true;
+		}
+		if (method == MethodName.OstyScaleToSize)
+		{
+			return true;
+		}
+		if (method == MethodName.AnimShake)
+		{
+			return true;
+		}
+		if (method == MethodName.DoScaleTween)
+		{
+			return true;
+		}
+		if (method == MethodName.SetOrbManagerPosition)
+		{
+			return true;
+		}
+		if (method == MethodName.GetTopOfHitbox)
+		{
+			return true;
+		}
+		if (method == MethodName.GetBottomOfHitbox)
+		{
+			return true;
+		}
+		if (method == MethodName.ShowMultiselectReticle)
+		{
+			return true;
+		}
+		if (method == MethodName.HideMultiselectReticle)
+		{
+			return true;
+		}
+		if (method == MethodName.ShowSingleSelectReticle)
+		{
+			return true;
+		}
+		if (method == MethodName.HideSingleSelectReticle)
+		{
+			return true;
+		}
+		if (method == MethodName.SetupForBestiary)
+		{
+			return true;
+		}
+		if (method == MethodName.StartSfxLoop)
+		{
+			return true;
+		}
+		if (method == MethodName.StopSfxLoop)
+		{
+			return true;
+		}
+		if (method == MethodName.StopAllSfxLoops)
+		{
+			return true;
+		}
+		return base.HasGodotClassMethod(in method);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool SetGodotClassPropertyValue(in godot_string_name name, in godot_variant value)
+	{
+		if (name == PropertyName.Hitbox)
+		{
+			Hitbox = VariantUtils.ConvertTo<Control>(in value);
+			return true;
+		}
+		if (name == PropertyName.OrbManager)
+		{
+			OrbManager = VariantUtils.ConvertTo<NOrbManager>(in value);
+			return true;
+		}
+		if (name == PropertyName.IsInteractable)
+		{
+			IsInteractable = VariantUtils.ConvertTo<bool>(in value);
+			return true;
+		}
+		if (name == PropertyName.Visuals)
+		{
+			Visuals = VariantUtils.ConvertTo<NCreatureVisuals>(in value);
+			return true;
+		}
+		if (name == PropertyName.IntentContainer)
+		{
+			IntentContainer = VariantUtils.ConvertTo<Control>(in value);
+			return true;
+		}
+		if (name == PropertyName.IsFocused)
+		{
+			IsFocused = VariantUtils.ConvertTo<bool>(in value);
+			return true;
+		}
+		if (name == PropertyName.PlayerIntentHandler)
+		{
+			PlayerIntentHandler = VariantUtils.ConvertTo<NMultiplayerPlayerIntentHandler>(in value);
+			return true;
+		}
+		if (name == PropertyName._stateDisplay)
+		{
+			_stateDisplay = VariantUtils.ConvertTo<NCreatureStateDisplay>(in value);
+			return true;
+		}
+		if (name == PropertyName._intentFadeTween)
+		{
+			_intentFadeTween = VariantUtils.ConvertTo<Tween>(in value);
+			return true;
+		}
+		if (name == PropertyName._shakeTween)
+		{
+			_shakeTween = VariantUtils.ConvertTo<Tween>(in value);
+			return true;
+		}
+		if (name == PropertyName._isRemotePlayerOrPet)
+		{
+			_isRemotePlayerOrPet = VariantUtils.ConvertTo<bool>(in value);
+			return true;
+		}
+		if (name == PropertyName._isInBestiary)
+		{
+			_isInBestiary = VariantUtils.ConvertTo<bool>(in value);
+			return true;
+		}
+		if (name == PropertyName._tempScale)
+		{
+			_tempScale = VariantUtils.ConvertTo<float>(in value);
+			return true;
+		}
+		if (name == PropertyName._scaleTween)
+		{
+			_scaleTween = VariantUtils.ConvertTo<Tween>(in value);
+			return true;
+		}
+		if (name == PropertyName._isInMultiselect)
+		{
+			_isInMultiselect = VariantUtils.ConvertTo<bool>(in value);
+			return true;
+		}
+		if (name == PropertyName._selectionReticle)
+		{
+			_selectionReticle = VariantUtils.ConvertTo<NSelectionReticle>(in value);
+			return true;
+		}
+		return base.SetGodotClassPropertyValue(in name, in value);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool GetGodotClassPropertyValue(in godot_string_name name, out godot_variant value)
+	{
+		Control from;
+		if (name == PropertyName.Hitbox)
+		{
+			from = Hitbox;
+			value = VariantUtils.CreateFrom(in from);
+			return true;
+		}
+		if (name == PropertyName.OrbManager)
+		{
+			value = VariantUtils.CreateFrom<NOrbManager>(OrbManager);
+			return true;
+		}
+		bool from2;
+		if (name == PropertyName.IsInteractable)
+		{
+			from2 = IsInteractable;
+			value = VariantUtils.CreateFrom(in from2);
+			return true;
+		}
+		Vector2 from3;
+		if (name == PropertyName.VfxSpawnPosition)
+		{
+			from3 = VfxSpawnPosition;
+			value = VariantUtils.CreateFrom(in from3);
+			return true;
+		}
+		if (name == PropertyName.PowerAppliedVfxSpawnPosition)
+		{
+			from3 = PowerAppliedVfxSpawnPosition;
+			value = VariantUtils.CreateFrom(in from3);
+			return true;
+		}
+		if (name == PropertyName.Visuals)
+		{
+			value = VariantUtils.CreateFrom<NCreatureVisuals>(Visuals);
+			return true;
+		}
+		if (name == PropertyName.Body)
+		{
+			value = VariantUtils.CreateFrom<Node2D>(Body);
+			return true;
+		}
+		if (name == PropertyName.IntentContainer)
+		{
+			from = IntentContainer;
+			value = VariantUtils.CreateFrom(in from);
+			return true;
+		}
+		if (name == PropertyName.IsPlayingDeathAnimation)
+		{
+			from2 = IsPlayingDeathAnimation;
+			value = VariantUtils.CreateFrom(in from2);
+			return true;
+		}
+		if (name == PropertyName.HasSpineAnimation)
+		{
+			from2 = HasSpineAnimation;
+			value = VariantUtils.CreateFrom(in from2);
+			return true;
+		}
+		if (name == PropertyName.IsFocused)
+		{
+			from2 = IsFocused;
+			value = VariantUtils.CreateFrom(in from2);
+			return true;
+		}
+		if (name == PropertyName.PlayerIntentHandler)
+		{
+			value = VariantUtils.CreateFrom<NMultiplayerPlayerIntentHandler>(PlayerIntentHandler);
+			return true;
+		}
+		if (name == PropertyName._stateDisplay)
+		{
+			value = VariantUtils.CreateFrom(in _stateDisplay);
+			return true;
+		}
+		if (name == PropertyName._intentFadeTween)
+		{
+			value = VariantUtils.CreateFrom(in _intentFadeTween);
+			return true;
+		}
+		if (name == PropertyName._shakeTween)
+		{
+			value = VariantUtils.CreateFrom(in _shakeTween);
+			return true;
+		}
+		if (name == PropertyName._isRemotePlayerOrPet)
+		{
+			value = VariantUtils.CreateFrom(in _isRemotePlayerOrPet);
+			return true;
+		}
+		if (name == PropertyName._isInBestiary)
+		{
+			value = VariantUtils.CreateFrom(in _isInBestiary);
+			return true;
+		}
+		if (name == PropertyName._tempScale)
+		{
+			value = VariantUtils.CreateFrom(in _tempScale);
+			return true;
+		}
+		if (name == PropertyName._scaleTween)
+		{
+			value = VariantUtils.CreateFrom(in _scaleTween);
+			return true;
+		}
+		if (name == PropertyName._isInMultiselect)
+		{
+			value = VariantUtils.CreateFrom(in _isInMultiselect);
+			return true;
+		}
+		if (name == PropertyName._selectionReticle)
+		{
+			value = VariantUtils.CreateFrom(in _selectionReticle);
+			return true;
+		}
+		return base.GetGodotClassPropertyValue(in name, out value);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	internal static List<PropertyInfo> GetGodotPropertyList()
+	{
+		List<PropertyInfo> val = new List<PropertyInfo>();
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName._stateDisplay, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName._intentFadeTween, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName._shakeTween, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Bool, PropertyName._isRemotePlayerOrPet, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Bool, PropertyName._isInBestiary, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Float, PropertyName._tempScale, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName._scaleTween, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.Hitbox, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.OrbManager, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Bool, PropertyName._isInMultiselect, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName._selectionReticle, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Bool, PropertyName.IsInteractable, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Vector2, PropertyName.VfxSpawnPosition, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Vector2, PropertyName.PowerAppliedVfxSpawnPosition, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.Visuals, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.Body, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.IntentContainer, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Bool, PropertyName.IsPlayingDeathAnimation, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Bool, PropertyName.HasSpineAnimation, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Bool, PropertyName.IsFocused, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.PlayerIntentHandler, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		return val;
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override void SaveGodotObjectData(GodotSerializationInfo info)
+	{
+		base.SaveGodotObjectData(info);
+		info.AddProperty(PropertyName.Hitbox, Variant.From<Control>(Hitbox));
+		info.AddProperty(PropertyName.OrbManager, Variant.From<NOrbManager>(OrbManager));
+		info.AddProperty(PropertyName.IsInteractable, Variant.From<bool>(IsInteractable));
+		info.AddProperty(PropertyName.Visuals, Variant.From<NCreatureVisuals>(Visuals));
+		info.AddProperty(PropertyName.IntentContainer, Variant.From<Control>(IntentContainer));
+		info.AddProperty(PropertyName.IsFocused, Variant.From<bool>(IsFocused));
+		info.AddProperty(PropertyName.PlayerIntentHandler, Variant.From<NMultiplayerPlayerIntentHandler>(PlayerIntentHandler));
+		info.AddProperty(PropertyName._stateDisplay, Variant.From(in _stateDisplay));
+		info.AddProperty(PropertyName._intentFadeTween, Variant.From(in _intentFadeTween));
+		info.AddProperty(PropertyName._shakeTween, Variant.From(in _shakeTween));
+		info.AddProperty(PropertyName._isRemotePlayerOrPet, Variant.From(in _isRemotePlayerOrPet));
+		info.AddProperty(PropertyName._isInBestiary, Variant.From(in _isInBestiary));
+		info.AddProperty(PropertyName._tempScale, Variant.From(in _tempScale));
+		info.AddProperty(PropertyName._scaleTween, Variant.From(in _scaleTween));
+		info.AddProperty(PropertyName._isInMultiselect, Variant.From(in _isInMultiselect));
+		info.AddProperty(PropertyName._selectionReticle, Variant.From(in _selectionReticle));
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override void RestoreGodotObjectData(GodotSerializationInfo info)
+	{
+		base.RestoreGodotObjectData(info);
+		if (info.TryGetProperty(PropertyName.Hitbox, out var value))
+		{
+			Hitbox = value.As<Control>();
+		}
+		if (info.TryGetProperty(PropertyName.OrbManager, out var value2))
+		{
+			OrbManager = value2.As<NOrbManager>();
+		}
+		if (info.TryGetProperty(PropertyName.IsInteractable, out var value3))
+		{
+			IsInteractable = value3.As<bool>();
+		}
+		if (info.TryGetProperty(PropertyName.Visuals, out var value4))
+		{
+			Visuals = value4.As<NCreatureVisuals>();
+		}
+		if (info.TryGetProperty(PropertyName.IntentContainer, out var value5))
+		{
+			IntentContainer = value5.As<Control>();
+		}
+		if (info.TryGetProperty(PropertyName.IsFocused, out var value6))
+		{
+			IsFocused = value6.As<bool>();
+		}
+		if (info.TryGetProperty(PropertyName.PlayerIntentHandler, out var value7))
+		{
+			PlayerIntentHandler = value7.As<NMultiplayerPlayerIntentHandler>();
+		}
+		if (info.TryGetProperty(PropertyName._stateDisplay, out var value8))
+		{
+			_stateDisplay = value8.As<NCreatureStateDisplay>();
+		}
+		if (info.TryGetProperty(PropertyName._intentFadeTween, out var value9))
+		{
+			_intentFadeTween = value9.As<Tween>();
+		}
+		if (info.TryGetProperty(PropertyName._shakeTween, out var value10))
+		{
+			_shakeTween = value10.As<Tween>();
+		}
+		if (info.TryGetProperty(PropertyName._isRemotePlayerOrPet, out var value11))
+		{
+			_isRemotePlayerOrPet = value11.As<bool>();
+		}
+		if (info.TryGetProperty(PropertyName._isInBestiary, out var value12))
+		{
+			_isInBestiary = value12.As<bool>();
+		}
+		if (info.TryGetProperty(PropertyName._tempScale, out var value13))
+		{
+			_tempScale = value13.As<float>();
+		}
+		if (info.TryGetProperty(PropertyName._scaleTween, out var value14))
+		{
+			_scaleTween = value14.As<Tween>();
+		}
+		if (info.TryGetProperty(PropertyName._isInMultiselect, out var value15))
+		{
+			_isInMultiselect = value15.As<bool>();
+		}
+		if (info.TryGetProperty(PropertyName._selectionReticle, out var value16))
+		{
+			_selectionReticle = value16.As<NSelectionReticle>();
+		}
+	}
+}
+
+// ===== MegaCrit.Sts2.Core.Nodes.Combat.NCreatureStateDisplay =====
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using Godot;
+using Godot.Bridge;
+using Godot.NativeInterop;
+using MegaCrit.Sts2.Core.Combat;
+using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.UI;
+using MegaCrit.Sts2.Core.Helpers;
+using MegaCrit.Sts2.Core.Nodes.Rooms;
+using MegaCrit.Sts2.Core.Random;
+using MegaCrit.Sts2.Core.Saves;
+using MegaCrit.Sts2.Core.Settings;
+using MegaCrit.Sts2.addons.mega_text;
+
+namespace MegaCrit.Sts2.Core.Nodes.Combat;
+
+[ScriptPath("res://src/Core/Nodes/Combat/NCreatureStateDisplay.cs")]
+public class NCreatureStateDisplay : Control
+{
+	public new class MethodName : Control.MethodName
+	{
+		public new static readonly StringName _Ready = "_Ready";
+
+		public new static readonly StringName _EnterTree = "_EnterTree";
+
+		public new static readonly StringName _ExitTree = "_ExitTree";
+
+		public static readonly StringName SubscribeToCreatureEvents = "SubscribeToCreatureEvents";
+
+		public static readonly StringName DebugToggleVisibility = "DebugToggleVisibility";
+
+		public static readonly StringName SetCreatureBounds = "SetCreatureBounds";
+
+		public static readonly StringName RefreshValues = "RefreshValues";
+
+		public static readonly StringName OnHovered = "OnHovered";
+
+		public static readonly StringName OnUnhovered = "OnUnhovered";
+
+		public static readonly StringName ShowNameplate = "ShowNameplate";
+
+		public static readonly StringName HideNameplate = "HideNameplate";
+
+		public static readonly StringName HideImmediately = "HideImmediately";
+
+		public static readonly StringName AnimateIn = "AnimateIn";
+
+		public static readonly StringName AnimateInBlock = "AnimateInBlock";
+
+		public static readonly StringName AnimateOut = "AnimateOut";
+
+		public static readonly StringName OnBlockTrackingCreatureBlockChanged = "OnBlockTrackingCreatureBlockChanged";
+	}
+
+	public new class PropertyName : Control.PropertyName
+	{
+		public static readonly StringName _powerContainer = "_powerContainer";
+
+		public static readonly StringName _nameplateContainer = "_nameplateContainer";
+
+		public static readonly StringName _nameplateLabel = "_nameplateLabel";
+
+		public static readonly StringName _healthBar = "_healthBar";
+
+		public static readonly StringName _hpBarHitbox = "_hpBarHitbox";
+
+		public static readonly StringName _creatureSize = "_creatureSize";
+
+		public static readonly StringName _showHideTween = "_showHideTween";
+
+		public static readonly StringName _hoverTween = "_hoverTween";
+
+		public static readonly StringName _originalPosition = "_originalPosition";
+	}
+
+	public new class SignalName : Control.SignalName
+	{
+	}
+
+	private NPowerContainer _powerContainer;
+
+	private Control _nameplateContainer;
+
+	private MegaLabel _nameplateLabel;
+
+	private NHealthBar _healthBar;
+
+	private Control _hpBarHitbox;
+
+	private Creature? _creature;
+
+	private Vector2 _creatureSize;
+
+	private Creature? _blockTrackingCreature;
+
+	private Tween? _showHideTween;
+
+	private Tween? _hoverTween;
+
+	private static readonly Vector2 _healthBarAnimOffset = new Vector2(0f, 20f);
+
+	private Vector2 _originalPosition;
+
+	public override void _Ready()
+	{
+		//IL_009c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a6: Expected O, but got Unknown
+		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c9: Expected O, but got Unknown
+		_powerContainer = GetNode<NPowerContainer>("%PowerContainer");
+		_nameplateContainer = GetNode<Control>("%NameplateContainer");
+		_nameplateLabel = GetNode<MegaLabel>("%NameplateLabel");
+		_healthBar = GetNode<NHealthBar>("%HealthBar");
+		_hpBarHitbox = GetNode<Control>("%HpBarHitbox");
+		_nameplateContainer.Modulate = StsColors.transparentWhite;
+		_originalPosition = base.Position;
+		_hpBarHitbox.Connect(Control.SignalName.MouseEntered, Callable.From(new Action(OnHovered)));
+		_hpBarHitbox.Connect(Control.SignalName.MouseExited, Callable.From(new Action(OnUnhovered)));
+	}
+
+	public override void _EnterTree()
+	{
+		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0049: Expected O, but got Unknown
+		base._EnterTree();
+		CombatManager.Instance.StateTracker.CombatStateChanged += OnCombatStateChanged;
+		SubscribeToCreatureEvents();
+		if (NCombatRoom.Instance != null)
+		{
+			NCombatRoom.Instance.Ui.DebugToggleHpBar += new Action(DebugToggleVisibility);
+		}
+	}
+
+	public override void _ExitTree()
+	{
+		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00af: Expected O, but got Unknown
+		base._ExitTree();
+		CombatManager.Instance.StateTracker.CombatStateChanged -= OnCombatStateChanged;
+		if (_creature != null)
+		{
+			_creature.BlockChanged -= AnimateInBlock;
+			_creature.Died -= OnCreatureDied;
+			_creature.Revived -= OnCreatureRevived;
+		}
+		if (_blockTrackingCreature != null)
+		{
+			_blockTrackingCreature.BlockChanged -= OnBlockTrackingCreatureBlockChanged;
+		}
+		if (NCombatRoom.Instance != null)
+		{
+			NCombatRoom.Instance.Ui.DebugToggleHpBar -= new Action(DebugToggleVisibility);
+		}
+	}
+
+	public void SetCreature(Creature creature)
+	{
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		if (_creature != null)
+		{
+			throw new InvalidOperationException("Creature was already set.");
+		}
+		_creature = creature;
+		SubscribeToCreatureEvents();
+		_nameplateLabel.SetTextAutoSize(creature.Name);
+		_powerContainer.SetCreature(_creature);
+		_healthBar.SetCreature(_creature);
+		RefreshValues();
+	}
+
+	private void SubscribeToCreatureEvents()
+	{
+		if (_creature != null)
+		{
+			_creature.BlockChanged += AnimateInBlock;
+			_creature.Died += OnCreatureDied;
+			_creature.Revived += OnCreatureRevived;
+		}
+	}
+
+	private void DebugToggleVisibility()
+	{
+		base.Visible = !NCombatUi.IsDebugHidingHpBar;
+	}
+
+	public void SetCreatureBounds(Control bounds)
+	{
+		_healthBar.UpdateLayoutForCreatureBounds(bounds);
+		_nameplateContainer.GlobalPosition = new Vector2(bounds.GlobalPosition.X, _nameplateContainer.GlobalPosition.Y);
+		_nameplateContainer.Size = new Vector2(bounds.Size.X * bounds.Scale.X, _nameplateContainer.Size.Y);
+		_powerContainer.SetCreatureBounds(bounds);
+		RefreshValues();
+	}
+
+	private void RefreshValues()
+	{
+		if (_creature != null)
+		{
+			_nameplateLabel.SetTextAutoSize(_creature.Name);
+			_healthBar.RefreshValues();
+		}
+	}
+
+	private void OnCombatStateChanged(CombatState _)
+	{
+		RefreshValues();
+	}
+
+	private void OnHovered()
+	{
+		_healthBar.FadeOutHpLabel(0.5f, 0.1f);
+		ShowNameplate();
+		if (!NTargetManager.Instance.IsInSelection)
+		{
+			NCombatRoom.Instance?.GetCreatureNode(_creature)?.ShowHoverTips(_creature.HoverTips);
+		}
+	}
+
+	private void OnUnhovered()
+	{
+		_healthBar.FadeInHpLabel(0.5f);
+		HideNameplate();
+		NCombatRoom.Instance.GetCreatureNode(_creature)?.HideHoverTips();
+	}
+
+	public void ShowNameplate()
+	{
+		_hoverTween?.Kill();
+		_hoverTween = CreateTween().SetParallel();
+		_hoverTween.TweenProperty(_powerContainer, "modulate:a", 0.5f, 0.15);
+		_hoverTween.TweenProperty(_nameplateContainer, "modulate:a", 1f, 0.15);
+	}
+
+	public void HideNameplate()
+	{
+		_hoverTween?.Kill();
+		_hoverTween = CreateTween().SetParallel();
+		_hoverTween.TweenProperty(_powerContainer, "modulate:a", 1f, 0.2);
+		_hoverTween.TweenProperty(_nameplateContainer, "modulate:a", 0f, 0.2);
+	}
+
+	public void HideImmediately()
+	{
+		_showHideTween?.Kill();
+		_hoverTween?.Kill();
+		Color modulate = base.Modulate;
+		modulate.A = 0f;
+		base.Modulate = modulate;
+	}
+
+	public void AnimateIn(HealthBarAnimMode mode)
+	{
+		if (SaveManager.Instance.PrefsSave.FastMode == FastModeType.Instant)
+		{
+			Color modulate = base.Modulate;
+			modulate.A = 1f;
+			base.Modulate = modulate;
+			base.Visible = true;
+			return;
+		}
+		float num = 0f;
+		base.Visible = true;
+		base.Modulate = StsColors.transparentWhite;
+		base.Position -= _healthBarAnimOffset;
+		if (mode == HealthBarAnimMode.SpawnedAtCombatStart)
+		{
+			num = Rng.Chaotic.NextFloat(1.3f, 1.7f);
+		}
+		_showHideTween?.Kill();
+		_showHideTween = CreateTween().SetParallel();
+		_showHideTween.TweenProperty(this, "modulate:a", 1f, (mode == HealthBarAnimMode.FromHidden) ? 0.15 : 1.0).SetEase(Tween.EaseType.Out).SetTrans(Tween.TransitionType.Sine)
+			.SetDelay(num);
+		_showHideTween.TweenProperty(this, "position", _originalPosition, (mode == HealthBarAnimMode.FromHidden) ? 0.15 : 0.5).SetEase(Tween.EaseType.Out).SetTrans(Tween.TransitionType.Quad)
+			.SetDelay(num);
+	}
+
+	private void AnimateInBlock(int oldBlock, int blockGain)
+	{
+		if (oldBlock == 0 && blockGain != 0)
+		{
+			_healthBar.AnimateInBlock(oldBlock, blockGain);
+		}
+	}
+
+	public void AnimateOut()
+	{
+		if (SaveManager.Instance.PrefsSave.FastMode == FastModeType.Instant)
+		{
+			Color modulate = base.Modulate;
+			modulate.A = 0f;
+			base.Modulate = modulate;
+			base.Visible = false;
+			return;
+		}
+		_showHideTween?.Kill();
+		_showHideTween = CreateTween().SetParallel();
+		_showHideTween.TweenProperty(this, "modulate:a", 0f, 0.5).SetEase(Tween.EaseType.Out).SetTrans(Tween.TransitionType.Sine);
+		_showHideTween.TweenProperty(this, "position", _healthBarAnimOffset, 0.25).SetEase(Tween.EaseType.Out).SetTrans(Tween.TransitionType.Quad);
+		_showHideTween.Chain().TweenCallback(Callable.From<bool>((Func<bool>)([CompilerGenerated] () => base.Visible = false)));
+	}
+
+	private void OnCreatureDied(Creature _)
+	{
+		_hpBarHitbox.MouseFilter = MouseFilterEnum.Ignore;
+	}
+
+	private void OnCreatureRevived(Creature _)
+	{
+		_hpBarHitbox.MouseFilter = MouseFilterEnum.Stop;
+	}
+
+	public void TrackBlockStatus(Creature creature)
+	{
+		_blockTrackingCreature = creature;
+		_blockTrackingCreature.BlockChanged += OnBlockTrackingCreatureBlockChanged;
+		_healthBar.TrackBlockStatus(creature);
+	}
+
+	private void OnBlockTrackingCreatureBlockChanged(int oldBlock, int blockGain)
+	{
+		_healthBar.RefreshValues();
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	internal static List<MethodInfo> GetGodotMethodList()
+	{
+		List<MethodInfo> val = new List<MethodInfo>(16);
+		val.Add(new MethodInfo(MethodName._Ready, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName._EnterTree, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName._ExitTree, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.SubscribeToCreatureEvents, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.DebugToggleVisibility, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		StringName setCreatureBounds = MethodName.SetCreatureBounds;
+		PropertyInfo returnVal = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags = 1L;
+		List<PropertyInfo> obj = new List<PropertyInfo>();
+		obj.Add(new PropertyInfo(Variant.Type.Object, "bounds", PropertyHint.None, "", PropertyUsageFlags.Default, new StringName("Control"), exported: false));
+		val.Add(new MethodInfo(setCreatureBounds, returnVal, (MethodFlags)flags, obj, null));
+		val.Add(new MethodInfo(MethodName.RefreshValues, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.OnHovered, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.OnUnhovered, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.ShowNameplate, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.HideNameplate, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.HideImmediately, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		StringName animateIn = MethodName.AnimateIn;
+		PropertyInfo returnVal2 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags2 = 1L;
+		List<PropertyInfo> obj2 = new List<PropertyInfo>();
+		obj2.Add(new PropertyInfo(Variant.Type.Int, "mode", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		val.Add(new MethodInfo(animateIn, returnVal2, (MethodFlags)flags2, obj2, null));
+		StringName animateInBlock = MethodName.AnimateInBlock;
+		PropertyInfo returnVal3 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags3 = 1L;
+		List<PropertyInfo> obj3 = new List<PropertyInfo>();
+		obj3.Add(new PropertyInfo(Variant.Type.Int, "oldBlock", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		obj3.Add(new PropertyInfo(Variant.Type.Int, "blockGain", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		val.Add(new MethodInfo(animateInBlock, returnVal3, (MethodFlags)flags3, obj3, null));
+		val.Add(new MethodInfo(MethodName.AnimateOut, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		StringName onBlockTrackingCreatureBlockChanged = MethodName.OnBlockTrackingCreatureBlockChanged;
+		PropertyInfo returnVal4 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags4 = 1L;
+		List<PropertyInfo> obj4 = new List<PropertyInfo>();
+		obj4.Add(new PropertyInfo(Variant.Type.Int, "oldBlock", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		obj4.Add(new PropertyInfo(Variant.Type.Int, "blockGain", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		val.Add(new MethodInfo(onBlockTrackingCreatureBlockChanged, returnVal4, (MethodFlags)flags4, obj4, null));
+		return val;
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool InvokeGodotClassMethod(in godot_string_name method, NativeVariantPtrArgs args, out godot_variant ret)
+	{
+		if (method == MethodName._Ready && args.Count == 0)
+		{
+			_Ready();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName._EnterTree && args.Count == 0)
+		{
+			_EnterTree();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName._ExitTree && args.Count == 0)
+		{
+			_ExitTree();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.SubscribeToCreatureEvents && args.Count == 0)
+		{
+			SubscribeToCreatureEvents();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.DebugToggleVisibility && args.Count == 0)
+		{
+			DebugToggleVisibility();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.SetCreatureBounds && args.Count == 1)
+		{
+			SetCreatureBounds(VariantUtils.ConvertTo<Control>(in args[0]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.RefreshValues && args.Count == 0)
+		{
+			RefreshValues();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.OnHovered && args.Count == 0)
+		{
+			OnHovered();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.OnUnhovered && args.Count == 0)
+		{
+			OnUnhovered();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.ShowNameplate && args.Count == 0)
+		{
+			ShowNameplate();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.HideNameplate && args.Count == 0)
+		{
+			HideNameplate();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.HideImmediately && args.Count == 0)
+		{
+			HideImmediately();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.AnimateIn && args.Count == 1)
+		{
+			AnimateIn(VariantUtils.ConvertTo<HealthBarAnimMode>(in args[0]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.AnimateInBlock && args.Count == 2)
+		{
+			AnimateInBlock(VariantUtils.ConvertTo<int>(in args[0]), VariantUtils.ConvertTo<int>(in args[1]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.AnimateOut && args.Count == 0)
+		{
+			AnimateOut();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.OnBlockTrackingCreatureBlockChanged && args.Count == 2)
+		{
+			OnBlockTrackingCreatureBlockChanged(VariantUtils.ConvertTo<int>(in args[0]), VariantUtils.ConvertTo<int>(in args[1]));
+			ret = default(godot_variant);
+			return true;
+		}
+		return base.InvokeGodotClassMethod(in method, args, out ret);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool HasGodotClassMethod(in godot_string_name method)
+	{
+		if (method == MethodName._Ready)
+		{
+			return true;
+		}
+		if (method == MethodName._EnterTree)
+		{
+			return true;
+		}
+		if (method == MethodName._ExitTree)
+		{
+			return true;
+		}
+		if (method == MethodName.SubscribeToCreatureEvents)
+		{
+			return true;
+		}
+		if (method == MethodName.DebugToggleVisibility)
+		{
+			return true;
+		}
+		if (method == MethodName.SetCreatureBounds)
+		{
+			return true;
+		}
+		if (method == MethodName.RefreshValues)
+		{
+			return true;
+		}
+		if (method == MethodName.OnHovered)
+		{
+			return true;
+		}
+		if (method == MethodName.OnUnhovered)
+		{
+			return true;
+		}
+		if (method == MethodName.ShowNameplate)
+		{
+			return true;
+		}
+		if (method == MethodName.HideNameplate)
+		{
+			return true;
+		}
+		if (method == MethodName.HideImmediately)
+		{
+			return true;
+		}
+		if (method == MethodName.AnimateIn)
+		{
+			return true;
+		}
+		if (method == MethodName.AnimateInBlock)
+		{
+			return true;
+		}
+		if (method == MethodName.AnimateOut)
+		{
+			return true;
+		}
+		if (method == MethodName.OnBlockTrackingCreatureBlockChanged)
+		{
+			return true;
+		}
+		return base.HasGodotClassMethod(in method);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool SetGodotClassPropertyValue(in godot_string_name name, in godot_variant value)
+	{
+		if (name == PropertyName._powerContainer)
+		{
+			_powerContainer = VariantUtils.ConvertTo<NPowerContainer>(in value);
+			return true;
+		}
+		if (name == PropertyName._nameplateContainer)
+		{
+			_nameplateContainer = VariantUtils.ConvertTo<Control>(in value);
+			return true;
+		}
+		if (name == PropertyName._nameplateLabel)
+		{
+			_nameplateLabel = VariantUtils.ConvertTo<MegaLabel>(in value);
+			return true;
+		}
+		if (name == PropertyName._healthBar)
+		{
+			_healthBar = VariantUtils.ConvertTo<NHealthBar>(in value);
+			return true;
+		}
+		if (name == PropertyName._hpBarHitbox)
+		{
+			_hpBarHitbox = VariantUtils.ConvertTo<Control>(in value);
+			return true;
+		}
+		if (name == PropertyName._creatureSize)
+		{
+			_creatureSize = VariantUtils.ConvertTo<Vector2>(in value);
+			return true;
+		}
+		if (name == PropertyName._showHideTween)
+		{
+			_showHideTween = VariantUtils.ConvertTo<Tween>(in value);
+			return true;
+		}
+		if (name == PropertyName._hoverTween)
+		{
+			_hoverTween = VariantUtils.ConvertTo<Tween>(in value);
+			return true;
+		}
+		if (name == PropertyName._originalPosition)
+		{
+			_originalPosition = VariantUtils.ConvertTo<Vector2>(in value);
+			return true;
+		}
+		return base.SetGodotClassPropertyValue(in name, in value);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool GetGodotClassPropertyValue(in godot_string_name name, out godot_variant value)
+	{
+		if (name == PropertyName._powerContainer)
+		{
+			value = VariantUtils.CreateFrom(in _powerContainer);
+			return true;
+		}
+		if (name == PropertyName._nameplateContainer)
+		{
+			value = VariantUtils.CreateFrom(in _nameplateContainer);
+			return true;
+		}
+		if (name == PropertyName._nameplateLabel)
+		{
+			value = VariantUtils.CreateFrom(in _nameplateLabel);
+			return true;
+		}
+		if (name == PropertyName._healthBar)
+		{
+			value = VariantUtils.CreateFrom(in _healthBar);
+			return true;
+		}
+		if (name == PropertyName._hpBarHitbox)
+		{
+			value = VariantUtils.CreateFrom(in _hpBarHitbox);
+			return true;
+		}
+		if (name == PropertyName._creatureSize)
+		{
+			value = VariantUtils.CreateFrom(in _creatureSize);
+			return true;
+		}
+		if (name == PropertyName._showHideTween)
+		{
+			value = VariantUtils.CreateFrom(in _showHideTween);
+			return true;
+		}
+		if (name == PropertyName._hoverTween)
+		{
+			value = VariantUtils.CreateFrom(in _hoverTween);
+			return true;
+		}
+		if (name == PropertyName._originalPosition)
+		{
+			value = VariantUtils.CreateFrom(in _originalPosition);
+			return true;
+		}
+		return base.GetGodotClassPropertyValue(in name, out value);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	internal static List<PropertyInfo> GetGodotPropertyList()
+	{
+		List<PropertyInfo> val = new List<PropertyInfo>();
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName._powerContainer, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName._nameplateContainer, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName._nameplateLabel, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName._healthBar, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName._hpBarHitbox, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Vector2, PropertyName._creatureSize, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName._showHideTween, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName._hoverTween, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Vector2, PropertyName._originalPosition, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		return val;
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override void SaveGodotObjectData(GodotSerializationInfo info)
+	{
+		base.SaveGodotObjectData(info);
+		info.AddProperty(PropertyName._powerContainer, Variant.From(in _powerContainer));
+		info.AddProperty(PropertyName._nameplateContainer, Variant.From(in _nameplateContainer));
+		info.AddProperty(PropertyName._nameplateLabel, Variant.From(in _nameplateLabel));
+		info.AddProperty(PropertyName._healthBar, Variant.From(in _healthBar));
+		info.AddProperty(PropertyName._hpBarHitbox, Variant.From(in _hpBarHitbox));
+		info.AddProperty(PropertyName._creatureSize, Variant.From(in _creatureSize));
+		info.AddProperty(PropertyName._showHideTween, Variant.From(in _showHideTween));
+		info.AddProperty(PropertyName._hoverTween, Variant.From(in _hoverTween));
+		info.AddProperty(PropertyName._originalPosition, Variant.From(in _originalPosition));
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override void RestoreGodotObjectData(GodotSerializationInfo info)
+	{
+		base.RestoreGodotObjectData(info);
+		if (info.TryGetProperty(PropertyName._powerContainer, out var value))
+		{
+			_powerContainer = value.As<NPowerContainer>();
+		}
+		if (info.TryGetProperty(PropertyName._nameplateContainer, out var value2))
+		{
+			_nameplateContainer = value2.As<Control>();
+		}
+		if (info.TryGetProperty(PropertyName._nameplateLabel, out var value3))
+		{
+			_nameplateLabel = value3.As<MegaLabel>();
+		}
+		if (info.TryGetProperty(PropertyName._healthBar, out var value4))
+		{
+			_healthBar = value4.As<NHealthBar>();
+		}
+		if (info.TryGetProperty(PropertyName._hpBarHitbox, out var value5))
+		{
+			_hpBarHitbox = value5.As<Control>();
+		}
+		if (info.TryGetProperty(PropertyName._creatureSize, out var value6))
+		{
+			_creatureSize = value6.As<Vector2>();
+		}
+		if (info.TryGetProperty(PropertyName._showHideTween, out var value7))
+		{
+			_showHideTween = value7.As<Tween>();
+		}
+		if (info.TryGetProperty(PropertyName._hoverTween, out var value8))
+		{
+			_hoverTween = value8.As<Tween>();
+		}
+		if (info.TryGetProperty(PropertyName._originalPosition, out var value9))
+		{
+			_originalPosition = value9.As<Vector2>();
+		}
+	}
+}
+
+// ===== MegaCrit.Sts2.Core.Nodes.Combat.NCreatureVisuals =====
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
+using Godot;
+using Godot.Bridge;
+using Godot.NativeInterop;
+using MegaCrit.Sts2.Core.Assets;
+using MegaCrit.Sts2.Core.Bindings.MegaSpine;
+using MegaCrit.Sts2.Core.Helpers;
+using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Nodes.GodotExtensions;
+using MegaCrit.Sts2.Core.Nodes.Vfx.Forms;
+using MegaCrit.Sts2.Core.Saves;
+
+namespace MegaCrit.Sts2.Core.Nodes.Combat;
+
+[ScriptPath("res://src/Core/Nodes/Combat/NCreatureVisuals.cs")]
+public class NCreatureVisuals : Node2D
+{
+	public new class MethodName : Node2D.MethodName
+	{
+		public static readonly StringName GetCurrentBody = "GetCurrentBody";
+
+		public new static readonly StringName _Ready = "_Ready";
+
+		public static readonly StringName AddFormVfx = "AddFormVfx";
+
+		public static readonly StringName RemoveFormVfx = "RemoveFormVfx";
+
+		public new static readonly StringName _EnterTree = "_EnterTree";
+
+		public new static readonly StringName _ExitTree = "_ExitTree";
+
+		public static readonly StringName SetScaleAndHue = "SetScaleAndHue";
+
+		public static readonly StringName IsPlayingHurtAnimation = "IsPlayingHurtAnimation";
+
+		public static readonly StringName IsPlayingIdleAnimation = "IsPlayingIdleAnimation";
+
+		public static readonly StringName TryApplyLiquidOverlay = "TryApplyLiquidOverlay";
+	}
+
+	public new class PropertyName : Node2D.PropertyName
+	{
+		public static readonly StringName Bounds = "Bounds";
+
+		public static readonly StringName IntentPosition = "IntentPosition";
+
+		public static readonly StringName OrbPosition = "OrbPosition";
+
+		public static readonly StringName TalkPosition = "TalkPosition";
+
+		public static readonly StringName IsSpineNode = "IsSpineNode";
+
+		public static readonly StringName HasSpineAnimation = "HasSpineAnimation";
+
+		public static readonly StringName IsUsingPhobiaModeBody = "IsUsingPhobiaModeBody";
+
+		public static readonly StringName FormVfxHolder = "FormVfxHolder";
+
+		public static readonly StringName VfxSpawnPosition = "VfxSpawnPosition";
+
+		public static readonly StringName DefaultScale = "DefaultScale";
+
+		public static readonly StringName Body = "Body";
+
+		public static readonly StringName _body = "_body";
+
+		public static readonly StringName _phobiaModeBody = "_phobiaModeBody";
+
+		public static readonly StringName _hue = "_hue";
+
+		public static readonly StringName _liquidOverlayTimer = "_liquidOverlayTimer";
+
+		public static readonly StringName _savedNormalMaterial = "_savedNormalMaterial";
+
+		public static readonly StringName _currentLiquidOverlayMaterial = "_currentLiquidOverlayMaterial";
+	}
+
+	public new class SignalName : Node2D.SignalName
+	{
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <ApplyLiquidOverlayInternal>d__65 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public NCreatureVisuals <>4__this;
+
+		public Color tint;
+
+		private TaskAwaiter<float> <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_015f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0132: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0147: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			NCreatureVisuals nCreatureVisuals = <>4__this;
+			try
+			{
+				TaskAwaiter<float> val;
+				if (num == 0)
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter<float>);
+					num = (<>1__state = -1);
+					goto IL_017b;
+				}
+				if (nCreatureVisuals.SpineBody != null)
+				{
+					nCreatureVisuals._savedNormalMaterial = nCreatureVisuals.SpineBody.GetNormalMaterial();
+					Material material = (ShaderMaterial)PreloadManager.Cache.GetMaterial("res://materials/vfx/potion/potion_liquid_overlay.tres");
+					nCreatureVisuals._currentLiquidOverlayMaterial = (ShaderMaterial)material.Duplicate();
+					nCreatureVisuals._currentLiquidOverlayMaterial.SetShaderParameter(_tint, tint);
+					nCreatureVisuals._currentLiquidOverlayMaterial.SetShaderParameter(_h, nCreatureVisuals._hue);
+					nCreatureVisuals._currentLiquidOverlayMaterial.SetShaderParameter(_overlayInfluence, 1f);
+					nCreatureVisuals.SpineBody.SetNormalMaterial(nCreatureVisuals._currentLiquidOverlayMaterial);
+					nCreatureVisuals._liquidOverlayTimer = 1.0;
+					goto IL_0183;
+				}
+				goto end_IL_000e;
+				IL_0183:
+				if (nCreatureVisuals._liquidOverlayTimer > 0.0)
+				{
+					double num2 = (1.0 - nCreatureVisuals._liquidOverlayTimer) / 1.0;
+					nCreatureVisuals._currentLiquidOverlayMaterial.SetShaderParameter(_overlayInfluence, 1.0 - num2);
+					nCreatureVisuals._liquidOverlayTimer -= nCreatureVisuals.GetProcessDeltaTime();
+					val = nCreatureVisuals.AwaitProcessFrame(nCreatureVisuals._cts.Token).GetAwaiter();
+					if (!val.IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter<float>, <ApplyLiquidOverlayInternal>d__65>(ref val, ref this);
+						return;
+					}
+					goto IL_017b;
+				}
+				nCreatureVisuals.SpineBody.SetNormalMaterial(nCreatureVisuals._savedNormalMaterial);
+				nCreatureVisuals._currentLiquidOverlayMaterial = null;
+				goto end_IL_000e;
+				IL_017b:
+				val.GetResult();
+				goto IL_0183;
+				end_IL_000e:;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	private static readonly StringName _overlayInfluence = new StringName("overlay_influence");
+
+	private static readonly StringName _h = new StringName("h");
+
+	private static readonly StringName _tint = new StringName("tint");
+
+	private const double _baseLiquidOverlayDuration = 1.0;
+
+	private Node2D _body;
+
+	private Node2D? _phobiaModeBody;
+
+	private float _hue = 1f;
+
+	private double _liquidOverlayTimer;
+
+	private Material? _savedNormalMaterial;
+
+	private ShaderMaterial? _currentLiquidOverlayMaterial;
+
+	private CancellationTokenSource _cts = new CancellationTokenSource();
+
+	[field: CompilerGenerated]
+	public Control Bounds
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public Marker2D IntentPosition
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public Marker2D OrbPosition
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public Marker2D? TalkPosition
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	private bool IsSpineNode
+	{
+		get
+		{
+			if (GodotObject.IsInstanceValid(_body))
+			{
+				return _body.GetClass() == "SpineSprite";
+			}
+			return false;
+		}
+	}
+
+	public bool HasSpineAnimation => SpineBody != null;
+
+	public bool IsUsingPhobiaModeBody => _phobiaModeBody == GetCurrentBody();
+
+	[field: CompilerGenerated]
+	public Control? FormVfxHolder
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public MegaSprite? SpineBody
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	public SpineAnimationAccess SpineAnimation => new SpineAnimationAccess(SpineBody);
+
+	[field: CompilerGenerated]
+	public Marker2D VfxSpawnPosition
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public float DefaultScale
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		set;
+	} = 1f;
+
+	public Node2D Body => _body;
+
+	public Node2D GetCurrentBody()
+	{
+		Node2D phobiaModeBody = _phobiaModeBody;
+		if (phobiaModeBody == null || !phobiaModeBody.Visible)
+		{
+			return _body;
+		}
+		return _phobiaModeBody;
+	}
+
+	public override void _Ready()
+	{
+		_body = GetNode<Node2D>("%Visuals");
+		_phobiaModeBody = GetNodeOrNull<Node2D>("%PhobiaModeVisuals");
+		FormVfxHolder = GetNodeOrNull<Control>("%FormVfx");
+		Bounds = GetNode<Control>("%Bounds");
+		IntentPosition = GetNode<Marker2D>("%IntentPos");
+		VfxSpawnPosition = GetNode<Marker2D>("%CenterPos");
+		OrbPosition = (HasNode("%OrbPos") ? GetNode<Marker2D>("%OrbPos") : IntentPosition);
+		TalkPosition = (HasNode("%TalkPos") ? GetNode<Marker2D>("%TalkPos") : null);
+		if (IsSpineNode)
+		{
+			SpineBody = new MegaSprite(_body);
+			if (SpineBody.GetSkeleton()?.GetData() == null)
+			{
+				GD.PushWarning($"Spine skeleton data failed to load for {base.Name}, disabling spine animation.");
+				SpineBody = null;
+			}
+		}
+		_savedNormalMaterial = null;
+		_currentLiquidOverlayMaterial = null;
+	}
+
+	public void AddFormVfx(NFormVfx formVfx)
+	{
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		if (FormVfxHolder == null)
+		{
+			throw new InvalidOperationException("This creature has no form holder to put this form vfx");
+		}
+		FormVfxHolder.FreeChildren();
+		FormVfxHolder.AddChildSafely(formVfx);
+		formVfx.Position = Vector2.Zero;
+	}
+
+	public void RemoveFormVfx()
+	{
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		if (FormVfxHolder == null)
+		{
+			throw new InvalidOperationException("This creature has no form holder to put this form vfx");
+		}
+		FormVfxHolder.FreeChildren();
+	}
+
+	public override void _EnterTree()
+	{
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000b: Expected O, but got Unknown
+		_cts = new CancellationTokenSource();
+	}
+
+	public override void _ExitTree()
+	{
+		_cts.Cancel();
+	}
+
+	public void UpdatePhobiaMode(MonsterModel? model)
+	{
+		if (_phobiaModeBody != null)
+		{
+			_phobiaModeBody.Visible = SaveManager.Instance.PrefsSave.PhobiaMode;
+			_body.Visible = !_phobiaModeBody.Visible;
+		}
+		if (SpineBody != null)
+		{
+			MegaSkeleton skeleton = SpineBody.GetSkeleton();
+			if (skeleton != null)
+			{
+				model?.OnPhobiaModeToggled(SaveManager.Instance.PrefsSave.PhobiaMode, SpineBody, skeleton);
+			}
+		}
+	}
+
+	public void SetUpSkin(MonsterModel model)
+	{
+		if (SpineBody != null)
+		{
+			MegaSkeleton skeleton = SpineBody.GetSkeleton();
+			if (skeleton != null)
+			{
+				model.SetupSkins(SpineBody, skeleton);
+			}
+		}
+	}
+
+	public void SetScaleAndHue(float scale, float hue)
+	{
+		DefaultScale = scale;
+		base.Scale = Vector2.One * scale;
+		_hue = hue;
+		if (!Mathf.IsEqualApprox(hue, 0f) && SpineBody != null)
+		{
+			Material normalMaterial = SpineBody.GetNormalMaterial();
+			ShaderMaterial shaderMaterial;
+			if (normalMaterial == null)
+			{
+				Material material = (ShaderMaterial)PreloadManager.Cache.GetMaterial("res://materials/vfx/hsv.tres");
+				shaderMaterial = (ShaderMaterial)material.Duplicate();
+				SpineBody.SetNormalMaterial(shaderMaterial);
+			}
+			else
+			{
+				shaderMaterial = (ShaderMaterial)normalMaterial;
+			}
+			shaderMaterial.SetShaderParameter(_h, hue);
+		}
+	}
+
+	public bool IsPlayingHurtAnimation()
+	{
+		return SpineAnimation.GetCurrentAnimationName() == "hurt";
+	}
+
+	public bool IsPlayingIdleAnimation()
+	{
+		if (!(SpineAnimation.GetCurrentAnimationName() == "idle_loop"))
+		{
+			return SpineAnimation.GetCurrentAnimationName() == "low_health_loop";
+		}
+		return true;
+	}
+
+	public void TryApplyLiquidOverlay(Color tint)
+	{
+		if (_currentLiquidOverlayMaterial != null)
+		{
+			_currentLiquidOverlayMaterial.SetShaderParameter(_tint, tint);
+			_liquidOverlayTimer = 1.0;
+		}
+		else
+		{
+			TaskHelper.RunSafely(ApplyLiquidOverlayInternal(tint));
+		}
+	}
+
+	[AsyncStateMachine(typeof(<ApplyLiquidOverlayInternal>d__65))]
+	private System.Threading.Tasks.Task ApplyLiquidOverlayInternal(Color tint)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<ApplyLiquidOverlayInternal>d__65 <ApplyLiquidOverlayInternal>d__66 = default(<ApplyLiquidOverlayInternal>d__65);
+		<ApplyLiquidOverlayInternal>d__66.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<ApplyLiquidOverlayInternal>d__66.<>4__this = this;
+		<ApplyLiquidOverlayInternal>d__66.tint = tint;
+		<ApplyLiquidOverlayInternal>d__66.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <ApplyLiquidOverlayInternal>d__66.<>t__builder)).Start<<ApplyLiquidOverlayInternal>d__65>(ref <ApplyLiquidOverlayInternal>d__66);
+		return ((AsyncTaskMethodBuilder)(ref <ApplyLiquidOverlayInternal>d__66.<>t__builder)).Task;
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	internal static List<MethodInfo> GetGodotMethodList()
+	{
+		List<MethodInfo> val = new List<MethodInfo>(10);
+		val.Add(new MethodInfo(MethodName.GetCurrentBody, new PropertyInfo(Variant.Type.Object, "", PropertyHint.None, "", PropertyUsageFlags.Default, new StringName("Node2D"), exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName._Ready, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		StringName addFormVfx = MethodName.AddFormVfx;
+		PropertyInfo returnVal = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags = 1L;
+		List<PropertyInfo> obj = new List<PropertyInfo>();
+		obj.Add(new PropertyInfo(Variant.Type.Object, "formVfx", PropertyHint.None, "", PropertyUsageFlags.Default, new StringName("Node2D"), exported: false));
+		val.Add(new MethodInfo(addFormVfx, returnVal, (MethodFlags)flags, obj, null));
+		val.Add(new MethodInfo(MethodName.RemoveFormVfx, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName._EnterTree, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName._ExitTree, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		StringName setScaleAndHue = MethodName.SetScaleAndHue;
+		PropertyInfo returnVal2 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags2 = 1L;
+		List<PropertyInfo> obj2 = new List<PropertyInfo>();
+		obj2.Add(new PropertyInfo(Variant.Type.Float, "scale", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		obj2.Add(new PropertyInfo(Variant.Type.Float, "hue", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		val.Add(new MethodInfo(setScaleAndHue, returnVal2, (MethodFlags)flags2, obj2, null));
+		val.Add(new MethodInfo(MethodName.IsPlayingHurtAnimation, new PropertyInfo(Variant.Type.Bool, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.IsPlayingIdleAnimation, new PropertyInfo(Variant.Type.Bool, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		StringName tryApplyLiquidOverlay = MethodName.TryApplyLiquidOverlay;
+		PropertyInfo returnVal3 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags3 = 1L;
+		List<PropertyInfo> obj3 = new List<PropertyInfo>();
+		obj3.Add(new PropertyInfo(Variant.Type.Color, "tint", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		val.Add(new MethodInfo(tryApplyLiquidOverlay, returnVal3, (MethodFlags)flags3, obj3, null));
+		return val;
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool InvokeGodotClassMethod(in godot_string_name method, NativeVariantPtrArgs args, out godot_variant ret)
+	{
+		if (method == MethodName.GetCurrentBody && args.Count == 0)
+		{
+			ret = VariantUtils.CreateFrom<Node2D>(GetCurrentBody());
+			return true;
+		}
+		if (method == MethodName._Ready && args.Count == 0)
+		{
+			_Ready();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.AddFormVfx && args.Count == 1)
+		{
+			AddFormVfx(VariantUtils.ConvertTo<NFormVfx>(in args[0]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.RemoveFormVfx && args.Count == 0)
+		{
+			RemoveFormVfx();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName._EnterTree && args.Count == 0)
+		{
+			_EnterTree();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName._ExitTree && args.Count == 0)
+		{
+			_ExitTree();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.SetScaleAndHue && args.Count == 2)
+		{
+			SetScaleAndHue(VariantUtils.ConvertTo<float>(in args[0]), VariantUtils.ConvertTo<float>(in args[1]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.IsPlayingHurtAnimation && args.Count == 0)
+		{
+			ret = VariantUtils.CreateFrom<bool>(IsPlayingHurtAnimation());
+			return true;
+		}
+		if (method == MethodName.IsPlayingIdleAnimation && args.Count == 0)
+		{
+			ret = VariantUtils.CreateFrom<bool>(IsPlayingIdleAnimation());
+			return true;
+		}
+		if (method == MethodName.TryApplyLiquidOverlay && args.Count == 1)
+		{
+			TryApplyLiquidOverlay(VariantUtils.ConvertTo<Color>(in args[0]));
+			ret = default(godot_variant);
+			return true;
+		}
+		return base.InvokeGodotClassMethod(in method, args, out ret);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool HasGodotClassMethod(in godot_string_name method)
+	{
+		if (method == MethodName.GetCurrentBody)
+		{
+			return true;
+		}
+		if (method == MethodName._Ready)
+		{
+			return true;
+		}
+		if (method == MethodName.AddFormVfx)
+		{
+			return true;
+		}
+		if (method == MethodName.RemoveFormVfx)
+		{
+			return true;
+		}
+		if (method == MethodName._EnterTree)
+		{
+			return true;
+		}
+		if (method == MethodName._ExitTree)
+		{
+			return true;
+		}
+		if (method == MethodName.SetScaleAndHue)
+		{
+			return true;
+		}
+		if (method == MethodName.IsPlayingHurtAnimation)
+		{
+			return true;
+		}
+		if (method == MethodName.IsPlayingIdleAnimation)
+		{
+			return true;
+		}
+		if (method == MethodName.TryApplyLiquidOverlay)
+		{
+			return true;
+		}
+		return base.HasGodotClassMethod(in method);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool SetGodotClassPropertyValue(in godot_string_name name, in godot_variant value)
+	{
+		if (name == PropertyName.Bounds)
+		{
+			Bounds = VariantUtils.ConvertTo<Control>(in value);
+			return true;
+		}
+		if (name == PropertyName.IntentPosition)
+		{
+			IntentPosition = VariantUtils.ConvertTo<Marker2D>(in value);
+			return true;
+		}
+		if (name == PropertyName.OrbPosition)
+		{
+			OrbPosition = VariantUtils.ConvertTo<Marker2D>(in value);
+			return true;
+		}
+		if (name == PropertyName.TalkPosition)
+		{
+			TalkPosition = VariantUtils.ConvertTo<Marker2D>(in value);
+			return true;
+		}
+		if (name == PropertyName.FormVfxHolder)
+		{
+			FormVfxHolder = VariantUtils.ConvertTo<Control>(in value);
+			return true;
+		}
+		if (name == PropertyName.VfxSpawnPosition)
+		{
+			VfxSpawnPosition = VariantUtils.ConvertTo<Marker2D>(in value);
+			return true;
+		}
+		if (name == PropertyName.DefaultScale)
+		{
+			DefaultScale = VariantUtils.ConvertTo<float>(in value);
+			return true;
+		}
+		if (name == PropertyName._body)
+		{
+			_body = VariantUtils.ConvertTo<Node2D>(in value);
+			return true;
+		}
+		if (name == PropertyName._phobiaModeBody)
+		{
+			_phobiaModeBody = VariantUtils.ConvertTo<Node2D>(in value);
+			return true;
+		}
+		if (name == PropertyName._hue)
+		{
+			_hue = VariantUtils.ConvertTo<float>(in value);
+			return true;
+		}
+		if (name == PropertyName._liquidOverlayTimer)
+		{
+			_liquidOverlayTimer = VariantUtils.ConvertTo<double>(in value);
+			return true;
+		}
+		if (name == PropertyName._savedNormalMaterial)
+		{
+			_savedNormalMaterial = VariantUtils.ConvertTo<Material>(in value);
+			return true;
+		}
+		if (name == PropertyName._currentLiquidOverlayMaterial)
+		{
+			_currentLiquidOverlayMaterial = VariantUtils.ConvertTo<ShaderMaterial>(in value);
+			return true;
+		}
+		return base.SetGodotClassPropertyValue(in name, in value);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool GetGodotClassPropertyValue(in godot_string_name name, out godot_variant value)
+	{
+		Control from;
+		if (name == PropertyName.Bounds)
+		{
+			from = Bounds;
+			value = VariantUtils.CreateFrom(in from);
+			return true;
+		}
+		Marker2D from2;
+		if (name == PropertyName.IntentPosition)
+		{
+			from2 = IntentPosition;
+			value = VariantUtils.CreateFrom(in from2);
+			return true;
+		}
+		if (name == PropertyName.OrbPosition)
+		{
+			from2 = OrbPosition;
+			value = VariantUtils.CreateFrom(in from2);
+			return true;
+		}
+		if (name == PropertyName.TalkPosition)
+		{
+			from2 = TalkPosition;
+			value = VariantUtils.CreateFrom(in from2);
+			return true;
+		}
+		bool from3;
+		if (name == PropertyName.IsSpineNode)
+		{
+			from3 = IsSpineNode;
+			value = VariantUtils.CreateFrom(in from3);
+			return true;
+		}
+		if (name == PropertyName.HasSpineAnimation)
+		{
+			from3 = HasSpineAnimation;
+			value = VariantUtils.CreateFrom(in from3);
+			return true;
+		}
+		if (name == PropertyName.IsUsingPhobiaModeBody)
+		{
+			from3 = IsUsingPhobiaModeBody;
+			value = VariantUtils.CreateFrom(in from3);
+			return true;
+		}
+		if (name == PropertyName.FormVfxHolder)
+		{
+			from = FormVfxHolder;
+			value = VariantUtils.CreateFrom(in from);
+			return true;
+		}
+		if (name == PropertyName.VfxSpawnPosition)
+		{
+			from2 = VfxSpawnPosition;
+			value = VariantUtils.CreateFrom(in from2);
+			return true;
+		}
+		if (name == PropertyName.DefaultScale)
+		{
+			value = VariantUtils.CreateFrom<float>(DefaultScale);
+			return true;
+		}
+		if (name == PropertyName.Body)
+		{
+			value = VariantUtils.CreateFrom<Node2D>(Body);
+			return true;
+		}
+		if (name == PropertyName._body)
+		{
+			value = VariantUtils.CreateFrom(in _body);
+			return true;
+		}
+		if (name == PropertyName._phobiaModeBody)
+		{
+			value = VariantUtils.CreateFrom(in _phobiaModeBody);
+			return true;
+		}
+		if (name == PropertyName._hue)
+		{
+			value = VariantUtils.CreateFrom(in _hue);
+			return true;
+		}
+		if (name == PropertyName._liquidOverlayTimer)
+		{
+			value = VariantUtils.CreateFrom(in _liquidOverlayTimer);
+			return true;
+		}
+		if (name == PropertyName._savedNormalMaterial)
+		{
+			value = VariantUtils.CreateFrom(in _savedNormalMaterial);
+			return true;
+		}
+		if (name == PropertyName._currentLiquidOverlayMaterial)
+		{
+			value = VariantUtils.CreateFrom(in _currentLiquidOverlayMaterial);
+			return true;
+		}
+		return base.GetGodotClassPropertyValue(in name, out value);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	internal static List<PropertyInfo> GetGodotPropertyList()
+	{
+		List<PropertyInfo> val = new List<PropertyInfo>();
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName._body, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName._phobiaModeBody, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.Bounds, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.IntentPosition, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.OrbPosition, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.TalkPosition, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Bool, PropertyName.IsSpineNode, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Bool, PropertyName.HasSpineAnimation, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Bool, PropertyName.IsUsingPhobiaModeBody, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.FormVfxHolder, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.VfxSpawnPosition, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Float, PropertyName.DefaultScale, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Float, PropertyName._hue, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Float, PropertyName._liquidOverlayTimer, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName._savedNormalMaterial, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName._currentLiquidOverlayMaterial, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.Body, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		return val;
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override void SaveGodotObjectData(GodotSerializationInfo info)
+	{
+		base.SaveGodotObjectData(info);
+		info.AddProperty(PropertyName.Bounds, Variant.From<Control>(Bounds));
+		info.AddProperty(PropertyName.IntentPosition, Variant.From<Marker2D>(IntentPosition));
+		info.AddProperty(PropertyName.OrbPosition, Variant.From<Marker2D>(OrbPosition));
+		info.AddProperty(PropertyName.TalkPosition, Variant.From<Marker2D>(TalkPosition));
+		info.AddProperty(PropertyName.FormVfxHolder, Variant.From<Control>(FormVfxHolder));
+		info.AddProperty(PropertyName.VfxSpawnPosition, Variant.From<Marker2D>(VfxSpawnPosition));
+		info.AddProperty(PropertyName.DefaultScale, Variant.From<float>(DefaultScale));
+		info.AddProperty(PropertyName._body, Variant.From(in _body));
+		info.AddProperty(PropertyName._phobiaModeBody, Variant.From(in _phobiaModeBody));
+		info.AddProperty(PropertyName._hue, Variant.From(in _hue));
+		info.AddProperty(PropertyName._liquidOverlayTimer, Variant.From(in _liquidOverlayTimer));
+		info.AddProperty(PropertyName._savedNormalMaterial, Variant.From(in _savedNormalMaterial));
+		info.AddProperty(PropertyName._currentLiquidOverlayMaterial, Variant.From(in _currentLiquidOverlayMaterial));
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override void RestoreGodotObjectData(GodotSerializationInfo info)
+	{
+		base.RestoreGodotObjectData(info);
+		if (info.TryGetProperty(PropertyName.Bounds, out var value))
+		{
+			Bounds = value.As<Control>();
+		}
+		if (info.TryGetProperty(PropertyName.IntentPosition, out var value2))
+		{
+			IntentPosition = value2.As<Marker2D>();
+		}
+		if (info.TryGetProperty(PropertyName.OrbPosition, out var value3))
+		{
+			OrbPosition = value3.As<Marker2D>();
+		}
+		if (info.TryGetProperty(PropertyName.TalkPosition, out var value4))
+		{
+			TalkPosition = value4.As<Marker2D>();
+		}
+		if (info.TryGetProperty(PropertyName.FormVfxHolder, out var value5))
+		{
+			FormVfxHolder = value5.As<Control>();
+		}
+		if (info.TryGetProperty(PropertyName.VfxSpawnPosition, out var value6))
+		{
+			VfxSpawnPosition = value6.As<Marker2D>();
+		}
+		if (info.TryGetProperty(PropertyName.DefaultScale, out var value7))
+		{
+			DefaultScale = value7.As<float>();
+		}
+		if (info.TryGetProperty(PropertyName._body, out var value8))
+		{
+			_body = value8.As<Node2D>();
+		}
+		if (info.TryGetProperty(PropertyName._phobiaModeBody, out var value9))
+		{
+			_phobiaModeBody = value9.As<Node2D>();
+		}
+		if (info.TryGetProperty(PropertyName._hue, out var value10))
+		{
+			_hue = value10.As<float>();
+		}
+		if (info.TryGetProperty(PropertyName._liquidOverlayTimer, out var value11))
+		{
+			_liquidOverlayTimer = value11.As<double>();
+		}
+		if (info.TryGetProperty(PropertyName._savedNormalMaterial, out var value12))
+		{
+			_savedNormalMaterial = value12.As<Material>();
+		}
+		if (info.TryGetProperty(PropertyName._currentLiquidOverlayMaterial, out var value13))
+		{
+			_currentLiquidOverlayMaterial = value13.As<ShaderMaterial>();
+		}
+	}
+}
+
+// ===== MegaCrit.Sts2.Core.Nodes.Combat.NCreature.MethodName =====
+// ERROR: Could not find type definition MegaCrit.Sts2.Core.Nodes.Combat.NCreature.MethodName in type system.
+// ===== MegaCrit.Sts2.Core.Nodes.Combat.NCreature.PropertyName =====
+// ERROR: Could not find type definition MegaCrit.Sts2.Core.Nodes.Combat.NCreature.PropertyName in type system.
+// ===== MegaCrit.Sts2.Core.Nodes.Combat.NCreature.SignalName =====
+// ERROR: Could not find type definition MegaCrit.Sts2.Core.Nodes.Combat.NCreature.SignalName in type system.
+// ===== MegaCrit.Sts2.Core.Nodes.Combat.NCreature.<>c =====
+// ERROR: Could not find type definition MegaCrit.Sts2.Core.Nodes.Combat.NCreature.<>c in type system.
+// ===== MegaCrit.Sts2.Core.Nodes.Combat.NCreature.<>c__DisplayClass91_0 =====
+// ERROR: Could not find type definition MegaCrit.Sts2.Core.Nodes.Combat.NCreature.<>c__DisplayClass91_0 in type system.

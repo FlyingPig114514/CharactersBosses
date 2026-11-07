@@ -1,0 +1,1074 @@
+kind	id	name	owner	mod
+0	IRONCLAD	铁甲战士		
+0	SILENT	静默猎手		
+0	REGENT	储君		
+0	NECROBINDER	亡灵契约师		
+0	DEFECT	故障机器人		
+1	AGGRESSION	好勇斗狠	铁甲战士	
+1	ANGER	愤怒	铁甲战士	
+1	ARMAMENTS	武装	铁甲战士	
+1	ASHEN_STRIKE	灰烬打击	铁甲战士	
+1	BARRICADE	壁垒	铁甲战士	
+1	BASH	痛击	铁甲战士	
+1	BATTLE_TRANCE	战斗专注	铁甲战士	
+1	BLAZE	炽焰	铁甲战士	
+1	BLOOD_WALL	血墙	铁甲战士	
+1	BLOODLETTING	放血	铁甲战士	
+1	BLUDGEON	重锤	铁甲战士	
+1	BODY_SLAM	全身撞击	铁甲战士	
+1	BRAND	烙印	铁甲战士	
+1	BREAK	破击	铁甲战士	
+1	BREAKTHROUGH	突破	铁甲战士	
+1	BULLY	欺凌	铁甲战士	
+1	BURNING_PACT	燃烧契约	铁甲战士	
+1	CASCADE	倾泻	铁甲战士	
+1	CINDER	余烬	铁甲战士	
+1	COLOSSUS	巨像	铁甲战士	
+1	CONFLAGRATION	焚烧	铁甲战士	
+1	CORRUPTION	腐化	铁甲战士	
+1	CRIMSON_MANTLE	绯红披风	铁甲战士	
+1	CRUELTY	残酷	铁甲战士	
+1	DARK_EMBRACE	黑暗之拥	铁甲战士	
+1	DEFEND_IRONCLAD	防御	铁甲战士	
+1	DEMON_FORM	恶魔形态	铁甲战士	
+1	DEMONIC_SHIELD	恶魔护盾	铁甲战士	
+1	DISMANTLE	拆卸	铁甲战士	
+1	DOMINATE	主宰	铁甲战士	
+1	DRUM_OF_BATTLE	战鼓	铁甲战士	
+1	EVIL_EYE	邪眼	铁甲战士	
+1	EXPECT_A_FIGHT	跃跃欲试	铁甲战士	
+1	FEED	狂宴	铁甲战士	
+1	FEEL_NO_PAIN	无惧疼痛	铁甲战士	
+1	FIEND_FIRE	恶魔之焰	铁甲战士	
+1	FIGHT_ME	与我一战！	铁甲战士	
+1	FLAME_BARRIER	火焰屏障	铁甲战士	
+1	FORGOTTEN_RITUAL	被遗忘的仪式	铁甲战士	
+1	HAVOC	破灭	铁甲战士	
+1	HEADBUTT	头槌	铁甲战士	
+1	HELLRAISER	地狱狂徒	铁甲战士	
+1	HEMOKINESIS	御血术	铁甲战士	
+1	HOWL_FROM_BEYOND	彼岸咆哮	铁甲战士	
+1	IMPERVIOUS	岿然不动	铁甲战士	
+1	INFERNAL_BLADE	地狱之刃	铁甲战士	
+1	INFERNO	狱火	铁甲战士	
+1	INFLAME	燃烧	铁甲战士	
+1	IRON_WAVE	铁斩波	铁甲战士	
+1	JUGGERNAUT	势不可当	铁甲战士	
+1	JUGGLING	杂耍	铁甲战士	
+1	MANGLE	凌虐	铁甲战士	
+1	MIDNIGHT	午夜	铁甲战士	
+1	MOLTEN_FIST	熔融之拳	铁甲战士	
+1	NOT_YET	时候未到	铁甲战士	
+1	OFFERING	祭品	铁甲战士	
+1	ONE_TWO_PUNCH	连环拳	铁甲战士	
+1	OUTRAGE	群情激愤	铁甲战士	
+1	PACTS_END	契约终结	铁甲战士	
+1	PERFECTED_STRIKE	完美打击	铁甲战士	
+1	PILLAGE	劫掠	铁甲战士	
+1	POMMEL_STRIKE	剑柄打击	铁甲战士	
+1	PRIMAL_FORCE	原始力量	铁甲战士	
+1	PYRE	薪火之源	铁甲战士	
+1	RAGE	狂怒	铁甲战士	
+1	RAMPAGE	暴走	铁甲战士	
+1	RUPTURE	撕裂	铁甲战士	
+1	SECOND_WIND	重振精神	铁甲战士	
+1	SETUP_STRIKE	预备打击	铁甲战士	
+1	SHRUG_IT_OFF	耸肩无视	铁甲战士	
+1	SPITE	怨恨	铁甲战士	
+1	STAMPEDE	惊逃	铁甲战士	
+1	STOKE	添柴	铁甲战士	
+1	STOMP	踩踏	铁甲战士	
+1	STONE_ARMOR	岩石铠甲	铁甲战士	
+1	STRIKE_IRONCLAD	打击	铁甲战士	
+1	SWORD_BOOMERANG	飞剑回旋镖	铁甲战士	
+1	TANK	肉盾	铁甲战士	
+1	TAUNT	挑衅	铁甲战士	
+1	TEAR_ASUNDER	扯碎	铁甲战士	
+1	THRASH	痛殴	铁甲战士	
+1	THUNDERCLAP	闪电霹雳	铁甲战士	
+1	TREMBLE	战栗	铁甲战士	
+1	TRUE_GRIT	坚毅	铁甲战士	
+1	TWIN_STRIKE	双重打击	铁甲战士	
+1	UNMOVABLE	坚定不移	铁甲战士	
+1	UNRELENTING	无情猛攻	铁甲战士	
+1	UPPERCUT	上勾拳	铁甲战士	
+1	VICIOUS	凶恶	铁甲战士	
+1	WHIRLWIND	旋风斩	铁甲战士	
+1	ABRASIVE	磨蚀	静默猎手	
+1	ACCELERANT	触媒	静默猎手	
+1	ACCURACY	精准	静默猎手	
+1	ACROBATICS	杂技	静默猎手	
+1	ADRENALINE	肾上腺素	静默猎手	
+1	AFTERIMAGE	余像	静默猎手	
+1	ANTICIPATE	预判	静默猎手	
+1	ASSASSINATE	刺杀	静默猎手	
+1	BACKFLIP	后空翻	静默猎手	
+1	BACKSTAB	背刺	静默猎手	
+1	BLADE_OF_INK	墨之刃	静默猎手	
+1	BLADE_DANCE	刀刃之舞	静默猎手	
+1	BLADE_SYMPHONY	刀刃交响曲	静默猎手	
+1	BLUR	残影	静默猎手	
+1	BOUNCING_FLASK	弹跳药瓶	静默猎手	
+1	BUBBLE_BUBBLE	咕嘟冒泡	静默猎手	
+1	BULLET_TIME	子弹时间	静默猎手	
+1	BURST	爆发	静默猎手	
+1	CALCULATED_GAMBLE	计算下注	静默猎手	
+1	CLOAK_AND_DAGGER	斗篷与匕首	静默猎手	
+1	CORROSIVE_WAVE	腐蚀波	静默猎手	
+1	CONCOCT	调制	静默猎手	
+1	DAGGER_SPRAY	匕首雨	静默猎手	
+1	DAGGER_THROW	投掷匕首	静默猎手	
+1	DASH	冲刺	静默猎手	
+1	DEADLY_POISON	致命毒药	静默猎手	
+1	DEFEND_SILENT	防御	静默猎手	
+1	DEFLECT	偏折	静默猎手	
+1	DODGE_AND_ROLL	闪躲翻滚	静默猎手	
+1	ECHOING_SLASH	回响斩击	静默猎手	
+1	ENVENOM	涂毒	静默猎手	
+1	ESCAPE_PLAN	逃脱计划	静默猎手	
+1	EXPERTISE	独门技术	静默猎手	
+1	EXPOSE	暴露	静默猎手	
+1	FADE	消影	静默猎手	
+1	FAN_OF_KNIVES	刀扇	静默猎手	
+1	FINISHER	终结技	静默猎手	
+1	FLANKING	夹击	静默猎手	
+1	FLECHETTES	飞镖	静默猎手	
+1	FLICK_FLACK	翻越撑击	静默猎手	
+1	SIDESTEP	侧步	静默猎手	
+1	FOOTWORK	灵动步法	静默猎手	
+1	GRAND_FINALE	华丽收场	静默猎手	
+1	HAND_TRICK	手上技法	静默猎手	
+1	HAZE	迷雾	静默猎手	
+1	HIDDEN_DAGGERS	隐秘匕首	静默猎手	
+1	INFINITE_BLADES	无尽刀刃	静默猎手	
+1	KNIFE_TRAP	刀刃陷阱	静默猎手	
+1	LEADING_STRIKE	先制打击	静默猎手	
+1	LEG_SWEEP	扫腿	静默猎手	
+1	MALAISE	萎靡	静默猎手	
+1	MASTER_PLANNER	谋划专家	静默猎手	
+1	MEMENTO_MORI	铭记死亡	静默猎手	
+1	MIRAGE	蜃景	静默猎手	
+1	MURDER	谋杀	静默猎手	
+1	NEUTRALIZE	中和	静默猎手	
+1	NIGHTMARE	夜魇	静默猎手	
+1	NOXIOUS_FUMES	毒雾	静默猎手	
+1	OUTBREAK	毒性爆发	静默猎手	
+1	PHANTOM_BLADES	幻影之刃	静默猎手	
+1	PIERCING_WAIL	尖啸	静默猎手	
+1	PINPOINT	精密瞄准	静默猎手	
+1	POISONED_STAB	带毒刺击	静默猎手	
+1	POUNCE	猛扑	静默猎手	
+1	PRECISE_CUT	精确切击	静默猎手	
+1	PREDATOR	猎杀者	静默猎手	
+1	PREPARED	早有准备	静默猎手	
+1	REFLEX	本能反应	静默猎手	
+1	RICOCHET	连续反弹	静默猎手	
+1	SERPENT_FORM	群蛇形态	静默猎手	
+1	SHADOW_STEP	暗影步	静默猎手	
+1	SHADOWMELD	融入暗影	静默猎手	
+1	SKEWER	串刺	静默猎手	
+1	SLICE	切割	静默猎手	
+1	SNAKEBITE	蛇咬	静默猎手	
+1	SNEAKY	鬼祟	静默猎手	
+1	SPEEDSTER	速行者	静默猎手	
+1	STORM_OF_STEEL	钢铁风暴	静默猎手	
+1	STRANGLE	紧勒	静默猎手	
+1	STRIKE_SILENT	打击	静默猎手	
+1	SUCKER_PUNCH	突然一拳	静默猎手	
+1	SUPPRESS	压制	静默猎手	
+1	SURVIVOR	生存者	静默猎手	
+1	TACTICIAN	战术大师	静默猎手	
+1	THE_HUNT	狩猎	静默猎手	
+1	TOOLS_OF_THE_TRADE	必备工具	静默猎手	
+1	TRACKING	跟踪	静默猎手	
+1	UNTOUCHABLE	触不可及	静默猎手	
+1	UP_MY_SLEEVE	袖里乾坤	静默猎手	
+1	WELL_LAID_PLANS	计划妥当	静默猎手	
+1	WRAITH_FORM	幽魂形态	静默猎手	
+1	ALIGNMENT	星位序列	储君	
+1	ARSENAL	武器库	储君	
+1	ASTRAL_PULSE	星界脉冲	储君	
+1	BEAT_INTO_SHAPE	锻打成型	储君	
+1	BEGONE	下去！	储君	
+1	BIG_BANG	大爆炸	储君	
+1	BLACK_HOLE	黑洞	储君	
+1	BOMBARDMENT	轰击	储君	
+1	BULWARK	铸墙	储君	
+1	BUNDLE_OF_JOY	新生之喜	储君	
+1	CELESTIAL_MIGHT	天穹之力	储君	
+1	CHARGE	冲锋！！	储君	
+1	CHILD_OF_THE_STARS	群星之子	储君	
+1	CLOAK_OF_STARS	群星斗篷	储君	
+1	COLLISION_COURSE	碰撞轨迹	储君	
+1	COMET	彗星	储君	
+1	CONQUEROR	征服者	储君	
+1	CONSTELLATION	群星荟萃	储君	
+1	CONVERGENCE	汇流	储君	
+1	COSMIC_INDIFFERENCE	宇宙冷漠	储君	
+1	CRASH_LANDING	迫降	储君	
+1	CRESCENT_SPEAR	新月长矛	储君	
+1	CRUSH_UNDER	下砸	储君	
+1	DECISIONS_DECISIONS	抉择，抉择	储君	
+1	DEFEND_REGENT	防御	储君	
+1	DEVASTATE	葬送	储君	
+1	DYING_STAR	星灭	储君	
+1	FALLING_STAR	陨星	储君	
+1	FOREGONE_CONCLUSION	既定事项	储君	
+1	FURNACE	熔炉	储君	
+1	GAMMA_BLAST	伽马爆破	储君	
+1	GATHER_LIGHT	收集光辉	储君	
+1	GENESIS	创世纪	储君	
+1	GLIMMER	微光	储君	
+1	GLITTERSTREAM	流光溢彩	储君	
+1	GLOW	辉光	储君	
+1	GUARDS	护驾！！！	储君	
+1	GUIDING_STAR	引导之星	储君	
+1	HAMMER_TIME	锤子时间	储君	
+1	HEAVENLY_DRILL	天际钻头	储君	
+1	HEGEMONY	霸权	储君	
+1	HEIRLOOM_HAMMER	传承之锤	储君	
+1	HIDDEN_CACHE	隐秘藏品	储君	
+1	I_AM_INVINCIBLE	所向无敌	储君	
+1	KINGLY_KICK	王者之踢	储君	
+1	KINGLY_PUNCH	王者之拳	储君	
+1	KNOCKOUT_BLOW	决胜一击	储君	
+1	KNOW_THY_PLACE	何人僭越	储君	
+1	LARGESSE	慷慨捐助	储君	
+1	LUNAR_BLAST	月面射击	储君	
+1	MAKE_IT_SO	如此甚好	储君	
+1	MANIFEST_AUTHORITY	君权自授	储君	
+1	METEOR_SHOWER	流星雨	储君	
+1	MONARCHS_GAZE	王之凝视	储君	
+1	MONOLOGUE	独白	储君	
+1	NEUTRON_AEGIS	中子护盾	储君	
+1	ORBIT	环绕轨道	储君	
+1	PALE_BLUE_DOT	暗淡蓝点	储君	
+1	PARRY	招架	储君	
+1	PARTICLE_WALL	粒子墙	储君	
+1	PATTER	星星点点	储君	
+1	PHOTON_CUT	光子切割	储君	
+1	PLOT	筹划	储君	
+1	PILLAR_OF_CREATION	创世之柱	储君	
+1	PROPHESIZE	预言	储君	
+1	QUASAR	类星体	储君	
+1	RADIATE	辐射	储君	
+1	REFINE_BLADE	淬炼刀刃	储君	
+1	REFLECT	倒映	储君	
+1	RESONANCE	共鸣	储君	
+1	ROYAL_GAMBLE	胜券在王	储君	
+1	ROYALTIES	王国资产	储君	
+1	SEEKING_EDGE	追踪之刃	储君	
+1	SEVEN_STARS	七星	储君	
+1	SHINING_STRIKE	明耀打击	储君	
+1	SOLAR_STRIKE	太阳打击	储君	
+1	SPECTRUM_SHIFT	光谱偏移	储君	
+1	SPOILS_OF_BATTLE	战利品	储君	
+1	STARDUST	星尘	储君	
+1	STRIKE_REGENT	打击	储君	
+1	SUMMON_FORTH	征召上前	储君	
+1	SUPERMASSIVE	超质量体	储君	
+1	SWORD_SAGE	剑圣	储君	
+1	TERRAFORMING	地形改造	储君	
+1	THE_SEALED_THRONE	封印王座	储君	
+1	THE_SMITH	铸剑者	储君	
+1	TUTOR	指导	储君	
+1	TYRANNY	暴政	储君	
+1	VENERATE	崇拜	储君	
+1	VOID_FORM	虚空形态	储君	
+1	WROUGHT_IN_WAR	战火铸就	储君	
+1	AFTERLIFE	来生	亡灵契约师	
+1	BANSHEES_CRY	女妖之嚎	亡灵契约师	
+1	BLIGHT_STRIKE	荒疫打击	亡灵契约师	
+1	BODYGUARD	护卫	亡灵契约师	
+1	BONE_SHARDS	碎骨	亡灵契约师	
+1	BORROWED_TIME	预借时间	亡灵契约师	
+1	BURY	埋葬	亡灵契约师	
+1	CACOPHONY	不谐合曲	亡灵契约师	
+1	CALCIFY	钙化	亡灵契约师	
+1	CALL_OF_THE_VOID	虚空之唤	亡灵契约师	
+1	CAPTURE_SPIRIT	捕捉灵魂	亡灵契约师	
+1	CLEANSE	洁净	亡灵契约师	
+1	COUNTDOWN	倒数计时	亡灵契约师	
+1	DANSE_MACABRE	死亡之舞	亡灵契约师	
+1	DEATH_MARCH	死亡行军	亡灵契约师	
+1	DEATHBRINGER	死亡使者	亡灵契约师	
+1	DEATHS_DOOR	死亡之门	亡灵契约师	
+1	DEBILITATE	摧残	亡灵契约师	
+1	DEFEND_NECROBINDER	防御	亡灵契约师	
+1	DEFILE	玷污	亡灵契约师	
+1	DEFY	违逆	亡灵契约师	
+1	DELAY	拖延	亡灵契约师	
+1	DEMESNE	领域	亡灵契约师	
+1	DEVOUR_LIFE	吞噬生命	亡灵契约师	
+1	DIRGE	挽歌	亡灵契约师	
+1	DRAIN_POWER	能量汲取	亡灵契约师	
+1	DREDGE	清淤	亡灵契约师	
+1	EIDOLON	幻景	亡灵契约师	
+1	END_OF_DAYS	末日降临	亡灵契约师	
+1	ENFEEBLING_TOUCH	弱化之触	亡灵契约师	
+1	ERADICATE	根除	亡灵契约师	
+1	FEAR	恐惧	亡灵契约师	
+1	FETCH	取回	亡灵契约师	
+1	FLATTEN	重压	亡灵契约师	
+1	FORBIDDEN_GRIMOIRE	禁忌魔典	亡灵契约师	
+1	FRIENDSHIP	友谊	亡灵契约师	
+1	GLIMPSE_BEYOND	彼岸一瞥	亡灵契约师	
+1	GRAVE_WARDEN	守墓人	亡灵契约师	
+1	GRAVEBLAST	坟冢爆射	亡灵契约师	
+1	HANG	吊杀	亡灵契约师	
+1	HAUNT	纠缠	亡灵契约师	
+1	HIGH_FIVE	击掌	亡灵契约师	
+1	INVOKE	唤起	亡灵契约师	
+1	LEGION_OF_BONE	骸骨军团	亡灵契约师	
+1	LETHALITY	致死性	亡灵契约师	
+1	MELANCHOLY	忧郁	亡灵契约师	
+1	MISERY	苦难	亡灵契约师	
+1	NECRO_MASTERY	亡灵精通	亡灵契约师	
+1	NEGATIVE_PULSE	负能量脉冲	亡灵契约师	
+1	NEUROSURGE	精神过载	亡灵契约师	
+1	NO_ESCAPE	无处可逃	亡灵契约师	
+1	OBLIVION	湮灭	亡灵契约师	
+1	PAGESTORM	书页风暴	亡灵契约师	
+1	PARSE	领会	亡灵契约师	
+1	POKE	戳击	亡灵契约师	
+1	PROTECTOR	守护者	亡灵契约师	
+1	PULL_AGGRO	吸引仇恨	亡灵契约师	
+1	PULL_FROM_BELOW	亡魂牵引	亡灵契约师	
+1	PUTREFY	腐败	亡灵契约师	
+1	RATTLE	猛晃	亡灵契约师	
+1	REANIMATE	死者苏生	亡灵契约师	
+1	REAP	收割	亡灵契约师	
+1	REAPER_FORM	死神形态	亡灵契约师	
+1	REAVE	剥夺	亡灵契约师	
+1	RIGHT_HAND_HAND	得力助手	亡灵契约师	
+1	SACRIFICE	牺牲	亡灵契约师	
+1	SCOURGE	鞭打	亡灵契约师	
+1	SCULPTING_STRIKE	雕琢打击	亡灵契约师	
+1	SEANCE	降灵	亡灵契约师	
+1	SENTRY_MODE	哨卫模式	亡灵契约师	
+1	SEVERANCE	切断	亡灵契约师	
+1	SHARED_FATE	命运同担	亡灵契约师	
+1	SHROUD	厄运之衣	亡灵契约师	
+1	SIC_EM	紧追不放	亡灵契约师	
+1	SLEIGHT_OF_FLESH	血肉戏法	亡灵契约师	
+1	SNAP	响指	亡灵契约师	
+1	SOUL_STORM	灵魂风暴	亡灵契约师	
+1	SOULBOUND	灵魂绑定	亡灵契约师	
+1	SOW	播种	亡灵契约师	
+1	SPIRIT_OF_ASH	灰烬之灵	亡灵契约师	
+1	SPUR	增生	亡灵契约师	
+1	SQUEEZE	榨取	亡灵契约师	
+1	STRIKE_NECROBINDER	打击	亡灵契约师	
+1	THE_SCYTHE	巨镰	亡灵契约师	
+1	TIMES_UP	大限已至	亡灵契约师	
+1	TRANSFIGURE	重构	亡灵契约师	
+1	UNDEATH	不死	亡灵契约师	
+1	UNDERWORLD	幽冥之界	亡灵契约师	
+1	UNLEASH	出击	亡灵契约师	
+1	VEILPIERCER	刺破帷幕	亡灵契约师	
+1	WISP	鬼火	亡灵契约师	
+1	ADAPTIVE_STRIKE	适应打击	故障机器人	
+1	ALL_FOR_ONE	万物一心	故障机器人	
+1	BALL_LIGHTNING	球状闪电	故障机器人	
+1	BARRAGE	弹幕齐射	故障机器人	
+1	BEAM_CELL	光束射线	故障机器人	
+1	BIASED_COGNITION	偏差认知	故障机器人	
+1	BOOST_AWAY	高速脱离	故障机器人	
+1	BOOT_SEQUENCE	启动流程	故障机器人	
+1	BUFFER	缓冲	故障机器人	
+1	BULK_UP	暴涨	故障机器人	
+1	CAPACITOR	扩容	故障机器人	
+1	CHAOS	混沌	故障机器人	
+1	CHARGE_BATTERY	充电	故障机器人	
+1	CHILL	冰寒	故障机器人	
+1	CLAW	爪击	故障机器人	
+1	COLD_SNAP	寒流	故障机器人	
+1	COMPACT	压缩	故障机器人	
+1	COMPILE_DRIVER	编译冲击	故障机器人	
+1	CONSUMING_SHADOW	吞噬暗影	故障机器人	
+1	COOLANT	冷却剂	故障机器人	
+1	COOLHEADED	冷静头脑	故障机器人	
+1	CREATIVE_AI	创造性AI	故障机器人	
+1	DARKNESS	漆黑	故障机器人	
+1	DEFEND_DEFECT	防御	故障机器人	
+1	DEFRAGMENT	碎片整理	故障机器人	
+1	DOUBLE_ENERGY	双倍能量	故障机器人	
+1	DUALCAST	双重释放	故障机器人	
+1	ECHO_FORM	回响形态	故障机器人	
+1	ENERGY_SURGE	能量涌动	故障机器人	
+1	FERAL	野性	故障机器人	
+1	FIGHT_THROUGH	强撑	故障机器人	
+1	FLAK_CANNON	散射炮	故障机器人	
+1	FOCUSED_STRIKE	集中打击	故障机器人	
+1	FTL	超越光速	故障机器人	
+1	FUSION	聚变	故障机器人	
+1	GENETIC_ALGORITHM	遗传算法	故障机器人	
+1	GLACIER	冰川	故障机器人	
+1	GLASSWORK	玻璃工艺	故障机器人	
+1	GO_FOR_THE_EYES	眼部攻击	故障机器人	
+1	GUNK_UP	污秽攻击	故障机器人	
+1	HAILSTORM	冰雹风暴	故障机器人	
+1	HELIX_DRILL	螺旋钻击	故障机器人	
+1	HIBERNATE	休眠	故障机器人	
+1	HOLOGRAM	全息影像	故障机器人	
+1	HOTFIX	热修复	故障机器人	
+1	HYPERBEAM	超能光束	故障机器人	
+1	ICE_LANCE	冰之长枪	故障机器人	
+1	IGNITION	引火	故障机器人	
+1	IMITATION_LEARNING	模仿学习	故障机器人	
+1	ITERATION	迭代	故障机器人	
+1	LEAP	飞跃	故障机器人	
+1	LIGHTNING_ROD	引雷针	故障机器人	
+1	LOOP	循环	故障机器人	
+1	MACHINE_LEARNING	机器学习	故障机器人	
+1	METEOR_STRIKE	陨石打击	故障机器人	
+1	MODDED	模组改造	故障机器人	
+1	MOMENTUM_STRIKE	趁势打击	故障机器人	
+1	MULTI_CAST	多重释放	故障机器人	
+1	NULL	空值	故障机器人	
+1	ONE_FOR_ALL	一心化万	故障机器人	
+1	OVERCLOCK	超频	故障机器人	
+1	QUADCAST	四重释放	故障机器人	
+1	RAINBOW	彩虹	故障机器人	
+1	REBOOT	重启	故障机器人	
+1	REFRACT	折射	故障机器人	
+1	ROCKET_PUNCH	火箭飞拳	故障机器人	
+1	SCAVENGE	内存清理	故障机器人	
+1	SCRAPE	刮削	故障机器人	
+1	SHADOW_SHIELD	暗影之盾	故障机器人	
+1	SHATTER	打碎	故障机器人	
+1	SIGNAL_BOOST	信号增强	故障机器人	
+1	SKIM	快速检索	故障机器人	
+1	SMOKESTACK	烟囱	故障机器人	
+1	SPINNER	旋转工艺	故障机器人	
+1	STORM	雷暴	故障机器人	
+1	STRIKE_DEFECT	打击	故障机器人	
+1	SUBROUTINE	子程序	故障机器人	
+1	SUNDER	分离	故障机器人	
+1	SUPERCRITICAL	超临界态	故障机器人	
+1	SWEEPING_BEAM	扫荡射线	故障机器人	
+1	SYNCHRONIZE	同步	故障机器人	
+1	SYNTHESIS	人工合成	故障机器人	
+1	TEMPEST	暴风雨	故障机器人	
+1	TESLA_COIL	特斯拉线圈	故障机器人	
+1	THUNDER	雷霆	故障机器人	
+1	TRASH_TO_TREASURE	化废为宝	故障机器人	
+1	TURBO	内核加速	故障机器人	
+1	UPROAR	骚动	故障机器人	
+1	VOLTAIC	电流相生	故障机器人	
+1	WHITE_NOISE	白噪声	故障机器人	
+1	ZAP	电击	故障机器人	
+1	ALCHEMIZE	炼制药水	无色	
+1	ANOINTED	天选	无色	
+1	AUTOMATION	自动化	无色	
+1	BEACON_OF_HOPE	希望灯塔	无色	
+1	BEAT_DOWN	狠揍	无色	
+1	BELIEVE_IN_YOU	相信着你	无色	
+1	BOLAS	流星锤	无色	
+1	CALAMITY	劫难	无色	
+1	CATASTROPHE	横祸	无色	
+1	COORDINATE	协同配合	无色	
+1	DARK_SHACKLES	黑暗镣铐	无色	
+1	DISCOVERY	发现	无色	
+1	DRAMATIC_ENTRANCE	闪亮登场	无色	
+1	ENTROPY	熵	无色	
+1	EQUILIBRIUM	均衡	无色	
+1	ETERNAL_ARMOR	永恒铠甲	无色	
+1	FASTEN	勒紧	无色	
+1	FINESSE	妙计	无色	
+1	FISTICUFFS	拳斗	无色	
+1	FLASH_OF_STEEL	亮剑	无色	
+1	GANG_UP	群起攻之	无色	
+1	GOLD_AXE	金斧	无色	
+1	HAND_OF_GREED	贪婪之手	无色	
+1	HIDDEN_GEM	未掘宝石	无色	
+1	HUDDLE_UP	抱团	无色	
+1	IMPATIENCE	急躁	无色	
+1	INTERCEPT	拦截	无色	
+1	JACK_OF_ALL_TRADES	花样百出	无色	
+1	JACKPOT	大奖	无色	
+1	KNOCKDOWN	击倒	无色	
+1	LIFT	托举	无色	
+1	MASTER_OF_STRATEGY	战略大师	无色	
+1	MAYHEM	乱战	无色	
+1	MIMIC	拟态	无色	
+1	MIND_BLAST	心灵震慑	无色	
+1	NOSTALGIA	怀旧	无色	
+1	OMNISLICE	万向斩	无色	
+1	PANACHE	神气制胜	无色	
+1	PANIC_BUTTON	应急按钮	无色	
+1	PREP_TIME	准备时间	无色	
+1	PRODUCTION	生产制造	无色	
+1	PROLONG	延伸	无色	
+1	PROWESS	非凡技艺	无色	
+1	PURITY	净化	无色	
+1	RALLY	集结	无色	
+1	REND	撕碎	无色	
+1	RESTLESSNESS	心神不宁	无色	
+1	ROLLING_BOULDER	滚石	无色	
+1	SALVO	箭雨	无色	
+1	SCRAWL	潦草急就	无色	
+1	SECRET_TECHNIQUE	秘密技法	无色	
+1	SECRET_WEAPON	秘密武器	无色	
+1	SEEKER_STRIKE	探寻打击	无色	
+1	SHOCKWAVE	震荡波	无色	
+1	SPLASH	飞溅	无色	
+1	STRATAGEM	计策	无色	
+1	TAG_TEAM	双打组合	无色	
+1	THE_BALL	魔球	无色	
+1	THE_BOMB	炸弹	无色	
+1	THE_GAMBIT	孤注一掷	无色	
+1	THINKING_AHEAD	深谋远虑	无色	
+1	THRUMMING_HATCHET	无休手斧	无色	
+1	ULTIMATE_DEFEND	究极防御	无色	
+1	ULTIMATE_STRIKE	究极打击	无色	
+1	VOLLEY	连射	无色	
+1	ASCENDERS_BANE	进阶之灾	诅咒	
+1	BAD_LUCK	霉运	诅咒	
+1	CLUMSY	笨拙	诅咒	
+1	CURSE_OF_THE_BELL	铃铛的诅咒	诅咒	
+1	DEBT	债务	诅咒	
+1	DECAY	腐朽	诅咒	
+1	DOUBT	疑虑	诅咒	
+1	ENTHRALLED	执迷	诅咒	
+1	FOLLY	愚行	诅咒	
+1	GREED	贪婪	诅咒	
+1	GUILTY	愧疚	诅咒	
+1	INJURY	受伤	诅咒	
+1	NORMALITY	凡庸	诅咒	
+1	POOR_SLEEP	睡眠不佳	诅咒	
+1	REGRET	悔恨	诅咒	
+1	SHAME	羞耻	诅咒	
+1	SPORE_MIND	孢子心灵	诅咒	
+1	WRITHE	苦恼	诅咒	
+1	DEPRECATED_CARD	弃用卡牌	token	
+1	ABUNDANCE	富足	事件	
+1	APOTHEOSIS	神化	事件	
+1	APPARITION	灵体	事件	
+1	BRIGHTEST_FLAME	至亮之焰	事件	
+1	BYRD_SWOOP	异鸟扑击	事件	
+1	CALTROPS	铁蒺藜	事件	
+1	CLASH	交锋	事件	
+1	DISTRACTION	声东击西	事件	
+1	DUAL_WIELD	双持	事件	
+1	ENLIGHTENMENT	开悟	事件	
+1	ENTRENCH	巩固	事件	
+1	EXTERMINATE	杀灭	事件	
+1	FEEDING_FRENZY	疯狂进食	事件	
+1	HELLO_WORLD	你好世界	事件	
+1	MAD_SCIENCE	疯狂科学	事件	
+1	MAUL	撕咬	事件	
+1	METAMORPHOSIS	羽化	事件	
+1	NEOWS_FURY	涅奥之怒	事件	
+1	OUTMANEUVER	抢占先机	事件	
+1	PECK	啄击	事件	
+1	REBOUND	弹回	事件	
+1	RELAX	放松	事件	
+1	RIP_AND_TEAR	狂乱撕扯	事件	
+1	SQUASH	压扁	事件	
+1	STACK	堆栈	事件	
+1	TORIC_TOUGHNESS	坚韧之环	事件	
+1	WISH	许愿	事件	
+1	WHISTLE	吹哨	事件	
+1	BYRDONIS_EGG	多尼斯异鸟蛋	任务	
+1	DOWSING	探寻	任务	
+1	LANTERN_KEY	灯火钥匙	任务	
+1	SPOILS_MAP	藏宝图	任务	
+1	BECKON	呼唤	状态	
+1	BURN	灼伤	状态	
+1	DAZED	晕眩	状态	
+1	DEBRIS	碎屑	状态	
+1	FRANTIC_ESCAPE	狂乱逃离	状态	
+1	INFECTION	感染	状态	
+1	WITHER	凋萎	状态	
+1	SLIMED	黏液	状态	
+1	SOOT	煤灰	状态	
+1	TOXIC	毒素	状态	
+1	VOID	虚空	状态	
+1	WOUND	伤口	状态	
+1	DISINTEGRATION	瓦解	衍生	
+1	FUEL	燃料	衍生	
+1	GIANT_ROCK	巨石	衍生	
+1	LUMINESCE	冷光	衍生	
+1	MIND_ROT	心灵腐化	衍生	
+1	MINION_DIVE_BOMB	仆从俯冲	衍生	
+1	MINION_SACRIFICE	仆从捐躯	衍生	
+1	MINION_STRIKE	仆从打击	衍生	
+1	SHIV	小刀	衍生	
+1	SLOTH	懒惰	衍生	
+1	SOUL	灵魂	衍生	
+1	SOVEREIGN_BLADE	君王之剑	衍生	
+1	SWEEPING_GAZE	扫荡凝视	衍生	
+1	WASTE_AWAY	衰朽	衍生	
+1	AGAIN	再起	无色	Steam 随机匹配
+2	AKABEKO	赤牛		
+2	ALCHEMICAL_COFFER	炼金箱		
+2	AMETHYST_AUBERGINE	紫水晶茄子		
+2	ANCHOR	锚		
+2	ARCANE_SCROLL	奥术卷轴		
+2	ARCHAIC_TOOTH	古老牙齿		
+2	ART_OF_WAR	孙子兵法		
+2	ASTROLABE	星盘		
+2	BAG_OF_MARBLES	弹珠袋		
+2	BAG_OF_PREPARATION	准备背包		
+2	BEATING_REMNANT	律动残余		
+2	BEAUTIFUL_BRACELET	华美手镯		
+2	BELLOWS	风箱		
+2	BELT_BUCKLE	腰带扣		
+2	BIG_HAT	大帽子		
+2	BIG_MUSHROOM	大蘑菇		
+2	BIIIG_HUG	大～抱抱		
+2	BING_BONG	宾邦		
+2	BLACK_BLOOD	黑暗之血		
+2	BLACK_STAR	黑星		
+2	BLESSED_ANTLER	赐福鹿角		
+2	BLOOD_SOAKED_ROSE	血染玫瑰		
+2	BLOOD_VIAL	小血瓶		
+2	BONE_FLUTE	骨笛		
+2	BONE_TEA	骨茶		
+2	BOOK_OF_FIVE_RINGS	五轮书		
+2	BOOK_REPAIR_KNIFE	修书小刀		
+2	BOOKMARK	书签		
+2	BOOMING_CONCH	轰鸣海螺		
+2	BOUND_PHYLACTERY	缚魂命匣		
+2	BOWLER_HAT	圆顶礼帽		
+2	BREAD	面包		
+2	BRILLIANT_SCARF	艳丽围巾		
+2	BRIMSTONE	硫磺		
+2	BRONZE_SCALES	铜质鳞片		
+2	BURNING_BLOOD	燃烧之血		
+2	BURNING_STICKS	燃烧木棍		
+2	BYRDPIP	异鸟宝宝		
+2	CALLING_BELL	召唤铃铛		
+2	CANDELABRA	烛台		
+2	CAPTAINS_WHEEL	舵盘		
+2	CAULDRON	大锅		
+2	CENTENNIAL_PUZZLE	百年积木		
+2	CHANDELIER	吊灯		
+2	CHARONS_ASHES	卡戎之灰		
+2	CHEMICAL_X	化学物X		
+2	CHOICES_PARADOX	选择悖论		
+2	CHOSEN_CHEESE	天选芝士		
+2	CIRCLET	头环		
+2	CLAWS	利爪		
+2	CLOAK_CLASP	斗篷扣		
+2	CRACKED_CORE	破损核心		
+2	CROSSBOW	十字弓		
+2	CURSED_PEARL	诅咒珍珠		
+2	DARKSTONE_PERIAPT	黑石护符		
+2	DATA_DISK	数据磁盘		
+2	DAUGHTER_OF_THE_WIND	风的女儿		
+2	DELICATE_FROND	娇嫩蕨草		
+2	DEMON_TONGUE	恶魔之舌		
+2	DEPRECATED_RELIC	弃用遗物		
+2	DIAMOND_DIADEM	钻石头冠		
+2	DINGY_RUG	肮脏地毯		
+2	DISTINGUISHED_CAPE	卓越斗篷		
+2	DIVINE_DESTINY	天命所归		
+2	DIVINE_RIGHT	天赋君权		
+2	DOLLYS_MIRROR	多利之镜		
+2	DOWSING_ROD	寻龙尺		
+2	DRAGON_FRUIT	火龙果		
+2	DREAM_CATCHER	捕梦网		
+2	DRIFTWOOD	浮木		
+2	DUSTY_TOME	尘封魔典		
+2	ECTOPLASM	灵体外质		
+2	ELECTRIC_SHRYMP	放电异虾		
+2	EMBER_TEA	余烬茶		
+2	EMOTION_CHIP	情感芯片		
+2	EMPTY_CAGE	空鸟笼		
+2	ETERNAL_FEATHER	永恒羽毛		
+2	FAKE_ANCHOR	锚？？？		
+2	FAKE_BLOOD_VIAL	小血瓶？？？		
+2	FAKE_HAPPY_FLOWER	开心小花？？？		
+2	FAKE_LEES_WAFFLE	李家华夫饼？？？		
+2	FAKE_MANGO	芒果？？？		
+2	FAKE_MERCHANTS_RUG	商人的地毯？？？		
+2	FAKE_ORICHALCUM	奥利哈钢？？？		
+2	FAKE_SNECKO_EYE	异蛇之眼？？？		
+2	FAKE_STRIKE_DUMMY	打击木偶？？？		
+2	FAKE_VENERABLE_TEA_SET	古茶具套装？？？		
+2	FENCING_MANUAL	击剑指南		
+2	FESTIVE_POPPER	节日拉炮		
+2	FIDDLE	小提琴		
+2	FISHING_ROD	钓鱼竿		
+2	FORGOTTEN_SOUL	遗忘之魂		
+2	FRAGRANT_MUSHROOM	芳香蘑菇		
+2	FRESNEL_LENS	菲涅耳透镜		
+2	FROZEN_EGG	冻结之蛋		
+2	FUNERARY_MASK	葬礼面具		
+2	FUR_COAT	皮草大衣		
+2	GALACTIC_DUST	星系尘埃		
+2	GAMBLING_CHIP	赌博筹码		
+2	GAME_PIECE	棋子		
+2	GHOST_SEED	幽灵种子		
+2	GIRYA	壶铃		
+2	GLASS_EYE	玻璃眼珠		
+2	GLITTER	亮片		
+2	GNARLED_HAMMER	扭曲锤子		
+2	GOLD_PLATED_CABLES	镀金缆线		
+2	GOLDEN_COMPASS	黄金罗盘		
+2	GOLDEN_PEARL	金色珍珠		
+2	GORGET	护喉甲		
+2	GREMLIN_HORN	地精之角		
+2	HAND_DRILL	手钻		
+2	HAPPY_FLOWER	开心小花		
+2	HEFTY_TABLET	沉重石板		
+2	HELICAL_DART	螺线飞镖		
+2	HISTORY_COURSE	历史课		
+2	HORN_CLEAT	船夹板		
+2	ICE_CREAM	冰淇淋		
+2	INFUSED_CORE	注能核心		
+2	INTIMIDATING_HELMET	骇人头盔		
+2	IRON_CLUB	铁棒		
+2	IVORY_TILE	象牙麻将牌		
+2	JEWELED_MASK	宝石面具		
+2	JEWELRY_BOX	珠宝盒		
+2	JOSS_PAPER	金纸		
+2	JUZU_BRACELET	佛珠手链		
+2	KALEIDOSCOPE	万花筒		
+2	KIFUDA	木札		
+2	KUNAI	苦无		
+2	KUSARIGAMA	锁镰		
+2	LANTERN	灯笼		
+2	LARGE_CAPSULE	巨大扭蛋		
+2	LASTING_CANDY	吃不完的糖		
+2	LAVA_LAMP	熔岩灯		
+2	LAVA_ROCK	熔岩石		
+2	LEAD_PAPERWEIGHT	铅制镇纸		
+2	LEAFY_POULTICE	树叶药膏		
+2	LEES_WAFFLE	李家华夫饼		
+2	LETTER_OPENER	开信刀		
+2	LIZARD_TAIL	蜥蜴尾巴		
+2	LOOMING_FRUIT	布质果实		
+2	LORDS_PARASOL	领主阳伞		
+2	LOST_COFFER	失物盒		
+2	LOST_WISP	迷失鬼火		
+2	LUCKY_FYSH	招财异鱼		
+2	LUNAR_PASTRY	月亮糕点		
+2	MANGO	芒果		
+2	MASSIVE_SCROLL	巨大卷轴		
+2	MAW_BANK	巨口储蓄罐		
+2	MEAL_TICKET	餐券		
+2	MEAT_CLEAVER	切肉刀		
+2	MEAT_ON_THE_BONE	带骨肉		
+2	MEMBERSHIP_CARD	会员卡		
+2	MERCURY_HOURGLASS	水银沙漏		
+2	METRONOME	节拍器		
+2	MINI_REGENT	迷你储君		
+2	MINIATURE_CANNON	微型大炮		
+2	MINIATURE_TENT	微型帐篷		
+2	MOLTEN_EGG	熔火之蛋		
+2	MR_STRUGGLES	抱抱先生		
+2	MUMMIFIED_HAND	干瘪之手		
+2	MUSIC_BOX	音乐盒		
+2	MYSTIC_LIGHTER	神秘打火机		
+2	NEOWS_BONES	涅奥骨骰		
+2	NEOWS_SACRIFICE	涅奥的牺牲		
+2	NEOWS_TALISMAN	涅奥的护符		
+2	NEOWS_TORMENT	涅奥的苦痛		
+2	NEW_LEAF	新叶		
+2	NINJA_SCROLL	忍术卷轴		
+2	NUNCHAKU	双截棍		
+2	NUTRITIOUS_OYSTER	营养牡蛎		
+2	NUTRITIOUS_SOUP	营养汤		
+2	ODDLY_SMOOTH_STONE	意外光滑的石头		
+2	OLD_COIN	古钱币		
+2	ORANGE_DOUGH	橙色团块		
+2	ORICHALCUM	奥利哈钢		
+2	ORNAMENTAL_FAN	精致折扇		
+2	ORRERY	星系仪		
+2	PAELS_BLOOD	佩尔之血		
+2	PAELS_CLAW	佩尔之爪		
+2	PAELS_EYE	佩尔之眼		
+2	PAELS_FLESH	佩尔之肉		
+2	PAELS_GROWTH	佩尔的增生组织		
+2	PAELS_HORN	佩尔之角		
+2	PAELS_LEGION	佩尔的士兵		
+2	PAELS_TEARS	佩尔之泪		
+2	PAELS_TOOTH	佩尔之牙		
+2	PAELS_WING	佩尔之翼		
+2	PANDORAS_BOX	潘多拉魔盒		
+2	PANTOGRAPH	缩放仪		
+2	PAPER_KRANE	纸鹤		
+2	PAPER_PHROG	纸蛙		
+2	PARRYING_SHIELD	招架盾		
+2	PEAR	梨子		
+2	PEN_NIB	钢笔尖		
+2	PENDULUM	摆动球		
+2	PERMAFROST	永冻冰晶		
+2	PETRIFIED_TOAD	石化蟾蜍		
+2	PHIAL_HOLSTER	药瓶皮套		
+2	PHILOSOPHERS_STONE	贤者之石		
+2	PHYLACTERY_UNBOUND	无界命匣		
+2	PLANISPHERE	活动星图		
+2	POCKETWATCH	怀表		
+2	POLLINOUS_CORE	花粉核心		
+2	POMANDER	橙型香盒		
+2	POTION_BELT	药水腰带		
+2	POWER_CELL	能量电池		
+2	PRAYER_WHEEL	转经轮		
+2	PRECARIOUS_SHEARS	松动羊毛剪		
+2	PRECISE_SCISSORS	精准剪刀		
+2	PRESERVED_FOG	腌制活雾		
+2	PRISMATIC_GEM	棱彩宝石		
+2	PUMPKIN_CANDLE	南瓜蜡烛		
+2	PUNCH_DAGGER	拳刃		
+2	RADIANT_PEARL	发光珍珠		
+2	RAINBOW_RING	彩虹戒指		
+2	RAZOR_TOOTH	剃刀牙		
+2	RED_MASK	红面具		
+2	RED_SKULL	红头骨		
+2	REGAL_PILLOW	皇家枕头		
+2	REGALITE	君王矿石		
+2	REPTILE_TRINKET	爬行动物饰品		
+2	RING_OF_THE_DRAKE	长蛇戒指		
+2	RING_OF_THE_SNAKE	蛇之戒指		
+2	RINGING_TRIANGLE	三角铃鼓		
+2	RIPPLE_BASIN	波纹水盆		
+2	ROYAL_POISON	王室猛毒		
+2	ROYAL_STAMP	王室印章		
+2	RUINED_HELMET	损毁头盔		
+2	RUNIC_CAPACITOR	符文电容器		
+2	RUNIC_PYRAMID	符文金字塔		
+2	SAI	钗		
+2	SAND_CASTLE	沙堡		
+2	SCREAMING_FLAGON	尖叫酒壶		
+2	SCROLL_BOXES	卷轴箱		
+2	SEA_GLASS	海玻璃		
+2	SEAL_OF_GOLD	黄金印		
+2	SELF_FORMING_CLAY	自成型黏土		
+2	SERE_TALON	原初之爪		
+2	SHOVEL	铲子		
+2	SHURIKEN	手里剑		
+2	SIGNET_RING	图章戒指		
+2	SILKEN_TRESS	华美发束		
+2	SILVER_CRUCIBLE	白银熔炉		
+2	SLING_OF_COURAGE	勇气投石索		
+2	SMALL_CAPSULE	小型扭蛋		
+2	SNECKO_EYE	异蛇之眼		
+2	SNECKO_SKULL	异蛇头骨		
+2	SOZU	添水		
+2	SPARKLING_ROUGE	闪亮口红		
+2	SPIKED_GAUNTLETS	带刺手甲		
+2	STONE_CALENDAR	历石		
+2	STONE_CRACKER	碎石钻		
+2	STONE_HUMIDIFIER	石炉加湿器		
+2	STORYBOOK	故事书		
+2	STRAWBERRY	草莓		
+2	STRIKE_DUMMY	打击木偶		
+2	STURDY_CLAMP	坚固钳子		
+2	SWORD_OF_JADE	玉之剑		
+2	SWORD_OF_STONE	石之剑		
+2	SYMBIOTIC_VIRUS	共生病毒		
+2	TANXS_WHISTLE	坦克斯的哨子		
+2	TEA_OF_DISCOURTESY	无礼之茶		
+2	THE_ABACUS	算盘		
+2	THE_BOOT	发条靴		
+2	THE_COURIER	送货员		
+2	THROWING_AXE	投斧		
+2	TINGSHA	铜钹		
+2	TINY_MAILBOX	小邮箱		
+2	TOASTY_MITTENS	烘焙手套		
+2	TOOLBOX	工具箱		
+2	TOUCH_OF_OROBAS	欧洛巴斯之触		
+2	TOUGH_BANDAGES	结实绷带		
+2	TOXIC_EGG	毒素之蛋		
+2	TOY_BOX	玩具盒		
+2	TRI_BOOMERANG	三刃回旋镖		
+2	TUNGSTEN_ROD	钨合金棍		
+2	TUNING_FORK	音叉		
+2	TWISTED_FUNNEL	扭曲漏斗		
+2	UNCEASING_TOP	不休陀螺		
+2	UNDYING_SIGIL	不死符文		
+2	UNSETTLING_LAMP	不安油灯		
+2	VAJRA	金刚杵		
+2	VAMBRACE	臂甲		
+2	VELVET_CHOKER	天鹅绒颈圈		
+2	VENERABLE_TEA_SET	古茶具套装		
+2	VERY_HOT_COCOA	烫嘴可可		
+2	VEXING_PUZZLEBOX	烦人机关盒		
+2	VITRUVIAN_MINION	维特鲁威仆从		
+2	WAR_HAMMER	战锤		
+2	WAR_PAINT	战纹涂料		
+2	WHETSTONE	磨刀石		
+2	WHISPERING_EARRING	低语耳环		
+2	WHITE_BEAST_STATUE	白兽雕像		
+2	WHITE_STAR	白星		
+2	WING_CHARM	羽翼护符		
+2	WINGED_BOOTS	羽翼之靴		
+2	WONGO_CUSTOMER_APPRECIATION_BADGE	旺购客户感恩徽章		
+2	WONGOS_MYSTERY_TICKET	旺购神秘券		
+2	YUMMY_COOKIE	美味饼干		
+3	BYGONE_EFFIGY	旧日雕像		
+3	BYRDONIS	多尼斯异鸟		
+3	CEREMONIAL_BEAST	仪式兽		
+3	CUBEX_CONSTRUCT	方柱构装体		
+3	FLYCONID	飞蝇菌子		
+3	LEAF_SLIME_M	树叶史莱姆（中）		
+3	TWIG_SLIME_M	树枝史莱姆（中）		
+3	FOGMOG	雾菇		
+3	EYE_WITH_TEETH	利齿之眼		
+3	FUZZY_WURM_CRAWLER	毛绒伏地虫		
+3	INKLET	墨宝		
+3	MAWLER	蛮兽		
+3	NIBBIT	小啃兽		
+3	SHRINKER_BEETLE	缩小甲虫		
+3	PHROG_PARASITE	异蛙寄生虫		
+3	WRIGGLER	扭动虫		
+3	AXE_RUBY_RAIDER	劫掠者斧手		
+3	ASSASSIN_RUBY_RAIDER	劫掠者刺客		
+3	BRUTE_RUBY_RAIDER	劫掠者暴徒		
+3	CROSSBOW_RUBY_RAIDER	劫掠者弩手		
+3	TRACKER_RUBY_RAIDER	劫掠者追踪手		
+3	LEAF_SLIME_S	树叶史莱姆（小）		
+3	TWIG_SLIME_S	树枝史莱姆（小）		
+3	SNAPPING_JAXFRUIT	闪光贾克斯果		
+3	SLITHERING_STRANGLER	蛇行扼杀者		
+3	KIN_FOLLOWER	同族信徒		
+3	KIN_PRIEST	同族神官		
+3	VANTOM	墨影幻灵		
+3	VINE_SHAMBLER	藤蔓蹒跚者		
+3	CORPSE_SLUG	噬尸蛞蝓		
+3	CALCIFIED_CULTIST	钙化邪教徒		
+3	DAMP_CULTIST	潮湿邪教徒		
+3	FOSSIL_STALKER	化石追踪者		
+3	GREMLIN_MERC	地精佣兵		
+3	FAT_GREMLIN	胖地精		
+3	SNEAKY_GREMLIN	卑鄙地精		
+3	HAUNTED_SHIP	幽灵船		
+3	LAGAVULIN_MATRIARCH	乐加维林族母		
+3	LIVING_FOG	活雾		
+3	GAS_BOMB	气态炸弹		
+3	PHANTASMAL_GARDENER	花园幽灵鳗		
+3	PUNCH_CONSTRUCT	拳击构装体		
+3	SEAPUNK	海洋混混		
+3	SEWER_CLAM	下水道蚌		
+3	SKULKING_COLONY	鬼祟珊瑚群		
+3	SLUDGE_SPINNER	淤泥旋螺		
+3	SOUL_FYSH	灵魂异鱼		
+3	TERROR_EEL	骇鳗		
+3	TOADPOLE	蟾蜍蝌蚪		
+3	TWO_TAILED_RAT	双尾鼠		
+3	WATERFALL_GIANT	瀑布巨兽		
+3	BOWLBUG_EGG	盛碗虫（卵）		
+3	BOWLBUG_SILK	盛碗虫（丝）		
+3	BOWLBUG_NECTAR	盛碗虫（蜜）		
+3	BOWLBUG_ROCK	盛碗虫（石）		
+3	CHOMPER	啃咬机		
+3	DECIMILLIPEDE_SEGMENT_FRONT	残杀千足虫		
+3	DECIMILLIPEDE_SEGMENT_MIDDLE	残杀千足虫		
+3	DECIMILLIPEDE_SEGMENT_BACK	残杀千足虫		
+3	ENTOMANCER	蜂群术士		
+3	EXOSKELETON	外骨骼虫		
+3	HUNTER_KILLER	猎人杀手		
+3	CRUSHER	碾碎爪		
+3	ROCKET	火箭		
+3	INFESTED_PRISM	感染棱柱		
+3	KNOWLEDGE_DEMON	知识恶魔		
+3	LOUSE_PROGENITOR	虱虫之祖		
+3	MYTE	异螨		
+3	OVICOPTER	直飞产卵虫		
+3	TOUGH_EGG	结实的卵		
+3	SLUMBERING_BEETLE	熟睡甲虫		
+3	SPINY_TOAD	棘刺蟾蜍		
+3	THE_INSATIABLE	无厌沙虫		
+3	THE_OBSCURA	胧光怪		
+3	PARAFRIGHT	寄生惧魔		
+3	THIEVING_HOPPER	偷窃草蜢		
+3	TUNNELER	地道虫		
+3	AXEBOT	巨斧机器人		
+3	DEVOTED_SCULPTOR	虔诚雕刻师		
+3	AEONGLASS	永世沙漏		
+3	FABRICATOR	组装师		
+3	GUARDBOT	守护机器人		
+3	NOISEBOT	噪音机器人		
+3	ZAPBOT	电击机器人		
+3	STABBOT	戳刺机器人		
+3	FROG_KNIGHT	青蛙骑士		
+3	GLOBE_HEAD	电球头		
+3	FLAIL_KNIGHT	连枷骑士		
+3	SPECTRAL_KNIGHT	幽灵骑士		
+3	MAGI_KNIGHT	魔法骑士		
+3	MECHA_KNIGHT	机甲骑士		
+3	OWL_MAGISTRATE	猫头鹰法官		
+3	QUEEN	女王		
+3	TORCH_HEAD_AMALGAM	火炬头聚合体		
+3	SCROLL_OF_BITING	咬人卷轴		
+3	SLIMED_BERSERKER	史莱姆狂战士		
+3	SOUL_NEXUS	灵魂枢纽		
+3	TEST_SUBJECT	实验体 #C0		
+3	THE_LOST	失落之物		
+3	THE_FORGOTTEN	遗忘之物		
+3	LIVING_SHIELD	活体盾		
+3	TURRET_OPERATOR	高塔炮手		
+3	FAKE_MERCHANT_MONSTER	商人？？？		
+3	MYSTERIOUS_KNIGHT	神秘骑士		
+3	BATTLE_FRIEND_V1	战斗好伙伴V1.0		
+3	BATTLE_FRIEND_V2	战斗好伙伴V2.0		
+3	BATTLE_FRIEND_V3	战斗好伙伴V3.0		
+4	AROMA_OF_CHAOS	混沌芳香		
+4	BYRDONIS_NEST	多尼斯异鸟巢		
+4	DENSE_VEGETATION	茂密的植被		
+4	JUNGLE_MAZE_ADVENTURE	丛林迷宫奇遇		
+4	LUMINOUS_CHOIR	冷光合唱团		
+4	MORPHIC_GROVE	变形灵林谷		
+4	SAPPHIRE_SEED	蓝宝石种子		
+4	SUNKEN_STATUE	沉没雕像		
+4	TABLET_OF_TRUTH	真理石板		
+4	UNREST_SITE	无休之处		
+4	WELLSPRING	泉水		
+4	WHISPERING_HOLLOW	低语空谷		
+4	WOOD_CARVINGS	木雕		
+4	ABYSSAL_BATHS	深渊浴场		
+4	DROWNING_BEACON	淹水灯塔		
+4	ENDLESS_CONVEYOR	无尽传送带		
+4	PUNCH_OFF	重拳出击		
+4	SPIRALING_WHIRLPOOL	螺旋漩涡		
+4	SUNKEN_TREASURY	淹水金库		
+4	DOORS_OF_LIGHT_AND_DARK	光与暗的门扉		
+4	TRASH_HEAP	垃圾堆		
+4	WATERLOGGED_SCRIPTORIUM	水漫缮写室		
+4	AMALGAMATOR	熔合者		
+4	BUGSLAYER	害虫杀手		
+4	COLORFUL_PHILOSOPHERS	色彩哲学家		
+4	COLOSSAL_FLOWER	巨大花卉		
+4	FIELD_OF_MAN_SIZED_HOLES	人形洞穴之地		
+4	INFESTED_AUTOMATON	被寄生的自动机械		
+4	LOST_WISP	迷失鬼火		
+4	SPIRIT_GRAFTER	灵魂嫁接者		
+4	THE_LANTERN_KEY	灯火钥匙		
+4	ZEN_WEAVER	修禅织网者		
+4	BATTLEWORN_DUMMY	战痕累累的训练假人		
+4	GRAVE_OF_THE_FORGOTTEN	遗忘之墓		
+4	HUNGRY_FOR_MUSHROOMS	蘑菇饥渴		
+4	REFLECTIONS	镜中倒影  影倒中镜		
+4	ROUND_TEA_PARTY	圆桌茶会		
+4	TRIAL	审判		
+4	TINKER_TIME	打造时间		
+4	BRAIN_LEECH	脑蛭		
+4	CRYSTAL_SPHERE	水晶球		
+4	DOLL_ROOM	玩偶室		
+4	FAKE_MERCHANT	商人？？？		
+4	POTION_COURIER	药水快递员		
+4	RANWID_THE_ELDER	长者兰伟德		
+4	RELIC_TRADER	遗物交换商		
+4	ROOM_FULL_OF_CHEESE	满屋芝士		
+4	SELF_HELP_BOOK	自助指南		
+4	SLIPPERY_BRIDGE	滑脚木桥		
+4	STONE_OF_ALL_TIME	永恒之石		
+4	SYMBIOTE	共生体		
+4	TEA_MASTER	茶艺大师		
+4	THE_FUTURE_OF_POTIONS	药水的未来？		
+4	THE_LEGENDS_WERE_TRUE	传说是真的		
+4	THIS_OR_THAT	这个还是那个？		
+4	WAR_HISTORIAN_REPY	战史学家 付袭		
+4	WELCOME_TO_WONGOS	欢迎来到旺购百货		
+4	NEOW	涅奥		
+4	OROBAS	欧洛巴斯		
+4	PAEL	佩尔		
+4	TEZCATARA	特兹卡塔拉		
+4	NONUPEIPE	诺奴佩普		
+4	TANX	坦克斯		
+4	VAKUU	瓦库		
+4	DARV	达弗		

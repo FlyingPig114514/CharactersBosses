@@ -1,0 +1,103 @@
+{
+  "IRONCLAD_BOSS_ENCOUNTER.title": "Ironclad",
+  "IRONCLAD_BOSS_ENCOUNTER.loss": "L'[gold]Ironclad[/gold] ha spezzato {character}.",
+
+  "IRONCLAD_ANGER_BOSS_ENCOUNTER.title": "Ironclad",
+  "IRONCLAD_ANGER_BOSS_ENCOUNTER.loss": "La furia dell'[gold]Ironclad[/gold] ha ridotto {character} in cenere.",
+
+  "IRONCLAD_VULN_BOSS_ENCOUNTER.title": "Ironclad",
+  "IRONCLAD_VULN_BOSS_ENCOUNTER.loss": "L'[gold]Ironclad[/gold] ha squarciato {character} strato dopo strato.",
+
+  "SILENT_BOSS_ENCOUNTER.title": "Silent",
+  "SILENT_BOSS_ENCOUNTER.loss": "{character} non ha mai visto arrivare il [gold]Silent[/gold].",
+
+  "SILENT_ENVENOM_BOSS_ENCOUNTER.title": "Silent",
+  "SILENT_ENVENOM_BOSS_ENCOUNTER.loss": "Il [gold]Veleno[/gold] del [gold]Silent[/gold] ha consumato {character} fino alla fine.",
+
+  "SILENT_SHIV_BOSS_ENCOUNTER.title": "Silent",
+  "SILENT_SHIV_BOSS_ENCOUNTER.loss": "La pioggia di [gold]Pugnali[/gold] del [gold]Silent[/gold] ha travolto {character}.",
+
+  "SILENT_SLY_BOSS_ENCOUNTER.title": "Silent",
+  "SILENT_SLY_BOSS_ENCOUNTER.loss": "Il [gold]Silent[/gold] ha gettato {character} nella [gold]pila degli scarti[/gold].",
+
+  "SILENT_BREWER_BOSS_ENCOUNTER.title": "Silent",
+  "SILENT_BREWER_BOSS_ENCOUNTER.loss": "La barriera di pozioni del [gold]Silent[/gold] ha fermato {character}.",
+
+  "DEFECT_BOSS_ENCOUNTER.title": "Defect",
+  "DEFECT_BOSS_ENCOUNTER.loss": "Il [gold]Defect[/gold] ha analizzato ed eliminato {character}.",
+
+  "DEFECT_AI_BOSS_ENCOUNTER.title": "Defect",
+  "DEFECT_AI_BOSS_ENCOUNTER.loss": "Ogni carta di {character} è stata inserita nel modello del [gold]Defect[/gold].",
+
+  "DEFECT_CLAW_BOSS_ENCOUNTER.title": "Defect",
+  "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "L'[gold]Iper-Raggio[/gold] del [gold]Defect[/gold] ha annientato {character}.",
+
+  "NECROBINDER_BOSS_ENCOUNTER.title": "Necrobinder",
+  "NECROBINDER_BOSS_ENCOUNTER.loss": "Il [gold]Necrobinder[/gold] ha reclamato l'anima di {character}.",
+
+  "NECROBINDER_DOOM_BOSS_ENCOUNTER.title": "Necrobinder",
+  "NECROBINDER_DOOM_BOSS_ENCOUNTER.loss": "[gold]Il Necrobinder[/gold] ha condotto {character} alla fine della [gold]Condanna[/gold].",
+
+  "NECROBINDER_SOUL_BOSS_ENCOUNTER.title": "Necrobinder",
+  "NECROBINDER_SOUL_BOSS_ENCOUNTER.loss": "Il [gold]Necrobinder[/gold] ha reclamato l'anima di {character}.",
+
+  "NECROBINDER_ERADICATE_BOSS_ENCOUNTER.title": "Necrobinder",
+  "NECROBINDER_ERADICATE_BOSS_ENCOUNTER.loss": "Il [gold]Necrobinder[/gold] ha estirpato {character}, ricordi compresi.",
+
+  "REGENT_BOSS_ENCOUNTER.title": "Regent",
+  "REGENT_BOSS_ENCOUNTER.loss": "Il [gold]Regent[/gold] ha condannato {character}.",
+
+  "REGENT_DEBRIS_BOSS_ENCOUNTER.title": "Regent",
+  "REGENT_DEBRIS_BOSS_ENCOUNTER.loss": "Il [gold]Regent[/gold] ha sepolto {character} sotto i suoi [gold]Rottami[/gold].",
+
+  "REGENT_FORGE_BOSS_ENCOUNTER.title": "Regent",
+  "REGENT_FORGE_BOSS_ENCOUNTER.loss": "La lama del [gold]Regent[/gold] di {character} conserva solo una tacca.",
+
+  "REGENT_COLORLESS_BOSS_ENCOUNTER.title": "Regent",
+  "REGENT_COLORLESS_BOSS_ENCOUNTER.loss": "Il [gold]Regent[/gold] ha privato {character} di ogni colore.",
+
+  "REGENT_STAR_BOSS_ENCOUNTER.title": "Regent",
+  "REGENT_STAR_BOSS_ENCOUNTER.loss": "Le stelle scintillanti del [gold]Regent[/gold] hanno ridotto {character} in polvere.",
+
+  "REGENT_KING_BOSS_ENCOUNTER.title": "Regent",
+  "REGENT_KING_BOSS_ENCOUNTER.loss": "Il [gold]Regent[/gold] ha schiacciato {character} sotto la sua corona.",
+
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.title": "Ironclad",
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "La [gold]Forza[/gold] crescente dell'[gold]Ironclad[/gold] ha schiacciato {character}.",
+
+    "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.title": "Ironclad",
+  "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss": "L'[gold]Ironclad[/gold] ha fatto volteggiare {character} finché le sue stesse copie non hanno sommerso tutto.",
+"IRONCLAD_BOULDER_BOSS_ENCOUNTER.title": "Ironclad",
+  "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss": "I [gold]Macigni[/gold] dell'[gold]Ironclad[/gold] hanno ridotto {character} in pezzi.",
+
+  "DEFECT_DARK_BOSS_ENCOUNTER.title": "Defect",
+  "DEFECT_DARK_BOSS_ENCOUNTER.loss": "I [gold]Tetroglobi[/gold] del [gold]Defect[/gold] hanno inghiottito {character}.",
+
+  "IRONCLAD_BOSS_NORMAL_ENCOUNTER.title": "Ironclad",
+  "IRONCLAD_BOSS_NORMAL_ENCOUNTER.loss": "L'[gold]Ironclad[/gold] ha spezzato {character}.",
+  "SILENT_BOSS_NORMAL_ENCOUNTER.title": "Silent",
+  "SILENT_BOSS_NORMAL_ENCOUNTER.loss": "{character} non ha mai visto arrivare il [gold]Silent[/gold].",
+  "SILENT_ENVENOM_BOSS_NORMAL_ENCOUNTER.title": "Silent",
+  "SILENT_ENVENOM_BOSS_NORMAL_ENCOUNTER.loss": "Il [gold]Veleno[/gold] del [gold]Silent[/gold] ha consumato {character} fino alla fine.",
+  "SILENT_SLY_BOSS_NORMAL_ENCOUNTER.title": "Silent",
+  "SILENT_SLY_BOSS_NORMAL_ENCOUNTER.loss": "Il [gold]Silent[/gold] ha gettato {character} nella [gold]pila degli scarti[/gold].",
+  "SILENT_SHIV_BOSS_NORMAL_ENCOUNTER.title": "Silent",
+  "SILENT_SHIV_BOSS_NORMAL_ENCOUNTER.loss": "La pioggia di [gold]Pugnali[/gold] del [gold]Silent[/gold] ha travolto {character}.",
+  "DEFECT_BOSS_NORMAL_ENCOUNTER.title": "Defect",
+  "DEFECT_BOSS_NORMAL_ENCOUNTER.loss": "Il [gold]Defect[/gold] ha analizzato ed eliminato {character}.",
+  "NECROBINDER_BOSS_NORMAL_ENCOUNTER.title": "Necrobinder",
+  "NECROBINDER_BOSS_NORMAL_ENCOUNTER.loss": "Il [gold]Necrobinder[/gold] ha reclamato l'anima di {character}.",
+  "REGENT_BOSS_NORMAL_ENCOUNTER.title": "Regent",
+  "REGENT_BOSS_NORMAL_ENCOUNTER.loss": "Il [gold]Regent[/gold] ha condannato {character}.",
+
+  "TELEMETRY_PROMPT_HEADER": "Carica i dati di gioco (CharacterBosses)",
+  "TELEMETRY_PROMPT_BODY": "Questa mod vorrebbe raccogliere alcuni dati di gioco per correggere bug ed equilibrare i boss:\nil risultato di ogni scontro con i boss, Atto/scontro, Ascensione, numero di giocatori, PV del boss, turni e seed, più le righe di errore di questa mod.\n\nI dati vengono prima salvati in un [b]file locale[/b]; se l'autore ha configurato un server di raccolta, gli stessi dati anonimi vengono [b]caricati anche[/b] per l'autore.\n\nNon viene raccolta alcuna informazione personale (niente Steam ID, niente nickname).\n\nPuoi cambiare questa impostazione in qualsiasi momento in \"Configurazione mod → CharacterBosses → A5\". Vuoi attivarla ora?",
+  "TELEMETRY_PROMPT_YES": "Attiva",
+  "TELEMETRY_PROMPT_NO": "Lascia disattivata",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.title":  "The Necrobinder",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character} was dragged into the grave by the [gold]Necrobinder[/gold]\u0027s Osty.",
+    "SILENT_SNECKO_BOSS_ENCOUNTER.title":  "The Silent",
+    "SILENT_SNECKO_BOSS_ENCOUNTER.loss":  "{character} was sent to the grave by the [gold]Silent[/gold]\u0027s dice.",
+  "DEFECT_EVENT_BOSS_ENCOUNTER.loss": "[gold]Defect[/gold] ha riportato {character} fuori dalla pila degli scarti.",
+  "DEFECT_EVENT_BOSS_ENCOUNTER.title": "Defect"
+}

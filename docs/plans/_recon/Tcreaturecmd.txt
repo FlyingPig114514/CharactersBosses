@@ -1,0 +1,4142 @@
+﻿// ===== MegaCrit.Sts2.Core.Commands.CreatureCmd =====
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using Godot;
+using MegaCrit.Sts2.Core.Assets;
+using MegaCrit.Sts2.Core.Audio.Debug;
+using MegaCrit.Sts2.Core.Combat;
+using MegaCrit.Sts2.Core.Context;
+using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Helpers;
+using MegaCrit.Sts2.Core.Hooks;
+using MegaCrit.Sts2.Core.Localization.DynamicVars;
+using MegaCrit.Sts2.Core.Logging;
+using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Monsters;
+using MegaCrit.Sts2.Core.Nodes;
+using MegaCrit.Sts2.Core.Nodes.Audio;
+using MegaCrit.Sts2.Core.Nodes.Combat;
+using MegaCrit.Sts2.Core.Nodes.RestSite;
+using MegaCrit.Sts2.Core.Nodes.Rooms;
+using MegaCrit.Sts2.Core.Nodes.Vfx;
+using MegaCrit.Sts2.Core.Nodes.Vfx.Utilities;
+using MegaCrit.Sts2.Core.Rooms;
+using MegaCrit.Sts2.Core.Runs;
+using MegaCrit.Sts2.Core.Runs.History;
+using MegaCrit.Sts2.Core.Saves;
+using MegaCrit.Sts2.Core.TestSupport;
+using MegaCrit.Sts2.Core.ValueProps;
+
+namespace MegaCrit.Sts2.Core.Commands;
+
+public static class CreatureCmd
+{
+	[CompilerGenerated]
+	private sealed class <>c__DisplayClass12_0
+	{
+		public ValueProp props;
+
+		internal DamageResult <Damage>b__0(Creature t)
+		{
+			return new DamageResult(t, props);
+		}
+	}
+
+	[CompilerGenerated]
+	private sealed class <>c__DisplayClass20_0
+	{
+		public Creature creature;
+
+		internal bool <Heal>b__0(NRestSiteCharacter c)
+		{
+			return c.Player == creature.Player;
+		}
+	}
+
+	[CompilerGenerated]
+	private sealed class <>c__DisplayClass27_0
+	{
+		public Creature creature;
+
+		public Func<System.Collections.Generic.IReadOnlyList<Creature>, System.Threading.Tasks.Task> stunMove;
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <Add>d__0<T> : IAsyncStateMachine where T : notnull, MonsterModel
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder<Creature> <>t__builder;
+
+		public ICombatState combatState;
+
+		public string slotName;
+
+		private Creature <creature>5__2;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			Creature result;
+			try
+			{
+				TaskAwaiter val;
+				if (num != 0)
+				{
+					<creature>5__2 = combatState.CreateCreature(ModelDb.Monster<T>().ToMutable(), CombatSide.Enemy, slotName);
+					val = Add(<creature>5__2).GetAwaiter();
+					if (!((TaskAwaiter)(ref val)).IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <Add>d__0<T>>(ref val, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+				}
+				((TaskAwaiter)(ref val)).GetResult();
+				result = <creature>5__2;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<creature>5__2 = null;
+				<>t__builder.SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<creature>5__2 = null;
+			<>t__builder.SetResult(result);
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			<>t__builder.SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <Add>d__1 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder<Creature> <>t__builder;
+
+		public MonsterModel monster;
+
+		public ICombatState combatState;
+
+		public CombatSide side;
+
+		public string slotName;
+
+		private Creature <creature>5__2;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			Creature result;
+			try
+			{
+				TaskAwaiter val;
+				if (num != 0)
+				{
+					monster.AssertMutable();
+					<creature>5__2 = combatState.CreateCreature(monster, side, slotName);
+					val = Add(<creature>5__2).GetAwaiter();
+					if (!((TaskAwaiter)(ref val)).IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <Add>d__1>(ref val, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+				}
+				((TaskAwaiter)(ref val)).GetResult();
+				result = <creature>5__2;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<creature>5__2 = null;
+				<>t__builder.SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<creature>5__2 = null;
+			<>t__builder.SetResult(result);
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			<>t__builder.SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <Add>d__2 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public Creature creature;
+
+		private ICombatState <combatState>5__2;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0219: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0225: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0202: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0203: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			try
+			{
+				TaskAwaiter val;
+				if (num == 0)
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_00f6;
+				}
+				TaskAwaiter val2;
+				if (num == 1)
+				{
+					val2 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_0234;
+				}
+				if (!CombatManager.Instance.IsInProgress)
+				{
+					throw new InvalidOperationException("Attempted to add a creature outside of combat.");
+				}
+				<combatState>5__2 = creature.CombatState;
+				if (<combatState>5__2 == null)
+				{
+					throw new InvalidOperationException("Attempted to add a creature with no combat state.");
+				}
+				if (<combatState>5__2.IsLiveCombat())
+				{
+					<combatState>5__2.AddCreature(creature);
+					CombatManager.Instance.AddCreature(creature);
+					NCombatRoom.Instance?.AddCreature(creature);
+					val = CombatManager.Instance.AfterCreatureAdded(creature).GetAwaiter();
+					if (!((TaskAwaiter)(ref val)).IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <Add>d__2>(ref val, ref this);
+						return;
+					}
+					goto IL_00f6;
+				}
+				goto end_IL_0007;
+				IL_0234:
+				((TaskAwaiter)(ref val2)).GetResult();
+				goto end_IL_0007;
+				IL_00f6:
+				((TaskAwaiter)(ref val)).GetResult();
+				if (<combatState>5__2.CurrentSide != CombatSide.Enemy && creature.IsMonster)
+				{
+					creature.PrepareForNextTurn(Enumerable.Select<Player, Creature>((System.Collections.Generic.IEnumerable<Player>)<combatState>5__2.Players, (Func<Player, Creature>)((Player p) => p.Creature)), rollNewMove: false);
+				}
+				MapPointHistoryEntry? currentMapPointHistoryEntry = <combatState>5__2.RunState.CurrentMapPointHistoryEntry;
+				MapPointRoomHistoryEntry mapPointRoomHistoryEntry = ((currentMapPointHistoryEntry != null) ? Enumerable.Last<MapPointRoomHistoryEntry>((System.Collections.Generic.IEnumerable<MapPointRoomHistoryEntry>)currentMapPointHistoryEntry.Rooms) : null);
+				if (mapPointRoomHistoryEntry != null && creature != null && creature.Monster != null && creature.Side == CombatSide.Enemy && !mapPointRoomHistoryEntry.MonsterIds.Contains(creature.Monster.Id))
+				{
+					mapPointRoomHistoryEntry.MonsterIds.Add(creature.Monster.Id);
+				}
+				val2 = Hook.AfterCreatureAddedToCombat(creature.CombatState, creature).GetAwaiter();
+				if (!((TaskAwaiter)(ref val2)).IsCompleted)
+				{
+					num = (<>1__state = 1);
+					<>u__1 = val2;
+					((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <Add>d__2>(ref val2, ref this);
+					return;
+				}
+				goto IL_0234;
+				end_IL_0007:;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<combatState>5__2 = null;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<combatState>5__2 = null;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <Damage>d__10 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder<System.Collections.Generic.IEnumerable<DamageResult>> <>t__builder;
+
+		public PlayerChoiceContext choiceContext;
+
+		public Creature target;
+
+		public decimal amount;
+
+		public ValueProp props;
+
+		public Creature dealer;
+
+		public CardModel cardSource;
+
+		public CardPlay cardPlay;
+
+		private TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>> <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			System.Collections.Generic.IEnumerable<DamageResult> result2;
+			try
+			{
+				TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>> val;
+				if (num != 0)
+				{
+					val = Damage(choiceContext, new global::<>z__ReadOnlySingleElementList<Creature>(target), amount, props, dealer, cardSource, cardPlay).GetAwaiter();
+					if (!val.IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>>, <Damage>d__10>(ref val, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>>);
+					num = (<>1__state = -1);
+				}
+				System.Collections.Generic.IEnumerable<DamageResult> result = val.GetResult();
+				result2 = result;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<>t__builder.SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<>t__builder.SetResult(result2);
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			<>t__builder.SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <Damage>d__11 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder<System.Collections.Generic.IEnumerable<DamageResult>> <>t__builder;
+
+		public PlayerChoiceContext choiceContext;
+
+		public System.Collections.Generic.IEnumerable<Creature> targets;
+
+		public DamageVar damageVar;
+
+		public Creature dealer;
+
+		public CardModel cardSource;
+
+		public CardPlay cardPlay;
+
+		private TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>> <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			System.Collections.Generic.IEnumerable<DamageResult> result2;
+			try
+			{
+				TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>> val;
+				if (num != 0)
+				{
+					val = Damage(choiceContext, targets, damageVar.BaseValue, damageVar.Props, dealer, cardSource, cardPlay).GetAwaiter();
+					if (!val.IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>>, <Damage>d__11>(ref val, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>>);
+					num = (<>1__state = -1);
+				}
+				System.Collections.Generic.IEnumerable<DamageResult> result = val.GetResult();
+				result2 = result;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<>t__builder.SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<>t__builder.SetResult(result2);
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			<>t__builder.SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <Damage>d__12 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder<System.Collections.Generic.IEnumerable<DamageResult>> <>t__builder;
+
+		public ValueProp props;
+
+		public System.Collections.Generic.IEnumerable<Creature> targets;
+
+		public Creature dealer;
+
+		public decimal amount;
+
+		private <>c__DisplayClass12_0 <>8__1;
+
+		public CardModel cardSource;
+
+		public CardPlay cardPlay;
+
+		public PlayerChoiceContext choiceContext;
+
+		private List<DamageResult> <results>5__2;
+
+		private List<Creature> <targetList>5__3;
+
+		private ICombatState <combatState>5__4;
+
+		private IRunState <runState>5__5;
+
+		private List<Creature> <killedCreatures>5__6;
+
+		private Enumerator<Creature> <>7__wrap6;
+
+		private Creature <originalTarget>5__8;
+
+		private decimal <modifiedAmount>5__9;
+
+		private decimal <blockedDamage>5__10;
+
+		private decimal <unblockedDamage>5__11;
+
+		private Creature <unblockedDamageTarget>5__12;
+
+		private DamageResult <unblockedDamageResult>5__13;
+
+		private List<DamageResult> <damageResults>5__14;
+
+		private bool <wasBlockBroken>5__15;
+
+		private bool <wasFullyBlocked>5__16;
+
+		private List<System.Threading.Tasks.Task> <hitTriggers>5__17;
+
+		private TaskAwaiter <>u__1;
+
+		private decimal <originalTargetDamage>5__18;
+
+		private Enumerator<DamageResult> <>7__wrap18;
+
+		private int <damage>5__20;
+
+		private void MoveNext()
+		{
+			//IL_0ee3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0ee8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0ef0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0f56: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0f5b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0f63: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0f13: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0f19: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0f20: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0f25: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0202: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_028f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0294: Unknown result type (might be due to invalid IL or missing references)
+			//IL_029c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_038a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_038f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0397: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0475: Unknown result type (might be due to invalid IL or missing references)
+			//IL_047a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0482: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0626: Unknown result type (might be due to invalid IL or missing references)
+			//IL_062b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0633: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b81: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b86: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b8e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c12: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c17: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c1f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0cf2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0cf7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0cff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0db5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0dba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0dc2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0f3b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0f3d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0274: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0276: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0440: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0445: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0abb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0ad3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0ad8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0bdd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0be2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0d7f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0d84: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b4c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b51: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0e9b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0ead: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0eb2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0355: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_045a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_045c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0bf7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0bf9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0cbd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0cc2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0d9a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0d9c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b66: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b68: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0ec8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0eca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_036f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0371: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0a53: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0cd7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0cd9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_060b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_060d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08c6: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			System.Collections.Generic.IEnumerable<DamageResult> result;
+			try
+			{
+				TaskAwaiter val2;
+				TaskAwaiter val;
+				switch (num)
+				{
+				default:
+					<>8__1 = new <>c__DisplayClass12_0();
+					<>8__1.props = props;
+					if (targets == null)
+					{
+						result = System.Array.Empty<DamageResult>();
+					}
+					else if (dealer != null && dealer.IsDead)
+					{
+						result = (System.Collections.Generic.IEnumerable<DamageResult>)Enumerable.ToList<DamageResult>(Enumerable.Select<Creature, DamageResult>(targets, (Func<Creature, DamageResult>)((Creature t) => new DamageResult(t, <>8__1.props))));
+					}
+					else
+					{
+						<results>5__2 = new List<DamageResult>();
+						<targetList>5__3 = Enumerable.ToList<Creature>(targets);
+						if (<targetList>5__3.Count != 0)
+						{
+							<combatState>5__4 = <targetList>5__3[0].CombatState;
+							<runState>5__5 = IRunState.GetFrom(Enumerable.OfType<Creature>((System.Collections.IEnumerable)Enumerable.Append<Creature>((System.Collections.Generic.IEnumerable<Creature>)<targetList>5__3, dealer)));
+							<>7__wrap6 = <targetList>5__3.GetEnumerator();
+							goto case 0;
+						}
+						result = (System.Collections.Generic.IEnumerable<DamageResult>)<results>5__2;
+					}
+					goto end_IL_0007;
+				case 0:
+				case 1:
+				case 2:
+				case 3:
+				case 4:
+				case 5:
+					try
+					{
+						TaskAwaiter val7;
+						TaskAwaiter val6;
+						TaskAwaiter val5;
+						TaskAwaiter val4;
+						TaskAwaiter val3;
+						System.Collections.Generic.IEnumerable<AbstractModel> modifiers;
+						List<DamageResult> obj;
+						Creature creature;
+						DamageResult damageResult;
+						switch (num)
+						{
+						case 0:
+							val7 = <>u__1;
+							<>u__1 = default(TaskAwaiter);
+							num = (<>1__state = -1);
+							goto IL_0219;
+						case 1:
+							val6 = <>u__1;
+							<>u__1 = default(TaskAwaiter);
+							num = (<>1__state = -1);
+							goto IL_02ab;
+						case 2:
+							val5 = <>u__1;
+							<>u__1 = default(TaskAwaiter);
+							num = (<>1__state = -1);
+							goto IL_03a6;
+						case 3:
+							val4 = <>u__1;
+							<>u__1 = default(TaskAwaiter);
+							num = (<>1__state = -1);
+							goto IL_0491;
+						case 4:
+							val3 = <>u__1;
+							<>u__1 = default(TaskAwaiter);
+							num = (<>1__state = -1);
+							goto IL_0642;
+						case 5:
+							try
+							{
+								if (num != 5)
+								{
+									goto IL_0a25;
+								}
+								TaskAwaiter val8 = <>u__1;
+								<>u__1 = default(TaskAwaiter);
+								num = (<>1__state = -1);
+								goto IL_08fb;
+								IL_08fb:
+								((TaskAwaiter)(ref val8)).GetResult();
+								if (<damage>5__20 > 0)
+								{
+									if (Enumerable.Any<DamageResult>((System.Collections.Generic.IEnumerable<DamageResult>)<damageResults>5__14, (Func<DamageResult, bool>)((DamageResult r) => r.WasBlockBroken)))
+									{
+										SfxCmd.Play("event:/sfx/block_break");
+									}
+									if (LocalContext.IsMe(<originalTarget>5__8) && (!CombatManager.Instance.IsInProgress || <originalTarget>5__8.GetHpPercentRemaining() <= 0.25))
+									{
+										PlayerHurtVignetteHelper.Play();
+									}
+									if (<originalTarget>5__8.Side == CombatSide.Enemy)
+									{
+										SfxCmd.PlayDamage(<originalTarget>5__8.Monster, <unblockedDamageResult>5__13.UnblockedDamage);
+									}
+									if (CombatManager.Instance.IsInProgress || LocalContext.ContainsMe((System.Collections.Generic.IEnumerable<Creature>)<targetList>5__3))
+									{
+										if (<unblockedDamageResult>5__13.UnblockedDamage < 6)
+										{
+											NGame.Instance?.ScreenShake(ShakeStrength.Weak, ShakeDuration.Short);
+										}
+										else if (<unblockedDamageResult>5__13.UnblockedDamage < 11)
+										{
+											NGame.Instance?.ScreenShake(ShakeStrength.Medium, ShakeDuration.Short);
+										}
+										else
+										{
+											NGame.Instance?.ScreenShake(ShakeStrength.Strong, ShakeDuration.Short);
+										}
+									}
+								}
+								goto IL_0a25;
+								IL_0a25:
+								while (<>7__wrap18.MoveNext())
+								{
+									DamageResult current = <>7__wrap18.Current;
+									<damage>5__20 = current.UnblockedDamage + current.OverkillDamage;
+									Creature receiver = current.Receiver;
+									if (CombatManager.Instance.IsInProgress && !CombatManager.Instance.IsEnding)
+									{
+										CombatManager.Instance.History.DamageReceived(<combatState>5__4, receiver, dealer, current, cardSource);
+									}
+									if (current.WasFullyBlocked)
+									{
+										continue;
+									}
+									Node vfxContainer = receiver.GetVfxContainer();
+									if (<damage>5__20 > 0 || (<modifiedAmount>5__9 == 0m && current.Receiver == <unblockedDamageTarget>5__12))
+									{
+										NDamageNumVfx nDamageNumVfx = NDamageNumVfx.Create(receiver, current);
+										if (nDamageNumVfx != null)
+										{
+											if (vfxContainer != null)
+											{
+												vfxContainer.AddChildSafely(nDamageNumVfx);
+											}
+											else
+											{
+												NRun.Instance.GlobalUi.AddChildSafely(nDamageNumVfx);
+											}
+										}
+									}
+									if (<damage>5__20 > 0)
+									{
+										vfxContainer?.AddChildSafely(NHitSparkVfx.Create(receiver));
+										if (receiver != dealer && !((System.Enum)<>8__1.props).HasFlag((System.Enum)ValueProp.SkipHurtAnim))
+										{
+											<hitTriggers>5__17.Add(TriggerAnim(receiver, "Hit", 0f));
+											if (receiver.IsMonster && receiver.Monster.HasHurtSfx)
+											{
+												SfxCmd.Play(receiver.Monster.HurtSfx);
+											}
+										}
+										MapPointHistoryEntry mapPointHistoryEntry = receiver.Player?.RunState.CurrentMapPointHistoryEntry;
+										if (mapPointHistoryEntry != null)
+										{
+											mapPointHistoryEntry.GetEntry(receiver.Player.NetId).DamageTaken += current.UnblockedDamage;
+										}
+									}
+									val8 = System.Threading.Tasks.Task.WhenAll((System.Collections.Generic.IEnumerable<System.Threading.Tasks.Task>)<hitTriggers>5__17).GetAwaiter();
+									if (!((TaskAwaiter)(ref val8)).IsCompleted)
+									{
+										num = (<>1__state = 5);
+										<>u__1 = val8;
+										<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <Damage>d__12>(ref val8, ref this);
+										return;
+									}
+									goto IL_08fb;
+								}
+							}
+							finally
+							{
+								if (num < 0)
+								{
+									((System.IDisposable)<>7__wrap18/*cast due to .constrained prefix*/).Dispose();
+								}
+							}
+							<>7__wrap18 = default(Enumerator<DamageResult>);
+							<results>5__2.AddRange((System.Collections.Generic.IEnumerable<DamageResult>)<damageResults>5__14);
+							<unblockedDamageTarget>5__12 = null;
+							<unblockedDamageResult>5__13 = null;
+							<damageResults>5__14 = null;
+							<hitTriggers>5__17 = null;
+							<originalTarget>5__8 = null;
+							goto default;
+						default:
+							{
+								while (<>7__wrap6.MoveNext())
+								{
+									<originalTarget>5__8 = <>7__wrap6.Current;
+									if (<originalTarget>5__8.IsDead)
+									{
+										continue;
+									}
+									<modifiedAmount>5__9 = Hook.ModifyDamage(<runState>5__5, <combatState>5__4, <originalTarget>5__8, dealer, amount, <>8__1.props, cardSource, cardPlay, ModifyDamageHookType.All, CardPreviewMode.None, out modifiers);
+									val7 = Hook.AfterModifyingDamageAmount(<runState>5__5, <combatState>5__4, cardSource, modifiers).GetAwaiter();
+									if (!((TaskAwaiter)(ref val7)).IsCompleted)
+									{
+										num = (<>1__state = 0);
+										<>u__1 = val7;
+										<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <Damage>d__12>(ref val7, ref this);
+										return;
+									}
+									goto IL_0219;
+								}
+								break;
+							}
+							IL_0219:
+							((TaskAwaiter)(ref val7)).GetResult();
+							val6 = Hook.BeforeDamageReceived(choiceContext, <runState>5__5, <combatState>5__4, <originalTarget>5__8, <modifiedAmount>5__9, <>8__1.props, dealer, cardSource).GetAwaiter();
+							if (!((TaskAwaiter)(ref val6)).IsCompleted)
+							{
+								num = (<>1__state = 1);
+								<>u__1 = val6;
+								<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <Damage>d__12>(ref val6, ref this);
+								return;
+							}
+							goto IL_02ab;
+							IL_0491:
+							((TaskAwaiter)(ref val4)).GetResult();
+							<unblockedDamageResult>5__13 = <unblockedDamageTarget>5__12.LoseHpInternal(<unblockedDamage>5__11, <>8__1.props);
+							obj = new List<DamageResult>(1);
+							obj.Add(<unblockedDamageResult>5__13);
+							<damageResults>5__14 = obj;
+							<wasBlockBroken>5__15 = <originalTarget>5__8.Block <= 0 && <blockedDamage>5__10 > 0m;
+							<wasFullyBlocked>5__16 = !((System.Enum)<>8__1.props).HasFlag((System.Enum)ValueProp.Unblockable) && (<blockedDamage>5__10 > 0m || <originalTarget>5__8.Block > 0) && (int)<unblockedDamage>5__11 == 0;
+							if (<originalTarget>5__8 == <unblockedDamageTarget>5__12)
+							{
+								<unblockedDamageResult>5__13.BlockedDamage = (int)<blockedDamage>5__10;
+								<unblockedDamageResult>5__13.WasBlockBroken = <wasBlockBroken>5__15;
+								<unblockedDamageResult>5__13.WasFullyBlocked = <wasFullyBlocked>5__16;
+								goto IL_06cc;
+							}
+							<originalTargetDamage>5__18 = Hook.ModifyHpLost(<runState>5__5, <combatState>5__4, <originalTarget>5__8, decimal.op_Implicit(<unblockedDamageResult>5__13.OverkillDamage), <>8__1.props, dealer, cardSource, HpLossHookPhase.AfterOsty, out modifiers);
+							val3 = Hook.AfterModifyingHpLostAfterOsty(<runState>5__5, <combatState>5__4, modifiers).GetAwaiter();
+							if (!((TaskAwaiter)(ref val3)).IsCompleted)
+							{
+								num = (<>1__state = 4);
+								<>u__1 = val3;
+								<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <Damage>d__12>(ref val3, ref this);
+								return;
+							}
+							goto IL_0642;
+							IL_02ab:
+							((TaskAwaiter)(ref val6)).GetResult();
+							creature = <originalTarget>5__8.PetOwner?.Creature ?? <originalTarget>5__8;
+							<blockedDamage>5__10 = creature.DamageBlockInternal(<modifiedAmount>5__9, <>8__1.props);
+							<unblockedDamage>5__11 = Hook.ModifyHpLost(<runState>5__5, <combatState>5__4, <originalTarget>5__8, Math.Max(<modifiedAmount>5__9 - <blockedDamage>5__10, 0m), <>8__1.props, dealer, cardSource, HpLossHookPhase.BeforeOsty, out modifiers);
+							val5 = Hook.AfterModifyingHpLostBeforeOsty(<runState>5__5, <combatState>5__4, modifiers).GetAwaiter();
+							if (!((TaskAwaiter)(ref val5)).IsCompleted)
+							{
+								num = (<>1__state = 2);
+								<>u__1 = val5;
+								<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <Damage>d__12>(ref val5, ref this);
+								return;
+							}
+							goto IL_03a6;
+							IL_0642:
+							((TaskAwaiter)(ref val3)).GetResult();
+							damageResult = ((!(<originalTargetDamage>5__18 > 0m)) ? new DamageResult(<originalTarget>5__8, <>8__1.props) : <originalTarget>5__8.LoseHpInternal(<originalTargetDamage>5__18, <>8__1.props));
+							damageResult.BlockedDamage = (int)<blockedDamage>5__10;
+							damageResult.WasBlockBroken = <wasBlockBroken>5__15;
+							damageResult.WasFullyBlocked = <wasFullyBlocked>5__16;
+							<damageResults>5__14.Add(damageResult);
+							goto IL_06cc;
+							IL_03a6:
+							((TaskAwaiter)(ref val5)).GetResult();
+							if (<combatState>5__4 != null)
+							{
+								<unblockedDamageTarget>5__12 = Hook.ModifyUnblockedDamageTarget(<combatState>5__4, <originalTarget>5__8, <unblockedDamage>5__11, <>8__1.props, dealer);
+							}
+							else
+							{
+								<unblockedDamageTarget>5__12 = <originalTarget>5__8;
+							}
+							<unblockedDamage>5__11 = Hook.ModifyHpLost(<runState>5__5, <combatState>5__4, <unblockedDamageTarget>5__12, <unblockedDamage>5__11, <>8__1.props, dealer, cardSource, HpLossHookPhase.AfterOsty, out modifiers);
+							val4 = Hook.AfterModifyingHpLostAfterOsty(<runState>5__5, <combatState>5__4, modifiers).GetAwaiter();
+							if (!((TaskAwaiter)(ref val4)).IsCompleted)
+							{
+								num = (<>1__state = 3);
+								<>u__1 = val4;
+								<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <Damage>d__12>(ref val4, ref this);
+								return;
+							}
+							goto IL_0491;
+							IL_06cc:
+							<hitTriggers>5__17 = new List<System.Threading.Tasks.Task>();
+							<>7__wrap18 = <damageResults>5__14.GetEnumerator();
+							goto case 5;
+						}
+					}
+					finally
+					{
+						if (num < 0)
+						{
+							((System.IDisposable)<>7__wrap6/*cast due to .constrained prefix*/).Dispose();
+						}
+					}
+					<>7__wrap6 = default(Enumerator<Creature>);
+					<killedCreatures>5__6 = new List<Creature>();
+					<>7__wrap18 = <results>5__2.GetEnumerator();
+					goto case 6;
+				case 6:
+				case 7:
+				case 8:
+				case 9:
+					try
+					{
+						TaskAwaiter val12;
+						TaskAwaiter val11;
+						TaskAwaiter val10;
+						TaskAwaiter val9;
+						switch (num)
+						{
+						case 6:
+							val12 = <>u__1;
+							<>u__1 = default(TaskAwaiter);
+							num = (<>1__state = -1);
+							goto IL_0b9d;
+						case 7:
+							val11 = <>u__1;
+							<>u__1 = default(TaskAwaiter);
+							num = (<>1__state = -1);
+							goto IL_0c2e;
+						case 8:
+							val10 = <>u__1;
+							<>u__1 = default(TaskAwaiter);
+							num = (<>1__state = -1);
+							goto IL_0d0e;
+						case 9:
+							val9 = <>u__1;
+							<>u__1 = default(TaskAwaiter);
+							num = (<>1__state = -1);
+							goto IL_0dd1;
+						default:
+							{
+								if (!<>7__wrap18.MoveNext())
+								{
+									break;
+								}
+								<unblockedDamageResult>5__13 = <>7__wrap18.Current;
+								<originalTarget>5__8 = <unblockedDamageResult>5__13.Receiver;
+								if (<unblockedDamageResult>5__13.WasBlockBroken)
+								{
+									val12 = Hook.AfterBlockBroken(<originalTarget>5__8.CombatState, choiceContext, <originalTarget>5__8, dealer).GetAwaiter();
+									if (!((TaskAwaiter)(ref val12)).IsCompleted)
+									{
+										num = (<>1__state = 6);
+										<>u__1 = val12;
+										<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <Damage>d__12>(ref val12, ref this);
+										return;
+									}
+									goto IL_0b9d;
+								}
+								goto IL_0ba4;
+							}
+							IL_0b9d:
+							((TaskAwaiter)(ref val12)).GetResult();
+							goto IL_0ba4;
+							IL_0ba4:
+							if (<unblockedDamageResult>5__13.UnblockedDamage > 0)
+							{
+								val11 = Hook.AfterCurrentHpChanged(<runState>5__5, <combatState>5__4, <originalTarget>5__8, decimal.op_Implicit(-<unblockedDamageResult>5__13.UnblockedDamage)).GetAwaiter();
+								if (!((TaskAwaiter)(ref val11)).IsCompleted)
+								{
+									num = (<>1__state = 7);
+									<>u__1 = val11;
+									<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <Damage>d__12>(ref val11, ref this);
+									return;
+								}
+								goto IL_0c2e;
+							}
+							goto IL_0c35;
+							IL_0dd8:
+							if (<unblockedDamageResult>5__13.WasFullyBlocked && CombatManager.Instance.IsInProgress)
+							{
+								SfxCmd.Play("event:/sfx/block_hit");
+								Node vfxContainer2 = <unblockedDamageResult>5__13.Receiver.GetVfxContainer();
+								vfxContainer2?.AddChildSafely(NBlockSparkVfx.Create(<unblockedDamageResult>5__13.Receiver));
+								vfxContainer2?.AddChildSafely(NDamageBlockedVfx.Create(<unblockedDamageResult>5__13.Receiver));
+								NGame.Instance?.ScreenShake(ShakeStrength.Weak, ShakeDuration.Short);
+							}
+							<originalTarget>5__8 = null;
+							<unblockedDamageResult>5__13 = null;
+							goto default;
+							IL_0c2e:
+							((TaskAwaiter)(ref val11)).GetResult();
+							goto IL_0c35;
+							IL_0c35:
+							if (dealer != null && dealer.Player != null && <originalTarget>5__8.Player == null)
+							{
+								dealer.Player.ExtraFields.DamageDealt += <unblockedDamageResult>5__13.UnblockedDamage;
+							}
+							if (<combatState>5__4 != null)
+							{
+								val10 = Hook.AfterDamageGiven(choiceContext, <combatState>5__4, dealer, <unblockedDamageResult>5__13, <>8__1.props, <originalTarget>5__8, cardSource).GetAwaiter();
+								if (!((TaskAwaiter)(ref val10)).IsCompleted)
+								{
+									num = (<>1__state = 8);
+									<>u__1 = val10;
+									<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <Damage>d__12>(ref val10, ref this);
+									return;
+								}
+								goto IL_0d0e;
+							}
+							goto IL_0d15;
+							IL_0d0e:
+							((TaskAwaiter)(ref val10)).GetResult();
+							goto IL_0d15;
+							IL_0d15:
+							if (<unblockedDamageResult>5__13.WasTargetKilled && <originalTarget>5__8.IsDead)
+							{
+								<killedCreatures>5__6.Add(<originalTarget>5__8);
+								goto IL_0dd8;
+							}
+							val9 = Hook.AfterDamageReceived(choiceContext, <runState>5__5, <combatState>5__4, <originalTarget>5__8, <unblockedDamageResult>5__13, <>8__1.props, dealer, cardSource).GetAwaiter();
+							if (!((TaskAwaiter)(ref val9)).IsCompleted)
+							{
+								num = (<>1__state = 9);
+								<>u__1 = val9;
+								<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <Damage>d__12>(ref val9, ref this);
+								return;
+							}
+							goto IL_0dd1;
+							IL_0dd1:
+							((TaskAwaiter)(ref val9)).GetResult();
+							goto IL_0dd8;
+						}
+					}
+					finally
+					{
+						if (num < 0)
+						{
+							((System.IDisposable)<>7__wrap18/*cast due to .constrained prefix*/).Dispose();
+						}
+					}
+					<>7__wrap18 = default(Enumerator<DamageResult>);
+					val2 = Kill((System.Collections.Generic.IReadOnlyCollection<Creature>)<killedCreatures>5__6).GetAwaiter();
+					if (!((TaskAwaiter)(ref val2)).IsCompleted)
+					{
+						num = (<>1__state = 10);
+						<>u__1 = val2;
+						<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <Damage>d__12>(ref val2, ref this);
+						return;
+					}
+					goto IL_0eff;
+				case 10:
+					val2 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_0eff;
+				case 11:
+					{
+						val = <>u__1;
+						<>u__1 = default(TaskAwaiter);
+						num = (<>1__state = -1);
+						break;
+					}
+					IL_0eff:
+					((TaskAwaiter)(ref val2)).GetResult();
+					val = Cmd.CustomScaledWait(0.1f, 0.2f).GetAwaiter();
+					if (!((TaskAwaiter)(ref val)).IsCompleted)
+					{
+						num = (<>1__state = 11);
+						<>u__1 = val;
+						<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <Damage>d__12>(ref val, ref this);
+						return;
+					}
+					break;
+				}
+				((TaskAwaiter)(ref val)).GetResult();
+				result = (System.Collections.Generic.IEnumerable<DamageResult>)<results>5__2;
+				end_IL_0007:;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<>8__1 = null;
+				<results>5__2 = null;
+				<targetList>5__3 = null;
+				<combatState>5__4 = null;
+				<runState>5__5 = null;
+				<killedCreatures>5__6 = null;
+				<>t__builder.SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<>8__1 = null;
+			<results>5__2 = null;
+			<targetList>5__3 = null;
+			<combatState>5__4 = null;
+			<runState>5__5 = null;
+			<killedCreatures>5__6 = null;
+			<>t__builder.SetResult(result);
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			<>t__builder.SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <Damage>d__3 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder<System.Collections.Generic.IEnumerable<DamageResult>> <>t__builder;
+
+		public PlayerChoiceContext choiceContext;
+
+		public Creature target;
+
+		public DamageVar damageVar;
+
+		public CardModel cardSource;
+
+		public CardPlay cardPlay;
+
+		private TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>> <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			System.Collections.Generic.IEnumerable<DamageResult> result2;
+			try
+			{
+				TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>> val;
+				if (num != 0)
+				{
+					val = Damage(choiceContext, target, damageVar.BaseValue, damageVar.Props, cardSource, cardPlay).GetAwaiter();
+					if (!val.IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>>, <Damage>d__3>(ref val, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>>);
+					num = (<>1__state = -1);
+				}
+				System.Collections.Generic.IEnumerable<DamageResult> result = val.GetResult();
+				result2 = result;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<>t__builder.SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<>t__builder.SetResult(result2);
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			<>t__builder.SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <Damage>d__4 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder<System.Collections.Generic.IEnumerable<DamageResult>> <>t__builder;
+
+		public PlayerChoiceContext choiceContext;
+
+		public Creature target;
+
+		public decimal amount;
+
+		public ValueProp props;
+
+		public CardModel cardSource;
+
+		public CardPlay cardPlay;
+
+		private TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>> <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			System.Collections.Generic.IEnumerable<DamageResult> result2;
+			try
+			{
+				TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>> val;
+				if (num != 0)
+				{
+					PlayerChoiceContext playerChoiceContext = choiceContext;
+					List<Creature> obj = new List<Creature>();
+					obj.Add(target);
+					val = Damage(playerChoiceContext, (System.Collections.Generic.IEnumerable<Creature>?)obj, amount, props, cardSource?.Owner.Creature, cardSource, cardPlay).GetAwaiter();
+					if (!val.IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>>, <Damage>d__4>(ref val, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>>);
+					num = (<>1__state = -1);
+				}
+				System.Collections.Generic.IEnumerable<DamageResult> result = val.GetResult();
+				result2 = result;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<>t__builder.SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<>t__builder.SetResult(result2);
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			<>t__builder.SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <Damage>d__5 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder<System.Collections.Generic.IEnumerable<DamageResult>> <>t__builder;
+
+		public PlayerChoiceContext choiceContext;
+
+		public System.Collections.Generic.IEnumerable<Creature> targets;
+
+		public DamageVar damageVar;
+
+		public Creature dealer;
+
+		private TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>> <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			System.Collections.Generic.IEnumerable<DamageResult> result2;
+			try
+			{
+				TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>> val;
+				if (num != 0)
+				{
+					val = Damage(choiceContext, targets, damageVar.BaseValue, damageVar.Props, dealer).GetAwaiter();
+					if (!val.IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>>, <Damage>d__5>(ref val, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>>);
+					num = (<>1__state = -1);
+				}
+				System.Collections.Generic.IEnumerable<DamageResult> result = val.GetResult();
+				result2 = result;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<>t__builder.SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<>t__builder.SetResult(result2);
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			<>t__builder.SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <Damage>d__6 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder<System.Collections.Generic.IEnumerable<DamageResult>> <>t__builder;
+
+		public PlayerChoiceContext choiceContext;
+
+		public System.Collections.Generic.IEnumerable<Creature> targets;
+
+		public decimal amount;
+
+		public ValueProp props;
+
+		public Creature dealer;
+
+		private TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>> <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			System.Collections.Generic.IEnumerable<DamageResult> result2;
+			try
+			{
+				TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>> val;
+				if (num != 0)
+				{
+					val = Damage(choiceContext, targets, amount, props, dealer, null, null).GetAwaiter();
+					if (!val.IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>>, <Damage>d__6>(ref val, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>>);
+					num = (<>1__state = -1);
+				}
+				System.Collections.Generic.IEnumerable<DamageResult> result = val.GetResult();
+				result2 = result;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<>t__builder.SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<>t__builder.SetResult(result2);
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			<>t__builder.SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <Damage>d__7 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder<System.Collections.Generic.IEnumerable<DamageResult>> <>t__builder;
+
+		public PlayerChoiceContext choiceContext;
+
+		public Creature target;
+
+		public DamageVar damageVar;
+
+		public Creature dealer;
+
+		private TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>> <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			System.Collections.Generic.IEnumerable<DamageResult> result2;
+			try
+			{
+				TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>> val;
+				if (num != 0)
+				{
+					val = Damage(choiceContext, target, damageVar.BaseValue, damageVar.Props, dealer).GetAwaiter();
+					if (!val.IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>>, <Damage>d__7>(ref val, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>>);
+					num = (<>1__state = -1);
+				}
+				System.Collections.Generic.IEnumerable<DamageResult> result = val.GetResult();
+				result2 = result;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<>t__builder.SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<>t__builder.SetResult(result2);
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			<>t__builder.SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <Damage>d__8 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder<System.Collections.Generic.IEnumerable<DamageResult>> <>t__builder;
+
+		public PlayerChoiceContext choiceContext;
+
+		public Creature target;
+
+		public decimal amount;
+
+		public ValueProp props;
+
+		public Creature dealer;
+
+		private TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>> <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			System.Collections.Generic.IEnumerable<DamageResult> result2;
+			try
+			{
+				TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>> val;
+				if (num != 0)
+				{
+					val = Damage(choiceContext, new global::<>z__ReadOnlySingleElementList<Creature>(target), amount, props, dealer, null, null).GetAwaiter();
+					if (!val.IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>>, <Damage>d__8>(ref val, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>>);
+					num = (<>1__state = -1);
+				}
+				System.Collections.Generic.IEnumerable<DamageResult> result = val.GetResult();
+				result2 = result;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<>t__builder.SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<>t__builder.SetResult(result2);
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			<>t__builder.SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <Damage>d__9 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder<System.Collections.Generic.IEnumerable<DamageResult>> <>t__builder;
+
+		public PlayerChoiceContext choiceContext;
+
+		public Creature target;
+
+		public DamageVar damageVar;
+
+		public Creature dealer;
+
+		public CardModel cardSource;
+
+		public CardPlay cardPlay;
+
+		private TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>> <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			System.Collections.Generic.IEnumerable<DamageResult> result2;
+			try
+			{
+				TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>> val;
+				if (num != 0)
+				{
+					val = Damage(choiceContext, new global::<>z__ReadOnlySingleElementList<Creature>(target), damageVar.BaseValue, damageVar.Props, dealer, cardSource, cardPlay).GetAwaiter();
+					if (!val.IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>>, <Damage>d__9>(ref val, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>>);
+					num = (<>1__state = -1);
+				}
+				System.Collections.Generic.IEnumerable<DamageResult> result = val.GetResult();
+				result2 = result;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<>t__builder.SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<>t__builder.SetResult(result2);
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			<>t__builder.SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <GainBlock>d__17 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder<decimal> <>t__builder;
+
+		public Creature creature;
+
+		public BlockVar blockVar;
+
+		public CardPlay cardPlay;
+
+		public bool fast;
+
+		private TaskAwaiter<decimal> <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			decimal result2;
+			try
+			{
+				TaskAwaiter<decimal> val;
+				if (num != 0)
+				{
+					val = GainBlock(creature, blockVar.BaseValue, blockVar.Props, cardPlay, fast).GetAwaiter();
+					if (!val.IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter<decimal>, <GainBlock>d__17>(ref val, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter<decimal>);
+					num = (<>1__state = -1);
+				}
+				decimal result = val.GetResult();
+				result2 = result;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<>t__builder.SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<>t__builder.SetResult(result2);
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			<>t__builder.SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <GainBlock>d__18 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder<decimal> <>t__builder;
+
+		public Creature creature;
+
+		public decimal amount;
+
+		public ValueProp props;
+
+		public CardPlay cardPlay;
+
+		public bool fast;
+
+		private ICombatState <combatState>5__2;
+
+		private decimal <modifiedAmount>5__3;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0298: Unknown result type (might be due to invalid IL or missing references)
+			//IL_029d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_030c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0311: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0319: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0390: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0395: Unknown result type (might be due to invalid IL or missing references)
+			//IL_039d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0256: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0263: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0268: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0363: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0172: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0177: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0378: Unknown result type (might be due to invalid IL or missing references)
+			//IL_037a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			decimal result;
+			try
+			{
+				TaskAwaiter val5;
+				TaskAwaiter val4;
+				TaskAwaiter val3;
+				TaskAwaiter val2;
+				TaskAwaiter val;
+				System.Collections.Generic.IEnumerable<AbstractModel> modifiers;
+				switch (num)
+				{
+				default:
+					if (CombatManager.Instance.IsOverOrEnding)
+					{
+						result = default(decimal);
+					}
+					else
+					{
+						if (!creature.IsDead)
+						{
+							<combatState>5__2 = creature.CombatState;
+							val5 = Hook.BeforeBlockGained(<combatState>5__2, creature, amount, props, cardPlay?.Card).GetAwaiter();
+							if (!((TaskAwaiter)(ref val5)).IsCompleted)
+							{
+								num = (<>1__state = 0);
+								<>u__1 = val5;
+								<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <GainBlock>d__18>(ref val5, ref this);
+								return;
+							}
+							goto IL_00e2;
+						}
+						result = default(decimal);
+					}
+					goto end_IL_0007;
+				case 0:
+					val5 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_00e2;
+				case 1:
+					val4 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_01c3;
+				case 2:
+					val3 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_02b4;
+				case 3:
+					val2 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_0328;
+				case 4:
+					{
+						val = <>u__1;
+						<>u__1 = default(TaskAwaiter);
+						num = (<>1__state = -1);
+						break;
+					}
+					IL_032f:
+					val = Hook.AfterBlockGained(<combatState>5__2, creature, <modifiedAmount>5__3, props, cardPlay?.Card).GetAwaiter();
+					if (!((TaskAwaiter)(ref val)).IsCompleted)
+					{
+						num = (<>1__state = 4);
+						<>u__1 = val;
+						<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <GainBlock>d__18>(ref val, ref this);
+						return;
+					}
+					break;
+					IL_01c3:
+					((TaskAwaiter)(ref val4)).GetResult();
+					if (<modifiedAmount>5__3 > 0m)
+					{
+						SfxCmd.Play("event:/sfx/block_gain");
+						VfxCmd.PlayOnCreatureCenter(creature, "vfx/vfx_block");
+						creature.GainBlockInternal(<modifiedAmount>5__3);
+						CombatManager.Instance.History.BlockGained(<combatState>5__2, creature, (int)<modifiedAmount>5__3, props, cardPlay);
+						if (fast)
+						{
+							val3 = Cmd.CustomScaledWait(0f, 0.03f).GetAwaiter();
+							if (!((TaskAwaiter)(ref val3)).IsCompleted)
+							{
+								num = (<>1__state = 2);
+								<>u__1 = val3;
+								<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <GainBlock>d__18>(ref val3, ref this);
+								return;
+							}
+							goto IL_02b4;
+						}
+						val2 = Cmd.CustomScaledWait(0.1f, 0.25f).GetAwaiter();
+						if (!((TaskAwaiter)(ref val2)).IsCompleted)
+						{
+							num = (<>1__state = 3);
+							<>u__1 = val2;
+							<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <GainBlock>d__18>(ref val2, ref this);
+							return;
+						}
+						goto IL_0328;
+					}
+					goto IL_032f;
+					IL_02b4:
+					((TaskAwaiter)(ref val3)).GetResult();
+					goto IL_032f;
+					IL_00e2:
+					((TaskAwaiter)(ref val5)).GetResult();
+					<modifiedAmount>5__3 = amount;
+					<modifiedAmount>5__3 = Hook.ModifyBlock(<combatState>5__2, creature, <modifiedAmount>5__3, props, cardPlay?.Card, cardPlay, out modifiers);
+					<modifiedAmount>5__3 = Math.Max(<modifiedAmount>5__3, 0m);
+					val4 = Hook.AfterModifyingBlockAmount(<combatState>5__2, <modifiedAmount>5__3, cardPlay?.Card, cardPlay, modifiers).GetAwaiter();
+					if (!((TaskAwaiter)(ref val4)).IsCompleted)
+					{
+						num = (<>1__state = 1);
+						<>u__1 = val4;
+						<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <GainBlock>d__18>(ref val4, ref this);
+						return;
+					}
+					goto IL_01c3;
+					IL_0328:
+					((TaskAwaiter)(ref val2)).GetResult();
+					goto IL_032f;
+				}
+				((TaskAwaiter)(ref val)).GetResult();
+				result = <modifiedAmount>5__3;
+				end_IL_0007:;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<combatState>5__2 = null;
+				<>t__builder.SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<combatState>5__2 = null;
+			<>t__builder.SetResult(result);
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			<>t__builder.SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <GainMaxHp>d__22 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public decimal amount;
+
+		public Creature creature;
+
+		private TaskAwaiter<decimal> <>u__1;
+
+		private TaskAwaiter <>u__2;
+
+		private void MoveNext()
+		{
+			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0136: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			try
+			{
+				TaskAwaiter val;
+				TaskAwaiter<decimal> val2;
+				if (num != 0)
+				{
+					if (num == 1)
+					{
+						val = <>u__2;
+						<>u__2 = default(TaskAwaiter);
+						num = (<>1__state = -1);
+						goto IL_0152;
+					}
+					if (amount < 0m)
+					{
+						throw new ArgumentException("amount must be non-negative. Use LoseMaxHp for max HP loss.");
+					}
+					val2 = SetMaxHp(creature, decimal.op_Implicit(creature.MaxHp) + amount).GetAwaiter();
+					if (!val2.IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val2;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter<decimal>, <GainMaxHp>d__22>(ref val2, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val2 = <>u__1;
+					<>u__1 = default(TaskAwaiter<decimal>);
+					num = (<>1__state = -1);
+				}
+				decimal result = val2.GetResult();
+				decimal num2 = result;
+				MapPointHistoryEntry mapPointHistoryEntry = creature.Player?.RunState.CurrentMapPointHistoryEntry;
+				if (mapPointHistoryEntry != null)
+				{
+					mapPointHistoryEntry.GetEntry(creature.Player.NetId).MaxHpGained += (int)num2;
+				}
+				val = Heal(creature, num2).GetAwaiter();
+				if (!((TaskAwaiter)(ref val)).IsCompleted)
+				{
+					num = (<>1__state = 1);
+					<>u__2 = val;
+					((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <GainMaxHp>d__22>(ref val, ref this);
+					return;
+				}
+				goto IL_0152;
+				IL_0152:
+				((TaskAwaiter)(ref val)).GetResult();
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <Heal>d__20 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public Creature creature;
+
+		public decimal amount;
+
+		public bool playAnim;
+
+		private <>c__DisplayClass20_0 <>8__1;
+
+		private bool <wasDead>5__2;
+
+		private decimal <amountHealed>5__3;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_0205: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0212: Unknown result type (might be due to invalid IL or missing references)
+			//IL_049a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_049f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0574: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0579: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0581: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0542: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0547: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0458: Unknown result type (might be due to invalid IL or missing references)
+			//IL_045e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0465: Unknown result type (might be due to invalid IL or missing references)
+			//IL_046a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_055c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_055e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_047f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0481: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			try
+			{
+				TaskAwaiter val3;
+				TaskAwaiter val2;
+				TaskAwaiter val;
+				MapPointHistoryEntry mapPointHistoryEntry;
+				switch (num)
+				{
+				default:
+					<>8__1 = new <>c__DisplayClass20_0();
+					<>8__1.creature = creature;
+					if (!CombatManager.Instance.IsEnding || <>8__1.creature.IsPlayer)
+					{
+						<wasDead>5__2 = <>8__1.creature.IsDead;
+						<amountHealed>5__3 = Math.Min(amount, decimal.op_Implicit(<>8__1.creature.MaxHp - <>8__1.creature.CurrentHp));
+						if (<>8__1.creature == null || !(<>8__1.creature.Monster is Osty))
+						{
+							SfxCmd.Play("event:/sfx/heal");
+						}
+						<>8__1.creature.HealInternal(amount);
+						if (playAnim)
+						{
+							if (CombatManager.Instance.IsInProgress || <>8__1.creature.Player?.RunState.CurrentRoom is CombatRoom)
+							{
+								if (<>8__1.creature != null && <>8__1.creature.Monster is Osty)
+								{
+									VfxCmd.PlayOnCreatureCenter(<>8__1.creature, "vfx/vfx_heal_osty");
+								}
+								else
+								{
+									VfxCmd.PlayOnCreatureCenter(<>8__1.creature, "vfx/vfx_cross_heal");
+								}
+								if (<>8__1.creature.IsPlayer)
+								{
+									NCreature creatureNode = <>8__1.creature.GetCreatureNode();
+									if (creatureNode != null && creatureNode.Visuals.IsPlayingIdleAnimation())
+									{
+										val3 = TriggerAnim(<>8__1.creature, "Idle", 0f).GetAwaiter();
+										if (!((TaskAwaiter)(ref val3)).IsCompleted)
+										{
+											num = (<>1__state = 0);
+											<>u__1 = val3;
+											((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <Heal>d__20>(ref val3, ref this);
+											return;
+										}
+										goto IL_0221;
+									}
+								}
+								goto IL_0228;
+							}
+							if (LocalContext.IsMe(<>8__1.creature))
+							{
+								if (<>8__1.creature.Player.RunState.CurrentRoom is EventRoom)
+								{
+									PlayerFullscreenHealVfx.Play(<>8__1.creature.Player, amount, NEventRoom.Instance?.VfxContainer);
+								}
+								else if (<>8__1.creature.Player.RunState.CurrentRoom is MerchantRoom)
+								{
+									PlayerFullscreenHealVfx.Play(<>8__1.creature.Player, amount, NMerchantRoom.Instance);
+								}
+							}
+							else if (<>8__1.creature.Player?.RunState.CurrentRoom is RestSiteRoom && TestMode.IsOff)
+							{
+								NRestSiteRoom? instance = NRestSiteRoom.Instance;
+								NRestSiteCharacter nRestSiteCharacter = ((instance != null) ? Enumerable.First<NRestSiteCharacter>((System.Collections.Generic.IEnumerable<NRestSiteCharacter>)instance.Characters, (Func<NRestSiteCharacter, bool>)((NRestSiteCharacter c) => c.Player == <>8__1.creature.Player)) : null);
+								string scenePath = SceneHelper.GetScenePath("vfx/vfx_cross_heal");
+								Node2D node2D = PreloadManager.Cache.GetScene(scenePath).Instantiate<Node2D>(PackedScene.GenEditState.Disabled);
+								nRestSiteCharacter?.AddChildSafely(node2D);
+								node2D.Position = Vector2.Zero;
+							}
+						}
+						goto IL_03d6;
+					}
+					goto end_IL_0007;
+				case 0:
+					val3 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_0221;
+				case 1:
+					val2 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_04b6;
+				case 2:
+					{
+						val = <>u__1;
+						<>u__1 = default(TaskAwaiter);
+						num = (<>1__state = -1);
+						break;
+					}
+					IL_03d6:
+					mapPointHistoryEntry = <>8__1.creature.Player?.RunState.CurrentMapPointHistoryEntry;
+					if (mapPointHistoryEntry != null && <amountHealed>5__3 > 0m)
+					{
+						mapPointHistoryEntry.GetEntry(<>8__1.creature.Player.NetId).HpHealed += (int)<amountHealed>5__3;
+					}
+					if (CombatManager.Instance.IsInProgress)
+					{
+						val2 = Cmd.CustomScaledWait(0.1f, 0.25f).GetAwaiter();
+						if (!((TaskAwaiter)(ref val2)).IsCompleted)
+						{
+							num = (<>1__state = 1);
+							<>u__1 = val2;
+							((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <Heal>d__20>(ref val2, ref this);
+							return;
+						}
+						goto IL_04b6;
+					}
+					goto IL_04bd;
+					IL_0228:
+					<>8__1.creature.GetVfxContainer()?.AddChildSafely(NHealNumVfx.Create(<>8__1.creature, amount));
+					if (<wasDead>5__2)
+					{
+						NCombatRoom.Instance?.GetCreatureNode(<>8__1.creature)?.StartReviveAnim();
+					}
+					goto IL_03d6;
+					IL_04bd:
+					if (amount > 0m && <>8__1.creature.CombatState != null)
+					{
+						val = Hook.AfterCurrentHpChanged(<>8__1.creature.Player?.RunState ?? <>8__1.creature.CombatState.RunState, <>8__1.creature.CombatState, <>8__1.creature, amount).GetAwaiter();
+						if (!((TaskAwaiter)(ref val)).IsCompleted)
+						{
+							num = (<>1__state = 2);
+							<>u__1 = val;
+							((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <Heal>d__20>(ref val, ref this);
+							return;
+						}
+						break;
+					}
+					goto end_IL_0007;
+					IL_04b6:
+					((TaskAwaiter)(ref val2)).GetResult();
+					goto IL_04bd;
+					IL_0221:
+					((TaskAwaiter)(ref val3)).GetResult();
+					goto IL_0228;
+				}
+				((TaskAwaiter)(ref val)).GetResult();
+				end_IL_0007:;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<>8__1 = null;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<>8__1 = null;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <Kill>d__13 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public Creature creature;
+
+		public bool force;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			try
+			{
+				TaskAwaiter val;
+				if (num != 0)
+				{
+					val = Kill(new global::<>z__ReadOnlySingleElementList<Creature>(creature), force).GetAwaiter();
+					if (!((TaskAwaiter)(ref val)).IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <Kill>d__13>(ref val, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+				}
+				((TaskAwaiter)(ref val)).GetResult();
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <Kill>d__14 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public System.Collections.Generic.IReadOnlyCollection<Creature> creatures;
+
+		public bool force;
+
+		private IRunState <runState>5__2;
+
+		private Enumerator<Creature> <>7__wrap2;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0119: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fe: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			try
+			{
+				if (num == 0)
+				{
+					goto IL_007b;
+				}
+				if (creatures.Count != 0)
+				{
+					<runState>5__2 = Enumerable.FirstOrDefault<Creature>((System.Collections.Generic.IEnumerable<Creature>)creatures, (Func<Creature, bool>)((Creature c) => c.IsPlayer))?.Player?.RunState;
+					<>7__wrap2 = Enumerable.ToList<Creature>((System.Collections.Generic.IEnumerable<Creature>)creatures).GetEnumerator();
+					goto IL_007b;
+				}
+				goto end_IL_0007;
+				IL_007b:
+				try
+				{
+					if (num != 0)
+					{
+						goto IL_00ee;
+					}
+					TaskAwaiter val = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_00e7;
+					IL_00e7:
+					((TaskAwaiter)(ref val)).GetResult();
+					goto IL_00ee;
+					IL_00ee:
+					if (<>7__wrap2.MoveNext())
+					{
+						Creature current = <>7__wrap2.Current;
+						val = KillWithoutCheckingWinCondition(current, force).GetAwaiter();
+						if (!((TaskAwaiter)(ref val)).IsCompleted)
+						{
+							num = (<>1__state = 0);
+							<>u__1 = val;
+							((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <Kill>d__14>(ref val, ref this);
+							return;
+						}
+						goto IL_00e7;
+					}
+				}
+				finally
+				{
+					if (num < 0)
+					{
+						((System.IDisposable)<>7__wrap2/*cast due to .constrained prefix*/).Dispose();
+					}
+				}
+				<>7__wrap2 = default(Enumerator<Creature>);
+				if (RunManager.Instance.IsInProgress && !RunManager.Instance.IsCleaningUp)
+				{
+					if (<runState>5__2 != null && Enumerable.All<Player>((System.Collections.Generic.IEnumerable<Player>)<runState>5__2.Players, (Func<Player, bool>)((Player p) => p.Creature.IsDead)))
+					{
+						if (CombatManager.Instance.IsInProgress)
+						{
+							CombatManager.Instance.LoseCombat();
+						}
+						if (TestMode.IsOff)
+						{
+							NRun.Instance.RunMusicController.StopMusic();
+							NDebugAudioManager.Instance?.StopAll();
+							NAudioManager.Instance.PlayMusic("event:/temp/sfx/game_over");
+							SerializableRun serializableRun = RunManager.Instance.OnEnded(isVictory: false);
+							NRun.Instance.ShowGameOverScreen(serializableRun);
+						}
+					}
+					else if (CombatManager.Instance.IsInProgress)
+					{
+						Enumerator<Creature> enumerator = Enumerable.ToList<Creature>((System.Collections.Generic.IEnumerable<Creature>)creatures).GetEnumerator();
+						try
+						{
+							while (enumerator.MoveNext())
+							{
+								Creature current2 = enumerator.Current;
+								if (current2 != null)
+								{
+									ICombatState combatState = current2.CombatState;
+									if (combatState != null && combatState.CurrentSide == CombatSide.Player && current2.IsDead && current2.IsPlayer)
+									{
+										PlayerCmd.EndTurn(current2.Player, canBackOut: false);
+									}
+								}
+							}
+						}
+						finally
+						{
+							if (num < 0)
+							{
+								((System.IDisposable)enumerator/*cast due to .constrained prefix*/).Dispose();
+							}
+						}
+					}
+				}
+				end_IL_0007:;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<runState>5__2 = null;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<runState>5__2 = null;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <KillWithoutCheckingWinCondition>d__15 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public Creature creature;
+
+		public bool force;
+
+		public int recursion;
+
+		private CombatId? <killCombatId>5__2;
+
+		private ICombatState <combatState>5__3;
+
+		private IRunState <runState>5__4;
+
+		private AbstractModel <preventer>5__5;
+
+		private TaskAwaiter <>u__1;
+
+		private bool <shouldRemoveFromCombat>5__6;
+
+		private List<Creature> <teammates>5__7;
+
+		private bool <isPrimaryEnemy>5__8;
+
+		private System.Collections.Generic.IEnumerator<PowerModel> <>7__wrap8;
+
+		private Player <player>5__10;
+
+		private void MoveNext()
+		{
+			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0166: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0233: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_029d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_063c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0641: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0649: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0705: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0779: Unknown result type (might be due to invalid IL or missing references)
+			//IL_077e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0786: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0816: Unknown result type (might be due to invalid IL or missing references)
+			//IL_081b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0823: Unknown result type (might be due to invalid IL or missing references)
+			//IL_088c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0891: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0899: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0908: Unknown result type (might be due to invalid IL or missing references)
+			//IL_090d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0915: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0856: Unknown result type (might be due to invalid IL or missing references)
+			//IL_085b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0268: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_054f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0554: Unknown result type (might be due to invalid IL or missing references)
+			//IL_055c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0871: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0873: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0282: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0284: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0744: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0749: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08f2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_051a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_051f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_075e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0760: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0534: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0536: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0213: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0215: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0607: Unknown result type (might be due to invalid IL or missing references)
+			//IL_060c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0621: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0623: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			try
+			{
+				TaskAwaiter val10;
+				TaskAwaiter val9;
+				TaskAwaiter val8;
+				TaskAwaiter val7;
+				TaskAwaiter val6;
+				TaskAwaiter val5;
+				TaskAwaiter val4;
+				TaskAwaiter val3;
+				TaskAwaiter val2;
+				TaskAwaiter val;
+				ICombatState combatState;
+				System.Collections.Generic.IEnumerable<PowerModel> enumerable;
+				switch (num)
+				{
+				default:
+					<killCombatId>5__2 = CombatManager.Instance.CurrentCombatId;
+					if ((creature.CombatState != null || creature.IsPlayer) && (creature.CombatState == null || creature.CombatState.IsLiveCombat()))
+					{
+						if (!CombatManager.Instance.IsInProgress && creature.IsPlayer && ((System.Collections.Generic.IReadOnlyCollection<Player>)creature.Player.RunState.Players).Count > 1 && !force)
+						{
+							Log.Error($"Player {creature.Player.NetId} has been killed outside of combat in multiplayer! This should not occur");
+							val10 = Heal(creature, 1m).GetAwaiter();
+							if (!((TaskAwaiter)(ref val10)).IsCompleted)
+							{
+								num = (<>1__state = 0);
+								<>u__1 = val10;
+								((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <KillWithoutCheckingWinCondition>d__15>(ref val10, ref this);
+								return;
+							}
+							goto IL_017d;
+						}
+						<combatState>5__3 = creature.CombatState;
+						<runState>5__4 = IRunState.GetFrom(new global::<>z__ReadOnlySingleElementList<Creature>(creature));
+						int currentHp = creature.CurrentHp;
+						if (currentHp > 0)
+						{
+							creature.LoseHpInternal(decimal.op_Implicit(currentHp), ValueProp.Unblockable | ValueProp.Unpowered);
+							val9 = Hook.AfterCurrentHpChanged(<runState>5__4, creature.CombatState, creature, decimal.op_Implicit(-currentHp)).GetAwaiter();
+							if (!((TaskAwaiter)(ref val9)).IsCompleted)
+							{
+								num = (<>1__state = 1);
+								<>u__1 = val9;
+								((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <KillWithoutCheckingWinCondition>d__15>(ref val9, ref this);
+								return;
+							}
+							goto IL_024a;
+						}
+						goto IL_0251;
+					}
+					goto end_IL_0007;
+				case 0:
+					val10 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_017d;
+				case 1:
+					val9 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_024a;
+				case 2:
+					val8 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_02b9;
+				case 3:
+					val7 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_0406;
+				case 4:
+					try
+					{
+						if (num != 4)
+						{
+							goto IL_0572;
+						}
+						TaskAwaiter val11 = <>u__1;
+						<>u__1 = default(TaskAwaiter);
+						num = (<>1__state = -1);
+						goto IL_056b;
+						IL_056b:
+						((TaskAwaiter)(ref val11)).GetResult();
+						goto IL_0572;
+						IL_0572:
+						if (((System.Collections.IEnumerator)<>7__wrap8).MoveNext())
+						{
+							PowerModel current = <>7__wrap8.Current;
+							val11 = current.AfterRemoved(creature).GetAwaiter();
+							if (!((TaskAwaiter)(ref val11)).IsCompleted)
+							{
+								num = (<>1__state = 4);
+								<>u__1 = val11;
+								((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <KillWithoutCheckingWinCondition>d__15>(ref val11, ref this);
+								return;
+							}
+							goto IL_056b;
+						}
+					}
+					finally
+					{
+						if (num < 0 && <>7__wrap8 != null)
+						{
+							((System.IDisposable)<>7__wrap8).Dispose();
+						}
+					}
+					<>7__wrap8 = null;
+					if (creature.Side == CombatSide.Enemy)
+					{
+						if (<isPrimaryEnemy>5__8 && <teammates>5__7.Count != 0 && Enumerable.All<Creature>((System.Collections.Generic.IEnumerable<Creature>)<teammates>5__7, (Func<Creature, bool>)((Creature t) => t.IsSecondaryEnemy)))
+						{
+							val6 = Kill((System.Collections.Generic.IReadOnlyCollection<Creature>)<teammates>5__7).GetAwaiter();
+							if (!((TaskAwaiter)(ref val6)).IsCompleted)
+							{
+								num = (<>1__state = 5);
+								<>u__1 = val6;
+								((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <KillWithoutCheckingWinCondition>d__15>(ref val6, ref this);
+								return;
+							}
+							goto IL_0658;
+						}
+					}
+					else if (creature.IsPlayer)
+					{
+						<player>5__10 = creature.Player;
+						<player>5__10.PlayerCombatState?.OrbQueue.Clear();
+						if (<player>5__10.IsOstyAlive)
+						{
+							val5 = Kill(<player>5__10.Osty, force).GetAwaiter();
+							if (!((TaskAwaiter)(ref val5)).IsCompleted)
+							{
+								num = (<>1__state = 6);
+								<>u__1 = val5;
+								((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <KillWithoutCheckingWinCondition>d__15>(ref val5, ref this);
+								return;
+							}
+							goto IL_0714;
+						}
+						goto IL_071b;
+					}
+					goto IL_07a3;
+				case 5:
+					val6 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_0658;
+				case 6:
+					val5 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_0714;
+				case 7:
+					val4 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_0795;
+				case 8:
+					val3 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_0832;
+				case 9:
+					val2 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_08a8;
+				case 10:
+					{
+						val = <>u__1;
+						<>u__1 = default(TaskAwaiter);
+						num = (<>1__state = -1);
+						break;
+					}
+					IL_0251:
+					val8 = Hook.BeforeDeath(<runState>5__4, <combatState>5__3, creature).GetAwaiter();
+					if (!((TaskAwaiter)(ref val8)).IsCompleted)
+					{
+						num = (<>1__state = 2);
+						<>u__1 = val8;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <KillWithoutCheckingWinCondition>d__15>(ref val8, ref this);
+						return;
+					}
+					goto IL_02b9;
+					IL_079c:
+					<player>5__10 = null;
+					goto IL_07a3;
+					IL_02b9:
+					((TaskAwaiter)(ref val8)).GetResult();
+					<preventer>5__5 = null;
+					if (force || creature.MaxHp <= 0 || Hook.ShouldDie(<runState>5__4, <combatState>5__3, creature, out <preventer>5__5))
+					{
+						creature.InvokeDiedEvent();
+						<shouldRemoveFromCombat>5__6 = <combatState>5__3 != null && Hook.ShouldCreatureBeRemovedFromCombatAfterDeath(<combatState>5__3, creature);
+						float deathAnimLength = 0f;
+						NCreature nCreature = NCombatRoom.Instance?.GetCreatureNode(creature);
+						if (nCreature != null)
+						{
+							deathAnimLength = nCreature.StartDeathAnim(<shouldRemoveFromCombat>5__6 && creature.IsMonster);
+							if (<shouldRemoveFromCombat>5__6 && creature.IsMonster)
+							{
+								NCombatRoom.Instance?.RemoveCreatureNode(nCreature);
+							}
+						}
+						val7 = Hook.AfterDeath(<runState>5__4, <combatState>5__3, creature, wasRemovalPrevented: false, deathAnimLength).GetAwaiter();
+						if (!((TaskAwaiter)(ref val7)).IsCompleted)
+						{
+							num = (<>1__state = 3);
+							<>u__1 = val7;
+							((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <KillWithoutCheckingWinCondition>d__15>(ref val7, ref this);
+							return;
+						}
+						goto IL_0406;
+					}
+					if (recursion >= 10)
+					{
+						throw new InvalidOperationException("Combat is ending, but something is continually preventing the last creature from being killed!");
+					}
+					val3 = Hook.AfterDeath(<runState>5__4, <combatState>5__3, creature, wasRemovalPrevented: true, 0f).GetAwaiter();
+					if (!((TaskAwaiter)(ref val3)).IsCompleted)
+					{
+						num = (<>1__state = 8);
+						<>u__1 = val3;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <KillWithoutCheckingWinCondition>d__15>(ref val3, ref this);
+						return;
+					}
+					goto IL_0832;
+					IL_0714:
+					((TaskAwaiter)(ref val5)).GetResult();
+					goto IL_071b;
+					IL_0406:
+					((TaskAwaiter)(ref val7)).GetResult();
+					combatState = <combatState>5__3;
+					<teammates>5__7 = ((combatState != null) ? Enumerable.ToList<Creature>(Enumerable.Where<Creature>((System.Collections.Generic.IEnumerable<Creature>)combatState.GetTeammatesOf(creature), (Func<Creature, bool>)((Creature t) => t.IsAlive))) : null) ?? new List<Creature>();
+					if (<shouldRemoveFromCombat>5__6 && creature.Side == CombatSide.Enemy)
+					{
+						ICombatState combatState2 = <combatState>5__3;
+						if (combatState2 != null && Enumerable.Contains<Creature>((System.Collections.Generic.IEnumerable<Creature>)combatState2.Enemies, creature))
+						{
+							CombatManager.Instance.RemoveCreature(creature);
+							MonsterModel monster = creature.Monster;
+							if (monster != null && !monster.IsPerformingMove)
+							{
+								<combatState>5__3.RemoveCreature(creature);
+							}
+						}
+					}
+					<isPrimaryEnemy>5__8 = creature.IsPrimaryEnemy;
+					enumerable = creature.RemoveAllPowersAfterDeath();
+					<>7__wrap8 = enumerable.GetEnumerator();
+					goto case 4;
+					IL_0658:
+					((TaskAwaiter)(ref val6)).GetResult();
+					goto IL_07a3;
+					IL_0795:
+					((TaskAwaiter)(ref val4)).GetResult();
+					goto IL_079c;
+					IL_0832:
+					((TaskAwaiter)(ref val3)).GetResult();
+					val2 = Hook.AfterPreventingDeath(<runState>5__4, <combatState>5__3, <preventer>5__5, creature).GetAwaiter();
+					if (!((TaskAwaiter)(ref val2)).IsCompleted)
+					{
+						num = (<>1__state = 9);
+						<>u__1 = val2;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <KillWithoutCheckingWinCondition>d__15>(ref val2, ref this);
+						return;
+					}
+					goto IL_08a8;
+					IL_017d:
+					((TaskAwaiter)(ref val10)).GetResult();
+					goto end_IL_0007;
+					IL_071b:
+					<player>5__10.DeactivateHooks();
+					if (<combatState>5__3 != null)
+					{
+						val4 = CombatManager.Instance.HandlePlayerDeath(<killCombatId>5__2, <player>5__10).GetAwaiter();
+						if (!((TaskAwaiter)(ref val4)).IsCompleted)
+						{
+							num = (<>1__state = 7);
+							<>u__1 = val4;
+							((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <KillWithoutCheckingWinCondition>d__15>(ref val4, ref this);
+							return;
+						}
+						goto IL_0795;
+					}
+					goto IL_079c;
+					IL_07a3:
+					<teammates>5__7 = null;
+					goto end_IL_0007;
+					IL_08a8:
+					((TaskAwaiter)(ref val2)).GetResult();
+					if (creature.IsDead)
+					{
+						val = KillWithoutCheckingWinCondition(creature, force, recursion + 1).GetAwaiter();
+						if (!((TaskAwaiter)(ref val)).IsCompleted)
+						{
+							num = (<>1__state = 10);
+							<>u__1 = val;
+							((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <KillWithoutCheckingWinCondition>d__15>(ref val, ref this);
+							return;
+						}
+						break;
+					}
+					goto end_IL_0007;
+					IL_024a:
+					((TaskAwaiter)(ref val9)).GetResult();
+					goto IL_0251;
+				}
+				((TaskAwaiter)(ref val)).GetResult();
+				end_IL_0007:;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<combatState>5__3 = null;
+				<runState>5__4 = null;
+				<preventer>5__5 = null;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<combatState>5__3 = null;
+			<runState>5__4 = null;
+			<preventer>5__5 = null;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <LoseBlock>d__19 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public Creature target;
+
+		public decimal amount;
+
+		public PlayerChoiceContext choiceContext;
+
+		public Creature remover;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			try
+			{
+				TaskAwaiter val;
+				if (num == 0)
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_00f8;
+				}
+				if (!CombatManager.Instance.IsOverOrEnding && !target.IsDead && !(amount <= 0m))
+				{
+					int block = target.Block;
+					target.LoseBlockInternal(amount);
+					if (block > 0 && target.Block <= 0)
+					{
+						SfxCmd.Play("event:/sfx/block_break");
+						val = Hook.AfterBlockBroken(target.CombatState, choiceContext, target, remover).GetAwaiter();
+						if (!((TaskAwaiter)(ref val)).IsCompleted)
+						{
+							num = (<>1__state = 0);
+							<>u__1 = val;
+							((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <LoseBlock>d__19>(ref val, ref this);
+							return;
+						}
+						goto IL_00f8;
+					}
+				}
+				goto end_IL_0007;
+				IL_00f8:
+				((TaskAwaiter)(ref val)).GetResult();
+				end_IL_0007:;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <LoseMaxHp>d__23 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public decimal amount;
+
+		public Creature creature;
+
+		public PlayerChoiceContext choiceContext;
+
+		public bool isFromCard;
+
+		private decimal <newMaxHp>5__2;
+
+		private TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>> <>u__1;
+
+		private TaskAwaiter<decimal> <>u__2;
+
+		private void MoveNext()
+		{
+			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0132: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0139: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0171: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0176: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0114: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			try
+			{
+				TaskAwaiter<decimal> val;
+				TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>> val2;
+				if (num != 0)
+				{
+					if (num == 1)
+					{
+						val = <>u__2;
+						<>u__2 = default(TaskAwaiter<decimal>);
+						num = (<>1__state = -1);
+						goto IL_01bc;
+					}
+					if (amount < 0m)
+					{
+						throw new ArgumentException("amount must be non-negative. Use GainMaxHp for max HP gain.");
+					}
+					<newMaxHp>5__2 = decimal.op_Implicit(creature.MaxHp) - amount;
+					MapPointHistoryEntry mapPointHistoryEntry = creature.Player?.RunState.CurrentMapPointHistoryEntry;
+					if (mapPointHistoryEntry != null)
+					{
+						mapPointHistoryEntry.GetEntry(creature.Player.NetId).MaxHpLost += (int)amount;
+					}
+					if (!(<newMaxHp>5__2 < decimal.op_Implicit(creature.CurrentHp)))
+					{
+						goto IL_0150;
+					}
+					val2 = Damage(choiceContext, creature, decimal.op_Implicit(creature.CurrentHp) - <newMaxHp>5__2, isFromCard ? (ValueProp.Unblockable | ValueProp.Unpowered | ValueProp.Move) : (ValueProp.Unblockable | ValueProp.Unpowered), null, null).GetAwaiter();
+					if (!val2.IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val2;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>>, <LoseMaxHp>d__23>(ref val2, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val2 = <>u__1;
+					<>u__1 = default(TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>>);
+					num = (<>1__state = -1);
+				}
+				val2.GetResult();
+				goto IL_0150;
+				IL_0150:
+				val = SetMaxHp(creature, Math.Max(1.0m, <newMaxHp>5__2)).GetAwaiter();
+				if (!val.IsCompleted)
+				{
+					num = (<>1__state = 1);
+					<>u__2 = val;
+					((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter<decimal>, <LoseMaxHp>d__23>(ref val, ref this);
+					return;
+				}
+				goto IL_01bc;
+				IL_01bc:
+				val.GetResult();
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <SetCurrentHp>d__21 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public Creature creature;
+
+		public decimal amount;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_0128: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0134: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0195: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0163: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0168: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			try
+			{
+				TaskAwaiter val;
+				TaskAwaiter val2;
+				if (num != 0)
+				{
+					if (num == 1)
+					{
+						val = <>u__1;
+						<>u__1 = default(TaskAwaiter);
+						num = (<>1__state = -1);
+						goto IL_01b1;
+					}
+					bool flag = creature.IsDead && amount > 0m;
+					decimal num2 = decimal.op_Implicit(creature.CurrentHp);
+					creature.SetCurrentHpInternal(amount);
+					if (!(amount != num2))
+					{
+						goto IL_014a;
+					}
+					if (CombatManager.Instance.IsInProgress && flag)
+					{
+						NCombatRoom.Instance?.GetCreatureNode(creature)?.StartReviveAnim();
+					}
+					val2 = Hook.AfterCurrentHpChanged(creature.Player?.RunState ?? creature.CombatState?.RunState ?? NullRunState.Instance, creature.CombatState, creature, amount - num2).GetAwaiter();
+					if (!((TaskAwaiter)(ref val2)).IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val2;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <SetCurrentHp>d__21>(ref val2, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val2 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+				}
+				((TaskAwaiter)(ref val2)).GetResult();
+				goto IL_014a;
+				IL_014a:
+				if (creature.IsDead)
+				{
+					val = Kill(creature).GetAwaiter();
+					if (!((TaskAwaiter)(ref val)).IsCompleted)
+					{
+						num = (<>1__state = 1);
+						<>u__1 = val;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <SetCurrentHp>d__21>(ref val, ref this);
+						return;
+					}
+					goto IL_01b1;
+				}
+				goto end_IL_0007;
+				IL_01b1:
+				((TaskAwaiter)(ref val)).GetResult();
+				end_IL_0007:;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <SetMaxAndCurrentHp>d__25 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public Creature creature;
+
+		public decimal amount;
+
+		private TaskAwaiter<decimal> <>u__1;
+
+		private TaskAwaiter <>u__2;
+
+		private void MoveNext()
+		{
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			try
+			{
+				TaskAwaiter val;
+				TaskAwaiter<decimal> val2;
+				if (num != 0)
+				{
+					if (num == 1)
+					{
+						val = <>u__2;
+						<>u__2 = default(TaskAwaiter);
+						num = (<>1__state = -1);
+						goto IL_00d4;
+					}
+					val2 = SetMaxHp(creature, amount).GetAwaiter();
+					if (!val2.IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val2;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter<decimal>, <SetMaxAndCurrentHp>d__25>(ref val2, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val2 = <>u__1;
+					<>u__1 = default(TaskAwaiter<decimal>);
+					num = (<>1__state = -1);
+				}
+				val2.GetResult();
+				val = SetCurrentHp(creature, amount).GetAwaiter();
+				if (!((TaskAwaiter)(ref val)).IsCompleted)
+				{
+					num = (<>1__state = 1);
+					<>u__2 = val;
+					((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <SetMaxAndCurrentHp>d__25>(ref val, ref this);
+					return;
+				}
+				goto IL_00d4;
+				IL_00d4:
+				((TaskAwaiter)(ref val)).GetResult();
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <SetMaxHp>d__24 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder<decimal> <>t__builder;
+
+		public Creature creature;
+
+		public decimal amount;
+
+		private int <oldMaxHp>5__2;
+
+		private int <newMaxHp>5__3;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			decimal result;
+			try
+			{
+				TaskAwaiter val;
+				if (num != 0)
+				{
+					<oldMaxHp>5__2 = creature.MaxHp;
+					creature.SetMaxHpInternal(Math.Max(0m, amount));
+					<newMaxHp>5__3 = creature.MaxHp;
+					if (creature.MaxHp > 0)
+					{
+						goto IL_00b6;
+					}
+					val = Kill(creature).GetAwaiter();
+					if (!((TaskAwaiter)(ref val)).IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <SetMaxHp>d__24>(ref val, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+				}
+				((TaskAwaiter)(ref val)).GetResult();
+				goto IL_00b6;
+				IL_00b6:
+				result = decimal.op_Implicit(<newMaxHp>5__3 - <oldMaxHp>5__2);
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<>t__builder.SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<>t__builder.SetResult(result);
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			<>t__builder.SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <Stun>d__26 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public Creature creature;
+
+		public string nextMoveId;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			try
+			{
+				TaskAwaiter val;
+				if (num != 0)
+				{
+					val = Stun(creature, (System.Collections.Generic.IReadOnlyList<Creature> _) => System.Threading.Tasks.Task.CompletedTask, nextMoveId).GetAwaiter();
+					if (!((TaskAwaiter)(ref val)).IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <Stun>d__26>(ref val, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+				}
+				((TaskAwaiter)(ref val)).GetResult();
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <TriggerAnim>d__28 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public Creature creature;
+
+		public string triggerName;
+
+		public float waitTime;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_017e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0183: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0145: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0166: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0168: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			try
+			{
+				TaskAwaiter val;
+				if (num == 0)
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_019a;
+				}
+				NCreature creatureNode = creature.GetCreatureNode();
+				if (creatureNode == null)
+				{
+					if (!TestMode.IsOn && CombatManager.Instance.IsInProgress)
+					{
+						Log.Error($"Attempted to play animation on creature {creature} but its creature node doesn't exist!");
+					}
+				}
+				else
+				{
+					if (!creature.IsPlayer)
+					{
+						goto IL_0114;
+					}
+					CharacterModel character = creature.Player.Character;
+					if (!creature.IsDead)
+					{
+						string text = triggerName;
+						if (!(text == "Attack"))
+						{
+							if (!(text == "Cast"))
+							{
+								if (text == "PowerUp")
+								{
+									SfxCmd.Play(character.PowerUpSfx);
+								}
+							}
+							else
+							{
+								SfxCmd.Play(character.CastSfx);
+							}
+						}
+						else
+						{
+							SfxCmd.Play(character.AttackSfx);
+						}
+						goto IL_0114;
+					}
+				}
+				goto end_IL_0007;
+				IL_0114:
+				creatureNode.SetAnimationTrigger(triggerName);
+				val = Cmd.CustomScaledWait(Mathf.Min(waitTime * 0.5f, 0.25f), waitTime).GetAwaiter();
+				if (!((TaskAwaiter)(ref val)).IsCompleted)
+				{
+					num = (<>1__state = 0);
+					<>u__1 = val;
+					((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <TriggerAnim>d__28>(ref val, ref this);
+					return;
+				}
+				goto IL_019a;
+				IL_019a:
+				((TaskAwaiter)(ref val)).GetResult();
+				end_IL_0007:;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[AsyncStateMachine(typeof(<Add>d__0<>))]
+	public static async System.Threading.Tasks.Task<Creature> Add<T>(ICombatState combatState, string? slotName = null) where T : MonsterModel
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		Creature creature = combatState.CreateCreature(ModelDb.Monster<T>().ToMutable(), CombatSide.Enemy, slotName);
+		await Add(creature);
+		return creature;
+	}
+
+	[AsyncStateMachine(typeof(<Add>d__1))]
+	public static async System.Threading.Tasks.Task<Creature> Add(MonsterModel monster, ICombatState combatState, CombatSide side = CombatSide.Enemy, string? slotName = null)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		monster.AssertMutable();
+		Creature creature = combatState.CreateCreature(monster, side, slotName);
+		await Add(creature);
+		return creature;
+	}
+
+	[AsyncStateMachine(typeof(<Add>d__2))]
+	public static System.Threading.Tasks.Task Add(Creature creature)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<Add>d__2 <Add>d__3 = default(<Add>d__2);
+		<Add>d__3.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<Add>d__3.creature = creature;
+		<Add>d__3.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <Add>d__3.<>t__builder)).Start<<Add>d__2>(ref <Add>d__3);
+		return ((AsyncTaskMethodBuilder)(ref <Add>d__3.<>t__builder)).Task;
+	}
+
+	[AsyncStateMachine(typeof(<Damage>d__3))]
+	public static async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<DamageResult>> Damage(PlayerChoiceContext choiceContext, Creature target, DamageVar damageVar, CardModel cardSource, CardPlay? cardPlay)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		return await Damage(choiceContext, target, damageVar.BaseValue, damageVar.Props, cardSource, cardPlay);
+	}
+
+	[AsyncStateMachine(typeof(<Damage>d__4))]
+	public static async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<DamageResult>> Damage(PlayerChoiceContext choiceContext, Creature target, decimal amount, ValueProp props, CardModel? cardSource, CardPlay? cardPlay)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		List<Creature> obj = new List<Creature>();
+		obj.Add(target);
+		return await Damage(choiceContext, (System.Collections.Generic.IEnumerable<Creature>?)obj, amount, props, cardSource?.Owner.Creature, cardSource, cardPlay);
+	}
+
+	[AsyncStateMachine(typeof(<Damage>d__5))]
+	public static async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<DamageResult>> Damage(PlayerChoiceContext choiceContext, System.Collections.Generic.IEnumerable<Creature> targets, DamageVar damageVar, Creature dealer)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		return await Damage(choiceContext, targets, damageVar.BaseValue, damageVar.Props, dealer);
+	}
+
+	[AsyncStateMachine(typeof(<Damage>d__6))]
+	public static async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<DamageResult>> Damage(PlayerChoiceContext choiceContext, System.Collections.Generic.IEnumerable<Creature> targets, decimal amount, ValueProp props, Creature dealer)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		return await Damage(choiceContext, targets, amount, props, dealer, null, null);
+	}
+
+	[AsyncStateMachine(typeof(<Damage>d__7))]
+	public static async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<DamageResult>> Damage(PlayerChoiceContext choiceContext, Creature target, DamageVar damageVar, Creature dealer)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		return await Damage(choiceContext, target, damageVar.BaseValue, damageVar.Props, dealer);
+	}
+
+	[AsyncStateMachine(typeof(<Damage>d__8))]
+	public static async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<DamageResult>> Damage(PlayerChoiceContext choiceContext, Creature target, decimal amount, ValueProp props, Creature dealer)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		return await Damage(choiceContext, new global::<>z__ReadOnlySingleElementList<Creature>(target), amount, props, dealer, null, null);
+	}
+
+	[AsyncStateMachine(typeof(<Damage>d__9))]
+	public static async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<DamageResult>> Damage(PlayerChoiceContext choiceContext, Creature target, DamageVar damageVar, Creature? dealer, CardModel? cardSource, CardPlay? cardPlay)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		return await Damage(choiceContext, new global::<>z__ReadOnlySingleElementList<Creature>(target), damageVar.BaseValue, damageVar.Props, dealer, cardSource, cardPlay);
+	}
+
+	[AsyncStateMachine(typeof(<Damage>d__10))]
+	public static async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<DamageResult>> Damage(PlayerChoiceContext choiceContext, Creature target, decimal amount, ValueProp props, Creature? dealer, CardModel? cardSource, CardPlay? cardPlay)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		return await Damage(choiceContext, new global::<>z__ReadOnlySingleElementList<Creature>(target), amount, props, dealer, cardSource, cardPlay);
+	}
+
+	[AsyncStateMachine(typeof(<Damage>d__11))]
+	public static async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<DamageResult>> Damage(PlayerChoiceContext choiceContext, System.Collections.Generic.IEnumerable<Creature>? targets, DamageVar damageVar, Creature? dealer, CardModel? cardSource, CardPlay? cardPlay)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		return await Damage(choiceContext, targets, damageVar.BaseValue, damageVar.Props, dealer, cardSource, cardPlay);
+	}
+
+	[AsyncStateMachine(typeof(<Damage>d__12))]
+	public static async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<DamageResult>> Damage(PlayerChoiceContext choiceContext, System.Collections.Generic.IEnumerable<Creature>? targets, decimal amount, ValueProp props, Creature? dealer, CardModel? cardSource, CardPlay? cardPlay)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		if (targets == null)
+		{
+			return System.Array.Empty<DamageResult>();
+		}
+		if (dealer != null && dealer.IsDead)
+		{
+			return (System.Collections.Generic.IEnumerable<DamageResult>)Enumerable.ToList<DamageResult>(Enumerable.Select<Creature, DamageResult>(targets, (Func<Creature, DamageResult>)((Creature t) => new DamageResult(t, props))));
+		}
+		List<DamageResult> results = new List<DamageResult>();
+		List<Creature> targetList = Enumerable.ToList<Creature>(targets);
+		if (targetList.Count == 0)
+		{
+			return (System.Collections.Generic.IEnumerable<DamageResult>)results;
+		}
+		ICombatState combatState = targetList[0].CombatState;
+		IRunState runState = IRunState.GetFrom(Enumerable.OfType<Creature>((System.Collections.IEnumerable)Enumerable.Append<Creature>((System.Collections.Generic.IEnumerable<Creature>)targetList, dealer)));
+		Enumerator<Creature> enumerator = targetList.GetEnumerator();
+		Enumerator<DamageResult> enumerator2;
+		try
+		{
+			while (enumerator.MoveNext())
+			{
+				Creature originalTarget = enumerator.Current;
+				if (originalTarget.IsDead)
+				{
+					continue;
+				}
+				System.Collections.Generic.IEnumerable<AbstractModel> modifiers;
+				decimal modifiedAmount = Hook.ModifyDamage(runState, combatState, originalTarget, dealer, amount, props, cardSource, cardPlay, ModifyDamageHookType.All, CardPreviewMode.None, out modifiers);
+				await Hook.AfterModifyingDamageAmount(runState, combatState, cardSource, modifiers);
+				await Hook.BeforeDamageReceived(choiceContext, runState, combatState, originalTarget, modifiedAmount, props, dealer, cardSource);
+				Creature creature = originalTarget.PetOwner?.Creature ?? originalTarget;
+				decimal blockedDamage = creature.DamageBlockInternal(modifiedAmount, props);
+				decimal unblockedDamage = Hook.ModifyHpLost(runState, combatState, originalTarget, Math.Max(modifiedAmount - blockedDamage, 0m), props, dealer, cardSource, HpLossHookPhase.BeforeOsty, out modifiers);
+				await Hook.AfterModifyingHpLostBeforeOsty(runState, combatState, modifiers);
+				Creature unblockedDamageTarget = ((combatState == null) ? originalTarget : Hook.ModifyUnblockedDamageTarget(combatState, originalTarget, unblockedDamage, props, dealer));
+				unblockedDamage = Hook.ModifyHpLost(runState, combatState, unblockedDamageTarget, unblockedDamage, props, dealer, cardSource, HpLossHookPhase.AfterOsty, out modifiers);
+				await Hook.AfterModifyingHpLostAfterOsty(runState, combatState, modifiers);
+				DamageResult unblockedDamageResult = unblockedDamageTarget.LoseHpInternal(unblockedDamage, props);
+				List<DamageResult> obj = new List<DamageResult>(1);
+				obj.Add(unblockedDamageResult);
+				List<DamageResult> damageResults = obj;
+				bool wasBlockBroken = originalTarget.Block <= 0 && blockedDamage > 0m;
+				bool wasFullyBlocked = !((System.Enum)props).HasFlag((System.Enum)ValueProp.Unblockable) && (blockedDamage > 0m || originalTarget.Block > 0) && (int)unblockedDamage == 0;
+				if (originalTarget == unblockedDamageTarget)
+				{
+					unblockedDamageResult.BlockedDamage = (int)blockedDamage;
+					unblockedDamageResult.WasBlockBroken = wasBlockBroken;
+					unblockedDamageResult.WasFullyBlocked = wasFullyBlocked;
+				}
+				else
+				{
+					decimal originalTargetDamage = Hook.ModifyHpLost(runState, combatState, originalTarget, decimal.op_Implicit(unblockedDamageResult.OverkillDamage), props, dealer, cardSource, HpLossHookPhase.AfterOsty, out modifiers);
+					await Hook.AfterModifyingHpLostAfterOsty(runState, combatState, modifiers);
+					DamageResult damageResult = ((!(originalTargetDamage > 0m)) ? new DamageResult(originalTarget, props) : originalTarget.LoseHpInternal(originalTargetDamage, props));
+					damageResult.BlockedDamage = (int)blockedDamage;
+					damageResult.WasBlockBroken = wasBlockBroken;
+					damageResult.WasFullyBlocked = wasFullyBlocked;
+					damageResults.Add(damageResult);
+				}
+				List<System.Threading.Tasks.Task> hitTriggers = new List<System.Threading.Tasks.Task>();
+				enumerator2 = damageResults.GetEnumerator();
+				try
+				{
+					while (enumerator2.MoveNext())
+					{
+						DamageResult current = enumerator2.Current;
+						int damage = current.UnblockedDamage + current.OverkillDamage;
+						Creature receiver = current.Receiver;
+						if (CombatManager.Instance.IsInProgress && !CombatManager.Instance.IsEnding)
+						{
+							CombatManager.Instance.History.DamageReceived(combatState, receiver, dealer, current, cardSource);
+						}
+						if (current.WasFullyBlocked)
+						{
+							continue;
+						}
+						Node vfxContainer = receiver.GetVfxContainer();
+						if (damage > 0 || (modifiedAmount == 0m && current.Receiver == unblockedDamageTarget))
+						{
+							NDamageNumVfx nDamageNumVfx = NDamageNumVfx.Create(receiver, current);
+							if (nDamageNumVfx != null)
+							{
+								if (vfxContainer != null)
+								{
+									vfxContainer.AddChildSafely(nDamageNumVfx);
+								}
+								else
+								{
+									NRun.Instance.GlobalUi.AddChildSafely(nDamageNumVfx);
+								}
+							}
+						}
+						if (damage > 0)
+						{
+							vfxContainer?.AddChildSafely(NHitSparkVfx.Create(receiver));
+							if (receiver != dealer && !((System.Enum)props).HasFlag((System.Enum)ValueProp.SkipHurtAnim))
+							{
+								hitTriggers.Add(TriggerAnim(receiver, "Hit", 0f));
+								if (receiver.IsMonster && receiver.Monster.HasHurtSfx)
+								{
+									SfxCmd.Play(receiver.Monster.HurtSfx);
+								}
+							}
+							MapPointHistoryEntry mapPointHistoryEntry = receiver.Player?.RunState.CurrentMapPointHistoryEntry;
+							if (mapPointHistoryEntry != null)
+							{
+								mapPointHistoryEntry.GetEntry(receiver.Player.NetId).DamageTaken += current.UnblockedDamage;
+							}
+						}
+						await System.Threading.Tasks.Task.WhenAll((System.Collections.Generic.IEnumerable<System.Threading.Tasks.Task>)hitTriggers);
+						if (damage <= 0)
+						{
+							continue;
+						}
+						if (Enumerable.Any<DamageResult>((System.Collections.Generic.IEnumerable<DamageResult>)damageResults, (Func<DamageResult, bool>)((DamageResult r) => r.WasBlockBroken)))
+						{
+							SfxCmd.Play("event:/sfx/block_break");
+						}
+						if (LocalContext.IsMe(originalTarget) && (!CombatManager.Instance.IsInProgress || originalTarget.GetHpPercentRemaining() <= 0.25))
+						{
+							PlayerHurtVignetteHelper.Play();
+						}
+						if (originalTarget.Side == CombatSide.Enemy)
+						{
+							SfxCmd.PlayDamage(originalTarget.Monster, unblockedDamageResult.UnblockedDamage);
+						}
+						if (CombatManager.Instance.IsInProgress || LocalContext.ContainsMe((System.Collections.Generic.IEnumerable<Creature>)targetList))
+						{
+							if (unblockedDamageResult.UnblockedDamage < 6)
+							{
+								NGame.Instance?.ScreenShake(ShakeStrength.Weak, ShakeDuration.Short);
+							}
+							else if (unblockedDamageResult.UnblockedDamage < 11)
+							{
+								NGame.Instance?.ScreenShake(ShakeStrength.Medium, ShakeDuration.Short);
+							}
+							else
+							{
+								NGame.Instance?.ScreenShake(ShakeStrength.Strong, ShakeDuration.Short);
+							}
+						}
+					}
+				}
+				finally
+				{
+					((System.IDisposable)enumerator2/*cast due to .constrained prefix*/).Dispose();
+				}
+				results.AddRange((System.Collections.Generic.IEnumerable<DamageResult>)damageResults);
+			}
+		}
+		finally
+		{
+			((System.IDisposable)enumerator/*cast due to .constrained prefix*/).Dispose();
+		}
+		List<Creature> killedCreatures = new List<Creature>();
+		enumerator2 = results.GetEnumerator();
+		try
+		{
+			while (enumerator2.MoveNext())
+			{
+				DamageResult unblockedDamageResult = enumerator2.Current;
+				Creature originalTarget = unblockedDamageResult.Receiver;
+				if (unblockedDamageResult.WasBlockBroken)
+				{
+					await Hook.AfterBlockBroken(originalTarget.CombatState, choiceContext, originalTarget, dealer);
+				}
+				if (unblockedDamageResult.UnblockedDamage > 0)
+				{
+					await Hook.AfterCurrentHpChanged(runState, combatState, originalTarget, decimal.op_Implicit(-unblockedDamageResult.UnblockedDamage));
+				}
+				if (dealer != null && dealer.Player != null && originalTarget.Player == null)
+				{
+					dealer.Player.ExtraFields.DamageDealt += unblockedDamageResult.UnblockedDamage;
+				}
+				if (combatState != null)
+				{
+					await Hook.AfterDamageGiven(choiceContext, combatState, dealer, unblockedDamageResult, props, originalTarget, cardSource);
+				}
+				if (!unblockedDamageResult.WasTargetKilled || !originalTarget.IsDead)
+				{
+					await Hook.AfterDamageReceived(choiceContext, runState, combatState, originalTarget, unblockedDamageResult, props, dealer, cardSource);
+				}
+				else
+				{
+					killedCreatures.Add(originalTarget);
+				}
+				if (unblockedDamageResult.WasFullyBlocked && CombatManager.Instance.IsInProgress)
+				{
+					SfxCmd.Play("event:/sfx/block_hit");
+					Node vfxContainer2 = unblockedDamageResult.Receiver.GetVfxContainer();
+					vfxContainer2?.AddChildSafely(NBlockSparkVfx.Create(unblockedDamageResult.Receiver));
+					vfxContainer2?.AddChildSafely(NDamageBlockedVfx.Create(unblockedDamageResult.Receiver));
+					NGame.Instance?.ScreenShake(ShakeStrength.Weak, ShakeDuration.Short);
+				}
+			}
+		}
+		finally
+		{
+			((System.IDisposable)enumerator2/*cast due to .constrained prefix*/).Dispose();
+		}
+		await Kill((System.Collections.Generic.IReadOnlyCollection<Creature>)killedCreatures);
+		await Cmd.CustomScaledWait(0.1f, 0.2f);
+		return (System.Collections.Generic.IEnumerable<DamageResult>)results;
+	}
+
+	[AsyncStateMachine(typeof(<Kill>d__13))]
+	public static System.Threading.Tasks.Task Kill(Creature creature, bool force = false)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<Kill>d__13 <Kill>d__15 = default(<Kill>d__13);
+		<Kill>d__15.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<Kill>d__15.creature = creature;
+		<Kill>d__15.force = force;
+		<Kill>d__15.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <Kill>d__15.<>t__builder)).Start<<Kill>d__13>(ref <Kill>d__15);
+		return ((AsyncTaskMethodBuilder)(ref <Kill>d__15.<>t__builder)).Task;
+	}
+
+	[AsyncStateMachine(typeof(<Kill>d__14))]
+	public static System.Threading.Tasks.Task Kill(System.Collections.Generic.IReadOnlyCollection<Creature> creatures, bool force = false)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<Kill>d__14 <Kill>d__15 = default(<Kill>d__14);
+		<Kill>d__15.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<Kill>d__15.creatures = creatures;
+		<Kill>d__15.force = force;
+		<Kill>d__15.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <Kill>d__15.<>t__builder)).Start<<Kill>d__14>(ref <Kill>d__15);
+		return ((AsyncTaskMethodBuilder)(ref <Kill>d__15.<>t__builder)).Task;
+	}
+
+	[AsyncStateMachine(typeof(<KillWithoutCheckingWinCondition>d__15))]
+	private static System.Threading.Tasks.Task KillWithoutCheckingWinCondition(Creature creature, bool force, int recursion = 0)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<KillWithoutCheckingWinCondition>d__15 <KillWithoutCheckingWinCondition>d__16 = default(<KillWithoutCheckingWinCondition>d__15);
+		<KillWithoutCheckingWinCondition>d__16.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<KillWithoutCheckingWinCondition>d__16.creature = creature;
+		<KillWithoutCheckingWinCondition>d__16.force = force;
+		<KillWithoutCheckingWinCondition>d__16.recursion = recursion;
+		<KillWithoutCheckingWinCondition>d__16.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <KillWithoutCheckingWinCondition>d__16.<>t__builder)).Start<<KillWithoutCheckingWinCondition>d__15>(ref <KillWithoutCheckingWinCondition>d__16);
+		return ((AsyncTaskMethodBuilder)(ref <KillWithoutCheckingWinCondition>d__16.<>t__builder)).Task;
+	}
+
+	public static System.Threading.Tasks.Task Escape(Creature creature, bool removeCreatureNode = true)
+	{
+		if (creature.IsDead)
+		{
+			return System.Threading.Tasks.Task.CompletedTask;
+		}
+		if (creature.CombatState == null || !creature.CombatState.IsLiveCombat())
+		{
+			return System.Threading.Tasks.Task.CompletedTask;
+		}
+		creature.RemoveAllPowersInternalExcept();
+		if (removeCreatureNode)
+		{
+			NCreature nCreature = NCombatRoom.Instance?.GetCreatureNode(creature);
+			if (nCreature != null)
+			{
+				NCombatRoom.Instance.RemoveCreatureNode(nCreature);
+				nCreature.ToggleIsInteractable(on: false);
+				nCreature.Visible = false;
+			}
+		}
+		CombatManager.Instance.RemoveCreature(creature);
+		creature.CombatState?.CreatureEscaped(creature);
+		return System.Threading.Tasks.Task.CompletedTask;
+	}
+
+	[AsyncStateMachine(typeof(<GainBlock>d__17))]
+	public static async System.Threading.Tasks.Task<decimal> GainBlock(Creature creature, BlockVar blockVar, CardPlay? cardPlay, bool fast = false)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		return await GainBlock(creature, blockVar.BaseValue, blockVar.Props, cardPlay, fast);
+	}
+
+	[AsyncStateMachine(typeof(<GainBlock>d__18))]
+	public static async System.Threading.Tasks.Task<decimal> GainBlock(Creature creature, decimal amount, ValueProp props, CardPlay? cardPlay, bool fast = false)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		if (CombatManager.Instance.IsOverOrEnding)
+		{
+			return default(decimal);
+		}
+		if (creature.IsDead)
+		{
+			return default(decimal);
+		}
+		ICombatState combatState = creature.CombatState;
+		await Hook.BeforeBlockGained(combatState, creature, amount, props, cardPlay?.Card);
+		decimal modifiedAmount = amount;
+		modifiedAmount = Hook.ModifyBlock(combatState, creature, modifiedAmount, props, cardPlay?.Card, cardPlay, out System.Collections.Generic.IEnumerable<AbstractModel> modifiers);
+		modifiedAmount = Math.Max(modifiedAmount, 0m);
+		await Hook.AfterModifyingBlockAmount(combatState, modifiedAmount, cardPlay?.Card, cardPlay, modifiers);
+		if (modifiedAmount > 0m)
+		{
+			SfxCmd.Play("event:/sfx/block_gain");
+			VfxCmd.PlayOnCreatureCenter(creature, "vfx/vfx_block");
+			creature.GainBlockInternal(modifiedAmount);
+			CombatManager.Instance.History.BlockGained(combatState, creature, (int)modifiedAmount, props, cardPlay);
+			if (!fast)
+			{
+				await Cmd.CustomScaledWait(0.1f, 0.25f);
+			}
+			else
+			{
+				await Cmd.CustomScaledWait(0f, 0.03f);
+			}
+		}
+		await Hook.AfterBlockGained(combatState, creature, modifiedAmount, props, cardPlay?.Card);
+		return modifiedAmount;
+	}
+
+	[AsyncStateMachine(typeof(<LoseBlock>d__19))]
+	public static System.Threading.Tasks.Task LoseBlock(PlayerChoiceContext choiceContext, Creature target, decimal amount, Creature? remover)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<LoseBlock>d__19 <LoseBlock>d__20 = default(<LoseBlock>d__19);
+		<LoseBlock>d__20.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<LoseBlock>d__20.choiceContext = choiceContext;
+		<LoseBlock>d__20.target = target;
+		<LoseBlock>d__20.amount = amount;
+		<LoseBlock>d__20.remover = remover;
+		<LoseBlock>d__20.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <LoseBlock>d__20.<>t__builder)).Start<<LoseBlock>d__19>(ref <LoseBlock>d__20);
+		return ((AsyncTaskMethodBuilder)(ref <LoseBlock>d__20.<>t__builder)).Task;
+	}
+
+	[AsyncStateMachine(typeof(<Heal>d__20))]
+	public static System.Threading.Tasks.Task Heal(Creature creature, decimal amount, bool playAnim = true)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<Heal>d__20 <Heal>d__21 = default(<Heal>d__20);
+		<Heal>d__21.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<Heal>d__21.creature = creature;
+		<Heal>d__21.amount = amount;
+		<Heal>d__21.playAnim = playAnim;
+		<Heal>d__21.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <Heal>d__21.<>t__builder)).Start<<Heal>d__20>(ref <Heal>d__21);
+		return ((AsyncTaskMethodBuilder)(ref <Heal>d__21.<>t__builder)).Task;
+	}
+
+	[AsyncStateMachine(typeof(<SetCurrentHp>d__21))]
+	public static System.Threading.Tasks.Task SetCurrentHp(Creature creature, decimal amount)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<SetCurrentHp>d__21 <SetCurrentHp>d__22 = default(<SetCurrentHp>d__21);
+		<SetCurrentHp>d__22.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<SetCurrentHp>d__22.creature = creature;
+		<SetCurrentHp>d__22.amount = amount;
+		<SetCurrentHp>d__22.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <SetCurrentHp>d__22.<>t__builder)).Start<<SetCurrentHp>d__21>(ref <SetCurrentHp>d__22);
+		return ((AsyncTaskMethodBuilder)(ref <SetCurrentHp>d__22.<>t__builder)).Task;
+	}
+
+	[AsyncStateMachine(typeof(<GainMaxHp>d__22))]
+	public static System.Threading.Tasks.Task GainMaxHp(Creature creature, decimal amount)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<GainMaxHp>d__22 <GainMaxHp>d__23 = default(<GainMaxHp>d__22);
+		<GainMaxHp>d__23.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<GainMaxHp>d__23.creature = creature;
+		<GainMaxHp>d__23.amount = amount;
+		<GainMaxHp>d__23.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <GainMaxHp>d__23.<>t__builder)).Start<<GainMaxHp>d__22>(ref <GainMaxHp>d__23);
+		return ((AsyncTaskMethodBuilder)(ref <GainMaxHp>d__23.<>t__builder)).Task;
+	}
+
+	[AsyncStateMachine(typeof(<LoseMaxHp>d__23))]
+	public static System.Threading.Tasks.Task LoseMaxHp(PlayerChoiceContext choiceContext, Creature creature, decimal amount, bool isFromCard)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<LoseMaxHp>d__23 <LoseMaxHp>d__24 = default(<LoseMaxHp>d__23);
+		<LoseMaxHp>d__24.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<LoseMaxHp>d__24.choiceContext = choiceContext;
+		<LoseMaxHp>d__24.creature = creature;
+		<LoseMaxHp>d__24.amount = amount;
+		<LoseMaxHp>d__24.isFromCard = isFromCard;
+		<LoseMaxHp>d__24.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <LoseMaxHp>d__24.<>t__builder)).Start<<LoseMaxHp>d__23>(ref <LoseMaxHp>d__24);
+		return ((AsyncTaskMethodBuilder)(ref <LoseMaxHp>d__24.<>t__builder)).Task;
+	}
+
+	[AsyncStateMachine(typeof(<SetMaxHp>d__24))]
+	public static async System.Threading.Tasks.Task<decimal> SetMaxHp(Creature creature, decimal amount)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		int oldMaxHp = creature.MaxHp;
+		creature.SetMaxHpInternal(Math.Max(0m, amount));
+		int newMaxHp = creature.MaxHp;
+		if (creature.MaxHp <= 0)
+		{
+			await Kill(creature);
+		}
+		return decimal.op_Implicit(newMaxHp - oldMaxHp);
+	}
+
+	[AsyncStateMachine(typeof(<SetMaxAndCurrentHp>d__25))]
+	public static System.Threading.Tasks.Task SetMaxAndCurrentHp(Creature creature, decimal amount)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<SetMaxAndCurrentHp>d__25 <SetMaxAndCurrentHp>d__26 = default(<SetMaxAndCurrentHp>d__25);
+		<SetMaxAndCurrentHp>d__26.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<SetMaxAndCurrentHp>d__26.creature = creature;
+		<SetMaxAndCurrentHp>d__26.amount = amount;
+		<SetMaxAndCurrentHp>d__26.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <SetMaxAndCurrentHp>d__26.<>t__builder)).Start<<SetMaxAndCurrentHp>d__25>(ref <SetMaxAndCurrentHp>d__26);
+		return ((AsyncTaskMethodBuilder)(ref <SetMaxAndCurrentHp>d__26.<>t__builder)).Task;
+	}
+
+	[AsyncStateMachine(typeof(<Stun>d__26))]
+	public static System.Threading.Tasks.Task Stun(Creature creature, string? nextMoveId = null)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<Stun>d__26 <Stun>d__27 = default(<Stun>d__26);
+		<Stun>d__27.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<Stun>d__27.creature = creature;
+		<Stun>d__27.nextMoveId = nextMoveId;
+		<Stun>d__27.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <Stun>d__27.<>t__builder)).Start<<Stun>d__26>(ref <Stun>d__27);
+		return ((AsyncTaskMethodBuilder)(ref <Stun>d__27.<>t__builder)).Task;
+	}
+
+	public static System.Threading.Tasks.Task Stun(Creature creature, Func<System.Collections.Generic.IReadOnlyList<Creature>, System.Threading.Tasks.Task> stunMove, string? nextMoveId = null)
+	{
+		<>c__DisplayClass27_0 CS$<>8__locals4 = new <>c__DisplayClass27_0();
+		CS$<>8__locals4.creature = creature;
+		CS$<>8__locals4.stunMove = stunMove;
+		CS$<>8__locals4.creature.StunInternal(Wrapper, nextMoveId);
+		return System.Threading.Tasks.Task.CompletedTask;
+		[AsyncStateMachine(typeof(<>c__DisplayClass27_0.<<Stun>g__Wrapper|0>d))]
+		System.Threading.Tasks.Task Wrapper(System.Collections.Generic.IReadOnlyList<Creature> c)
+		{
+			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			<>c__DisplayClass27_0.<<Stun>g__Wrapper|0>d <<Stun>g__Wrapper|0>d = default(<>c__DisplayClass27_0.<<Stun>g__Wrapper|0>d);
+			<<Stun>g__Wrapper|0>d.<>t__builder = AsyncTaskMethodBuilder.Create();
+			<<Stun>g__Wrapper|0>d.<>4__this = CS$<>8__locals4;
+			<<Stun>g__Wrapper|0>d.c = c;
+			<<Stun>g__Wrapper|0>d.<>1__state = -1;
+			((AsyncTaskMethodBuilder)(ref <<Stun>g__Wrapper|0>d.<>t__builder)).Start<<>c__DisplayClass27_0.<<Stun>g__Wrapper|0>d>(ref <<Stun>g__Wrapper|0>d);
+			return ((AsyncTaskMethodBuilder)(ref <<Stun>g__Wrapper|0>d.<>t__builder)).Task;
+		}
+	}
+
+	[AsyncStateMachine(typeof(<TriggerAnim>d__28))]
+	public static System.Threading.Tasks.Task TriggerAnim(Creature creature, string triggerName, float waitTime)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<TriggerAnim>d__28 <TriggerAnim>d__29 = default(<TriggerAnim>d__28);
+		<TriggerAnim>d__29.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<TriggerAnim>d__29.creature = creature;
+		<TriggerAnim>d__29.triggerName = triggerName;
+		<TriggerAnim>d__29.waitTime = waitTime;
+		<TriggerAnim>d__29.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <TriggerAnim>d__29.<>t__builder)).Start<<TriggerAnim>d__28>(ref <TriggerAnim>d__29);
+		return ((AsyncTaskMethodBuilder)(ref <TriggerAnim>d__29.<>t__builder)).Task;
+	}
+}
+

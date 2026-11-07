@@ -1,0 +1,103 @@
+{
+  "IRONCLAD_BOSS_ENCOUNTER.title": "Der Eiserne",
+  "IRONCLAD_BOSS_ENCOUNTER.loss": "{character} wurde vom [gold]Eisernen[/gold] gebrochen.",
+
+  "IRONCLAD_ANGER_BOSS_ENCOUNTER.title": "Der Eiserne",
+  "IRONCLAD_ANGER_BOSS_ENCOUNTER.loss": "{character} wurde vom Zorn des [gold]Eisernen[/gold] zu Asche verbrannt.",
+
+  "IRONCLAD_VULN_BOSS_ENCOUNTER.title": "Der Eiserne",
+  "IRONCLAD_VULN_BOSS_ENCOUNTER.loss": "{character} wurde vom [gold]Eisernen[/gold] Schicht für Schicht aufgeschlitzt.",
+
+  "SILENT_BOSS_ENCOUNTER.title": "Die Stille",
+  "SILENT_BOSS_ENCOUNTER.loss": "{character} sah die [gold]Stille[/gold] bis zuletzt nicht kommen.",
+
+  "SILENT_ENVENOM_BOSS_ENCOUNTER.title": "Die Stille",
+  "SILENT_ENVENOM_BOSS_ENCOUNTER.loss": "{character} wurde vom [gold]Gift[/gold] der [gold]Stillen[/gold] zermürbt.",
+
+  "SILENT_SHIV_BOSS_ENCOUNTER.title": "Die Stille",
+  "SILENT_SHIV_BOSS_ENCOUNTER.loss": "{character} wurde vom Klingenregen der [gold]Stillen[/gold] begraben.",
+
+  "SILENT_SLY_BOSS_ENCOUNTER.title": "Die Stille",
+  "SILENT_SLY_BOSS_ENCOUNTER.loss": "{character} wurde von der [gold]Stillen[/gold] in den [gold]Abwurfstapel[/gold] geworfen.",
+
+  "SILENT_BREWER_BOSS_ENCOUNTER.title": "Die Stille",
+  "SILENT_BREWER_BOSS_ENCOUNTER.loss": "{character} konnte die aus Tränken gewobene Barriere der [gold]Stillen[/gold] nicht durchbrechen.",
+
+  "DEFECT_BOSS_ENCOUNTER.title": "Das Defekte",
+  "DEFECT_BOSS_ENCOUNTER.loss": "{character} wurde vom [gold]Defekten[/gold] analysiert und gelöscht.",
+
+  "DEFECT_AI_BOSS_ENCOUNTER.title": "Das Defekte",
+  "DEFECT_AI_BOSS_ENCOUNTER.loss": "Jede Karte von {character} wurde in das Modell des [gold]Defekten[/gold] eingerechnet.",
+
+  "DEFECT_CLAW_BOSS_ENCOUNTER.title": "Das Defekte",
+  "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character} wurde vom [gold]Hyperstrahl[/gold] des [gold]Defekten[/gold] ausgelöscht.",
+
+  "NECROBINDER_BOSS_ENCOUNTER.title": "Die Totenbinderin",
+  "NECROBINDER_BOSS_ENCOUNTER.loss": "Die Seele von {character} wurde von der [gold]Totenbinderin[/gold] eingefordert.",
+
+  "NECROBINDER_DOOM_BOSS_ENCOUNTER.title": "Die Totenbinderin",
+  "NECROBINDER_DOOM_BOSS_ENCOUNTER.loss": "[gold]Die Totenbinderin[/gold] rief {character} ans bittere Ende des [gold]Verderbens[/gold].",
+
+  "NECROBINDER_SOUL_BOSS_ENCOUNTER.title": "Die Totenbinderin",
+  "NECROBINDER_SOUL_BOSS_ENCOUNTER.loss": "Die Seele von {character} wurde von der [gold]Totenbinderin[/gold] eingefordert.",
+
+  "NECROBINDER_ERADICATE_BOSS_ENCOUNTER.title": "Die Totenbinderin",
+  "NECROBINDER_ERADICATE_BOSS_ENCOUNTER.loss": "{character} wurde samt Erinnerungen von der [gold]Totenbinderin[/gold] ausgelöscht.",
+
+  "REGENT_BOSS_ENCOUNTER.title": "Der Regent",
+  "REGENT_BOSS_ENCOUNTER.loss": "{character} wurde vom [gold]Regenten[/gold] verurteilt.",
+
+  "REGENT_DEBRIS_BOSS_ENCOUNTER.title": "Der Regent",
+  "REGENT_DEBRIS_BOSS_ENCOUNTER.loss": "{character} wurde unter dem [gold]Schutt[/gold] des [gold]Regenten[/gold] begraben.",
+
+  "REGENT_FORGE_BOSS_ENCOUNTER.title": "Der Regent",
+  "REGENT_FORGE_BOSS_ENCOUNTER.loss": "{character} wurde zu einer Kerbe in der Klinge des [gold]Regenten[/gold].",
+
+  "REGENT_COLORLESS_BOSS_ENCOUNTER.title": "Der Regent",
+  "REGENT_COLORLESS_BOSS_ENCOUNTER.loss": "{character} wurde vom [gold]Regenten[/gold] aller Farben beraubt.",
+
+  "REGENT_STAR_BOSS_ENCOUNTER.title": "Der Regent",
+  "REGENT_STAR_BOSS_ENCOUNTER.loss": "{character} wurde von den glitzernden Sternen des [gold]Regenten[/gold] zu Staub zermahlen.",
+
+  "REGENT_KING_BOSS_ENCOUNTER.title": "Der Regent",
+  "REGENT_KING_BOSS_ENCOUNTER.loss": "{character} wurde unter der Krone des [gold]Regenten[/gold] zermalmt.",
+
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.title": "Der Eiserne",
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "{character} wurde von der wachsenden [gold]Stärke[/gold] des [gold]Eisernen[/gold] zermalmt.",
+
+    "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.title": "Der Eiserne",
+  "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss": "{character} wurde vom [gold]Eisernen[/gold] herumgewirbelt und schließlich von seinen eigenen Kopien begraben.",
+"IRONCLAD_BOULDER_BOSS_ENCOUNTER.title": "Der Eiserne",
+  "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss": "{character} wurde vom [gold]Riesigen Fels[/gold] des [gold]Eisernen[/gold] zu Splittern zermalmt.",
+
+  "DEFECT_DARK_BOSS_ENCOUNTER.title": "Das Defekte",
+  "DEFECT_DARK_BOSS_ENCOUNTER.loss": "{character} wurde von den [gold]Schatten[/gold]-Orbs des [gold]Defekten[/gold] verschlungen.",
+
+  "IRONCLAD_BOSS_NORMAL_ENCOUNTER.title": "Der Eiserne",
+  "IRONCLAD_BOSS_NORMAL_ENCOUNTER.loss": "{character} wurde vom [gold]Eisernen[/gold] gebrochen.",
+  "SILENT_BOSS_NORMAL_ENCOUNTER.title": "Die Stille",
+  "SILENT_BOSS_NORMAL_ENCOUNTER.loss": "{character} sah die [gold]Stille[/gold] bis zuletzt nicht kommen.",
+  "SILENT_ENVENOM_BOSS_NORMAL_ENCOUNTER.title": "Die Stille",
+  "SILENT_ENVENOM_BOSS_NORMAL_ENCOUNTER.loss": "{character} wurde vom [gold]Gift[/gold] der [gold]Stillen[/gold] zermürbt.",
+  "SILENT_SLY_BOSS_NORMAL_ENCOUNTER.title": "Die Stille",
+  "SILENT_SLY_BOSS_NORMAL_ENCOUNTER.loss": "{character} wurde von der [gold]Stillen[/gold] in den [gold]Abwurfstapel[/gold] geworfen.",
+  "SILENT_SHIV_BOSS_NORMAL_ENCOUNTER.title": "Die Stille",
+  "SILENT_SHIV_BOSS_NORMAL_ENCOUNTER.loss": "{character} wurde vom Klingenregen der [gold]Stillen[/gold] begraben.",
+  "DEFECT_BOSS_NORMAL_ENCOUNTER.title": "Das Defekte",
+  "DEFECT_BOSS_NORMAL_ENCOUNTER.loss": "{character} wurde vom [gold]Defekten[/gold] analysiert und gelöscht.",
+  "NECROBINDER_BOSS_NORMAL_ENCOUNTER.title": "Die Totenbinderin",
+  "NECROBINDER_BOSS_NORMAL_ENCOUNTER.loss": "Die Seele von {character} wurde von der [gold]Totenbinderin[/gold] eingefordert.",
+  "REGENT_BOSS_NORMAL_ENCOUNTER.title": "Der Regent",
+  "REGENT_BOSS_NORMAL_ENCOUNTER.loss": "{character} wurde vom [gold]Regenten[/gold] verurteilt.",
+
+  "TELEMETRY_PROMPT_HEADER": "Spieldaten hochladen (CharacterBosses)",
+  "TELEMETRY_PROMPT_BODY": "Diese Mod möchte einige Spieldaten sammeln, um Fehler zu beheben und die Bossstärke auszubalancieren:\nSieg oder Niederlage jedes Bosskampfs, Akt/Kampf, Aufstieg, Spielerzahl, TP des Bosses, Züge und Seed sowie die Fehlerzeilen dieser Mod.\n\nDie Daten werden zuerst in einer [b]lokalen Datei[/b] gespeichert; hat der Autor einen Sammelserver eingerichtet, werden dieselben anonymen Daten [b]zusätzlich hochgeladen[/b].\n\nEs werden keinerlei persönliche Informationen gesammelt (keine Steam-ID, kein Nickname).\n\nJederzeit änderbar unter „Mod-Konfiguration → CharacterBosses → A5“. Jetzt aktivieren?",
+  "TELEMETRY_PROMPT_YES": "Aktivieren",
+  "TELEMETRY_PROMPT_NO": "Ausgeschaltet lassen",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.title":  "The Necrobinder",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character} was dragged into the grave by the [gold]Necrobinder[/gold]\u0027s Osty.",
+    "SILENT_SNECKO_BOSS_ENCOUNTER.title":  "The Silent",
+    "SILENT_SNECKO_BOSS_ENCOUNTER.loss":  "{character} was sent to the grave by the [gold]Silent[/gold]\u0027s dice.",
+  "DEFECT_EVENT_BOSS_ENCOUNTER.loss": "{character} wurde vom [gold]Defekten[/gold] aus dem Abwurfstapel zurückgeholt.",
+  "DEFECT_EVENT_BOSS_ENCOUNTER.title": "Das Defekte"
+}

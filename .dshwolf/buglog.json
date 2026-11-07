@@ -1,0 +1,1405 @@
+{
+  "version": 1,
+  "bugs": [
+    {
+      "id": "bug-1-mvjdx57l",
+      "error_message": "多人双 Boss 时「跟踪锁定」可能锁到另一只 Boss 的影子 Player；「何人僭越」的 −1 力量也挂到了别的 Boss 身上（因为影子 Player 满足 Creature.IsPlayer，会出现在 CombatState.Players 里）。",
+      "fix": "BossLockOn 新增 RealPlayers / RealPlayerCount（按 Creature.Monster == null 过滤），PickLeastLocked / IsLocked / EnsurePower / Rebalance / WeakenPlayers 全部改用它；新增 SpecialEffectAppliesTo(boss, player) 做对应型特殊效果的闸门。判断「是不是多人」要用 MultiBossPlan.WantsSecondBoss（读 RunState.Players）。",
+      "at": "2026-10-22T10:15:01.281Z"
+    },
+    {
+      "id": "bug-2-mvjdx580",
+      "error_message": "给两只 Boss 都跑 BossShadowPets.Update 之后：① 死亡监听每帧重复挂（_deathHookedOn 只记一只）；② 只有第一只死时才会清理随从（_cleanedForDeadBoss 是 bool）；③ 打死一只会把队友的佩尔士兵一起摘掉（Known 没有主人信息）。",
+      "fix": "改成 DeathHooked / CleanedFor（按实例 hash 的 HashSet）+ OwnedBy（随从 → 主人 Boss），死亡清理只摘自己的；BossFrameTick 的随从朝向/摆位遍历 everyBoss。",
+      "at": "2026-10-22T10:15:01.296Z"
+    },
+    {
+      "id": "bug-3-mvjdzqnr",
+      "error_message": "两套 Boss 面板（多 Boss 同场）时状态条互相打架：BossStatusRow.Fill 用静态镜像 EnergyCounterNode 判「这个能量球别销毁」，于是 A 行刷新会把 B 行的能量球当垃圾销毁；MakeEnergyDisplay 用一对静态 _energyCounter/_energyPlayer，两只交替刷新时每次都重建 NEnergyCounter（反复播粒子特效）；ShowStars 用静态 _starShadow，两只交替导致辉星计数器每轮摘掉重建（数字闪到 1）。",
+      "fix": "Fill 改成按「这一行自己的」EnergyOf(row) 判保留；MakeEnergyDisplay 改成 Dictionary<Player, NEnergyCounter>（每个影武者一个）；ShowStars 的绑定关系改成 Dictionary<Control, Player>（按这一行的能量球各记一份）；EnergyCenterX 也改成读 EnergyOf(row)。",
+      "at": "2026-10-22T10:17:02.391Z"
+    },
+    {
+      "id": "bug-4-mvje5lzq",
+      "error_message": "A1 休眠的格挡拦截可能吞掉真人玩家自己的冰球格挡：原版激发是「先 Remove 再 Evoke」（OrbCmd.Evoke），所以用「他队列里还有没有那颗冰球」判断来源时会扑空；等于真人玩故障机器人时偶尔被扣掉一次激发格挡。",
+      "fix": "在 FrostOrb.Passive / FrostOrb.Evoke 上各加一个只记录、不改行为的前缀，把「这名真人刚触发自己的冰球」记成时间戳（1.5s 窗口）；拦截逻辑里若目标正在这个窗口内就一律放行（宁可少拦，也不吞玩家格挡）。另加豁免：目标队列里若有数值相同的冰球也放行。",
+      "at": "2026-10-22T10:21:36.278Z"
+    },
+    {
+      "id": "bug-5-mvjhqd4y",
+      "error_message": "多人换牌的三张牌（休眠/骸骨军团/刀刃交响曲）永远打不出去：手牌里明明是换上的牌，规划器却报「PullAggro(不在手牌)」。用户实测表现为「三层根除骨全程没有奥斯提」。",
+      "fix": "BossScriptPlanner.Matches 之前只拿原牌类型（entry.Card）比对，而 BuildHand 造的是换牌表里的 To 类型 → 匹配不上。改成 Matches(card, entry, boss) 同时尝试 MultiplayerCardSwap.ResolveQuiet(entry.Card, boss) 的结果（不打日志，避免逐张比对刷屏）。另外 BossOsty 的 A2 闸门从「禁止一切自动召唤」改成「只禁止死后的自动复活」（HadOsty 记录），否则第 1 回合她就是空手打。",
+      "at": "2026-10-22T12:01:43.426Z"
+    },
+    {
+      "id": "bug-6-mvjhx826",
+      "error_message": "骸骨军团（LegionOfBone）打出后只给「真人玩家」跑召唤循环，Boss 一只都没拿到奥斯提（多层根除骨实测）。根本原因：影子 Player 不在 CombatState.PlayerCreatures 里，而原版的循环正是遍历 PlayerCreatures ⇒ 我们的 Boss 根本不在循环里。同一条事实也让 BossIntentBuilder.TeammateBossesOf 里 c.IsPlayer 的过滤永远为假（A3 刀刃交响曲的队友意图/出刀同样失效）。",
+      "fix": "改成整段接管 LegionOfBone.OnPlay（前缀返回 false）：施法者是我们的 Boss 时，直接给场上每个 CharBossMonster 各 OstyCmd.Summon 一次（PetOwner 天然归属该 Boss），真人玩家一概不给。TeammateBossesOf 去掉 c.IsPlayer 条件，改按 Monster is CharBossMonster 判定。BossOsty.MightHaveOsty 改成「先看有没有随从（不分角色），没有随从时只有亡灵契约师才继续兜底扫描」，否则队友 Boss 的奥斯提找不到节点、不会被标爪牙/摆位。",
+      "at": "2026-10-22T12:07:03.438Z"
+    },
+    {
+      "id": "bug-7-mvjic8ow",
+      "error_message": "SL（退出重进）后 Boss↔玩家的跟踪锁定关系会变；更糟的是老实例还留在字典里（IsAlive 仍为真），选靶可能指向已经不存在的生物。",
+      "fix": "① TargetFor 校验已有锁定「必须还在这一场战斗里」（existing.Creature.CombatState == 本场 combat），否则作废重选；② PickLeastLocked 的并列改成按 Player.NetId 升序取第一个（原来是 Rng.Next 随机）；③ Rebalance 里 Boss 的排序从 RuntimeHelpers.GetHashCode 改成按怪物 id（hash 每次运行都变）；④ PurgeDeadBosses 连 CombatState == null 的残留项一起清。",
+      "at": "2026-10-22T12:18:44.096Z"
+    },
+    {
+      "id": "bug-8-mvjim03h",
+      "error_message": "多人局里一名玩家死亡后，对应 Boss 不会把跟踪锁定转给存活玩家；存活玩家身上也没有锁定图标。",
+      "fix": "根因是两处「是不是多人」都用了**活着的真人玩家数**：EnsurePower 里 `if (playerCount >= 2) ApplyLockPowerAsync(...)`，死的那个一走活人就剩 1 → 不给存活玩家挂锁定；Rebalance 里 `if (players.Count < 2) return;` → 直接早退，校准永远不发生。改成用 RunState 人数（MultiBossPlan.WantsSecondBoss）判断「是不是多人局」，映射用存活玩家列表算，于是玩家一死 → PickForBoss 只剩存活者 → 锁定自动转过去并补挂图标。",
+      "at": "2026-10-22T12:26:19.517Z"
+    },
+    {
+      "id": "bug-9-mvjir8ea",
+      "error_message": "多人第一幕里「站在右边」的储君先行动，而设计是左边（亡灵契约师）先行动。",
+      "fix": "行动顺序＝GenerateMonsters 返回列表的顺序，而列表是「本幕主 Boss + PartnerFor 追加的第二只」。ActTable 第一/二幕全是 4（储君）⇒ 储君永远排第一。现在在 list 里按「站位侧」排序（对称于 BossEnemySpreadPatch.IsLeftSide：静默/亡灵/铁甲=左=0，故障/储君=右=1），保证左边那只先动。",
+      "at": "2026-10-22T12:30:23.554Z"
+    },
+    {
+      "id": "bug-10-mvjiwma9",
+      "error_message": "多人局里亡灵契约师死后她的奥斯提不死，要等到储君也死了才消失。",
+      "fix": "两个原因：① RemoveOnBossDeath 只处理「按节点找到的第一只」奥斯提（HerLiveOstyNode 是扫节点+带缓存，骸骨军团之后每只 Boss 各有一只，很容易抓错/抓漏）；② 它只靠 BossFrameTick 的 everyBoss 逐帧检查，而 Boss 死后可能已经不在 CombatState.Enemies 里 → everyBoss 漏掉她 → 完全不执行。改成：给每只 Boss 挂 Creature.Died 监听（BossOsty.EnsureDeathHook，按生物 hash 去重，战斗结束清表），死亡时遍历 Enemies+Allies 把所有「PetOwner==她 或 在她 Pets 里」的 Osty 全部带走。",
+      "at": "2026-10-22T12:34:34.833Z"
+    },
+    {
+      "id": "bug-11-mvjjemxr",
+      "error_message": "第三幕第一场只出现能力机，刀贼没有配上来（PartnerFor 返回 null）。",
+      "fix": "PartnerFor 第三幕原来用「本幕第几只 Boss」记（BossesHandedThisAct >= 1 → 用 {3,4}）来选配对；但原版一幕的两个 Boss 槽在**进幕时**就都生成了，计数早已 ≥1，于是第一场也被当成第 2 场 → 拿 {3,4} 去配能力机(2) → 不在配对里 → 返回 null。改成按「自己是谁」分组：能力机/刀贼（下标 ≤2）用 {1,2}，根除骨/无色储君（下标 ≥3）用 {3,4}。",
+      "at": "2026-10-22T12:48:35.487Z"
+    },
+    {
+      "id": "bug-12-mvjjipxl",
+      "error_message": "多人第三幕第一场还是「根除骨+无色储君」，改了 ForVanillaBoss 也没生效。根因：MultiBossPlan.WantsSecondBoss 读的是 _runState，而它只在 EncounterModel.GenerateMonstersWithSlots 时被抓；「拉 Boss 房间」（ActModel.PullNextEncounter）发生在那之前 ⇒ 那一刻 _runState 还是 null ⇒ 被判成单人 ⇒ 多人分支整段不生效。另外 RunManager.State 是 private（交接文档写「不存在」是错的，C# 直接访问会 CS1061）。",
+      "fix": "新增 CurrentRunState()：反射读 RunManager.Instance 的 private 属性 State（PropertyInfo 缓存一次），拿不到再退回 _runState。WantsSecondBoss 改用它 ⇒ 拉房间那一刻也能拿到真实人数。同时第三幕配对改成按「自己是谁」分组（mine ≤ 2 → {1,2}；否则 {3,4}），不再依赖 BossesHandedThisAct 记账。",
+      "at": "2026-10-22T12:51:45.993Z"
+    },
+    {
+      "id": "bug-13-mvjjn9yp",
+      "error_message": "多人局里能力机的充能球（闪电/黑暗被动与激发）会打到没有被它跟踪锁定的玩家；随机选靶的攻击牌同样。",
+      "fix": "反编译确认两条路径都从 CombatState.GetOpponentsOf(owner) 取候选：AttackCommand.Execute 的随机选靶，以及 LightningOrb.ApplyLightningDamage 的 `GetOpponentsOf(orb.Owner.Creature).Where(IsHittable)` + Rng.CombatTargets.NextItem。所以在已有的 GetOpponentsOf 后置补丁里加一条：当发起者是我们模组的 Boss 且多人时，把对手列表收窄成 BossLockOn.TargetFor(boss) 那一人。群攻牌不受影响（CrushUnder/Thunderclap/DaggerSpray/EchoingSlash 走 HittableEnemies + TargetingAllOpponents，已逐张核对）。",
+      "at": "2026-10-22T12:55:18.577Z"
+    },
+    {
+      "id": "bug-14-mvjjw39v",
+      "error_message": "同一名玩家被两只 Boss 同时锁定时，状态栏上只显示一个跟踪锁定图标，且描述里只写着其中一只的名字（Layer 被后挂的那只顶掉）。",
+      "fix": "LockOnPower 从 StackType.Single 改成 Counter（层数 = 有几只 Boss 盯我），内部维护 List&lt;Creature&gt; _bosses：AfterApplied(applier) 与 BossLockOn.ApplyLockPowerAsync 都调 AddBoss；描述遍历全部锁定者（多只时用「它们 / their」并把每只的对应型特殊效果逐条列成「…只对你生效（Boss名）」）。BossLockOn 新增 DropLockIcon：某只 Boss 死亡时只从名单里摘它，一个都不剩才整体移除图标。",
+      "at": "2026-10-22T13:02:09.811Z"
+    },
+    {
+      "id": "bug-15-mvjkw15b",
+      "error_message": "联机时进 Boss 房立刻「多人数据不同步」并掉线。",
+      "fix": "两个非确定性来源都在 Boss 房创建战斗状态时生效：① 影子 Player 的 NetId 原来是 `boss.GetHashCode() & 0xFFFF`（进程内对象身份哈希，房主和客人必然不同）→ 改成按怪物 Id.Entry 的 FNV-1a 低 16 位；② `PartnerFor` 的幕数读 `_runState`（生成怪物时顺手抓的，两边可能一个为 null）→ 改读反射的 `RunManager.State`；③ `PullNextEncounterPatch` 的「本幕第二只」改用遭遇身份比对（act.BossEncounter / act.SecondBossEncounter 的 id），本地计数只作兜底。",
+      "at": "2026-10-22T13:30:06.671Z"
+    },
+    {
+      "id": "bug-16-mvjkyds3",
+      "error_message": "刚进 Boss 战，两名玩家身上都叠了好几层「跟踪锁定」（层数应该是「有几只 Boss 盯我」，最多 2）。",
+      "fix": "LockOnPower 改成 Counter 之后，ApplyLockPowerAsync 每次调用都 PowerCmd.Apply(…,1m,…) 把层数 +1；而 EnsurePower（每只 Boss 回合）与 Rebalance（4Hz 校准）可能多次调用它 → 层数一路叠上去。现在先查玩家身上有没有这层 Power：有就只往内部名单加这一只（AddBoss 会把层数归一成名单长度），没有才真正 Apply 一次。",
+      "at": "2026-10-22T13:31:56.355Z"
+    },
+    {
+      "id": "bug-17-mvjm6qxu",
+      "error_message": "联机状态分歧（进战斗后掉线）；诊断包显示差异就在我们自己的 POWER.LOCK_ON_POWER：local 6 层 / remote 4 层、另一玩家 local 5 / remote 3。同时跟踪锁定会把好几只「旧 Boss」都算进去，显示成被多个 Boss 盯上。",
+      "fix": "LockOnPower 会跨战斗留在玩家身上，层数＝名单长度 ⇒ 每打一场+2，双方历史不同 ⇒ 层数不同 ⇒ 校验分歧。修：① LockOnPower.PruneStale()（TargetBosses/TargetBoss/HasBoss/AddBoss/RemoveBoss/Description 全部先剔除 CombatState 不是本场的旧 Boss，并把层数归一）；② BossLockOn.CleanupStaleForNewFight(boss) 在每只 Boss 生成（AfterAddedToRoom）时清空名单、层数归零、摘掉图标，并清 Locks/Recorded；③ ClearAll() 供其使用。",
+      "at": "2026-10-22T14:06:26.274Z"
+    },
+    {
+      "id": "bug-18-mvjmihvo",
+      "error_message": "联机状态分歧仍由 LOCK_ON_POWER 的层数引起（诊断包：local 2 / remote 1）——因为我把层数当「有几只 Boss 盯我」，两边各自在不同时机增删，Amount 又是会同步的状态。",
+      "fix": "层数不再承载任何信息：StackType 改回 Single（恒 1），AddBoss/RemoveBoss/PruneStale/ClearAll 一律不碰 Amount；「哪几只 Boss 锁我」只放本地 List&lt;Creature&gt; _bosses（不序列化、不参与校验），仅供描述文本使用。新战斗开始时 BossLockOn.CleanupStaleForNewFight 直接把旧 Power 摘掉。",
+      "at": "2026-10-22T14:15:34.404Z"
+    },
+    {
+      "id": "bug-19-mvjmwlgn",
+      "error_message": "多人 2 人局里本模组 Boss 打出卡牌获得的格挡正好翻倍（群星斗篷 7→14、防御 5→10）。",
+      "fix": "这是游戏原版机制：MultiplayerScalingModel.ModifyBlockMultiplicative 对 primary/secondary enemy 返回玩家数（2 人 ⇒ ×2，3 人以上再 ×1.1/1.2/1.3）。我们之前只关了血量缩放。新增 BossNoMultiplayerBlockScalePatch：当目标是 CharBossMonster 且原版乘数 != 1 时，postfix 把 __result 改成 1m（单人原版本来就返回 1，所以单人零变化；原版怪物不受影响）。",
+      "at": "2026-10-22T14:26:32.231Z"
+    },
+    {
+      "id": "bug-20-mvjn0bnf",
+      "error_message": "「时候未到」下玩家的灾厄会自己消失（没打格挡、格挡也没被扣，层数就掉到 0）。",
+      "fix": "①「格挡可能在本钩子之前就被清掉」的兜底用了 _blockCarry 暂存值，但 CarryOf 只读不清 ⇒ 上一回合记下的格挡会在之后**每一回合**被重复用来抵扣灾厄（玩家这回合一点格挡都没打，灾厄也每回合自己往下掉）。改成 TakeCarry（取一次立刻 Remove）；有真实格挡时也顺手 Remove 旧暂存；日志里标出「(上回合暂存)」便于核对。",
+      "at": "2026-10-22T14:29:26.139Z"
+    },
+    {
+      "id": "bug-21-mvkbs7ve",
+      "error_message": "PowerModel / 影子 Player 相关类型在 mod 里编译报 CS0246（找不到 PowerModel、CharBosses 命名空间）",
+      "fix": "PowerModel 在 `MegaCrit.Sts2.Core.Models`（不是 Entities.Powers），所以新 Power 文件要同时 using Models + Entities.Powers；在 `CharacterBosses.Patches` 命名空间里引用怪物类型不能写 `CharBosses.Monsters.X`（会被解析成 CharacterBosses.CharBosses…），要 using CharacterBosses.Monsters 或写全 CharacterBosses.Monsters.X。",
+      "file": "src/Hooks/Powers/BossSoulBoundPower.cs",
+      "at": "2026-10-23T02:02:58.394Z"
+    },
+    {
+      "id": "bug-22-mvkbs7vp",
+      "error_message": "PowerModel 类名叫 XxxPower 时，本地化 key 就是类名转大写下划线；特殊效果要在 BossSpecialPowerIconPatch 的白名单里加类型，否则图标缺失",
+      "fix": "BossSoulBoundPower → BOSS_SOUL_BOUND_POWER.title/description 写进 content/localization/{zhs,eng}/powers.json；并把 BossSoulBoundPower 加进 Patches/BossSpecialPowerIconPatch.cs 的类型判断（借用原版 CuriousPower 灯泡图标）。改完 content 必须重打 PCK。",
+      "file": "src/Hooks/Patches/BossSpecialPowerIconPatch.cs",
+      "at": "2026-10-23T02:02:58.405Z"
+    },
+    {
+      "id": "bug-23-mvkbz3zq",
+      "error_message": "Boss 打出「拖延」/「汇流」后，下回合的能量不增加（EnergyNextTurnPower 既不兑现也永不过期，图标一直挂着）",
+      "fix": "原版是靠 `EnergyNextTurnPower.AfterEnergyReset(player)` 结算，而那个钩子只对 `CombatState.Players` 派发，影子 Player 不在里面。以前统一「只删不发」并把能量写进剧本逐回合表。需要真兑现时：`BossDefinition.HonorsNextTurnEnergyActs`（幕号 1 起）声明哪几幕要读，`CharBossMonster.PendingNextTurnEnergyCredit()` 在算本回合能量那一处（pcs.Energy = energy + plasma + charged + delayed）读该 Power 的 Amount 后 `PowerCmd.Remove`。二层灵魂骨的「拖延+ = 下回合 2 费」就是这条路径：3 基础 + 2 = 5。",
+      "file": "src/Hooks/Monsters/CharBossMonster.Turn.cs",
+      "at": "2026-10-23T02:08:19.958Z"
+    },
+    {
+      "id": "bug-24-mvkc2ti2",
+      "error_message": "X 费牌（挽歌 Dirge / 根除 Eradicate）在剧本里永远打不出来，日志写「费不够 3>1」",
+      "fix": "`CardEnergyCost.GetAmountToSpend()` 对 CostsX 返回**当前** `Owner.PlayerCombatState.Energy`（规划期还没扣费 ⇒ 永远是满的），而实际花掉的是「打出那一刻的剩余能量」（`CardCmd.AutoPlay` 里 `CapturedXValue = pcs.Energy`）。BossScriptPlanner 里加 `IsXCost(card)`（问 `card.EnergyCost.CostsX`），命中时把 cost 改成**本地剩余 energy**，这样既不会误判「费不够」，后面的牌也会按「能量被花光」正确跳过。",
+      "file": "src/Hooks/Core/BossScriptPlanner.cs",
+      "at": "2026-10-23T02:11:12.986Z"
+    },
+    {
+      "id": "bug-25-mvkckvtz",
+      "error_message": "Boss（影子 Player）的牌会真的抽进手里，把「按剧本手牌提前算好的意图」搞乱",
+      "fix": "照「无色储君拦印牌」（拦 CardFactory.GetDistinctForCombat 返回空集合）的思路，在抽牌入口上一刀切：前缀切 CardPileCmd.DrawInternal(ctx,count,player,fromHandDraw) 与 CardPileCmd.DrawWithoutBlockingOnOtherPlayers，返回空集合/CompletedTask ⇒ 一张都不搬。但计数要照加：补 History.CardDrawn(combat, 她的一张牌, fromHandDraw)（死亡行军倍率）+ 直接调她身上的 AutomationPower.AfterCardDrawn（自动化计数）。闸门用「她是我们的 Boss 且身上有 BossSoulBoundPower」，只影响灵魂骨。",
+      "file": "src/Hooks/Patches/ShadowBossNoDrawPatch.cs",
+      "at": "2026-10-23T02:25:15.815Z"
+    },
+    {
+      "id": "bug-26-mvkczvyg",
+      "error_message": "写在「玩家回合」里的 CardDrawnEntry 在 Boss 的回合里读不到（死亡行军不增伤）",
+      "fix": "`CombatHistoryEntry.HappenedThisTurn` 要求三件事同时成立：`RoundNumber` 相同、**`CurrentSide` 相同**、创建时快照的各玩家 `PlayerCombatState.TurnNumber` 没变。玩家回合记的条目 CurrentSide=Player，Boss 回合读时是 Enemy ⇒ 永不命中。做法：玩家回合内抽牌先记一份（供规划期/预览读），同时累计 `PendingDrawCredits`；Boss 回合开始时（BossHookBridge.SoulBoundTurnStart）把它折算成**敌人回合这一侧**的新条目，再清零。",
+      "file": "src/Hooks/Core/BossHookBridge.cs",
+      "at": "2026-10-23T02:36:55.816Z"
+    },
+    {
+      "id": "bug-27-mvkd822v",
+      "error_message": "Boss 有时候会打出「没费」的牌（能量不够却真的打出来了）",
+      "fix": "两个原因：① 规划期把 `DynamicVars[\"Energy\"]` 一律当成立刻回能，而「拖延」是下回合 +N、「自动化」是每抽 10 张 +N ⇒ 多算 1~2 点；现在 BossScriptPlanner.DeferredEnergyCard 跳过这两张（鬼火 Wisp 是真回能，照记）。② CardCmd.AutoPlay 既不检查也不扣费（能量由 pcs.LoseEnergy(play.Cost) 补记，且会夹到 0）⇒ 规划一算多就白打；现在 CharBossMonster.PlayOne 出牌前兜底 `play.Cost > pcs.Energy || play.StarCost > pcs.Stars` 就跳过并写日志。",
+      "file": "src/Hooks/Monsters/CharBossMonster.cs",
+      "at": "2026-10-23T02:43:16.999Z"
+    },
+    {
+      "id": "bug-28-mvkdcfqj",
+      "error_message": "Boss 手牌里的诅咒「羞耻」不给脆弱（Frail）",
+      "fix": "原版 `Shame.OnTurnEndInHand` 由 CombatManager 遍历 **CombatState.Players** 的手牌派发，影子 Player 不在里面 ⇒ 永不触发。修法：CharBossMonster.RunCurseTurnEndHooks 在她自己回合结束时、丢手牌之前，对手牌里的每张 SHAME 手动跑一遍：`PowerCmd.Apply<FrailPower>(ctx, 她的生物, DynamicVars[\"Frail\"].BaseValue, null, shameCard, false)`，并在「施加前没有脆弱」时把返回的 power 的 `SkipNextDurationTick = true`（照抄原版，避免当回合立刻掉一层）。",
+      "file": "src/Hooks/Monsters/CharBossMonster.cs",
+      "at": "2026-10-23T02:46:41.323Z"
+    },
+    {
+      "id": "bug-29-mvkdewth",
+      "error_message": "Boss 手牌里「回合结束时若在手牌」这一族牌（羞耻/厄运/灼烧/债务/腐朽/怀疑/感染/召唤）全都不触发",
+      "fix": "原版 CombatManager.DoTurnEnd 只遍历 **CombatState.Players 的手牌**、对 `HasTurnEndInHandEffect == true` 的牌调 `OnTurnEndInHandWrapper`；影子 Player 不在列表里 ⇒ 一张都不触发。修法：CharBossMonster.RunCurseTurnEndHooks 在丢手牌之前用同一套 `card.HasTurnEndInHandEffect` 判定扫她的手牌，逐张 `await card.OnTurnEndInHandWrapper(ctx)`，调的是每张牌自己的实现（不用复刻效果），新牌自动生效。",
+      "file": "src/Hooks/Monsters/CharBossMonster.cs",
+      "at": "2026-10-23T02:48:36.773Z"
+    },
+    {
+      "id": "bug-30-mvkdy4qb",
+      "error_message": "Boss 出牌过程中意图伤害数字来回闪（先弹高再落回），且预补撤回时机不对",
+      "fix": "原因：预补是每次重算时按剧本「重新算一遍」的，而真实增量（灵魂进消耗堆、奥斯提加血、被拦掉的抽牌记账）在卡牌结算中途就落地 ⇒ 中途重算会看到「真实值涨了但预补还没撤」的中间态，于是数字弹高再落回。改成：规划期把预补**冻结**到 boss 上（DrawCompensation/SoulStormCompensation/UnleashCompensation + 每单位值），真实增量到账后按同样数量撤回（Withdraw*）；她自己的增量不再打 IntentsDirty（只在每张牌打出前、回合结束这两个稳定点重算）；另外她回合真的开始后（缚魂命匣已到账）用 BladesGrowth.RefreshCompensation 重新冻结一次。",
+      "file": "src/Hooks/Core/BladesGrowth.cs",
+      "at": "2026-10-23T03:03:33.491Z"
+    },
+    {
+      "id": "bug-31-mvke5ziw",
+      "error_message": "出击的意图少算了「吞噬生命」——因为吞噬生命是同一回合里先打出去的牌，规划期她身上还没有这层能力",
+      "fix": "BladesGrowth.PlanCompensation 走剧本时维护一个 running `devour`（初值取 BossDamagePredictor.DevourAmountOf(boss)，走到 DEVOUR_LIFE 就用 BossDamagePredictor.DevourLifeCardAmount(card) 抬高），每张 SOUL 的奥斯提生命增量按这个 running 值算。DevourLifeCardAmount 读牌面 `DevourLife`/`DevourLifePower` 变量（PowerVar 的 key = 类型名去掉 Power），读不到退回「未升级 1 / 升级 2」。",
+      "file": "src/Hooks/Core/BladesGrowth.cs",
+      "at": "2026-10-23T03:09:39.992Z"
+    },
+    {
+      "id": "bug-32-mvkeeyxy",
+      "error_message": "Boss 有的时候有费不出牌（回合结束时手里还有牌、能量也还剩）",
+      "fix": "计划是回合开始前按当时能量算的，而她在出牌过程中还会拿到能量（自动化每抽 10 张 +1、鬼火 +1）；计划期因「费不够」被跳过的牌不会自动补上。修法：出牌阶段末尾按同一份剧本对**当前手牌**重新跑一遍 BossScriptPlanner.Plan（已打出的牌不在手上，所以只剩「还没打且现在打得起的」），按剧本顺序补打并 RefreshForce。日志：`回合中又拿到资源 → 按剧本补打：[...]（余费 N）`。",
+      "file": "src/Hooks/Monsters/CharBossMonster.cs",
+      "at": "2026-10-23T03:16:39.142Z"
+    },
+    {
+      "id": "bug-33-mvkemibe",
+      "error_message": "实际打出了某张牌，但之前手牌栏里那张牌是暗的（预测为「不出」）",
+      "fix": "计划是回合开始前按当时能量算的，而「自动化」每抽 10 张会 +能量，她的回合开始补手牌(3 张)与打出的每张「灵魂」(Cards 张) 这些抽牌都是**确定会发生**的 ⇒ 规划期必须把它们带来的能量先算进来，否则那些牌会被判成「费不够」显示成暗的，实际打牌时能量已到账又打出去了。实现：BossScriptPlanner.Plan 里用 AutomationPower.Amount/DisplayAmount 做一个小模拟（NoteAutomationDraws），回合开始那几张先记，之后每打出一张灵魂再记；出牌末尾的「补打」保留为玩家回合内抽牌带来能量的兜底。",
+      "file": "src/Hooks/Core/BossScriptPlanner.cs",
+      "at": "2026-10-23T03:22:30.842Z"
+    },
+    {
+      "id": "bug-34-mvkitkmv",
+      "error_message": "装了新 Boss 后，她的第 3 回合结束、玩家回合刚开始就整局卡死",
+      "fix": "Harmony 前缀拦截一个**返回 Task** 的方法时（这里是 AggressionPower.BeforeSideTurnStart），`return false` 而不设置 `__result` 会让它变成 null，调用方 await null 直接 NRE，整条「回合开始」协程断掉 ⇒ 卡死。修法：`Prefix(..., ref Task __result)` 里先 `__result = Task.CompletedTask` 再 return false。自查手段：所有 HarmonyPrefix 返回 false 的补丁，若目标方法返回 Task/Task&lt;T&gt;，必须显式给 __result。",
+      "at": "2026-10-23T05:19:58.903Z"
+    },
+    {
+      "id": "bug-35-mvkj98dv",
+      "error_message": "卡戎之灰对玩家造成了两次 3 点伤害（双触发）",
+      "fix": "原因是「原版对影子 Player 的遗物钩子其实会派发一次 + 我们手动又补跑一次」。改成确定性写法：① 用前缀把原版对「我们的 Boss」的 CharonsAshes.AfterCardExhausted / Orichalcum.BeforeSideTurnEnd(VeryEarly) 压掉（返回 false 时必须 __result = Task.CompletedTask）；② 由 BossRelicHookBridge 自己实现一次（数值读遗物 DynamicVars，卡戎之灰用 Unpowered 伤害对 HittableEnemies，奥利哈钢无格挡时 GainBlock）。这样无论原版派不派发都恰好一次。",
+      "at": "2026-10-23T05:32:09.523Z"
+    },
+    {
+      "id": "bug-36-mvkl93n8",
+      "error_message": "死亡行军有时不把玩家抽牌算进增伤；另外意图里显示了要打的牌但最后没打（忧郁 Melancholy 耗能会变）",
+      "fix": "① 玩家侧写的 CardDrawnEntry 在敌人回合读不到（HappenedThisTurn 要求同一边）⇒ 预览/实战两套口径。改成：玩家回合内抽牌只记自动化 + 往「死亡行军预补池」加一笔（NotePlayerInTurnDraw → DrawCompensation += DeathMarchPerDraw），她回合开始时再折算成敌人侧历史条目并同步扣池子（显示连续、不重复）。② 忧郁每有生物死亡 -1 费 ⇒ 玩家回合里算好的计划过期，计划里留着实际打不出的牌。改成她出牌阶段开始前 ReplanAtPlayStart() 用真实能量重规划（闸门：只有身上有 BossSoulBoundPower 的她）。",
+      "at": "2026-10-23T06:28:02.612Z"
+    },
+    {
+      "id": "bug-37-mvkltk01",
+      "error_message": "超质量体（Supermassive）意图数值不对：每生成一张牌加了多少写死成 4",
+      "fix": "反编译 Supermassive：`new ExtraDamageVar(3m)`（升级 +1 ⇒ 4），倍率 = History 里 `CardGeneratedEntry.Creator == card.Owner` 的条数。以前 BladesGrowth/BossScriptPlanner 都用常量 `CharBossMonster.GenerationBonusPer = 4` ⇒ 未升级时高估 1/张。现在两处都改成读牌面 `ExtraDamage`（PerUnit(card, 4)）。",
+      "at": "2026-10-23T06:43:56.929Z"
+    },
+    {
+      "id": "bug-38-mvl31cvv",
+      "error_message": "崩坠「转嫁疼痛」（Collector.FeelMyPainPower，随机挑一只 HittableEnemies）会选中角色 Boss 名下已死的奥斯提并让它掉血",
+      "fix": "过滤补丁的零开销闸门原来是 BossShadowPets.HasKnownPets（只统计装饰性随从），而亡灵契约师没有装饰性随从 ⇒ HittableEnemies/GetOpponentsOf 的过滤整段被跳过。改成 HasKnownPets || BossShadowPets.BossFightActive(combat)（按战斗实例缓存「房里有我们的 CharBossMonster」），并顺带摘掉 !IsAlive 的生物；BossOsty.IsBossOsty 在 PetOwner 与 Player 都为 null 时退回阵营判据 creature.Side==Enemy。日志验证：'奥斯提已从「可命中敌人」里摘掉'。",
+      "file": "src/Hooks/Patches/CombatSidePatches.cs + src/Hooks/Core/BossOsty.cs",
+      "at": "2026-10-23T14:45:54.427Z"
+    },
+    {
+      "id": "bug-39-mvl41lpi",
+      "error_message": "崩坠收藏家的「思维抽取 / Brain Drain」（0 费攻击，获得敌人的藏品牌）打我们的角色 Boss 时抽不到任何牌：血量伤害照打，手牌里不出现藏品",
+      "fix": "BrainDrain 用 FirstOrDefault(CollectibleCardPool.AllCards.Cast&lt;ICollectible&gt;(), e => e.GetMonsterModel().Id == cardPlay.Target.Monster.Id) 找牌，而我们的 Boss 是原版牌换皮、池里没有对应项，且池里只含它自己的 CollectorCardModel（改判断条件无效）。改为动态 Harmony postfix 挂 Collector.CollectorCode.Cards.Uncommon.BrainDrain.OnPlayInternal：声明 (object __instance, CardPlay cardPlay, ref Task __result)，当 cardPlay.Target.Monster is CharBossMonster 且掉落表 LootTable[(Def.Key, ActIndex+1)] 有牌时，把 Task 包一层——await 原版结算后 CreateCard + 必要时 CardCmd.Upgrade(HorizontalLayout) + CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, player, CardPilePosition.Bottom)（与原版参数一致）。",
+      "file": "src/Hooks/Core/DownfallCollectibleCompat.cs",
+      "at": "2026-10-23T15:14:05.478Z"
+    },
+    {
+      "id": "bug-40-mvl58768",
+      "error_message": "根除骨被减力量后意图仍显示旧伤害（例：崩坠「哀嚎」减了 11 点力量，根除还显示 10×4，应 0×4）",
+      "fix": "两个根因：①根除走 RawMultiAttackIntent，手算 GetPowerAmount&lt;StrengthPower&gt;()，而崩坠哀嚎是 CursedWailPower : TemporaryDebuffPowerWrapper&lt;CursedWail, StrengthPower&gt;，不改 StrengthPower 层数；②Raw 意图的数字在玩家回合开始就冻住，中途不重算。修法：BossDamagePredictor.FinalDamage 走原版 Hook.ModifyDamage(run, combat, target, dealer, 基础值, ValueProp.Move, null, null, All, None, out _)；新增 LiveMultiAttackIntent（GetIntentLabel/GetTotalDamage/Repeats 渲染时重算，同帧缓存）；BossFrameTickPatch 每帧比对 power 指纹变化 + 玩家侧行动时置 IntentsDirty；BossHandPanel.Rebuild 比对意图数字签名，变了整排重建。",
+      "file": "src/Hooks/Core/BossIntentBuilder.cs + BossDamagePredictor.cs + RawAttackIntent.cs + UI/BossHandPanel.cs + Patches/BossFrameTickPatch.cs",
+      "at": "2026-10-23T15:47:12.848Z"
+    },
+    {
+      "id": "bug-41-mvm6leur",
+      "error_message": "进阶 10 的两个三层 Boss 重复（两场都是同一个角色，日志里 act 2 boss #1/#2 两次 incoming 都是 ENCOUNTER.REGENT_BOSS_ENCOUNTER，第二次没有「（第二只）」标记）",
+      "fix": "IsSecondSlot 原来靠比较遭遇 id（incoming==SecondBoss 且 incoming!=Boss），两槽存同一个 id 时永远判不出第二场。改为读原版自己的开关 ActModel._rooms(RoomSet).bossEncountersVisited（反编译 RoomSet.NextBossEncounter 就是用它切换 Boss/SecondBoss；_rooms 是非公开字段，用反射，字段缓存），并保留「SecondBoss != null」这个原版条件，读不到再退回旧 id 判据。",
+      "file": "src/Hooks/Patches/BossReplacementPatches.cs",
+      "at": "2026-10-24T09:13:15.123Z"
+    },
+    {
+      "id": "bug-42-mvm6w42y",
+      "error_message": "玩家身上有「无实体」时，Boss 的奥斯提牌（戳击/重压/出击/骨碎片）意图仍显示原伤害（截图里 17），比无实体下真实的 1 高得多",
+      "fix": "Osty 牌走 RawAttackIntent，而 Raw 意图不吃意图节点的 Hook.ModifyDamage，所以 ModifyDamageCap 从不生效。新增 BossDamagePredictor.CapDamage（Hook.ModifyDamage 只跑 ModifyDamageHookType.Cap = min(伤害, 各 ModifyDamageCap)），在 BossIntentBuilder 的 fromOsty 分支套上。只跑 Cap 不跑 Additive/Multiplicative，避免和手工加的钙化重复。",
+      "file": "src/Hooks/Core/BossIntentBuilder.cs",
+      "at": "2026-10-24T09:21:34.378Z"
+    },
+    {
+      "id": "bug-43-mvm8071h",
+      "error_message": "物理机（二层故障机器人）实测五连：① 超越光速的原版抽牌与野性的回手把剧本手牌搞乱；② 螺旋钻击打出去 0 伤害、意图只显示单段；③ 超能光束光束朝下（射向她自己的脚下）；④ 会玩球的 Boss 看不到本回合充能球被动的伤害；⑤ 显示 2 点集中（以为是数据磁盘给多了）",
+      "fix": "① BossDefinition 新增 BlocksVanillaDraw（Defect=true）→ ShadowBossNoDraw 也拦这种 Boss；新增 FeralNoReturnPatch 前缀 FeralPower.ModifyCardPlayResultLocation 返回原去向。② 根因：PlayOne 走 AutoPlay 从不付钱 ⇒ 历史里没有 EnergySpentEntry，而 HelixDrill 段数 = 本回合已花能量之和 ⇒ 0 段；现在 LoseEnergy 后补记录 CombatHistory.EnergySpent，规划期再用 BossScriptPlanner.HelixExtraHits 按计划已花能量预补（= spent-1，因为基础 hits 至少 1）。③ 根因：Hyperbeam.OnPlay 用 CombatState.Enemies（不是 HittableEnemies）取 .Last() 当光束终点 ⇒ Boss 打时射向自己那侧；新增 HyperbeamAimPatch 把 NHyperbeamVfx/NHyperbeamImpactVfx 的目标换成玩家侧真人。④ BossHandPanel.Extra 改成「一行多个独立意图」，新增 OrbPassiveDamage（BossOrbSim.OrbsAfter 模拟回合结束的球，闪电/玻璃按 PassiveVal，镀金缆线给 Orbs[0] 额外一次触发）。⑤ 其实那 2 点是热修复（+2 本回合）；数据磁盘的 +1 从来没到过（它的效果挂在 AfterRoomEntered，早于影子 Player 建立）⇒ BossHookBridge 战斗开始时补 +1 集中。",
+      "file": "src/Hooks/UI/BossHandPanel.Extra.cs",
+      "at": "2026-10-24T09:52:44.453Z"
+    },
+    {
+      "id": "bug-44-mvma8gn5",
+      "error_message": "顶栏/地图显示的 Boss 与实际打到的不同（例如显示「愤怒战」，进房间打的是「灾厄骨」）",
+      "fix": "地图显示的是 act 里存着的遭遇（BossSlotReplacer 在生成房间时写入并进存档），而 PullNextEncounter 的后缀又按「阵容」重算了一次；阵容随机种子不写档（读不到 RunState.Rng.Seed 时用本地随机，重启后变值），于是重算会给出另一个角色。改成：拉 Boss 房间时若 incoming 已经是我们的遭遇就沿用（唯一例外是「第二只」与第一只撞成同一个才重算）。多人搭子 PartnerFor 在阵容里找不到自己时，改用 act.BossEncounter / SecondBossEncounter 两个存档槽反查角色兜底（CharBossEncounters.CharacterOfEncounter 按 id 前缀认角色）。",
+      "file": "src/Hooks/Patches/BossReplacementPatches.cs",
+      "at": "2026-10-24T10:55:09.377Z"
+    },
+    {
+      "id": "bug-45-mvmehylu",
+      "error_message": "Boss 储君只剩 2 血、玩家有 3 点荆棘时，君王之剑「21×2」第一剑被荆棘弹死后仍劈出第二剑，导致同归于尽",
+      "fix": "「×2」不是 WithHitCount 多段，而是剑圣 SwordSagePower 给卡面加 BaseReplayCount ⇒ 引擎重放整张牌；多段循环里每段会查 Attacker.IsDead，但重放是另一条路径，死了照样结算。新增 DeadBossNoAttackPatch：AttackCommand.Execute 前缀，攻击者是我们 Boss 且 IsDead 时直接返回 Task.FromResult(__instance)（只影响我们的 Boss）。",
+      "file": "src/Hooks/Patches/DeadBossNoAttackPatch.cs",
+      "at": "2026-10-24T12:54:31.026Z"
+    },
+    {
+      "id": "bug-46-mvmeyage",
+      "error_message": "联机（2/3 人局）两端遇到的 Boss 不一样，进 Boss 房「多人数据不同步」",
+      "fix": "BossLineups.CurrentSeed 在多人局用了本地随机：日志 mod_log (3).txt 第 32543 行 `阵容随机种子 = 1874266711334065713（来源：本地随机）` 出现在「2 人局」里 —— 旧实现只在第一次读 RunState.Rng.Seed（那时 RunManager.State 还是 null），读不到就 FreshSeed() 并永久沿用。改为：① 每次调用都重试读 RunState.Rng.Seed，读到就重新对齐并清缓存；② 读不到时，确认单人局才用本地随机，多人或人数未知一律用固定种子 1（宁可这一局不随机也不能两端不同）。",
+      "file": "src/Hooks/Core/BossLineups.cs",
+      "at": "2026-10-24T13:07:12.878Z"
+    },
+    {
+      "id": "bug-47-mvmho58r",
+      "error_message": "收藏家打完二层（物理机+灵魂骨）后奖励界面冒出一堆魂粹（约 53），随后 SL 报错；日志里每只 Boss 的「已作为藏品奖励加到结算界面」都打印了 2 次",
+      "fix": "mod_log (5).txt 实证：act1 两只 Boss 各打印 2 次（2287-2290），act2 灵魂骨也打印 2 次（4677-4678），而「记下」只有 1 次 ⇒ 不是 Defeated 列表重复，而是 AfterCollectorModelCombatEnd 被【嵌套重入】（room.AddExtraReward 触发结算界面刷新又回到这里），每重入一层再发一遍 ⇒ 数字成倍增长。v0.1.62 已加 _handlingCombatEnd 重入闸 + (Key,Act) 去重 + HandledBosses 去重，并把奖励牌改成 canonical.ToMutable()（脱离战斗作用域，避免存档序列化出错）。",
+      "at": "2026-10-24T14:23:18.411Z"
+    },
+    {
+      "id": "bug-48-mvos3bid",
+      "error_message": "炼药贼喝药后药水栏图标不实时变化；日志 rowChildren 在 15/29/31 之间乱跳",
+      "fix": "根因不是「旧格子没被清掉」，而是 Godot 的 QueueFree 只把节点标记到帧末销毁、此刻仍挂在树上，于是 GetChildCount 与 PlaceBesideCards 的排版（ContentWidth/LayoutChildren）把上一批旧格子一起算进去 —— 状态栏被算成一倍宽（rowW 872→2050、x 跑到 -180），药水/遗物被挤到屏幕外再弹回。修法：Fill 清空改为同步 RemoveChild + QueueFree；遗物图标改成复用 + MoveChild 排序；药水格子名带序号；每帧比对 BossPotions.Version 一变就 Refresh（覆盖回合开始喝药/出牌前喝药/炼药三条路径）。详见 docs/plans/brewer-potion-row-2026-10-26b.md",
+      "file": "src/Hooks/UI/BossStatusRow.cs",
+      "at": "2026-10-26T04:50:34.885Z"
+    },
+    {
+      "id": "bug-49-mvos3bik",
+      "error_message": "[CharBoss] 药水意图渲染失败: Object reference not set to an instance of an object",
+      "fix": "NIntent 的 _intentParticle/_valueLabel 是在 _Ready() 里 GetNode(\"%IntentParticle\")/%Value 取的；以前 MakeCell 先把 NIntent 挂在还没入树的 cell 上就调 UpdateIntent，_Ready 没跑 ⇒ UpdateVisuals 里 _intentParticle.Texture 空引用，药水意图一个都画不出来。修法：cell 先 row.AddChild 再 AddIntent（先入树、后 UpdateIntent）；顺带把意图摆到图标正下方（potionIntentGapY 热调）",
+      "file": "src/Hooks/UI/BossPotionRow.cs",
+      "at": "2026-10-26T04:50:34.892Z"
+    },
+    {
+      "id": "bug-50-mvot7ymo",
+      "error_message": "炼药贼「调制」第三条（她可以格挡中毒）一直没实现；现扩到「中毒 + 魂劫（崩坠收藏家）」，需要只对她自己生效且不改结算时序",
+      "fix": "反编译确认两者打的是同一形状的伤害：原版 PoisonPower.<Trigger>d__10.MoveNext 与崩坠 Collector.CollectorCode.Powers.CollectorDoomPower.<AfterSideTurnStart>d__2.MoveNext 都调 CreatureCmd.Damage(ctx, Owner, amount, ValueProp.Unblockable|Unpowered, null, null)（ValueProp: Unblockable=2, Unpowered=4）。所有 Damage 重载都汇到 7 参数核心 Damage(PlayerChoiceContext, IEnumerable<Creature>, decimal, ValueProp, Creature?, CardModel?, CardPlay?)。做法：①给这两个 power 的状态机 MoveNext 挂前后夹（ThreadStatic 计数）标记「这两种伤害正在结算」；②核心 Damage 的 prefix 里 ref ValueProp __3，若记号有效且目标里有 CharBossMonster 就 props &= ~Unblockable（保留 Unpowered，只让格挡生效）。不按 props 形状无差别处理，是为了不误伤崩坠的灼魂/活体炸弹（同为 Unblockable|Unpowered 但用户没要求）。另有旧机制：二层「带毒刺击」只在本场有 PoisonStrikePower 时接管，炼药贼走本补丁",
+      "file": "src/Hooks/Patches/BossBlockableDotPatch.cs",
+      "at": "2026-10-26T05:22:11.088Z"
+    },
+    {
+      "id": "bug-51-mvoxarmf",
+      "error_message": "炼药贼第 1 回合多一张不出的扫腿、第 5 回合多一张不出的生存者（同一张牌两份，一张打一张不打）",
+      "fix": "她的「剧本手牌」是 BossScriptRunner.BuildHand 里 combat.CreateCard 新建的卡实例，而那副真实卡组（18 张）一直躺在抽牌堆里没动过；第 1/5 回合剧本都喝「明晰提取物」（效果=抽 {Cards} 张牌），于是从抽牌堆顶抽走了一张同名的真实卡牌 —— 抽牌堆顺序 = 卡组顺序 LEG_SWEEP,SURVIVOR,... 所以第 1 次抽到扫腿、第 2 次抽到生存者，正好对上用户报的两处。修法：BossPotions.DrinkAsync 喝药前 SnapshotHand 拍快照，喝完 KeepScriptedHand 把「这次新进手牌」的牌（引用比较 ContainsSame）RemoveInternal 后 AddInternal 回抽牌堆顶 —— 手牌=剧本，药水不再多出计划外的牌，牌也没丢。诊断线索来自 v0.2.9 加的「手牌栏：N 张里有 M 张本回合不会打[...]（全部=[...]）」日志",
+      "file": "src/Hooks/Core/BossPotions.cs",
+      "at": "2026-10-26T07:16:20.439Z"
+    },
+    {
+      "id": "bug-52-mvoxxaq3",
+      "error_message": "炼药贼攻击意图数字与实战不符：喝药(爬行动物饰品+3力量/瓶)后攻击都高9点、精确切击因手牌数显示偏低、狡诈药水显示成\"强化\"、群蛇形态每张牌的4点伤害没有意图",
+      "fix": "反编译核对后按真实值提前算：①ReptileTrinket.AfterPotionUsed → PowerCmd.Apply<ReptileTrinketPower>(3)，ReptileTrinketPower : TemporaryStrengthPower ⇒ 每喝一瓶本回合+3力量，她的药水都在所有牌之前喝 ⇒ 规划期把 3×PlannedPotions.Count 加进 plannedBaseRise（出牌期不再补，避免算两遍）；②PreciseCut 的 CalculatedDamage = CalculationBase(13) − ExtraDamage(2)×(手牌里的其他牌数) ⇒ 新增 BossDamagePredictor.PreciseCutDamage(card, handCountAtPlay)，BladesGrowth 按计划顺序维护 playedCards，规划期传「开局手牌−已打张数」、出牌期传当前真实手牌数，经 IntentsFor(handAtPlay:) 生效；③CunningPotion = Shiv.CreateInHand(3)+Upgrade ⇒ 小刀+6 伤，BossPotionRow.IntentFor 改成原版 MultiAttackIntent(6,3)（力量虚弱由意图节点自己算）；④SerpentFormPower.AfterCardPlayed = 随机 HittableEnemies 打 ValueProp.Unpowered 的 4 点，Owner.Player 因 ShadowPlayerFactory 反射绑定而有效 ⇒ 只需显示：BladesGrowth 沿计划走，遇到 SERPENT_FORM 之后每张牌加 serpentHere（群蛇自己不加），IntentsFor 用 RawAttackIntent 追加（不受力量/虚弱，纯显示不造成伤害）",
+      "file": "src/Hooks/Core/BladesGrowth.cs",
+      "at": "2026-10-26T07:33:51.627Z"
+    },
+    {
+      "id": "bug-53-mvoxxaq8",
+      "error_message": "多人时群蛇形态的伤害随机挑一名玩家，无视跟踪锁定",
+      "fix": "SerpentFormPower.<AfterCardPlayed>d__*.MoveNext 里是 Rng.CombatTargets.NextItem(CombatState.HittableEnemies)。新增 SerpentFormLockOnPatch：给这条状态机 MoveNext 挂前后夹，进入时用 BossLockOn.TargetFor(boss) 取到被锁定的玩家，调 HittableEnemiesSidePatch.PushNarrowTo(creature)，于是 HittableEnemies 只返回那一个（depth 有 16 层兜底）；pop 时清空、depth 归零才清 target。单人时收窄结果就是唯一玩家（零回归）。只对「Owner.Monster is CharBossMonster」的群蛇形态生效，玩家的群蛇形态保持原版随机",
+      "file": "src/Hooks/Patches/SerpentFormLockOnPatch.cs",
+      "at": "2026-10-26T07:33:51.632Z"
+    },
+    {
+      "id": "bug-54-mvoyddus",
+      "error_message": "被复制药水(DuplicationPower)或爆发(BurstPower)影响而打两次的牌，意图只显示一次（应显示 4×2）；且爆发对她完全没生效",
+      "fix": "反编译确认两个 power 都是靠 ModifyCardPlayCount(+1) + AfterModifyingCardPlayCount(消耗一层) 实现的：DuplicationPower 对任意牌 +1，BurstPower 只对 CardType.Skill +1 且回合结束自清；而 CardCmd 里根本没有 ModifyCardPlayCount 的引用（AutoPlay 管线不跑这两条钩子）。所以：①运行时在 PlayOne 里统一等效实现（dupHere/burstHere 各 +1 次重放并 Decrement，复制药水优先不影响叠加：两者可同时生效共打 3 次）；②显示侧在 BladesGrowth 沿计划维护 dupLeft/burstLeft（计划里的 DrinkBefore=Duplicator 加层、BURST 卡按牌面变量加层、每张牌消耗一层），把 playCount 传给 BossIntentBuilder.IntentsFor，段数/osty/RawMulti 都乘 playCount（4 → 4×2），群蛇那条额外意图也用 RawMultiAttackIntent(4, plays)。注意 playCount 的乘法要放在 extraHits 累加之后（牌自身的重放也要翻倍）",
+      "file": "src/Hooks/Monsters/CharBossMonster.cs",
+      "at": "2026-10-26T07:46:22.180Z"
+    },
+    {
+      "id": "bug-55-mvoyddv5",
+      "error_message": "第一回合喝 3 瓶药水时，精确切击的伤害先在基础上 +9 然后又跳回去",
+      "fix": "爬行动物饰品的 +3/瓶力量是「喝的时候才到账」，而意图预补以前整天补满 (3×PlannedPotions)：她每喝一瓶真实力量 +3、预补没撤 ⇒ 显示成 base+18，等她的回合重算才掉回 base+9（用户看到的「+9 再跳回」）。修法：新增 CharBossMonster.PotionsDrunkThisTurn（PrepareTurn 清零、BossPotions.DrinkAsync 每喝一瓶 +1、剧本要喝但栏位没有而跳过的也算处理过 +1），BladesGrowth.PotionStrengthRise(boss, planTime) 按「还没喝的那几瓶」补 = per×(planned−drunk)，于是 真实力量+预补 ≡ per×planned 恒定不变；并在 CharBossMonster.ShowPotionGoneAsync 里先 RefreshPlannedIntents() 再刷新面板，保证每喝一瓶立刻用新的真实力量重算",
+      "at": "2026-10-26T07:46:22.193Z"
+    },
+    {
+      "id": "bug-56-mvoym5l1",
+      "error_message": "炼药贼第一回合精确切击：预测 18、实打 20；且意图数字在喝药/出牌过程中一直跳（15/18/12/14）",
+      "fix": "两个独立原因。①手牌收缩算少 1 张：真实收缩是 扫腿−1、生存者−2（自己离手+额外弃1张，反编译 Survivor.OnPlay = GainBlock + CardSelectCmd.FromHandForDiscard(prefs,1)；日志 Also 候选5选[DECAY]）、穿透哀嚎−1 ⇒ 打到精确切击时手牌是 2 张而不是 3 张，13−2×1=11 再+9力量=20，而我按「每张牌−1」算成手牌3 ⇒ 9+9=18。②出牌期对所有未打出牌都用「当前手牌数」⇒ 每打一张后面所有牌意图都变、回合一开始还先掉到12。修法：新增 HandDeltaOf(card)（只列反编译验证过的 SURVIVOR=−1、ACROBATICS=+2，其它0），沿计划累加 shrink=1+HandDeltaOf+生成小刀；规划期 handAtPlay=开局手牌−前面所有收缩，出牌期 handAtPlay=当前真实手牌−「还没打出去」那些牌的收缩（用 StillInHand 跳过已打出的，它们已体现在当前手牌里）。结果：第1回合精确切击从规划期到打出恒为 20，不再跳",
+      "at": "2026-10-26T07:53:11.365Z"
+    },
+    {
+      "id": "bug-57-mvoyqxvj",
+      "error_message": "v0.2.14 炼药贼第一回合精确切击预测变成 16（实际 20）",
+      "fix": "HandDeltaOf 的语义是「负数=手牌还会少几张(弃牌)、正数=还会多几张(抽牌)」，但收缩公式写成了 shrink = 1 + HandDeltaOf(card) ⇒ 生存者那项 = 1+(−1) = 0，等于没算它弃的那张，手牌被估成 4 张 → 13−2×3=7 +9力量 = 16。正确是 shrink = 1 − HandDeltaOf(card)：扫腿1/生存者2/穿透1 累计4 ⇒ 出手时手牌 2 张 ⇒ 11+9=20。另外 GeneratedShivs 不该加进收缩（生出来的小刀当回合就被打出去，净变化 0）。并新增诊断日志：PlayOne 打出 PRECISE_CUT 时打印「出手时真实手牌 N 张」，与意图日志的 +手N 对照",
+      "at": "2026-10-26T07:56:54.655Z"
+    },
+    {
+      "id": "bug-58-mvoywzr5",
+      "error_message": "爆发(Burst)把自己也算成「被爆发影响的技能牌」：意图显示 ×2、运行时自己再打一遍还多给一层",
+      "fix": "原版是在出牌**前**问 ModifyCardPlayCount，而我把「爆发给几层」写在了「判断这张牌打几次」之前，爆发自己又是技能牌 ⇒ 自我叠加。修法两边同一条规则：出牌前判定次数、牌的自身效果之后才生效。显示侧 BladesGrowth：先按当前 dupLeft/burstLeft 算 playCount 并消耗层数，然后才在「这张是 BURST」时把层数加给后续技能牌；运行时 CharBossMonster.PlayOne：dupHere/burstHere 在主 AutoPlay 之前取快照，重放与 PowerCmd.Decrement 仍在主结算之后。结果：爆发自身打 1 次，它之后的第一张技能牌（残影）打 2 次 ⇒ 群蛇触发 2 次 ⇒ 那条额外攻击意图显示 4×2（用户 2026-10-26 口径：×2 是给受影响的牌，不是给爆发）",
+      "at": "2026-10-26T08:01:37.025Z"
+    },
+    {
+      "id": "bug-59-mvoz090w",
+      "error_message": "开完群蛇形态后，形态特效方向是反的（朝右、背对玩家），应该朝左面向玩家",
+      "fix": "她立绘是 BossVisuals.FaceThePlayer 把 Visuals.Body 的 scale.x 取负来镜像的；而 NSerpentFormVfx.Create 走的是 creatureNode.Visuals.AddFormVfx(vfx) → FormVfxHolder.AddChildSafely(vfx) + vfx.Position=Zero，而 NCreatureVisuals.FormVfxHolder 是 Visuals 下一个独立的 Godot.Control、不是 Body 的子节点 ⇒ 不继承镜像，蛇就朝右了。修法：HarmonyPostfix 挂 NSerpentFormVfx.Create，目标 Creature.Monster is CharBossMonster 时把特效节点自己的 scale.x 取负（Position 被强制 Zero，子节点相对它定位）；再在 BossFrameTick 的 4Hz 慢车道遍历 FormVfxHolder 子节点幂等兜底。翻转不会被抹掉：NSpineSpriteBoneFollower._Process 每帧只写 GlobalPosition、不碰 scale。只对我们的 Boss 生效",
+      "at": "2026-10-26T08:04:09.008Z"
+    },
+    {
+      "id": "bug-60-mvoz2jvz",
+      "error_message": "其它形态牌（恶魔形态/回响形态/死神形态/虚空形态）的特效同样方向反了（朝右、背对玩家）",
+      "fix": "不要一个个挂 Create：五个形态（NDemonFormVfx/NEchoFormVfx/NReaperFormVfx/NSerpentFormVfx/NVoidFormVfx）的 Create(Creature) 签名完全一致，且都只走同一入口 creatureNode.Visuals.AddFormVfx(vfx)。所以只挂 NCreatureVisuals.AddFormVfx 的 postfix：从 NCreatureVisuals 往上最多 4 层找 NCreature，用其公开的 Entity 判断 Creature.Monster is CharBossMonster，是则把该形态特效节点自己的 scale.x 取负（幂等，Position 被强制 Zero 所以就地镜像即可）；再在 BossFrameTick 4Hz 慢车道遍历 FormVfxHolder 子节点兜底。原因同群蛇：FormVfxHolder 是 Visuals 下独立的 Control、不是 Body 子节点，不继承 Body 的镜像；NSpineSpriteBoneFollower 每帧只写 GlobalPosition 不碰 scale，所以翻转不会被抹掉",
+      "at": "2026-10-26T08:05:56.399Z"
+    },
+    {
+      "id": "bug-61-mvozd4ci",
+      "error_message": "炼药贼「喝药恢复5血」看起来没实现（满血喝药完全无痕迹；且混沌药水那一瓶确实从来不回血）",
+      "fix": "查日志：15:09 那场回血是生效的（受伤511→516），之后每次复测都停在满血520/520 的第1回合 ⇒ +5 无处可加，而旧代码只在 CurrentHp<MaxHp 时打日志 ⇒ 屏幕上和日志里都没有任何痕迹。真 bug 只有一个：EntropicBrew（混沌药水）走「补满栏位后 return true」分支，从来没走到回血那段。修法：抽出 HealAfterPotionAsync(shadow, healPerPotion, potionName)，所有喝药路径（含混沌药水分支）都调用，并把三种情况都记日志（生效 / 满血不生效 / 找不到生物或已死亡）；上限仍是 MaxHp，时序数值不变",
+      "at": "2026-10-26T08:14:09.474Z"
+    },
+    {
+      "id": "bug-62-mvozd4co",
+      "error_message": "炼药贼「调制」特殊效果说明框太长、顶到画面底部，需要单独上移（其它 Boss 不动）",
+      "fix": "BossUiTuning 新增热调项 brewSpecialY（默认 -120 = 上移 120px），BossSpecialUi.Place 里只在 boss.Def.SpecialPowerForAct(ActIndex) == typeof(BrewModPower) 时加这个偏移，其它 Boss 保持 0 偏移完全不动；Place 开头先 BossUiTuning.Refresh() 使得改 charbosses_ui.txt 存盘即生效",
+      "at": "2026-10-26T08:14:09.480Z"
+    },
+    {
+      "id": "bug-63-mvozl565",
+      "error_message": "残影（BLUR）被打出 3 次；根因是我们在 PlayOne 里手写的「复制药水/爆发重放」与原版重复",
+      "fix": "不要再自己实现重复打出：原版 CardModel.OnPlayWrapper 内部就是 GeneratePlayCount()（= GetEnchantedReplayCount()+1 → Hook.ModifyCardPlayCount → Hook.AfterModifyingCardPlayCount）然后 for(i<playCount) 逐次打；CardCmd.AutoPlay 调的就是 OnPlayWrapper，所以走 AutoPlay 也照常打两遍。我们 v0.2.13 依据「CardCmd 类型里搜不到 ModifyCardPlayCount」误判成钩子不跑，手写了一轮 AutoPlay 重放 ⇒ 2+1=3 次。修法：整段删除，交回原版；意图侧的 playCount 保留但只用于显示（4×2）。教训：钩子可能在更深一层被调用，不能因为某个类里搜不到就断定管线不跑",
+      "at": "2026-10-26T08:20:23.789Z"
+    },
+    {
+      "id": "bug-64-mvozl56g",
+      "error_message": "残影（BLUR）的意图只有「守势」，缺「强化」",
+      "fix": "反编译 Blur.OnPlay = CreatureCmd.GainBlock(Block) + PowerCmd.Apply&lt;BlurPower&gt;(…, DynamicVars[\"Blur\"].BaseValue, …)，变量名是普通 DynamicVar「Blur」而不是 PowerVar&lt;BlurPower&gt;，而 ClassifyPowers 只认泛型 PowerVar&lt;&gt; ⇒ 自动识别不到。修法：BossIntentBuilder 新增点名表 BuffVarCards={\"BLUR\"} 并 OR 进 selfBenefit，于是残影意图 = 守势 + 强化（守势保留）。以后再有「用普通 DynamicVar 表达能力层数」的牌往这张表加",
+      "at": "2026-10-26T08:20:23.800Z"
+    },
+    {
+      "id": "bug-65-mvp03qex",
+      "error_message": "镣铐药水/爆炸药水等「对所有敌方生效」的药水被扔向她自己（日志：喝药水：SHACKLING_POTION（目标 静默猎手））",
+      "fix": "ShacklingPotion/ExplosiveAmpoule 的 TargetType 都是 AllEnemies，本该在 ChooseTarget 的敌方分支选中真人玩家；但那个分支要求 p.Creature.IsHittable，而她回合刚开始时真人玩家常常还不是 IsHittable（与 HittableEnemiesSidePatch 注释记录的同一个坑）⇒ 一个都选不到，函数最后 return me。修法两点：①ChooseTarget 敌方分支改为「优先可命中的真人玩家，否则退回任意活着的真人玩家，绝不退回自己」；②喝药期间把 HittableEnemiesSidePatch.ForceRelativeSide 置 true（用完恢复原值），因为这两种药水内部读 CombatState.HittableEnemies，CurrentSide 还没切过来时会被解释成敌方阵营（她自己）",
+      "at": "2026-10-26T08:34:51.129Z"
+    },
+    {
+      "id": "bug-66-mvp0b8l4",
+      "error_message": "改完目标选择后，镣铐药水/爆炸药水的抛掷动画依旧朝她自己飞",
+      "fix": "抛掷动画的目标点根本不看我们传的 target：反编译 PotionModel.OnUseWrapper 发现，非单体目标时它是 var list = TargetType != AllEnemies ? combatState.GetCreaturesOnSide(CombatSide.Player).Where(IsHittable) : combatState.GetCreaturesOnSide(CombatSide.Enemy).Where(IsHittable)；然后取这些生物 VfxSpawnPosition 的平均值，再 NItemThrowVfx.Create(owner.VfxSpawnPosition, targetPosition, potion.Image)。即 AllEnemies 类药水写死取 Enemy 阵营平均位置 ⇒ 我们的 Boss 在敌方阵营，药水当然朝她飞（效果本身走 HittableEnemies 早已正确打在玩家身上）。修法：新增 PotionThrowAtPlayerPatch —— 在 NItemThrowVfx.Create 的 prefix 里把 __1 targetPosition 替换成事先算好的真人玩家平均 VfxSpawnPosition（一次性、用完即清）；BossPotions.ArmThrowAtPlayersIfNeeded 在 OnUseWrapper 前 Arm、finally 里 Disarm，拿不到玩家位置就不干预",
+      "at": "2026-10-26T08:40:41.272Z"
+    },
+    {
+      "id": "bug-67-mvp0b8le",
+      "error_message": "炼药贼剧本需把第 3 回合的爆炸药水挪到第 2 回合",
+      "fix": "SilentBrewerScript 第 2 回合 Potions&lt;ShacklingPotion, ShipInABottle&gt; 改为再加 ExplosiveAmpoule；第 3 回合 Potions&lt;ShipInABottle, GhostInAJar, ExplosiveAmpoule&gt; 改为去掉 ExplosiveAmpoule（只有这两处，第 7 回合的爆炸药水保持不变，符合「其它都不变」），两回合 Note 同步改措辞",
+      "at": "2026-10-26T08:40:41.282Z"
+    },
+    {
+      "id": "bug-68-mvp0de4w",
+      "error_message": "炼药贼剧本：第 2 回合的尖啸要换成中和，第 3 回合的中和要移除",
+      "fix": "SilentBrewerScript：第 2 回合 Cards(...) 里 C&lt;PiercingWail&gt;() 换成 C&lt;Neutralize&gt;()（顺序保持在 Nightmare、Brew(ShipInABottle) 之后、DefendSilent 之前）；第 3 回合 Cards(...) 里删掉 C&lt;Neutralize&gt;()（其余 SerpentForm/Brew×3/Footwork/Burst/Blur 不动）；两回合 Note 同步改措辞。设计稿 docs/plans/boss-silent-brewer.md §1 的逐字记录也同步标注了这两处挪动",
+      "at": "2026-10-26T08:42:21.776Z"
+    },
+    {
+      "id": "bug-69-mvp0ljar",
+      "error_message": "炼药贼第 2 回合的瓶中船在回合开始就喝，但那瓶是本回合炼制药水才炼出来的（日志：剧本要喝 ShipInABottle，但栏位里没有 → 跳过）",
+      "fix": "第 2 回合 Potions&lt;ShacklingPotion, ShipInABottle, ExplosiveAmpoule&gt; 去掉 ShipInABottle（回合开始只喝镣铐+爆炸）；改在卡序里给「中和」挂 Drink(typeof(ShipInABottle), C&lt;Neutralize&gt;())，即 夜魇 → 炼制药水+（炼出瓶中船）→ 喝瓶中船 → 中和 → 防御。顺带 BladesGrowth 增加 drinkRise：中途「打某张牌之前先喝一瓶」也会触发爬行动物饰品 +3 力量，规划期给后面那些牌补上（出牌期不补，避免双算）",
+      "at": "2026-10-26T08:48:41.715Z"
+    },
+    {
+      "id": "bug-70-mvp12jxz",
+      "error_message": "炼药贼需削弱：去掉特殊效果里「喝药回 5 血」这一条",
+      "fix": "BossDefs 里炼药贼变体的 HealPerPotion 5 → 0（回血逻辑仍在 BossPotions.HealAfterPotionAsync，healPerPotion&lt;=0 时直接返回，填回正数即可恢复）；中英 × monsters.json / powers.json 共 4 处描述删掉「每当静默猎手使用药水时，她恢复 5 点生命。」/「Whenever she uses a potion, she heals 5 HP.」；CharBossMonster.Turn.cs 的「药水就绪」日志改为 healPerPotion&gt;0 才写「每瓶回 N 点生命」，否则写「不回血」",
+      "at": "2026-10-26T09:01:55.703Z"
+    },
+    {
+      "id": "bug-71-mvp2vukt",
+      "error_message": "阵容以「角色下标」为单位，导致刀贼/炼药贼只能靠种子二选一；且每场固定 2 只，无法支持三人联机（进阶10三层需要人数×2 个 Boss）",
+      "fix": "新增 BossKeys（Boss 标识 = 角色+变体）：Key = 档位遭遇 id 去掉 _ENCOUNTER/_BOSS（SILENT_BREWER_BOSS_ENCOUNTER→SILENT_BREWER），三层候补 6 个（刀贼/能力机/根除骨/无色储君/易伤战/炼药贼）。BossLineups.For 改为返回 string[]（Boss 标识），长度 = PlayersPerFight()=clamp(玩家数,1,3)：①同一场不出现同角色 Boss（⇒ 刀贼与炼药贼不同场）；②进阶10三层两场之间 Boss 标识完全不重复，但允许同角色跨场（第二场从第一场没用过的 Key 里挑）；③主 Boss 角色逐幕不重复只在候补够时尽量避开，不够就主动让步。全部用 RankOf(seed,act,fight,key) 派生保证两端一致。MultiBossPlan.PartnerFor 改为 PartnersFor(myKey) 返回多只伙伴（按 Key 取怪物类型），由 CharBossEncounterBase.GenerateMonsters 逐个加入。BrewerActive 增加「看这一场阵容里的静默 Key」判断，伙伴是炼药贼时也能判对。3 只站位：BossEnemySpreadPatch 增加 ours.Count>=3 分支（左上/中下/右上，2 只逻辑完全不变）",
+      "at": "2026-10-26T09:52:42.125Z"
+    },
+    {
+      "id": "bug-72-mvp2zfmz",
+      "error_message": "炼药贼需要进阶加成：进阶8 升级中和，进阶9 升级精确切击与拳斗",
+      "fix": "不能在 BossDefinition.AscensionUpgrades 里加（那是按角色的，刀贼与炼药贼共用 BossDefs.Silent，会连刀贼一起升级）。正确做法是写在剧本卡上：新增小工具 A&lt;T&gt;(int minAscension) 生成带 UpgradeMinAscension 的 ScriptCard（BossScriptRunner.BuildHand 会在 AscensionOf(shadow) &gt;= 该值时 UpgradeInternal）。具体：第1/5回合精确切击 A&lt;PreciseCut&gt;(9)；第2/7回合中和 A&lt;Neutralize&gt;(8)；第4/8回合拳斗 A&lt;Fisticuffs&gt;(9)",
+      "at": "2026-10-26T09:55:29.387Z"
+    },
+    {
+      "id": "bug-73-mvp89bks",
+      "error_message": "双人联机：击败一只 Boss 后，另一只还活着的 Boss 这一回合的意图/手牌面板整块消失（三人/四人同因）",
+      "fix": "BeforeRemovedFromRoom 以前无条件调 BossHandUi.EndFight()，它会把**所有** Boss 的面板 + 锁定 + 帧诊断一起清掉（那只 Boss 要等它下个回合 PrepareTurn 才重建面板）。v0.2.29 起：MultiBossPlan.AnyOtherBossAlive(this) 为真 ⇒ 只调 BossHandUi.ReleasePanel(this) 收掉阵亡那只自己的一套面板，场上其余 Boss 的面板原封不动；场上没有别的 Boss 时才走 EndFight。",
+      "file": "src/Hooks/Monsters/CharBossMonster.Descriptor.cs",
+      "at": "2026-10-26T12:23:08.764Z"
+    },
+    {
+      "id": "bug-74-mvq27x2y",
+      "error_message": "游戏启动失败（ModelDb 初始化抛 DuplicateModelException: POWER.COOLANT_POWER 已映射到 MegaCrit.Sts2.Core.Models.Powers.CoolantPower，又试图映射 CharacterBosses.Powers.CoolantPower）",
+      "fix": "模型 ID 由类名 Slugify 而来 ⇒ 自定义 Power/Card/Relic/Encounter 的类名绝不能和原版同名。我们的「冷却剂」原版已有（MegaCrit.Sts2.Core.Models.Powers.CoolantPower）⇒ 改名 BossCoolantPower、本地化 key 改 BOSS_COOLANT_POWER 即修复。**新增任何模型类之前先跑一次** `ilspycli types references\\sts2.dll <类名>` 看原版有没有同名类型。",
+      "file": "src/Hooks/Powers/BossCoolantPower.cs",
+      "at": "2026-10-27T02:21:51.802Z"
+    },
+    {
+      "id": "bug-75-mvq9scu6",
+      "error_message": "PowerShell 5.1 `Set-Content -Encoding UTF8` 给 content/localization/*.json 写入 BOM，游戏/`node JSON.parse` 直接报 \"Unexpected token '\\uFEFF'\" —— 本地化整份失效。",
+      "fix": "改文本后一律用 `[System.IO.File]::WriteAllText($path, $text, (New-Object System.Text.UTF8Encoding($false)))`（读取用 `[System.IO.File]::ReadAllText`，它会自动吃掉 BOM），然后 `node -e \"JSON.parse(...)\"` 校验每个 json。仓库里既有 json 全是「无 BOM + CRLF」。",
+      "at": "2026-10-27T05:53:42.654Z"
+    },
+    {
+      "id": "bug-76-mvqbes99",
+      "error_message": "Boss 意图伤害「吃虚弱后减半」：33→16、6→3、23→12（= ×0.5，不是 ×0.75）。曾误判为「虚弱算两遍（0.75²=0.5625）」，数值对不上。",
+      "fix": "反编译确认：WeakPower.ModifyDamageMultiplicative = 0.75，但随后调用 DebilitatePower.ModifyWeakMultiplier，其实现 amount-(1-amount) ⇒ 0.75→0.5。摧残(DEBILITATE_POWER，亡灵契约师的卡 Debilitate)效果就是「2 回合内易伤与虚弱效果翻倍」。所以 ×0.5 = 虚弱+摧残，是原版正确算法，不是重复计算。排查意图数值时先看 `意图伤害管道` 日志里的 虚弱/摧残/易伤 字段。",
+      "file": "src/Hooks/Core/BossDamagePredictor.cs",
+      "at": "2026-10-27T06:39:08.685Z"
+    },
+    {
+      "id": "bug-77-mvrgcj8x",
+      "error_message": "开局必崩：ArgumentNullException: Value cannot be null. (Parameter 'key') at AssetCache.GetAsset <- NTopBarBossIcon.RefreshBossIcon <- NGlobalUi.Initialize <- NRun._Ready，随后 NMapScreen.SetMap 连锁 NullReferenceException（Exception starting singleplayer run）",
+      "fix": "缺图补丁绝不能把路径清成 null：NTopBarBossIcon 不判空，null 会一路进 ConcurrentDictionary.TryGetValue(null) 抛异常打断 NRun._Ready。改为替换成原版占位 Boss 图标路径（TheKinBoss 的 ui/run_history/the_kin_boss.png/_outline.png，ResourceLoader.Exists 校验过），取不到就保持原路径不动（只刷加载警告不崩）。",
+      "file": "src/Hooks/Patches/EncounterIconPathPatch.cs",
+      "at": "2026-10-28T01:45:07.953Z"
+    },
+    {
+      "id": "bug-78-mvrgclqj",
+      "error_message": "红色横幅「存在多个id为CharacterBosses的模组！」+ 日志 [ERROR] Tried to load mod with id CharacterBosses, but a mod is already loaded with that name!（删除磁盘上的 mod_manifest.json 也没用）",
+      "fix": "根因是 PCK 里也打了一份 res://mod_manifest.json：与磁盘上的 mods\\CharacterBosses\\CharacterBosses.json 组成两个同 id 清单。对照原版/崩坠的 Downfall.pck 里没有内嵌清单。改 build_pck.gd 不再 packer.add_file(\"res://mod_manifest.json\", ...)，只在清单 json 里补 pck_name 字段；重建 PCK 后加载日志只剩一条清单、一条 mod 条目。",
+      "file": "tools/pck_builder/build_pck.gd",
+      "at": "2026-10-28T01:45:11.179Z"
+    },
+    {
+      "id": "bug-79-mvs5q1mg",
+      "error_message": "配置界面里用 Godot 的 CheckButton/CheckBox 做开关，面板上完全看不到勾选框（只有文字），用户看不出一项是开还是关",
+      "fix": "本游戏的 UI 主题没给 CheckButton/CheckBox 定义 check 图标 ⇒ 自绘面板里改用 Button + 文字状态前缀（【替换】/【不换】、【已选】/【未选】/【锁定】）。实测截图确认文字能渲染（中文正常）。",
+      "file": "src/Hooks/UI/BossConfigUi.cs",
+      "at": "2026-10-28T13:35:28.696Z"
+    },
+    {
+      "id": "bug-80-mvs5q3sh",
+      "error_message": "自绘的配置面板内容画到屏幕外：底部「关闭」按钮不可见 / 面板整体偏下，CenterContainer + 写死高度怎么调都对不上",
+      "fix": "两个原因：① 建面板时 dim 还没进树，GetViewportRect() 读回来是无效尺寸（面板被压成 260 高）；② VBoxContainer 空间不够时滚动区会把底部行挤出面板。改法：面板全部用**锚点比例**（0.06～0.94 × 0.07～0.93，不写死像素），关闭按钮放进**标题行**而不是底部，内容全部交给 ScrollContainer 滚动。",
+      "file": "src/Hooks/UI/BossConfigUi.cs",
+      "at": "2026-10-28T13:35:31.505Z"
+    },
+    {
+      "id": "bug-81-mvs5ub0q",
+      "error_message": "意图上出现多余的「×1」：根除骨的戳击显示 6×1；刀贼开完幻影刀刃那回合的隐秘匕首显示 16、7×1",
+      "fix": "根因是「先算段数、再无条件建多段意图」：① fromOsty 分支（戳击/重压/出击）无条件 new RawMultiAttackIntent(capped, hits*plays)；② 幻影刀刃分支里第二段 new MultiAttackIntent(shivDamage, shivs-1)，2 把刀时 shivs-1=1。新增 Core/AttackIntent.Multi/Raw 统一出口（段数≤1 退回单段），并把 fromOsty / X费 / 幻影刀刃余段 / 终结技(SilentBlades+BladesGrowth) / 狡诈药水全部换成它。",
+      "file": "src/Hooks/Core/BossIntentBuilder.cs",
+      "at": "2026-10-28T13:38:47.498Z"
+    },
+    {
+      "id": "bug-82-mvs6u7tc",
+      "error_message": "配置界面里地图开关点一次关掉后，再点也开不回来（按钮永远停在「不换」）",
+      "fix": "自绘面板把「构建时那份开关状态」捕进了点击闭包：OnMapClicked(button, entry, !enabled) 里的 enabled 是建行时的旧值 ⇒ 第二次点击传的还是同一个值。改成点击时现读 BossConfig.IsMapEnabledById(entry) 再取反（新的 BaseLib 界面里同样遵守这条：每次点击都重读配置）。",
+      "file": "src/Hooks/UI/BossConfigUi.cs",
+      "at": "2026-10-28T14:06:42.960Z"
+    },
+    {
+      "id": "bug-83-mvs7lu8j",
+      "error_message": "BaseLib 配置界面里勾选框/按钮全都看不见：`new NTickbox()` 和 `new NConfigTickbox()` 在画面上一个像素都不出",
+      "fix": "三个叠在一起的坑：① `NTickbox` 的 `_imageContainer/_tickedImage/_notTickedImage` 来自场景（res://scenes/ui/tickbox.tscn），裸 `new NTickbox()` 没有视觉子节点，`ConnectSignals()` 空引用被 try 吞掉 ⇒ 什么都不画；② 子类里**不能**调 `base._Ready()`（原版直接抛 `Don't call base._Ready()! Call ConnectSignals() instead.`）；③ BaseLib 的 `NConfigOptionRow` 是 MarginContainer、控件靠右，这个窗口尺寸下控件落在 x=610..1694 乘缩放后跑到屏幕外。最终方案：不用 NTickbox，自己搭 `HBoxContainer` 行（控件在左），勾选框用普通 `Button`（Flat+ToggleMode）配游戏自己的两张贴图 `res://images/atlases/ui_atlas.sprites/checkbox_ticked.tres` / `checkbox_unticked.tres`。",
+      "at": "2026-10-28T14:28:11.731Z"
+    },
+    {
+      "id": "bug-84-mvs7lwms",
+      "error_message": "配置界面里 BaseLib 的 `CreateRawLabelControl` 造出来的文字全部不显示（只剩分割线）",
+      "fix": "`MegaRichTextLabel` 在 `AutoSizeEnabled=false` 时**高度 0、最小宽度 1**。BaseLib 的 NConfigOptionRow 内部会给 label 设 `CustomMinimumSize(0,64)` 才显示；自己搭 HBoxContainer 时若不给 ExpandFill/最小尺寸，文字就被压成 1px 什么都看不见。解法：行内 label 设 `CustomMinimumSize=(0,64)`+`SizeFlagsHorizontal=ExpandFill`，说明性小字设 `FitContent=true`。",
+      "at": "2026-10-28T14:28:14.836Z"
+    },
+    {
+      "id": "bug-85-mvs8vfqx",
+      "error_message": "BGM 分段无效：写 insatiable_progress（事件内 update_music_parameter 或全局 update_global_parameter）都返回成功但音乐毫无变化",
+      "fix": "这类 `<boss>_progress` 参数对我们用 PlayCustomMusic 播的曲目不起作用（三场实测：血 18.5% 写 8 无变化；全局参数交替 0/10 也无变化；而同一次里 PlayCustomMusic 换成知识恶魔立刻能听出来）。bank 里 Insaitable_v2_Layer1~5 是同一事件内部的层，原版只在死亡时写一次 10。结论：不要基于这些参数做效果，唯一有效手段是换曲目；二层按用户口径统一用帝皇蟹。",
+      "file": "src/Hooks/Core/BossBgm.cs",
+      "at": "2026-10-28T15:03:39.129Z"
+    },
+    {
+      "id": "bug-86-mvssl8mo",
+      "error_message": "加载模组 CharacterBosses 时抛出 System.Reflection.ReflectionTypeLoadException：Could not load file or assembly 'BaseLib'（模组列表里显示红字报错）",
+      "fix": "清单里 \"dependencies\": [] 是空的 ⇒ 游戏把 CharacterBosses 排在 BaseLib **之前**加载；ModManager.TryLoadMod 会 Assembly.GetTypes() 枚举我们的类型，而 BossConfigModConfig 继承 BaseLib 的 SimpleModConfig ⇒ BaseLib 还没加载进来，整个枚举抛异常。改成 \"dependencies\": [ { \"id\": \"BaseLib\" } ]（ModDependency 的字段是 id + min_version），排序器就会先加载 BaseLib。代价：没装 BaseLib 的玩家加载不了本模组。",
+      "file": "src/CharacterBosses.json",
+      "at": "2026-10-29T00:15:35.664Z"
+    },
+    {
+      "id": "bug-87-mvsslcr1",
+      "error_message": "godot.log 每次启动刷 ERROR：Caught System.Text.Json.JsonException trying to deserialize mod manifest json at path ...\\CharacterBosses\\charbosses_config.json",
+      "fix": "游戏扫描 mod 目录时把**每个** *.json 都当模组清单反序列化，我们的运行期配置文件不是清单 ⇒ 报错。改名为 charbosses_config.cfg（内容仍是 JSON）；并在 NMainMenu._Ready 里调 BossConfig.EnsureLoaded() 主动加载一次，把旧的 .json 自动迁移成 .cfg 后删除（懒加载的话旧文件会一直躺在那里继续被扫描到）。",
+      "file": "src/Hooks/Core/BossConfig.cs",
+      "at": "2026-10-29T00:15:41.005Z"
+    },
+    {
+      "id": "bug-88-mvsvz9ei",
+      "error_message": "四人局：灾厄骨的「播种」(SOW, AllEnemies) 只打到一个玩家。日志：`PLAY SOW -> [unknown]` 后紧跟 `选靶收窄：NECROBINDER_BOSS 的对手列表只留锁定玩家（原来 1 项 → 1）`。",
+      "fix": "根因不是选靶：`SerpentFormLockOnPatch` 用 `HittableEnemiesSidePatch.PushNarrowTo/PopNarrowTo` 做「只打被锁定玩家」，这是一个**全局作用域开关**，多人同场时它跨到了别的牌的结算里。改成一次性收窄 `RequestNarrowOnce`（两帧内有效、被下一次 `HittableEnemies` 读取即失效），并在每次出牌前 `ResetNarrowing()`。安全性依据：`MoveNext` 每次调用同步跑到下一个 await 为止，`NextItem(HittableEnemies)` 就在同一片同步代码里，中间插不进别人的结算。",
+      "file": "src/Hooks/Patches/SerpentFormLockOnPatch.cs",
+      "at": "2026-10-29T01:50:28.698Z"
+    },
+    {
+      "id": "bug-89-mvswdi98",
+      "error_message": "播种 Sow（TargetType.AllEnemies）只打一个玩家，即使收窄深度=0、出牌瞬间 HittableEnemies 解析到 4 个目标。",
+      "fix": "真凶是 `ShadowPetNotAnOpponentPatch`（`CombatState.GetOpponentsOf` 的 postfix）里那层「只留锁定玩家」的收窄。反编译 `Sow.OnPlay` = `DamageCmd.Attack(...).FromCard(...).TargetingAllOpponents(...)`，而 `AttackCommand.GetPossibleTargets()` 在多目标时**返回的就是 `GetOpponentsOf(Attacker)`** —— 群攻牌的打击列表和随机单体牌同源，所以收窄必然把群攻变成单体。修法：新增 `HittableEnemiesSidePatch.MultiTargetCardDepth`，`CharBossMonster` 在 `CardCmd.AutoPlay` 前后按 `TargetType.AllEnemies/AllAllies` 成对加减，收窄处 depth>0 直接返回。",
+      "file": "src/Hooks/Patches/CombatSidePatches.cs",
+      "at": "2026-10-29T02:01:33.356Z"
+    },
+    {
+      "id": "bug-90-mvswp2b5",
+      "error_message": "奇巧贼第2回合「早有准备」应丢弃鬼祟+翻越撑击（两张都有奇巧，都会自动打出），实际只丢了鬼祟，翻越撑击留在手里。日志：自动选择: 候选 6 个（min=2 max=2）→ 选 [DEFEND_SILENT,SNEAKY]。",
+      "fix": "自动选择器（ICardSelector，替 Boss 回答「弃 N 张」）原来只按「剧本点名 → 价值 → 费用」挑，把 0 费防御挑走了。奇巧（CardKeyword.Sly / card.IsSlyThisTurn）牌被丢弃会**自动打出**，丢弃它们等于白赚一次，所以在排序里插一档 `IsSly(c) ? 0 : 1`，优先级仅次于剧本点名。",
+      "file": "src/Hooks/Core/BossCardSelector.cs",
+      "at": "2026-10-29T02:10:32.561Z"
+    },
+    {
+      "id": "bug-91-mvsx0uoj",
+      "error_message": "多人时故障机器人（黑球机/能力机）的「休眠」不给其它 Boss 它本回合冰球获得的格挡。",
+      "fix": "原版 FrostOrb.Passive/Evoke 在 Owner 带 HibernatePower 时 `foreach (p in CombatState.Players) if (p != Owner) GainBlock(p.Creature, …)`，而**我们 Boss 的影子 Player 被故意排除在 `CombatState.Players` 之外**（见 BossHookBridge 类注释），所以那圈循环只到真人玩家、其它 Boss 一个都拿不到。修法：拦下发真人玩家的那一笔之后，用 `GrantToOthersAsync` 把同样的数值发给场上除施法者外所有活着的 CharBossMonster（`OtherBosses`），拦下时日志会写「⇒ 转给其它 Boss [...]」。",
+      "file": "src/Hooks/Patches/HibernateFrostBlockPatch.cs",
+      "at": "2026-10-29T02:19:42.547Z"
+    },
+    {
+      "id": "bug-92-mvsyuuua",
+      "error_message": "四人局：1、3、4 号位玩家的状态栏上出现两个「跟踪锁定」图标，巡检日志却显示每人只有 1 份 LockOnPower。",
+      "fix": "根因在渲染层 NPowerContainer：Add 不去重、Remove 在 CombatManager.IsInProgress==false 时整段跳过、且按引用只摘第一个匹配项 ⇒ 多出来的节点永久残留（从来不是第二份 Power，InstanceType.None 不允许）。修法（v0.2.148，用户选的方案 B）：① Harmony Prefix 拦 NPowerContainer.Add，只对 InstanceType.None 的 Power 去重，遇到同类型残留节点就改绑（residual.Model = power）而不是新建；② Postfix 补 NPowerContainer.Remove 因 IsInProgress==false 跳过的那一半；③ 由 BossFrameTick 每 200ms 对账一次，节点的 Model 必须引用出现在 creature.Powers 里且同一模型只允许一个节点，否则 RemoveChild + QueueFree + UpdatePositions。不碰 PowerModel.IsVisible（队友可见性仍归原版 LocalContext.IsMe）。",
+      "file": "src/Hooks/Patches/PowerIconNodeReconcilePatch.cs",
+      "at": "2026-10-29T03:11:02.050Z"
+    },
+    {
+      "id": "bug-93-mvsz3yil",
+      "error_message": "奇巧贼的「翻越撑击」(FlickFlack, TargetType.AllEnemies/对所有敌人7伤) 被「早有准备」丢弃后只打一个玩家；播种 Sow 已修好，这张没有。",
+      "fix": "v0.2.141 的群攻豁免（HittableEnemiesSidePatch.MultiTargetCardDepth）只加在 CharBossMonster 的 CardCmd.AutoPlay 前后，即「我们自己主动打出的牌」。翻越撑击是奇巧(Sly)牌，由原版 CardCmd.<DiscardAndDraw>d__4 里 AutoPlay(..., AutoPlayType.SlyDiscard) 丢弃后免费打出 —— 在我们的包装之外，那一刻 depth=0 ⇒ 仍被 GetOpponentsOf 收窄成单体。修法（v0.2.149）：把豁免改挂到攻击的唯一汇合点 AttackCommand.GetPossibleTargets 的 Postfix（AoeAttackNotNarrowedPatch），判据换成 IsMultiTargeted：多目标攻击的结果若退化到 1 个对手，就用 SkipNarrowDepth 暂停收窄重算完整列表。随机单体(Ricochet/TargetingRandomOpponents)不受影响，仍跟锁定。",
+      "file": "src/Hooks/Patches/CombatSidePatches.cs",
+      "at": "2026-10-29T03:18:06.717Z"
+    },
+    {
+      "id": "bug-94-mvt0d0ho",
+      "error_message": "灾厄骨第6回合日志 FRIENDSHIP 回能 +1 → 用 2 费打出友谊+出击+护卫 三张 1 费牌（剧本写的是「护卫没费」）。",
+      "fix": "友谊 Friendship 的 Energy 变量喂的是 PowerCmd.Apply&lt;FriendshipPower&gt;，而 FriendshipPower 只实现 ModifyMaxEnergy（每回合能量上限 +Amount），不是当场回能。我们「牌面 Energy 变量直接补进 pcs.Energy」的逻辑把它当成立刻回能。修法：BossScriptPlanner.DeferredEnergyCard 加上 FRIENDSHIP（该判据同时被规划期与出牌期使用）。",
+      "file": "src/Hooks/Core/BossScriptPlanner.cs",
+      "at": "2026-10-29T03:53:08.796Z"
+    },
+    {
+      "id": "bug-95-mvt0d2wk",
+      "error_message": "奇巧贼第11回合「隐秘匕首」丢弃选择丢错牌（日志 选 [DEFEND_SILENT,DEFEND_SILENT]，剧本点名两张打击）；第5回合同类问题会把中和丢掉。",
+      "fix": "BossCardSelector.PreferDiscard 原本只按 CardModel 实例记「剧本点名要丢的牌」，而她回合开始时 BossScriptRunner.BuildHand 会把整手牌重建，实例全部失效 ⇒ Contains 一个都命中不了，退化成「价值→费用」排序（0 费的中和/1 费的防御排在 1 费打击前面）。修法：MarkPreferDiscard 同时记录「牌名 + 是否升级」的份数（PreferDiscardByKey），GetSelectedCards 分三段选：①实例命中 ②同名配额命中 ③兜底排序，并在日志里标出各段张数。",
+      "file": "src/Hooks/Core/BossCardSelector.cs",
+      "at": "2026-10-29T03:53:11.924Z"
+    },
+    {
+      "id": "bug-96-mvt0d4up",
+      "error_message": "多人局：休眠（故障机器人）转给其它 Boss 的冰球格挡是真人数倍（日志同一笔 5 点/2 点连续 4 行「转给其它 Boss [3 只]」）。",
+      "fix": "原版 FrostOrb.Passive/Evoke 的分发是 foreach (p in CombatState.Players) if (p != Owner) GainBlock(amount) —— 每名真人各调一次（4 人局 4 次），而我们每次拦下都把 amount 发给所有其它 Boss ⇒ 每只 Boss 拿 4 份。修法：新增 FirstPlayerInLoop(target)，只让「这一圈里第一名真人」那一次负责 GrantToOthersAsync，其余几次照样吞成 0 但不再转发。",
+      "file": "src/Hooks/Patches/HibernateFrostBlockPatch.cs",
+      "at": "2026-10-29T03:53:14.449Z"
+    },
+    {
+      "id": "bug-97-mvt0d6zb",
+      "error_message": "四人局：一名玩家阵亡后，锁着他的 Boss 没有把跟踪锁定改派给还活着的玩家（图标也不搬）。",
+      "fix": "OnPlayerDied 只删注册表条目不挑新目标；TargetFor 只在被问到才自愈；Rebalance 的按种子固定表在活人数 4→3 时 offset 变、整表平移，不保证死者那只换人。修法：新增 BossLockOn.ReassignDeadLocks(combat)（在 Rebalance 开头与 OnPlayerDied 里各调一次）：锁着的人不活着/不在这一场 ⇒ 立刻 PickLeastLockedAmong(活人) 改派、DropLockIcon 摘死者图标、ReconcilePowers 立刻重建，并打「跟踪锁定改派：<BOSS> → <新>（原来锁的 <旧> 已阵亡）」日志。",
+      "file": "src/Hooks/Core/BossLockOn.cs",
+      "at": "2026-10-29T03:53:17.207Z"
+    },
+    {
+      "id": "bug-98-mvt0wzs2",
+      "error_message": "四人局：同一名玩家被两只 Boss 锁定时，「跟踪锁定」悬浮里只剩最新那只 Boss 的名字（被新 Apply 出来的实例顶掉）。",
+      "fix": "新 Boss 锁同一名玩家时 PowerCmd.Apply 会新建一份 LockOnPower（InstanceType.None 只禁止同时存在两份），新实例名单里只有它自己；Description 原来只在「名单为空」时才用 BossLockOn.BossesLocking 补，于是旧 Boss 名字丢失。修法：Description 始终把注册表结果并进来（并集去重），不再只在空名单时补。",
+      "file": "src/Hooks/Powers/LockOnPower.cs",
+      "at": "2026-10-29T04:08:40.994Z"
+    },
+    {
+      "id": "bug-99-mvt0x1ep",
+      "error_message": "四人局：故障机器人闪电充能球被动的伤害意图对**所有**玩家都显示真实数字，实际只有被锁定的那名玩家会挨（球被动是单体随机）。",
+      "fix": "OrbPassiveDamage 算出的数字每个客户端都一样地画出来。球被动走 NextItem(HittableEnemies) 且她在出手时那份列表被收窄成被锁定的那位 ⇒ 单体。修法：新增 BossIntentBuilder.RandomAimIsElsewhere(CharBossMonster) 重载，为真时把这条独立意图按 0 显示（冰雹风暴/炸弹是全体伤害，不套用）。",
+      "file": "src/Hooks/UI/BossHandPanel.Extra.cs",
+      "at": "2026-10-29T04:08:43.105Z"
+    },
+    {
+      "id": "bug-100-mvt11zj1",
+      "error_message": "把多人局「攻势」意图悬浮文案改成点名玩家后，实测显示「只会落在另一名玩家身上，造成 0 点伤害」——所有攻击都变这样。",
+      "fix": "原因一：AttackIntent.GetIntentDescription 的 Damage 取的是该客户端实际渲染的那条意图，而「意图按人清零」（BossIntentBuilder.aimedElsewhere）对非被锁者建的就是 RawAttackIntent(0) ⇒ 点名后变成「0 点伤害」。原因二：远端玩家的 Creature.Name 在本机经常是 [unknown]，只能退化成本人看不到的「另一名玩家」。结论：改悬浮文案这条路走不通，已删除补丁与本地化键并重打 PCK。要做的话必须让意图本身携带目标信息（给 RawAttackIntent 加 TargetName），或按人清零时不建 0 伤害意图——那会改变意图栏语义，需先确认。",
+      "file": "src/Hooks/Patches/BossAttackIntentTipPatch.cs（已删除，v0.2.152 整块回退）",
+      "at": "2026-10-29T04:12:33.949Z"
+    },
+    {
+      "id": "bug-101-mvt1bnw6",
+      "error_message": "跟踪锁定在多只 Boss 锁同一名玩家时是「替换」而不是「共存」：只有一个图标、悬浮里只剩最新那只 Boss。",
+      "fix": "LockOnPower 原来是 PowerInstanceType.None（同类型只留一份），PowerCmd.Apply 会先摘旧的再建新的 ⇒ 后被锁就把先前的顶掉。改成 PowerInstanceType.InstancedPerApplier（每只 Boss 各一份、同一施加者重复 Apply 只合并），像 ToricToughnessPower/TheBombPower 那样共存；同时删掉 _bosses 名单与 SetBosses/AddBoss/RemoveBoss/HasBoss 系列，Description 改成只讲 Applier 那只 Boss；BossLockOn.ReconcilePowers 改成集合对账（wanted vs 按 applier 分组的实例，缺的补、多的摘），SweepDuplicate 只摘同一 Boss 的副本，DropLockIcon 只摘该 Boss 那一份，记账键改 (玩家,Boss)。",
+      "file": "src/Hooks/Powers/LockOnPower.cs",
+      "at": "2026-10-29T04:20:05.430Z"
+    },
+    {
+      "id": "bug-102-mvt1lsyg",
+      "error_message": "四人局 3 号位阵亡后锁定关系被「整表平移」：1 号位原本的 Boss 跑到了 2 号位身上，1 号位反而只剩 3 号位那只。",
+      "fix": "Rebalance 以前每 4Hz 用「本局种子 + 当前活人数」算一整张映射表，对不上的锁统统改写；而 offset 依赖玩家数，活人数 4→3 就整表平移 ⇒ 没死的锁也被换人（ReassignDeadLocks 补的正确结果紧接着被覆盖）。改成唯一规则「按当前负荷挑人、不动已经成立的锁」：Rebalance 只处理没有锁或锁的人已死的 Boss（PickLeastLockedAmong），PickForBoss 同规则并加闸门「RunState.Players.Count > 活人数时先不锁定」以防开局撞车；删除 StableOffset/AliveBossOrder。",
+      "at": "2026-10-29T04:27:58.552Z"
+    },
+    {
+      "id": "bug-103-mvt1tb1y",
+      "error_message": "多人局：储君的攻击打到了「被别的 Boss 锁定」的玩家，而它自己生成的碎屑却给了它锁定的那位 —— 同一张牌落到两个不同的人身上。",
+      "fix": "出牌用的是计划里存的 PlannedPlay.Target（PlayOne 只在它空/已死时才重算），而碎屑洗给谁用的是出牌瞬间的 BossLockOn.TargetFor。计划是玩家回合/她回合开始算的，锁定关系之后可能被 ReassignDeadLocks / Rebalance 改派 ⇒ 两者不一致。修法：PlayOne 开头，凡「需要对手」的牌（AnyEnemy/AllEnemies/RandomEnemy）一律用出牌瞬间的 TargetFor 重新取目标，并打日志「出牌目标按实时锁定改判」。顺带把 PLAY 日志的目标描述加成 <昵称|?>/<角色类名>/NetId=N，因为远端玩家名字常是 [unknown]，四个实例又写同一个 mod_log.txt，不看 NetId 无法核对。",
+      "file": "src/Hooks/Monsters/CharBossMonster.cs",
+      "at": "2026-10-29T04:33:48.598Z"
+    },
+    {
+      "id": "bug-104-mvt1zeml",
+      "error_message": "多人局：被 Boss 锁定的玩家看到那张牌的伤害是 0（碰撞轨迹应显示 10），但实际挨了这 10 点。",
+      "fix": "出牌在 v0.2.155 起按实时锁定取目标，而「意图按人清零」仍用 AimsElsewhere(计划里的 PlannedPlay.Target) 判定 ⇒ 计划过期时对本地玩家判成「打的是别人」，显示 RawAttackIntent(0)，但出牌按实时锁打到了他。修法：新增只读的 BossLockOn.PeekLock(不产生副作用)，BossIntentBuilder 改用 AimedAwayFromLocal —— 优先按「这只 Boss 此刻锁着谁」与本地玩家比较，拿不到锁才退回旧判据；RandomAimIsElsewhere(boss)(闪电球被动用) 同样改用 PeekLock，避免没锁时人人显示 0。",
+      "at": "2026-10-29T04:38:33.165Z"
+    },
+    {
+      "id": "bug-105-mvt24dam",
+      "error_message": "四人局第一回合：被储君锁定的玩家看到的意图伤害是 0（实际挨了 10）；改了实时锁定判据后仍无变化。",
+      "fix": "根因不在显示层：Locks（Boss→玩家映射）是每个客户端各自维护的本地字典，而旧分配「按当前负荷挑人」依赖各端已攒下的 Locks 内容 ⇒ 各端从开局第一次分配就分叉（combat.Players 逐个填满、EnsurePower 各自时机认领）。于是我这台认为锁的是别人（显示 0），结算那侧认为锁的是我（真打 10）。修法：新增纯函数 PureVictim —— 花名册（本局真人玩家按 NetId 升序，含已阵亡的）[Boss 在按怪物 id 排序的我们的 Boss 里的下标 % 花名册长度]，分到的人阵亡则给还活着的 NetId 最小者。多人局的 TargetFor（出牌/选靶/碎屑/收窄）与 PeekLock（意图显示）全走它，Locks 降级为只给日志/图标用的缓存，由 Rebalance 每 4Hz 同步；玩家未到齐时不锁定。",
+      "at": "2026-10-29T04:42:24.718Z"
+    },
+    {
+      "id": "bug-106-mvt2dwtc",
+      "error_message": "多人局死掉两个队友只剩两人时，锁定分配变成 3:1（一个人被 3 只 Boss 锁、另一个只被 1 只）。",
+      "fix": "PureVictim 原来把「锚点玩家已阵亡」的 Boss 一律丢给「活着的 NetId 最小那位」，两个队友阵亡就全压到同一个人。改成整张表的纯函数 ComputeAssignment：①锚点（花名册[rank%n]）活着就锁他、永不搬家；②锚点已阵亡的 Boss 作为孤儿，按顺序分给当前被锁份数最少的活人，并列时用 StableRotate（本局种子+幕数算出的固定轮转）挑 ⇒ 等概率但 SL 前后与各客户端一致。整表按帧缓存于 AssignmentOf。",
+      "at": "2026-10-29T04:49:49.920Z"
+    },
+    {
+      "id": "bug-107-mvt2dz57",
+      "error_message": "奇巧贼的「鬼祟」(SneakyPower) 只在真人玩家打出攻击牌时触发获得格挡，其它 Boss 打出攻击牌不触发。",
+      "fix": "SneakyPower.AfterCardPlayed 的判断是「别的生物打出 Attack 牌就 GainBlock」，但靠原版 Hook.AfterCardPlayed 扇出到 Power；我们 Boss 的牌由 CardCmd.AutoPlay 打出、其生物又不在 CombatState.Players 里，扇出漏掉。修法：新增 SneakyOnBossAttack，在 CharBossMonster.PlayOne 出牌前后成对调用——出牌前拍「持有鬼祟者（除出牌者）的格挡」，出牌后若某持有者格挡没变（说明原版没给）就按 SneakyPower.Amount 补一次；原版给了就不动，避免双份。",
+      "at": "2026-10-29T04:49:52.939Z"
+    },
+    {
+      "id": "bug-108-mvt2r64g",
+      "error_message": "奇巧贼第3回合「杂技」丢弃时选了「触不可及」而不是剧本点名的「连续反弹」⇒ 连续反弹没被丢弃、奇巧没触发、那张牌没打出去。日志：自动选择 … → 选 [UNTOUCHABLE]（点名 0 张按实例 + 0 张按牌名 + 其余 1 张兜底）。",
+      "fix": "PreferDiscard 原本是全局一份，而 BossScriptPlanner.Plan 进门就 ClearPreferDiscard()；她回合执行期间规划器还会为下一回合再算一次计划（意图刷新），那次清空把本回合刚点好的名单抹掉，选牌退化成按价值挑。修法：名单改成按 (Boss, 回合号) 各存一份（PreferByTurn），Mark/Clear 只动该回合；选牌时用 ActingBoss/ActingTurn（由 CharBossMonster.PlayOne 设置）取名单；日志加「第 N 回合的点名」便于核对。",
+      "at": "2026-10-29T05:00:08.512Z"
+    },
+    {
+      "id": "bug-109-mvt2wcqw",
+      "error_message": "奇巧贼的连续反弹（Ricochet，TargetType.RandomEnemy + TargetingRandomOpponents）打到了没被她锁定的玩家。",
+      "fix": "v0.2.149 的 AoeAttackNotNarrowedPatch 只看 IsMultiTargeted 就把收窄结果恢复成全部对手；而 TargetingRandomOpponents 也会填 _combatState（IsMultiTargeted 同样为 true）并置 IsRandomlyTargeted=true —— 于是「每次只打一个随机对手」的牌被当群攻放行。修法：放行前先判 IsRandomlyTargeted，随机目标一律照旧收窄（只打被锁定那位），只有真正的 TargetingAllOpponents 才豁免。",
+      "at": "2026-10-29T05:04:10.376Z"
+    },
+    {
+      "id": "bug-110-mvt38hvl",
+      "error_message": "多人局：暗黑充能球（DarkOrb）激发时打的是「血最少的玩家」，而不是被这只 Boss 跟踪锁定的那位。",
+      "fix": "暗黑球激发走的是 CombatState.HittableEnemies + MinBy(CurrentHp)，不经过 GetOpponentsOf，所以「只留锁定玩家」的收窄管不到。新增 DarkOrbLockOnPatch：给 DarkOrb 的 <Evoke> 状态机 MoveNext 挂 Harmony 前缀，在状态机刚开始（<>1__state == -1、HittableEnemies 还没被读）时 RequestNarrowOnce(被锁定的那位)，把可命中敌人一次性收窄成一人，MinBy 就只能选他。只设一次避免残留；真人玩家的暗黑球不动；挂载在 BuildInfo.LogOnce。玻璃球是 Damage(全部 HittableEnemies) 的真群攻，未改。",
+      "at": "2026-10-29T05:13:36.897Z"
+    },
+    {
+      "id": "bug-111-mvt3uvrs",
+      "error_message": "二层物理机打出「一心化万」后，Boss 的伤害预览没有计入它对 0 费攻击牌的增伤（实伤有、预览没有）。",
+      "fix": "OneForAllPower.ModifyDamageAdditive 的第一道判断是 if (cardSource == null) return 0m;，而我们的 FinalDamage/CapDamage 调 Hook.ModifyDamage 时 cardSource 与 cardPlay 都传了 null ⇒ 这条增伤永远不生效。修法：把 cardSource 传成这张牌本身（cardPlay 仍 null —— 预览期没有真实 CardPlay，原版也专门写了 cardPlay==null 时看牌面费用的分支），于是 0 费攻击牌 +Amount、1 费不加，与实伤一致。CapDamage 一并补上。",
+      "at": "2026-10-29T05:31:01.336Z"
+    },
+    {
+      "id": "bug-112-mvt4071d",
+      "error_message": "涂毒贼第2回合「生存者」丢弃时选了防御而不是连续反弹，导致连续反弹（奇巧）没有被丢、也没被自动打出。",
+      "fix": "剧本第2回合（与第9回合）的 C&lt;Ricochet&gt;(costOverride: 0) 漏了 discardInstead: true —— 没有这个标记就不会 MarkPreferDiscard，自动选择器只能按「价值→费用」挑，把纯技能的防御挑走，奇巧牌留在手里不会自动打出。修法：两处补 discardInstead: true，并给该剧本的 C&lt;T&gt; 助手加上这个参数；同时在 BossScriptPlanner 加自检：手牌里剩下的奇巧牌若既没排进计划也没被点名丢弃，就打一行「⚠ 剧本自检」日志（费不够/不可打出的不算）。",
+      "at": "2026-10-29T05:35:09.217Z"
+    },
+    {
+      "id": "bug-113-mvt46bhi",
+      "error_message": "涂毒贼第2回合：连续反弹（奇巧）被烘焙手套当成「消耗」目标烧掉，导致既没被丢弃也没奇巧自动打出，随后生存者只能弃防御。",
+      "fix": "烘焙手套的消耗发生在回合刚开始、早于本回合 Plan（MarkPreferDiscard）⇒ 那一刻点名名单为空，选择器退化成「奇巧优先→价值」，把奇巧牌（连续反弹）消耗掉（奇巧优先本来是给「丢弃后免费打出」用的，用在消耗上等于白扔）。修法：BossCardSelector.DeriveFromScript 在名单为空时，按候选项 owner 认出 Boss、读它的 TurnNumber（含 +1 回合），把剧本那回合 Burned/DiscardInstead 点名的牌按实例补进名单；同时按用户口述改第2回合剧本：生存者、连续反弹(弃)、防御(打出)、打击(被烧)。",
+      "at": "2026-10-29T05:39:54.918Z"
+    },
+    {
+      "id": "bug-114-mvt4e9dm",
+      "error_message": "多人局二层：行动/站位次序变成「猎骨战机储」——战士（铁甲）排在故障机器人前面，与预期的「猎骨机战储」不符。",
+      "fix": "遭遇 GenerateMonsters 里排序用的是旧的「左右分组」LeftRank（静默/亡灵/铁甲=左组0，故障/储君=右组1），铁甲被算进左组 ⇒ 永远排在故障机器人前面；而行动的先后与站位都等于这个列表次序（v0.2.141 起 PlacementRank 取 Enemies 下标）。修法：换成按职业的固定次序 StationRank(act, monster)——一二层 猎→骨→机→战→储（用户口径），三层保留「易伤战永远最右」⇒ 猎→机→骨→储→战。",
+      "at": "2026-10-29T05:46:05.434Z"
+    },
+    {
+      "id": "bug-115-mvt4n7ki",
+      "error_message": "涂毒贼第3回合：烘焙手套烧掉了「匕首雨」而不是剧本点名的「打击」，导致匕首雨没打出。",
+      "fix": "两个 bug 叠加：①DeriveFromScript 依次试 TurnNumber 与 TurnNumber+1（手套触发时 TurnNumber 还是上一回合），第 3 回合那份补到了打击，但旧代码补完仍返回 TurnNumber（第 2 回合）那份空名单 ⇒ 选择器退化；②兜底排序 Order() 在「三张 1 费攻击牌」里按牌名序挑中 DAGGER_SPRAY。修法：DeriveFromScript 返回真正补到东西的那一回合名单并打诊断日志；Order() 最外层加一档「剧本这一回合要打的牌排最后」（PlayTypesFor），点名失败也不会扔剧本要打的牌。",
+      "at": "2026-10-29T05:53:02.994Z"
+    },
+    {
+      "id": "bug-116-mvt4xob7",
+      "error_message": "涂毒贼「刀刃之舞」印出的小刀没有吃到「一心化万」的增伤（牌本身 1 费不吃，小刀是 0 费该吃）。",
+      "fix": "OneForAllPower.ModifyDamageAdditive 判的是 cardSource（被强化的那张牌）的费用，而小刀意图以前按「ShivBaseDamage + 待到手力量」算完交给原版意图节点，节点那一路 cardSource 是 null ⇒ 增伤进不来。修法：新增 ShivCardFor(boss)（每只 Boss 缓存一张真实 Shiv 卡，CombatState.CreateCard&lt;Shiv&gt;）+ ShivDamagePerHit(boss, pendingRise, target)，用这张卡跑 BossDamagePredictor.FinalDamage，力量/虚弱/易伤与「0 费攻击 +N」全对；意图改用 AttackIntent.Raw 避免节点二次加成；刀刃交响曲每把刀同走该函数。",
+      "at": "2026-10-29T06:01:11.251Z"
+    },
+    {
+      "id": "bug-117-mvt53rg4",
+      "error_message": "部分 Boss 把本回合的牌打完后整块界面（未打的牌、能量、遗物、药水）消失，另一些 Boss 则保留 —— 表现不统一。",
+      "fix": "BossHandUi.Refresh 里 hand.Count == 0 时直接 ReleasePanel(boss)，于是「把手牌全打完」的 Boss 整块面板被释放，而手里留着打不出的牌的 Boss 保留。修法：只在拿不到手牌数据（hand == null）时才收面板；hand.Count == 0 时照样 Rebuild（卡面区变空、状态条继续显示）。面板生命周期只剩两个终点：她阵亡 ReleasePanel、战斗结束 EndFight。LayoutCells 按本回合最大手牌数算宽度，所以卡面清空后状态条不会跳动。",
+      "at": "2026-10-29T06:05:55.252Z"
+    },
+    {
+      "id": "bug-118-mvt5ai99",
+      "error_message": "灵魂骨打出「切断」时会往手牌/抽牌堆/弃牌堆各印一张灵魂，而剧本里已经写好了那张灵魂 ⇒ 手牌多出剧本没算过的牌，意图与计划对不上。",
+      "fix": "Severance.OnPlay 调 Soul.Create(owner,3,...) 再三次 CardPileCmd.AddGeneratedCardToCombat。新增 SeveranceNoCardGenerationPatch：给 AddGeneratedCardToCombat 挂前缀，只在「正在打出的牌是 SEVERANCE」（CharBossMonster.CurrentPlayingEntry，PlayOne 里出牌前置位、finally 清掉）时吞掉整次生成，返回 Task.FromResult&lt;CardPileAddResult&gt;(default)（结构体 success=false，语义即未加入，await 方不会卡住）。要拦别的牌把 entry 加进 CharBossMonster.BlocksGeneratedCardsEntries 即可；真人玩家与其它牌不受影响。",
+      "at": "2026-10-29T06:11:09.933Z"
+    },
+    {
+      "id": "bug-119-mvt5kqrw",
+      "error_message": "涂毒贼第3回合烘焙手套又烧掉匕首雨；日志：自动选择 候选 3 个 → 选 [DAGGER_SPRAY]（第 2 回合的点名：0 张按实例 + 0 张按牌名 + 其余 1 张兜底；名单 1 条）。",
+      "fix": "v0.2.166 的「按剧本现算」顺手把 ActingBoss/ActingTurn（本意是「正在出牌」）写成某一回合，而 Current() 只看这两个字段、不校验回合号 ⇒ 下一个回合的手套消耗拿到上一回合的旧名单（点名的牌在新手牌里不存在）⇒ 命中 0 张 ⇒ 退化成兜底排序 ⇒ 按牌名挑中 DAGGER_SPRAY。修法：Current() 换成 LiveMarks(boss,turn,options)——按「候选项属于谁 + 它现在的 TurnNumber」取，只有 ActingBoss 是这只且 ActingTurn==当前回合才直接用，否则按剧本对当前回合现算；SeededMark 不再写 ActingBoss/ActingTurn；Order() 的「剧本要打的牌压最后」改用本次选择的 _orderBoss/_orderTurn。",
+      "at": "2026-10-29T06:19:07.532Z"
+    },
+    {
+      "id": "bug-120-mvt5v7bj",
+      "error_message": "打死一只 Boss 后所有玩家的「跟踪锁定」对象都换人了（连没被那只 Boss 锁的玩家也变），而不是只有它锁定的那名玩家失去锁定。",
+      "fix": "ComputeAssignment 的锚点序号取的是「当前 CombatState.Enemies 里的下标」；死掉的 Boss 从 Enemies 消失后，排在后面的 Boss 下标整体前移 ⇒ 每个 Boss 的锚点玩家都换人 ⇒ 全员锁定刷新。修法：锚点序号改用「本场 Boss 花名册」（BossRank/BossRosterOf）——按怪物 id 升序、只增不减，死掉的 Boss 仍占原位但 IsAlive 为 false 直接跳过不锁定任何人；花名册按 CombatState 缓存，Reset() 时清空。玩家阵亡时的改派逻辑不变。",
+      "at": "2026-10-29T06:27:15.535Z"
+    },
+    {
+      "id": "bug-121-mvt62e1v",
+      "error_message": "多人局中打死一只 Boss，整个 Boss 战的背景音乐立刻停了（其它 Boss 还在打）。应该等所有 Boss 都倒下再停并播胜利音效。",
+      "fix": "CharBossMonster.BeforeRemovedFromRoom 里无条件调用了两次 BossBgm.Stop()，而该方法在「任意一只 Boss 被移出房间（死亡）」时都会跑 ⇒ 掐掉全场音乐。修法：新增 ShouldStopBgmOnLeaveRoom()——场上没有别的活着的我们的 Boss 才停；还有别的活着且战斗仍在进行则不停；还有别的活着但战斗已结束（玩家全灭/退出）也停。两处调用都改成按它判断。",
+      "at": "2026-10-29T06:32:50.851Z"
+    },
+    {
+      "id": "bug-122-mvt675sb",
+      "error_message": "所有 Boss 都被打死时听不到战斗结束/胜利音效（自定义 BGM 停掉之后没有接上原版的结束音乐）。",
+      "fix": "BossBgm.Stop() 只在 CharBossMonster.BeforeRemovedFromRoom 才执行，而那一步晚于游戏自己的战斗结束音乐（NRunMusicController.GetTrack：combat room 且 !CombatManager.IsInProgress ⇒ MusicProgressTrack.CombatEnd）；我们随后 StopCustomMusic()（stop_music + 重播 _currentTrack + Progress=7）把已经开始的结束音乐掐掉了。修法：把还原提前到最后一只 Boss 倒下的那一帧——每帧驱动里在 OnBossDied 同一循环内，若 !MultiBossPlan.AnyOtherBossAlive(each) 且 BossBgm.IsPlaying 就 Stop() 并打日志；BeforeRemovedFromRoom 的调用保留作兜底。新增 BossBgm.IsPlaying。",
+      "at": "2026-10-29T06:36:33.419Z"
+    },
+    {
+      "id": "bug-123-mvt6j1wa",
+      "error_message": "Boss 手牌栏下方的意图图标会被旁边的卡面（别的格子/别的 Boss 面板）遮挡，翻越撑击的伤害数字看不清。",
+      "fix": "Godot 的 CanvasItem.ZIndex 只在同一父节点的兄弟之间比较。修法分两层：BossHandPanel._Ready 设 ZIndex=200（整块面板压过原版卡面/手牌）；BossHandCard.BuildIntentRow 给意图行设 row.ZIndex=20（意图行与卡面是同一格子的兄弟，于是面板内意图永远在卡面之上）。跨面板靠两套面板都在高层解决。",
+      "at": "2026-10-29T06:45:48.250Z"
+    },
+    {
+      "id": "bug-124-mvt6omon",
+      "error_message": "把意图层级抬到 ZIndex=200 后，切到地图界面时 Boss 手牌栏与意图还显示在地图上层。",
+      "fix": "PanelZIndex 从 200 降到 10（原版同层 Control 基本都是 0，10 足够压过卡面/遗物/能量；地图等浮层在别的 CanvasLayer，不该被我们影响）；意图行保留 IntentZIndex=20。另在 BossHandPanel.OnFrame 开头加硬闸门：CombatState.IsLiveCombat() != true 时 Visible=false 并 return（以前只有 FollowBoss 里顺手设一次，某些时序下面板仍留着）。",
+      "at": "2026-10-29T06:50:08.471Z"
+    },
+    {
+      "id": "bug-125-mvt6uz67",
+      "error_message": "把 Boss 手牌栏面板的 ZIndex 抬高（200 或 10）后，切到地图界面时整排意图箭头仍显示在地图上层。",
+      "fix": "抬面板 ZIndex 这条路根本行不通：ZIndex 只在同一父节点的兄弟之间比较，抬面板等于把整个面板抬到战斗房 UI 的其它兄弟（地图/结算）之上。改法：面板不设 ZIndex（默认）；把意图行从「格子的子节点」改成「面板的子节点」（Rows 登记表 + DropIntentRow/IntentRowOf/ClearIntentRows 管理生命周期），于是意图行与卡面是同一父节点的兄弟，给它 ZIndex=2 就能压过本面板所有卡面、又不越过地图界面；LayoutCells 里意图行位置改为「格子横向位置 + 原 0.4 卡宽左上偏移」；三处回收格子时都 DropIntentRow。",
+      "at": "2026-10-29T06:55:04.591Z"
+    },
+    {
+      "id": "bug-126-mvt6zce0",
+      "error_message": "给 Boss 手牌面板/意图行抬 ZIndex（200 / 10 / 意图行挂面板下再给 2）后，切到地图、暂停菜单、图鉴时本模组的卡面与意图仍浮在这些界面之上。",
+      "fix": "三种 ZIndex 方案全部失败，彻底回退（v0.2.180）：BuildIntentRow 恢复 cell.AddChild(row) 且不设 ZIndex，删掉 Rows 登记表与 DropIntentRow/IntentRowOf/ClearIntentRows，RefreshIntents 恢复在格子里找 Intents 子节点，LayoutCells 恢复在格子循环里定位意图行，删除 PanelZIndex/IntentZIndex 常量与三处调用。结论：本项目 UI 一律不抬 ZIndex（BossStatusRow.Icons.cs 早就记过同一教训）。保留炸弹闪烁与非战斗隐藏闸门。",
+      "at": "2026-10-29T06:58:28.344Z"
+    },
+    {
+      "id": "bug-127-mvt73rbn",
+      "error_message": "刀贼（三层静默猎手）战斗开始时没拿到钻石头冠的 20 点格挡；日志：钻石头冠：战斗开始 +20 格挡、+2 层残影（…；，现在格挡 0。",
+      "fix": "GainBlock 在「战斗还没真正开始」时给不进去（战斗开始流程随后会把格挡清零），日志里读回 Block=0，但残影留下了，于是又打了「跳过重复触发」。修法：抽出 DiademBlockOf(shadow)；新增 EnsureDiamondDiademBlock(boss)——在她第 1 回合之前（TurnNumber<=1）只要她身上格挡仍为 0 且带着该遗物，就等 120ms 后补一次（DiademRetrying 防重入），补完打日志；由 BossFrameTick 每帧车道对每只 Boss 调用（判断廉价，有格挡/无遗物/过第 1 回合直接返回）。",
+      "at": "2026-10-29T07:01:54.323Z"
+    },
+    {
+      "id": "bug-128-mvt7fce6",
+      "error_message": "地图 Boss 节点提示「静默猎手」，图标却是原版 TheKinBoss 的披甲武士剪影（用户：「上面是战士的头像」）",
+      "fix": "徽章贴图 = NBossMapPoint._Ready 里 enc.BossNodePath + \".png\"；我们的遭遇没专属美术时基类兜底到 TheKinBoss.BossNodePath（三只披甲武士）⇒ 名字与脸错配，同幕两颗 Boss 徽章还长得一样。修：①炼药贼→silent_poison、灾厄骨/根除骨→soul_bone；②新增 Patches/BossMapPointCharacterIconPatch.cs，对没有专属图的档位把徽章换成 CharacterModel.IconTexture 的白色剪影+白色圆盘衬底（白才能被 ActModel.MapTraveledColor/MapBgColor 染色成原版观感），整个 postfix 包 try，失败保持占位图。",
+      "file": "src/Hooks/Encounters/CharBossEncounters.cs",
+      "at": "2026-10-29T07:10:54.846Z"
+    },
+    {
+      "id": "bug-129-mvtd9cnf",
+      "error_message": "愤怒战打出「愤怒」时停顿太久（4 人局一次约 4 秒多）；日志里同一时刻还刷 Index was out of range",
+      "fix": "GiveAngerCopiesToPlayers 以前对每个真人玩家各做一次 CardCmd.Preview + await Cmd.Wait(1f) ⇒ 停顿按人数线性累加（日志一秒一条、共 4 条）。改成先把所有复制品塞进弃牌堆，最后只展示一次 + 等 0.8 秒。顺带：CardPileCmd.AddGeneratedCardToCombat = (await AddGeneratedCardsToCombat(...))[0]，而后者在 !CombatManager.Instance.IsInProgress 时返回空数组 ⇒ [0] 越界；现在先判 CombatIsLive，并把 IndexOutOfRangeException 当「战斗已结算」安静跳过并汇总一行日志。",
+      "file": "src/Hooks/Powers/IroncladRagePower.cs",
+      "at": "2026-10-29T09:54:12.939Z"
+    },
+    {
+      "id": "bug-130-mvtd9cnm",
+      "error_message": "真人玩家打出攻击牌仍然触发奇巧贼的「鬼祟」格挡（用户要的是只有其它 Boss 的攻击牌才算）",
+      "fix": "原版 SneakyPower.AfterCardPlayed 的条件是「任何别的生物打攻击牌 ⇒ 我格挡」，玩家出牌正好命中。新增前缀补丁：只在 CardType.Attack 上判断，「这张牌的 Owner 是否在 CombatState.Players 里」——在就是真人玩家，return false 不触发（并打一行日志）；不在（我们的 Boss 影子 Player 不在 Players 里）则交回原版，仍由 SneakyOnBossAttack 的「快照 + 原版没给才补」兜底。非攻击牌/判据取不到时一律 return true。",
+      "file": "src/Hooks/Patches/SneakyOnlyBossAttacksPatch.cs",
+      "at": "2026-10-29T09:54:12.946Z"
+    },
+    {
+      "id": "bug-131-mvtdjg46",
+      "error_message": "一张大卡吊在屏幕中央不走（用户：「奇巧贼的打击停在了空中」）",
+      "fix": "已知成因：NCard 自带悬浮大卡预览，节点在悬停状态下被拆掉时收不到 MouseExited，预览面板就残留成一张大卡。ReleaseCell 以前只对直接子节点发退出事件 ⇒ 改为递归遍历整棵子树，每个 NCard 先 MouseFilter=Ignore 再 EmitSignal(MouseExited)。⚠ 若真凶是「命运同担强制弃牌的飞行动画卡住」（同一时刻日志有 命运同担：玩家被迫弃掉 STRIKE_SILENT），则要改 SharedFateDiscardPower 的弃牌方式。",
+      "file": "src/Hooks/UI/BossHandCard.Hover.cs",
+      "at": "2026-10-29T10:02:03.990Z"
+    },
+    {
+      "id": "bug-132-mvtdnqyu",
+      "error_message": "Boss 打出的牌（奇巧贼的打击）停在屏幕中上方不动，直到返回主菜单才消失",
+      "fix": "原版 NCardPlayQueue.OnActionEnqueued 对非本机玩家的 PlayCardAction 走「远程玩家出牌」分支：建一个 NCard 摆在 creatureNode.PlayerIntentHandler.CardIntent 位置并 TweenCardToQueuePosition 进队列；清理那步属于「玩家出牌动画流程」。我们的 Boss 是影子 Player（不在 CombatState.Players、无玩家手牌 UI），出牌走 CardCmd.AutoPlay ⇒ 卡面永远没人收走。修：新增 StrayBossCardQueuePatch —— 扫 NCardPlayQueue 直接子节点，卡面所属生物是 CharBossMonster 的 Visible=false + 全透明（只隐藏不 QueueFree，避免撞执行阶段的 item 下标查找）；出牌后立刻扫一次 + BossFrameTick 4Hz 慢车道兜底。",
+      "file": "src/Hooks/Patches/StrayBossCardQueuePatch.cs",
+      "at": "2026-10-29T10:05:24.678Z"
+    },
+    {
+      "id": "bug-133-mvtdtcxp",
+      "error_message": "指向性攻击牌（Boss 的和玩家的）打出后停在半空不结算",
+      "fix": "我自己写的 Harmony 前缀对 Task 返回值的方法 SneakyPower.AfterCardPlayed(PlayerChoiceContext, CardPlay) 直接 return false 却没设置 __result ⇒ Harmony 留 null ⇒ 原版 Hook.AfterCardPlayed await 一个 null Task ⇒ NullReferenceException 在异步链里被吞掉，那次出牌永远结算不完，卡面停在半空（无红字）。修：前缀签名加 ref Task __result，两处 return false 前都设 __result = Task.CompletedTask。另用脚本全量扫过 60+ 前缀，只有 BossMultiplayerHpPatch / SafeLogPatch 也 return false 但目标是 void，无需处理。",
+      "file": "src/Hooks/Patches/SneakyOnlyBossAttacksPatch.cs",
+      "at": "2026-10-29T10:09:46.429Z"
+    },
+    {
+      "id": "bug-134-mvteb1ru",
+      "error_message": "群情激奋 / 何人僭越 的描述写死了单人数字（4 人局仍显示「失去 3 点力量」「失去 25 点生命」），效果本身是对的",
+      "fix": "原版 PowerModel.Description 会自动填 {Amount}。①群情激奋：StackType 改 Counter、Amount=StrengthLossPerAnger(人数)=3/2/1/1，回合开始与每次愤怒被打出时 SetAmount(n, silent)，扣力量也读 Amount，描述改用 {Amount}；②何人僭越：Amount 回合开始刷成 25×人数（4人=100），描述改用 {Amount}；新增 DisplayAmount 覆写 = (3-已触发)×阈值-本回合已累计掉血，即「本回合还能吃下多少掉血才再扣铸造」（4人=300 起，归 0 后本回合不再扣），掉血/触发后 InvokeDisplayAmountChanged() 重画，StackType 改 Counter、ShouldScaleInMultiplayer=false。两个 zhs/eng 本地化改用 {Amount} 并重建 PCK 验证。",
+      "at": "2026-10-29T10:23:31.770Z"
+    },
+    {
+      "id": "bug-135-mvteka5d",
+      "error_message": "power 描述里的 {Amount} 显示成 1（不是想要的阈值 100）：把自定义数值塞进 PowerModel.Amount 之后被层数语义覆盖",
+      "fix": "{Amount} 读的是「层数」，StackType.Counter 下会被施加/战斗流程写回 1，不能当自定义数值用。改为：①阈值固定 25（KnowThyPlace 不再按人数放大）直接写进本地化文案；②需要随人数变的数字（群情激奋的力量损失）用自定义占位符 {Loss} + Description 覆写里 description.Add(\"Loss\", …)；③图标数字一律走 DisplayAmount 覆写（Counter 才会画），不写 Amount —— Amount 保持 1 以免 ShouldRemoveDueToAmount 把 power 摘掉。何人僭越的 DisplayAmount = (3-已触发)*25-本回合已累计掉血（75→0）。",
+      "at": "2026-10-29T10:30:42.529Z"
+    },
+    {
+      "id": "bug-136-mvtf25rw",
+      "error_message": "偏差认知把崩坠觉醒者的「祭仪 / 火热研究」当例外（打这两张能力牌不给集中）；两处特殊效果描述里带括号补注",
+      "fix": "用户 2026-10-29 要求取消特判：删掉 DeviationPower.IsDownfallStrengthToken 方法及其调用点，现在任何 CardType.Power 的玩家出牌都给 Boss +1 集中。同时改本地化：偏差认知描述改成「你每打出 1 张能力牌，故障机器人获得 1 点集中；它的力量与集中数值始终相等。」，何人僭越删掉「（图标上的数字…75 → 0）」括号补注（DisplayAmount 计数保留）。PCK 已重建并抽出验证。",
+      "at": "2026-10-29T10:44:36.668Z"
+    },
+    {
+      "id": "bug-137-mvtfkhhk",
+      "error_message": "彗星（Comet）在多人里被当成全局效果：任何玩家打碎屑都触发（与「单体特殊效果」的设计不符）",
+      "fix": "AfterCardPlayed 里补上 BossLockOn.SpecialEffectAppliesTo(Owner.Monster as CharBossMonster, actor) 判据（碎屑改判本来就是按 TargetFor 走锁定玩家的）。同时按用户口径把单体效果英文统一成 you：SleeveTrick/Deviation/Resonance 的 \"a player\" → \"you\"（zhs 的「玩家」→「你」），GoForTheEyes 的 \"hits her\" → \"hits it\"（故障机器人无性别），PrimalForce 描述补正为「+3 覆甲、未格挡伤害让你抽 1 张牌」。PCK 已重建并抽出验证。",
+      "at": "2026-10-29T10:58:51.656Z"
+    },
+    {
+      "id": "bug-138-mvtgic7n",
+      "error_message": "巨石战剧本里的「彼岸咆哮」要换成「余烬」（余烬的随机消耗不吃剧本点名）",
+      "fix": "卡组 HowlFromBeyond→Cinder；第 4 回合改成 余烬+坚毅+（点名被烧的是防御 Burn<DefendIronclad>()），删掉第 4 回合的 FreePlayExhaustEntry=\"HOWL_FROM_BEYOND\"；第 8 回合末位改成不打的 Cinder。注意 Cinder.OnPlay 用 RunState.Rng.CombatCardSelection.NextItem 随机挑一张消耗，不走 CardSelectCmd ⇒ 剧本 Burn 点名对它无效，实际由 TrueGrit 的选择器兜住点名那张。",
+      "at": "2026-10-29T11:25:11.123Z"
+    },
+    {
+      "id": "bug-139-mvtgxrd4",
+      "error_message": "储君第二回合只打了 1 个炸弹，第四回合却像炸了两个（期望只有一个炸弹在第四回合爆炸）",
+      "fix": "反编译确认：TheBombPower.InstanceType=Instanced（多份独立倒计时）、BeforeSideTurnEnd 只在 participants.Contains(Owner) 时触发、层数>1 就 Decrement、层数<=1 才对 HittableEnemies 逐个放 NFireSmokePuffVfx 并造伤害后移除；所以第 N 回合打出的炸弹在第 N+2 回合末爆，第 4 回合本应只有一次爆炸。为定位「两个」的真相，新增 BombDiagnosticsPatch：在 TheBombPower.BeforeSideTurnEnd 前缀里清点她身上 OfType<TheBombPower>() 的实例数/层数/威力并打「炸弹巡检」日志（仅在会爆或实例≥2 时刷），下次即可区分是真有两个实例还是一团烟雾按目标各放一次。",
+      "at": "2026-10-29T11:37:10.600Z"
+    },
+    {
+      "id": "bug-140-mvti5y2a",
+      "error_message": "三层（四人局）阵容出现「两个刀贼同一场」与「巨石战跨两场重复」——每场没保证含猎/战/储，且变体跨场重复",
+      "fix": "三层候补的 8 个 Key 是三对变体（刀贼/炼药贼、易伤战/巨石战、无色储君/辉星储）+ 能力机 + 根除骨。新增 BuildAct3Pairs（3 人及以上生效）：每场固定给「猎+战+储」各一只，两场互补（哪一半落第一场由 SilentBrewerAt3/BoulderAt3/RegentStarAt3 的确定性 50/50 决定，第二场拿另一半），4 人局第 4 只由能力机/根除骨各分一场（salt 57）；顺序按 猎→机→骨→储→战，主位优先「本局还没当过主 Boss 的角色」且不与本幕第一场同角色。日志「第 3 层第 N 场阵容（三层分场规则：三对变体分两场 + 第 4 位）」。2 人局保持原逻辑。",
+      "at": "2026-10-29T12:11:32.146Z"
+    },
+    {
+      "id": "bug-141-mvtidwcl",
+      "error_message": "同一场战斗里储君的设计中途换了：第一回合显示辉星储的意图，第二回合开始按无色储君的剧本打炸弹",
+      "fix": "BossDefinition.ActiveVariant 每帧调用 variant.Enabled()（StarRegentActive/BoulderActive/BrewerActive），而它们的三级判据在战斗刚开始会变：房间遭遇（CombatManager.DebugOnlyGetState().Encounter）可能还是 null、_currentFightAct/_currentFightIndex 还是上一场的值、最后才退回种子 50/50 ⇒ 第 1 回合按种子算出「辉星储」，第 2 回合遭遇就绪后变成「无色储君」，剧本/卡组/特殊效果整场中途换掉。修：BossLineups 新增 Latched(key, compute)，按当前战斗状态对象引用锁定第一次结果，同一场全部返回它，引用变化（换场/控制台 fight/战斗结束）才清空重算；三个 Active 方法全部包一层，并加「变体判定（本场锁定）」日志。",
+      "at": "2026-10-29T12:17:43.173Z"
+    },
+    {
+      "id": "bug-142-mvtiit4l",
+      "error_message": "三人联机：先杀储君 → 存档读档 → 多人「数据不同步」；日志显示读档时本机把 (幕3,场2) 记成了「当前场」，实际在打第 1 幕 Boss 房",
+      "fix": "变体判据里的「按本机 _currentFightAct/_currentFightIndex 去查阵容」这一步是本地记账：生成房间、ValidateRoomsAfterLoad、控制台 fight 都会改它，而房主与客人跑这些路径的时机不同 ⇒ 两台机器用不同 (幕,场) 查阵容 ⇒「这一场储君/战士/猎手用哪套变体」答案不同 ⇒ 剧本/卡组不同 ⇒ 不同步（v0.2.196 的锁定还会把错误答案锁死整场）。修：ComputeStarRegent/ComputeBoulder/ComputeBrewer 删掉该步，只保留「房间遭遇（联机同步）+ 本局种子（与三层阵容同一套 salt）」两条两端一致的判据，配合 v0.2.196 的本场锁定。",
+      "at": "2026-10-29T12:21:32.277Z"
+    },
+    {
+      "id": "bug-143-mvtitcjp",
+      "error_message": "Boss 最后一张牌打完到「回合结束」效果（炸弹/冰雹风暴）结算之间会停 1~2 秒（实测 +2.6s，几乎恒定）",
+      "fix": "v0.2.195 的探针已证明这段停顿不在我们代码里：日志「出牌阶段结束: 共 Xms（最后一张牌后 0ms）」「回合收尾耗时: 球 0ms / 遗物 0ms / 诅咒 0ms / 弃手牌 0ms」但「敌方回合结束派发（BeforeSideTurnEnd）：距我们上次回合收尾 +2625ms」（三次 2625/2641/2609，接近固定超时）。本轮加 VanillaTurnEndTimingPatch：给 CombatManager 的 AfterAllPlayersReadyToEndTurn / WaitUntilQueueIsEmptyOrWaitingOnNonPlayerDrivenAction / DoTurnEnd / AwaitTurnEndAndSwitchSides 挂「Task 完成后计时」postfix（ref Task __result 包装），日志「原版回合结束步骤：<步骤> = Nms」以定位那 2.6 秒。怀疑点是队列等待：Boss 牌是 CardCmd.AutoPlay 打的，若留下的 PlayCardAction / BlockingPlayerChoiceContext 没正确收尾，等待就会到超时。",
+      "at": "2026-10-29T12:29:44.005Z"
+    },
+    {
+      "id": "bug-144-mvtj0opq",
+      "error_message": "多人 Boss 战「回合收尾」停顿随回合递增：单人无停顿，多人 +594ms → +1094ms → +2578ms 后稳定在 ~2.6s",
+      "fix": "同一时间我们的收尾全是 0ms（最后一张牌后 0ms、球/遗物/诅咒/弃手牌 0ms），所以耗时在原版回合收尾流程里，且随回合增长 ⇒ 有东西累积残留。最符合的是 NCardPlayQueue：Boss 牌走 CardCmd.AutoPlay，原版把「非本机玩家出牌」的卡面塞进 _playQueue，v0.2.185 只把卡面隐藏、item 一直留着 ⇒ 每回合每只 Boss 3~4 张残留越积越多，原版那条「等队列/等动画」越晚结束（等不到就超时 ≈2.5s，正好是封顶值）。修：Reap() 改用原版 RemoveCardFromQueueForCancellation(card,false) 真正摘掉 item（Kill 补间 + 从 _playQueue 移除 + 淡出后 QueueFree），异常时退回只隐藏；并给 RemoveCardFromQueueForExecution 加「找不到就跳过」的前缀，避免我们提前摘掉后原版抛 InvalidOperationException。",
+      "at": "2026-10-29T12:35:26.366Z"
+    },
+    {
+      "id": "bug-145-mvtj7u6y",
+      "error_message": "进阶 10 第三幕「第二个 Boss」的地图节点徽章仍是原版 TheKin 占位图，不是角色剪影",
+      "fix": "原判据只有 ReferenceEquals(point, runState.Map.SecondBossMapPoint)：①读档/地图重建后节点 Point 与 Map.SecondBossMapPoint 可能不是同一实例，被判成「第一只」，于是拿第一只的遭遇判断（它常带专属美术⇒直接 return）；②进阶10 第三幕地图绘制可能早于「第二槽被替换」，act.SecondBossEncounter 还是 null（getter 补丁只在 __result!=null 时替换）。修：SamePoint 用「引用相同或坐标（私有 coord 字段）相同」判断；候选按是否第二颗排序，只认「我们的且会用占位图的」遭遇；用 ShowingPlaceholder(image)（比对贴图 ResourcePath 与 TheKinBoss.BossNodePath）兜底；第二槽为 null 时用 BossLineups.For(act,1)[0] → BossKeys.EncounterOf 推出第二场主 Boss 取角色徽记并打日志。",
+      "at": "2026-10-29T12:41:00.058Z"
+    },
+    {
+      "id": "bug-146-mvtjwrjf",
+      "error_message": "装了「第四幕心脏」后第 4 幕的 Boss 也会被本模组替换；装了「往昔之章」等地图模组后非原版地图的 Boss 默认被替换",
+      "fix": "①第4幕：CharBossEncounters.ActTable 有第 4 行且 ForVanillaBoss 用 Math.Clamp(act.Index,0,3)，于是第4幕也会被换。现在 ForVanillaBoss 开头 act.Index>=3 直接 return null（四个切点都走这个漏斗），MultiBossPlan.PartnersFor 也 CurrentActIndex>=3 时不再加伙伴，并各打一次日志。②非原版地图：原来 IsMapEnabledById 「缺项=开」，且 BossConfig.Load() 补齐清单时把所有地图（含模组加的）写成 true。现在 IsMapEnabledById = 用户显式设过就听用户的、否则原版四张(OVERGROWTH/UNDERDOCKS/HIVE/GLORY)默认开、其余默认关、认不出也关；Load() 按 IsVanillaMap 给默认值；存盘 version 1→2 迁移把非原版地图一次性改回 false 并打日志。",
+      "at": "2026-10-29T13:00:23.019Z"
+    },
+    {
+      "id": "bug-147-mvtkcjpn",
+      "error_message": "多人时各机用自己的配置文件决定 Boss ⇒ 两端可能算出不同 Boss（不同步）；另缺「与原本 Boss 共用匹配池」这个设置",
+      "fix": "①新增 Core/NetRole.cs（RunManager.Instance.NetService.Type → IsHostOrSolo / IsGuest）。ForVanillaBoss 增加客人分支：多人非房主完全不读本机配置（地图开关/共用匹配池都不看），只跟随房主写进同步状态的结论——act.BossEncounter/SecondBossEncounter 是我们的就返回它，否则 return null；用 [ThreadStatic] InGuestFollow 防 getter 递归。音乐 A3 不受影响。②新增配置 A4 BossConfig.SharePool（sharePool，默认关，配置界面一行勾选框）：开启后在房主/单人路径上、且该地图开了替换之后，用 BossLineups.SharePoolPicksVanilla(act,fight)=Roll(act,61+fight,2)==0 做种子抽取；true→return null 保持原版，false→照旧完全替换（主 Boss=阵容第0位、Boss数=玩家数）。抽取只看本局种子+幕+场 ⇒ 一幕开场即定、预告与实际一致、两端一致。③进阶10第三幕第一场出现过的 Key 不进第二场抽取（2人局走 usedInThisAct，3人+走 BuildAct3Pairs 互补变体）。",
+      "at": "2026-10-29T13:12:39.371Z"
+    },
+    {
+      "id": "bug-148-mvtki6p8",
+      "error_message": "配置界面区块显示顺序是 A1 → A4 → A2 → A3（A4 被塞在 A1 段末尾）",
+      "fix": "A4「与原本 Boss 共用匹配池」原本是加在 BuildMapSection 末尾的，而 SetupConfigUI 的调用顺序仍是 A1→A2→A3，所以画面上成了 1/4/2/3。修：抽出独立方法 BuildSharePoolSection，SetupConfigUI 调用顺序改为 BuildMapSection(A1) → BuildMixedMatchingSection(A2) → BuildBgmSection(A3) → BuildSharePoolSection(A4)，中间照旧插分割线；编号不变（用户要求以当前编号为准）。",
+      "at": "2026-10-29T13:17:02.444Z"
+    },
+    {
+      "id": "bug-149-mvtkq4tm",
+      "error_message": "A4 状态文案前后矛盾（关着时写「勾了就一定是角色 Boss」）；配置文件写在模组目录，创意工坊更新会覆盖/只读导致设置丢失",
+      "fix": "①StateText2 改成：不勾=「关（一定是角色 Boss）」、勾上=「开（原版 Boss 与角色 Boss 混抽）」。②FilePath 改为按优先级挑第一个可写目录：%APPDATA%\\SlayTheSpire2\\mod_configs\\CharacterBosses\\ → Godot user://mod_config\\CharacterBosses\\ → DLL 目录兜底；每个候选目录先做「写临时文件再删」的可写性测试，只读的 workshop 目录会被跳过。TryMigrateLegacy 把旧位置（模组目录）的 charbosses_config.cfg / .json 迁移到新位置并删旧的，打日志。配置界面底部改为显示 BossConfig.DescribeConfigPath() 的实际路径。",
+      "at": "2026-10-29T13:23:13.258Z"
+    },
+    {
+      "id": "bug-150-mvtl2bfl",
+      "error_message": "缺设置：进阶 10 第三幕两场 Boss 需要固定为「一场原本 + 一场角色」（现在各抽各的，可能两场都是原版或都是角色）",
+      "fix": "新增配置子项 asc10Act3OneEach（BossConfig.Asc10Act3OneEach 返回生效值 = 混匹开 && 本项开；Asc10Act3OneEachRaw 供界面显示勾选态）。BossLineups.Asc10Act3PicksVanilla(fight) 用 salt 63 整幕只抽一次、两场互补 ⇒ 必定一场原版一场角色；ForVanillaBoss 在混匹开启且「本项开 && 幕>=3 && 进阶>=10」时走这个整幕互补抽取，否则仍每场各抽；日志追加说明。配置界面 A4 段新增一行勾选框，混匹关着时追加灰字「需要开启共用匹配池才生效」。多人由客人分支保证只看房主。",
+      "at": "2026-10-29T13:32:41.697Z"
+    },
+    {
+      "id": "bug-151-mvtlkyoe",
+      "error_message": "带毒刺击让「触媒」和「毒性爆发」也对玩家方生效（玩家自己的中毒被自己的触媒加速、毒性爆发波及玩家）",
+      "fix": "我们自实现的 TriggerCount 以前用「毒主人自己的触媒」：TriggerCountOf = min(Amount, 1 + poison.Owner.GetPowerAmount<AccelerantPower>())；反编译原版 PoisonPower.TriggerCount 用的是**对手**：min(Amount, 1 + Σ GetOpponentsOf(Owner).Where(alive).GetPowerAmount<AccelerantPower>())，也就是触媒属于下毒方、加成对手身上的中毒。因为毒性爆发的「立即触发」也走 TriggerBlockableAsync，所以两边一起错位。修：TriggerCountOf 改为累加对手的触媒层数，删掉 AccelerantOf；本地化删掉「触媒和毒性爆发在本场战斗中对全场生效」那条警告（中英各一条，保留「为你而死」那条）。",
+      "at": "2026-10-29T13:47:11.630Z"
+    },
+    {
+      "id": "bug-152-mvtlzsw3",
+      "error_message": "多人不同步：变体判定把「开战前按种子猜的答案」锁进 LatchTable，某端在遭遇就绪前先问一次就整场用错变体（日志同一秒 REGENT_STAR True→False）",
+      "fix": "①新增 CurrentFightLineup()：用存档里的主 Boss 遭遇（act.BossEncounter → BossKeys.KeyOfEncounter）反查两层阵容里属于哪一场，变体直接从这一场阵容读（同步数据，不依赖本机 _currentFightAct）。ComputeStarRegent/ComputeBoulder/ComputeBrewer 判据顺序改为 ①房间遭遇 ②存档主 Boss 反查阵容 ③种子（不可靠）。②Latched 改成接收 Func<(bool Value, bool Decisive)>：只有 ①② 的决定性答案才写入 LatchTable，走种子得到的答案不缓存、下次重算，并在日志里区分「（来自同步数据；换场后才会重算）」。",
+      "at": "2026-10-29T13:58:43.971Z"
+    },
+    {
+      "id": "bug-153-mvtm9pyg",
+      "error_message": "多人不同步（State divergence）：每次都在「玩家打出一张指向静默猎手那格的牌、动作结束」时校验和不符；客人侧状态 dump 拿不到，无法 diff",
+      "fix": "godot (4).log 显示 5 次 State divergence（checksum 593/29/36/17/38），上下文都是 PlayCardAction(OUTRAGE / STRIKE_IRONCLAD) targetid=4 结束后；房主 LOCAL STATE DUMP 里 4 名玩家各 1 个 LOCK_ON_POWER、四只 Boss 的本模组 power 都在，看不出异常，而客人的 dump 不在手上。修：①新增 DivergenceStateProbe，挂在 ChecksumTracker.LogStateDivergence 上（两端都会走），打「⚠ 不同步状态摘要」——每玩家的锁定图标实例数与施加者、每只 Boss 的本模组 power 层数与 HP/格挡、我们算出的锁定分配表，便于两端 mod_log 并排比对；②BossLockOn.CleanupStaleForNewFight 改为一场只清一次（原来每只 Boss 生成都跑一次，会把本场刚挂的图标当旧图标摘掉，造成加一份删一份的抖动）。",
+      "at": "2026-10-29T14:06:26.728Z"
+    },
+    {
+      "id": "bug-154-mvto7nh8",
+      "error_message": "三层 Boss 战没有胜利音效 / BGM 中途消失：BossBgm.Stop()→StopCustomMusic() 在最后一只 Boss 倒下那一帧执行，把游戏刚切出来的胜利段落掐掉",
+      "fix": "反编译实证：CombatManager.EndCombatInternal 末尾调 NRunMusicController.UpdateTrack() → update_global_parameter(\"Progress\", GetTrack(roomType))，战斗房且!IsInProgress ⇒ CombatEnd(7)；胜利段落是在「当前正在响的曲目」上切出来的。修法：BossBgm.OnLastBossDied() 只放标记不停音乐，4 秒后由 TickRestore（BossFrameTick 慢车道 + NMapScreen._Process 驱动）还原；BeforeRemovedFromRoom 改调 OnFightEnded 延迟还原；同场重复 OnCombatStart 去重（按 CombatManager.DebugOnlyGetState() 引用比）；加 MusicTracePatch 记录谁在动音乐",
+      "file": "src/Hooks/Core/BossBgm.cs",
+      "at": "2026-10-29T15:00:49.436Z"
+    },
+    {
+      "id": "bug-155-mvtoe5di",
+      "error_message": "混匹（共用匹配池）遇到自带 CustomBgm 的原版 Boss（女王/沙虫/墨影幻灵）时，OnCombatStart 仍 PlayCustomMusic 把人家主题曲顶掉；另外 A3=② 一代音乐用 StopMusic() 压原版音乐，导致战斗结束后 _currentTrack==null → StopCustomMusic 只发 stop_music，整段没音乐也没环境音",
+      "fix": "OnCombatStart 开头检查 CombatState.Encounter.CustomBgm（HasBgm => CustomBgm != \"\"），非空则不接管并记日志；Restore() 里反射读 NRunMusicController._currentTrack，为空则补一次 controller.UpdateMusic()（重新解析本幕 BGM + LoadActBank + UpdateAmbience）",
+      "file": "src/Hooks/Core/BossBgm.cs",
+      "at": "2026-10-29T15:05:52.566Z"
+    },
+    {
+      "id": "bug-156-mvube8vh",
+      "error_message": "多人不同步：房主场上有 DEFECT_BOSS + NECROBINDER_BOSS 两只，客人只有 DEFECT_BOSS 一只（State divergence ID 291, After player turn start）；锁定图标数量与 RNG Niche 计数随之不同",
+      "fix": "根因是「搭子 Boss 生成」在两端分叉：房主那台跑 v0.2.204（旧版有随机兜底种子 / 本机 _currentFightAct / 猜种子锁存），与本机新版本判定实现不同。硬化：SyncedFightOf 优先用同步的 act.BossEncounter / act.SecondBossEncounter 判「我是第几场」，只有两槽都不占才退回按种子反推；并新增两端指纹日志「※多 Boss 生成指纹※」与「※本机生成※ … 怪物 N 只」。前提条件：两台机器必须同版本",
+      "file": "src/Hooks/Core/MultiBossPlan.cs",
+      "at": "2026-10-30T01:49:48.269Z"
+    },
+    {
+      "id": "bug-157-mvubofoq",
+      "error_message": "模组 CharacterBosses 的程序集DLL初始化失败：HarmonyException Ambiguous match for HarmonyMethod[(class=NRunMusicController, methodname=UpdateTrack, args=undefined)] → AmbiguousMatchException → PatchAll 中断 → 全部补丁未挂上",
+      "fix": "MusicTracePatch 里 7 个音乐补丁与 MusicRestoreDriverPatch 全部写死参数类型（new Type[0] / new[]{typeof(string)} / new[]{typeof(double)}）；新增 tools\\check-harmony-attributes.ps1 列出未钉参数类型的 nameof 目标；教训写入 cerebrum Do-Not-Repeat",
+      "file": "src/Hooks/Patches/MusicTracePatch.cs",
+      "at": "2026-10-30T01:57:43.658Z"
+    },
+    {
+      "id": "bug-158-mvuch1s7",
+      "error_message": "Boss 死亡后没有胜利音乐（v0.2.209~212）：把「战斗结束游戏 UpdateTrack 设 Progress=7 会切出胜利段落」当成结论，于是死亡时不停音乐、4 秒后再还原 —— 实际 Progress=7 只作用于 _currentTrack（本幕地图音乐），Boss 自定义曲目（the_kin/queen/kaiser_crab）不响应，等于没声音；而且延迟还原在战斗结束后根本没驱动（战斗内帧驱动已停、NMapScreen 奖励界面未实例化），待还原时间戳一路过期",
+      "fix": "胜利段落只出现在 StopCustomMusic()（stop_music + 重放 _currentTrack + Progress=7）⇒ OnLastBossDied/OnFightEnded 改回当场 Restore()；TickRestore 降级为纯兜底；保留 _currentTrack==null 时补 UpdateMusic() 与「本场遭遇自带曲目则不接管」",
+      "file": "src/Hooks/Core/BossBgm.cs",
+      "at": "2026-10-30T02:19:58.663Z"
+    },
+    {
+      "id": "bug-159-mvuefevb",
+      "error_message": "Boss 战胜利没有原版胜利音（只有小怪那种淡出）；进阶10第二颗地图徽章变成白圆盘+灰星星；顶栏显示 encounters.REGENT_STAR_BOSS_ENCOUNTER.title 原始 key",
+      "fix": "①原版 Boss 死亡是给自己曲目 UpdateMusicParameter(\"<boss>_progress\", 5f)：现在最后一只 Boss 倒下时补发该参数、放 5 秒死亡段落，再用 SceneTreeTimer 还原（不依赖战斗内帧驱动）；删掉 v0.2.214/215 的 debug_audio/victory.mp3 短音 ②地图徽章不再覆盖 %PlaceholderOutline（白圆盘不染色→看不见），只换剪影 ③zhs/eng encounters.json 补齐 REGENT_STAR_BOSS_ENCOUNTER 与全部 8 个 *_NORMAL_ENCOUNTER（各 64 键、键集一致），PCK 重建并抽取验证",
+      "file": "src/Hooks/Core/BossBgm.cs",
+      "at": "2026-10-30T03:14:41.543Z"
+    },
+    {
+      "id": "bug-160-mvui6qr5",
+      "error_message": "击败 Boss 后游戏卡死崩溃（只播了 1 秒胜利音）：mod_log 同一秒出现 9621 行「BGM：兜底还原」",
+      "fix": "Restore() 内部的 controller.UpdateTrack() 触发 MusicTrace.UpdateTrackPatch.Postfix → HasPendingRestore(=_playing!=null) 为真 → TickRestore → Restore 无限递归；且 _playing 原本最后才清所以永远不会终止。修法：Restore 先清 _playing/_claimed 等状态再动 FMOD；新增 _restoring 互斥（finally 复位）；HasPendingRestore 改为 _playing!=null && !_restoring && !_deathPlaybackScheduled；TickRestore 增加死亡段落判断与 _fallbackLogged 单次日志",
+      "file": "src/Hooks/Core/BossBgm.cs",
+      "at": "2026-10-30T04:59:55.505Z"
+    },
+    {
+      "id": "bug-161-mvuieimd",
+      "error_message": "收藏家藏品堆里的「遗传算法」打出后格挡量不增长",
+      "fix": "原版 GeneticAlgorithm.OnPlay 的 BuffFromPlay 只作用于本实例 + DeckVersion（牌库那张）；藏品堆是 CollectiblesModel.CollectorDeck 的 List<SerializableCard> 快照，GetCollectibles 每次 CardModel.FromSerializable 重建新实例，DeckVersion 为 null ⇒ 成长丢失。修法：GetCollectibles postfix 记录 卡实例→下标；GeneticAlgorithm.BuffFromPlay(int) postfix 里把 ToSerializable()（CurrentBlock/IncreasedBlock 为 [SavedProperty]）写回该下标并用 SpireField.Set(player,新列表) 提交；Owner 为空时按实例遍历玩家",
+      "file": "src/Hooks/Core/DownfallCollectibleCompat.cs",
+      "at": "2026-10-30T05:05:58.213Z"
+    },
+    {
+      "id": "bug-162-mvuily7o",
+      "error_message": "v0.2.219 的 BuffFromPlay 补丁装上了但藏品堆遗传算法仍不成长（日志里既没有「写回」也没有「写回失败」）",
+      "fix": "两个原因：① GeneticAlgorithm.BuffFromPlay 只有两行，极可能被 JIT 内联 ⇒ 挂方法入口的补丁不被调用；改挂 IncreasedBlock 的 setter（含 AssertMutable，不会内联），BuffFromPlay 作为副钩子 ② 之前只靠「GetCollectibles 重建实例」映射定位，藏品堆里打出的常是另一份实例 ⇒ 新增慢路径按「同 id + 同升级 + 条目存的格挡 = 1+IncreasedBlock-Increase」在 CollectorDeck 里定位；setter 时机 CurrentBlock 仍是旧值，格挡一律按 1+IncreasedBlock 算；并补齐诊断日志",
+      "file": "src/Hooks/Core/DownfallCollectibleCompat.cs",
+      "at": "2026-10-30T05:11:45.012Z"
+    },
+    {
+      "id": "bug-163-mvuiqks5",
+      "error_message": "v0.2.220 进战斗黑屏然后崩溃；mod_log 最后一行是「成长钩子命中「GENETIC_ALGORITHM」」",
+      "fix": "写回逻辑里用 CardModel.FromSerializable 反序列化 CollectorDeck 条目来匹配旧格挡值，而反序列化会重新赋值 [SavedProperty]（IncreasedBlock）⇒ 再次触发我们的 setter postfix ⇒ 无限递归 → 栈溢出崩溃。修法：AfterGrowChanged 加 [ThreadStatic] _persisting 重入锁；postfix 内绝不再调用 FromSerializable，只用 SerializableCard.Id.Entry 与 Props.ints 的 SavedProperty<int>.name/value 读取匹配；写回前做幂等短路（条目已是新值就直接返回）",
+      "file": "src/Hooks/Core/DownfallCollectibleCompat.cs",
+      "at": "2026-10-30T05:15:20.885Z"
+    },
+    {
+      "id": "bug-164-mvuj7as9",
+      "error_message": "Boss 胜利音没完全播完就戛然而止；进阶10第三幕第二场的地图徽章是角色剪影叠着原版 Boss（女王）底图、且剪影纯白刺眼",
+      "fix": "①胜利音：死亡段落长度未知，固定 5 秒会切断 ⇒ 新增 BossBgm.OnRoomEntered() 挂 RunManager.EnterMapPointInternal 前缀，玩家离开战斗房才还原，5 秒计时器改为 20 秒兜底 ②徽章：%PlaceholderOutline 显示的是 <BossNodePath>_outline.png（原本那只 Boss 的底图），必须一起换成我们生成的圆盘；剪影与圆盘改用原版占位图的深灰（#4A545E / #5D6870），因为纯白在某些地图状态下不染色",
+      "file": "src/Hooks/Patches/BossMapPointCharacterIconPatch.cs",
+      "at": "2026-10-30T05:28:21.081Z"
+    },
+    {
+      "id": "bug-165-mvuji22l",
+      "error_message": "进阶10第三幕第二场是根除骨（亡灵契约师），但地图第二颗徽章画的是储君（和第一颗一样）；且外圈还残留原版 Boss（TheKin/女王）的装饰",
+      "fix": "老逻辑两颗节点都用 [本槽,另一槽] 候选且要求「无专属美术」，而根除骨有专属美术 soul_bone ⇒ 被否掉后跨槽回落到第一场的储君。改为先用 MatchByArt 拿节点当前贴图路径与两槽 BossNodePath 比对确定「是第几颗」，只认那一格的遭遇、绝不跨槽回落；该格有专属美术且节点已显示它就一个像素不动。外圈 %PlaceholderOutline 是 <BossNodePath>_outline.png（原版那只 Boss 的装饰）⇒ 换图时 outline.Visible=false 隐藏",
+      "file": "src/Hooks/Patches/BossMapPointCharacterIconPatch.cs",
+      "at": "2026-10-30T05:36:43.005Z"
+    },
+    {
+      "id": "bug-166-mvukm9yt",
+      "error_message": "进阶10三层第二只 Boss 死亡时没有胜利音（日志显示死亡段落刚发出、同一秒就被 Restore 还原）",
+      "fix": "ScheduleRestore 的计时器在 CombatInProgress() 为真时会自己再排 2 秒，而结算期间 IsInProgress 仍为真 ⇒ 整场每 2 秒重排（日志刷屏），第二只 Boss 发完死亡段落后被某个旧计时器立刻 Restore 切掉。修法：① 计时器带 _restoreGen 代号，回调 gen 不匹配即返回 ② 到点若仍在战斗/结算就直接返回，不再自行重排（交给 OnRoomEntered） ③ OnCombatStart 清掉上一场的 _deathPendingRestore/_deathPlaybackScheduled 并 ++_restoreGen",
+      "file": "src/Hooks/Core/BossBgm.cs",
+      "at": "2026-10-30T06:07:59.477Z"
+    },
+    {
+      "id": "bug-167-mvume0w4",
+      "error_message": "收藏家的「祸不单行」（DoubleTroublePower）不能让我们 Boss 掉落的藏品牌打出两次",
+      "fix": "DoubleTroublePower.ModifyCardPlayCount 的判断是「card.Owner.Creature == Owner && card is ICollectible」——只认它自己的藏品牌 token 类型；我们的藏品是原版牌（GeneticAlgorithm 等），类型上永远不是 ICollectible ⇒ 永远 +0。修法：给 ModifyCardPlayCount 挂 postfix，若 __result == playCount 且牌属于该 power 主人且牌 id 在掉落表里，则 __result = playCount + 1",
+      "file": "src/Hooks/Core/DownfallCollectibleCompat.cs",
+      "at": "2026-10-30T06:57:33.700Z"
+    },
+    {
+      "id": "bug-168-mvuy6te4",
+      "error_message": "联机（4 人局）进第 1 幕 Boss 房立刻「数据不同步」：客人打的是原版仪典兽（CEREMONIAL_BEAST_BOSS），房主打的是 DEFECT_DARK（角色 Boss），之后一直回滚重打",
+      "fix": "ForVanillaBoss 的客人分支不再「同步槽位不是我们的就 return null」——那会把「房主真没换」和「房主数据还没同步到本机」混为一谈。现在槽位是原版时继续走本机那套确定性规则（RunState.Rng.Seed + 幕 + 场 + 人数 + 进阶，两端同源）并记日志；同时 BossSlotReplacer 对客人不再 SetBossEncounter（客户端不写同步状态）；DivergenceStateProbe 摘要加遭遇 id / 房主客人 / Boss 手牌·能量·出牌计划便于下次对齐。v0.2.237",
+      "file": "src/Hooks/Encounters/CharBossEncounters.cs / src/Hooks/Patches/BossSlotPatches.cs",
+      "at": "2026-10-30T12:27:52.780Z"
+    },
+    {
+      "id": "bug-169-mvuyz3jc",
+      "error_message": "联机在小怪（普通怪物）关不同步：godot 日志 State divergence for player …210246781，checksum id 94/70「After player turn start」，战斗是 BOWLBUG_ROCK/EGG + 玩家召唤物",
+      "fix": "HittableEnemiesSidePatch 的「敌方回合把 HittableEnemies 翻成玩家侧」以前没有任何闸门，在每一场战斗的敌方回合都生效 ⇒ 普通战斗也在改所有怪物的选靶语义，联机两端只要有一台没装/版本不同就分叉。现在要求 BossShadowPets.BossFightActive(__instance) 为真（本场真的有 CharBossMonster），否则走原版。v0.2.238",
+      "file": "src/Hooks/Patches/CombatSidePatches.cs",
+      "at": "2026-10-30T12:49:52.296Z"
+    },
+    {
+      "id": "bug-170-mvuz7x8f",
+      "error_message": "联机普通战斗不同步的真正原因：收藏家藏品册里的「我们的 Boss 掉落牌」在同一张牌上两端关键词不一致（dump 里 CARD.AGGRESSION → Keywords: Ethereal；CARD.SNEAKY → Keywords: Ethereal,Sly），关键词进校验和 ⇒ 打出时消耗堆/弃牌堆不同",
+      "fix": "AfterGetCollectibles（挂在崩坠 CollectiblesModel.GetCollectibles 的界面路径）以前给掉落表里的牌补 Ethereal/Exhaust，只有渲染册子的客户端跑得到 ⇒ 同一张牌两端关键词不同。现在 GetCollectibles 只做「实例→下标」记账，不再改牌；关键词只在 CreateCard/CreateRewardCard 造牌时加（同步流程，两端一致）。v0.2.239",
+      "file": "src/Hooks/Core/DownfallCollectibleCompat.cs",
+      "at": "2026-10-30T12:56:44.031Z"
+    },
+    {
+      "id": "bug-171-mvv14r14",
+      "error_message": "联机时灵魂骨（第二层亡灵契约师）的「灵魂绑定」把**所有玩家**回合内的抽牌都算成她的抽牌（死亡行军倍率、自动化计数），而不是只有被她锁定的那位",
+      "fix": "AfterCardDrawn 前缀原来只判「抽牌者是不是真人玩家」，没判锁定。现在加 BossLockOn.SpecialEffectAppliesTo(boss, 抽牌者)：单人恒 true，多人只有锁定她的那位算数（判据来自同步数据，不会引入不同步）。被挡掉的写一行日志。v0.2.240",
+      "file": "src/Hooks/Patches/SoulBoundDrawPatch.cs",
+      "at": "2026-10-30T13:50:15.256Z"
+    },
+    {
+      "id": "bug-172-mvv1lm8r",
+      "error_message": "联机不同步（checksum 1695, After player turn start）：三次全部点名 7656119…（Hermit 玩家），另两台客户端的 LOCAL STATE DUMP 前 839 行完全相同、Local/Remote 数字也相同",
+      "fix": "比对方法：从两份 godot.log 里各取同一 checksum 的 LOCAL STATE DUMP（生物/HP/power/各牌堆/遗物/药水/金币/RNG 全部计数）逐行 diff。结果 839 行全同 ⇒ 两台客户端+房主一致，离群的是 Hermit 那台。结论：需要那一台的 mod_log（CharacterBosses 构建版本）+ mod 清单 + RitsuLib 诊断包 zip，而不是继续改本模组。",
+      "file": "（诊断结论，非代码）godot (8).log / godot (9).log / mod_log (15).txt",
+      "at": "2026-10-30T14:03:22.203Z"
+    },
+    {
+      "id": "bug-173-mvv1xrrp",
+      "error_message": "联机不同步（RitsuLib 诊断包 checksum #0）：只有 5 个字段不同，核心是 creatures[6].block: local=20; remote=0（MONSTER.SILENT_BOSS 的格挡）",
+      "fix": "钻石头冠的 20 格挡以前「战斗开始 GainBlock」+「帧回调 Task.Delay(120) 异步补」，而原版战斗开始清零的时序两端不同 ⇒ 一端 20 一端 0。现在战斗开始只给残影 2 层；格挡改到同步钩子 Hook.AfterSideTurnStart(Player) 的 postfix 里用 Creature.GainBlockInternal 同步补齐（DiademBlockSyncPatch / BossHookBridge.GrantDiademBlockSync），并删掉帧驱动里的补格挡。教训：战斗状态绝不能在帧回调/UI tick 里改。v0.2.241",
+      "file": "src/Hooks/Core/BossHookBridge.SideTurn.cs / src/Hooks/Patches/BossFrameTickPatch.cs / src/Hooks/Patches/ShadowDiamondDiademOncePatch.cs",
+      "at": "2026-10-30T14:12:49.237Z"
+    },
+    {
+      "id": "bug-174-mvv2pscr",
+      "error_message": "进阶10 第三幕两场 Boss 战斗用了同一套变体（两场都是刀贼 SILENT_SHIV / 辉星储 REGENT_STAR / 易伤战 IRONCLAD_VULN）",
+      "fix": "不是分场规则写反（BuildAct3Pairs 本身互补），而是「第几场」判定错：IsSecondSlot 照抄原版要求 SecondBoss != null，可原版第二槽常到真正拉第二场时才滚出来 ⇒ 判成第一场 ⇒ 两场都用 fight0 阵容。现在 visited>0 且（进阶≥10 且第三幕）直接按第二场；另加硬保险 BossKeys.ComplementVariant：第二场 Key 与第一场阵容重复时换成同角色互补变体。v0.2.242",
+      "file": "src/Hooks/Patches/BossReplacementPatches.cs / src/Hooks/Encounters/CharBossEncounters.cs / src/Hooks/Core/BossKeys.cs",
+      "at": "2026-10-30T14:34:36.363Z"
+    },
+    {
+      "id": "bug-175-mvv30nfn",
+      "error_message": "游戏黑屏进不去：mod_log 里 1 秒内 411 条「配置读取失败: '\"' is invalid after a value ... LineNumber: 17」，且用户同时开了两个 SlayTheSpire2 进程（其中一个 Responding=False）",
+      "fix": "① 玩家手改 cfg 少了逗号（\"telemetry\": false 后面）+ 重复 telemetry + 没替换 secret 占位符 ⇒ JSON 整体坏掉；已重写为合法 JSON（含真 secret），旧文件备份为 .broken-20261030。② 模组 bug：Current 首次解析没有锁，预载线程并发各自 Load() 一遍 ⇒ 411 条日志 + 411 次同步读盘；已加 lock + 失败只记一次 + 自动把坏文件备份成 .broken-<时间>（v0.2.243）。③ 同时开了两个游戏实例（黑屏的是无响应的那个），已强杀；另一个需用户在任务管理器手动结束。",
+      "file": "src/Hooks/Core/BossConfig.cs + %APPDATA%\\SlayTheSpire2\\mod_configs\\CharacterBosses\\charbosses_config.cfg",
+      "at": "2026-10-30T14:43:03.203Z"
+    },
+    {
+      "id": "bug-176-mvv399se",
+      "error_message": "数据收集表格里 6 行只有 1 条 boss_fight，其余是 diag 噪音（性能(5s) 因含「异常=0」被关键字过滤器放过；构建横幅因含「失败」被放过；「移除已喝药水失败」是重复移除）",
+      "fix": "Telemetry.Diagnostic 增加噪音过滤（性能(/帧回调耗时/构建横幅）+ 同一条消息每进程只记一次；BossPotions 喝药后先确认药水还在栏位里再 RemoveUsedPotionInternal（原版喝药已移除，重复移除会抛异常被记成 diag）；boss_fight 的 lineup 与实际遭遇对不上时（控制台点名）前缀 console:。v0.2.244",
+      "file": "src/Hooks/Core/Telemetry.cs / src/Hooks/Core/BossPotions.cs",
+      "at": "2026-10-30T14:49:45.422Z"
+    },
+    {
+      "id": "bug-177-mvv3bzgp",
+      "error_message": "数据收集把「双方都还活着就结束」的战斗记成 result=lose（玩家用控制台结束战斗：Boss 剩 23 血被移出房间、没有「已阵亡」事件，玩家也没死）",
+      "fix": "战斗结果从两档改三档：Boss 真死=win；Boss 没死且真人玩家全灭=lose；双方都还有活的（控制台结束/中途结束）=不写 result 字段 + lineup 前缀 aborted: + mod_log 记一行。BossFightEnded 增加 playersAlive 参数，调用处用 BossLockOn.RealPlayers 统计。v0.2.245",
+      "file": "src/Hooks/Core/Telemetry.cs / src/Hooks/Monsters/CharBossMonster.Descriptor.cs",
+      "at": "2026-10-30T14:51:52.009Z"
+    },
+    {
+      "id": "bug-178-mvv3qbrd",
+      "error_message": "数据表里混着无价值的杂项（构建横幅、性能统计、consent），影响看对局数据",
+      "fix": "按用户 2026-10-30 定稿：只上传 boss_fight + diag 里「失败/异常/Exception」与「不同步」两类（Diagnostic 加正向白名单 + 同类去重），consent 与其它 kind 只留本机（Write(queueForUpload:false)）；配了 feishuDiagTableId 时诊断进那张表，否则与对局数据同表。v0.2.247",
+      "file": "src/Hooks/Core/Telemetry.cs",
+      "at": "2026-10-30T15:03:01.129Z"
+    },
+    {
+      "id": "bug-179-mvv3wi9j",
+      "error_message": "多人联机时同一场 Boss 战会被每个同意上传的客户端各传一条 ⇒ 表格里同一局出现多次",
+      "fix": "BossFightEnded 改为：只有 NetRole.IsHostOrSolo（单人/房主）才 queueForUpload，客人只写本机 jsonl 并在日志说明；每条记录新增 role 字段（solo/host/guest），上传器把它映射进表（表里加 role 列即可见）。diag 仍由各端上传（不同步摘要两端内容不同、都有价值）。v0.2.248",
+      "file": "src/Hooks/Core/Telemetry.cs",
+      "at": "2026-10-30T15:07:49.495Z"
+    },
+    {
+      "id": "bug-180-mvvq4x2i",
+      "error_message": "能力机（第三幕故障机器人）「偏差认知」把玩家打出的衍生能力牌也算进了 +1 集中（祭仪/火热研究/收藏家藏品牌/蛇之精髓 等）",
+      "fix": "描述改为「每打出 1 张**非衍生的**能力牌」；判定用原版稀有度 CardRarity.Token（反编译确认 ViperEssence 等 token 牌就是 (CardRarity)7=Token），再叠「命名空间含 .Token」「卡池名含 Token/Collectible」「状态/诅咒/事件/任务」三条保险；命中就 return 并各牌只记一行日志。content 变了所以重建了 PCK。v0.2.249",
+      "file": "src/Hooks/Powers/DeviationPower.cs + content/localization/{zhs,eng}/powers.json",
+      "at": "2026-10-31T01:30:13.482Z"
+    },
+    {
+      "id": "bug-181-mvvrc54d",
+      "error_message": "巨石战（三层铁甲战士第二套设计）之前被削掉了「彼岸咆哮」：卡组里删了、第 4 回合改成打击+坚毅+（消耗防御）、第 8 回合第三张也换成了打击",
+      "fix": "按用户 2026-10-30「回退那一刀削弱、把彼岸咆哮加回来（不回退更多）」：Deck() 加回 HowlFromBeyond；第 4 回合恢复为 防御 + 坚毅+（Burn 彼岸咆哮）+ FreePlayExhaustEntry=\"HOWL_FROM_BEYOND\"（回合结束从消耗堆自动打出）；第 8 回合第三张恢复为彼岸咆哮（3 费 ⇒ 出不了，与设计一致）。第 3 回合的打击/坚毅、能量、遗物等其它削弱一律没动。v0.2.250",
+      "file": "src/Hooks/Core/BoulderIroncladScript.cs",
+      "at": "2026-10-31T02:03:50.125Z"
+    },
+    {
+      "id": "bug-182-mvvro6m6",
+      "error_message": "（需求）需要增强部分 Boss 的群攻、并微调碎屑储君/愤怒战/刀贼的剧本",
+      "fix": "碎屑储君：第1/6回合「群星斗篷(0费)→防御(1费)」（会各多出一张没费打不了的防御，用户要的效果）、第2/5回合「太阳打击(单体9)→下砸 CRUSH_UNDER(1费全体8，升级+1)」、遗物加 MiniRegent（放基础列表=不限进阶，实现走 CharBossMonster 的 MiniRegent 广播）；愤怒战：第2/5/7/9回合**未被烧掉**的打击→突破 BREAKTHROUGH(1费全体+自损)；刀贼：第4、5回合意图整体对调（能量都是 2 费，账不变）。v0.2.251",
+      "file": "src/Hooks/Core/DebrisRegentScript.cs / IroncladAngerScript.cs / SilentScript.cs",
+      "at": "2026-10-31T02:13:11.934Z"
+    },
+    {
+      "id": "bug-183-mvvrufmw",
+      "error_message": "打一半退出/弃档的战斗也被上传，而且被判定成 lose（表格里出现 result=lose + lineup=console:… 的半途记录）",
+      "fix": "BossFightEnded 增加 playerCount 参数：只有 won（Boss 死=win）或 playerCount>0 且无活人（玩家全灭=lose）才 queueForUpload；其余（打一半退出/弃档/控制台结束/读档回滚）判为 aborted —— result 留空、lineup 前缀 aborted:、**只写本机不上传**，并记一行说明。要求 playerCount>0 是因为中途退出时玩家表可能为空，空表不能当「全灭」。v0.2.252",
+      "file": "src/Hooks/Core/Telemetry.cs / src/Hooks/Monsters/CharBossMonster.Descriptor.cs",
+      "at": "2026-10-31T02:18:03.560Z"
+    },
+    {
+      "id": "bug-184-mvvsnems",
+      "error_message": "多人多 Boss 时每个 boss 各写一行对局数据，统计时胜率被 Boss 数量放大（4 人局一场最多 4 行）",
+      "fix": "改成「一场战斗一行」：NoteBossEnded 在每只 Boss 结束时只按 (combat, boss) 累积（Key/MaxHp/Hp/Dead/Turns），等 MultiBossPlan.AnyOtherBossAlive 为 false（最后一只）才汇总写一行；result 按整场判（全部死=win / 玩家全灭=lose / 其它 aborted 不上传）；新增 bossTotal/bossesKilled/maxHpTotal/hpTotal/bossList/hpList（前四为数字列），boss/bossMaxHp/bossHp 语义改为主 Boss。配套 tools\\feishu-add-columns.ps1 幂等补列。v0.2.253",
+      "file": "src/Hooks/Core/Telemetry.cs / src/Hooks/Monsters/CharBossMonster.Descriptor.cs",
+      "at": "2026-10-31T02:40:35.284Z"
+    },
+    {
+      "id": "bug-185-mvvsqfzc",
+      "error_message": "「一场战斗一行」只挂在 BeforeRemovedFromRoom（最后一只 Boss 被移出房间）上 —— 玩家全灭时房间是被直接拆的，不保证每只怪物都走那条路 ⇒ 会漏掉所有「输」的局",
+      "fix": "新增 Hook.AfterCombatEnd 兜底（反编译确认 CombatManager.EndCombatInternal 胜负都会 await 它，AfterCombatVictory 只在胜利时调）：把场上还活着的我们的 Boss 登记进本场累积（它们=没打死的那几只），再走 FinalizeFight 写一行；用 _fightWritten 幂等，避免胜利时写两行。v0.2.254",
+      "file": "src/Hooks/Core/Telemetry.cs + src/Hooks/Patches/TelemetryCombatEndPatch.cs",
+      "at": "2026-10-31T02:42:57.000Z"
+    },
+    {
+      "id": "bug-186-mvw3nbap",
+      "error_message": "ModUploader: System.DllNotFoundException: Unable to load DLL 'steam_api64' or one of its dependencies: 找不到指定的模块。(0x8007007E) when running `dotnet bin\\Release\\net8.0\\ModUploader.dll upload -w ..\\..\\workshop`",
+      "fix": "Root cause: the process image is tools\\dotnet\\dotnet.exe, so Windows' \"application directory\" for native DLL search is tools\\dotnet\\, NOT the folder holding steam_api64.dll. Probe proved NativeLibrary.Load(\"steam_api64\") fails by name but succeeds by full path. Two verified fixes: (a) run the apphost bin\\Release\\net8.0\\ModUploader.exe with DOTNET_ROOT=tools\\dotnet (its own folder is the app dir); (b) prepend bin\\Release\\net8.0 to PATH and keep using dotnet ....dll. tools\\upload-workshop.ps1 implements (a).",
+      "file": "sts2-mod-uploader-main/sts2-mod-uploader-main/src/Program.cs (InitializeSteam) / tools/upload-workshop.ps1",
+      "at": "2026-10-31T07:48:26.737Z"
+    },
+    {
+      "id": "bug-187-mw1oznkg",
+      "error_message": "对战「事件机」(DEFECT_EVENT) 时玩家没有「结束回合」按钮、Boss 一手牌都不出。日志: `玩家回合开始钩子：开始` → `选择悖论：对她跳过` → `玩家回合开始钩子：异常:Object reference not set to an instance of an object.(耗时 2ms)`。Hook.AfterPlayerTurnStart 是 async，链上某个模型抛 NRE 打断整条回合开始流程 ⇒ NEndTurnButton.OnTurnStarted 轮不到 ⇒ _state 一直 Hidden。",
+      "fix": "根因是 src/Hooks/Patches/EmotionChipBossTakeoverPatch.cs 用 [HarmonyPrefix] return false 跳过 async 方法 EmotionChip.AfterPlayerTurnStart，却没有 ref Task __result ⇒ 方法体不执行 ⇒ 返回 default(Task)=null ⇒ 状态机里 model.AfterPlayerTurnStart(...).GetAwaiter() 对 null 抛 NRE。修法：Prefix 加 ref Task __result 并赋 Task.CompletedTask。同类 bug 在 ConfusedPowerBossPatch.cs (ConfusedPower.AfterCardDrawn 也返回 Task) 一并修掉 —— 那是蛇眼猎的定时炸弹。另外 v0.2.355 加在 Hook.AfterPlayerTurnStart 上的 HarmonyFinalizer 永远无效：async 方法体全在状态机里，异常由 catch{SetException} 塞进 Task，不穿方法边界（与 CombatHasOurBoss 判断无关），必须改成 Postfix 检查 ref Task __result 才行。v0.2.356 实机三回合验证：按钮 Hidden→Enabled、PLAY 正常、AfterAllPlayersReadyToEndTurn 有跑。",
+      "file": "src/Hooks/Patches/EmotionChipBossTakeoverPatch.cs",
+      "at": "2026-11-04T05:44:45.328Z"
+    },
+    {
+      "id": "bug-188-mw1qnmg2",
+      "error_message": "事件机（三层故障机器人变体）一批反馈：①王室猛毒掉两次 ②伤害预览没算吞噬暗影生成的黑暗球 ③疯狂科学显示成攻击意图、卡面是「？？？」 ④情感芯片从不触发 ⑤预览没算一心化万返手给的力量 ⑥伤害预览里情感芯片那次额外球被动算错集合",
+      "fix": "①王室猛毒原版钩子其实会打到影子 Boss 身上（v0.2.356 修好 NRE 后才暴露）⇒ 新增 Patches/RoyalPoisonOncePatch，对 Owner 是自己 Boss 且 player==Owner 的那次整条跳过（ref Task __result = Task.CompletedTask）。②BossOrbMath.TryChannels 补 CONSUMING_SHADOW→2 个 DarkOrb（数量读 Repeat 变量）；DarkOrb.EvokeVal 不含集中所以 EvokeDamageOf 里对黑暗球不减 focus；BossHandPanel.Extra 再加「回合结束被 ConsumingShadowPower 激发最左侧 N 颗」的伤害。③BossIntentBuilder 对 MAD_SCIENCE 按 entry 清零那个三模板共用的假 Damage 变量、去掉牺牲意图、强制加强化 ⇒ [DefendIntent+BuffIntent]；卡面用 Patches/MadScienceTextPatch 挂 CardModel.GetDescriptionForPile（必须钉死 typeof(PileType),typeof(Creature)，否则与私有 3 参重载歧义）把「？？？」换成 events 表 TINKER_TIME.pages.CHOOSE_RIDER.options.CHAOS.description，16 语言自带。④EmotionChipPlays 原判据只有 HpAtOwnTurnStart 快照且每步静默 return ⇒ 改成「快照差 OR 战斗历史 DamageReceivedEntry（Receiver==她的生物 && !WasFullyBlocked && UnblockedDamage>0）」，加 EmotionChipHistoryMark 游标，全程打日志。⑤⑥有球 Boss 每张牌打出前原来无条件走 BladesGrowth.RecomputeAll（小刀路径，不认识一心化万返手、还会冲掉激发意图）⇒ 改为 OrbQueue.Capacity>0 时走 RefreshPlannedIntents，且 RefreshPlannedIntents 与 BladesGrowth 都用 BossDamagePredictor.StrengthGainOfPlanned（含 AllForOne 返手张数）累加 plannedStrength、减 PlannedStrengthGainedThisTurn；PlayOne 里撤回也用 StrengthGainOfPlanned。情感芯片那次额外球被动改成按「她回合开始那批球（当前队列）」单独累加，不再拿回合结束总数翻倍。⑦削弱：EventMachineScript.Relics() 删掉 SwordOfJade。",
+      "file": "src/Hooks/Core/EventMachineScript.cs",
+      "at": "2026-11-04T06:31:23.234Z"
+    },
+    {
+      "id": "bug-189-mw1r1zmd",
+      "error_message": "事件机①全息影像会把牌从弃牌堆捞回手牌（剧本已摆好，重复）②特殊效果「一心化万」本回合会提供的力量没被提前算进伤害预览（第 7 回合冰之长枪/双重释放少 1 点）",
+      "fix": "①新增 src/Hooks/Patches/HologramNoReturnPatch.cs：Hologram.OnPlay（protected，不能用 nameof，写死字符串并钉死 typeof(PlayerChoiceContext),typeof(CardPlay)）前缀开「只对这只 Boss」的窗口 SuppressFor，后置在 Task 完成时关掉；CardPileCmd.Add 的 5 参重载前缀在窗口内 + 牌主是她 + 来源是弃牌堆 ⇒ return false 跳过搬运，同时 PendingReturnStrength++ 让一心化万照样给 +1 力量（真正的加力量仍在 PlayOne 同一 await 链里结算）。只对带 BossAllForOnePower 的 Boss 生效，能力机（DefectScript）第 2 回合的全息影像不受影响。②根因是 BossDamagePredictor.StrengthGainOfPlanned 只认 ALL_FOR_ONE 的 ReturnsToHand，漏了 HOLOGRAM（1 张）⇒ 新增 DiscardReturnStrengthOf(ALL_FOR_ONE→剧本张数 / HOLOGRAM→1)，BossScriptPlanner 里原来那段硬编码替换为它，RefreshPlannedIntents 与 PlayOne 的撤回也走同一入口。",
+      "file": "src/Hooks/Patches/HologramNoReturnPatch.cs",
+      "at": "2026-11-04T06:42:33.493Z"
+    },
+    {
+      "id": "bug-190-mw1ruy6f",
+      "error_message": "养手骨每回合召唤无界命匣的 2 变成两次（2+2=4 血）",
+      "fix": "根因与「王室猛毒掉两次」同源：影子玩家其实收得到原版 Hook.AfterSideTurnStart 广播，只是 v0.2.351~355 期间那条链在情感芯片那里抛 NRE 提前断了，看起来像收不到。v0.2.356 修掉 NRE 后，原版 PhylacteryUnbound.AfterSideTurnStart（→ OstyCmd.Summon(StartOfTurn=2)）真的执行，而我们自己 BossOsty.SummonAndRegister 每回合也召唤 StartOfTurn ⇒ 2+2。_lastSummonTurn 已把「我们自己」那次限制成每回合一次，所以多出的必然是原版那条。修法：新增 src/Hooks/Patches/PhylacteryNoDoubleSummonPatch.cs —— 遗物主人是 CharBossMonster 时对 PhylacteryUnbound.AfterSideTurnStart 整条跳过（ref Task __result = Task.CompletedTask）。现在召唤只有两处各一次：战斗开始 5（BossOsty.TryCombatStartSummon）、每回合 2（BossOsty.SummonAndRegister）；原版 BeforeCombatStart 那条由 OstyNoCombatStartSummonPatch 拦着。⚠ 由此推广：v0.2.356 之后所有「原版钩子打不到影子玩家所以我们手动补」的写法都可能变双份，同类补丁 CrackedCoreOncePatch / FencingManualOncePatch / HappyFlowerNoDoublePatch / ShadowRedMaskPatch / ShadowDiamondDiademOncePatch / AkabekoOncePatch 都要留意。",
+      "file": "src/Hooks/Patches/PhylacteryNoDoubleSummonPatch.cs",
+      "at": "2026-11-04T07:05:04.647Z"
+    },
+    {
+      "id": "bug-191-mw1s3cb1",
+      "error_message": "养手骨「出击」的伤害预览多了 2，并且没算目标易伤（真实伤害远高于预览）。日志：奥斯提伤害预览 UNLEASH base=6 extra=1 ostyHp=26 → 32，但意图显示 40（预补 8）；成长修正行写着 UNLEASH(补=0+力2)",
+      "fix": "①「多了 2」：出击伤害公式 = CalculationBase + ExtraDamage×奥斯提生命（OstyScaledDamage），不吃她的 StrengthPower；但 BossIntentBuilder.IntentsFor 里 damage += extraDamage 是所有分支共用的，而调用方把「本回合待到手的力量」混在 extraDamage 一起传 ⇒ 被加到奥斯提牌上。改法：IntentsFor 新增 strengthBonus 参数，只在 !fromOsty 时加；BossScriptPlanner 主路径 / BossScriptPlanner.PreviewIntents / BladesGrowth 三处把力量拆出去（出击的「奥斯提待加生命」仍留在 extraDamage）。②「没算易伤」：奥斯提牌走 AttackIntent.Raw（故意的，不吃她力量），代价是目标易伤也没算——以前只跑 CapDamage(ModifyDamageHookType.Cap，只为无实体=1)。改法：新增 BossDamagePredictor.OstyFinalDamage，整条 Hook.ModifyDamage 跑一遍但 dealer 换成奥斯提本人(card.Owner.Osty)、cardSource 传 null ⇒ 目标侧易伤/摧残/无实体上限生效，她的力量/虚弱/致死性/一心化万不误加；致死性仍由 BossIntentBuilder 按「本回合第一张攻击牌」手工乘一次。日志关键字：奥斯提牌伤害管道 X: 牌面 A → B。",
+      "file": "src/Hooks/Core/BossIntentBuilder.cs",
+      "at": "2026-11-04T07:11:36.205Z"
+    },
+    {
+      "id": "bug-192-mw1sohh0",
+      "error_message": "蛇眼猎/奇巧猎的「谋杀」伤害预览偏高，不是只在手牌中被保留时抽牌才增伤。日志见「谋杀：起点之后抽到 N 张 ⇒ 伤害 1 + 1×N = X（累计 …，起点 …）」",
+      "fix": "BossScriptRunner.BuildHand 里旧写法 total = CardsDrawnThisCombat + 本回合手牌数，然后无条件 CardsDrawnThisCombat = total，再加一个整场不重置的 MurderDrawBaseline ⇒ 谋杀被打出去、不在手里的那几个回合抽的牌也被算进加伤，越到后面越偏高。改法：新增 CharBossMonster.MurderSeenInHand / MurderDrawProgress；它第一次进手那一手进度归零，之后只有当这一手手里确实还有谋杀时才 MurderDrawProgress += 本回合手牌数，不在手的回合一律不计（日志「谋杀：这一手不在她手里 ⇒ 本回合的手牌不计入加伤进度」）。伤害仍写进卡实例 DynamicVars[\"CalculationBase\"] = base + ExtraDamage×进度。同时把 SILENT_BOSS.well_laid（计划妥当）第二段在 16 个语言里改成「她的谋杀只会在其保留在手牌中时才会因抽牌增加伤害。」并重打 PCK（Packed 80 content + 48 extra，check-localization 全绿）。⚠ 改含中文的 loc 文件时别用 .ps1 文件（PS 5.1 按 ANSI 读无 BOM 的 .ps1 ⇒ 中文乱码），用 JSON 存新文案 + 全 ASCII 命令 + [System.IO.File]::WriteAllLines(path, lines, UTF8Encoding($false))。",
+      "file": "src/Hooks/Core/BossScript.cs",
+      "at": "2026-11-04T07:28:02.676Z"
+    },
+    {
+      "id": "bug-193-mw1t0rjr",
+      "error_message": "刀刃之舞的意图显示 4×3，但玩家身上有易伤，实际应是 6×3。生成刀的牌（刀刃之舞/斗篷与匕首/隐秘匕首/先制打击/刀扇/刀刃交响曲）的「小刀 ×N」意图不吃易伤。",
+      "fix": "这批牌的意图走 Raw（RawMultiAttackIntent / AttackIntent.Raw），Raw 不过意图节点的 Hook.ModifyDamage，所以力量/虚弱/易伤都要 ShivDamagePerHit 自己算。旧写法：var shiv = ShivCardFor(boss); if (shiv == null) return baseDamage; return FinalDamage(shiv, base, target); —— 造不出临时 Shiv 卡实例时直接返回牌面值 4，易伤/力量/虚弱全丢（静默退化）。改法：BossDamagePredictor 新增 FinalDamageFor(Creature dealer, CardModel? cardSource, int base, Creature? target)，FinalDamage 改成它的包装；ShivDamagePerHit 改为 FinalDamageFor(boss.Creature, shiv可能为null, base, target)，dealer 显式给 ⇒ 没有卡实例也照样算易伤/力量/虚弱。另加诊断日志「小刀预览: 牌面 A → B（Shiv卡实例=有/无，目标易伤=N，目标=…）」最多 12 行。桌上真小刀（FrontloadRealShivs 的 PlannedPlay）走 LiveSingleAttackIntent→渲染期 FinalDamage，本来就是对的；匕首雨是普通多段攻击也走 Live，不用改。",
+      "file": "src/Hooks/Core/BossIntentBuilder.cs",
+      "at": "2026-11-04T07:37:35.608Z"
+    },
+    {
+      "id": "bug-194-mw1t5f1c",
+      "error_message": "刀刃之舞的「小刀 ×N」意图在玩家有易伤时仍显示 4×3（应为 6×3），而同一场里冲刺正确显示 15=10×1.5",
+      "fix": "真正根因不是算错而是**算早了**：v0.2.365 的日志实证「小刀预览: 牌面 4 → 4（Shiv卡实例=有，目标易伤=0）」—— 计算那一刻玩家身上还没有易伤。冲刺走 LiveSingleAttackIntent（每帧渲染时重算 Hook.ModifyDamage）所以后来上的易伤立刻生效（10→15）；小刀走 AttackIntent.Raw / RawMultiAttackIntent，数值在规划那一刻就冻住了。改法：小刀改成渲染时重算的 LiveMultiAttackIntent（多段）/ 新增 LiveDelegateSingleAttackIntent（段数=1 时必须单段，否则「隐秘匕首」2 把刀会显示 16、7×1），幻影之刃的「第一把 +N / 其余扣回」两段也都用动态版；刀刃交响曲同样从 Raw* 改成动态。以后凡是「生成物/无来源伤害」的意图，要么走 Live*，要么就该吃这个 bug。",
+      "file": "src/Hooks/Core/BossIntentBuilder.cs",
+      "at": "2026-11-04T07:41:12.672Z"
+    },
+    {
+      "id": "bug-195-mw1u8g8k",
+      "error_message": "养手骨（第三幕亡灵契约师变体 NECROBINDER_OSTY）的最大生命值是 577，多了 31 点（应为 546）。她并没有布质果实。",
+      "fix": "BossDefinition.HpForAct 的规则是「角色起始血量 + (Hp[幕] − Hp[0])」，而亡灵契约师 Hp = {66,66,97,66}，第三幕那个 97 = 66 + 31 是**根除骨专属**的布质果实（v0.2.286 为把果实算进去才这么写）。变体和主设计共用同一行血量 ⇒ 养手骨白吃 31 点：66+31+480=577。改法：HpForAct 里加判断 —— ActiveVariant(act) != null（变体接管这一幕）时逐幕加成按 0 算，变体真需要额外血量由它自己的 BossVariant.HpBonus 显式给（事件机的大蘑菇 +20 就是这么做的）。核对：根除骨 577 不变、事件机 575 不变、其它 Boss 各幕 Hp 都等于基础血量（加成 0）全不受影响，只有养手骨变 546。⚠ 通用教训：任何「主设计专属的遗物/加成写进 BossDefinition 的公共数组（Hp/HpBonus 等）」的地方，变体接管那一刻都要单独确认会不会被继承。",
+      "file": "src/Hooks/Core/BossDefinition.cs",
+      "at": "2026-11-04T08:11:33.812Z"
+    },
+    {
+      "id": "bug-196-mw1uljl9",
+      "error_message": "①蛇眼猎特殊效果「计划妥当」的描述改了但游戏里没变 ②刀刃之舞的意图在玩家回合显示 6×3，一进她的回合就变回 4×3（桌上真小刀仍是 6）",
+      "fix": "①这份文案有两个独立 loc key：monsters.json 的 SILENT_BOSS.well_laid（特殊效果说明框）和 powers.json 的 BOSS_WELL_LAID_PLANS_POWER.description / .smartDescription（power 图标悬浮）。v0.2.363 只改了前者，用户看到的是后者 ⇒ 16 语言两处都改，content 变了要重打 PCK。②v0.2.366 的动态 lambda 里写的是 var victim = FirstPlayerTarget(targets) ?? card.Owner?.Creature，她自己的回合里意图节点给的 targets 可能为空 ⇒ victim 回退成「她自己」（身上没易伤）⇒ 4；而 LiveSingleAttackIntent 的规则是 target ?? LocalContext.GetMe(...) ?? dealer ⇒ 兜底成本机玩家（有易伤）⇒ 6。改法：6 处 lambda（小刀单段/多段、幻影之刃两段、刀刃交响曲两段）都改成 Creature? victim = FirstPlayerTarget(targets)（可能为 null），由 BossDamagePredictor.FinalDamageFor 自己兜底成本机玩家。⚠ 通用教训：凡是自己解析「受害者」的地方，兜底必须和原版一致（本机玩家），绝不能兜成 dealer 自己，否则受害者身上的易伤/虚弱全部丢失。",
+      "at": "2026-11-04T08:21:44.685Z"
+    },
+    {
+      "id": "bug-197-mw1uyr7l",
+      "error_message": "刀刃之舞的「小刀 ×N」意图在她的回合显示 4×3，而同一帧里冲刺显示 19（13×1.5，易伤已算）。玩家回合是 6×3。",
+      "fix": "真凶是 BossIntentBuilder.FirstPlayerTarget 的判据只写了 if (creature.Player == null) continue;（「只认玩家侧」）。但我们这只 Boss 的生物挂在**影子 Player** 身上 ⇒ creature.Player 也非 null ⇒ 她回合里意图节点给的 targets 一旦包含她自己，就把她自己当成「玩家」当成了受害者（她身上没有易伤/虚弱）⇒ 数字偏低；玩家回合 targets 只有真人玩家所以那时是对的。改法：照抄原版 LiveSingleAttackIntent 的判据，加一条 if (creature.Monster != null) continue;（真人玩家 Monster == null，我们的 Boss 有 Monster）。这条同时修好所有走 FirstPlayerTarget 的路径（小刀系、X 费多段意图…）。⚠ 之前两版（v0.2.369 把 null 交给 FinalDamageFor 兜底、v0.2.370 再退回规划期目标）都只是补兜底、没碰判据，所以没修好。⚠ 这类视觉差异必须用 ffmpeg 抽帧核对（C:\\Users\\<user>\\AppData\\Local\\Programs\\xiezuo\\resources\\ffmpeg\\ffmpeg.exe，只能出 jpg），流程见 docs/plans/how-to-read-video.md。",
+      "at": "2026-11-04T08:32:01.090Z"
+    },
+    {
+      "id": "bug-198-mw1v5f8c",
+      "error_message": "刀刃之舞的「小刀 ×N」意图在玩家回合也变成 4×3（v0.2.370 之后）。日志同一秒里 4/6 交替，两条都写「目标=静默猎手」。",
+      "fix": "元凶是 v0.2.370 加的 `FirstPlayerTarget(targets) ?? target`：刀刃之舞是**无目标技能牌**，BossPlanner.ChooseTarget 给它的 target 就是**她自己**（而这 Boss 自己也是静默猎手，所以日志里两条都显示「静默猎手」）。于是「节点没给目标 → 退回 target → 受害者=她自己 → 没易伤 → 4」。改法：新增 BossIntentBuilder.ResolvePreviewVictim(boss, targets, card)，三级兜底且每一步都校验 creature.Monster == null（真人玩家 Monster 为 null，我们的 Boss 生物挂影子 Player、有 Monster）：①意图节点目标里的真人玩家 ②本机玩家 LocalContext.GetMe ③她跟踪锁定的那位；彻底不再使用规划期 target。6 处小刀 lambda（单段/多段/幻影之刃两段/刀刃交响曲两段）全部改走它。⚠ 教训：兜底链里「退回某个已有的 Creature 引用」很危险——那个引用可能是她自己、也可能是旧战斗的实例；预览用的受害者必须每次重新校验「是不是当前战斗里活着的真人玩家」。",
+      "at": "2026-11-04T08:37:12.156Z"
+    },
+    {
+      "id": "bug-199-mw1vg7cr",
+      "error_message": "刀贼（SILENT_SHIV）第 4 回合「隐秘匕首」在幻影之刃生效时，意图显示成 16 + 「7×1」，应为 16 + 7（单段）。其它回合正常。",
+      "fix": "BossIntentBuilder 里幻影之刃把「小刀 ×N」拆成「第一把」+「其余 N-1 把」两条意图；v0.2.366 重写成动态意图（LiveDelegateSingleAttackIntent / LiveMultiAttackIntent）时只判了 if (shivs > 1)，于是 shivs==2 时 rest==1 仍然用 LiveMultiAttackIntent 画成「7×1」。改法：rest > 1 才用多段意图，rest == 1 用单段（LiveDelegateSingleAttackIntent）。数值本身是对的（视频实测 16 = 4 + 力量3 + 幻影9；其余 7 = 4 + 力量3），只有「×1」这个显示形态错。⚠ 同类坑 v0.2.28x 曾修过（「隐秘匕首」2 把刀显示 16、7×1，用户 2026-10-28 报过），重写实现时不要丢掉这条判断。",
+      "at": "2026-11-04T08:45:35.163Z"
+    },
+    {
+      "id": "bug-200-mw1vkgj4",
+      "error_message": "刀贼第 4 回合「隐秘匕首+」在幻影之刃还没打出去时，意图数值显示成 7 和 **0**（第二把刀被算成 0 伤害）。应为 16 和 7。",
+      "fix": "旧逻辑：int firstExtra = shivBonusBakedIn ? 0 : shivBonus; int restAdjust = shivBonusBakedIn ? -shivBonus : 0; 用「扣回 9 点」来抵消原版 PhantomBladesPower 给每把小刀都加的 N 点。但 shivBonusBakedIn 来自 BladesGrowth 的 phantomOnHer，而 phantomOnHer 在**幻影之刃还只在手里**时就已经被置 true 了；那一刻 power 还没上身 ⇒ ShivDamagePerHit 里根本没有 +9 ⇒ 7-9 被 Math.Max(0,…) 夹成 0。改法：新增 BossIntentBuilder.CleanShivDamage —— 先把「真正挂在她身上的幻影层数」（Core.PhantomShivs.AmountOf(boss)）从 ShivDamagePerHit 结果里减回去，得到不含幻影的干净每刀伤害，再由调用方「第一把 +N、其余原样」加一次。这样无论 power 在不在身上都只加一次，也永不为负。⚠ 教训：用「负向扣回」去抵消另一个系统的加成时，必须确认那个加成在**当前时刻**真的存在；状态标志（phantomOnHer）的语义是「计划里会有」，不等于「现在已经生效」。",
+      "at": "2026-11-04T08:48:53.680Z"
+    },
+    {
+      "id": "bug-201-mw1vpmoz",
+      "error_message": "刀贼第 4 回合「隐秘匕首+」生成的两把小刀实际伤害是 18 和 9，而我们的意图按小刀 4 点算（显示 7 / 0，修完变成 16 / 7）。",
+      "fix": "18/9 = (6+3+9)/(6+3)：小刀基础伤害是 6 不是 4。反编译 HiddenDaggers.OnPlay 里有 `if (hiddenDaggers.IsUpgraded) CardCmd.Upgrade(current);` —— 升级版隐秘匕首会把生成的每把小刀升级；而 Shiv 的 CanonicalVars 是 DamageVar(4m)、OnUpgrade 是 UpgradeValueBy(2m) ⇒ 升级后 6 点。我们一直把 BossIntentBuilder.ShivBaseDamage = 4 写死。改法：新增 GeneratesUpgradedShivs(card)（目前只有 HIDDEN_DAGGERS 且 IsUpgraded 时为 true），ShivDamagePerHit / CleanShivDamage 增加 shivBase 参数，小刀分支按 shivBase = 4 + (升级 ? 2 : 0) 计算；刀刃交响曲同样传。⚠ 其它生成刀的牌（刀刃之舞/斗篷与匕首/先制打击/刀扇）升级时改的是张数或别的数值，小刀仍是 4 点，所以只能按牌判断，不能一概而论。",
+      "at": "2026-11-04T08:52:54.947Z"
+    },
+    {
+      "id": "bug-202-mw216bbx",
+      "error_message": "运行 tools\\feishu-stats.ps1 报一堆解析错误：第 27 行 `Missing expression after ','`、`Missing ')' in function parameter list`、`Unexpected token ')'` 等，但脚本本身语法没问题",
+      "fix": "文件是 UTF-8 **无 BOM**，Windows PowerShell 5.1 按 ANSI(GBK) 解码 ⇒ 中文字符串变乱码（报错信息里能看到 `閲岀殑銆寋0}銆`），多字节序列吞掉引号/括号导致假语法错。tools\\ 下其余含中文的 .ps1 都有 BOM，只有 feishu-stats.ps1（和我留下的 update-welllaid-loc.ps1）没有。修法：[System.IO.File]::ReadAllText(p, UTF8) 读出，再用 New-Object System.Text.UTF8Encoding($true) 的 WriteAllText 写回加 BOM；之后用 [System.Management.Automation.Language.Parser]::ParseFile 验证错误数=0。注意：加完 BOM 脚本能跑到 `[1/3] 取 tenant_access_token`，后续 curl(35) schannel SEC_E_NO_CREDENTIALS 是受限 shell 的问题，不是脚本问题。",
+      "file": "tools/feishu-stats.ps1",
+      "at": "2026-11-04T11:25:51.453Z"
+    },
+    {
+      "id": "bug-203-mw21li5m",
+      "error_message": "[CharBoss] ⚠ 佩尔的士兵 受到了伤害 15.75（未格挡=15，props=Move）—— 有路径绕过了「不可命中」。玩家（带 Hikari - 光 Arcaea 角色模组）的对局里被上传到飞书 diag。",
+      "fix": "前四层拦的都是**选靶阶段**（Hook.ShouldAllowHitting / CombatState.GetOpponentsOf / IsSecondaryEnemy / IsPrimaryEnemy），而第三方模组的牌可以自己算目标列表（读 CombatState.Enemies 或缓存列表后调 CreatureCmd.Damage(list,…)），一条都不经过 ⇒ 照样打到装饰性随从。修法：新增 Patches/CombatSidePatches.cs 里的 ShadowPetNoDamagePatch —— 对 Creature.LoseHpInternal(decimal amount, ValueProp props) 加 **前缀**把 amount 改成 0（这是所有掉血的唯一终点）。比 return false 安全：原版照常结算出一个「0 点、无格挡」的 DamageResult，不会给调用方留假的/空的返回值。只对 BossShadowPets.IsShadowPet 生效。⚠ 教训：给「不该被命中」的东西做防护时，只堵选靶路径挡不住第三方 mod，最终必须堵在**结算终点**。",
+      "file": "src/Hooks/Patches/CombatSidePatches.cs",
+      "at": "2026-11-04T11:37:40.138Z"
+    },
+    {
+      "id": "bug-204-mw22bbra",
+      "error_message": "炼药猎进二阶段（失去瓶中精灵）后，混沌药水本应在原本瓶中精灵的位置炼出狡诈药水、她会喝掉并打出 3 把小刀，但实际只看到药水进栏位、没有喝也没有打刀。",
+      "fix": "「炒出狡诈药水」这半早就实现（BossPotions.DrinkAsync 在补混沌药水时，若栏位里已没有 FairyInABottle 就把 typeof(FairyInABottle) 换成 typeof(CunningPotion)）；漏的是「喝它」这半 —— 第 8 回合剧本 Potions<BlockPotion, FyshOil, EntropicBrew>() 里没有 CunningPotion，所以那瓶药永远躺在栏位里。不需要新增「条件回合」机制：DrinkPlannedPotionsAsync 是按类型在栏位里找药的，找不到只打一行「栏位里没有 → 跳过」，所以只要把 CunningPotion 放在混沌药水**之后**加进这一回合的队列即可 —— 一阶段自动跳过，二阶段混沌补出狡诈后当场喝掉，3 张小刀由 SilentBlades.FrontloadRealShivs 当回合打出。给 SilentBrewerScript 加了 Potions<T1,T2,T3,T4> 辅助。⚠ 顺序必须放在混沌药水之后，否则那一刻药水还不存在。",
+      "at": "2026-11-04T11:57:44.902Z"
+    },
+    {
+      "id": "bug-205-mw27fkrn",
+      "error_message": "BossStatusRow.Fill 的内容指纹不含「她是否被击晕」⇒ 击晕发生时指纹不变、Fill 直接 return，药水栏上「本回合要喝」的意图箭头撤不掉（其它撤意图的地方都刷了，只有药水箭头留着）。",
+      "fix": "在 FillStamps 的整数指纹元组里加一位 `Stunned`（0/1），并同步改字典的元组类型；这样击晕/解除都会让指纹变化、触发一次真正的重建。",
+      "file": "src/Hooks/UI/BossStatusRow.cs",
+      "at": "2026-11-04T14:21:01.283Z"
+    },
+    {
+      "id": "bug-206-mw284uls",
+      "error_message": "玩家的奥斯提在某些牌面前\"不能替你承担伤害\"：万向斩（Omnislice）的第二段溅射走 `GetTeammatesOf(receiver) - 目标` + `CreatureCmd.Damage`，既不走 `HittableEnemies`、也不走 `AttackCommand.GetPossibleTargets`，绕过了模组已有的两条\"她的攻击只打真人玩家\"闸门 ⇒ 单人局里第一段被改派到奥斯提、第二段又打它一份，奥斯提一条命顶两下，紧随的王者之拳就打到玩家身上。",
+      "fix": "给 `CreatureCmd.Damage(ctx, IEnumerable, decimal, ValueProp, dealer, cardSource, cardPlay)` 挂 Prefix：只对「她的牌 + cardSource 是 OMNISLICE + props 含 Unpowered|Move（就是溅射那一段）」把目标列表过滤成真人玩家（Monster==null && Player!=null && !IsPet）。列表可能被清空 —— `CreatureCmd.Damage` 收到空列表只返回空结果不抛异常，所以不用动 __result，绕开 async 返回 Task 那条铁律。",
+      "file": "src/Hooks/Patches/OmnisliceSplashRealPlayersOnlyPatch.cs",
+      "at": "2026-11-04T14:40:40.432Z"
+    },
+    {
+      "id": "bug-207-mw284wp2",
+      "error_message": "排查「意图显示伤害与实际不符」时日志查不到关键牌的数字：`BossDamagePredictor.LogDamagePipeline` 用了**全局 40 行**的静态上限（`_pipelineLogs++ < 40`），一场战斗里第一张牌（例如 ASTRAL_PULSE 每帧重算）就能把额度烧光，真正要查的王者之拳/万向斩一行都不剩。",
+      "fix": "改成按「牌名 + 从多少变成多少」去重的 HashSet：同一种数值变化只打一次，组合数很少，既不刷屏也不会被某一张牌耗光额度。",
+      "file": "src/Hooks/Core/BossDamagePredictor.cs",
+      "at": "2026-11-04T14:40:43.142Z"
+    },
+    {
+      "id": "bug-208-mw2t6d4d",
+      "error_message": "玩家反馈角色皮肤 mod（铁甲战士「绯刃战姬」/ 亡灵契约师「空洞骑士」那类）换不了角色 Boss 的皮肤，Boss 永远显示原版立绘。",
+      "fix": "这类皮肤 mod 是在 `NCreature._Ready` 的**后置补丁**里判 `entity.Player?.Character.Id.Entry`（反编译 `NCreature_Ready_Knight_Patch`：`if (player == null || entry != \"NECROBINDER\") return;`）再把自己的场景 AddChild 进立绘节点，压根不读 VisualsPath / CreateVisuals。而我们的影子 Player 是进房后 `AfterAddedToRoom` 才绑的 ⇒ `_ready` 那一刻 Player 为 null ⇒ 皮肤补丁直接 return。修法：影子玩家绑好之后，用反射调 `Harmony.GetPatchInfo(NCreature._Ready)` 取 `Patches.Postfixes`，把别家的、签名为 `static void X(NCreature)` 的后置补丁对我们这只 Boss 的节点补跑一次（每只生物只补一次 —— 那些补丁不幂等，那个皮肤每调一次就 AddChild 一个场景）。**不要**改成「提前绑影子玩家」：`Creature.IsPlayer => Player != null` 会让原版挂球位管理器、隐藏血条、把 Boss 摆到玩家侧。",
+      "file": "src/Hooks/Patches/SkinReadyPatchReplay.cs",
+      "at": "2026-11-05T00:29:43.021Z"
+    },
+    {
+      "id": "bug-209-mw6cablm",
+      "error_message": "隐私：diag 记录可能带本机用户目录（C:\\\\Users\\\\<Windows用户名>\\\\…）。链路：SafeLogPatch 把含「失败/异常」的日志转成 Telemetry.Diagnostic() 上传，而 .NET IO 异常消息里常带完整路径 ⇒ 等于把玩家的电脑用户名传给了作者。",
+      "fix": "v0.2.463：Diagnostic() 入队前用 MaskUserPaths 打码（Windows `C:\\\\Users\\\\<名>` → `C:\\\\Users\\\\<user>`，`/home/<名>` → `/home/<user>`），本机数据文件也一起打码。自查报告 docs/plans/privacy-audit-2026-11-07.md。",
+      "file": "src/Hooks/Core/Telemetry.cs",
+      "at": "2026-11-07T11:47:58.906Z"
+    },
+    {
+      "id": "bug-210-mw6cae6t",
+      "error_message": "凭据：飞书 app_secret 曾以 base64 内嵌在 BossConfig.cs 并随工坊 DLL 公开（v0.2.262~0.2.460，含 git 历史 commit ffe7f1c）。base64 不是加密，strings 就能拿到 ⇒ 任何人可换 tenant_access_token 读写作者的多维表格。",
+      "fix": "v0.2.462：删掉 4 个 base64 常量，改成只有一个群机器人 webhook（BuiltInRelayUrl，按 /open-apis/bot/v2/hook/ 判断回填 feishuBotUrl）；玩家端只能往一个群发消息。用户已重置 app_secret，实测旧值 code=10014 invalid。剩余风险：仓库历史仍可解出旧值 ⇒ 要开源必须先 git filter-repo。",
+      "file": "src/Hooks/Core/BossConfig.cs",
+      "at": "2026-11-07T11:48:02.261Z"
+    },
+    {
+      "id": "bug-211-mw6cj80b",
+      "error_message": "不同步报告不可分诊：① DivergenceStateProbe.History（回合快照环）是跨战斗累积的静态 list，摘要里 #1/#2 常是上一场战斗（Boss 前的精英战，如 3 只 CORPSE_SLUG）的快照，真正要看的本场回合被挤到后面；② Telemetry.ClipDiagLine 把「不同步」摘要截到 1500 字，玩家上报那条长度正好 1500，截断点落在快照中间 ⇒ 两端第一处分叉整段丢失。",
+      "fix": "v0.2.464：RecordSnapshot 里比对 CombatState 引用，换了战斗就 History.Clear()；DiagLineLimitDesync 1500→4000；UploadToFeishuBot 改成按总字数（BotMsgChars=6000）分批，长行不再被固定 8 条/批顶掉。判断「不同步报告没用」的快速特征：line 字段长度恰好等于上限值。",
+      "file": "src/Hooks/Patches/DivergenceStateProbe.cs",
+      "at": "2026-11-07T11:54:54.155Z"
+    },
+    {
+      "id": "bug-212-mw6cxyne",
+      "error_message": "玩家上报「回合结束手牌效果失败: Collection was modified; enumeration operation may not execute.」——CharBossMonster.RunCurseTurnEndHooks 直接 foreach pcs.Hand.Cards，而这些诅咒/状态牌的 OnTurnEndInHandWrapper 会真的改手牌（摧毁/塞牌/转化）。",
+      "fix": "v0.2.465：先把手牌拷进 List 再遍历，每张结算前用 pcs.Hand.Cards.Contains(card) 确认它还在手里（避免对已被吃掉的牌重复结算）。",
+      "file": "src/Hooks/Monsters/CharBossMonster.cs",
+      "at": "2026-11-07T12:06:21.866Z"
+    },
+    {
+      "id": "bug-213-mw6cy0y6",
+      "error_message": "玩家上报「补召佩尔的士兵失败: Attempted to add a creature outside of combat.」——战斗开始那串补效果是逐个 await 的，期间战斗可能已经结束，轮到时 PlayerCmd.AddPet 就抛 outside of combat。",
+      "fix": "v0.2.465：EnsurePaelsLegionPet 里先查 CombatManager.Instance.IsInProgress，不在战斗中就直接跳过（随从纯装饰）。",
+      "file": "src/Hooks/Core/BossHookBridge.SideTurn.cs",
+      "at": "2026-11-07T12:06:24.846Z"
+    },
+    {
+      "id": "bug-214-mw6cy38p",
+      "error_message": "玩家上报「回合结束免费打出失败: KeyNotFoundException: The given key 'MegaCrit.Sts2.Core.Entities.Players.Player' was not present in the dictionary. at YuYuYu.Scripts.Singletons.CardsSeenSingleton.AfterCardPlayed」——第三方模组拿影子玩家去查它自己的字典，影子玩家不在 RunState.Players 里。",
+      "fix": "v0.2.465：新增 DescribePlayFailure(e)，把栈里第一个非本模组/非原版的帧点出来写进日志，并注明「这张牌本体效果已结算，炸的只是第三方模组自己的统计」。不是我们的 bug，但以前日志只打一串栈，看不出是谁。",
+      "file": "src/Hooks/Monsters/CharBossMonster.cs",
+      "at": "2026-11-07T12:06:27.817Z"
+    }
+  ]
+}

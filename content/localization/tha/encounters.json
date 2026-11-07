@@ -1,0 +1,103 @@
+{
+  "IRONCLAD_BOSS_ENCOUNTER.title": "นักรบเกราะเหล็ก",
+  "IRONCLAD_BOSS_ENCOUNTER.loss": "{character} ถูก[gold]นักรบเกราะเหล็ก[/gold]บดขยี้จนพ่ายแพ้",
+
+  "IRONCLAD_ANGER_BOSS_ENCOUNTER.title": "นักรบเกราะเหล็ก",
+  "IRONCLAD_ANGER_BOSS_ENCOUNTER.loss": "{character} ถูกเพลิงแค้นของ[gold]นักรบเกราะเหล็ก[/gold]เผาเป็นเถ้าถ่าน",
+
+  "IRONCLAD_VULN_BOSS_ENCOUNTER.title": "นักรบเกราะเหล็ก",
+  "IRONCLAD_VULN_BOSS_ENCOUNTER.loss": "{character} ถูก[gold]นักรบเกราะเหล็ก[/gold]ฉีกแผลออกทีละชั้น",
+
+  "SILENT_BOSS_ENCOUNTER.title": "นักฆ่าแห่งความเงียบ",
+  "SILENT_BOSS_ENCOUNTER.loss": "{character} มองไม่เห็น[gold]นักฆ่าแห่งความเงียบ[/gold]จนวินาทีสุดท้าย",
+
+  "SILENT_ENVENOM_BOSS_ENCOUNTER.title": "นักฆ่าแห่งความเงียบ",
+  "SILENT_ENVENOM_BOSS_ENCOUNTER.loss": "{character} ถูก[gold]พิษ[/gold]ของ[gold]นักฆ่าแห่งความเงียบ[/gold]เค้นจนสิ้นแรง",
+
+  "SILENT_SHIV_BOSS_ENCOUNTER.title": "นักฆ่าแห่งความเงียบ",
+  "SILENT_SHIV_BOSS_ENCOUNTER.loss": "{character} จมอยู่ใต้สายฝน[gold]มีดสั้น[/gold]ของ[gold]นักฆ่าแห่งความเงียบ[/gold]",
+
+  "SILENT_SLY_BOSS_ENCOUNTER.title": "นักฆ่าแห่งความเงียบ",
+  "SILENT_SLY_BOSS_ENCOUNTER.loss": "{character} ถูก[gold]นักฆ่าแห่งความเงียบ[/gold]โยนลง[gold]กองทิ้ง[/gold]",
+
+  "SILENT_BREWER_BOSS_ENCOUNTER.title": "นักฆ่าแห่งความเงียบ",
+  "SILENT_BREWER_BOSS_ENCOUNTER.loss": "{character} ทลายกำแพงที่ก่อขึ้นจากขวดยาของ[gold]นักฆ่าแห่งความเงียบ[/gold]ไม่สำเร็จ",
+
+  "DEFECT_BOSS_ENCOUNTER.title": "นักเวทแปรพักตร์",
+  "DEFECT_BOSS_ENCOUNTER.loss": "{character} ถูก[gold]นักเวทแปรพักตร์[/gold]วิเคราะห์แล้วลบทิ้ง",
+
+  "DEFECT_AI_BOSS_ENCOUNTER.title": "นักเวทแปรพักตร์",
+  "DEFECT_AI_BOSS_ENCOUNTER.loss": "ทุกการ์ดที่ {character} เล่นถูกนับเข้าโมเดลของ[gold]นักเวทแปรพักตร์[/gold]",
+
+  "DEFECT_CLAW_BOSS_ENCOUNTER.title": "นักเวทแปรพักตร์",
+  "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character} ถูก[gold]ลำแสงพิฆาต[/gold]ของ[gold]นักเวทแปรพักตร์[/gold]สลายจนสิ้นซาก",
+
+  "NECROBINDER_BOSS_ENCOUNTER.title": "นักปลุกผีผูกจิต",
+  "NECROBINDER_BOSS_ENCOUNTER.loss": "วิญญาณของ {character} ถูก[gold]นักปลุกผีผูกจิต[/gold]เก็บไป",
+
+  "NECROBINDER_DOOM_BOSS_ENCOUNTER.title": "นักปลุกผีผูกจิต",
+  "NECROBINDER_DOOM_BOSS_ENCOUNTER.loss": "[gold]นักปลุกผีผูกจิต[/gold]เรียก {character} สู่ปลายทางของ[gold]อายุขัย[/gold]",
+
+  "NECROBINDER_SOUL_BOSS_ENCOUNTER.title": "นักปลุกผีผูกจิต",
+  "NECROBINDER_SOUL_BOSS_ENCOUNTER.loss": "วิญญาณของ {character} ถูก[gold]นักปลุกผีผูกจิต[/gold]เก็บไป",
+
+  "NECROBINDER_ERADICATE_BOSS_ENCOUNTER.title": "นักปลุกผีผูกจิต",
+  "NECROBINDER_ERADICATE_BOSS_ENCOUNTER.loss": "{character} ถูก[gold]นักปลุกผีผูกจิต[/gold]ถอนรากถอนโคนไปพร้อมกับความทรงจำ",
+
+  "REGENT_BOSS_ENCOUNTER.title": "Regent",
+  "REGENT_BOSS_ENCOUNTER.loss": "{character} ถูก[gold]Regent[/gold]ตัดสินโทษ",
+
+  "REGENT_DEBRIS_BOSS_ENCOUNTER.title": "Regent",
+  "REGENT_DEBRIS_BOSS_ENCOUNTER.loss": "{character} ถูกฝังอยู่ใต้[gold]เศษซาก[/gold]ของ[gold]Regent[/gold]",
+
+  "REGENT_FORGE_BOSS_ENCOUNTER.title": "Regent",
+  "REGENT_FORGE_BOSS_ENCOUNTER.loss": "{character} กลายเป็นรอยบากหนึ่งบนดาบของ[gold]Regent[/gold]",
+
+  "REGENT_COLORLESS_BOSS_ENCOUNTER.title": "Regent",
+  "REGENT_COLORLESS_BOSS_ENCOUNTER.loss": "{character} ถูก[gold]Regent[/gold]ปลดสีสันจนหมด",
+
+  "REGENT_STAR_BOSS_ENCOUNTER.title": "Regent",
+  "REGENT_STAR_BOSS_ENCOUNTER.loss": "{character} ถูกดวงดาวระยิบระยับของ[gold]Regent[/gold]บดจนเป็นผง",
+
+  "REGENT_KING_BOSS_ENCOUNTER.title": "Regent",
+  "REGENT_KING_BOSS_ENCOUNTER.loss": "{character} ถูกบดขยี้ใต้บัลลังก์ของ[gold]Regent[/gold]",
+
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.title": "นักรบเกราะเหล็ก",
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "{character} ถูก[gold]ความแข็งแรง[/gold]ที่เพิ่มขึ้นเรื่อยๆ ของ[gold]นักรบเกราะเหล็ก[/gold]บดขยี้",
+
+  "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.title": "นักรบเกราะเหล็ก",
+  "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss": "{character} ถูก[gold]นักรบเกราะเหล็ก[/gold]เล่นเหมือนโยนรับส่ง ก่อนจมอยู่ใต้สำเนาของตัวเอง",
+  "IRONCLAD_BOULDER_BOSS_ENCOUNTER.title": "นักรบเกราะเหล็ก",
+  "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss": "{character} ถูก[gold]หินยักษ์[/gold]ของ[gold]นักรบเกราะเหล็ก[/gold]บดเป็นชิ้น",
+
+  "DEFECT_DARK_BOSS_ENCOUNTER.title": "นักเวทแปรพักตร์",
+  "DEFECT_DARK_BOSS_ENCOUNTER.loss": "{character} ถูกกลืนโดยลูกแก้วความมืดของ[gold]นักเวทแปรพักตร์[/gold]",
+
+  "IRONCLAD_BOSS_NORMAL_ENCOUNTER.title": "นักรบเกราะเหล็ก",
+  "IRONCLAD_BOSS_NORMAL_ENCOUNTER.loss": "{character} ถูก[gold]นักรบเกราะเหล็ก[/gold]บดขยี้จนพ่ายแพ้",
+  "SILENT_BOSS_NORMAL_ENCOUNTER.title": "นักฆ่าแห่งความเงียบ",
+  "SILENT_BOSS_NORMAL_ENCOUNTER.loss": "{character} มองไม่เห็น[gold]นักฆ่าแห่งความเงียบ[/gold]จนวินาทีสุดท้าย",
+  "SILENT_ENVENOM_BOSS_NORMAL_ENCOUNTER.title": "นักฆ่าแห่งความเงียบ",
+  "SILENT_ENVENOM_BOSS_NORMAL_ENCOUNTER.loss": "{character} ถูก[gold]พิษ[/gold]ของ[gold]นักฆ่าแห่งความเงียบ[/gold]เค้นจนสิ้นแรง",
+  "SILENT_SLY_BOSS_NORMAL_ENCOUNTER.title": "นักฆ่าแห่งความเงียบ",
+  "SILENT_SLY_BOSS_NORMAL_ENCOUNTER.loss": "{character} ถูก[gold]นักฆ่าแห่งความเงียบ[/gold]โยนลง[gold]กองทิ้ง[/gold]",
+  "SILENT_SHIV_BOSS_NORMAL_ENCOUNTER.title": "นักฆ่าแห่งความเงียบ",
+  "SILENT_SHIV_BOSS_NORMAL_ENCOUNTER.loss": "{character} จมอยู่ใต้สายฝน[gold]มีดสั้น[/gold]ของ[gold]นักฆ่าแห่งความเงียบ[/gold]",
+  "DEFECT_BOSS_NORMAL_ENCOUNTER.title": "นักเวทแปรพักตร์",
+  "DEFECT_BOSS_NORMAL_ENCOUNTER.loss": "{character} ถูก[gold]นักเวทแปรพักตร์[/gold]วิเคราะห์แล้วลบทิ้ง",
+  "NECROBINDER_BOSS_NORMAL_ENCOUNTER.title": "นักปลุกผีผูกจิต",
+  "NECROBINDER_BOSS_NORMAL_ENCOUNTER.loss": "วิญญาณของ {character} ถูก[gold]นักปลุกผีผูกจิต[/gold]เก็บไป",
+  "REGENT_BOSS_NORMAL_ENCOUNTER.title": "Regent",
+  "REGENT_BOSS_NORMAL_ENCOUNTER.loss": "{character} ถูก[gold]Regent[/gold]ตัดสินโทษ",
+
+  "TELEMETRY_PROMPT_HEADER": "อัปโหลดข้อมูลการเล่น (CharacterBosses)",
+  "TELEMETRY_PROMPT_BODY": "มอดนี้ต้องการเก็บข้อมูลการเล่นบางส่วนเพื่อแก้บั๊กและใช้ปรับสมดุลการต่อสู้กับบอส:\nผลแพ้ชนะของทุกการต่อสู้กับบอส องก์/รอบ แอสเซนชัน จำนวนผู้เล่น HP ของบอส จำนวนเทิร์นและซีด รวมถึงบรรทัดข้อผิดพลาดของมอดนี้เอง\n\nข้อมูลจะถูกบันทึกไว้ใน[b]ไฟล์ในเครื่อง[/b]ก่อน หากผู้พัฒนาได้ตั้งค่าเซิร์ฟเวอร์เก็บข้อมูล ข้อมูลนิรนามชุดเดียวกันจะ[b]ถูกอัปโหลดไปให้ผู้พัฒนาด้วย[/b]\n\nจะไม่มีการเก็บข้อมูลส่วนบุคคลใดๆ (ไม่บันทึก SteamID / ชื่อเล่น)\n\nเปลี่ยนได้ทุกเมื่อที่ “การตั้งค่ามอด → CharacterBosses → A5” เปิดใช้งานตอนนี้เลยไหม",
+  "TELEMETRY_PROMPT_YES": "เปิดใช้งาน",
+  "TELEMETRY_PROMPT_NO": "ปิดไว้ก่อน",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.title":  "The Necrobinder",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character} was dragged into the grave by the [gold]Necrobinder[/gold]\u0027s Osty.",
+    "SILENT_SNECKO_BOSS_ENCOUNTER.title":  "The Silent",
+    "SILENT_SNECKO_BOSS_ENCOUNTER.loss":  "{character} was sent to the grave by the [gold]Silent[/gold]\u0027s dice.",
+  "DEFECT_EVENT_BOSS_ENCOUNTER.loss": "[gold]นักเวทแปรพักตร์[/gold]ดึง {character} กลับมาจากกองทิ้ง",
+  "DEFECT_EVENT_BOSS_ENCOUNTER.title": "นักเวทแปรพักตร์"
+}

@@ -1,0 +1,82 @@
+# Build artifacts
+**/bin/
+**/obj/
+**/.vs/
+**/.idea/
+*.user
+*.suo
+
+# NuGet
+**/packages/
+**/*.nuget.props
+**/*.nuget.targets
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Logs
+*.log
+
+# Temp files
+nul
+*.pck
+
+# References (game DLLs - downloaded separately)
+references/
+
+# Local config
+.env
+opencode.jsonc
+
+# Tool downloads (keep scripts and pck_builder)
+/tools/*
+!/tools/*.ps1
+!/tools/pck_builder/
+!/tools/pck_builder/**
+
+# STS2MenuControl (cloned from GitHub at install time)
+/tools/STS2MenuControl/
+
+# Cloned repositories
+/Modding-Tutorial/
+
+# ─────────────────────────────────────────────────────────────
+# CharacterBosses 追加（2026-11-06）
+# ─────────────────────────────────────────────────────────────
+
+# 发布/打包产物（只有明确说「打包」时才生成，不进仓库）
+/.dist/
+/.build/
+/.tmp/
+/.frames/
+/workshop/content/
+*.zip
+
+# 反编译 / 侦察 / 游戏本体引用（体积大、可重新生成、有版权）
+/.recon/
+/.refs/
+
+# 第三方上传器仓库（独立仓库，随用随 clone）
+/sts2-mod-uploader-main/
+
+# 录像素材（GB 级；发版截图只用导出的帧）
+*.mp4
+
+# 本机日志（玩家反馈的 mod_log 也要按需手动放，不进仓库）
+mod_log*.txt
+
+# 代理工具的本机账本
+/.dshwolf/token-ledger*
+
+# 代理/工具运行时临时文件
+*.tmp
+/.dshwolf/hooks/
+
+# Telemetry import (player data pulled from Feishu group - local only)
+/docs/plans/telemetry-import/
+/.feishu-group-state.json
+
+# Excel workbooks (user-owned data + Excel lock/backup files)
+*.xlsx
+~$*

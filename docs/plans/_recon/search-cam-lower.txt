@@ -1,0 +1,21 @@
+﻿// --- System.Text.RegularExpressions.Generated.<RegexGenerator_g>FACC081AAF3D765EFF87A82C4FBB77F6FD3EA759AA2D03D993988F88E97CC0B5B__CamelCaseRegex_0
+// --- MegaCrit.Sts2.Core.Runs.Metrics.MetricsSerializerContext
+  F static System.Text.Json.JsonEncodedText PropName_campfireUpgrades
+// --- MegaCrit.Sts2.Core.Runs.Metrics.RunMetrics
+  P System.Collections.Generic.List`1[[System.String]] CampfireUpgrades
+  F System.Collections.Generic.List`1[[System.String]] <CampfireUpgrades>k__BackingField
+// --- MegaCrit.Sts2.Core.Models.EncounterModel
+  M public virtual System.Single GetCameraScaling()
+  M public virtual Godot.Vector2 GetCameraOffset()
+// --- MegaCrit.Sts2.Core.Models.Encounters.AeonglassBoss
+  M public System.Single GetCameraScaling()
+  M public Godot.Vector2 GetCameraOffset()
+// --- MegaCrit.Sts2.Core.Models.Encounters.BygoneEffigyElite
+  M public System.Single GetCameraScaling()
+  M public Godot.Vector2 GetCameraOffset()
+// --- MegaCrit.Sts2.Core.Models.Encounters.CeremonialBeastBoss
+  M public System.Single GetCameraScaling()
+  M public Godot.Vector2 GetCameraOffset()
+// --- MegaCrit.Sts2.Core.Models.Encounters.DecimillipedeElite
+  M public System.Single GetCameraScaling()
+  M public Godot.Vector2 GetCameraOffset()

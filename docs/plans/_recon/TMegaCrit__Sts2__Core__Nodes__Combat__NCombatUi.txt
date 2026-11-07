@@ -1,0 +1,1480 @@
+﻿// ===== MegaCrit.Sts2.Core.Nodes.Combat.NCombatUi =====
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
+using Godot;
+using Godot.Bridge;
+using Godot.NativeInterop;
+using MegaCrit.Sts2.Core.Combat;
+using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Context;
+using MegaCrit.Sts2.Core.Debug;
+using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.Helpers;
+using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Nodes.Cards;
+using MegaCrit.Sts2.Core.Nodes.CommonUi;
+using MegaCrit.Sts2.Core.Nodes.Rooms;
+using MegaCrit.Sts2.Core.Nodes.Screens.ScreenContext;
+using MegaCrit.Sts2.Core.Nodes.Vfx;
+using MegaCrit.Sts2.Core.Rooms;
+using MegaCrit.Sts2.Core.Runs;
+
+namespace MegaCrit.Sts2.Core.Nodes.Combat;
+
+[ScriptPath("res://src/Core/Nodes/Combat/NCombatUi.cs")]
+public class NCombatUi : Control
+{
+	public new class MethodName : Control.MethodName
+	{
+		public new static readonly StringName _Ready = "_Ready";
+
+		public new static readonly StringName _ExitTree = "_ExitTree";
+
+		public static readonly StringName Deactivate = "Deactivate";
+
+		public static readonly StringName DisconnectSignals = "DisconnectSignals";
+
+		public static readonly StringName AddToPlayContainer = "AddToPlayContainer";
+
+		public static readonly StringName AnimIn = "AnimIn";
+
+		public static readonly StringName AnimOut = "AnimOut";
+
+		public static readonly StringName PostCombatCleanUp = "PostCombatCleanUp";
+
+		public static readonly StringName OnHandSelectModeEntered = "OnHandSelectModeEntered";
+
+		public static readonly StringName OnHandSelectModeExited = "OnHandSelectModeExited";
+
+		public static readonly StringName OnPeekButtonReady = "OnPeekButtonReady";
+
+		public static readonly StringName OnPeekButtonToggled = "OnPeekButtonToggled";
+
+		public static readonly StringName Enable = "Enable";
+
+		public static readonly StringName Disable = "Disable";
+
+		public new static readonly StringName _Input = "_Input";
+
+		public static readonly StringName DebugHideCombatUi = "DebugHideCombatUi";
+	}
+
+	public new class PropertyName : Control.PropertyName
+	{
+		public static readonly StringName EnergyCounterContainer = "EnergyCounterContainer";
+
+		public static readonly StringName EndTurnButton = "EndTurnButton";
+
+		public static readonly StringName PingButton = "PingButton";
+
+		public static readonly StringName DrawPile = "DrawPile";
+
+		public static readonly StringName DiscardPile = "DiscardPile";
+
+		public static readonly StringName ExhaustPile = "ExhaustPile";
+
+		public static readonly StringName Hand = "Hand";
+
+		public static readonly StringName PlayContainer = "PlayContainer";
+
+		public static readonly StringName PlayQueue = "PlayQueue";
+
+		public static readonly StringName CardPreviewContainer = "CardPreviewContainer";
+
+		public static readonly StringName MessyCardPreviewContainer = "MessyCardPreviewContainer";
+
+		public static readonly StringName _starCounter = "_starCounter";
+
+		public static readonly StringName _energyCounter = "_energyCounter";
+
+		public static readonly StringName _combatPilesContainer = "_combatPilesContainer";
+
+		public static readonly StringName _playContainerPeekModeTween = "_playContainerPeekModeTween";
+
+		public static readonly StringName _originalHandChildIndex = "_originalHandChildIndex";
+	}
+
+	public new class SignalName : Control.SignalName
+	{
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <ProceedWithoutRewards>d__95 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public NCombatUi <>4__this;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			NCombatUi nCombatUi = <>4__this;
+			try
+			{
+				TaskAwaiter val;
+				TaskAwaiter val2;
+				if (num != 0)
+				{
+					if (num == 1)
+					{
+						val = <>u__1;
+						<>u__1 = default(TaskAwaiter);
+						num = (<>1__state = -1);
+						goto IL_00d8;
+					}
+					val2 = Cmd.Wait(1f, nCombatUi._cts.Token).GetAwaiter();
+					if (!((TaskAwaiter)(ref val2)).IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val2;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <ProceedWithoutRewards>d__95>(ref val2, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val2 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+				}
+				((TaskAwaiter)(ref val2)).GetResult();
+				val = RunManager.Instance.ProceedFromTerminalRewardsScreen().GetAwaiter();
+				if (!((TaskAwaiter)(ref val)).IsCompleted)
+				{
+					num = (<>1__state = 1);
+					<>u__1 = val;
+					((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <ProceedWithoutRewards>d__95>(ref val, ref this);
+					return;
+				}
+				goto IL_00d8;
+				IL_00d8:
+				((TaskAwaiter)(ref val)).GetResult();
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <ShowRewards>d__96 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public NCombatUi <>4__this;
+
+		public CombatRoom room;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0191: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0217: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0277: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0238: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0252: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0254: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0176: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0178: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			NCombatUi nCombatUi = <>4__this;
+			try
+			{
+				TaskAwaiter val4;
+				TaskAwaiter val3;
+				TaskAwaiter val2;
+				TaskAwaiter val;
+				switch (num)
+				{
+				default:
+				{
+					float num2 = 0f;
+					System.Collections.Generic.IEnumerator<NCreature> enumerator = NCombatRoom.Instance.RemovingCreatureNodes.GetEnumerator();
+					try
+					{
+						while (((System.Collections.IEnumerator)enumerator).MoveNext())
+						{
+							NCreature current = enumerator.Current;
+							if (current != null && current.HasSpineAnimation && current.IsPlayingDeathAnimation)
+							{
+								num2 = Math.Max(num2, current.GetCurrentAnimationTimeRemaining());
+								continue;
+							}
+							MonsterModel monster = current.Entity.Monster;
+							if (monster != null && monster.HasDeathAnimLengthOverride)
+							{
+								num2 = Math.Max(num2, current.Entity.Monster.DeathAnimLengthOverride);
+							}
+						}
+					}
+					finally
+					{
+						if (num < 0)
+						{
+							((System.IDisposable)enumerator)?.Dispose();
+						}
+					}
+					if (_isDebugSlowRewards)
+					{
+						val4 = Cmd.Wait(num2 + 3f, nCombatUi._cts.Token).GetAwaiter();
+						if (!((TaskAwaiter)(ref val4)).IsCompleted)
+						{
+							num = (<>1__state = 0);
+							<>u__1 = val4;
+							((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <ShowRewards>d__96>(ref val4, ref this);
+							return;
+						}
+						goto IL_0125;
+					}
+					if (room.RoomType != RoomType.Boss)
+					{
+						val3 = Cmd.CustomScaledWait(0.5f, num2 + 1f, ignoreCombatEnd: false, nCombatUi._cts.Token).GetAwaiter();
+						if (!((TaskAwaiter)(ref val3)).IsCompleted)
+						{
+							num = (<>1__state = 1);
+							<>u__1 = val3;
+							((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <ShowRewards>d__96>(ref val3, ref this);
+							return;
+						}
+						goto IL_01ad;
+					}
+					val2 = Cmd.CustomScaledWait(num2 * 0.5f, num2 + 1f, ignoreCombatEnd: false, nCombatUi._cts.Token).GetAwaiter();
+					if (!((TaskAwaiter)(ref val2)).IsCompleted)
+					{
+						num = (<>1__state = 2);
+						<>u__1 = val2;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <ShowRewards>d__96>(ref val2, ref this);
+						return;
+					}
+					goto IL_0226;
+				}
+				case 0:
+					val4 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_0125;
+				case 1:
+					val3 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_01ad;
+				case 2:
+					val2 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_0226;
+				case 3:
+					{
+						val = <>u__1;
+						<>u__1 = default(TaskAwaiter);
+						num = (<>1__state = -1);
+						break;
+					}
+					IL_0226:
+					((TaskAwaiter)(ref val2)).GetResult();
+					goto IL_022d;
+					IL_022d:
+					val = room.OfferRoomEndRewards().GetAwaiter();
+					if (!((TaskAwaiter)(ref val)).IsCompleted)
+					{
+						num = (<>1__state = 3);
+						<>u__1 = val;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <ShowRewards>d__96>(ref val, ref this);
+						return;
+					}
+					break;
+					IL_01ad:
+					((TaskAwaiter)(ref val3)).GetResult();
+					goto IL_022d;
+					IL_0125:
+					((TaskAwaiter)(ref val4)).GetResult();
+					goto IL_022d;
+				}
+				((TaskAwaiter)(ref val)).GetResult();
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	private NStarCounter _starCounter;
+
+	private NEnergyCounter _energyCounter;
+
+	private NCombatPilesContainer _combatPilesContainer;
+
+	private readonly Dictionary<NCard, Vector2> _originalPlayContainerCardPositions = new Dictionary<NCard, Vector2>();
+
+	private readonly Dictionary<NCard, Vector2> _originalPlayContainerCardScales = new Dictionary<NCard, Vector2>();
+
+	private Tween? _playContainerPeekModeTween;
+
+	private readonly CancellationTokenSource _cts = new CancellationTokenSource();
+
+	private int _originalHandChildIndex;
+
+	private CombatState _state;
+
+	private static bool _isDebugSlowRewards;
+
+	private static bool _isDebugHidden;
+
+	private static bool _isDebugHidingHand;
+
+	[CompilerGenerated]
+	private Action? m_DebugToggleIntent;
+
+	[CompilerGenerated]
+	private Action? m_DebugToggleHpBar;
+
+	[field: CompilerGenerated]
+	public Control EnergyCounterContainer
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public NEndTurnButton EndTurnButton
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	private NPingButton PingButton
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		set;
+	}
+
+	public NDrawPileButton DrawPile => _combatPilesContainer.DrawPile;
+
+	public NDiscardPileButton DiscardPile => _combatPilesContainer.DiscardPile;
+
+	public NExhaustPileButton ExhaustPile => _combatPilesContainer.ExhaustPile;
+
+	[field: CompilerGenerated]
+	public NPlayerHand Hand
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public Control PlayContainer
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public NCardPlayQueue PlayQueue
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public Control CardPreviewContainer
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public NMessyCardPreviewContainer MessyCardPreviewContainer
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	private System.Collections.Generic.IEnumerable<NCard> PlayContainerCards => Enumerable.OfType<NCard>((System.Collections.IEnumerable)PlayContainer.GetChildren());
+
+	[field: CompilerGenerated]
+	public static bool IsDebugHidingIntent
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public static bool IsDebugHidingPlayContainer
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public static bool IsDebugHidingHpBar
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public static bool IsDebugHideTextVfx
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public static bool IsDebugHideTargetingUi
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public static bool IsDebugHideMpTargetingUi
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public static bool IsDebugHideMpIntents
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	public event Action DebugToggleIntent
+	{
+		[CompilerGenerated]
+		add
+		{
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Expected O, but got Unknown
+			Action val = this.m_DebugToggleIntent;
+			Action val2;
+			do
+			{
+				val2 = val;
+				Action val3 = (Action)System.Delegate.Combine((System.Delegate)(object)val2, (System.Delegate)(object)value);
+				val = Interlocked.CompareExchange<Action>(ref this.m_DebugToggleIntent, val3, val2);
+			}
+			while (val != val2);
+		}
+		[CompilerGenerated]
+		remove
+		{
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Expected O, but got Unknown
+			Action val = this.m_DebugToggleIntent;
+			Action val2;
+			do
+			{
+				val2 = val;
+				Action val3 = (Action)System.Delegate.Remove((System.Delegate)(object)val2, (System.Delegate)(object)value);
+				val = Interlocked.CompareExchange<Action>(ref this.m_DebugToggleIntent, val3, val2);
+			}
+			while (val != val2);
+		}
+	}
+
+	public event Action DebugToggleHpBar
+	{
+		[CompilerGenerated]
+		add
+		{
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Expected O, but got Unknown
+			Action val = this.m_DebugToggleHpBar;
+			Action val2;
+			do
+			{
+				val2 = val;
+				Action val3 = (Action)System.Delegate.Combine((System.Delegate)(object)val2, (System.Delegate)(object)value);
+				val = Interlocked.CompareExchange<Action>(ref this.m_DebugToggleHpBar, val3, val2);
+			}
+			while (val != val2);
+		}
+		[CompilerGenerated]
+		remove
+		{
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Expected O, but got Unknown
+			Action val = this.m_DebugToggleHpBar;
+			Action val2;
+			do
+			{
+				val2 = val;
+				Action val3 = (Action)System.Delegate.Remove((System.Delegate)(object)val2, (System.Delegate)(object)value);
+				val = Interlocked.CompareExchange<Action>(ref this.m_DebugToggleHpBar, val3, val2);
+			}
+			while (val != val2);
+		}
+	}
+
+	public override void _Ready()
+	{
+		EnergyCounterContainer = GetNode<Control>("%EnergyCounterContainer");
+		_starCounter = GetNode<NStarCounter>("%StarCounter");
+		EndTurnButton = GetNode<NEndTurnButton>("%EndTurnButton");
+		PingButton = GetNode<NPingButton>("%PingButton");
+		_combatPilesContainer = GetNode<NCombatPilesContainer>("%CombatPileContainer");
+		Hand = GetNode<NPlayerHand>("%Hand");
+		PlayContainer = GetNode<Control>("%PlayContainer");
+		PlayQueue = GetNode<NCardPlayQueue>("%PlayQueue");
+		CardPreviewContainer = GetNode<Control>("%CardPreviewContainer");
+		MessyCardPreviewContainer = GetNode<NMessyCardPreviewContainer>("%MessyCardPreviewContainer");
+		if (!_isDebugHidden)
+		{
+			return;
+		}
+		System.Collections.Generic.IEnumerator<Control> enumerator = Enumerable.OfType<Control>((System.Collections.IEnumerable)GetChildren()).GetEnumerator();
+		try
+		{
+			while (((System.Collections.IEnumerator)enumerator).MoveNext())
+			{
+				Control current = enumerator.Current;
+				if (current != Hand)
+				{
+					current.Modulate = (_isDebugHidden ? Colors.Transparent : Colors.White);
+				}
+			}
+		}
+		finally
+		{
+			((System.IDisposable)enumerator)?.Dispose();
+		}
+	}
+
+	public override void _ExitTree()
+	{
+		_cts.Cancel();
+		DisconnectSignals();
+	}
+
+	public void Activate(CombatState state)
+	{
+		CombatManager.Instance.CombatEnded += OnCombatEnded;
+		CombatManager.Instance.CombatWon += OnCombatWon;
+		_state = state;
+		Player me = LocalContext.GetMe(_state);
+		_combatPilesContainer.Initialize(me);
+		_starCounter.Initialize(me);
+		EndTurnButton.Initialize(state);
+		if (me.Character.ShouldAlwaysShowStarCounter)
+		{
+			EnergyCounterContainer.SetPosition(new Vector2(100f, 806f), keepOffsets: true);
+		}
+		_energyCounter = NEnergyCounter.Create(me);
+		EnergyCounterContainer.AddChildSafely(_energyCounter);
+		_starCounter.Reparent(_energyCounter);
+		base.Visible = true;
+		AnimIn();
+	}
+
+	public void Deactivate()
+	{
+		DisconnectSignals();
+		base.Visible = false;
+	}
+
+	private void DisconnectSignals()
+	{
+		CombatManager.Instance.CombatEnded -= OnCombatEnded;
+		CombatManager.Instance.CombatWon -= OnCombatWon;
+	}
+
+	public void AddToPlayContainer(NCard card)
+	{
+		card.GetParent()?.RemoveChildSafely(card);
+		PlayContainer.AddChildSafely(card);
+	}
+
+	public NCard? GetCardFromPlayContainer(CardModel model)
+	{
+		return Enumerable.FirstOrDefault<NCard>(PlayContainerCards, (Func<NCard, bool>)((NCard n) => n.Model == model));
+	}
+
+	private void OnCombatEnded(CombatRoom combatRoom)
+	{
+		AnimOut();
+		PostCombatCleanUp();
+	}
+
+	private void OnCombatWon(CombatRoom room)
+	{
+		if (room.Encounter.ShouldGiveRewards)
+		{
+			TaskHelper.RunSafely(ShowRewards(room));
+		}
+		else
+		{
+			TaskHelper.RunSafely(ProceedWithoutRewards());
+		}
+	}
+
+	[AsyncStateMachine(typeof(<ProceedWithoutRewards>d__95))]
+	public System.Threading.Tasks.Task ProceedWithoutRewards()
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<ProceedWithoutRewards>d__95 <ProceedWithoutRewards>d__96 = default(<ProceedWithoutRewards>d__95);
+		<ProceedWithoutRewards>d__96.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<ProceedWithoutRewards>d__96.<>4__this = this;
+		<ProceedWithoutRewards>d__96.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <ProceedWithoutRewards>d__96.<>t__builder)).Start<<ProceedWithoutRewards>d__95>(ref <ProceedWithoutRewards>d__96);
+		return ((AsyncTaskMethodBuilder)(ref <ProceedWithoutRewards>d__96.<>t__builder)).Task;
+	}
+
+	[AsyncStateMachine(typeof(<ShowRewards>d__96))]
+	private System.Threading.Tasks.Task ShowRewards(CombatRoom room)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<ShowRewards>d__96 <ShowRewards>d__97 = default(<ShowRewards>d__96);
+		<ShowRewards>d__97.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<ShowRewards>d__97.<>4__this = this;
+		<ShowRewards>d__97.room = room;
+		<ShowRewards>d__97.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <ShowRewards>d__97.<>t__builder)).Start<<ShowRewards>d__96>(ref <ShowRewards>d__97);
+		return ((AsyncTaskMethodBuilder)(ref <ShowRewards>d__97.<>t__builder)).Task;
+	}
+
+	private void AnimIn()
+	{
+		Hand.AnimIn();
+		_energyCounter.AnimIn();
+		_combatPilesContainer.AnimIn();
+	}
+
+	public void AnimOut()
+	{
+		Hand.AnimOut();
+		PlayQueue.AnimOut();
+		EndTurnButton.OnCombatEnded();
+		PingButton.OnCombatEnded();
+		_energyCounter.AnimOut();
+		_combatPilesContainer.AnimOut();
+	}
+
+	private void PostCombatCleanUp()
+	{
+		Tween tween = CreateTween();
+		tween.TweenProperty(PlayContainer, "modulate", Colors.Transparent, 0.25);
+	}
+
+	public void OnHandSelectModeEntered()
+	{
+		_originalHandChildIndex = Hand.GetIndex();
+		Hand.MoveToFrontSafely();
+		ActiveScreenContext.Instance.Update();
+	}
+
+	public void OnHandSelectModeExited()
+	{
+		this.MoveChildSafely(Hand, _originalHandChildIndex);
+		ActiveScreenContext.Instance.Update();
+	}
+
+	public void OnPeekButtonReady(NPeekButton peekButton)
+	{
+		peekButton.Connect(NPeekButton.SignalName.Toggled, Callable.From<NPeekButton>((Action<NPeekButton>)OnPeekButtonToggled));
+	}
+
+	private void OnPeekButtonToggled(NPeekButton peekButton)
+	{
+		if (_playContainerPeekModeTween != null)
+		{
+			_playContainerPeekModeTween.Pause();
+			_playContainerPeekModeTween.CustomStep(0.25);
+			_playContainerPeekModeTween.Kill();
+			_playContainerPeekModeTween = null;
+		}
+		Vector2 size = GetViewportRect().Size;
+		if (peekButton.IsPeeking)
+		{
+			PlayQueue.Hide();
+			System.Collections.Generic.IEnumerator<NCard> enumerator = PlayContainerCards.GetEnumerator();
+			try
+			{
+				while (((System.Collections.IEnumerator)enumerator).MoveNext())
+				{
+					NCard current = enumerator.Current;
+					_originalPlayContainerCardPositions[current] = current.Position;
+					_originalPlayContainerCardScales[current] = current.Scale;
+					Vector2 globalPosition = peekButton.CurrentCardMarker.GlobalPosition;
+					Vector2 vector = current.Scale * 0.5f;
+					if (_playContainerPeekModeTween == null)
+					{
+						_playContainerPeekModeTween = CreateTween();
+					}
+					_playContainerPeekModeTween.TweenProperty(current, "global_position", globalPosition, 0.25).SetEase(Tween.EaseType.Out).SetTrans(Tween.TransitionType.Cubic);
+					_playContainerPeekModeTween.Parallel().TweenProperty(current, "scale", vector, 0.25).SetEase(Tween.EaseType.Out)
+						.SetTrans(Tween.TransitionType.Cubic);
+				}
+			}
+			finally
+			{
+				((System.IDisposable)enumerator)?.Dispose();
+			}
+		}
+		else
+		{
+			PlayQueue.Show();
+			System.Collections.Generic.IEnumerator<NCard> enumerator2 = PlayContainerCards.GetEnumerator();
+			try
+			{
+				Vector2 vector3 = default(Vector2);
+				Vector2 vector5 = default(Vector2);
+				while (((System.Collections.IEnumerator)enumerator2).MoveNext())
+				{
+					NCard current2 = enumerator2.Current;
+					Vector2 vector2 = (_originalPlayContainerCardPositions.TryGetValue(current2, ref vector3) ? vector3 : (size * 0.5f));
+					Vector2 vector4 = (_originalPlayContainerCardScales.TryGetValue(current2, ref vector5) ? vector5 : Vector2.One);
+					if (_playContainerPeekModeTween == null)
+					{
+						_playContainerPeekModeTween = CreateTween();
+					}
+					_playContainerPeekModeTween.TweenProperty(current2, "position", vector2, 0.25).SetEase(Tween.EaseType.Out).SetTrans(Tween.TransitionType.Cubic);
+					_playContainerPeekModeTween.Parallel().TweenProperty(current2, "scale", vector4, 0.25).SetEase(Tween.EaseType.Out)
+						.SetTrans(Tween.TransitionType.Cubic);
+				}
+			}
+			finally
+			{
+				((System.IDisposable)enumerator2)?.Dispose();
+			}
+			_originalPlayContainerCardPositions.Clear();
+			_originalPlayContainerCardScales.Clear();
+		}
+		ActiveScreenContext.Instance.Update();
+	}
+
+	public void Enable()
+	{
+		NPlayerHand hand = Hand;
+		if (hand != null && hand.IsInCardSelection)
+		{
+			NPeekButton peekButton = hand.PeekButton;
+			if (peekButton != null && !peekButton.IsPeeking)
+			{
+				_combatPilesContainer.Disable();
+				goto IL_003c;
+			}
+		}
+		_combatPilesContainer.Enable();
+		goto IL_003c;
+		IL_003c:
+		if (_state.CurrentSide == CombatSide.Player)
+		{
+			EndTurnButton.RefreshEnabled();
+		}
+		if (((System.Collections.Generic.IReadOnlyCollection<Creature>)_state.PlayerCreatures).Count > 1)
+		{
+			PingButton.RefreshEnabled();
+		}
+		NPlayerHand.Mode currentMode = Hand.CurrentMode;
+		if ((uint)(currentMode - 2) <= 1u)
+		{
+			Hand.PeekButton.Enable();
+		}
+	}
+
+	public void Disable()
+	{
+		_combatPilesContainer.Disable();
+		EndTurnButton.RefreshEnabled();
+		PingButton.RefreshEnabled();
+		Hand.PeekButton.Disable();
+		Hand.CancelAllCardPlay();
+	}
+
+	public override void _Input(InputEvent inputEvent)
+	{
+		if (inputEvent.IsActionReleased(DebugHotkey.hideIntents))
+		{
+			IsDebugHidingIntent = !IsDebugHidingIntent;
+			NGame.Instance.AddChildSafely(NFullscreenTextVfx.Create(IsDebugHidingIntent ? "Hide Intents" : "Show Intents"));
+			Action? obj = this.DebugToggleIntent;
+			if (obj != null)
+			{
+				obj.Invoke();
+			}
+		}
+		if (inputEvent.IsActionReleased(DebugHotkey.hideCombatUi))
+		{
+			_isDebugHidden = !_isDebugHidden;
+			NGame.Instance.AddChildSafely(NFullscreenTextVfx.Create(_isDebugHidden ? "Hide Combat UI" : "Show Combat UI"));
+			DebugHideCombatUi();
+		}
+		else if (inputEvent.IsActionReleased(DebugHotkey.hidePlayContainer))
+		{
+			IsDebugHidingPlayContainer = !IsDebugHidingPlayContainer;
+			NGame.Instance.AddChildSafely(NFullscreenTextVfx.Create(IsDebugHidingPlayContainer ? "Hide Played Card" : "Show Played Card"));
+			DebugHideCombatUi();
+		}
+		else if (inputEvent.IsActionReleased(DebugHotkey.hideHand))
+		{
+			_isDebugHidingHand = !_isDebugHidingHand;
+			NGame.Instance.AddChildSafely(NFullscreenTextVfx.Create(_isDebugHidingHand ? "Hide Hand Cards" : "Show Hand Cards"));
+			DebugHideCombatUi();
+		}
+		else if (inputEvent.IsActionReleased(DebugHotkey.hideHpBars))
+		{
+			IsDebugHidingHpBar = !IsDebugHidingHpBar;
+			NGame.Instance.AddChildSafely(NFullscreenTextVfx.Create(IsDebugHidingHpBar ? "Hide HP Bars" : "Show HP Bars"));
+			Action? obj2 = this.DebugToggleHpBar;
+			if (obj2 != null)
+			{
+				obj2.Invoke();
+			}
+		}
+		else if (inputEvent.IsActionReleased(DebugHotkey.hideTextVfx))
+		{
+			IsDebugHideTextVfx = !IsDebugHideTextVfx;
+			NGame.Instance.AddChildSafely(NFullscreenTextVfx.Create(IsDebugHideTextVfx ? "Hide Text Vfx" : "Show Text Vfx"));
+		}
+		else if (inputEvent.IsActionReleased(DebugHotkey.hideTargetingUi))
+		{
+			IsDebugHideTargetingUi = !IsDebugHideTargetingUi;
+			NGame.Instance.AddChildSafely(NFullscreenTextVfx.Create(IsDebugHideTargetingUi ? "Hide Targeting UI" : "Show Targeting UI"));
+		}
+		else if (inputEvent.IsActionReleased(DebugHotkey.slowRewards))
+		{
+			_isDebugSlowRewards = !_isDebugSlowRewards;
+			NGame.Instance.AddChildSafely(NFullscreenTextVfx.Create(_isDebugSlowRewards ? "Slow Rewards Screens" : "Normal Rewards Screen"));
+		}
+		else if (inputEvent.IsActionReleased(DebugHotkey.hideMpTargeting))
+		{
+			IsDebugHideMpTargetingUi = !IsDebugHideMpTargetingUi;
+			NGame.Instance.AddChildSafely(NFullscreenTextVfx.Create(IsDebugHideMpTargetingUi ? "Hide MP Targeting" : "Show MP Targeting"));
+		}
+		else if (inputEvent.IsActionReleased(DebugHotkey.hideMpIntents))
+		{
+			IsDebugHideMpIntents = !IsDebugHideMpIntents;
+			NGame.Instance.AddChildSafely(NFullscreenTextVfx.Create(IsDebugHideMpIntents ? "Hide MP Intents" : "Show MP Intents"));
+		}
+	}
+
+	private void DebugHideCombatUi()
+	{
+		System.Collections.Generic.IEnumerator<Control> enumerator = Enumerable.OfType<Control>((System.Collections.IEnumerable)GetChildren()).GetEnumerator();
+		try
+		{
+			while (((System.Collections.IEnumerator)enumerator).MoveNext())
+			{
+				Control current = enumerator.Current;
+				if (current == Hand)
+				{
+					current.Modulate = (_isDebugHidingHand ? Colors.Transparent : Colors.White);
+				}
+				else if (current.Name == PropertyName.PlayContainer)
+				{
+					current.Modulate = (IsDebugHidingPlayContainer ? Colors.Transparent : Colors.White);
+				}
+				else
+				{
+					current.Modulate = (_isDebugHidden ? Colors.Transparent : Colors.White);
+				}
+			}
+		}
+		finally
+		{
+			((System.IDisposable)enumerator)?.Dispose();
+		}
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	internal static List<MethodInfo> GetGodotMethodList()
+	{
+		List<MethodInfo> val = new List<MethodInfo>(16);
+		val.Add(new MethodInfo(MethodName._Ready, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName._ExitTree, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.Deactivate, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.DisconnectSignals, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		StringName addToPlayContainer = MethodName.AddToPlayContainer;
+		PropertyInfo returnVal = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags = 1L;
+		List<PropertyInfo> obj = new List<PropertyInfo>();
+		obj.Add(new PropertyInfo(Variant.Type.Object, "card", PropertyHint.None, "", PropertyUsageFlags.Default, new StringName("Control"), exported: false));
+		val.Add(new MethodInfo(addToPlayContainer, returnVal, (MethodFlags)flags, obj, null));
+		val.Add(new MethodInfo(MethodName.AnimIn, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.AnimOut, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.PostCombatCleanUp, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.OnHandSelectModeEntered, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.OnHandSelectModeExited, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		StringName onPeekButtonReady = MethodName.OnPeekButtonReady;
+		PropertyInfo returnVal2 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags2 = 1L;
+		List<PropertyInfo> obj2 = new List<PropertyInfo>();
+		obj2.Add(new PropertyInfo(Variant.Type.Object, "peekButton", PropertyHint.None, "", PropertyUsageFlags.Default, new StringName("Control"), exported: false));
+		val.Add(new MethodInfo(onPeekButtonReady, returnVal2, (MethodFlags)flags2, obj2, null));
+		StringName onPeekButtonToggled = MethodName.OnPeekButtonToggled;
+		PropertyInfo returnVal3 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags3 = 1L;
+		List<PropertyInfo> obj3 = new List<PropertyInfo>();
+		obj3.Add(new PropertyInfo(Variant.Type.Object, "peekButton", PropertyHint.None, "", PropertyUsageFlags.Default, new StringName("Control"), exported: false));
+		val.Add(new MethodInfo(onPeekButtonToggled, returnVal3, (MethodFlags)flags3, obj3, null));
+		val.Add(new MethodInfo(MethodName.Enable, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.Disable, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		StringName input = MethodName._Input;
+		PropertyInfo returnVal4 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags4 = 1L;
+		List<PropertyInfo> obj4 = new List<PropertyInfo>();
+		obj4.Add(new PropertyInfo(Variant.Type.Object, "inputEvent", PropertyHint.None, "", PropertyUsageFlags.Default, new StringName("InputEvent"), exported: false));
+		val.Add(new MethodInfo(input, returnVal4, (MethodFlags)flags4, obj4, null));
+		val.Add(new MethodInfo(MethodName.DebugHideCombatUi, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		return val;
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool InvokeGodotClassMethod(in godot_string_name method, NativeVariantPtrArgs args, out godot_variant ret)
+	{
+		if (method == MethodName._Ready && args.Count == 0)
+		{
+			_Ready();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName._ExitTree && args.Count == 0)
+		{
+			_ExitTree();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.Deactivate && args.Count == 0)
+		{
+			Deactivate();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.DisconnectSignals && args.Count == 0)
+		{
+			DisconnectSignals();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.AddToPlayContainer && args.Count == 1)
+		{
+			AddToPlayContainer(VariantUtils.ConvertTo<NCard>(in args[0]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.AnimIn && args.Count == 0)
+		{
+			AnimIn();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.AnimOut && args.Count == 0)
+		{
+			AnimOut();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.PostCombatCleanUp && args.Count == 0)
+		{
+			PostCombatCleanUp();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.OnHandSelectModeEntered && args.Count == 0)
+		{
+			OnHandSelectModeEntered();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.OnHandSelectModeExited && args.Count == 0)
+		{
+			OnHandSelectModeExited();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.OnPeekButtonReady && args.Count == 1)
+		{
+			OnPeekButtonReady(VariantUtils.ConvertTo<NPeekButton>(in args[0]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.OnPeekButtonToggled && args.Count == 1)
+		{
+			OnPeekButtonToggled(VariantUtils.ConvertTo<NPeekButton>(in args[0]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.Enable && args.Count == 0)
+		{
+			Enable();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.Disable && args.Count == 0)
+		{
+			Disable();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName._Input && args.Count == 1)
+		{
+			_Input(VariantUtils.ConvertTo<InputEvent>(in args[0]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.DebugHideCombatUi && args.Count == 0)
+		{
+			DebugHideCombatUi();
+			ret = default(godot_variant);
+			return true;
+		}
+		return base.InvokeGodotClassMethod(in method, args, out ret);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool HasGodotClassMethod(in godot_string_name method)
+	{
+		if (method == MethodName._Ready)
+		{
+			return true;
+		}
+		if (method == MethodName._ExitTree)
+		{
+			return true;
+		}
+		if (method == MethodName.Deactivate)
+		{
+			return true;
+		}
+		if (method == MethodName.DisconnectSignals)
+		{
+			return true;
+		}
+		if (method == MethodName.AddToPlayContainer)
+		{
+			return true;
+		}
+		if (method == MethodName.AnimIn)
+		{
+			return true;
+		}
+		if (method == MethodName.AnimOut)
+		{
+			return true;
+		}
+		if (method == MethodName.PostCombatCleanUp)
+		{
+			return true;
+		}
+		if (method == MethodName.OnHandSelectModeEntered)
+		{
+			return true;
+		}
+		if (method == MethodName.OnHandSelectModeExited)
+		{
+			return true;
+		}
+		if (method == MethodName.OnPeekButtonReady)
+		{
+			return true;
+		}
+		if (method == MethodName.OnPeekButtonToggled)
+		{
+			return true;
+		}
+		if (method == MethodName.Enable)
+		{
+			return true;
+		}
+		if (method == MethodName.Disable)
+		{
+			return true;
+		}
+		if (method == MethodName._Input)
+		{
+			return true;
+		}
+		if (method == MethodName.DebugHideCombatUi)
+		{
+			return true;
+		}
+		return base.HasGodotClassMethod(in method);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool SetGodotClassPropertyValue(in godot_string_name name, in godot_variant value)
+	{
+		if (name == PropertyName.EnergyCounterContainer)
+		{
+			EnergyCounterContainer = VariantUtils.ConvertTo<Control>(in value);
+			return true;
+		}
+		if (name == PropertyName.EndTurnButton)
+		{
+			EndTurnButton = VariantUtils.ConvertTo<NEndTurnButton>(in value);
+			return true;
+		}
+		if (name == PropertyName.PingButton)
+		{
+			PingButton = VariantUtils.ConvertTo<NPingButton>(in value);
+			return true;
+		}
+		if (name == PropertyName.Hand)
+		{
+			Hand = VariantUtils.ConvertTo<NPlayerHand>(in value);
+			return true;
+		}
+		if (name == PropertyName.PlayContainer)
+		{
+			PlayContainer = VariantUtils.ConvertTo<Control>(in value);
+			return true;
+		}
+		if (name == PropertyName.PlayQueue)
+		{
+			PlayQueue = VariantUtils.ConvertTo<NCardPlayQueue>(in value);
+			return true;
+		}
+		if (name == PropertyName.CardPreviewContainer)
+		{
+			CardPreviewContainer = VariantUtils.ConvertTo<Control>(in value);
+			return true;
+		}
+		if (name == PropertyName.MessyCardPreviewContainer)
+		{
+			MessyCardPreviewContainer = VariantUtils.ConvertTo<NMessyCardPreviewContainer>(in value);
+			return true;
+		}
+		if (name == PropertyName._starCounter)
+		{
+			_starCounter = VariantUtils.ConvertTo<NStarCounter>(in value);
+			return true;
+		}
+		if (name == PropertyName._energyCounter)
+		{
+			_energyCounter = VariantUtils.ConvertTo<NEnergyCounter>(in value);
+			return true;
+		}
+		if (name == PropertyName._combatPilesContainer)
+		{
+			_combatPilesContainer = VariantUtils.ConvertTo<NCombatPilesContainer>(in value);
+			return true;
+		}
+		if (name == PropertyName._playContainerPeekModeTween)
+		{
+			_playContainerPeekModeTween = VariantUtils.ConvertTo<Tween>(in value);
+			return true;
+		}
+		if (name == PropertyName._originalHandChildIndex)
+		{
+			_originalHandChildIndex = VariantUtils.ConvertTo<int>(in value);
+			return true;
+		}
+		return base.SetGodotClassPropertyValue(in name, in value);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool GetGodotClassPropertyValue(in godot_string_name name, out godot_variant value)
+	{
+		Control from;
+		if (name == PropertyName.EnergyCounterContainer)
+		{
+			from = EnergyCounterContainer;
+			value = VariantUtils.CreateFrom(in from);
+			return true;
+		}
+		if (name == PropertyName.EndTurnButton)
+		{
+			value = VariantUtils.CreateFrom<NEndTurnButton>(EndTurnButton);
+			return true;
+		}
+		if (name == PropertyName.PingButton)
+		{
+			value = VariantUtils.CreateFrom<NPingButton>(PingButton);
+			return true;
+		}
+		if (name == PropertyName.DrawPile)
+		{
+			value = VariantUtils.CreateFrom<NDrawPileButton>(DrawPile);
+			return true;
+		}
+		if (name == PropertyName.DiscardPile)
+		{
+			value = VariantUtils.CreateFrom<NDiscardPileButton>(DiscardPile);
+			return true;
+		}
+		if (name == PropertyName.ExhaustPile)
+		{
+			value = VariantUtils.CreateFrom<NExhaustPileButton>(ExhaustPile);
+			return true;
+		}
+		if (name == PropertyName.Hand)
+		{
+			value = VariantUtils.CreateFrom<NPlayerHand>(Hand);
+			return true;
+		}
+		if (name == PropertyName.PlayContainer)
+		{
+			from = PlayContainer;
+			value = VariantUtils.CreateFrom(in from);
+			return true;
+		}
+		if (name == PropertyName.PlayQueue)
+		{
+			value = VariantUtils.CreateFrom<NCardPlayQueue>(PlayQueue);
+			return true;
+		}
+		if (name == PropertyName.CardPreviewContainer)
+		{
+			from = CardPreviewContainer;
+			value = VariantUtils.CreateFrom(in from);
+			return true;
+		}
+		if (name == PropertyName.MessyCardPreviewContainer)
+		{
+			value = VariantUtils.CreateFrom<NMessyCardPreviewContainer>(MessyCardPreviewContainer);
+			return true;
+		}
+		if (name == PropertyName._starCounter)
+		{
+			value = VariantUtils.CreateFrom(in _starCounter);
+			return true;
+		}
+		if (name == PropertyName._energyCounter)
+		{
+			value = VariantUtils.CreateFrom(in _energyCounter);
+			return true;
+		}
+		if (name == PropertyName._combatPilesContainer)
+		{
+			value = VariantUtils.CreateFrom(in _combatPilesContainer);
+			return true;
+		}
+		if (name == PropertyName._playContainerPeekModeTween)
+		{
+			value = VariantUtils.CreateFrom(in _playContainerPeekModeTween);
+			return true;
+		}
+		if (name == PropertyName._originalHandChildIndex)
+		{
+			value = VariantUtils.CreateFrom(in _originalHandChildIndex);
+			return true;
+		}
+		return base.GetGodotClassPropertyValue(in name, out value);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	internal static List<PropertyInfo> GetGodotPropertyList()
+	{
+		List<PropertyInfo> val = new List<PropertyInfo>();
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.EnergyCounterContainer, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.EndTurnButton, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.PingButton, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName._starCounter, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName._energyCounter, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName._combatPilesContainer, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.DrawPile, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.DiscardPile, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.ExhaustPile, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.Hand, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.PlayContainer, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.PlayQueue, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.CardPreviewContainer, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.MessyCardPreviewContainer, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName._playContainerPeekModeTween, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Int, PropertyName._originalHandChildIndex, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		return val;
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override void SaveGodotObjectData(GodotSerializationInfo info)
+	{
+		base.SaveGodotObjectData(info);
+		info.AddProperty(PropertyName.EnergyCounterContainer, Variant.From<Control>(EnergyCounterContainer));
+		info.AddProperty(PropertyName.EndTurnButton, Variant.From<NEndTurnButton>(EndTurnButton));
+		info.AddProperty(PropertyName.PingButton, Variant.From<NPingButton>(PingButton));
+		info.AddProperty(PropertyName.Hand, Variant.From<NPlayerHand>(Hand));
+		info.AddProperty(PropertyName.PlayContainer, Variant.From<Control>(PlayContainer));
+		info.AddProperty(PropertyName.PlayQueue, Variant.From<NCardPlayQueue>(PlayQueue));
+		info.AddProperty(PropertyName.CardPreviewContainer, Variant.From<Control>(CardPreviewContainer));
+		info.AddProperty(PropertyName.MessyCardPreviewContainer, Variant.From<NMessyCardPreviewContainer>(MessyCardPreviewContainer));
+		info.AddProperty(PropertyName._starCounter, Variant.From(in _starCounter));
+		info.AddProperty(PropertyName._energyCounter, Variant.From(in _energyCounter));
+		info.AddProperty(PropertyName._combatPilesContainer, Variant.From(in _combatPilesContainer));
+		info.AddProperty(PropertyName._playContainerPeekModeTween, Variant.From(in _playContainerPeekModeTween));
+		info.AddProperty(PropertyName._originalHandChildIndex, Variant.From(in _originalHandChildIndex));
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override void RestoreGodotObjectData(GodotSerializationInfo info)
+	{
+		base.RestoreGodotObjectData(info);
+		if (info.TryGetProperty(PropertyName.EnergyCounterContainer, out var value))
+		{
+			EnergyCounterContainer = value.As<Control>();
+		}
+		if (info.TryGetProperty(PropertyName.EndTurnButton, out var value2))
+		{
+			EndTurnButton = value2.As<NEndTurnButton>();
+		}
+		if (info.TryGetProperty(PropertyName.PingButton, out var value3))
+		{
+			PingButton = value3.As<NPingButton>();
+		}
+		if (info.TryGetProperty(PropertyName.Hand, out var value4))
+		{
+			Hand = value4.As<NPlayerHand>();
+		}
+		if (info.TryGetProperty(PropertyName.PlayContainer, out var value5))
+		{
+			PlayContainer = value5.As<Control>();
+		}
+		if (info.TryGetProperty(PropertyName.PlayQueue, out var value6))
+		{
+			PlayQueue = value6.As<NCardPlayQueue>();
+		}
+		if (info.TryGetProperty(PropertyName.CardPreviewContainer, out var value7))
+		{
+			CardPreviewContainer = value7.As<Control>();
+		}
+		if (info.TryGetProperty(PropertyName.MessyCardPreviewContainer, out var value8))
+		{
+			MessyCardPreviewContainer = value8.As<NMessyCardPreviewContainer>();
+		}
+		if (info.TryGetProperty(PropertyName._starCounter, out var value9))
+		{
+			_starCounter = value9.As<NStarCounter>();
+		}
+		if (info.TryGetProperty(PropertyName._energyCounter, out var value10))
+		{
+			_energyCounter = value10.As<NEnergyCounter>();
+		}
+		if (info.TryGetProperty(PropertyName._combatPilesContainer, out var value11))
+		{
+			_combatPilesContainer = value11.As<NCombatPilesContainer>();
+		}
+		if (info.TryGetProperty(PropertyName._playContainerPeekModeTween, out var value12))
+		{
+			_playContainerPeekModeTween = value12.As<Tween>();
+		}
+		if (info.TryGetProperty(PropertyName._originalHandChildIndex, out var value13))
+		{
+			_originalHandChildIndex = value13.As<int>();
+		}
+	}
+}
+
+// ===== MegaCrit.Sts2.Core.Nodes.Combat.NCombatUi.MethodName =====
+// ERROR: Could not find type definition MegaCrit.Sts2.Core.Nodes.Combat.NCombatUi.MethodName in type system.
+// ===== MegaCrit.Sts2.Core.Nodes.Combat.NCombatUi.PropertyName =====
+// ERROR: Could not find type definition MegaCrit.Sts2.Core.Nodes.Combat.NCombatUi.PropertyName in type system.
+// ===== MegaCrit.Sts2.Core.Nodes.Combat.NCombatUi.SignalName =====
+// ERROR: Could not find type definition MegaCrit.Sts2.Core.Nodes.Combat.NCombatUi.SignalName in type system.
+// ===== MegaCrit.Sts2.Core.Nodes.Combat.NCombatUi.<>c__DisplayClass92_0 =====
+// ERROR: Could not find type definition MegaCrit.Sts2.Core.Nodes.Combat.NCombatUi.<>c__DisplayClass92_0 in type system.
+// ===== MegaCrit.Sts2.Core.Nodes.Combat.NCombatUi.<ProceedWithoutRewards>d__95 =====
+// ERROR: Could not find type definition MegaCrit.Sts2.Core.Nodes.Combat.NCombatUi.<ProceedWithoutRewards>d__95 in type system.
+// ===== MegaCrit.Sts2.Core.Nodes.Combat.NCombatUi.<ShowRewards>d__96 =====
+// ERROR: Could not find type definition MegaCrit.Sts2.Core.Nodes.Combat.NCombatUi.<ShowRewards>d__96 in type system.

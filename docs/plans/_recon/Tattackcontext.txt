@@ -1,0 +1,216 @@
+﻿// ===== MegaCrit.Sts2.Core.Commands.Builders.AttackContext =====
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using MegaCrit.Sts2.Core.Combat;
+using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Hooks;
+using MegaCrit.Sts2.Core.Logging;
+
+namespace MegaCrit.Sts2.Core.Commands.Builders;
+
+public sealed class AttackContext : System.IAsyncDisposable
+{
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <CreateAsync>d__5 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder<AttackContext> <>t__builder;
+
+		public ICombatState combatState;
+
+		public PlayerChoiceContext choiceContext;
+
+		public CardPlay cardPlay;
+
+		private AttackContext <context>5__2;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			AttackContext result;
+			try
+			{
+				TaskAwaiter val;
+				if (num != 0)
+				{
+					<context>5__2 = new AttackContext(combatState, choiceContext, cardPlay);
+					val = Hook.BeforeAttack(combatState, <context>5__2._attackCommand).GetAwaiter();
+					if (!((TaskAwaiter)(ref val)).IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <CreateAsync>d__5>(ref val, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+				}
+				((TaskAwaiter)(ref val)).GetResult();
+				result = <context>5__2;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<context>5__2 = null;
+				<>t__builder.SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<context>5__2 = null;
+			<>t__builder.SetResult(result);
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			<>t__builder.SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <DisposeAsync>d__7 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncValueTaskMethodBuilder <>t__builder;
+
+		public AttackContext <>4__this;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			AttackContext attackContext = <>4__this;
+			try
+			{
+				if (num == 0)
+				{
+					goto IL_0026;
+				}
+				if (!attackContext._disposed)
+				{
+					attackContext._disposed = true;
+					goto IL_0026;
+				}
+				goto end_IL_000e;
+				IL_0026:
+				try
+				{
+					TaskAwaiter val;
+					if (num != 0)
+					{
+						val = Hook.AfterAttack(attackContext._combatState, attackContext._choiceContext, attackContext._attackCommand).GetAwaiter();
+						if (!((TaskAwaiter)(ref val)).IsCompleted)
+						{
+							num = (<>1__state = 0);
+							<>u__1 = val;
+							((AsyncValueTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <DisposeAsync>d__7>(ref val, ref this);
+							return;
+						}
+					}
+					else
+					{
+						val = <>u__1;
+						<>u__1 = default(TaskAwaiter);
+						num = (<>1__state = -1);
+					}
+					((TaskAwaiter)(ref val)).GetResult();
+				}
+				catch (System.Exception ex)
+				{
+					Log.Error(((object)ex).ToString());
+				}
+				end_IL_000e:;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncValueTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncValueTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncValueTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	private readonly ICombatState _combatState;
+
+	private readonly PlayerChoiceContext _choiceContext;
+
+	private readonly AttackCommand _attackCommand;
+
+	private bool _disposed;
+
+	private AttackContext(ICombatState combatState, PlayerChoiceContext choiceContext, CardPlay cardPlay)
+	{
+		_combatState = combatState;
+		_choiceContext = choiceContext;
+		_attackCommand = new AttackCommand(0m).FromCard(cardPlay.Card, cardPlay).TargetingAllOpponents(combatState);
+	}
+
+	[AsyncStateMachine(typeof(<CreateAsync>d__5))]
+	public static async System.Threading.Tasks.Task<AttackContext> CreateAsync(ICombatState combatState, PlayerChoiceContext choiceContext, CardPlay cardPlay)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		AttackContext context = new AttackContext(combatState, choiceContext, cardPlay);
+		await Hook.BeforeAttack(combatState, context._attackCommand);
+		return context;
+	}
+
+	public void AddHit(System.Collections.Generic.IEnumerable<DamageResult> results)
+	{
+		_attackCommand.IncrementHitsInternal();
+		_attackCommand.AddResultsInternal(results);
+	}
+
+	[AsyncStateMachine(typeof(<DisposeAsync>d__7))]
+	public System.Threading.Tasks.ValueTask DisposeAsync()
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<DisposeAsync>d__7 <DisposeAsync>d__8 = default(<DisposeAsync>d__7);
+		<DisposeAsync>d__8.<>t__builder = AsyncValueTaskMethodBuilder.Create();
+		<DisposeAsync>d__8.<>4__this = this;
+		<DisposeAsync>d__8.<>1__state = -1;
+		((AsyncValueTaskMethodBuilder)(ref <DisposeAsync>d__8.<>t__builder)).Start<<DisposeAsync>d__7>(ref <DisposeAsync>d__8);
+		return ((AsyncValueTaskMethodBuilder)(ref <DisposeAsync>d__8.<>t__builder)).Task;
+	}
+}
+

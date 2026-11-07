@@ -1,0 +1,103 @@
+{
+  "IRONCLAD_BOSS_ENCOUNTER.title": "Pancernik",
+  "IRONCLAD_BOSS_ENCOUNTER.loss": "{character} został złamany przez [gold]Pancernika[/gold].",
+
+  "IRONCLAD_ANGER_BOSS_ENCOUNTER.title": "Pancernik",
+  "IRONCLAD_ANGER_BOSS_ENCOUNTER.loss": "{character} spłonął na popiół w gniewie [gold]Pancernika[/gold].",
+
+  "IRONCLAD_VULN_BOSS_ENCOUNTER.title": "Pancernik",
+  "IRONCLAD_VULN_BOSS_ENCOUNTER.loss": "[gold]Pancernik[/gold] rozcinał {character} warstwa po warstwie.",
+
+  "SILENT_BOSS_ENCOUNTER.title": "Zjawa",
+  "SILENT_BOSS_ENCOUNTER.loss": "Do końca {character} nie dostrzegł sylwetki [gold]Zjawy[/gold].",
+
+  "SILENT_ENVENOM_BOSS_ENCOUNTER.title": "Zjawa",
+  "SILENT_ENVENOM_BOSS_ENCOUNTER.loss": "Trucizna [gold]Zjawy[/gold] wypiła {character} do dna.",
+
+  "SILENT_SHIV_BOSS_ENCOUNTER.title": "Zjawa",
+  "SILENT_SHIV_BOSS_ENCOUNTER.loss": "{character} utonął w deszczu ostrzy [gold]Zjawy[/gold].",
+
+  "SILENT_SLY_BOSS_ENCOUNTER.title": "Zjawa",
+  "SILENT_SLY_BOSS_ENCOUNTER.loss": "[gold]Zjawa[/gold] wrzuciła {character} do stosu kart odrzuconych.",
+
+  "SILENT_BREWER_BOSS_ENCOUNTER.title": "Zjawa",
+  "SILENT_BREWER_BOSS_ENCOUNTER.loss": "{character} nie zdołał przebić bariery wzniesionej miksturami [gold]Zjawy[/gold].",
+
+  "DEFECT_BOSS_ENCOUNTER.title": "Defekt",
+  "DEFECT_BOSS_ENCOUNTER.loss": "{character} został przeanalizowany i usunięty przez [gold]Defekta[/gold].",
+
+  "DEFECT_AI_BOSS_ENCOUNTER.title": "Defekt",
+  "DEFECT_AI_BOSS_ENCOUNTER.loss": "Każda karta zagrana przez {character} została wpisana do modelu [gold]Defekta[/gold].",
+
+  "DEFECT_CLAW_BOSS_ENCOUNTER.title": "Defekt",
+  "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character} został unicestwiony „Hiperpromieniem” [gold]Defekta[/gold].",
+
+  "NECROBINDER_BOSS_ENCOUNTER.title": "Nekromantka",
+  "NECROBINDER_BOSS_ENCOUNTER.loss": "Duszę {character} zagarnęła [gold]Nekromantka[/gold].",
+
+  "NECROBINDER_DOOM_BOSS_ENCOUNTER.title": "Nekromantka",
+  "NECROBINDER_DOOM_BOSS_ENCOUNTER.loss": "[gold]Nekromantka[/gold] przywołała {character} na sam kres Zagłady.",
+
+  "NECROBINDER_SOUL_BOSS_ENCOUNTER.title": "Nekromantka",
+  "NECROBINDER_SOUL_BOSS_ENCOUNTER.loss": "Duszę {character} zagarnęła [gold]Nekromantka[/gold].",
+
+  "NECROBINDER_ERADICATE_BOSS_ENCOUNTER.title": "Nekromantka",
+  "NECROBINDER_ERADICATE_BOSS_ENCOUNTER.loss": "[gold]Nekromantka[/gold] wykorzeniła {character} wraz z pamięcią o nim.",
+
+  "REGENT_BOSS_ENCOUNTER.title": "Monarcha",
+  "REGENT_BOSS_ENCOUNTER.loss": "[gold]Monarcha[/gold] wydał na {character} wyrok.",
+
+  "REGENT_DEBRIS_BOSS_ENCOUNTER.title": "Monarcha",
+  "REGENT_DEBRIS_BOSS_ENCOUNTER.loss": "{character} został zasypany gruzem [gold]Monarchy[/gold].",
+
+  "REGENT_FORGE_BOSS_ENCOUNTER.title": "Monarcha",
+  "REGENT_FORGE_BOSS_ENCOUNTER.loss": "{character} stał się rysą na ostrzu [gold]Monarchy[/gold].",
+
+  "REGENT_COLORLESS_BOSS_ENCOUNTER.title": "Monarcha",
+  "REGENT_COLORLESS_BOSS_ENCOUNTER.loss": "[gold]Monarcha[/gold] odarł {character} z wszelkich barw.",
+
+  "REGENT_STAR_BOSS_ENCOUNTER.title": "Monarcha",
+  "REGENT_STAR_BOSS_ENCOUNTER.loss": "{character} został starty w pył przez lśniące gwiazdy [gold]Monarchy[/gold].",
+
+  "REGENT_KING_BOSS_ENCOUNTER.title": "Monarcha",
+  "REGENT_KING_BOSS_ENCOUNTER.loss": "{character} został zmiażdżony władzą [gold]Monarchy[/gold].",
+
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.title": "Pancernik",
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "{character} został zmiażdżony rosnącą Siłą [gold]Pancernika[/gold].",
+
+    "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.title": "Pancernik",
+  "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss": "[gold]Pancernik[/gold] żonglował {character}, aż w końcu zasypały go własne kopie.",
+"IRONCLAD_BOULDER_BOSS_ENCOUNTER.title": "Pancernik",
+  "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss": "{character} został starty na proch przez skały [gold]Pancernika[/gold].",
+
+  "DEFECT_DARK_BOSS_ENCOUNTER.title": "Defekt",
+  "DEFECT_DARK_BOSS_ENCOUNTER.loss": "{character} został pochłonięty przez Sfery Ciemności [gold]Defekta[/gold].",
+
+  "IRONCLAD_BOSS_NORMAL_ENCOUNTER.title": "Pancernik",
+  "IRONCLAD_BOSS_NORMAL_ENCOUNTER.loss": "{character} został złamany przez [gold]Pancernika[/gold].",
+  "SILENT_BOSS_NORMAL_ENCOUNTER.title": "Zjawa",
+  "SILENT_BOSS_NORMAL_ENCOUNTER.loss": "Do końca {character} nie dostrzegł sylwetki [gold]Zjawy[/gold].",
+  "SILENT_ENVENOM_BOSS_NORMAL_ENCOUNTER.title": "Zjawa",
+  "SILENT_ENVENOM_BOSS_NORMAL_ENCOUNTER.loss": "Trucizna [gold]Zjawy[/gold] wypiła {character} do dna.",
+  "SILENT_SLY_BOSS_NORMAL_ENCOUNTER.title": "Zjawa",
+  "SILENT_SLY_BOSS_NORMAL_ENCOUNTER.loss": "[gold]Zjawa[/gold] wrzuciła {character} do stosu kart odrzuconych.",
+  "SILENT_SHIV_BOSS_NORMAL_ENCOUNTER.title": "Zjawa",
+  "SILENT_SHIV_BOSS_NORMAL_ENCOUNTER.loss": "{character} utonął w deszczu ostrzy [gold]Zjawy[/gold].",
+  "DEFECT_BOSS_NORMAL_ENCOUNTER.title": "Defekt",
+  "DEFECT_BOSS_NORMAL_ENCOUNTER.loss": "{character} został przeanalizowany i usunięty przez [gold]Defekta[/gold].",
+  "NECROBINDER_BOSS_NORMAL_ENCOUNTER.title": "Nekromantka",
+  "NECROBINDER_BOSS_NORMAL_ENCOUNTER.loss": "Duszę {character} zagarnęła [gold]Nekromantka[/gold].",
+  "REGENT_BOSS_NORMAL_ENCOUNTER.title": "Monarcha",
+  "REGENT_BOSS_NORMAL_ENCOUNTER.loss": "[gold]Monarcha[/gold] wydał na {character} wyrok.",
+
+  "TELEMETRY_PROMPT_HEADER": "Przesyłanie danych z rozgrywki (CharacterBosses)",
+  "TELEMETRY_PROMPT_BODY": "Ten mod chce zbierać część danych z rozgrywki, aby naprawiać błędy i balansować siłę bossów:\nwynik każdej walki z bossem, akt/walka, wniebowstąpienie, liczba graczy, PŻ bossa, liczba tur i ziarno, a także własne linie błędów tego moda.\n\nDane najpierw zapisywane są w [b]pliku lokalnym[/b]; jeśli autor skonfigurował serwer zbierania, te same anonimowe dane [b]są dodatkowo wysyłane[/b] autorowi.\n\nŻadne dane osobowe nie są zbierane (bez SteamID i nicku).\n\nMożesz to zmienić w każdej chwili w „Konfiguracja modów → CharacterBosses → A5”. Włączyć teraz?",
+  "TELEMETRY_PROMPT_YES": "Włącz",
+  "TELEMETRY_PROMPT_NO": "Zostaw wyłączone",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.title":  "The Necrobinder",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character} was dragged into the grave by the [gold]Necrobinder[/gold]\u0027s Osty.",
+    "SILENT_SNECKO_BOSS_ENCOUNTER.title":  "The Silent",
+    "SILENT_SNECKO_BOSS_ENCOUNTER.loss":  "{character} was sent to the grave by the [gold]Silent[/gold]\u0027s dice.",
+  "DEFECT_EVENT_BOSS_ENCOUNTER.loss": "[gold]Defekt[/gold] wyciągnął {character} ze stosu kart odrzuconych.",
+  "DEFECT_EVENT_BOSS_ENCOUNTER.title": "Defekt"
+}

@@ -1,0 +1,738 @@
+﻿// ===== MegaCrit.Sts2.Core.Models.PowerModel =====
+using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Godot;
+using MegaCrit.Sts2.Core.Assets;
+using MegaCrit.Sts2.Core.Combat;
+using MegaCrit.Sts2.Core.Context;
+using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.Entities.Powers;
+using MegaCrit.Sts2.Core.Helpers;
+using MegaCrit.Sts2.Core.HoverTips;
+using MegaCrit.Sts2.Core.Localization;
+using MegaCrit.Sts2.Core.Localization.DynamicVars;
+using MegaCrit.Sts2.Core.Models.Singleton;
+using MegaCrit.Sts2.Core.Platform;
+using MegaCrit.Sts2.Core.Runs;
+
+namespace MegaCrit.Sts2.Core.Models;
+
+public abstract class PowerModel : AbstractModel
+{
+	public const string locTable = "powers";
+
+	protected static readonly Color _normalAmountLabelColor = StsColors.cream;
+
+	protected static readonly Color _debuffAmountLabelColor = StsColors.red;
+
+	private string? _resolvedBigIconPath;
+
+	[CompilerGenerated]
+	private Action? m_PulsingStarted;
+
+	[CompilerGenerated]
+	private Action? m_PulsingStopped;
+
+	private int _amount;
+
+	private int _amountOnTurnStart;
+
+	[CompilerGenerated]
+	private Action<PowerModel>? m_Flashed;
+
+	[CompilerGenerated]
+	private Action? m_DisplayAmountChanged;
+
+	[CompilerGenerated]
+	private Action? m_Removed;
+
+	private bool _skipNextDurationTick;
+
+	private Creature? _owner;
+
+	private Creature? _applier;
+
+	private Creature? _target;
+
+	private DynamicVarSet? _dynamicVars;
+
+	private object? _internalData;
+
+	private PowerModel _canonicalInstance;
+
+	public virtual LocString Title => new LocString("powers", base.Id.Entry + ".title");
+
+	public virtual LocString Description => new LocString("powers", base.Id.Entry + ".description");
+
+	public LocString SmartDescription
+	{
+		get
+		{
+			if (!HasSmartDescription)
+			{
+				return Description;
+			}
+			return new LocString("powers", SmartDescriptionLocKey);
+		}
+	}
+
+	public bool HasSmartDescription => LocString.Exists("powers", SmartDescriptionLocKey);
+
+	public LocString RemoteDescription
+	{
+		get
+		{
+			if (!HasRemoteDescription)
+			{
+				return Description;
+			}
+			return new LocString("powers", RemoteDescriptionLocKey);
+		}
+	}
+
+	public bool HasRemoteDescription => LocString.Exists("powers", RemoteDescriptionLocKey);
+
+	protected virtual string RemoteDescriptionLocKey => base.Id.Entry + ".remoteDescription";
+
+	protected virtual string SmartDescriptionLocKey => base.Id.Entry + ".smartDescription";
+
+	protected LocString SelectionScreenPrompt
+	{
+		get
+		{
+			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+			LocString locString = new LocString("powers", base.Id.Entry + ".selectionScreenPrompt");
+			if (!locString.Exists())
+			{
+				throw new InvalidOperationException($"No selection screen prompt for {base.Id}.");
+			}
+			DynamicVars.AddTo(locString);
+			locString.Add("Amount", decimal.op_Implicit(Amount));
+			return locString;
+		}
+	}
+
+	public string PackedIconPath => ImageHelper.GetImagePath("atlases/power_atlas.sprites/" + base.Id.Entry.ToLowerInvariant() + ".tres");
+
+	private string BigIconPath => ImageHelper.GetImagePath("powers/" + base.Id.Entry.ToLowerInvariant() + ".png");
+
+	private string BigBetaIconPath => ImageHelper.GetImagePath("powers/beta/" + base.Id.Entry.ToLowerInvariant() + ".png");
+
+	private static string MissingIconPath => ImageHelper.GetImagePath("powers/missing_power.png");
+
+	public string IconPath => PackedIconPath;
+
+	public Texture2D Icon => ResourceLoader.Load<Texture2D>(PackedIconPath, null, ResourceLoader.CacheMode.Reuse);
+
+	public Texture2D BigIcon => PreloadManager.Cache.GetTexture2D(ResolvedBigIconPath);
+
+	public string ResolvedBigIconPath
+	{
+		get
+		{
+			if (_resolvedBigIconPath != null)
+			{
+				return _resolvedBigIconPath;
+			}
+			if (ResourceLoader.Exists(BigIconPath))
+			{
+				_resolvedBigIconPath = BigIconPath;
+			}
+			else if (ResourceLoader.Exists(BigBetaIconPath))
+			{
+				_resolvedBigIconPath = BigBetaIconPath;
+			}
+			else
+			{
+				_resolvedBigIconPath = MissingIconPath;
+			}
+			return _resolvedBigIconPath;
+		}
+	}
+
+	public abstract PowerType Type { get; }
+
+	public virtual PowerInstanceType InstanceType => PowerInstanceType.None;
+
+	public bool IsVisible
+	{
+		get
+		{
+			if (Target == null || LocalContext.IsMe(Target) || Target.IsEnemy)
+			{
+				return IsVisibleInternal;
+			}
+			return false;
+		}
+	}
+
+	protected virtual bool IsVisibleInternal => true;
+
+	public virtual bool ShouldPlayVfx
+	{
+		get
+		{
+			Creature owner = Owner;
+			if (owner != null && owner.IsAlive && CombatManager.Instance.IsInProgress)
+			{
+				return IsVisible;
+			}
+			return false;
+		}
+	}
+
+	public int Amount
+	{
+		get
+		{
+			return _amount;
+		}
+		private set
+		{
+			SetAmount(value);
+		}
+	}
+
+	public int AmountOnTurnStart
+	{
+		get
+		{
+			return _amountOnTurnStart;
+		}
+		set
+		{
+			AssertMutable();
+			_amountOnTurnStart = value;
+		}
+	}
+
+	public virtual int DisplayAmount => Amount;
+
+	public virtual Color AmountLabelColor
+	{
+		get
+		{
+			if (GetTypeForAmount(decimal.op_Implicit(Amount)) != PowerType.Debuff)
+			{
+				return _normalAmountLabelColor;
+			}
+			return _debuffAmountLabelColor;
+		}
+	}
+
+	public abstract PowerStackType StackType { get; }
+
+	public virtual bool AllowNegative => false;
+
+	public PowerType TypeForCurrentAmount => GetTypeForAmount(decimal.op_Implicit(Amount));
+
+	public bool SkipNextDurationTick
+	{
+		get
+		{
+			return _skipNextDurationTick;
+		}
+		set
+		{
+			AssertMutable();
+			_skipNextDurationTick = value;
+		}
+	}
+
+	public Creature Owner
+	{
+		get
+		{
+			AssertMutable();
+			return _owner;
+		}
+		private set
+		{
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			AssertMutable();
+			if (_owner != null && _owner != value)
+			{
+				throw new InvalidOperationException("Cannot move power " + base.Id.Entry + " from one owner to another");
+			}
+			_owner = value;
+		}
+	}
+
+	public ICombatState CombatState => Owner.CombatState;
+
+	public Creature? Applier
+	{
+		get
+		{
+			return _applier;
+		}
+		set
+		{
+			AssertMutable();
+			_applier = value;
+		}
+	}
+
+	public Creature? Target
+	{
+		get
+		{
+			return _target;
+		}
+		set
+		{
+			AssertMutable();
+			_target = value;
+		}
+	}
+
+	public DynamicVarSet DynamicVars
+	{
+		get
+		{
+			if (_dynamicVars != null)
+			{
+				return _dynamicVars;
+			}
+			_dynamicVars = new DynamicVarSet(CanonicalVars);
+			_dynamicVars.InitializeWithOwner(this);
+			return _dynamicVars;
+		}
+	}
+
+	public virtual bool ShouldScaleInMultiplayer => false;
+
+	protected virtual System.Collections.Generic.IEnumerable<DynamicVar> CanonicalVars => System.Array.Empty<DynamicVar>();
+
+	public HoverTip DumbHoverTip => GetDumbHoverTip();
+
+	protected virtual System.Collections.Generic.IEnumerable<IHoverTip> ExtraHoverTips => System.Array.Empty<IHoverTip>();
+
+	public System.Collections.Generic.IEnumerable<IHoverTip> HoverTips
+	{
+		get
+		{
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Expected O, but got Unknown
+			List<IHoverTip> val = new List<IHoverTip>();
+			if (!IsVisible)
+			{
+				return (System.Collections.Generic.IEnumerable<IHoverTip>)val;
+			}
+			StringBuilder val2 = new StringBuilder();
+			bool flag = HasSmartDescription && base.IsMutable;
+			if (flag)
+			{
+				LocString locString = SmartDescription;
+				if (Applier != null && !LocalContext.IsMe(Applier) && HasRemoteDescription)
+				{
+					locString = RemoteDescription;
+				}
+				locString.Add("Amount", decimal.op_Implicit(Amount));
+				locString.Add("OnPlayer", Owner.IsPlayer);
+				locString.Add("IsMultiplayer", ((System.Collections.Generic.IReadOnlyCollection<Player>)Owner.CombatState.Players).Count > 1);
+				locString.Add("PlayerCount", decimal.op_Implicit(((System.Collections.Generic.IReadOnlyCollection<Player>)Owner.CombatState.Players).Count));
+				locString.Add("OwnerName", Owner.IsPlayer ? Owner.Player.Character.Title : Owner.Monster.Title);
+				if (Applier != null)
+				{
+					string variable = ((Applier.Monster != null) ? Applier.Monster.Title.GetFormattedText() : ((Applier.Player == null) ? "" : PlatformUtil.GetPlayerName(RunManager.Instance.NetService.Platform, Applier.Player.NetId)));
+					locString.Add("ApplierName", variable);
+				}
+				if (Target != null)
+				{
+					if (Target.IsMonster)
+					{
+						locString.Add("TargetName", Target.Monster.Title);
+					}
+					else
+					{
+						locString.Add("TargetName", PlatformUtil.GetPlayerName(RunManager.Instance.NetService.Platform, Target.Player.NetId));
+					}
+				}
+				AddDumbVariablesToDescription(locString);
+				DynamicVars.AddTo(locString);
+				val2.Append(locString.GetFormattedText());
+			}
+			else
+			{
+				LocString description = Description;
+				AddDumbVariablesToDescription(description);
+				val2.Append(description.GetFormattedText());
+			}
+			val.Add((IHoverTip)new HoverTip(this, ((object)val2).ToString(), flag));
+			val.AddRange(ExtraHoverTips);
+			return (System.Collections.Generic.IEnumerable<IHoverTip>)val;
+		}
+	}
+
+	private PowerModel CanonicalInstance
+	{
+		get
+		{
+			if (!base.IsMutable)
+			{
+				return this;
+			}
+			return _canonicalInstance;
+		}
+		set
+		{
+			AssertMutable();
+			_canonicalInstance = value;
+		}
+	}
+
+	public override bool ShouldReceiveCombatHooks => true;
+
+	public virtual bool OwnerIsSecondaryEnemy => false;
+
+	public event Action PulsingStarted
+	{
+		[CompilerGenerated]
+		add
+		{
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Expected O, but got Unknown
+			Action val = this.m_PulsingStarted;
+			Action val2;
+			do
+			{
+				val2 = val;
+				Action val3 = (Action)System.Delegate.Combine((System.Delegate)(object)val2, (System.Delegate)(object)value);
+				val = Interlocked.CompareExchange<Action>(ref this.m_PulsingStarted, val3, val2);
+			}
+			while (val != val2);
+		}
+		[CompilerGenerated]
+		remove
+		{
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Expected O, but got Unknown
+			Action val = this.m_PulsingStarted;
+			Action val2;
+			do
+			{
+				val2 = val;
+				Action val3 = (Action)System.Delegate.Remove((System.Delegate)(object)val2, (System.Delegate)(object)value);
+				val = Interlocked.CompareExchange<Action>(ref this.m_PulsingStarted, val3, val2);
+			}
+			while (val != val2);
+		}
+	}
+
+	public event Action PulsingStopped
+	{
+		[CompilerGenerated]
+		add
+		{
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Expected O, but got Unknown
+			Action val = this.m_PulsingStopped;
+			Action val2;
+			do
+			{
+				val2 = val;
+				Action val3 = (Action)System.Delegate.Combine((System.Delegate)(object)val2, (System.Delegate)(object)value);
+				val = Interlocked.CompareExchange<Action>(ref this.m_PulsingStopped, val3, val2);
+			}
+			while (val != val2);
+		}
+		[CompilerGenerated]
+		remove
+		{
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Expected O, but got Unknown
+			Action val = this.m_PulsingStopped;
+			Action val2;
+			do
+			{
+				val2 = val;
+				Action val3 = (Action)System.Delegate.Remove((System.Delegate)(object)val2, (System.Delegate)(object)value);
+				val = Interlocked.CompareExchange<Action>(ref this.m_PulsingStopped, val3, val2);
+			}
+			while (val != val2);
+		}
+	}
+
+	public event Action<PowerModel>? Flashed
+	{
+		[CompilerGenerated]
+		add
+		{
+			Action<PowerModel> val = this.m_Flashed;
+			Action<PowerModel> val2;
+			do
+			{
+				val2 = val;
+				Action<PowerModel> val3 = (Action<PowerModel>)(object)System.Delegate.Combine((System.Delegate)(object)val2, (System.Delegate)(object)value);
+				val = Interlocked.CompareExchange<Action<PowerModel>>(ref this.m_Flashed, val3, val2);
+			}
+			while (val != val2);
+		}
+		[CompilerGenerated]
+		remove
+		{
+			Action<PowerModel> val = this.m_Flashed;
+			Action<PowerModel> val2;
+			do
+			{
+				val2 = val;
+				Action<PowerModel> val3 = (Action<PowerModel>)(object)System.Delegate.Remove((System.Delegate)(object)val2, (System.Delegate)(object)value);
+				val = Interlocked.CompareExchange<Action<PowerModel>>(ref this.m_Flashed, val3, val2);
+			}
+			while (val != val2);
+		}
+	}
+
+	public event Action DisplayAmountChanged
+	{
+		[CompilerGenerated]
+		add
+		{
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Expected O, but got Unknown
+			Action val = this.m_DisplayAmountChanged;
+			Action val2;
+			do
+			{
+				val2 = val;
+				Action val3 = (Action)System.Delegate.Combine((System.Delegate)(object)val2, (System.Delegate)(object)value);
+				val = Interlocked.CompareExchange<Action>(ref this.m_DisplayAmountChanged, val3, val2);
+			}
+			while (val != val2);
+		}
+		[CompilerGenerated]
+		remove
+		{
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Expected O, but got Unknown
+			Action val = this.m_DisplayAmountChanged;
+			Action val2;
+			do
+			{
+				val2 = val;
+				Action val3 = (Action)System.Delegate.Remove((System.Delegate)(object)val2, (System.Delegate)(object)value);
+				val = Interlocked.CompareExchange<Action>(ref this.m_DisplayAmountChanged, val3, val2);
+			}
+			while (val != val2);
+		}
+	}
+
+	public event Action Removed
+	{
+		[CompilerGenerated]
+		add
+		{
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Expected O, but got Unknown
+			Action val = this.m_Removed;
+			Action val2;
+			do
+			{
+				val2 = val;
+				Action val3 = (Action)System.Delegate.Combine((System.Delegate)(object)val2, (System.Delegate)(object)value);
+				val = Interlocked.CompareExchange<Action>(ref this.m_Removed, val3, val2);
+			}
+			while (val != val2);
+		}
+		[CompilerGenerated]
+		remove
+		{
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Expected O, but got Unknown
+			Action val = this.m_Removed;
+			Action val2;
+			do
+			{
+				val2 = val;
+				Action val3 = (Action)System.Delegate.Remove((System.Delegate)(object)val2, (System.Delegate)(object)value);
+				val = Interlocked.CompareExchange<Action>(ref this.m_Removed, val3, val2);
+			}
+			while (val != val2);
+		}
+	}
+
+	public void StartPulsing()
+	{
+		Action? obj = this.PulsingStarted;
+		if (obj != null)
+		{
+			obj.Invoke();
+		}
+	}
+
+	public void StopPulsing()
+	{
+		Action? obj = this.PulsingStopped;
+		if (obj != null)
+		{
+			obj.Invoke();
+		}
+	}
+
+	protected void Flash()
+	{
+		this.Flashed?.Invoke(this);
+	}
+
+	protected void InvokeDisplayAmountChanged()
+	{
+		Action? obj = this.DisplayAmountChanged;
+		if (obj != null)
+		{
+			obj.Invoke();
+		}
+	}
+
+	public PowerType GetTypeForAmount(decimal customAmount)
+	{
+		if (((object)StackType/*cast due to .constrained prefix*/).Equals((object)PowerStackType.Counter) && AllowNegative && customAmount < 0m)
+		{
+			return PowerType.Debuff;
+		}
+		if (!AllowNegative && ((object)Type/*cast due to .constrained prefix*/).Equals((object)PowerType.Debuff) && customAmount < 0m)
+		{
+			return PowerType.Buff;
+		}
+		return Type;
+	}
+
+	public bool ShouldRemoveDueToAmount()
+	{
+		if (AllowNegative || Amount > 0)
+		{
+			if (AllowNegative)
+			{
+				return Amount == 0;
+			}
+			return false;
+		}
+		return true;
+	}
+
+	public virtual decimal GetScaledAmountForMultiplayer(ICombatState combatState, Creature? applier, decimal amount, Creature target, CardModel? cardSource)
+	{
+		return amount * decimal.op_Implicit(((System.Collections.Generic.IReadOnlyCollection<Player>)combatState.Players).Count) * MultiplayerScalingModel.GetMultiplayerScaling(combatState.Encounter, combatState.RunState.CurrentActIndex);
+	}
+
+	protected virtual object? InitInternalData()
+	{
+		return null;
+	}
+
+	protected T GetInternalData<T>()
+	{
+		return (T)_internalData;
+	}
+
+	public HoverTip GetDumbHoverTip(int? amountOverride = null)
+	{
+		LocString description = Description;
+		AddDumbVariablesToDescription(description, amountOverride);
+		return new HoverTip(this, description.GetFormattedText(), isSmart: false);
+	}
+
+	private void AddDumbVariablesToDescription(LocString description, int? amountOverride = null)
+	{
+		description.Add("Amount", decimal.op_Implicit(amountOverride ?? Amount));
+		description.Add("singleStarIcon", "[img]res://images/packed/sprite_fonts/star_icon.png[/img]");
+		description.Add("energyPrefix", EnergyIconHelper.GetPrefix(this));
+	}
+
+	public void SetAmount(int amount, bool silent = false)
+	{
+		AssertMutable();
+		amount = Math.Clamp(amount, -999999999, 999999999);
+		int num = amount - _amount;
+		if (num != 0)
+		{
+			_amount = amount;
+			Action? obj = this.DisplayAmountChanged;
+			if (obj != null)
+			{
+				obj.Invoke();
+			}
+			Owner.InvokePowerModified(this, num, silent);
+		}
+	}
+
+	public PowerModel ToMutable(int initialAmount = 0)
+	{
+		AssertCanonical();
+		PowerModel powerModel = (PowerModel)MutableClone();
+		powerModel.CanonicalInstance = this;
+		powerModel.Amount = initialAmount;
+		return powerModel;
+	}
+
+	public void ApplyInternal(Creature owner, decimal amount, bool silent = false)
+	{
+		if (!(amount == 0m))
+		{
+			AssertMutable();
+			Owner = owner;
+			SetAmount((int)amount, silent);
+			Owner.ApplyPowerInternal(this);
+		}
+	}
+
+	public void RemoveInternal()
+	{
+		AssertMutable();
+		Action? obj = this.Removed;
+		if (obj != null)
+		{
+			obj.Invoke();
+		}
+		Owner.RemovePowerInternal(this);
+	}
+
+	protected override void DeepCloneFields()
+	{
+		base.DeepCloneFields();
+		_dynamicVars = DynamicVars.Clone(this);
+		_internalData = InitInternalData();
+	}
+
+	protected override void AfterCloned()
+	{
+		base.AfterCloned();
+		this.Flashed = null;
+		this.DisplayAmountChanged = null;
+		this.Removed = null;
+		this.PulsingStarted = null;
+		this.PulsingStopped = null;
+		_owner = null;
+	}
+
+	public virtual System.Threading.Tasks.Task BeforeApplied(Creature target, decimal amount, Creature? applier, CardModel? cardSource)
+	{
+		return System.Threading.Tasks.Task.CompletedTask;
+	}
+
+	public virtual System.Threading.Tasks.Task AfterApplied(Creature? applier, CardModel? cardSource)
+	{
+		return System.Threading.Tasks.Task.CompletedTask;
+	}
+
+	public virtual System.Threading.Tasks.Task AfterRemoved(Creature oldOwner)
+	{
+		return System.Threading.Tasks.Task.CompletedTask;
+	}
+
+	public virtual bool ShouldPowerBeRemovedAfterOwnerDeath()
+	{
+		return true;
+	}
+
+	public virtual bool ShouldOwnerDeathTriggerFatal()
+	{
+		return true;
+	}
+}
+

@@ -1,0 +1,103 @@
+{
+  "IRONCLAD_BOSS_ENCOUNTER.title": "铁甲战士",
+  "IRONCLAD_BOSS_ENCOUNTER.loss": "{character} 被[gold]铁甲战士[/gold]击溃了。",
+
+  "IRONCLAD_ANGER_BOSS_ENCOUNTER.title": "铁甲战士",
+  "IRONCLAD_ANGER_BOSS_ENCOUNTER.loss": "{character} 被[gold]铁甲战士[/gold]的怒火烧成了灰。",
+
+  "IRONCLAD_VULN_BOSS_ENCOUNTER.title": "铁甲战士",
+  "IRONCLAD_VULN_BOSS_ENCOUNTER.loss": "{character} 被[gold]铁甲战士[/gold]一层层撕开了伤口。",
+
+  "SILENT_BOSS_ENCOUNTER.title": "静默猎手",
+  "SILENT_BOSS_ENCOUNTER.loss": "{character} 至死都没看清[gold]静默猎手[/gold]的身影。",
+
+  "SILENT_ENVENOM_BOSS_ENCOUNTER.title": "静默猎手",
+  "SILENT_ENVENOM_BOSS_ENCOUNTER.loss": "{character} 被[gold]静默猎手[/gold]的毒耗尽了。",
+
+  "SILENT_SHIV_BOSS_ENCOUNTER.title": "静默猎手",
+  "SILENT_SHIV_BOSS_ENCOUNTER.loss": "{character} 被[gold]静默猎手[/gold]的刀雨淹没了。",
+
+  "SILENT_SLY_BOSS_ENCOUNTER.title": "静默猎手",
+  "SILENT_SLY_BOSS_ENCOUNTER.loss": "{character} 被[gold]静默猎手[/gold]丢进了弃牌堆。",
+
+  "SILENT_BREWER_BOSS_ENCOUNTER.title": "静默猎手",
+  "SILENT_BREWER_BOSS_ENCOUNTER.loss": "{character}没能击穿[gold]静默猎手[/gold]用药水构筑的屏障。",
+
+  "DEFECT_BOSS_ENCOUNTER.title": "故障机器人",
+  "DEFECT_BOSS_ENCOUNTER.loss": "{character} 被[gold]故障机器人[/gold]分析并删除了。",
+
+  "DEFECT_AI_BOSS_ENCOUNTER.title": "故障机器人",
+  "DEFECT_AI_BOSS_ENCOUNTER.loss": "{character} 的每一张牌都被[gold]故障机器人[/gold]算进了模型。",
+
+  "DEFECT_CLAW_BOSS_ENCOUNTER.title": "故障机器人",
+  "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character}被[gold]故障机器人[/gold]的超能光束湮灭了。",
+
+  "NECROBINDER_BOSS_ENCOUNTER.title": "亡灵契约师",
+  "NECROBINDER_BOSS_ENCOUNTER.loss": "{character} 的灵魂被[gold]亡灵契约师[/gold]收走了。",
+
+  "NECROBINDER_DOOM_BOSS_ENCOUNTER.title": "亡灵契约师",
+  "NECROBINDER_DOOM_BOSS_ENCOUNTER.loss": "[gold]亡灵契约师[/gold]将{character}召唤到了灾厄的末路。",
+
+  "NECROBINDER_SOUL_BOSS_ENCOUNTER.title": "亡灵契约师",
+  "NECROBINDER_SOUL_BOSS_ENCOUNTER.loss": "{character} 的灵魂被[gold]亡灵契约师[/gold]收走了。",
+
+  "NECROBINDER_ERADICATE_BOSS_ENCOUNTER.title": "亡灵契约师",
+  "NECROBINDER_ERADICATE_BOSS_ENCOUNTER.loss": "{character} 连同记忆一起被[gold]亡灵契约师[/gold]根除了。",
+
+  "REGENT_BOSS_ENCOUNTER.title": "储君",
+  "REGENT_BOSS_ENCOUNTER.loss": "{character} 被[gold]储君[/gold]判决了。",
+
+  "REGENT_DEBRIS_BOSS_ENCOUNTER.title": "储君",
+  "REGENT_DEBRIS_BOSS_ENCOUNTER.loss": "{character} 被[gold]储君[/gold]的碎屑掩埋了。",
+
+  "REGENT_FORGE_BOSS_ENCOUNTER.title": "储君",
+  "REGENT_FORGE_BOSS_ENCOUNTER.loss": "{character} 成了[gold]储君[/gold]剑上的一道痕。",
+
+  "REGENT_COLORLESS_BOSS_ENCOUNTER.title": "储君",
+  "REGENT_COLORLESS_BOSS_ENCOUNTER.loss": "{character} 被[gold]储君[/gold]褪去了颜色。",
+
+  "REGENT_STAR_BOSS_ENCOUNTER.title": "储君",
+  "REGENT_STAR_BOSS_ENCOUNTER.loss": "{character} 被[gold]储君[/gold]的辉星碾成了尘埃。",
+
+  "REGENT_KING_BOSS_ENCOUNTER.title": "储君",
+  "REGENT_KING_BOSS_ENCOUNTER.loss": "{character} 被[gold]储君[/gold]的王权碾碎了。",
+
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.title": "铁甲战士",
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "{character} 被[gold]铁甲战士[/gold]越打越强的力量碾碎了。",
+
+    "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.title": "铁甲战士",
+  "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss": "{character} 被[gold]铁甲战士[/gold]耍得团团转，最后被自己的复制品淹没。",
+"IRONCLAD_BOULDER_BOSS_ENCOUNTER.title": "铁甲战士",
+  "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss": "{character} 被[gold]铁甲战士[/gold]用巨石碾成了碎片。",
+
+  "DEFECT_DARK_BOSS_ENCOUNTER.title": "故障机器人",
+  "DEFECT_DARK_BOSS_ENCOUNTER.loss": "{character} 被[gold]故障机器人[/gold]的暗黑充能球吞噬了。",
+
+  "IRONCLAD_BOSS_NORMAL_ENCOUNTER.title": "铁甲战士",
+  "IRONCLAD_BOSS_NORMAL_ENCOUNTER.loss": "{character} 被[gold]铁甲战士[/gold]击溃了。",
+  "SILENT_BOSS_NORMAL_ENCOUNTER.title": "静默猎手",
+  "SILENT_BOSS_NORMAL_ENCOUNTER.loss": "{character} 至死都没看清[gold]静默猎手[/gold]的身影。",
+  "SILENT_ENVENOM_BOSS_NORMAL_ENCOUNTER.title": "静默猎手",
+  "SILENT_ENVENOM_BOSS_NORMAL_ENCOUNTER.loss": "{character} 被[gold]静默猎手[/gold]的毒耗尽了。",
+  "SILENT_SLY_BOSS_NORMAL_ENCOUNTER.title": "静默猎手",
+  "SILENT_SLY_BOSS_NORMAL_ENCOUNTER.loss": "{character} 被[gold]静默猎手[/gold]丢进了弃牌堆。",
+  "SILENT_SHIV_BOSS_NORMAL_ENCOUNTER.title": "静默猎手",
+  "SILENT_SHIV_BOSS_NORMAL_ENCOUNTER.loss": "{character} 被[gold]静默猎手[/gold]的刀雨淹没了。",
+  "DEFECT_BOSS_NORMAL_ENCOUNTER.title": "故障机器人",
+  "DEFECT_BOSS_NORMAL_ENCOUNTER.loss": "{character} 被[gold]故障机器人[/gold]分析并删除了。",
+  "NECROBINDER_BOSS_NORMAL_ENCOUNTER.title": "亡灵契约师",
+  "NECROBINDER_BOSS_NORMAL_ENCOUNTER.loss": "{character} 的灵魂被[gold]亡灵契约师[/gold]收走了。",
+  "REGENT_BOSS_NORMAL_ENCOUNTER.title": "储君",
+  "REGENT_BOSS_NORMAL_ENCOUNTER.loss": "{character} 被[gold]储君[/gold]判决了。",
+
+  "TELEMETRY_PROMPT_HEADER": "上传游戏数据（CharacterBosses）",
+  "TELEMETRY_PROMPT_BODY": "本模组想收集一些游玩数据，用来修复 bug 和作为平衡 Boss 强度的依据：\n每场 Boss 战的胜负、幕/场、进阶、人数、Boss 血量、回合数与种子，以及本模组自己的报错行。\n\n数据会先保存在[b]本机文件[/b]；如果作者配置了收集服务器，会[b]同时上传这些匿名数据[/b]给作者。\n\n任何个人信息都不会被收集（不写 SteamID / 昵称）。\n\n随时可在「模组配置 → CharacterBosses → A5」更改。要现在开启吗？",
+  "TELEMETRY_PROMPT_YES": "开启",
+  "TELEMETRY_PROMPT_NO": "保持关闭",
+  "NECROBINDER_OSTY_BOSS_ENCOUNTER.title": "亡灵契约师",
+  "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss": "{character} 被[gold]亡灵契约师[/gold]的奥斯提拖进了坟墓。",
+  "SILENT_SNECKO_BOSS_ENCOUNTER.title": "静默猎手",
+  "SILENT_SNECKO_BOSS_ENCOUNTER.loss": "{character} 被[gold]静默猎手[/gold]掷出的骰子送进了坟墓。",
+  "DEFECT_EVENT_BOSS_ENCOUNTER.loss": "{character} 被[gold]故障机器人[/gold]从弃牌堆里翻了回来。",
+  "DEFECT_EVENT_BOSS_ENCOUNTER.title": "故障机器人"
+}

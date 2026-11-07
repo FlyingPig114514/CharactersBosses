@@ -1,0 +1,6 @@
+﻿MegaCrit.Sts2.Core.Nodes.Screens.Overlays.IOverlayScreen
+MegaCrit.Sts2.Core.Nodes.Screens.Overlays.NOverlayStack
+MegaCrit.Sts2.Core.Nodes.Screens.Overlays.NOverlayStack.ChangedEventHandler
+MegaCrit.Sts2.Core.Nodes.Screens.Overlays.NOverlayStack.MethodName
+MegaCrit.Sts2.Core.Nodes.Screens.Overlays.NOverlayStack.PropertyName
+MegaCrit.Sts2.Core.Nodes.Screens.Overlays.NOverlayStack.SignalName

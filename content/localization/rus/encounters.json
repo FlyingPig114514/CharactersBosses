@@ -1,0 +1,103 @@
+{
+  "IRONCLAD_BOSS_ENCOUNTER.title": "Латоносец",
+  "IRONCLAD_BOSS_ENCOUNTER.loss": "{character} был сломлен [gold]Латоносцем[/gold].",
+
+  "IRONCLAD_ANGER_BOSS_ENCOUNTER.title": "Латоносец",
+  "IRONCLAD_ANGER_BOSS_ENCOUNTER.loss": "{character} сгорел в пепел от ярости [gold]Латоносца[/gold].",
+
+  "IRONCLAD_VULN_BOSS_ENCOUNTER.title": "Латоносец",
+  "IRONCLAD_VULN_BOSS_ENCOUNTER.loss": "Слой за слоем [gold]Латоносец[/gold] вскрывал {character}.",
+
+  "SILENT_BOSS_ENCOUNTER.title": "Безмолвная",
+  "SILENT_BOSS_ENCOUNTER.loss": "До самого конца {character} так и не разглядел силуэт [gold]Безмолвной[/gold].",
+
+  "SILENT_ENVENOM_BOSS_ENCOUNTER.title": "Безмолвная",
+  "SILENT_ENVENOM_BOSS_ENCOUNTER.loss": "Яд [gold]Безмолвной[/gold] выпил {character} до дна.",
+
+  "SILENT_SHIV_BOSS_ENCOUNTER.title": "Безмолвная",
+  "SILENT_SHIV_BOSS_ENCOUNTER.loss": "{character} захлебнулся в дожде клинков [gold]Безмолвной[/gold].",
+
+  "SILENT_SLY_BOSS_ENCOUNTER.title": "Безмолвная",
+  "SILENT_SLY_BOSS_ENCOUNTER.loss": "[gold]Безмолвная[/gold] отправила {character} в стопку сброса.",
+
+  "SILENT_BREWER_BOSS_ENCOUNTER.title": "Безмолвная",
+  "SILENT_BREWER_BOSS_ENCOUNTER.loss": "{character} не смог пробить барьер, возведенный зельями [gold]Безмолвной[/gold].",
+
+  "DEFECT_BOSS_ENCOUNTER.title": "Дефект",
+  "DEFECT_BOSS_ENCOUNTER.loss": "{character} был проанализирован и удален [gold]Дефектом[/gold].",
+
+  "DEFECT_AI_BOSS_ENCOUNTER.title": "Дефект",
+  "DEFECT_AI_BOSS_ENCOUNTER.loss": "Каждая карта, разыгранная {character}, была учтена в модели [gold]Дефекта[/gold].",
+
+  "DEFECT_CLAW_BOSS_ENCOUNTER.title": "Дефект",
+  "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character} был испепелен «Гиперлучом» [gold]Дефекта[/gold].",
+
+  "NECROBINDER_BOSS_ENCOUNTER.title": "Призывающая",
+  "NECROBINDER_BOSS_ENCOUNTER.loss": "Душу {character} забрала [gold]Призывающая[/gold].",
+
+  "NECROBINDER_DOOM_BOSS_ENCOUNTER.title": "Призывающая",
+  "NECROBINDER_DOOM_BOSS_ENCOUNTER.loss": "[gold]Призывающая[/gold] поманила {character} к самому краю злого рока.",
+
+  "NECROBINDER_SOUL_BOSS_ENCOUNTER.title": "Призывающая",
+  "NECROBINDER_SOUL_BOSS_ENCOUNTER.loss": "Душу {character} забрала [gold]Призывающая[/gold].",
+
+  "NECROBINDER_ERADICATE_BOSS_ENCOUNTER.title": "Призывающая",
+  "NECROBINDER_ERADICATE_BOSS_ENCOUNTER.loss": "[gold]Призывающая[/gold] истребила {character} вместе с памятью о нем.",
+
+  "REGENT_BOSS_ENCOUNTER.title": "Наследник",
+  "REGENT_BOSS_ENCOUNTER.loss": "[gold]Наследник[/gold] вынес {character} приговор.",
+
+  "REGENT_DEBRIS_BOSS_ENCOUNTER.title": "Наследник",
+  "REGENT_DEBRIS_BOSS_ENCOUNTER.loss": "{character} был погребен под обломками [gold]Наследника[/gold].",
+
+  "REGENT_FORGE_BOSS_ENCOUNTER.title": "Наследник",
+  "REGENT_FORGE_BOSS_ENCOUNTER.loss": "{character} стал зазубриной на клинке [gold]Наследника[/gold].",
+
+  "REGENT_COLORLESS_BOSS_ENCOUNTER.title": "Наследник",
+  "REGENT_COLORLESS_BOSS_ENCOUNTER.loss": "[gold]Наследник[/gold] лишил {character} всех красок.",
+
+  "REGENT_STAR_BOSS_ENCOUNTER.title": "Наследник",
+  "REGENT_STAR_BOSS_ENCOUNTER.loss": "{character} был стерт в пыль сияющими звездами [gold]Наследника[/gold].",
+
+  "REGENT_KING_BOSS_ENCOUNTER.title": "Наследник",
+  "REGENT_KING_BOSS_ENCOUNTER.loss": "{character} был раздавлен властью [gold]Наследника[/gold].",
+
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.title": "Латоносец",
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "{character} был раздавлен растущей силой [gold]Латоносца[/gold].",
+
+    "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.title": "Латоносец",
+  "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss": "[gold]Латоносец[/gold] жонглировал {character}, пока того не погребли его собственные копии.",
+"IRONCLAD_BOULDER_BOSS_ENCOUNTER.title": "Латоносец",
+  "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss": "{character} был растерт в крошку булыжниками [gold]Латоносца[/gold].",
+
+  "DEFECT_DARK_BOSS_ENCOUNTER.title": "Дефект",
+  "DEFECT_DARK_BOSS_ENCOUNTER.loss": "{character} был поглощен сферами тьмы [gold]Дефекта[/gold].",
+
+  "IRONCLAD_BOSS_NORMAL_ENCOUNTER.title": "Латоносец",
+  "IRONCLAD_BOSS_NORMAL_ENCOUNTER.loss": "{character} был сломлен [gold]Латоносцем[/gold].",
+  "SILENT_BOSS_NORMAL_ENCOUNTER.title": "Безмолвная",
+  "SILENT_BOSS_NORMAL_ENCOUNTER.loss": "До самого конца {character} так и не разглядел силуэт [gold]Безмолвной[/gold].",
+  "SILENT_ENVENOM_BOSS_NORMAL_ENCOUNTER.title": "Безмолвная",
+  "SILENT_ENVENOM_BOSS_NORMAL_ENCOUNTER.loss": "Яд [gold]Безмолвной[/gold] выпил {character} до дна.",
+  "SILENT_SLY_BOSS_NORMAL_ENCOUNTER.title": "Безмолвная",
+  "SILENT_SLY_BOSS_NORMAL_ENCOUNTER.loss": "[gold]Безмолвная[/gold] отправила {character} в стопку сброса.",
+  "SILENT_SHIV_BOSS_NORMAL_ENCOUNTER.title": "Безмолвная",
+  "SILENT_SHIV_BOSS_NORMAL_ENCOUNTER.loss": "{character} захлебнулся в дожде клинков [gold]Безмолвной[/gold].",
+  "DEFECT_BOSS_NORMAL_ENCOUNTER.title": "Дефект",
+  "DEFECT_BOSS_NORMAL_ENCOUNTER.loss": "{character} был проанализирован и удален [gold]Дефектом[/gold].",
+  "NECROBINDER_BOSS_NORMAL_ENCOUNTER.title": "Призывающая",
+  "NECROBINDER_BOSS_NORMAL_ENCOUNTER.loss": "Душу {character} забрала [gold]Призывающая[/gold].",
+  "REGENT_BOSS_NORMAL_ENCOUNTER.title": "Наследник",
+  "REGENT_BOSS_NORMAL_ENCOUNTER.loss": "[gold]Наследник[/gold] вынес {character} приговор.",
+
+  "TELEMETRY_PROMPT_HEADER": "Отправка игровых данных (CharacterBosses)",
+  "TELEMETRY_PROMPT_BODY": "Этот мод хочет собрать немного игровых данных, чтобы исправлять ошибки и балансировать силу боссов:\nрезультат каждой битвы с боссом, акт/бой, возвышение, число игроков, ОЗ босса, число ходов и сид, а также строки ошибок самого мода.\n\nДанные сначала сохраняются в [b]локальный файл[/b]; если автор настроил сервер сбора, те же анонимные данные [b]дополнительно отправляются[/b] автору.\n\nНикакая личная информация не собирается (SteamID и ник не записываются).\n\nЭто можно изменить в любой момент в «Настройки мода → CharacterBosses → A5». Включить сейчас?",
+  "TELEMETRY_PROMPT_YES": "Включить",
+  "TELEMETRY_PROMPT_NO": "Оставить выключенным",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.title":  "The Necrobinder",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character} was dragged into the grave by the [gold]Necrobinder[/gold]\u0027s Osty.",
+    "SILENT_SNECKO_BOSS_ENCOUNTER.title":  "The Silent",
+    "SILENT_SNECKO_BOSS_ENCOUNTER.loss":  "{character} was sent to the grave by the [gold]Silent[/gold]\u0027s dice.",
+  "DEFECT_EVENT_BOSS_ENCOUNTER.loss": "[gold]Дефект[/gold] вытащил {character} обратно из стопки сброса.",
+  "DEFECT_EVENT_BOSS_ENCOUNTER.title": "Дефект"
+}

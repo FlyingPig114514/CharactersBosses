@@ -1,0 +1,103 @@
+{
+  "IRONCLAD_BOSS_ENCOUNTER.title": "O Rígido",
+  "IRONCLAD_BOSS_ENCOUNTER.loss": "{character} foi despedaçado por [gold]O Rígido[/gold].",
+
+  "IRONCLAD_ANGER_BOSS_ENCOUNTER.title": "O Rígido",
+  "IRONCLAD_ANGER_BOSS_ENCOUNTER.loss": "{character} virou cinzas com a fúria de [gold]O Rígido[/gold].",
+
+  "IRONCLAD_VULN_BOSS_ENCOUNTER.title": "O Rígido",
+  "IRONCLAD_VULN_BOSS_ENCOUNTER.loss": "[gold]O Rígido[/gold] abriu as feridas de {character} camada por camada.",
+
+  "SILENT_BOSS_ENCOUNTER.title": "A Sorrateira",
+  "SILENT_BOSS_ENCOUNTER.loss": "{character} morreu sem nunca ver [gold]A Sorrateira[/gold].",
+
+  "SILENT_ENVENOM_BOSS_ENCOUNTER.title": "A Sorrateira",
+  "SILENT_ENVENOM_BOSS_ENCOUNTER.loss": "{character} se consumiu com o [gold]Veneno[/gold] de [gold]A Sorrateira[/gold].",
+
+  "SILENT_SHIV_BOSS_ENCOUNTER.title": "A Sorrateira",
+  "SILENT_SHIV_BOSS_ENCOUNTER.loss": "{character} foi soterrado pela chuva de [gold]Lâminas[/gold] de [gold]A Sorrateira[/gold].",
+
+  "SILENT_SLY_BOSS_ENCOUNTER.title": "A Sorrateira",
+  "SILENT_SLY_BOSS_ENCOUNTER.loss": "[gold]A Sorrateira[/gold] jogou {character} na Pilha de Descarte.",
+
+  "SILENT_BREWER_BOSS_ENCOUNTER.title": "A Sorrateira",
+  "SILENT_BREWER_BOSS_ENCOUNTER.loss": "{character} não conseguiu romper a barreira de poções de [gold]A Sorrateira[/gold].",
+
+  "DEFECT_BOSS_ENCOUNTER.title": "O Defeituoso",
+  "DEFECT_BOSS_ENCOUNTER.loss": "{character} foi analisado e excluído por [gold]O Defeituoso[/gold].",
+
+  "DEFECT_AI_BOSS_ENCOUNTER.title": "O Defeituoso",
+  "DEFECT_AI_BOSS_ENCOUNTER.loss": "Todas as cartas de {character} entraram no modelo de [gold]O Defeituoso[/gold].",
+
+  "DEFECT_CLAW_BOSS_ENCOUNTER.title": "O Defeituoso",
+  "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character} foi aniquilado pelo [gold]Hiper Raio[/gold] de [gold]O Defeituoso[/gold].",
+
+  "NECROBINDER_BOSS_ENCOUNTER.title": "A Necroartífice",
+  "NECROBINDER_BOSS_ENCOUNTER.loss": "[gold]A Necroartífice[/gold] tomou a alma de {character}.",
+
+  "NECROBINDER_DOOM_BOSS_ENCOUNTER.title": "A Necroartífice",
+  "NECROBINDER_DOOM_BOSS_ENCOUNTER.loss": "[gold]A Necroartífice[/gold] levou {character} até o fim da [gold]Ruína[/gold].",
+
+  "NECROBINDER_SOUL_BOSS_ENCOUNTER.title": "A Necroartífice",
+  "NECROBINDER_SOUL_BOSS_ENCOUNTER.loss": "[gold]A Necroartífice[/gold] tomou a alma de {character}.",
+
+  "NECROBINDER_ERADICATE_BOSS_ENCOUNTER.title": "A Necroartífice",
+  "NECROBINDER_ERADICATE_BOSS_ENCOUNTER.loss": "{character} foi erradicado, memórias e tudo, por [gold]A Necroartífice[/gold].",
+
+  "REGENT_BOSS_ENCOUNTER.title": "O Regente",
+  "REGENT_BOSS_ENCOUNTER.loss": "[gold]O Regente[/gold] proferiu a sentença contra {character}.",
+
+  "REGENT_DEBRIS_BOSS_ENCOUNTER.title": "O Regente",
+  "REGENT_DEBRIS_BOSS_ENCOUNTER.loss": "{character} foi soterrado pelos [gold]Escombros[/gold] de [gold]O Regente[/gold].",
+
+  "REGENT_FORGE_BOSS_ENCOUNTER.title": "O Regente",
+  "REGENT_FORGE_BOSS_ENCOUNTER.loss": "{character} virou um entalhe na lâmina de [gold]O Regente[/gold].",
+
+  "REGENT_COLORLESS_BOSS_ENCOUNTER.title": "O Regente",
+  "REGENT_COLORLESS_BOSS_ENCOUNTER.loss": "[gold]O Regente[/gold] tirou toda a cor de {character}.",
+
+  "REGENT_STAR_BOSS_ENCOUNTER.title": "O Regente",
+  "REGENT_STAR_BOSS_ENCOUNTER.loss": "{character} foi moído até virar poeira pelas estrelas de [gold]O Regente[/gold].",
+
+  "REGENT_KING_BOSS_ENCOUNTER.title": "O Regente",
+  "REGENT_KING_BOSS_ENCOUNTER.loss": "{character} foi esmagado sob a coroa de [gold]O Regente[/gold].",
+
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.title": "O Rígido",
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "{character} foi esmagado pela [gold]Força[/gold] crescente de [gold]O Rígido[/gold].",
+
+    "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.title": "O Rígido",
+  "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss": "[gold]O Rígido[/gold] fez {character} de bola até afogá-lo nas próprias cópias.",
+"IRONCLAD_BOULDER_BOSS_ENCOUNTER.title": "O Rígido",
+  "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss": "[gold]O Rígido[/gold] reduziu {character} a estilhaços com suas rochas.",
+
+  "DEFECT_DARK_BOSS_ENCOUNTER.title": "O Defeituoso",
+  "DEFECT_DARK_BOSS_ENCOUNTER.loss": "{character} foi engolido pelas Orbes de [gold]Trevas[/gold] de [gold]O Defeituoso[/gold].",
+
+  "IRONCLAD_BOSS_NORMAL_ENCOUNTER.title": "O Rígido",
+  "IRONCLAD_BOSS_NORMAL_ENCOUNTER.loss": "{character} foi despedaçado por [gold]O Rígido[/gold].",
+  "SILENT_BOSS_NORMAL_ENCOUNTER.title": "A Sorrateira",
+  "SILENT_BOSS_NORMAL_ENCOUNTER.loss": "{character} morreu sem nunca ver [gold]A Sorrateira[/gold].",
+  "SILENT_ENVENOM_BOSS_NORMAL_ENCOUNTER.title": "A Sorrateira",
+  "SILENT_ENVENOM_BOSS_NORMAL_ENCOUNTER.loss": "{character} se consumiu com o [gold]Veneno[/gold] de [gold]A Sorrateira[/gold].",
+  "SILENT_SLY_BOSS_NORMAL_ENCOUNTER.title": "A Sorrateira",
+  "SILENT_SLY_BOSS_NORMAL_ENCOUNTER.loss": "[gold]A Sorrateira[/gold] jogou {character} na Pilha de Descarte.",
+  "SILENT_SHIV_BOSS_NORMAL_ENCOUNTER.title": "A Sorrateira",
+  "SILENT_SHIV_BOSS_NORMAL_ENCOUNTER.loss": "{character} foi soterrado pela chuva de [gold]Lâminas[/gold] de [gold]A Sorrateira[/gold].",
+  "DEFECT_BOSS_NORMAL_ENCOUNTER.title": "O Defeituoso",
+  "DEFECT_BOSS_NORMAL_ENCOUNTER.loss": "{character} foi analisado e excluído por [gold]O Defeituoso[/gold].",
+  "NECROBINDER_BOSS_NORMAL_ENCOUNTER.title": "A Necroartífice",
+  "NECROBINDER_BOSS_NORMAL_ENCOUNTER.loss": "[gold]A Necroartífice[/gold] tomou a alma de {character}.",
+  "REGENT_BOSS_NORMAL_ENCOUNTER.title": "O Regente",
+  "REGENT_BOSS_NORMAL_ENCOUNTER.loss": "[gold]O Regente[/gold] proferiu a sentença contra {character}.",
+
+  "TELEMETRY_PROMPT_HEADER": "Enviar dados de jogo (CharacterBosses)",
+  "TELEMETRY_PROMPT_BODY": "Este mod quer coletar alguns dados de partida para corrigir bugs e servir de base para balancear a força dos chefes:\nresultado, ato/combate, ascensão, número de jogadores, PV do chefe, turnos e semente de cada combate contra um chefe, além das linhas de erro deste próprio mod.\n\nOs dados primeiro são salvos em um [b]arquivo local[/b]; se o autor tiver configurado um servidor de coleta, esses mesmos dados anônimos [b]também são enviados[/b] ao autor.\n\nNenhuma informação pessoal é coletada (nem SteamID nem apelido).\n\nVocê pode mudar isso a qualquer momento em «Configurações de Mods → CharacterBosses → A5». Deseja ativar agora?",
+  "TELEMETRY_PROMPT_YES": "Ativar",
+  "TELEMETRY_PROMPT_NO": "Manter desativado",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.title":  "The Necrobinder",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character} was dragged into the grave by the [gold]Necrobinder[/gold]\u0027s Osty.",
+    "SILENT_SNECKO_BOSS_ENCOUNTER.title":  "The Silent",
+    "SILENT_SNECKO_BOSS_ENCOUNTER.loss":  "{character} was sent to the grave by the [gold]Silent[/gold]\u0027s dice.",
+  "DEFECT_EVENT_BOSS_ENCOUNTER.loss": "[gold]O Defeituoso[/gold] tirou {character} de volta da Pilha de Descarte.",
+  "DEFECT_EVENT_BOSS_ENCOUNTER.title": "O Defeituoso"
+}

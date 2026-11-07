@@ -1,0 +1,5 @@
+﻿MegaCrit.Sts2.Core.Animation.AnimState
+MegaCrit.Sts2.Core.Animation.CreatureAnimator
+MegaCrit.Sts2.Core.Animation.AnimState.Branch
+MegaCrit.Sts2.Core.Animation.AnimState.<>c
+MegaCrit.Sts2.Core.Animation.AnimState.<>c__DisplayClass34_0

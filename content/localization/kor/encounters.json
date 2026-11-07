@@ -1,0 +1,103 @@
+{
+  "IRONCLAD_BOSS_ENCOUNTER.title": "아이언클래드",
+  "IRONCLAD_BOSS_ENCOUNTER.loss": "{character}는 [gold]아이언클래드[/gold]에게 무너졌습니다.",
+
+  "IRONCLAD_ANGER_BOSS_ENCOUNTER.title": "아이언클래드",
+  "IRONCLAD_ANGER_BOSS_ENCOUNTER.loss": "{character}는 [gold]아이언클래드[/gold]의 분노에 불타 재가 되었습니다.",
+
+  "IRONCLAD_VULN_BOSS_ENCOUNTER.title": "아이언클래드",
+  "IRONCLAD_VULN_BOSS_ENCOUNTER.loss": "{character}는 [gold]아이언클래드[/gold]에게 한 겹 한 겹 살점을 뜯겼습니다.",
+
+  "SILENT_BOSS_ENCOUNTER.title": "사일런트",
+  "SILENT_BOSS_ENCOUNTER.loss": "{character}는 죽을 때까지 [gold]사일런트[/gold]의 모습을 보지 못했습니다.",
+
+  "SILENT_ENVENOM_BOSS_ENCOUNTER.title": "사일런트",
+  "SILENT_ENVENOM_BOSS_ENCOUNTER.loss": "{character}는 [gold]사일런트[/gold]의 독에 생명을 다했습니다.",
+
+  "SILENT_SHIV_BOSS_ENCOUNTER.title": "사일런트",
+  "SILENT_SHIV_BOSS_ENCOUNTER.loss": "{character}는 [gold]사일런트[/gold]의 칼날 비에 잠겼습니다.",
+
+  "SILENT_SLY_BOSS_ENCOUNTER.title": "사일런트",
+  "SILENT_SLY_BOSS_ENCOUNTER.loss": "{character}는 [gold]사일런트[/gold]에게 버린 카드 더미로 던져졌습니다.",
+
+  "SILENT_BREWER_BOSS_ENCOUNTER.title": "사일런트",
+  "SILENT_BREWER_BOSS_ENCOUNTER.loss": "{character}는 [gold]사일런트[/gold]가 포션으로 쌓아 올린 장벽을 뚫지 못했습니다.",
+
+  "DEFECT_BOSS_ENCOUNTER.title": "디펙트",
+  "DEFECT_BOSS_ENCOUNTER.loss": "{character}는 [gold]디펙트[/gold]에게 분석되어 삭제되었습니다.",
+
+  "DEFECT_AI_BOSS_ENCOUNTER.title": "디펙트",
+  "DEFECT_AI_BOSS_ENCOUNTER.loss": "{character}가 낸 모든 카드는 [gold]디펙트[/gold]의 모델에 계산되어 들어갔습니다.",
+
+  "DEFECT_CLAW_BOSS_ENCOUNTER.title": "디펙트",
+  "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character}는 [gold]디펙트[/gold]의 파괴광선에 소멸했습니다.",
+
+  "NECROBINDER_BOSS_ENCOUNTER.title": "네크로바인더",
+  "NECROBINDER_BOSS_ENCOUNTER.loss": "{character}의 영혼은 [gold]네크로바인더[/gold]에게 거두어졌습니다.",
+
+  "NECROBINDER_DOOM_BOSS_ENCOUNTER.title": "네크로바인더",
+  "NECROBINDER_DOOM_BOSS_ENCOUNTER.loss": "[gold]네크로바인더[/gold]가 {character}를 종말의 막다른 끝으로 불러들였습니다.",
+
+  "NECROBINDER_SOUL_BOSS_ENCOUNTER.title": "네크로바인더",
+  "NECROBINDER_SOUL_BOSS_ENCOUNTER.loss": "{character}의 영혼은 [gold]네크로바인더[/gold]에게 거두어졌습니다.",
+
+  "NECROBINDER_ERADICATE_BOSS_ENCOUNTER.title": "네크로바인더",
+  "NECROBINDER_ERADICATE_BOSS_ENCOUNTER.loss": "{character}는 기억까지 [gold]네크로바인더[/gold]에게 뿌리째 말살되었습니다.",
+
+  "REGENT_BOSS_ENCOUNTER.title": "리젠트",
+  "REGENT_BOSS_ENCOUNTER.loss": "{character}는 [gold]리젠트[/gold]에게 판결을 받았습니다.",
+
+  "REGENT_DEBRIS_BOSS_ENCOUNTER.title": "리젠트",
+  "REGENT_DEBRIS_BOSS_ENCOUNTER.loss": "{character}는 [gold]리젠트[/gold]의 잔해에 파묻혔습니다.",
+
+  "REGENT_FORGE_BOSS_ENCOUNTER.title": "리젠트",
+  "REGENT_FORGE_BOSS_ENCOUNTER.loss": "{character}는 [gold]리젠트[/gold]의 검날에 남은 흠집 하나가 되었습니다.",
+
+  "REGENT_COLORLESS_BOSS_ENCOUNTER.title": "리젠트",
+  "REGENT_COLORLESS_BOSS_ENCOUNTER.loss": "{character}는 [gold]리젠트[/gold]에게 색을 모두 빼앗겼습니다.",
+
+  "REGENT_STAR_BOSS_ENCOUNTER.title": "리젠트",
+  "REGENT_STAR_BOSS_ENCOUNTER.loss": "{character}는 [gold]리젠트[/gold]의 빛나는 별에 가루가 되도록 갈렸습니다.",
+
+  "REGENT_KING_BOSS_ENCOUNTER.title": "리젠트",
+  "REGENT_KING_BOSS_ENCOUNTER.loss": "{character}는 [gold]리젠트[/gold]의 왕권에 짓눌려 부서졌습니다.",
+
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.title": "아이언클래드",
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "{character}는 싸울수록 강해지는 [gold]아이언클래드[/gold]의 힘에 짓눌려 부서졌습니다.",
+
+    "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.title": "아이언클래드",
+  "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss": "{character}는 [gold]아이언클래드[/gold]에게 농락당하다가 마지막에는 자신의 복사본에 파묻혔습니다.",
+"IRONCLAD_BOULDER_BOSS_ENCOUNTER.title": "아이언클래드",
+  "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss": "{character}는 [gold]아이언클래드[/gold]의 바위에 산산조각 났습니다.",
+
+  "DEFECT_DARK_BOSS_ENCOUNTER.title": "디펙트",
+  "DEFECT_DARK_BOSS_ENCOUNTER.loss": "{character}는 [gold]디펙트[/gold]의 암흑 구체에 삼켜졌습니다.",
+
+  "IRONCLAD_BOSS_NORMAL_ENCOUNTER.title": "아이언클래드",
+  "IRONCLAD_BOSS_NORMAL_ENCOUNTER.loss": "{character}는 [gold]아이언클래드[/gold]에게 무너졌습니다.",
+  "SILENT_BOSS_NORMAL_ENCOUNTER.title": "사일런트",
+  "SILENT_BOSS_NORMAL_ENCOUNTER.loss": "{character}는 죽을 때까지 [gold]사일런트[/gold]의 모습을 보지 못했습니다.",
+  "SILENT_ENVENOM_BOSS_NORMAL_ENCOUNTER.title": "사일런트",
+  "SILENT_ENVENOM_BOSS_NORMAL_ENCOUNTER.loss": "{character}는 [gold]사일런트[/gold]의 독에 생명을 다했습니다.",
+  "SILENT_SLY_BOSS_NORMAL_ENCOUNTER.title": "사일런트",
+  "SILENT_SLY_BOSS_NORMAL_ENCOUNTER.loss": "{character}는 [gold]사일런트[/gold]에게 버린 카드 더미로 던져졌습니다.",
+  "SILENT_SHIV_BOSS_NORMAL_ENCOUNTER.title": "사일런트",
+  "SILENT_SHIV_BOSS_NORMAL_ENCOUNTER.loss": "{character}는 [gold]사일런트[/gold]의 칼날 비에 잠겼습니다.",
+  "DEFECT_BOSS_NORMAL_ENCOUNTER.title": "디펙트",
+  "DEFECT_BOSS_NORMAL_ENCOUNTER.loss": "{character}는 [gold]디펙트[/gold]에게 분석되어 삭제되었습니다.",
+  "NECROBINDER_BOSS_NORMAL_ENCOUNTER.title": "네크로바인더",
+  "NECROBINDER_BOSS_NORMAL_ENCOUNTER.loss": "{character}의 영혼은 [gold]네크로바인더[/gold]에게 거두어졌습니다.",
+  "REGENT_BOSS_NORMAL_ENCOUNTER.title": "리젠트",
+  "REGENT_BOSS_NORMAL_ENCOUNTER.loss": "{character}는 [gold]리젠트[/gold]에게 판결을 받았습니다.",
+
+  "TELEMETRY_PROMPT_HEADER": "플레이 데이터 업로드(CharacterBosses)",
+  "TELEMETRY_PROMPT_BODY": "이 모드는 버그 수정과 보스 밸런스 조정의 근거로 쓰기 위해 플레이 데이터를 조금 수집하려 합니다:\n보스 전투별 승패, 막/전투, 승천, 인원수, 보스 체력, 턴 수와 시드, 그리고 이 모드 자체의 오류 줄.\n\n데이터는 먼저 [b]이 컴퓨터의 파일[/b]에 저장됩니다. 제작자가 수집 서버를 설정한 경우에는 같은 익명 데이터가 [b]제작자에게도 업로드[/b]됩니다.\n\n어떤 개인정보도 수집하지 않습니다(SteamID/닉네임을 기록하지 않습니다).\n\n'모드 설정 → CharacterBosses → A5'에서 언제든 변경할 수 있습니다. 지금 활성화할까요?",
+  "TELEMETRY_PROMPT_YES": "활성화",
+  "TELEMETRY_PROMPT_NO": "끈 상태 유지",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.title":  "The Necrobinder",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character} was dragged into the grave by the [gold]Necrobinder[/gold]\u0027s Osty.",
+    "SILENT_SNECKO_BOSS_ENCOUNTER.title":  "The Silent",
+    "SILENT_SNECKO_BOSS_ENCOUNTER.loss":  "{character} was sent to the grave by the [gold]Silent[/gold]\u0027s dice.",
+  "DEFECT_EVENT_BOSS_ENCOUNTER.loss": "{character}는 [gold]디펙트[/gold]에게 버린 카드 더미에서 다시 끌려 나왔습니다.",
+  "DEFECT_EVENT_BOSS_ENCOUNTER.title": "디펙트"
+}

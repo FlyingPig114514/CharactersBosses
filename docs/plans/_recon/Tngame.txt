@@ -1,0 +1,4393 @@
+﻿// ===== MegaCrit.Sts2.Core.Nodes.NGame =====
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
+using Godot;
+using Godot.Bridge;
+using Godot.NativeInterop;
+using MegaCrit.Sts2.Core.Assets;
+using MegaCrit.Sts2.Core.Audio.Debug;
+using MegaCrit.Sts2.Core.AutoSlay;
+using MegaCrit.Sts2.Core.ControllerInput;
+using MegaCrit.Sts2.Core.Debug;
+using MegaCrit.Sts2.Core.Entities.Multiplayer;
+using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.Extensions;
+using MegaCrit.Sts2.Core.Helpers;
+using MegaCrit.Sts2.Core.Leaderboard;
+using MegaCrit.Sts2.Core.Localization;
+using MegaCrit.Sts2.Core.Localization.Fonts;
+using MegaCrit.Sts2.Core.Logging;
+using MegaCrit.Sts2.Core.Modding;
+using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Multiplayer.Game;
+using MegaCrit.Sts2.Core.Multiplayer.Game.Lobby;
+using MegaCrit.Sts2.Core.Nodes.Audio;
+using MegaCrit.Sts2.Core.Nodes.Cards;
+using MegaCrit.Sts2.Core.Nodes.Cards.Holders;
+using MegaCrit.Sts2.Core.Nodes.CommonUi;
+using MegaCrit.Sts2.Core.Nodes.Debug;
+using MegaCrit.Sts2.Core.Nodes.GodotExtensions;
+using MegaCrit.Sts2.Core.Nodes.Multiplayer;
+using MegaCrit.Sts2.Core.Nodes.Reaction;
+using MegaCrit.Sts2.Core.Nodes.Screens;
+using MegaCrit.Sts2.Core.Nodes.Screens.FeedbackScreen;
+using MegaCrit.Sts2.Core.Nodes.Screens.InspectScreens;
+using MegaCrit.Sts2.Core.Nodes.Screens.MainMenu;
+using MegaCrit.Sts2.Core.Nodes.Screens.Settings;
+using MegaCrit.Sts2.Core.Nodes.Vfx;
+using MegaCrit.Sts2.Core.Nodes.Vfx.Utilities;
+using MegaCrit.Sts2.Core.Platform;
+using MegaCrit.Sts2.Core.Platform.Steam;
+using MegaCrit.Sts2.Core.Random;
+using MegaCrit.Sts2.Core.Rooms;
+using MegaCrit.Sts2.Core.Runs;
+using MegaCrit.Sts2.Core.Saves;
+using MegaCrit.Sts2.Core.Saves.Runs;
+using MegaCrit.Sts2.Core.Settings;
+using MegaCrit.Sts2.Core.Unlocks;
+using MegaCrit.Sts2.addons.mega_text;
+
+namespace MegaCrit.Sts2.Core.Nodes;
+
+[ScriptPath("res://src/Core/Nodes/NGame.cs")]
+public class NGame : Control
+{
+	[Signal]
+	public delegate void WindowChangeEventHandler();
+
+	[Signal]
+	public delegate void PhobiaModeToggledEventHandler();
+
+	public new class MethodName : Control.MethodName
+	{
+		public new static readonly StringName _EnterTree = "_EnterTree";
+
+		public static readonly StringName OnFilesDropped = "OnFilesDropped";
+
+		public new static readonly StringName _Ready = "_Ready";
+
+		public static readonly StringName OnWindowChange = "OnWindowChange";
+
+		public static readonly StringName IsMainThread = "IsMainThread";
+
+		public new static readonly StringName _ExitTree = "_ExitTree";
+
+		public static readonly StringName IsReleaseGame = "IsReleaseGame";
+
+		public static readonly StringName InitializeGraphicsPreferences = "InitializeGraphicsPreferences";
+
+		public static readonly StringName ApplyDisplaySettings = "ApplyDisplaySettings";
+
+		public static readonly StringName GetInspectRelicScreen = "GetInspectRelicScreen";
+
+		public static readonly StringName GetInspectCardScreen = "GetInspectCardScreen";
+
+		public static readonly StringName ApplySyncSetting = "ApplySyncSetting";
+
+		public static readonly StringName Reset = "Reset";
+
+		public new static readonly StringName _Notification = "_Notification";
+
+		public static readonly StringName Quit = "Quit";
+
+		public static readonly StringName Relocalize = "Relocalize";
+
+		public static readonly StringName ReloadMainMenu = "ReloadMainMenu";
+
+		public new static readonly StringName _Input = "_Input";
+
+		public static readonly StringName ToggleFullscreen = "ToggleFullscreen";
+
+		public static readonly StringName DebugModifyTimescale = "DebugModifyTimescale";
+
+		public static readonly StringName ActivateWorldEnvironment = "ActivateWorldEnvironment";
+
+		public static readonly StringName DeactivateWorldEnvironment = "DeactivateWorldEnvironment";
+
+		public static readonly StringName SetScreenShakeTarget = "SetScreenShakeTarget";
+
+		public static readonly StringName ClearScreenShakeTarget = "ClearScreenShakeTarget";
+
+		public static readonly StringName ScreenShake = "ScreenShake";
+
+		public static readonly StringName ScreenRumble = "ScreenRumble";
+
+		public static readonly StringName ScreenShakeTrauma = "ScreenShakeTrauma";
+
+		public static readonly StringName DoHitStop = "DoHitStop";
+
+		public static readonly StringName ToggleTrailerMode = "ToggleTrailerMode";
+
+		public static readonly StringName SetScreenshakeMultiplier = "SetScreenshakeMultiplier";
+
+		public static readonly StringName InitPools = "InitPools";
+
+		public static readonly StringName CheckShowLocalizationOverrideErrors = "CheckShowLocalizationOverrideErrors";
+
+		public static readonly StringName CheckShowModdedSaveFilePopup = "CheckShowModdedSaveFilePopup";
+
+		public static readonly StringName OnSteamNoLongerRunning = "OnSteamNoLongerRunning";
+
+		public static readonly StringName LogResourceStats = "LogResourceStats";
+
+		public static readonly StringName FormatBytes = "FormatBytes";
+
+		public static readonly StringName IsGameFocusedWindow = "IsGameFocusedWindow";
+
+		public static readonly StringName GetOrCreateFeedbackScreen = "GetOrCreateFeedbackScreen";
+
+		public static readonly StringName GetGameVersion = "GetGameVersion";
+	}
+
+	public new class PropertyName : Control.PropertyName
+	{
+		public static readonly StringName RootSceneContainer = "RootSceneContainer";
+
+		public static readonly StringName HoverTipsContainer = "HoverTipsContainer";
+
+		public static readonly StringName MainMenu = "MainMenu";
+
+		public static readonly StringName CurrentRunNode = "CurrentRunNode";
+
+		public static readonly StringName LogoAnimation = "LogoAnimation";
+
+		public static readonly StringName Transition = "Transition";
+
+		public static readonly StringName TimeoutOverlay = "TimeoutOverlay";
+
+		public static readonly StringName AudioManager = "AudioManager";
+
+		public static readonly StringName RemoteCursorContainer = "RemoteCursorContainer";
+
+		public static readonly StringName InputManager = "InputManager";
+
+		public static readonly StringName HotkeyManager = "HotkeyManager";
+
+		public static readonly StringName FeedbackScreen = "FeedbackScreen";
+
+		public static readonly StringName ReactionWheel = "ReactionWheel";
+
+		public static readonly StringName ReactionContainer = "ReactionContainer";
+
+		public static readonly StringName CursorManager = "CursorManager";
+
+		public static readonly StringName DebugAudio = "DebugAudio";
+
+		public static readonly StringName DebugSeedOverride = "DebugSeedOverride";
+
+		public static readonly StringName StartOnMainMenu = "StartOnMainMenu";
+
+		public static readonly StringName InspectRelicScreen = "InspectRelicScreen";
+
+		public static readonly StringName InspectCardScreen = "InspectCardScreen";
+
+		public static readonly StringName ScreenshakeTarget = "ScreenshakeTarget";
+
+		public static readonly StringName WorldEnvironment = "WorldEnvironment";
+
+		public static readonly StringName HitStop = "HitStop";
+
+		public static readonly StringName _inspectionContainer = "_inspectionContainer";
+
+		public static readonly StringName _screenShake = "_screenShake";
+	}
+
+	public new class SignalName : Control.SignalName
+	{
+		public static readonly StringName WindowChange = "WindowChange";
+
+		public static readonly StringName PhobiaModeToggled = "PhobiaModeToggled";
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <DoCloudSync>d__122 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			try
+			{
+				TaskAwaiter val;
+				if (num == 0)
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_0077;
+				}
+				TaskAwaiter val2;
+				if (num != 1)
+				{
+					if (SaveManager.Instance.ShouldOverwriteCloudWithLocal())
+					{
+						val = SaveManager.Instance.OverwriteCloudWithLocal().GetAwaiter();
+						if (!((TaskAwaiter)(ref val)).IsCompleted)
+						{
+							num = (<>1__state = 0);
+							<>u__1 = val;
+							((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <DoCloudSync>d__122>(ref val, ref this);
+							return;
+						}
+						goto IL_0077;
+					}
+					val2 = SaveManager.Instance.SyncCloudToLocal().GetAwaiter();
+					if (!((TaskAwaiter)(ref val2)).IsCompleted)
+					{
+						num = (<>1__state = 1);
+						<>u__1 = val2;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <DoCloudSync>d__122>(ref val2, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val2 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+				}
+				((TaskAwaiter)(ref val2)).GetResult();
+				goto end_IL_0007;
+				IL_0077:
+				((TaskAwaiter)(ref val)).GetResult();
+				end_IL_0007:;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <GameStartup>d__121 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public NGame <>4__this;
+
+		private System.Threading.Tasks.Task <cloudSavesTask>5__2;
+
+		private ReadSaveResult<SerializableProgress> <progressReadResult>5__3;
+
+		private ReadSaveResult<PrefsSave> <prefsReadResult>5__4;
+
+		private TaskAwaiter <>u__1;
+
+		private object <>u__2;
+
+		private TaskAwaiter<float> <>u__3;
+
+		private void MoveNext()
+		{
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0262: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0267: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_038a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_038f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0397: Unknown result type (might be due to invalid IL or missing references)
+			//IL_047c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0481: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0489: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0148: Expected O, but got Unknown
+			//IL_0220: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0226: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0232: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0247: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0249: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0355: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_036f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0371: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0447: Unknown result type (might be due to invalid IL or missing references)
+			//IL_044c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0461: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0463: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			NGame nGame = <>4__this;
+			try
+			{
+				TaskAwaiter val4;
+				IAwaiter<Variant[]> awaiter;
+				TaskAwaiter<float> val3;
+				TaskAwaiter val2;
+				TaskAwaiter val;
+				Node child;
+				string seed;
+				string value;
+				AutoSlayer autoSlayer;
+				bool skipLogo;
+				switch (num)
+				{
+				default:
+					val4 = OneTimeInitialization.ExecuteVeryEarly().GetAwaiter();
+					if (!((TaskAwaiter)(ref val4)).IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val4;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <GameStartup>d__121>(ref val4, ref this);
+						return;
+					}
+					goto IL_007b;
+				case 0:
+					val4 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_007b;
+				case 1:
+					awaiter = (IAwaiter<Variant[]>)<>u__2;
+					<>u__2 = null;
+					num = (<>1__state = -1);
+					goto IL_012f;
+				case 2:
+					val3 = <>u__3;
+					<>u__3 = default(TaskAwaiter<float>);
+					num = (<>1__state = -1);
+					goto IL_027e;
+				case 3:
+					val2 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_03a6;
+				case 4:
+					{
+						val = <>u__1;
+						<>u__1 = default(TaskAwaiter);
+						num = (<>1__state = -1);
+						goto IL_0498;
+					}
+					IL_027e:
+					val3.GetResult();
+					goto IL_0286;
+					IL_007b:
+					((TaskAwaiter)(ref val4)).GetResult();
+					child = NDevConsole.Create();
+					nGame.AddChildSafely(child);
+					nGame.MoveChildSafely(child, nGame.GetChildCount() - 1);
+					AccountScopeUserDataMigrator.MigrateToUserScopedDirectories();
+					AccountScopeUserDataMigrator.ArchiveLegacyData();
+					ProfileAccountScopeMigrator.MigrateToProfileScopedDirectories();
+					ProfileAccountScopeMigrator.ArchiveLegacyData();
+					<cloudSavesTask>5__2 = nGame.DoCloudSync();
+					nGame.InitPools();
+					OneTimeInitialization.ExecuteEssential();
+					if (!nGame.IsNodeReady())
+					{
+						awaiter = nGame.ToSignal(nGame, Node.SignalName.Ready).GetAwaiter();
+						if (!awaiter.IsCompleted)
+						{
+							num = (<>1__state = 1);
+							<>u__2 = awaiter;
+							((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitOnCompleted<IAwaiter<Variant[]>, <GameStartup>d__121>(ref awaiter, ref this);
+							return;
+						}
+						goto IL_012f;
+					}
+					goto IL_0137;
+					IL_0498:
+					((TaskAwaiter)(ref val)).GetResult();
+					nGame.CheckShowSaveFileError(<progressReadResult>5__3, <prefsReadResult>5__4, OneTimeInitialization.SettingsReadResult);
+					nGame.CheckShowLocalizationOverrideErrors();
+					nGame.CheckShowModdedSaveFilePopup();
+					break;
+					IL_03a6:
+					((TaskAwaiter)(ref val2)).GetResult();
+					seed = CommandLineHelper.GetValue("seed") ?? SeedHelper.GetRandomSeed();
+					value = CommandLineHelper.GetValue("log-file");
+					autoSlayer = new AutoSlayer();
+					autoSlayer.Start(seed, value);
+					break;
+					IL_012f:
+					awaiter.GetResult();
+					goto IL_0137;
+					IL_0137:
+					Callable.From(new Action(nGame.InitializeGraphicsPreferences)).CallDeferred();
+					nGame.AudioManager.SetMasterVol(SaveManager.Instance.SettingsSave.VolumeMaster);
+					nGame.AudioManager.SetSfxVol(SaveManager.Instance.SettingsSave.VolumeSfx);
+					nGame.AudioManager.SetAmbienceVol(SaveManager.Instance.SettingsSave.VolumeAmbience);
+					nGame.AudioManager.SetBgmVol(SaveManager.Instance.SettingsSave.VolumeBgm);
+					nGame.DebugAudio.SetMasterAudioVolume(SaveManager.Instance.SettingsSave.VolumeMaster);
+					nGame.DebugAudio.SetSfxAudioVolume(SaveManager.Instance.SettingsSave.VolumeSfx);
+					LeaderboardManager.Initialize();
+					SteamStatsManager.Initialize();
+					nGame.TimeoutOverlay.Relocalize();
+					goto IL_0286;
+					IL_0286:
+					if (!<cloudSavesTask>5__2.IsCompleted)
+					{
+						if (SteamInitializer.Initialized)
+						{
+							val3 = nGame.AwaitProcessFrame().GetAwaiter();
+							if (!val3.IsCompleted)
+							{
+								num = (<>1__state = 2);
+								<>u__3 = val3;
+								((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter<float>, <GameStartup>d__121>(ref val3, ref this);
+								return;
+							}
+							goto IL_027e;
+						}
+						Log.Error("Steam became uninitialized while the cloud sync was in-progress! This might result in unpredictable behavior");
+					}
+					SaveManager.Instance.InitProfileId();
+					<progressReadResult>5__3 = SaveManager.Instance.InitProgressData();
+					<prefsReadResult>5__4 = SaveManager.Instance.InitPrefsData();
+					SentryService.AfterGameInit(PlatformUtil.GetPlatformBranch().ToName(), SaveManager.Instance.Progress.UniqueId);
+					nGame._screenShake.SetMultiplier(NScreenshakePaginator.GetShakeMultiplier(SaveManager.Instance.PrefsSave.ScreenShakeOptionIndex));
+					if (!OS.HasFeature("editor") && SaveManager.Instance.PrefsSave.FastMode == FastModeType.Instant)
+					{
+						SaveManager.Instance.PrefsSave.FastMode = FastModeType.Fast;
+					}
+					if (!IsReleaseGame() && CommandLineHelper.HasArg("autoslay"))
+					{
+						val2 = nGame.LaunchMainMenu(skipLogo: true).GetAwaiter();
+						if (!((TaskAwaiter)(ref val2)).IsCompleted)
+						{
+							num = (<>1__state = 3);
+							<>u__1 = val2;
+							((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <GameStartup>d__121>(ref val2, ref this);
+							return;
+						}
+						goto IL_03a6;
+					}
+					if (CommandLineHelper.HasArg("bootstrap"))
+					{
+						NSceneBootstrapper child2 = SceneHelper.Instantiate<NSceneBootstrapper>("debug/scene_bootstrapper");
+						nGame.AddChildSafely(child2);
+						break;
+					}
+					if (!nGame.StartOnMainMenu)
+					{
+						break;
+					}
+					skipLogo = DebugSettings.DevSkip || SaveManager.Instance.SettingsSave.SkipIntroLogo || CommandLineHelper.HasArg("fastmp");
+					val = nGame.LaunchMainMenu(skipLogo).GetAwaiter();
+					if (!((TaskAwaiter)(ref val)).IsCompleted)
+					{
+						num = (<>1__state = 4);
+						<>u__1 = val;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <GameStartup>d__121>(ref val, ref this);
+						return;
+					}
+					goto IL_0498;
+				}
+				ModManager.OnModDetected += nGame.OnNewModDetected;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<cloudSavesTask>5__2 = null;
+				<progressReadResult>5__3 = null;
+				<prefsReadResult>5__4 = null;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<cloudSavesTask>5__2 = null;
+			<progressReadResult>5__3 = null;
+			<prefsReadResult>5__4 = null;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <GameStartupError>d__120 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public NGame <>4__this;
+
+		private TaskAwaiter <>u__1;
+
+		private TaskAwaiter<bool> <>u__2;
+
+		private void MoveNext()
+		{
+			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0129: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			NGame nGame = <>4__this;
+			try
+			{
+				TaskAwaiter<bool> val;
+				TaskAwaiter val2;
+				if (num != 0)
+				{
+					if (num == 1)
+					{
+						val = <>u__2;
+						<>u__2 = default(TaskAwaiter<bool>);
+						num = (<>1__state = -1);
+						goto IL_0138;
+					}
+					Log.Error("Encountered error on game startup! Attempting to show error dialog");
+					val2 = nGame.TryErrorInit().GetAwaiter();
+					if (!((TaskAwaiter)(ref val2)).IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val2;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <GameStartupError>d__120>(ref val2, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val2 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+				}
+				((TaskAwaiter)(ref val2)).GetResult();
+				NGenericPopup nGenericPopup = NGenericPopup.Create();
+				if (nGenericPopup != null && NModalContainer.Instance != null)
+				{
+					NModalContainer.Instance.Add(nGenericPopup);
+					val = nGenericPopup.WaitForConfirmation(new LocString("main_menu_ui", "STARTUP_ERROR.description"), new LocString("main_menu_ui", "STARTUP_ERROR.title"), null, new LocString("main_menu_ui", "QUIT")).GetAwaiter();
+					if (!val.IsCompleted)
+					{
+						num = (<>1__state = 1);
+						<>u__2 = val;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter<bool>, <GameStartupError>d__120>(ref val, ref this);
+						return;
+					}
+					goto IL_0138;
+				}
+				Log.Error("Cannot show error dialog: UI not initialized. Quitting immediately.");
+				nGame.GetTree().Quit();
+				goto end_IL_000e;
+				IL_0138:
+				val.GetResult();
+				nGame.GetTree().Quit();
+				end_IL_000e:;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <GameStartupWrapper>d__118 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public NGame <>4__this;
+
+		private TaskAwaiter<bool> <>u__1;
+
+		private TaskAwaiter <>u__2;
+
+		private void MoveNext()
+		{
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			NGame nGame = <>4__this;
+			try
+			{
+				TaskAwaiter<bool> val;
+				if (num != 0)
+				{
+					if (num == 1)
+					{
+						goto IL_00a4;
+					}
+					val = nGame.InitializePlatform().GetAwaiter();
+					if (!val.IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter<bool>, <GameStartupWrapper>d__118>(ref val, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter<bool>);
+					num = (<>1__state = -1);
+				}
+				if (val.GetResult())
+				{
+					TaskHelper.RunSafely(OsDebugInfo.LogSystemInfo());
+					TaskHelper.RunSafely(GitHelper.Initialize());
+					goto IL_00a4;
+				}
+				nGame._gameStartupComplete.TrySetResult();
+				goto end_IL_000e;
+				IL_00a4:
+				try
+				{
+					TaskAwaiter val2;
+					if (num != 1)
+					{
+						val2 = nGame.GameStartup().GetAwaiter();
+						if (!((TaskAwaiter)(ref val2)).IsCompleted)
+						{
+							num = (<>1__state = 1);
+							<>u__2 = val2;
+							((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <GameStartupWrapper>d__118>(ref val2, ref this);
+							return;
+						}
+					}
+					else
+					{
+						val2 = <>u__2;
+						<>u__2 = default(TaskAwaiter);
+						num = (<>1__state = -1);
+					}
+					((TaskAwaiter)(ref val2)).GetResult();
+					nGame._gameStartupComplete.TrySetResult();
+				}
+				catch
+				{
+					nGame._gameStartupComplete.TrySetResult();
+					TaskHelper.RunSafely(nGame.GameStartupError());
+					throw;
+				}
+				end_IL_000e:;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <GoToTimeline>d__140 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public NGame <>4__this;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0134: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0139: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			NGame nGame = <>4__this;
+			try
+			{
+				TaskAwaiter val3;
+				TaskAwaiter val2;
+				TaskAwaiter val;
+				switch (num)
+				{
+				default:
+					val3 = nGame.Transition.FadeOut().GetAwaiter();
+					if (!((TaskAwaiter)(ref val3)).IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val3;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <GoToTimeline>d__140>(ref val3, ref this);
+						return;
+					}
+					goto IL_008c;
+				case 0:
+					val3 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_008c;
+				case 1:
+					val2 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_00e9;
+				case 2:
+					{
+						val = <>u__1;
+						<>u__1 = default(TaskAwaiter);
+						num = (<>1__state = -1);
+						break;
+					}
+					IL_00e9:
+					((TaskAwaiter)(ref val2)).GetResult();
+					RunManager.Instance.CleanUp();
+					val = nGame.LoadMainMenu(openTimeline: true).GetAwaiter();
+					if (!((TaskAwaiter)(ref val)).IsCompleted)
+					{
+						num = (<>1__state = 2);
+						<>u__1 = val;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <GoToTimeline>d__140>(ref val, ref this);
+						return;
+					}
+					break;
+					IL_008c:
+					((TaskAwaiter)(ref val3)).GetResult();
+					val2 = PreloadManager.LoadCommonAndMainMenuAssets().GetAwaiter();
+					if (!((TaskAwaiter)(ref val2)).IsCompleted)
+					{
+						num = (<>1__state = 1);
+						<>u__1 = val2;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <GoToTimeline>d__140>(ref val2, ref this);
+						return;
+					}
+					goto IL_00e9;
+				}
+				((TaskAwaiter)(ref val)).GetResult();
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <GoToTimelineAfterRun>d__137 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public NGame <>4__this;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			NGame nGame = <>4__this;
+			try
+			{
+				TaskAwaiter val;
+				if (num != 0)
+				{
+					val = nGame.GoToTimeline().GetAwaiter();
+					if (!((TaskAwaiter)(ref val)).IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <GoToTimelineAfterRun>d__137>(ref val, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+				}
+				((TaskAwaiter)(ref val)).GetResult();
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <InitializePlatform>d__167 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder<bool> <>t__builder;
+
+		public NGame <>4__this;
+
+		private bool <steamInitialized>5__2;
+
+		private TaskAwaiter <>u__1;
+
+		private TaskAwaiter<bool> <>u__2;
+
+		private void MoveNext()
+		{
+			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0222: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022c: Expected O, but got Unknown
+			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			NGame nGame = <>4__this;
+			bool result;
+			try
+			{
+				TaskAwaiter val;
+				if (num == 0)
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_0112;
+				}
+				TaskAwaiter<bool> val2;
+				if (num == 1)
+				{
+					val2 = <>u__2;
+					<>u__2 = default(TaskAwaiter<bool>);
+					num = (<>1__state = -1);
+					goto IL_01fa;
+				}
+				bool flag = CommandLineHelper.HasArg("force-steam");
+				string text = CommandLineHelper.GetValue("force-steam") ?? "";
+				if (text.Equals("on", (StringComparison)5) || (flag && text == string.Empty) || (!text.Equals("off", (StringComparison)5) && !OS.HasFeature("editor")))
+				{
+					<steamInitialized>5__2 = SteamInitializer.Initialize(nGame);
+					if (!<steamInitialized>5__2)
+					{
+						Log.Error("Failed to initialize Steam! Attempting to show error popup");
+						val = nGame.TryErrorInit().GetAwaiter();
+						if (!((TaskAwaiter)(ref val)).IsCompleted)
+						{
+							num = (<>1__state = 0);
+							<>u__1 = val;
+							<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <InitializePlatform>d__167>(ref val, ref this);
+							return;
+						}
+						goto IL_0112;
+					}
+					nGame._joinCallbackHandler = new SteamJoinCallbackHandler();
+					SteamInitializer.SteamNoLongerRunning += new Action(nGame.OnSteamNoLongerRunning);
+					goto IL_022c;
+				}
+				Log.Info("Steam initialization skipped (editor mode). Use --force-steam to enable.");
+				result = true;
+				goto end_IL_000e;
+				IL_0112:
+				((TaskAwaiter)(ref val)).GetResult();
+				NGenericPopup nGenericPopup = NGenericPopup.Create();
+				if (nGenericPopup != null && NModalContainer.Instance != null)
+				{
+					NModalContainer.Instance.Add(nGenericPopup);
+					LocString locString = new LocString("main_menu_ui", "STEAM_INIT_ERROR.description");
+					locString.Add("details", SteamInitializer.InitErrorMessage ?? "<null>");
+					val2 = nGenericPopup.WaitForConfirmation(locString, new LocString("main_menu_ui", "STEAM_INIT_ERROR.title"), null, new LocString("main_menu_ui", "QUIT")).GetAwaiter();
+					if (!val2.IsCompleted)
+					{
+						num = (<>1__state = 1);
+						<>u__2 = val2;
+						<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter<bool>, <InitializePlatform>d__167>(ref val2, ref this);
+						return;
+					}
+					goto IL_01fa;
+				}
+				Log.Error("Cannot show Steam error dialog: UI not initialized. Quitting immediately.");
+				nGame.GetTree().Quit();
+				result = false;
+				goto end_IL_000e;
+				IL_022c:
+				result = <steamInitialized>5__2;
+				goto end_IL_000e;
+				IL_01fa:
+				val2.GetResult();
+				nGame.GetTree().Quit();
+				goto IL_022c;
+				end_IL_000e:;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<>t__builder.SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<>t__builder.SetResult(result);
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			<>t__builder.SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <LaunchMainMenu>d__135 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public bool skipLogo;
+
+		public NGame <>4__this;
+
+		private NLogoAnimation <logoAnimation>5__2;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0254: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0325: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0332: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0210: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0291: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0296: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0119: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0234: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0236: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0135: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0187: Expected O, but got Unknown
+			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_030a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_030c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			NGame nGame = <>4__this;
+			try
+			{
+				TaskAwaiter val7;
+				TaskAwaiter val5;
+				TaskAwaiter val6;
+				TaskAwaiter val4;
+				TaskAwaiter val3;
+				TaskAwaiter val2;
+				TaskAwaiter val;
+				switch (num)
+				{
+				default:
+					<logoAnimation>5__2 = null;
+					if (!skipLogo)
+					{
+						val7 = PreloadManager.LoadLogoAnimation().GetAwaiter();
+						if (!((TaskAwaiter)(ref val7)).IsCompleted)
+						{
+							num = (<>1__state = 0);
+							<>u__1 = val7;
+							((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <LaunchMainMenu>d__135>(ref val7, ref this);
+							return;
+						}
+						goto IL_0095;
+					}
+					val5 = PreloadManager.LoadMainMenuEssentials().GetAwaiter();
+					if (!((TaskAwaiter)(ref val5)).IsCompleted)
+					{
+						num = (<>1__state = 2);
+						<>u__1 = val5;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <LaunchMainMenu>d__135>(ref val5, ref this);
+						return;
+					}
+					goto IL_016a;
+				case 0:
+					val7 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_0095;
+				case 1:
+					val6 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_010b;
+				case 2:
+					val5 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_016a;
+				case 3:
+					val4 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_01fd;
+				case 4:
+					val3 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_026b;
+				case 5:
+					val2 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_02e2;
+				case 6:
+					{
+						val = <>u__1;
+						<>u__1 = default(TaskAwaiter);
+						num = (<>1__state = -1);
+						break;
+					}
+					IL_0171:
+					if (<logoAnimation>5__2 != null)
+					{
+						nGame._logoCancelToken = new CancellationTokenSource();
+						val4 = nGame.Transition.FadeIn(0.8f, "res://materials/transitions/fade_transition_mat.tres", nGame._logoCancelToken.Token).GetAwaiter();
+						if (!((TaskAwaiter)(ref val4)).IsCompleted)
+						{
+							num = (<>1__state = 3);
+							<>u__1 = val4;
+							((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <LaunchMainMenu>d__135>(ref val4, ref this);
+							return;
+						}
+						goto IL_01fd;
+					}
+					goto IL_02e9;
+					IL_02e9:
+					val = nGame.LoadMainMenu().GetAwaiter();
+					if (!((TaskAwaiter)(ref val)).IsCompleted)
+					{
+						num = (<>1__state = 6);
+						<>u__1 = val;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <LaunchMainMenu>d__135>(ref val, ref this);
+						return;
+					}
+					break;
+					IL_0095:
+					((TaskAwaiter)(ref val7)).GetResult();
+					<logoAnimation>5__2 = NLogoAnimation.Create();
+					nGame.RootSceneContainer.SetCurrentScene(<logoAnimation>5__2);
+					val6 = PreloadManager.LoadMainMenuEssentials().GetAwaiter();
+					if (!((TaskAwaiter)(ref val6)).IsCompleted)
+					{
+						num = (<>1__state = 1);
+						<>u__1 = val6;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <LaunchMainMenu>d__135>(ref val6, ref this);
+						return;
+					}
+					goto IL_010b;
+					IL_02e2:
+					((TaskAwaiter)(ref val2)).GetResult();
+					goto IL_02e9;
+					IL_010b:
+					((TaskAwaiter)(ref val6)).GetResult();
+					goto IL_0171;
+					IL_026b:
+					((TaskAwaiter)(ref val3)).GetResult();
+					val2 = nGame.Transition.FadeOut().GetAwaiter();
+					if (!((TaskAwaiter)(ref val2)).IsCompleted)
+					{
+						num = (<>1__state = 5);
+						<>u__1 = val2;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <LaunchMainMenu>d__135>(ref val2, ref this);
+						return;
+					}
+					goto IL_02e2;
+					IL_01fd:
+					((TaskAwaiter)(ref val4)).GetResult();
+					val3 = <logoAnimation>5__2.PlayAnimation(nGame._logoCancelToken.Token).GetAwaiter();
+					if (!((TaskAwaiter)(ref val3)).IsCompleted)
+					{
+						num = (<>1__state = 4);
+						<>u__1 = val3;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <LaunchMainMenu>d__135>(ref val3, ref this);
+						return;
+					}
+					goto IL_026b;
+					IL_016a:
+					((TaskAwaiter)(ref val5)).GetResult();
+					goto IL_0171;
+				}
+				((TaskAwaiter)(ref val)).GetResult();
+				Log.Info($"[Startup] Time to main menu: {Time.GetTicksMsec():N0}ms");
+				LogResourceStats("main menu loaded (essential)");
+				TaskHelper.RunSafely(nGame.LoadDeferredStartupAssetsAsync());
+				nGame._joinCallbackHandler?.CheckForCommandLineJoin();
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<logoAnimation>5__2 = null;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<logoAnimation>5__2 = null;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <LoadDeferredStartupAssetsAsync>d__136 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			try
+			{
+				TaskAwaiter val;
+				if (num != 0)
+				{
+					OneTimeInitialization.ExecuteDeferred();
+					val = PreloadManager.LoadCommonAndMainMenuAssets().GetAwaiter();
+					if (!((TaskAwaiter)(ref val)).IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <LoadDeferredStartupAssetsAsync>d__136>(ref val, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+				}
+				((TaskAwaiter)(ref val)).GetResult();
+				LogResourceStats("main menu loaded (complete)");
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <LoadMainMenu>d__144 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public bool openTimeline;
+
+		public NGame <>4__this;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			NGame nGame = <>4__this;
+			try
+			{
+				System.Threading.Tasks.Task currentRunSaveTask = default(System.Threading.Tasks.Task);
+				if (num != 0)
+				{
+					currentRunSaveTask = SaveManager.Instance.CurrentRunSaveTask;
+					if (currentRunSaveTask == null)
+					{
+						goto IL_00bc;
+					}
+					Log.Info("Saving in progress, waiting for it to be finished before loading the main menu");
+				}
+				try
+				{
+					TaskAwaiter val;
+					if (num != 0)
+					{
+						val = currentRunSaveTask.GetAwaiter();
+						if (!((TaskAwaiter)(ref val)).IsCompleted)
+						{
+							num = (<>1__state = 0);
+							<>u__1 = val;
+							((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <LoadMainMenu>d__144>(ref val, ref this);
+							return;
+						}
+					}
+					else
+					{
+						val = <>u__1;
+						<>u__1 = default(TaskAwaiter);
+						num = (<>1__state = -1);
+					}
+					((TaskAwaiter)(ref val)).GetResult();
+				}
+				catch (System.Exception ex)
+				{
+					Log.Error($"Save task failed while waiting to load main menu: {ex}");
+				}
+				goto IL_00bc;
+				IL_00bc:
+				NMainMenu currentScene = NMainMenu.Create(openTimeline);
+				NHotkeyManager.Instance?.ClearHotkeys();
+				nGame.RootSceneContainer.SetCurrentScene(currentScene);
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <LoadRun>d__147 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public RunState runState;
+
+		public NGame <>4__this;
+
+		public SerializableRoom preFinishedRoom;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0172: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0177: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0142: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0157: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0159: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			NGame nGame = <>4__this;
+			try
+			{
+				TaskAwaiter val4;
+				TaskAwaiter val3;
+				TaskAwaiter val2;
+				TaskAwaiter val;
+				switch (num)
+				{
+				default:
+					val4 = PreloadManager.LoadRunAssets(Enumerable.Select<Player, CharacterModel>((System.Collections.Generic.IEnumerable<Player>)runState.Players, (Func<Player, CharacterModel>)((Player p) => p.Character))).GetAwaiter();
+					if (!((TaskAwaiter)(ref val4)).IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val4;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <LoadRun>d__147>(ref val4, ref this);
+						return;
+					}
+					goto IL_00a6;
+				case 0:
+					val4 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_00a6;
+				case 1:
+					val3 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_010b;
+				case 2:
+					val2 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_018e;
+				case 3:
+					{
+						val = <>u__1;
+						<>u__1 = default(TaskAwaiter);
+						num = (<>1__state = -1);
+						break;
+					}
+					IL_018e:
+					((TaskAwaiter)(ref val2)).GetResult();
+					val = RunManager.Instance.LoadIntoLatestMapCoord(AbstractRoom.FromSerializable(preFinishedRoom, runState)).GetAwaiter();
+					if (!((TaskAwaiter)(ref val)).IsCompleted)
+					{
+						num = (<>1__state = 3);
+						<>u__1 = val;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <LoadRun>d__147>(ref val, ref this);
+						return;
+					}
+					break;
+					IL_00a6:
+					((TaskAwaiter)(ref val4)).GetResult();
+					val3 = PreloadManager.LoadActAssets(runState.Act).GetAwaiter();
+					if (!((TaskAwaiter)(ref val3)).IsCompleted)
+					{
+						num = (<>1__state = 1);
+						<>u__1 = val3;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <LoadRun>d__147>(ref val3, ref this);
+						return;
+					}
+					goto IL_010b;
+					IL_010b:
+					((TaskAwaiter)(ref val3)).GetResult();
+					RunManager.Instance.Launch();
+					nGame.RootSceneContainer.SetCurrentScene(NRun.Create(runState));
+					val2 = RunManager.Instance.GenerateMap().GetAwaiter();
+					if (!((TaskAwaiter)(ref val2)).IsCompleted)
+					{
+						num = (<>1__state = 2);
+						<>u__1 = val2;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <LoadRun>d__147>(ref val2, ref this);
+						return;
+					}
+					goto IL_018e;
+				}
+				((TaskAwaiter)(ref val)).GetResult();
+				if (RunManager.Instance.MapDrawingsToLoad != null)
+				{
+					NRun.Instance.GlobalUi.MapScreen.Drawings.LoadDrawings(RunManager.Instance.MapDrawingsToLoad);
+					RunManager.Instance.MapDrawingsToLoad = null;
+				}
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <ReturnToMainMenu>d__141 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public NGame <>4__this;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0134: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0139: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			NGame nGame = <>4__this;
+			try
+			{
+				TaskAwaiter val3;
+				TaskAwaiter val2;
+				TaskAwaiter val;
+				switch (num)
+				{
+				default:
+					val3 = nGame.Transition.FadeOut().GetAwaiter();
+					if (!((TaskAwaiter)(ref val3)).IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val3;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <ReturnToMainMenu>d__141>(ref val3, ref this);
+						return;
+					}
+					goto IL_008c;
+				case 0:
+					val3 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_008c;
+				case 1:
+					val2 = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_00e9;
+				case 2:
+					{
+						val = <>u__1;
+						<>u__1 = default(TaskAwaiter);
+						num = (<>1__state = -1);
+						break;
+					}
+					IL_00e9:
+					((TaskAwaiter)(ref val2)).GetResult();
+					RunManager.Instance.CleanUp();
+					val = nGame.LoadMainMenu().GetAwaiter();
+					if (!((TaskAwaiter)(ref val)).IsCompleted)
+					{
+						num = (<>1__state = 2);
+						<>u__1 = val;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <ReturnToMainMenu>d__141>(ref val, ref this);
+						return;
+					}
+					break;
+					IL_008c:
+					((TaskAwaiter)(ref val3)).GetResult();
+					val2 = PreloadManager.LoadCommonAndMainMenuAssets().GetAwaiter();
+					if (!((TaskAwaiter)(ref val2)).IsCompleted)
+					{
+						num = (<>1__state = 1);
+						<>u__1 = val2;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <ReturnToMainMenu>d__141>(ref val2, ref this);
+						return;
+					}
+					goto IL_00e9;
+				}
+				((TaskAwaiter)(ref val)).GetResult();
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <ReturnToMainMenuAfterRun>d__138 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public NGame <>4__this;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			NGame nGame = <>4__this;
+			try
+			{
+				TaskAwaiter val;
+				if (num != 0)
+				{
+					val = nGame.ReturnToMainMenu().GetAwaiter();
+					if (!((TaskAwaiter)(ref val)).IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <ReturnToMainMenuAfterRun>d__138>(ref val, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+				}
+				((TaskAwaiter)(ref val)).GetResult();
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <ReturnToMainMenuWithInternalError>d__139 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public NGame <>4__this;
+
+		public System.Exception e;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			NGame nGame = <>4__this;
+			try
+			{
+				TaskAwaiter val;
+				if (num != 0)
+				{
+					if (nGame.MainMenu != null)
+					{
+						goto IL_0077;
+					}
+					val = nGame.ReturnToMainMenu().GetAwaiter();
+					if (!((TaskAwaiter)(ref val)).IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <ReturnToMainMenuWithInternalError>d__139>(ref val, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+				}
+				((TaskAwaiter)(ref val)).GetResult();
+				goto IL_0077;
+				IL_0077:
+				LocString locString = new LocString("main_menu_ui", "INTERNAL_ERROR.description");
+				locString.Add("info", ((MemberInfo)e.GetType()).Name + ": " + e.Message);
+				NErrorPopup modalToCreate = NErrorPopup.Create(new LocString("main_menu_ui", "INTERNAL_ERROR.title"), locString, null, showReportBugButton: true);
+				NModalContainer.Instance.Add(modalToCreate);
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <StartNewMultiplayerRun>d__146 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder<RunState> <>t__builder;
+
+		public StartRunLobby lobby;
+
+		public System.Collections.Generic.IReadOnlyList<ActModel> acts;
+
+		public System.Collections.Generic.IReadOnlyList<ModifierModel> modifiers;
+
+		public int ascensionLevel;
+
+		public string seed;
+
+		public bool shouldSave;
+
+		public DateTimeOffset? dailyTime;
+
+		public NGame <>4__this;
+
+		private RunState <runState>5__2;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			NGame nGame = <>4__this;
+			RunState result;
+			try
+			{
+				TaskAwaiter val;
+				if (num != 0)
+				{
+					<runState>5__2 = RunState.CreateForNewRun((System.Collections.Generic.IReadOnlyList<Player>)Enumerable.ToList<Player>(Enumerable.Select<StartRunLobbyPlayer, Player>((System.Collections.Generic.IEnumerable<StartRunLobbyPlayer>)lobby.Players, (Func<StartRunLobbyPlayer, Player>)((StartRunLobbyPlayer p) => Player.CreateForNewRun(p.character, UnlockState.FromSerializable(p.unlockState), p.id)))), (System.Collections.Generic.IReadOnlyList<ActModel>)Enumerable.ToList<ActModel>(Enumerable.Select<ActModel, ActModel>((System.Collections.Generic.IEnumerable<ActModel>)acts, (Func<ActModel, ActModel>)((ActModel a) => a.ToMutable()))), modifiers, lobby.GameMode, ascensionLevel, seed);
+					RunManager.Instance.SetUpNewMultiplayer(<runState>5__2, lobby, shouldSave, dailyTime);
+					val = nGame.StartRun(<runState>5__2).GetAwaiter();
+					if (!((TaskAwaiter)(ref val)).IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <StartNewMultiplayerRun>d__146>(ref val, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+				}
+				((TaskAwaiter)(ref val)).GetResult();
+				result = <runState>5__2;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<runState>5__2 = null;
+				<>t__builder.SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<runState>5__2 = null;
+			<>t__builder.SetResult(result);
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			<>t__builder.SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <StartNewSingleplayerRun>d__145 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder<RunState> <>t__builder;
+
+		public CharacterModel character;
+
+		public System.Collections.Generic.IReadOnlyList<ActModel> acts;
+
+		public System.Collections.Generic.IReadOnlyList<ModifierModel> modifiers;
+
+		public GameMode gameMode;
+
+		public int ascensionLevel;
+
+		public string seed;
+
+		public bool shouldSave;
+
+		public DateTimeOffset? dailyTime;
+
+		public NGame <>4__this;
+
+		private RunState <runState>5__2;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			NGame nGame = <>4__this;
+			RunState result;
+			try
+			{
+				TaskAwaiter val;
+				if (num != 0)
+				{
+					UnlockState unlockState = SaveManager.Instance.GenerateUnlockStateFromProgress();
+					<runState>5__2 = RunState.CreateForNewRun(new global::<>z__ReadOnlySingleElementList<Player>(Player.CreateForNewRun(character, unlockState, 1uL)), (System.Collections.Generic.IReadOnlyList<ActModel>)Enumerable.ToList<ActModel>(Enumerable.Select<ActModel, ActModel>((System.Collections.Generic.IEnumerable<ActModel>)acts, (Func<ActModel, ActModel>)((ActModel a) => a.ToMutable()))), modifiers, gameMode, ascensionLevel, seed);
+					RunManager.Instance.SetUpNewSingleplayer(<runState>5__2, shouldSave, dailyTime);
+					val = nGame.StartRun(<runState>5__2).GetAwaiter();
+					if (!((TaskAwaiter)(ref val)).IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter, <StartNewSingleplayerRun>d__145>(ref val, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+				}
+				((TaskAwaiter)(ref val)).GetResult();
+				result = <runState>5__2;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<runState>5__2 = null;
+				<>t__builder.SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<runState>5__2 = null;
+			<>t__builder.SetResult(result);
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			<>t__builder.SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <StartRun>d__148 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public RunState runState;
+
+		public NGame <>4__this;
+
+		private NetLoadingHandle <loadHandle>5__2;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0171: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0176: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0200: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0158: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			NGame nGame = <>4__this;
+			try
+			{
+				if ((uint)num > 3u)
+				{
+					<loadHandle>5__2 = new NetLoadingHandle(RunManager.Instance.NetService);
+				}
+				try
+				{
+					TaskAwaiter val4;
+					TaskAwaiter val3;
+					TaskAwaiter val2;
+					TaskAwaiter val;
+					switch (num)
+					{
+					default:
+						val4 = PreloadManager.LoadRunAssets(Enumerable.Select<Player, CharacterModel>((System.Collections.Generic.IEnumerable<Player>)runState.Players, (Func<Player, CharacterModel>)((Player p) => p.Character))).GetAwaiter();
+						if (!((TaskAwaiter)(ref val4)).IsCompleted)
+						{
+							num = (<>1__state = 0);
+							<>u__1 = val4;
+							((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <StartRun>d__148>(ref val4, ref this);
+							return;
+						}
+						goto IL_00c0;
+					case 0:
+						val4 = <>u__1;
+						<>u__1 = default(TaskAwaiter);
+						num = (<>1__state = -1);
+						goto IL_00c0;
+					case 1:
+						val3 = <>u__1;
+						<>u__1 = default(TaskAwaiter);
+						num = (<>1__state = -1);
+						goto IL_012b;
+					case 2:
+						val2 = <>u__1;
+						<>u__1 = default(TaskAwaiter);
+						num = (<>1__state = -1);
+						goto IL_018d;
+					case 3:
+						{
+							val = <>u__1;
+							<>u__1 = default(TaskAwaiter);
+							num = (<>1__state = -1);
+							break;
+						}
+						IL_018d:
+						((TaskAwaiter)(ref val2)).GetResult();
+						RunManager.Instance.Launch();
+						nGame.RootSceneContainer.SetCurrentScene(NRun.Create(runState));
+						val = RunManager.Instance.EnterAct(0, doTransition: false).GetAwaiter();
+						if (!((TaskAwaiter)(ref val)).IsCompleted)
+						{
+							num = (<>1__state = 3);
+							<>u__1 = val;
+							((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <StartRun>d__148>(ref val, ref this);
+							return;
+						}
+						break;
+						IL_00c0:
+						((TaskAwaiter)(ref val4)).GetResult();
+						val3 = PreloadManager.LoadActAssets(runState.Acts[0]).GetAwaiter();
+						if (!((TaskAwaiter)(ref val3)).IsCompleted)
+						{
+							num = (<>1__state = 1);
+							<>u__1 = val3;
+							((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <StartRun>d__148>(ref val3, ref this);
+							return;
+						}
+						goto IL_012b;
+						IL_012b:
+						((TaskAwaiter)(ref val3)).GetResult();
+						val2 = RunManager.Instance.FinalizeStartingRelics().GetAwaiter();
+						if (!((TaskAwaiter)(ref val2)).IsCompleted)
+						{
+							num = (<>1__state = 2);
+							<>u__1 = val2;
+							((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <StartRun>d__148>(ref val2, ref this);
+							return;
+						}
+						goto IL_018d;
+					}
+					((TaskAwaiter)(ref val)).GetResult();
+				}
+				finally
+				{
+					if (num < 0 && <loadHandle>5__2 != null)
+					{
+						((System.IDisposable)<loadHandle>5__2).Dispose();
+					}
+				}
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<loadHandle>5__2 = null;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<loadHandle>5__2 = null;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <TryErrorInit>d__119 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public NGame <>4__this;
+
+		private object <>u__1;
+
+		private void MoveNext()
+		{
+			int num = <>1__state;
+			NGame nGame = <>4__this;
+			try
+			{
+				IAwaiter<Variant[]> awaiter;
+				if (num != 0)
+				{
+					try
+					{
+						if (SaveManager.Instance.SettingsSave == null)
+						{
+							SaveManager.Instance.InitSettingsData();
+						}
+						if (LocManager.Instance == null)
+						{
+							LocManager.Initialize();
+						}
+					}
+					catch (System.Exception ex)
+					{
+						Log.Error($"Failed to show error dialog! Exception: {ex}");
+						nGame.GetTree().Quit();
+						throw;
+					}
+					if (nGame.IsNodeReady())
+					{
+						goto IL_00dd;
+					}
+					awaiter = nGame.ToSignal(nGame, Node.SignalName.Ready).GetAwaiter();
+					if (!awaiter.IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = awaiter;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitOnCompleted<IAwaiter<Variant[]>, <TryErrorInit>d__119>(ref awaiter, ref this);
+						return;
+					}
+				}
+				else
+				{
+					awaiter = (IAwaiter<Variant[]>)<>u__1;
+					<>u__1 = null;
+					num = (<>1__state = -1);
+				}
+				awaiter.GetResult();
+				goto IL_00dd;
+				IL_00dd:
+				nGame.Transition.Visible = false;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	public static readonly Vector2 devResolution = new Vector2(1920f, 1080f);
+
+	private readonly TaskCompletionSource _gameStartupComplete = new TaskCompletionSource();
+
+	[CompilerGenerated]
+	private Action? m_DebugToggleProceedButton;
+
+	private Control _inspectionContainer;
+
+	private NScreenShake _screenShake;
+
+	private static int? _mainThreadId;
+
+	private static Window _window = null;
+
+	private CancellationTokenSource? _logoCancelToken;
+
+	private SteamJoinCallbackHandler? _joinCallbackHandler;
+
+	private WindowChangeEventHandler backing_WindowChange;
+
+	private PhobiaModeToggledEventHandler backing_PhobiaModeToggled;
+
+	[field: CompilerGenerated]
+	public static NGame? Instance
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public NSceneContainer RootSceneContainer
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public Node? HoverTipsContainer
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	public NMainMenu? MainMenu => RootSceneContainer.CurrentScene as NMainMenu;
+
+	public NRun? CurrentRunNode => RootSceneContainer.CurrentScene as NRun;
+
+	public NLogoAnimation? LogoAnimation => RootSceneContainer.CurrentScene as NLogoAnimation;
+
+	[field: CompilerGenerated]
+	public NTransition Transition
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public NMultiplayerTimeoutOverlay TimeoutOverlay
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public NAudioManager AudioManager
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public NRemoteMouseCursorContainer RemoteCursorContainer
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public NInputManager InputManager
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public NHotkeyManager HotkeyManager
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public NSendFeedbackScreen? FeedbackScreen
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public NReactionWheel ReactionWheel
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public NReactionContainer ReactionContainer
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public NCursorManager CursorManager
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public NDebugAudioManager DebugAudio
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public string? DebugSeedOverride
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		set;
+	}
+
+	[field: CompilerGenerated]
+	public bool StartOnMainMenu
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		set;
+	} = true;
+
+	public System.Threading.Tasks.Task GameStartupComplete => _gameStartupComplete.Task;
+
+	[field: CompilerGenerated]
+	public static bool IsTrailerMode
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public static bool IsDebugHidingHoverTips
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public static bool IsDebugHidingProceedButton
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public NInspectRelicScreen? InspectRelicScreen
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		set;
+	}
+
+	[field: CompilerGenerated]
+	public NInspectCardScreen? InspectCardScreen
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		set;
+	}
+
+	public Control? ScreenshakeTarget => _screenShake.ShakeTarget;
+
+	[field: CompilerGenerated]
+	private WorldEnvironment WorldEnvironment
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		set;
+	}
+
+	[field: CompilerGenerated]
+	private NHitStop HitStop
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		set;
+	}
+
+	public event Action DebugToggleProceedButton
+	{
+		[CompilerGenerated]
+		add
+		{
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Expected O, but got Unknown
+			Action val = this.m_DebugToggleProceedButton;
+			Action val2;
+			do
+			{
+				val2 = val;
+				Action val3 = (Action)System.Delegate.Combine((System.Delegate)(object)val2, (System.Delegate)(object)value);
+				val = Interlocked.CompareExchange<Action>(ref this.m_DebugToggleProceedButton, val3, val2);
+			}
+			while (val != val2);
+		}
+		[CompilerGenerated]
+		remove
+		{
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Expected O, but got Unknown
+			Action val = this.m_DebugToggleProceedButton;
+			Action val2;
+			do
+			{
+				val2 = val;
+				Action val3 = (Action)System.Delegate.Remove((System.Delegate)(object)val2, (System.Delegate)(object)value);
+				val = Interlocked.CompareExchange<Action>(ref this.m_DebugToggleProceedButton, val3, val2);
+			}
+			while (val != val2);
+		}
+	}
+
+	public event WindowChangeEventHandler WindowChange
+	{
+		add
+		{
+			backing_WindowChange = (WindowChangeEventHandler)System.Delegate.Combine((System.Delegate)backing_WindowChange, (System.Delegate)value);
+		}
+		remove
+		{
+			backing_WindowChange = (WindowChangeEventHandler)System.Delegate.Remove((System.Delegate)backing_WindowChange, (System.Delegate)value);
+		}
+	}
+
+	public event PhobiaModeToggledEventHandler PhobiaModeToggled
+	{
+		add
+		{
+			backing_PhobiaModeToggled = (PhobiaModeToggledEventHandler)System.Delegate.Combine((System.Delegate)backing_PhobiaModeToggled, (System.Delegate)value);
+		}
+		remove
+		{
+			backing_PhobiaModeToggled = (PhobiaModeToggledEventHandler)System.Delegate.Remove((System.Delegate)backing_PhobiaModeToggled, (System.Delegate)value);
+		}
+	}
+
+	public override void _EnterTree()
+	{
+		CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+		CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
+		if (Instance != null)
+		{
+			Log.Error("NGame already exists.");
+			this.QueueFreeSafely();
+			return;
+		}
+		Instance = this;
+		RootSceneContainer = GetNode<NSceneContainer>("%RootSceneContainer");
+		HoverTipsContainer = GetNode<Node>("%HoverTipsContainer");
+		DebugAudio = GetNode<NDebugAudioManager>("%DebugAudioManager");
+		AudioManager = GetNode<NAudioManager>("%AudioManager");
+		RemoteCursorContainer = GetNode<NRemoteMouseCursorContainer>("%RemoteCursorContainer");
+		InputManager = GetNode<NInputManager>("%InputManager");
+		CursorManager = GetNode<NCursorManager>("%CursorManager");
+		ReactionWheel = GetNode<NReactionWheel>("%ReactionWheel");
+		ReactionContainer = GetNode<NReactionContainer>("%ReactionContainer");
+		TimeoutOverlay = GetNode<NMultiplayerTimeoutOverlay>("%MultiplayerTimeoutOverlay");
+		WorldEnvironment = GetNode<WorldEnvironment>("%WorldEnvironment");
+		HotkeyManager = GetNode<NHotkeyManager>("%HotkeyManager");
+		_inspectionContainer = GetNode<Control>("%InspectionContainer");
+		_screenShake = GetNode<NScreenShake>("ScreenShake");
+		HitStop = GetNode<NHitStop>("HitStop");
+		Transition = GetNode<NTransition>("%GameTransitionRect");
+		_mainThreadId = Environment.CurrentManagedThreadId;
+		GetWindow().Connect(Window.SignalName.FilesDropped, Callable.From<string[]>((Action<string[]>)OnFilesDropped));
+		TaskHelper.RunSafely(GameStartupWrapper());
+	}
+
+	private void OnFilesDropped(string[] files)
+	{
+		FileDropHandler.OnFilesDropped(files);
+	}
+
+	public override void _Ready()
+	{
+		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002b: Expected O, but got Unknown
+		_window = GetTree().Root;
+		_window.Connect(Viewport.SignalName.SizeChanged, Callable.From(new Action(OnWindowChange)));
+		this.RemoveChildSafely(WorldEnvironment);
+	}
+
+	[AsyncStateMachine(typeof(<GameStartupWrapper>d__118))]
+	private System.Threading.Tasks.Task GameStartupWrapper()
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<GameStartupWrapper>d__118 <GameStartupWrapper>d__119 = default(<GameStartupWrapper>d__118);
+		<GameStartupWrapper>d__119.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<GameStartupWrapper>d__119.<>4__this = this;
+		<GameStartupWrapper>d__119.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <GameStartupWrapper>d__119.<>t__builder)).Start<<GameStartupWrapper>d__118>(ref <GameStartupWrapper>d__119);
+		return ((AsyncTaskMethodBuilder)(ref <GameStartupWrapper>d__119.<>t__builder)).Task;
+	}
+
+	[AsyncStateMachine(typeof(<TryErrorInit>d__119))]
+	private System.Threading.Tasks.Task TryErrorInit()
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<TryErrorInit>d__119 <TryErrorInit>d__120 = default(<TryErrorInit>d__119);
+		<TryErrorInit>d__120.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<TryErrorInit>d__120.<>4__this = this;
+		<TryErrorInit>d__120.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <TryErrorInit>d__120.<>t__builder)).Start<<TryErrorInit>d__119>(ref <TryErrorInit>d__120);
+		return ((AsyncTaskMethodBuilder)(ref <TryErrorInit>d__120.<>t__builder)).Task;
+	}
+
+	[AsyncStateMachine(typeof(<GameStartupError>d__120))]
+	private System.Threading.Tasks.Task GameStartupError()
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<GameStartupError>d__120 <GameStartupError>d__121 = default(<GameStartupError>d__120);
+		<GameStartupError>d__121.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<GameStartupError>d__121.<>4__this = this;
+		<GameStartupError>d__121.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <GameStartupError>d__121.<>t__builder)).Start<<GameStartupError>d__120>(ref <GameStartupError>d__121);
+		return ((AsyncTaskMethodBuilder)(ref <GameStartupError>d__121.<>t__builder)).Task;
+	}
+
+	[AsyncStateMachine(typeof(<GameStartup>d__121))]
+	private System.Threading.Tasks.Task GameStartup()
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<GameStartup>d__121 <GameStartup>d__122 = default(<GameStartup>d__121);
+		<GameStartup>d__122.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<GameStartup>d__122.<>4__this = this;
+		<GameStartup>d__122.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <GameStartup>d__122.<>t__builder)).Start<<GameStartup>d__121>(ref <GameStartup>d__122);
+		return ((AsyncTaskMethodBuilder)(ref <GameStartup>d__122.<>t__builder)).Task;
+	}
+
+	[AsyncStateMachine(typeof(<DoCloudSync>d__122))]
+	private System.Threading.Tasks.Task DoCloudSync()
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<DoCloudSync>d__122 <DoCloudSync>d__123 = default(<DoCloudSync>d__122);
+		<DoCloudSync>d__123.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<DoCloudSync>d__123.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <DoCloudSync>d__123.<>t__builder)).Start<<DoCloudSync>d__122>(ref <DoCloudSync>d__123);
+		return ((AsyncTaskMethodBuilder)(ref <DoCloudSync>d__123.<>t__builder)).Task;
+	}
+
+	private void OnWindowChange()
+	{
+		Log.Info($"Window changed! New size: {DisplayServer.WindowGetSize()}");
+		EmitSignal(SignalName.WindowChange, SaveManager.Instance.SettingsSave.AspectRatioSetting == AspectRatioSetting.Auto);
+	}
+
+	public static bool IsMainThread()
+	{
+		if (!_mainThreadId.HasValue)
+		{
+			_mainThreadId = Environment.CurrentManagedThreadId;
+			return true;
+		}
+		return _mainThreadId == Environment.CurrentManagedThreadId;
+	}
+
+	public override void _ExitTree()
+	{
+		ModManager.OnModDetected -= OnNewModDetected;
+		ModManager.Dispose();
+		_joinCallbackHandler?.Dispose();
+		SteamInitializer.Uninitialize();
+		SentryService.Shutdown();
+	}
+
+	public static bool IsReleaseGame()
+	{
+		return true;
+	}
+
+	private void InitializeGraphicsPreferences()
+	{
+		if (!DisplayServer.GetName().Equals("headless", (StringComparison)5))
+		{
+			ApplyDisplaySettings();
+			ApplySyncSetting();
+		}
+		Engine.MaxFps = SaveManager.Instance.SettingsSave.FpsLimit;
+	}
+
+	public void ApplyDisplaySettings()
+	{
+		//IL_026e: Unknown result type (might be due to invalid IL or missing references)
+		bool flag = false;
+		SettingsSave settingsSave = SaveManager.Instance.SettingsSave;
+		if (settingsSave.TargetDisplay == -1)
+		{
+			Log.Info("First time setup for display settings...");
+			settingsSave.TargetDisplay = DisplayServer.GetPrimaryScreen();
+		}
+		bool flag2 = PlatformUtil.GetSupportedWindowMode().ResolveFullscreen(settingsSave.Fullscreen, DebugSettings.DevWindowed);
+		if (flag2 && !settingsSave.Fullscreen)
+		{
+			Log.Warn($"Settings has fullscreen set to false, but we're forcing fullscreen because the platform reports our supported window mode as {PlatformUtil.GetSupportedWindowMode()}");
+		}
+		else if (!flag2 && settingsSave.Fullscreen)
+		{
+			Log.Info("[Display] STS2_DEV_WINDOWED is set. Forcing windowed mode for this launch.");
+		}
+		Log.Info($"Applying display settings...\n  FULLSCREEN: {flag2}\n  ASPECT_RATIO: ({settingsSave.AspectRatioSetting})\n  TARGET_DISPLAY: ({settingsSave.TargetDisplay})\n  WINDOW_SIZE: {settingsSave.WindowSize}\n  POSITION: {settingsSave.WindowPosition}");
+		Log.Info($"[Display] Min size: {DisplayServer.WindowGetMinSize()} Max size: {DisplayServer.WindowGetMaxSize()}");
+		if (settingsSave.AspectRatioSetting != AspectRatioSetting.Auto)
+		{
+			_window.ContentScaleAspect = Window.ContentScaleAspectEnum.Keep;
+		}
+		switch (settingsSave.AspectRatioSetting)
+		{
+		case AspectRatioSetting.Auto:
+			flag = true;
+			break;
+		case AspectRatioSetting.FourByThree:
+			_window.ContentScaleSize = new Vector2I(1680, 1260);
+			break;
+		case AspectRatioSetting.SixteenByTen:
+			_window.ContentScaleSize = new Vector2I(1920, 1200);
+			break;
+		case AspectRatioSetting.SixteenByNine:
+			_window.ContentScaleSize = new Vector2I(1920, 1080);
+			break;
+		case AspectRatioSetting.TwentyOneByNine:
+			_window.ContentScaleSize = new Vector2I(2580, 1080);
+			break;
+		default:
+			throw new ArgumentOutOfRangeException($"Invalid Aspect Ratio: {settingsSave.AspectRatioSetting}");
+		}
+		int num = Environment.GetCommandLineArgs().IndexOf("-wpos");
+		if (flag2 && num < 0)
+		{
+			if (_window.Unresizable)
+			{
+				_window.Unresizable = false;
+			}
+			Log.Info($"[Display] Setting FULLSCREEN on Display: {settingsSave.TargetDisplay + 1} of {DisplayServer.GetScreenCount()}");
+			if (settingsSave.TargetDisplay >= DisplayServer.GetScreenCount())
+			{
+				Log.Warn($"[Display] FAILED: Display {settingsSave.TargetDisplay} is missing. Fallback to primary.");
+				DisplayServer.WindowSetCurrentScreen(DisplayServer.GetPrimaryScreen());
+				settingsSave.TargetDisplay = DisplayServer.GetPrimaryScreen();
+			}
+			else
+			{
+				DisplayServer.WindowSetCurrentScreen(settingsSave.TargetDisplay);
+			}
+			DisplayServer.WindowSetMode(DisplayServer.WindowMode.Fullscreen);
+		}
+		else
+		{
+			Log.Info($"[Display] Attempting WINDOWED mode on Display {settingsSave.TargetDisplay + 1} of {DisplayServer.GetScreenCount()} at position {settingsSave.WindowPosition}");
+			DisplayServer.WindowSetMode(DisplayServer.WindowMode.Windowed);
+			if (_window.Unresizable != !settingsSave.ResizeWindows)
+			{
+				_window.Unresizable = !settingsSave.ResizeWindows;
+			}
+			if (num >= 0)
+			{
+				Log.Info("[Display] -wpos called. Applying special logic.");
+				settingsSave.Fullscreen = false;
+				Vector2I vector2I = new Vector2I(int.Parse(Environment.GetCommandLineArgs()[num + 1]), int.Parse(Environment.GetCommandLineArgs()[num + 2]));
+				Vector2I vector2I2 = DisplayServer.ScreenGetPosition(DisplayServer.WindowGetCurrentScreen());
+				Log.Info($"Applying window position from command line arg: {vector2I} ({string.Join(",", Environment.GetCommandLineArgs())} {vector2I2})");
+				DisplayServer.WindowSetPosition(vector2I2 + vector2I);
+				DisplayServer.WindowSetSize(settingsSave.WindowSize);
+			}
+			else
+			{
+				Vector2I vector2I3 = DisplayServer.ScreenGetSize(settingsSave.TargetDisplay);
+				Vector2I windowSize = settingsSave.WindowSize;
+				if (settingsSave.WindowPosition == new Vector2I(-1, -1))
+				{
+					Log.Info($"[Display] Going from fullscreen to windowed. Attempting to center window on screen {settingsSave.TargetDisplay}");
+					settingsSave.WindowPosition = vector2I3 / 2 - windowSize / 2;
+				}
+				Vector2I vector2I4 = settingsSave.WindowPosition;
+				if (vector2I4.X < 0 || vector2I4.Y < 0 || vector2I4.X > vector2I3.X || vector2I4.Y > vector2I3.Y)
+				{
+					Log.Warn("[Display] WARN: Game Window was offscreen. Resetting to top left corner.");
+					vector2I4 = new Vector2I(8, 48);
+				}
+				if (settingsSave.TargetDisplay >= DisplayServer.GetScreenCount())
+				{
+					Log.Info($"[Display] FAILED: Display {settingsSave.TargetDisplay + 1} is missing. Fallback to primary.");
+					settingsSave.WindowPosition = new Vector2I(8, 48);
+					DisplayServer.WindowSetSize(DisplayServer.ScreenGetSize(DisplayServer.GetPrimaryScreen()) - new Vector2I(8, 48));
+					DisplayServer.WindowSetPosition(DisplayServer.ScreenGetPosition(DisplayServer.GetPrimaryScreen()) + settingsSave.WindowPosition);
+				}
+				else
+				{
+					Vector2I vector2I5 = DisplayServer.ScreenGetPosition(settingsSave.TargetDisplay);
+					if (windowSize.X > vector2I3.X)
+					{
+						windowSize.X = vector2I3.X;
+					}
+					if (windowSize.Y > vector2I3.Y)
+					{
+						windowSize.Y = vector2I3.Y;
+					}
+					Log.Info($"[Display] SUCCESS: {windowSize} Windowed mode in Display {settingsSave.TargetDisplay}: Position {vector2I5 + vector2I4} ({vector2I4})");
+					DisplayServer.WindowSetSize(windowSize);
+					DisplayServer.WindowSetPosition(vector2I5 + vector2I4);
+					Log.Info($"[Display] New size: {DisplayServer.WindowGetSize()} position: {DisplayServer.WindowGetPosition()}");
+				}
+			}
+		}
+		if (flag)
+		{
+			Log.Info("Manual window change signal because of auto scaling");
+			EmitSignal(SignalName.WindowChange, settingsSave.AspectRatioSetting == AspectRatioSetting.Auto);
+		}
+	}
+
+	public NInspectRelicScreen GetInspectRelicScreen()
+	{
+		if (InspectRelicScreen == null)
+		{
+			InspectRelicScreen = NInspectRelicScreen.Create();
+			_inspectionContainer.AddChildSafely(InspectRelicScreen);
+		}
+		return InspectRelicScreen;
+	}
+
+	public NInspectCardScreen GetInspectCardScreen()
+	{
+		if (InspectCardScreen == null)
+		{
+			InspectCardScreen = NInspectCardScreen.Create();
+			_inspectionContainer.AddChildSafely(InspectCardScreen);
+		}
+		return InspectCardScreen;
+	}
+
+	public static void ApplySyncSetting()
+	{
+		switch (SaveManager.Instance.SettingsSave.VSync)
+		{
+		case VSyncType.Off:
+			Log.Info("VSync: Off");
+			DisplayServer.WindowSetVsyncMode(DisplayServer.VSyncMode.Disabled);
+			break;
+		case VSyncType.On:
+			Log.Info("VSync: On");
+			DisplayServer.WindowSetVsyncMode(DisplayServer.VSyncMode.Enabled);
+			break;
+		case VSyncType.Adaptive:
+			Log.Info("VSync: Adaptive");
+			DisplayServer.WindowSetVsyncMode(DisplayServer.VSyncMode.Adaptive);
+			break;
+		default:
+			Log.Error($"Invalid VSync type: {SaveManager.Instance.SettingsSave.VSync}");
+			break;
+		}
+	}
+
+	public static void Reset()
+	{
+		Instance?.QueueFreeSafely();
+		Instance = null;
+	}
+
+	public override void _Notification(int what)
+	{
+		if ((long)what == 1006)
+		{
+			Quit();
+		}
+	}
+
+	public void Quit()
+	{
+		//IL_0113: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011d: Expected O, but got Unknown
+		Log.Info("NGame.Quit called");
+		if (!PlatformUtil.GetSupportedWindowMode().ShouldForceFullscreen() && !SaveManager.Instance.SettingsSave.Fullscreen)
+		{
+			SettingsSave settingsSave = SaveManager.Instance.SettingsSave;
+			settingsSave.WindowSize = DisplayServer.WindowGetSize();
+			settingsSave.TargetDisplay = DisplayServer.WindowGetCurrentScreen();
+			settingsSave.WindowPosition = DisplayServer.WindowGetPosition() - DisplayServer.ScreenGetPosition(SaveManager.Instance.SettingsSave.TargetDisplay);
+			Log.Info($"[Display] On exit, saving window size: {settingsSave.WindowSize} display: {settingsSave.TargetDisplay} position: {settingsSave.WindowPosition}");
+		}
+		SaveManager.Instance.SaveSettings();
+		if (SaveManager.Instance.IsProfileInitialized)
+		{
+			SaveManager.Instance.SavePrefsFile();
+			SaveManager.Instance.SaveProgressFile();
+			SaveManager.Instance.SaveProfile();
+		}
+		SteamInitializer.SteamNoLongerRunning -= new Action(OnSteamNoLongerRunning);
+		MegaLabel.DisposeCachedParagraph();
+		MegaRichTextLabel.DisposeCachedParagraph();
+		FontManager.ClearCache();
+		GetTree().Quit();
+	}
+
+	[AsyncStateMachine(typeof(<LaunchMainMenu>d__135))]
+	private System.Threading.Tasks.Task LaunchMainMenu(bool skipLogo)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<LaunchMainMenu>d__135 <LaunchMainMenu>d__136 = default(<LaunchMainMenu>d__135);
+		<LaunchMainMenu>d__136.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<LaunchMainMenu>d__136.<>4__this = this;
+		<LaunchMainMenu>d__136.skipLogo = skipLogo;
+		<LaunchMainMenu>d__136.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <LaunchMainMenu>d__136.<>t__builder)).Start<<LaunchMainMenu>d__135>(ref <LaunchMainMenu>d__136);
+		return ((AsyncTaskMethodBuilder)(ref <LaunchMainMenu>d__136.<>t__builder)).Task;
+	}
+
+	[AsyncStateMachine(typeof(<LoadDeferredStartupAssetsAsync>d__136))]
+	private System.Threading.Tasks.Task LoadDeferredStartupAssetsAsync()
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<LoadDeferredStartupAssetsAsync>d__136 <LoadDeferredStartupAssetsAsync>d__137 = default(<LoadDeferredStartupAssetsAsync>d__136);
+		<LoadDeferredStartupAssetsAsync>d__137.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<LoadDeferredStartupAssetsAsync>d__137.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <LoadDeferredStartupAssetsAsync>d__137.<>t__builder)).Start<<LoadDeferredStartupAssetsAsync>d__136>(ref <LoadDeferredStartupAssetsAsync>d__137);
+		return ((AsyncTaskMethodBuilder)(ref <LoadDeferredStartupAssetsAsync>d__137.<>t__builder)).Task;
+	}
+
+	[AsyncStateMachine(typeof(<GoToTimelineAfterRun>d__137))]
+	public System.Threading.Tasks.Task GoToTimelineAfterRun()
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<GoToTimelineAfterRun>d__137 <GoToTimelineAfterRun>d__138 = default(<GoToTimelineAfterRun>d__137);
+		<GoToTimelineAfterRun>d__138.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<GoToTimelineAfterRun>d__138.<>4__this = this;
+		<GoToTimelineAfterRun>d__138.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <GoToTimelineAfterRun>d__138.<>t__builder)).Start<<GoToTimelineAfterRun>d__137>(ref <GoToTimelineAfterRun>d__138);
+		return ((AsyncTaskMethodBuilder)(ref <GoToTimelineAfterRun>d__138.<>t__builder)).Task;
+	}
+
+	[AsyncStateMachine(typeof(<ReturnToMainMenuAfterRun>d__138))]
+	public System.Threading.Tasks.Task ReturnToMainMenuAfterRun()
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<ReturnToMainMenuAfterRun>d__138 <ReturnToMainMenuAfterRun>d__139 = default(<ReturnToMainMenuAfterRun>d__138);
+		<ReturnToMainMenuAfterRun>d__139.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<ReturnToMainMenuAfterRun>d__139.<>4__this = this;
+		<ReturnToMainMenuAfterRun>d__139.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <ReturnToMainMenuAfterRun>d__139.<>t__builder)).Start<<ReturnToMainMenuAfterRun>d__138>(ref <ReturnToMainMenuAfterRun>d__139);
+		return ((AsyncTaskMethodBuilder)(ref <ReturnToMainMenuAfterRun>d__139.<>t__builder)).Task;
+	}
+
+	[AsyncStateMachine(typeof(<ReturnToMainMenuWithInternalError>d__139))]
+	public System.Threading.Tasks.Task ReturnToMainMenuWithInternalError(System.Exception e)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<ReturnToMainMenuWithInternalError>d__139 <ReturnToMainMenuWithInternalError>d__140 = default(<ReturnToMainMenuWithInternalError>d__139);
+		<ReturnToMainMenuWithInternalError>d__140.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<ReturnToMainMenuWithInternalError>d__140.<>4__this = this;
+		<ReturnToMainMenuWithInternalError>d__140.e = e;
+		<ReturnToMainMenuWithInternalError>d__140.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <ReturnToMainMenuWithInternalError>d__140.<>t__builder)).Start<<ReturnToMainMenuWithInternalError>d__139>(ref <ReturnToMainMenuWithInternalError>d__140);
+		return ((AsyncTaskMethodBuilder)(ref <ReturnToMainMenuWithInternalError>d__140.<>t__builder)).Task;
+	}
+
+	[AsyncStateMachine(typeof(<GoToTimeline>d__140))]
+	public System.Threading.Tasks.Task GoToTimeline()
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<GoToTimeline>d__140 <GoToTimeline>d__141 = default(<GoToTimeline>d__140);
+		<GoToTimeline>d__141.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<GoToTimeline>d__141.<>4__this = this;
+		<GoToTimeline>d__141.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <GoToTimeline>d__141.<>t__builder)).Start<<GoToTimeline>d__140>(ref <GoToTimeline>d__141);
+		return ((AsyncTaskMethodBuilder)(ref <GoToTimeline>d__141.<>t__builder)).Task;
+	}
+
+	[AsyncStateMachine(typeof(<ReturnToMainMenu>d__141))]
+	public System.Threading.Tasks.Task ReturnToMainMenu()
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<ReturnToMainMenu>d__141 <ReturnToMainMenu>d__142 = default(<ReturnToMainMenu>d__141);
+		<ReturnToMainMenu>d__142.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<ReturnToMainMenu>d__142.<>4__this = this;
+		<ReturnToMainMenu>d__142.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <ReturnToMainMenu>d__142.<>t__builder)).Start<<ReturnToMainMenu>d__141>(ref <ReturnToMainMenu>d__142);
+		return ((AsyncTaskMethodBuilder)(ref <ReturnToMainMenu>d__142.<>t__builder)).Task;
+	}
+
+	public void Relocalize()
+	{
+		if (RootSceneContainer.CurrentScene is NMainMenu)
+		{
+			ReloadMainMenu();
+		}
+		FeedbackScreen?.Relocalize();
+		TimeoutOverlay.Relocalize();
+	}
+
+	public void ReloadMainMenu()
+	{
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		if (MainMenu == null)
+		{
+			throw new InvalidOperationException("Tried to reload main menu when not already on the main menu!");
+		}
+		TaskHelper.RunSafely(LoadMainMenu());
+	}
+
+	[AsyncStateMachine(typeof(<LoadMainMenu>d__144))]
+	private System.Threading.Tasks.Task LoadMainMenu(bool openTimeline = false)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<LoadMainMenu>d__144 <LoadMainMenu>d__145 = default(<LoadMainMenu>d__144);
+		<LoadMainMenu>d__145.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<LoadMainMenu>d__145.<>4__this = this;
+		<LoadMainMenu>d__145.openTimeline = openTimeline;
+		<LoadMainMenu>d__145.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <LoadMainMenu>d__145.<>t__builder)).Start<<LoadMainMenu>d__144>(ref <LoadMainMenu>d__145);
+		return ((AsyncTaskMethodBuilder)(ref <LoadMainMenu>d__145.<>t__builder)).Task;
+	}
+
+	[AsyncStateMachine(typeof(<StartNewSingleplayerRun>d__145))]
+	public async System.Threading.Tasks.Task<RunState> StartNewSingleplayerRun(CharacterModel character, bool shouldSave, System.Collections.Generic.IReadOnlyList<ActModel> acts, System.Collections.Generic.IReadOnlyList<ModifierModel> modifiers, string seed, GameMode gameMode, int ascensionLevel = 0, DateTimeOffset? dailyTime = null)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		UnlockState unlockState = SaveManager.Instance.GenerateUnlockStateFromProgress();
+		RunState runState = RunState.CreateForNewRun(new global::<>z__ReadOnlySingleElementList<Player>(Player.CreateForNewRun(character, unlockState, 1uL)), (System.Collections.Generic.IReadOnlyList<ActModel>)Enumerable.ToList<ActModel>(Enumerable.Select<ActModel, ActModel>((System.Collections.Generic.IEnumerable<ActModel>)acts, (Func<ActModel, ActModel>)((ActModel a) => a.ToMutable()))), modifiers, gameMode, ascensionLevel, seed);
+		RunManager.Instance.SetUpNewSingleplayer(runState, shouldSave, dailyTime);
+		await StartRun(runState);
+		return runState;
+	}
+
+	[AsyncStateMachine(typeof(<StartNewMultiplayerRun>d__146))]
+	public async System.Threading.Tasks.Task<RunState> StartNewMultiplayerRun(StartRunLobby lobby, bool shouldSave, System.Collections.Generic.IReadOnlyList<ActModel> acts, System.Collections.Generic.IReadOnlyList<ModifierModel> modifiers, string seed, int ascensionLevel, DateTimeOffset? dailyTime = null)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		RunState runState = RunState.CreateForNewRun((System.Collections.Generic.IReadOnlyList<Player>)Enumerable.ToList<Player>(Enumerable.Select<StartRunLobbyPlayer, Player>((System.Collections.Generic.IEnumerable<StartRunLobbyPlayer>)lobby.Players, (Func<StartRunLobbyPlayer, Player>)((StartRunLobbyPlayer p) => Player.CreateForNewRun(p.character, UnlockState.FromSerializable(p.unlockState), p.id)))), (System.Collections.Generic.IReadOnlyList<ActModel>)Enumerable.ToList<ActModel>(Enumerable.Select<ActModel, ActModel>((System.Collections.Generic.IEnumerable<ActModel>)acts, (Func<ActModel, ActModel>)((ActModel a) => a.ToMutable()))), modifiers, lobby.GameMode, ascensionLevel, seed);
+		RunManager.Instance.SetUpNewMultiplayer(runState, lobby, shouldSave, dailyTime);
+		await StartRun(runState);
+		return runState;
+	}
+
+	[AsyncStateMachine(typeof(<LoadRun>d__147))]
+	public System.Threading.Tasks.Task LoadRun(RunState runState, SerializableRoom? preFinishedRoom)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<LoadRun>d__147 <LoadRun>d__148 = default(<LoadRun>d__147);
+		<LoadRun>d__148.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<LoadRun>d__148.<>4__this = this;
+		<LoadRun>d__148.runState = runState;
+		<LoadRun>d__148.preFinishedRoom = preFinishedRoom;
+		<LoadRun>d__148.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <LoadRun>d__148.<>t__builder)).Start<<LoadRun>d__147>(ref <LoadRun>d__148);
+		return ((AsyncTaskMethodBuilder)(ref <LoadRun>d__148.<>t__builder)).Task;
+	}
+
+	[AsyncStateMachine(typeof(<StartRun>d__148))]
+	private System.Threading.Tasks.Task StartRun(RunState runState)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<StartRun>d__148 <StartRun>d__149 = default(<StartRun>d__148);
+		<StartRun>d__149.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<StartRun>d__149.<>4__this = this;
+		<StartRun>d__149.runState = runState;
+		<StartRun>d__149.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <StartRun>d__149.<>t__builder)).Start<<StartRun>d__148>(ref <StartRun>d__149);
+		return ((AsyncTaskMethodBuilder)(ref <StartRun>d__149.<>t__builder)).Task;
+	}
+
+	public override void _Input(InputEvent inputEvent)
+	{
+		if (inputEvent.IsActionReleased(DebugHotkey.speedUp))
+		{
+			DebugModifyTimescale(0.1);
+		}
+		else if (inputEvent.IsActionReleased(DebugHotkey.speedDown))
+		{
+			DebugModifyTimescale(-0.1);
+		}
+		else if (inputEvent.IsActionReleased(DebugHotkey.hideProceedButton))
+		{
+			IsDebugHidingProceedButton = !IsDebugHidingProceedButton;
+			Instance.AddChildSafely(NFullscreenTextVfx.Create(IsDebugHidingProceedButton ? "Hide Proceed Button" : "Show Proceed Button"));
+			Action? obj = this.DebugToggleProceedButton;
+			if (obj != null)
+			{
+				obj.Invoke();
+			}
+		}
+		else if (inputEvent.IsActionReleased(DebugHotkey.hideHoverTips))
+		{
+			IsDebugHidingHoverTips = !IsDebugHidingHoverTips;
+			Instance.AddChildSafely(NFullscreenTextVfx.Create(IsDebugHidingHoverTips ? "Hide HoverTips" : "Show HoverTips"));
+		}
+		if (inputEvent is InputEventMouseButton { Pressed: not false } || inputEvent.IsActionPressed(MegaInput.select) || inputEvent.IsActionPressed(MegaInput.cancel))
+		{
+			CancellationTokenSource? logoCancelToken = _logoCancelToken;
+			if (logoCancelToken != null)
+			{
+				logoCancelToken.Cancel();
+			}
+		}
+		if (!(inputEvent is InputEventKey inputEventKey))
+		{
+			return;
+		}
+		if (OS.GetName().Contains("Windows"))
+		{
+			if (inputEventKey.Pressed && inputEventKey.AltPressed && inputEventKey.Keycode == Key.Enter)
+			{
+				ToggleFullscreen();
+			}
+		}
+		else if (OS.GetName().Contains("macOS") && inputEventKey.Pressed && inputEventKey.CtrlPressed && inputEventKey.MetaPressed && inputEventKey.Keycode == Key.F)
+		{
+			ToggleFullscreen();
+		}
+	}
+
+	private void ToggleFullscreen()
+	{
+		Log.Info("Used FULLSCREEN shortcut");
+		NFullscreenTickbox.SetFullscreen(!SaveManager.Instance.SettingsSave.Fullscreen);
+	}
+
+	private void DebugModifyTimescale(double offset)
+	{
+		double num = Math.Round(Engine.TimeScale + offset, 1);
+		num = Math.Clamp(num, 0.1, 4.0);
+		Engine.TimeScale = num;
+		this.AddChildSafely(NFullscreenTextVfx.Create($"TimeScale:{Engine.TimeScale}"));
+	}
+
+	public WorldEnvironment ActivateWorldEnvironment()
+	{
+		this.AddChildSafely(WorldEnvironment);
+		return WorldEnvironment;
+	}
+
+	public void DeactivateWorldEnvironment()
+	{
+		this.RemoveChildSafely(WorldEnvironment);
+	}
+
+	public void SetScreenShakeTarget(Control target)
+	{
+		_screenShake.SetTarget(target);
+	}
+
+	public void ClearScreenShakeTarget()
+	{
+		_screenShake.ClearTarget();
+	}
+
+	public void ScreenShake(ShakeStrength strength, ShakeDuration duration, float degAngle = -1f)
+	{
+		if (degAngle < 0f)
+		{
+			degAngle = Rng.Chaotic.NextFloat(360f);
+		}
+		_screenShake.Shake(strength, duration, degAngle);
+	}
+
+	public void ScreenRumble(ShakeStrength strength, ShakeDuration duration, RumbleStyle style)
+	{
+		_screenShake.Rumble(strength, duration, style);
+	}
+
+	public void ScreenShakeTrauma(ShakeStrength strength)
+	{
+		_screenShake.AddTrauma(strength);
+	}
+
+	public void DoHitStop(ShakeStrength strength, ShakeDuration duration)
+	{
+		HitStop.DoHitStop(strength, duration);
+	}
+
+	public static void ToggleTrailerMode()
+	{
+		IsTrailerMode = !IsTrailerMode;
+	}
+
+	public void SetScreenshakeMultiplier(float multiplier)
+	{
+		_screenShake.SetMultiplier(multiplier);
+	}
+
+	private void InitPools()
+	{
+		NCard.InitPool();
+		NGridCardHolder.InitPool();
+	}
+
+	private void OnNewModDetected(Mod mod)
+	{
+		if (!Enumerable.Any<NErrorPopup>(Enumerable.OfType<NErrorPopup>((System.Collections.IEnumerable)NModalContainer.Instance.GetChildren())))
+		{
+			NErrorPopup modalToCreate = NErrorPopup.Create(new LocString("main_menu_ui", "MOD_NOT_LOADED_POPUP.title"), new LocString("main_menu_ui", "MOD_NOT_LOADED_POPUP.description"), null, showReportBugButton: false);
+			NModalContainer.Instance.Add(modalToCreate);
+		}
+	}
+
+	public void CheckShowSaveFileError(ReadSaveResult<SerializableProgress> progressReadResult, ReadSaveResult<PrefsSave> prefsReadResult, ReadSaveResult<SettingsSave>? settingsReadResult)
+	{
+		LocString locString = null;
+		if (!progressReadResult.Success && progressReadResult.Status != ReadSaveStatus.FileNotFound)
+		{
+			locString = new LocString("main_menu_ui", "INVALID_SAVE_POPUP.description_progress");
+		}
+		else if (settingsReadResult != null && !settingsReadResult.Success && settingsReadResult.Status != ReadSaveStatus.FileNotFound)
+		{
+			locString = new LocString("main_menu_ui", "INVALID_SAVE_POPUP.description_settings");
+		}
+		else if (!prefsReadResult.Success && prefsReadResult.Status != ReadSaveStatus.FileNotFound)
+		{
+			locString = new LocString("main_menu_ui", "INVALID_SAVE_POPUP.description_settings");
+		}
+		if (locString != null)
+		{
+			NErrorPopup modalToCreate = NErrorPopup.Create(new LocString("main_menu_ui", "INVALID_SAVE_POPUP.title"), locString, new LocString("main_menu_ui", "INVALID_SAVE_POPUP.dismiss"), showReportBugButton: true);
+			NModalContainer.Instance.Add(modalToCreate);
+		}
+	}
+
+	private void CheckShowLocalizationOverrideErrors()
+	{
+		if (((System.Collections.Generic.IReadOnlyCollection<LocValidationError>)LocManager.Instance.ValidationErrors).Count != 0)
+		{
+			List<IGrouping<string, LocValidationError>> val = Enumerable.ToList<IGrouping<string, LocValidationError>>(Enumerable.GroupBy<LocValidationError, string>((System.Collections.Generic.IEnumerable<LocValidationError>)LocManager.Instance.ValidationErrors, (Func<LocValidationError, string>)((LocValidationError e) => e.FilePath)));
+			string text = string.Join("\n", Enumerable.Select<IGrouping<string, LocValidationError>, string>(Enumerable.Take<IGrouping<string, LocValidationError>>((System.Collections.Generic.IEnumerable<IGrouping<string, LocValidationError>>)val, 5), (Func<IGrouping<string, LocValidationError>, string>)((IGrouping<string, LocValidationError> g) => $"{Path.GetFileName(g.Key)} ({Enumerable.Count<LocValidationError>((System.Collections.Generic.IEnumerable<LocValidationError>)g)} errors)")));
+			if (val.Count > 5)
+			{
+				text += $"\n... and {val.Count - 5} more files";
+			}
+			string body = "Errors found in the following localization override files:\n\n" + text + "\n\n[gold]Check the console logs for detailed error messages.[/gold]\n\nTo fix: Remove or correct invalid override files in your localization_override folder.";
+			NErrorPopup modalToCreate = NErrorPopup.Create("Localization Override Errors", body, showReportBugButton: false);
+			NModalContainer.Instance.Add(modalToCreate);
+		}
+	}
+
+	private void CheckShowModdedSaveFilePopup()
+	{
+		if (ModManager.UnmoddedSavesWereCopied)
+		{
+			NErrorPopup modalToCreate = NErrorPopup.Create(new LocString("main_menu_ui", "MODDED_SAVE_COPY_POPUP.title"), new LocString("main_menu_ui", "MODDED_SAVE_COPY_POPUP.body"), null, showReportBugButton: false);
+			NModalContainer.Instance.Add(modalToCreate);
+		}
+	}
+
+	[AsyncStateMachine(typeof(<InitializePlatform>d__167))]
+	private async System.Threading.Tasks.Task<bool> InitializePlatform()
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		bool flag = CommandLineHelper.HasArg("force-steam");
+		string text = CommandLineHelper.GetValue("force-steam") ?? "";
+		if (!text.Equals("on", (StringComparison)5) && (!flag || !(text == string.Empty)) && (text.Equals("off", (StringComparison)5) || OS.HasFeature("editor")))
+		{
+			Log.Info("Steam initialization skipped (editor mode). Use --force-steam to enable.");
+			return true;
+		}
+		bool steamInitialized = SteamInitializer.Initialize(this);
+		if (!steamInitialized)
+		{
+			Log.Error("Failed to initialize Steam! Attempting to show error popup");
+			await TryErrorInit();
+			NGenericPopup nGenericPopup = NGenericPopup.Create();
+			if (nGenericPopup == null || NModalContainer.Instance == null)
+			{
+				Log.Error("Cannot show Steam error dialog: UI not initialized. Quitting immediately.");
+				GetTree().Quit();
+				return false;
+			}
+			NModalContainer.Instance.Add(nGenericPopup);
+			LocString locString = new LocString("main_menu_ui", "STEAM_INIT_ERROR.description");
+			locString.Add("details", SteamInitializer.InitErrorMessage ?? "<null>");
+			await nGenericPopup.WaitForConfirmation(locString, new LocString("main_menu_ui", "STEAM_INIT_ERROR.title"), null, new LocString("main_menu_ui", "QUIT"));
+			GetTree().Quit();
+		}
+		else
+		{
+			_joinCallbackHandler = new SteamJoinCallbackHandler();
+			SteamInitializer.SteamNoLongerRunning += new Action(OnSteamNoLongerRunning);
+		}
+		return steamInitialized;
+	}
+
+	private void OnSteamNoLongerRunning()
+	{
+		//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a4: Expected O, but got Unknown
+		NGenericPopup nGenericPopup = NGenericPopup.Create();
+		NModalContainer.Instance?.Add(nGenericPopup);
+		LocString locString = new LocString("main_menu_ui", "STEAM_STOPPED_ERROR.description");
+		locString.Add("details", $"{SteamInitializer.InitResult}: {SteamInitializer.InitErrorMessage}");
+		TaskHelper.RunSafely(nGenericPopup.WaitForConfirmation(locString, new LocString("main_menu_ui", "STEAM_STOPPED_ERROR.title"), null, new LocString("main_menu_ui", "GENERIC_POPUP.ok")));
+		SteamInitializer.SteamNoLongerRunning -= new Action(OnSteamNoLongerRunning);
+	}
+
+	public static void LogResourceStats(string context)
+	{
+		ulong staticMemoryUsage = OS.GetStaticMemoryUsage();
+		ulong renderingInfo = RenderingServer.GetRenderingInfo(RenderingServer.RenderingInfo.VideoMemUsed);
+		int num = (int)Performance.GetMonitor(Performance.Monitor.ObjectCount);
+		int num2 = (int)Performance.GetMonitor(Performance.Monitor.ObjectResourceCount);
+		int num3 = (int)Performance.GetMonitor(Performance.Monitor.ObjectNodeCount);
+		int num4 = Enumerable.Count<string>(PreloadManager.Cache.GetCacheKeys());
+		Log.Info($"[Startup] Resource stats ({context}): StaticMem={FormatBytes(staticMemoryUsage)}, VRAM={FormatBytes(renderingInfo)}, Objects={num:N0}, Resources={num2:N0}, Nodes={num3:N0}, CachedAssets={num4:N0}");
+	}
+
+	internal static string FormatBytes(ulong bytes)
+	{
+		string[] array = new string[4] { "B", "KB", "MB", "GB" };
+		int num = 0;
+		double num2 = bytes;
+		while (num2 >= 1024.0 && num < array.Length - 1)
+		{
+			num2 /= 1024.0;
+			num++;
+		}
+		return $"{num2:0.#}{array[num]}";
+	}
+
+	public static bool IsGameFocusedWindow()
+	{
+		if (!PlatformUtil.IsPlatformOverlayOpen())
+		{
+			return DisplayServer.WindowIsFocused();
+		}
+		return false;
+	}
+
+	public NSendFeedbackScreen GetOrCreateFeedbackScreen()
+	{
+		if (FeedbackScreen == null)
+		{
+			FeedbackScreen = NSendFeedbackScreen.Create();
+			this.AddChildSafely(FeedbackScreen);
+			this.MoveChildSafely(FeedbackScreen, Transition.GetIndex() - 1);
+		}
+		return FeedbackScreen;
+	}
+
+	public static string GetGameVersion()
+	{
+		return ReleaseInfoManager.Instance.ReleaseInfo?.Version ?? GitHelper.ShortCommitId ?? "UNKNOWN";
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	internal static List<MethodInfo> GetGodotMethodList()
+	{
+		List<MethodInfo> val = new List<MethodInfo>(39);
+		val.Add(new MethodInfo(MethodName._EnterTree, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		StringName onFilesDropped = MethodName.OnFilesDropped;
+		PropertyInfo returnVal = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags = 1L;
+		List<PropertyInfo> obj = new List<PropertyInfo>();
+		obj.Add(new PropertyInfo(Variant.Type.PackedStringArray, "files", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		val.Add(new MethodInfo(onFilesDropped, returnVal, (MethodFlags)flags, obj, null));
+		val.Add(new MethodInfo(MethodName._Ready, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.OnWindowChange, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.IsMainThread, new PropertyInfo(Variant.Type.Bool, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal | MethodFlags.Static, null, null));
+		val.Add(new MethodInfo(MethodName._ExitTree, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.IsReleaseGame, new PropertyInfo(Variant.Type.Bool, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal | MethodFlags.Static, null, null));
+		val.Add(new MethodInfo(MethodName.InitializeGraphicsPreferences, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.ApplyDisplaySettings, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.GetInspectRelicScreen, new PropertyInfo(Variant.Type.Object, "", PropertyHint.None, "", PropertyUsageFlags.Default, new StringName("Control"), exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.GetInspectCardScreen, new PropertyInfo(Variant.Type.Object, "", PropertyHint.None, "", PropertyUsageFlags.Default, new StringName("Control"), exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.ApplySyncSetting, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal | MethodFlags.Static, null, null));
+		val.Add(new MethodInfo(MethodName.Reset, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal | MethodFlags.Static, null, null));
+		StringName notification = MethodName._Notification;
+		PropertyInfo returnVal2 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags2 = 1L;
+		List<PropertyInfo> obj2 = new List<PropertyInfo>();
+		obj2.Add(new PropertyInfo(Variant.Type.Int, "what", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		val.Add(new MethodInfo(notification, returnVal2, (MethodFlags)flags2, obj2, null));
+		val.Add(new MethodInfo(MethodName.Quit, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.Relocalize, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.ReloadMainMenu, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		StringName input = MethodName._Input;
+		PropertyInfo returnVal3 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags3 = 1L;
+		List<PropertyInfo> obj3 = new List<PropertyInfo>();
+		obj3.Add(new PropertyInfo(Variant.Type.Object, "inputEvent", PropertyHint.None, "", PropertyUsageFlags.Default, new StringName("InputEvent"), exported: false));
+		val.Add(new MethodInfo(input, returnVal3, (MethodFlags)flags3, obj3, null));
+		val.Add(new MethodInfo(MethodName.ToggleFullscreen, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		StringName debugModifyTimescale = MethodName.DebugModifyTimescale;
+		PropertyInfo returnVal4 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags4 = 1L;
+		List<PropertyInfo> obj4 = new List<PropertyInfo>();
+		obj4.Add(new PropertyInfo(Variant.Type.Float, "offset", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		val.Add(new MethodInfo(debugModifyTimescale, returnVal4, (MethodFlags)flags4, obj4, null));
+		val.Add(new MethodInfo(MethodName.ActivateWorldEnvironment, new PropertyInfo(Variant.Type.Object, "", PropertyHint.None, "", PropertyUsageFlags.Default, new StringName("WorldEnvironment"), exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.DeactivateWorldEnvironment, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		StringName setScreenShakeTarget = MethodName.SetScreenShakeTarget;
+		PropertyInfo returnVal5 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags5 = 1L;
+		List<PropertyInfo> obj5 = new List<PropertyInfo>();
+		obj5.Add(new PropertyInfo(Variant.Type.Object, "target", PropertyHint.None, "", PropertyUsageFlags.Default, new StringName("Control"), exported: false));
+		val.Add(new MethodInfo(setScreenShakeTarget, returnVal5, (MethodFlags)flags5, obj5, null));
+		val.Add(new MethodInfo(MethodName.ClearScreenShakeTarget, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		StringName screenShake = MethodName.ScreenShake;
+		PropertyInfo returnVal6 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags6 = 1L;
+		List<PropertyInfo> obj6 = new List<PropertyInfo>();
+		obj6.Add(new PropertyInfo(Variant.Type.Int, "strength", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		obj6.Add(new PropertyInfo(Variant.Type.Int, "duration", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		obj6.Add(new PropertyInfo(Variant.Type.Float, "degAngle", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		val.Add(new MethodInfo(screenShake, returnVal6, (MethodFlags)flags6, obj6, null));
+		StringName screenRumble = MethodName.ScreenRumble;
+		PropertyInfo returnVal7 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags7 = 1L;
+		List<PropertyInfo> obj7 = new List<PropertyInfo>();
+		obj7.Add(new PropertyInfo(Variant.Type.Int, "strength", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		obj7.Add(new PropertyInfo(Variant.Type.Int, "duration", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		obj7.Add(new PropertyInfo(Variant.Type.Int, "style", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		val.Add(new MethodInfo(screenRumble, returnVal7, (MethodFlags)flags7, obj7, null));
+		StringName screenShakeTrauma = MethodName.ScreenShakeTrauma;
+		PropertyInfo returnVal8 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags8 = 1L;
+		List<PropertyInfo> obj8 = new List<PropertyInfo>();
+		obj8.Add(new PropertyInfo(Variant.Type.Int, "strength", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		val.Add(new MethodInfo(screenShakeTrauma, returnVal8, (MethodFlags)flags8, obj8, null));
+		StringName doHitStop = MethodName.DoHitStop;
+		PropertyInfo returnVal9 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags9 = 1L;
+		List<PropertyInfo> obj9 = new List<PropertyInfo>();
+		obj9.Add(new PropertyInfo(Variant.Type.Int, "strength", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		obj9.Add(new PropertyInfo(Variant.Type.Int, "duration", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		val.Add(new MethodInfo(doHitStop, returnVal9, (MethodFlags)flags9, obj9, null));
+		val.Add(new MethodInfo(MethodName.ToggleTrailerMode, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal | MethodFlags.Static, null, null));
+		StringName setScreenshakeMultiplier = MethodName.SetScreenshakeMultiplier;
+		PropertyInfo returnVal10 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags10 = 1L;
+		List<PropertyInfo> obj10 = new List<PropertyInfo>();
+		obj10.Add(new PropertyInfo(Variant.Type.Float, "multiplier", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		val.Add(new MethodInfo(setScreenshakeMultiplier, returnVal10, (MethodFlags)flags10, obj10, null));
+		val.Add(new MethodInfo(MethodName.InitPools, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.CheckShowLocalizationOverrideErrors, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.CheckShowModdedSaveFilePopup, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.OnSteamNoLongerRunning, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		StringName logResourceStats = MethodName.LogResourceStats;
+		PropertyInfo returnVal11 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags11 = 33L;
+		List<PropertyInfo> obj11 = new List<PropertyInfo>();
+		obj11.Add(new PropertyInfo(Variant.Type.String, "context", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		val.Add(new MethodInfo(logResourceStats, returnVal11, (MethodFlags)flags11, obj11, null));
+		StringName formatBytes = MethodName.FormatBytes;
+		PropertyInfo returnVal12 = new PropertyInfo(Variant.Type.String, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags12 = 33L;
+		List<PropertyInfo> obj12 = new List<PropertyInfo>();
+		obj12.Add(new PropertyInfo(Variant.Type.Int, "bytes", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		val.Add(new MethodInfo(formatBytes, returnVal12, (MethodFlags)flags12, obj12, null));
+		val.Add(new MethodInfo(MethodName.IsGameFocusedWindow, new PropertyInfo(Variant.Type.Bool, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal | MethodFlags.Static, null, null));
+		val.Add(new MethodInfo(MethodName.GetOrCreateFeedbackScreen, new PropertyInfo(Variant.Type.Object, "", PropertyHint.None, "", PropertyUsageFlags.Default, new StringName("Control"), exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.GetGameVersion, new PropertyInfo(Variant.Type.String, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal | MethodFlags.Static, null, null));
+		return val;
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool InvokeGodotClassMethod(in godot_string_name method, NativeVariantPtrArgs args, out godot_variant ret)
+	{
+		if (method == MethodName._EnterTree && args.Count == 0)
+		{
+			_EnterTree();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.OnFilesDropped && args.Count == 1)
+		{
+			OnFilesDropped(VariantUtils.ConvertTo<string[]>(in args[0]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName._Ready && args.Count == 0)
+		{
+			_Ready();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.OnWindowChange && args.Count == 0)
+		{
+			OnWindowChange();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.IsMainThread && args.Count == 0)
+		{
+			ret = VariantUtils.CreateFrom<bool>(IsMainThread());
+			return true;
+		}
+		if (method == MethodName._ExitTree && args.Count == 0)
+		{
+			_ExitTree();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.IsReleaseGame && args.Count == 0)
+		{
+			ret = VariantUtils.CreateFrom<bool>(IsReleaseGame());
+			return true;
+		}
+		if (method == MethodName.InitializeGraphicsPreferences && args.Count == 0)
+		{
+			InitializeGraphicsPreferences();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.ApplyDisplaySettings && args.Count == 0)
+		{
+			ApplyDisplaySettings();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.GetInspectRelicScreen && args.Count == 0)
+		{
+			ret = VariantUtils.CreateFrom<NInspectRelicScreen>(GetInspectRelicScreen());
+			return true;
+		}
+		if (method == MethodName.GetInspectCardScreen && args.Count == 0)
+		{
+			ret = VariantUtils.CreateFrom<NInspectCardScreen>(GetInspectCardScreen());
+			return true;
+		}
+		if (method == MethodName.ApplySyncSetting && args.Count == 0)
+		{
+			ApplySyncSetting();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.Reset && args.Count == 0)
+		{
+			Reset();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName._Notification && args.Count == 1)
+		{
+			_Notification(VariantUtils.ConvertTo<int>(in args[0]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.Quit && args.Count == 0)
+		{
+			Quit();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.Relocalize && args.Count == 0)
+		{
+			Relocalize();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.ReloadMainMenu && args.Count == 0)
+		{
+			ReloadMainMenu();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName._Input && args.Count == 1)
+		{
+			_Input(VariantUtils.ConvertTo<InputEvent>(in args[0]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.ToggleFullscreen && args.Count == 0)
+		{
+			ToggleFullscreen();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.DebugModifyTimescale && args.Count == 1)
+		{
+			DebugModifyTimescale(VariantUtils.ConvertTo<double>(in args[0]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.ActivateWorldEnvironment && args.Count == 0)
+		{
+			ret = VariantUtils.CreateFrom<WorldEnvironment>(ActivateWorldEnvironment());
+			return true;
+		}
+		if (method == MethodName.DeactivateWorldEnvironment && args.Count == 0)
+		{
+			DeactivateWorldEnvironment();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.SetScreenShakeTarget && args.Count == 1)
+		{
+			SetScreenShakeTarget(VariantUtils.ConvertTo<Control>(in args[0]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.ClearScreenShakeTarget && args.Count == 0)
+		{
+			ClearScreenShakeTarget();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.ScreenShake && args.Count == 3)
+		{
+			ScreenShake(VariantUtils.ConvertTo<ShakeStrength>(in args[0]), VariantUtils.ConvertTo<ShakeDuration>(in args[1]), VariantUtils.ConvertTo<float>(in args[2]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.ScreenRumble && args.Count == 3)
+		{
+			ScreenRumble(VariantUtils.ConvertTo<ShakeStrength>(in args[0]), VariantUtils.ConvertTo<ShakeDuration>(in args[1]), VariantUtils.ConvertTo<RumbleStyle>(in args[2]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.ScreenShakeTrauma && args.Count == 1)
+		{
+			ScreenShakeTrauma(VariantUtils.ConvertTo<ShakeStrength>(in args[0]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.DoHitStop && args.Count == 2)
+		{
+			DoHitStop(VariantUtils.ConvertTo<ShakeStrength>(in args[0]), VariantUtils.ConvertTo<ShakeDuration>(in args[1]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.ToggleTrailerMode && args.Count == 0)
+		{
+			ToggleTrailerMode();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.SetScreenshakeMultiplier && args.Count == 1)
+		{
+			SetScreenshakeMultiplier(VariantUtils.ConvertTo<float>(in args[0]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.InitPools && args.Count == 0)
+		{
+			InitPools();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.CheckShowLocalizationOverrideErrors && args.Count == 0)
+		{
+			CheckShowLocalizationOverrideErrors();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.CheckShowModdedSaveFilePopup && args.Count == 0)
+		{
+			CheckShowModdedSaveFilePopup();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.OnSteamNoLongerRunning && args.Count == 0)
+		{
+			OnSteamNoLongerRunning();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.LogResourceStats && args.Count == 1)
+		{
+			LogResourceStats(VariantUtils.ConvertTo<string>(in args[0]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.FormatBytes && args.Count == 1)
+		{
+			ret = VariantUtils.CreateFrom<string>(FormatBytes(VariantUtils.ConvertTo<ulong>(in args[0])));
+			return true;
+		}
+		if (method == MethodName.IsGameFocusedWindow && args.Count == 0)
+		{
+			ret = VariantUtils.CreateFrom<bool>(IsGameFocusedWindow());
+			return true;
+		}
+		if (method == MethodName.GetOrCreateFeedbackScreen && args.Count == 0)
+		{
+			ret = VariantUtils.CreateFrom<NSendFeedbackScreen>(GetOrCreateFeedbackScreen());
+			return true;
+		}
+		if (method == MethodName.GetGameVersion && args.Count == 0)
+		{
+			ret = VariantUtils.CreateFrom<string>(GetGameVersion());
+			return true;
+		}
+		return base.InvokeGodotClassMethod(in method, args, out ret);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	internal static bool InvokeGodotClassStaticMethod(in godot_string_name method, NativeVariantPtrArgs args, out godot_variant ret)
+	{
+		if (method == MethodName.IsMainThread && args.Count == 0)
+		{
+			ret = VariantUtils.CreateFrom<bool>(IsMainThread());
+			return true;
+		}
+		if (method == MethodName.IsReleaseGame && args.Count == 0)
+		{
+			ret = VariantUtils.CreateFrom<bool>(IsReleaseGame());
+			return true;
+		}
+		if (method == MethodName.ApplySyncSetting && args.Count == 0)
+		{
+			ApplySyncSetting();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.Reset && args.Count == 0)
+		{
+			Reset();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.ToggleTrailerMode && args.Count == 0)
+		{
+			ToggleTrailerMode();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.LogResourceStats && args.Count == 1)
+		{
+			LogResourceStats(VariantUtils.ConvertTo<string>(in args[0]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.FormatBytes && args.Count == 1)
+		{
+			ret = VariantUtils.CreateFrom<string>(FormatBytes(VariantUtils.ConvertTo<ulong>(in args[0])));
+			return true;
+		}
+		if (method == MethodName.IsGameFocusedWindow && args.Count == 0)
+		{
+			ret = VariantUtils.CreateFrom<bool>(IsGameFocusedWindow());
+			return true;
+		}
+		if (method == MethodName.GetGameVersion && args.Count == 0)
+		{
+			ret = VariantUtils.CreateFrom<string>(GetGameVersion());
+			return true;
+		}
+		ret = default(godot_variant);
+		return false;
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool HasGodotClassMethod(in godot_string_name method)
+	{
+		if (method == MethodName._EnterTree)
+		{
+			return true;
+		}
+		if (method == MethodName.OnFilesDropped)
+		{
+			return true;
+		}
+		if (method == MethodName._Ready)
+		{
+			return true;
+		}
+		if (method == MethodName.OnWindowChange)
+		{
+			return true;
+		}
+		if (method == MethodName.IsMainThread)
+		{
+			return true;
+		}
+		if (method == MethodName._ExitTree)
+		{
+			return true;
+		}
+		if (method == MethodName.IsReleaseGame)
+		{
+			return true;
+		}
+		if (method == MethodName.InitializeGraphicsPreferences)
+		{
+			return true;
+		}
+		if (method == MethodName.ApplyDisplaySettings)
+		{
+			return true;
+		}
+		if (method == MethodName.GetInspectRelicScreen)
+		{
+			return true;
+		}
+		if (method == MethodName.GetInspectCardScreen)
+		{
+			return true;
+		}
+		if (method == MethodName.ApplySyncSetting)
+		{
+			return true;
+		}
+		if (method == MethodName.Reset)
+		{
+			return true;
+		}
+		if (method == MethodName._Notification)
+		{
+			return true;
+		}
+		if (method == MethodName.Quit)
+		{
+			return true;
+		}
+		if (method == MethodName.Relocalize)
+		{
+			return true;
+		}
+		if (method == MethodName.ReloadMainMenu)
+		{
+			return true;
+		}
+		if (method == MethodName._Input)
+		{
+			return true;
+		}
+		if (method == MethodName.ToggleFullscreen)
+		{
+			return true;
+		}
+		if (method == MethodName.DebugModifyTimescale)
+		{
+			return true;
+		}
+		if (method == MethodName.ActivateWorldEnvironment)
+		{
+			return true;
+		}
+		if (method == MethodName.DeactivateWorldEnvironment)
+		{
+			return true;
+		}
+		if (method == MethodName.SetScreenShakeTarget)
+		{
+			return true;
+		}
+		if (method == MethodName.ClearScreenShakeTarget)
+		{
+			return true;
+		}
+		if (method == MethodName.ScreenShake)
+		{
+			return true;
+		}
+		if (method == MethodName.ScreenRumble)
+		{
+			return true;
+		}
+		if (method == MethodName.ScreenShakeTrauma)
+		{
+			return true;
+		}
+		if (method == MethodName.DoHitStop)
+		{
+			return true;
+		}
+		if (method == MethodName.ToggleTrailerMode)
+		{
+			return true;
+		}
+		if (method == MethodName.SetScreenshakeMultiplier)
+		{
+			return true;
+		}
+		if (method == MethodName.InitPools)
+		{
+			return true;
+		}
+		if (method == MethodName.CheckShowLocalizationOverrideErrors)
+		{
+			return true;
+		}
+		if (method == MethodName.CheckShowModdedSaveFilePopup)
+		{
+			return true;
+		}
+		if (method == MethodName.OnSteamNoLongerRunning)
+		{
+			return true;
+		}
+		if (method == MethodName.LogResourceStats)
+		{
+			return true;
+		}
+		if (method == MethodName.FormatBytes)
+		{
+			return true;
+		}
+		if (method == MethodName.IsGameFocusedWindow)
+		{
+			return true;
+		}
+		if (method == MethodName.GetOrCreateFeedbackScreen)
+		{
+			return true;
+		}
+		if (method == MethodName.GetGameVersion)
+		{
+			return true;
+		}
+		return base.HasGodotClassMethod(in method);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool SetGodotClassPropertyValue(in godot_string_name name, in godot_variant value)
+	{
+		if (name == PropertyName.RootSceneContainer)
+		{
+			RootSceneContainer = VariantUtils.ConvertTo<NSceneContainer>(in value);
+			return true;
+		}
+		if (name == PropertyName.HoverTipsContainer)
+		{
+			HoverTipsContainer = VariantUtils.ConvertTo<Node>(in value);
+			return true;
+		}
+		if (name == PropertyName.Transition)
+		{
+			Transition = VariantUtils.ConvertTo<NTransition>(in value);
+			return true;
+		}
+		if (name == PropertyName.TimeoutOverlay)
+		{
+			TimeoutOverlay = VariantUtils.ConvertTo<NMultiplayerTimeoutOverlay>(in value);
+			return true;
+		}
+		if (name == PropertyName.AudioManager)
+		{
+			AudioManager = VariantUtils.ConvertTo<NAudioManager>(in value);
+			return true;
+		}
+		if (name == PropertyName.RemoteCursorContainer)
+		{
+			RemoteCursorContainer = VariantUtils.ConvertTo<NRemoteMouseCursorContainer>(in value);
+			return true;
+		}
+		if (name == PropertyName.InputManager)
+		{
+			InputManager = VariantUtils.ConvertTo<NInputManager>(in value);
+			return true;
+		}
+		if (name == PropertyName.HotkeyManager)
+		{
+			HotkeyManager = VariantUtils.ConvertTo<NHotkeyManager>(in value);
+			return true;
+		}
+		if (name == PropertyName.FeedbackScreen)
+		{
+			FeedbackScreen = VariantUtils.ConvertTo<NSendFeedbackScreen>(in value);
+			return true;
+		}
+		if (name == PropertyName.ReactionWheel)
+		{
+			ReactionWheel = VariantUtils.ConvertTo<NReactionWheel>(in value);
+			return true;
+		}
+		if (name == PropertyName.ReactionContainer)
+		{
+			ReactionContainer = VariantUtils.ConvertTo<NReactionContainer>(in value);
+			return true;
+		}
+		if (name == PropertyName.CursorManager)
+		{
+			CursorManager = VariantUtils.ConvertTo<NCursorManager>(in value);
+			return true;
+		}
+		if (name == PropertyName.DebugAudio)
+		{
+			DebugAudio = VariantUtils.ConvertTo<NDebugAudioManager>(in value);
+			return true;
+		}
+		if (name == PropertyName.DebugSeedOverride)
+		{
+			DebugSeedOverride = VariantUtils.ConvertTo<string>(in value);
+			return true;
+		}
+		if (name == PropertyName.StartOnMainMenu)
+		{
+			StartOnMainMenu = VariantUtils.ConvertTo<bool>(in value);
+			return true;
+		}
+		if (name == PropertyName.InspectRelicScreen)
+		{
+			InspectRelicScreen = VariantUtils.ConvertTo<NInspectRelicScreen>(in value);
+			return true;
+		}
+		if (name == PropertyName.InspectCardScreen)
+		{
+			InspectCardScreen = VariantUtils.ConvertTo<NInspectCardScreen>(in value);
+			return true;
+		}
+		if (name == PropertyName.WorldEnvironment)
+		{
+			WorldEnvironment = VariantUtils.ConvertTo<WorldEnvironment>(in value);
+			return true;
+		}
+		if (name == PropertyName.HitStop)
+		{
+			HitStop = VariantUtils.ConvertTo<NHitStop>(in value);
+			return true;
+		}
+		if (name == PropertyName._inspectionContainer)
+		{
+			_inspectionContainer = VariantUtils.ConvertTo<Control>(in value);
+			return true;
+		}
+		if (name == PropertyName._screenShake)
+		{
+			_screenShake = VariantUtils.ConvertTo<NScreenShake>(in value);
+			return true;
+		}
+		return base.SetGodotClassPropertyValue(in name, in value);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool GetGodotClassPropertyValue(in godot_string_name name, out godot_variant value)
+	{
+		if (name == PropertyName.RootSceneContainer)
+		{
+			value = VariantUtils.CreateFrom<NSceneContainer>(RootSceneContainer);
+			return true;
+		}
+		if (name == PropertyName.HoverTipsContainer)
+		{
+			value = VariantUtils.CreateFrom<Node>(HoverTipsContainer);
+			return true;
+		}
+		if (name == PropertyName.MainMenu)
+		{
+			value = VariantUtils.CreateFrom<NMainMenu>(MainMenu);
+			return true;
+		}
+		if (name == PropertyName.CurrentRunNode)
+		{
+			value = VariantUtils.CreateFrom<NRun>(CurrentRunNode);
+			return true;
+		}
+		if (name == PropertyName.LogoAnimation)
+		{
+			value = VariantUtils.CreateFrom<NLogoAnimation>(LogoAnimation);
+			return true;
+		}
+		if (name == PropertyName.Transition)
+		{
+			value = VariantUtils.CreateFrom<NTransition>(Transition);
+			return true;
+		}
+		if (name == PropertyName.TimeoutOverlay)
+		{
+			value = VariantUtils.CreateFrom<NMultiplayerTimeoutOverlay>(TimeoutOverlay);
+			return true;
+		}
+		if (name == PropertyName.AudioManager)
+		{
+			value = VariantUtils.CreateFrom<NAudioManager>(AudioManager);
+			return true;
+		}
+		if (name == PropertyName.RemoteCursorContainer)
+		{
+			value = VariantUtils.CreateFrom<NRemoteMouseCursorContainer>(RemoteCursorContainer);
+			return true;
+		}
+		if (name == PropertyName.InputManager)
+		{
+			value = VariantUtils.CreateFrom<NInputManager>(InputManager);
+			return true;
+		}
+		if (name == PropertyName.HotkeyManager)
+		{
+			value = VariantUtils.CreateFrom<NHotkeyManager>(HotkeyManager);
+			return true;
+		}
+		if (name == PropertyName.FeedbackScreen)
+		{
+			value = VariantUtils.CreateFrom<NSendFeedbackScreen>(FeedbackScreen);
+			return true;
+		}
+		if (name == PropertyName.ReactionWheel)
+		{
+			value = VariantUtils.CreateFrom<NReactionWheel>(ReactionWheel);
+			return true;
+		}
+		if (name == PropertyName.ReactionContainer)
+		{
+			value = VariantUtils.CreateFrom<NReactionContainer>(ReactionContainer);
+			return true;
+		}
+		if (name == PropertyName.CursorManager)
+		{
+			value = VariantUtils.CreateFrom<NCursorManager>(CursorManager);
+			return true;
+		}
+		if (name == PropertyName.DebugAudio)
+		{
+			value = VariantUtils.CreateFrom<NDebugAudioManager>(DebugAudio);
+			return true;
+		}
+		if (name == PropertyName.DebugSeedOverride)
+		{
+			value = VariantUtils.CreateFrom<string>(DebugSeedOverride);
+			return true;
+		}
+		if (name == PropertyName.StartOnMainMenu)
+		{
+			value = VariantUtils.CreateFrom<bool>(StartOnMainMenu);
+			return true;
+		}
+		if (name == PropertyName.InspectRelicScreen)
+		{
+			value = VariantUtils.CreateFrom<NInspectRelicScreen>(InspectRelicScreen);
+			return true;
+		}
+		if (name == PropertyName.InspectCardScreen)
+		{
+			value = VariantUtils.CreateFrom<NInspectCardScreen>(InspectCardScreen);
+			return true;
+		}
+		if (name == PropertyName.ScreenshakeTarget)
+		{
+			value = VariantUtils.CreateFrom<Control>(ScreenshakeTarget);
+			return true;
+		}
+		if (name == PropertyName.WorldEnvironment)
+		{
+			value = VariantUtils.CreateFrom<WorldEnvironment>(WorldEnvironment);
+			return true;
+		}
+		if (name == PropertyName.HitStop)
+		{
+			value = VariantUtils.CreateFrom<NHitStop>(HitStop);
+			return true;
+		}
+		if (name == PropertyName._inspectionContainer)
+		{
+			value = VariantUtils.CreateFrom(in _inspectionContainer);
+			return true;
+		}
+		if (name == PropertyName._screenShake)
+		{
+			value = VariantUtils.CreateFrom(in _screenShake);
+			return true;
+		}
+		return base.GetGodotClassPropertyValue(in name, out value);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	internal static List<PropertyInfo> GetGodotPropertyList()
+	{
+		List<PropertyInfo> val = new List<PropertyInfo>();
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.RootSceneContainer, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.HoverTipsContainer, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.MainMenu, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.CurrentRunNode, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.LogoAnimation, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.Transition, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.TimeoutOverlay, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.AudioManager, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.RemoteCursorContainer, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.InputManager, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.HotkeyManager, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.FeedbackScreen, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.ReactionWheel, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.ReactionContainer, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.CursorManager, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.DebugAudio, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.String, PropertyName.DebugSeedOverride, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Bool, PropertyName.StartOnMainMenu, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.InspectRelicScreen, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.InspectCardScreen, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.ScreenshakeTarget, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.WorldEnvironment, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.HitStop, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName._inspectionContainer, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName._screenShake, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		return val;
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override void SaveGodotObjectData(GodotSerializationInfo info)
+	{
+		base.SaveGodotObjectData(info);
+		info.AddProperty(PropertyName.RootSceneContainer, Variant.From<NSceneContainer>(RootSceneContainer));
+		info.AddProperty(PropertyName.HoverTipsContainer, Variant.From<Node>(HoverTipsContainer));
+		info.AddProperty(PropertyName.Transition, Variant.From<NTransition>(Transition));
+		info.AddProperty(PropertyName.TimeoutOverlay, Variant.From<NMultiplayerTimeoutOverlay>(TimeoutOverlay));
+		info.AddProperty(PropertyName.AudioManager, Variant.From<NAudioManager>(AudioManager));
+		info.AddProperty(PropertyName.RemoteCursorContainer, Variant.From<NRemoteMouseCursorContainer>(RemoteCursorContainer));
+		info.AddProperty(PropertyName.InputManager, Variant.From<NInputManager>(InputManager));
+		info.AddProperty(PropertyName.HotkeyManager, Variant.From<NHotkeyManager>(HotkeyManager));
+		info.AddProperty(PropertyName.FeedbackScreen, Variant.From<NSendFeedbackScreen>(FeedbackScreen));
+		info.AddProperty(PropertyName.ReactionWheel, Variant.From<NReactionWheel>(ReactionWheel));
+		info.AddProperty(PropertyName.ReactionContainer, Variant.From<NReactionContainer>(ReactionContainer));
+		info.AddProperty(PropertyName.CursorManager, Variant.From<NCursorManager>(CursorManager));
+		info.AddProperty(PropertyName.DebugAudio, Variant.From<NDebugAudioManager>(DebugAudio));
+		info.AddProperty(PropertyName.DebugSeedOverride, Variant.From<string>(DebugSeedOverride));
+		info.AddProperty(PropertyName.StartOnMainMenu, Variant.From<bool>(StartOnMainMenu));
+		info.AddProperty(PropertyName.InspectRelicScreen, Variant.From<NInspectRelicScreen>(InspectRelicScreen));
+		info.AddProperty(PropertyName.InspectCardScreen, Variant.From<NInspectCardScreen>(InspectCardScreen));
+		info.AddProperty(PropertyName.WorldEnvironment, Variant.From<WorldEnvironment>(WorldEnvironment));
+		info.AddProperty(PropertyName.HitStop, Variant.From<NHitStop>(HitStop));
+		info.AddProperty(PropertyName._inspectionContainer, Variant.From(in _inspectionContainer));
+		info.AddProperty(PropertyName._screenShake, Variant.From(in _screenShake));
+		info.AddSignalEventDelegate(SignalName.WindowChange, backing_WindowChange);
+		info.AddSignalEventDelegate(SignalName.PhobiaModeToggled, backing_PhobiaModeToggled);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override void RestoreGodotObjectData(GodotSerializationInfo info)
+	{
+		base.RestoreGodotObjectData(info);
+		if (info.TryGetProperty(PropertyName.RootSceneContainer, out var value))
+		{
+			RootSceneContainer = value.As<NSceneContainer>();
+		}
+		if (info.TryGetProperty(PropertyName.HoverTipsContainer, out var value2))
+		{
+			HoverTipsContainer = value2.As<Node>();
+		}
+		if (info.TryGetProperty(PropertyName.Transition, out var value3))
+		{
+			Transition = value3.As<NTransition>();
+		}
+		if (info.TryGetProperty(PropertyName.TimeoutOverlay, out var value4))
+		{
+			TimeoutOverlay = value4.As<NMultiplayerTimeoutOverlay>();
+		}
+		if (info.TryGetProperty(PropertyName.AudioManager, out var value5))
+		{
+			AudioManager = value5.As<NAudioManager>();
+		}
+		if (info.TryGetProperty(PropertyName.RemoteCursorContainer, out var value6))
+		{
+			RemoteCursorContainer = value6.As<NRemoteMouseCursorContainer>();
+		}
+		if (info.TryGetProperty(PropertyName.InputManager, out var value7))
+		{
+			InputManager = value7.As<NInputManager>();
+		}
+		if (info.TryGetProperty(PropertyName.HotkeyManager, out var value8))
+		{
+			HotkeyManager = value8.As<NHotkeyManager>();
+		}
+		if (info.TryGetProperty(PropertyName.FeedbackScreen, out var value9))
+		{
+			FeedbackScreen = value9.As<NSendFeedbackScreen>();
+		}
+		if (info.TryGetProperty(PropertyName.ReactionWheel, out var value10))
+		{
+			ReactionWheel = value10.As<NReactionWheel>();
+		}
+		if (info.TryGetProperty(PropertyName.ReactionContainer, out var value11))
+		{
+			ReactionContainer = value11.As<NReactionContainer>();
+		}
+		if (info.TryGetProperty(PropertyName.CursorManager, out var value12))
+		{
+			CursorManager = value12.As<NCursorManager>();
+		}
+		if (info.TryGetProperty(PropertyName.DebugAudio, out var value13))
+		{
+			DebugAudio = value13.As<NDebugAudioManager>();
+		}
+		if (info.TryGetProperty(PropertyName.DebugSeedOverride, out var value14))
+		{
+			DebugSeedOverride = value14.As<string>();
+		}
+		if (info.TryGetProperty(PropertyName.StartOnMainMenu, out var value15))
+		{
+			StartOnMainMenu = value15.As<bool>();
+		}
+		if (info.TryGetProperty(PropertyName.InspectRelicScreen, out var value16))
+		{
+			InspectRelicScreen = value16.As<NInspectRelicScreen>();
+		}
+		if (info.TryGetProperty(PropertyName.InspectCardScreen, out var value17))
+		{
+			InspectCardScreen = value17.As<NInspectCardScreen>();
+		}
+		if (info.TryGetProperty(PropertyName.WorldEnvironment, out var value18))
+		{
+			WorldEnvironment = value18.As<WorldEnvironment>();
+		}
+		if (info.TryGetProperty(PropertyName.HitStop, out var value19))
+		{
+			HitStop = value19.As<NHitStop>();
+		}
+		if (info.TryGetProperty(PropertyName._inspectionContainer, out var value20))
+		{
+			_inspectionContainer = value20.As<Control>();
+		}
+		if (info.TryGetProperty(PropertyName._screenShake, out var value21))
+		{
+			_screenShake = value21.As<NScreenShake>();
+		}
+		if (info.TryGetSignalEventDelegate<WindowChangeEventHandler>(SignalName.WindowChange, out var value22))
+		{
+			backing_WindowChange = value22;
+		}
+		if (info.TryGetSignalEventDelegate<PhobiaModeToggledEventHandler>(SignalName.PhobiaModeToggled, out var value23))
+		{
+			backing_PhobiaModeToggled = value23;
+		}
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	internal static List<MethodInfo> GetGodotSignalList()
+	{
+		List<MethodInfo> val = new List<MethodInfo>(2);
+		val.Add(new MethodInfo(SignalName.WindowChange, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(SignalName.PhobiaModeToggled, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		return val;
+	}
+
+	protected void EmitSignalWindowChange()
+	{
+		EmitSignal(SignalName.WindowChange);
+	}
+
+	protected void EmitSignalPhobiaModeToggled()
+	{
+		EmitSignal(SignalName.PhobiaModeToggled);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override void RaiseGodotClassSignalCallbacks(in godot_string_name signal, NativeVariantPtrArgs args)
+	{
+		if (signal == SignalName.WindowChange && args.Count == 0)
+		{
+			backing_WindowChange?.Invoke();
+		}
+		else if (signal == SignalName.PhobiaModeToggled && args.Count == 0)
+		{
+			backing_PhobiaModeToggled?.Invoke();
+		}
+		else
+		{
+			base.RaiseGodotClassSignalCallbacks(in signal, args);
+		}
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool HasGodotClassSignal(in godot_string_name signal)
+	{
+		if (signal == SignalName.WindowChange)
+		{
+			return true;
+		}
+		if (signal == SignalName.PhobiaModeToggled)
+		{
+			return true;
+		}
+		return base.HasGodotClassSignal(in signal);
+	}
+}
+

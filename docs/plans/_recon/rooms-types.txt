@@ -1,0 +1,10 @@
+﻿MegaCrit.Sts2.Core.Nodes.Rooms.IRoomWithProceedButton
+MegaCrit.Sts2.Core.Nodes.Rooms.NCombatBackground
+MegaCrit.Sts2.Core.Nodes.Rooms.NCombatBackgroundLayer
+MegaCrit.Sts2.Core.Nodes.Rooms.NCombatRoom
+MegaCrit.Sts2.Core.Nodes.Rooms.NEventRoom
+MegaCrit.Sts2.Core.Nodes.Rooms.NMapRoom
+MegaCrit.Sts2.Core.Nodes.Rooms.NMerchantButton
+MegaCrit.Sts2.Core.Nodes.Rooms.NMerchantRoom
+MegaCrit.Sts2.Core.Nodes.Rooms.NRestSiteRoom
+MegaCrit.Sts2.Core.Nodes.Rooms.NTreasureRoom

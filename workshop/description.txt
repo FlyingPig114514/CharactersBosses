@@ -1,0 +1,31 @@
+本模组灵感来源于杀戮尖塔1代的模组崩坠。启用本模组后，你每一幕的Boss战都会被替换为由原版玩家角色扮演的Boss（可在设置中调整）。他们拥有自己的遗物、卡组，会使用自己职业的卡牌。与玩家不完全相同的是，他们的出牌受到一定程度的限制，但最大生命值更多并且每个都有独特的特殊效果。
+
+This mod is inspired by the Slay the Spire mod Downfall. With it enabled, the boss fight of every act is replaced by bosses played by the vanilla playable characters (adjustable in the mod settings). They bring their own relics and decks, and play the cards of their own class. Unlike you, their plays are somewhat restricted — but they have more Max HP, and each of them has a unique special effect.
+
+本模组的 Boss 说明已支持游戏的全部 16 种语言：简体中文 / 繁體中文 / English / 日本語 / 한국어 / Русский / Polski / Deutsch / Français / Italiano / Español / Português (BR) / Türkçe / Bahasa Indonesia / ไทย。
+
+本模组支持最多四人的联机。多人联机时，不会增加Boss的生命值，而是会增加Boss的数量（Boss数量与玩家数量相同）。每位玩家都会被一名Boss锁定（添加“跟踪锁定”buff），该Boss的单体攻击、随机攻击、充能球、单体特殊效果都只会影响这一名玩家。Boss的群体攻击牌会攻击所有玩家。当一名Boss被击败时，被其锁定的玩家会解除锁定，只受到其他boss群体攻击的影响。当一名玩家被击败时，锁定他的boss会重新锁定剩余玩家中拥有“跟踪锁定”数量最少的玩家。因为目前boss数量较少并且战场空间紧张，暂时不打算兼容超过4人的联机。
+
+Boss descriptions are available in all 16 languages the game supports (Simplified/Traditional Chinese, English, Japanese, Korean, Russian, Polish, German, French, Italian, Spanish, Brazilian Portuguese, Turkish, Indonesian, Thai).
+
+The mod supports multiplayer with up to four players. In multiplayer, boss HP is not increased — instead the number of bosses goes up (one boss per player). Every player is locked onto by one boss (granting the "Tracking Lock" buff): that boss's single-target attacks, random attacks, orbs and single-target special effects only ever affect that one player. Boss AoE attack cards hit every player. When a boss is defeated, the player it had locked onto is released and is afterwards only affected by other bosses' AoE attacks. When a player is defeated, the boss that had locked onto them re-locks onto the remaining player holding the fewest "Tracking Lock" stacks. Because there are only a handful of bosses right now and the battlefield is cramped, multiplayer with more than four players is not planned for the time being.
+
+到目前为止，本模组一共添加了23个Boss（5/8/10）。以后会考虑为所有地图变体也都添加boss，并可能联动观者和亡命之徒。
+
+So far the mod adds 23 bosses in total (5 / 8 / 10). In the future we may also add bosses for every map variant, and possibly a crossover with The Watcher and The Hermit.
+
+目前本模组的单人游戏较为稳定，但多人游戏仍有可能出现不同步等问题，并且为了兼顾单人和多人游戏，Boss强度很难平衡。因此，目前本模组会在玩家同意的情况下收集boss战的相关数据，用于进行平衡调整与bug修复，并且绝对不会收集与玩家隐私相关的内容。
+
+Single-player is fairly stable at the moment, but multiplayer can still run into desyncs and similar problems, and balancing boss strength is difficult because the same numbers have to work for both solo and co-op. That is why, with the player's consent, the mod collects data about boss fights to help with balance tuning and bug fixing. It never collects anything related to player privacy.
+
+本模组的代码完全由Deepseek-Harness编写，我只是个总策划。在此，我还需要向所有在本模组制作过程中进行投稿、测试等帮助的朋友表达由衷的感谢！作者B站：疯狂的飞猪_
+
+All of the code in this mod was written by DeepSeek-Harness — I am merely the lead designer. I would also like to sincerely thank every friend who helped during development by contributing content, testing and so on!
+
+本模组依赖BaseLib用于编写设置界面，请确保你装载了BaseLib，否则相关功能可能受到影响。
+
+This mod depends on BaseLib for building its settings screen — please make sure BaseLib is installed, otherwise the related features may be affected.
+
+声明：本模组使用了《杀戮尖塔2》本身的美术资源、《杀戮尖塔》与《杀戮尖塔2》的音乐，以及《杀戮尖塔》模组「崩坠（Downfall）」的美术资源。以上素材的版权归各自作者（MegaCrit 与崩坠模组的作者）所有，本模组仅供免费、非商业性使用，不以任何形式出售或收费；如原作者提出要求，可随时移除相关内容。除此之外的内容（代码、Boss 设计等）均为本模组原创（仅少量Boss参考了崩坠中的Boss设计）。
+
+Credits / Disclaimer: this mod uses art assets from Slay the Spire 2 itself, music from Slay the Spire and Slay the Spire 2, and art assets from the Slay the Spire mod "Downfall". All of these assets remain the property of their respective creators (MegaCrit and the author(s) of Downfall). This mod is provided free of charge for non-commercial use only and is never sold in any form; upon request from the original authors, the related content can be removed at any time. Everything else (code, boss designs, etc.) is original to this mod, aside from a few bosses that take inspiration from bosses in Downfall.

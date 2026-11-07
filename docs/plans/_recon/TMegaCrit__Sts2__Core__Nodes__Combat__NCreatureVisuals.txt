@@ -1,0 +1,879 @@
+﻿// ===== MegaCrit.Sts2.Core.Nodes.Combat.NCreatureVisuals =====
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
+using Godot;
+using Godot.Bridge;
+using Godot.NativeInterop;
+using MegaCrit.Sts2.Core.Assets;
+using MegaCrit.Sts2.Core.Bindings.MegaSpine;
+using MegaCrit.Sts2.Core.Helpers;
+using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Nodes.GodotExtensions;
+using MegaCrit.Sts2.Core.Nodes.Vfx.Forms;
+using MegaCrit.Sts2.Core.Saves;
+
+namespace MegaCrit.Sts2.Core.Nodes.Combat;
+
+[ScriptPath("res://src/Core/Nodes/Combat/NCreatureVisuals.cs")]
+public class NCreatureVisuals : Node2D
+{
+	public new class MethodName : Node2D.MethodName
+	{
+		public static readonly StringName GetCurrentBody = "GetCurrentBody";
+
+		public new static readonly StringName _Ready = "_Ready";
+
+		public static readonly StringName AddFormVfx = "AddFormVfx";
+
+		public static readonly StringName RemoveFormVfx = "RemoveFormVfx";
+
+		public new static readonly StringName _EnterTree = "_EnterTree";
+
+		public new static readonly StringName _ExitTree = "_ExitTree";
+
+		public static readonly StringName SetScaleAndHue = "SetScaleAndHue";
+
+		public static readonly StringName IsPlayingHurtAnimation = "IsPlayingHurtAnimation";
+
+		public static readonly StringName IsPlayingIdleAnimation = "IsPlayingIdleAnimation";
+
+		public static readonly StringName TryApplyLiquidOverlay = "TryApplyLiquidOverlay";
+	}
+
+	public new class PropertyName : Node2D.PropertyName
+	{
+		public static readonly StringName Bounds = "Bounds";
+
+		public static readonly StringName IntentPosition = "IntentPosition";
+
+		public static readonly StringName OrbPosition = "OrbPosition";
+
+		public static readonly StringName TalkPosition = "TalkPosition";
+
+		public static readonly StringName IsSpineNode = "IsSpineNode";
+
+		public static readonly StringName HasSpineAnimation = "HasSpineAnimation";
+
+		public static readonly StringName IsUsingPhobiaModeBody = "IsUsingPhobiaModeBody";
+
+		public static readonly StringName FormVfxHolder = "FormVfxHolder";
+
+		public static readonly StringName VfxSpawnPosition = "VfxSpawnPosition";
+
+		public static readonly StringName DefaultScale = "DefaultScale";
+
+		public static readonly StringName Body = "Body";
+
+		public static readonly StringName _body = "_body";
+
+		public static readonly StringName _phobiaModeBody = "_phobiaModeBody";
+
+		public static readonly StringName _hue = "_hue";
+
+		public static readonly StringName _liquidOverlayTimer = "_liquidOverlayTimer";
+
+		public static readonly StringName _savedNormalMaterial = "_savedNormalMaterial";
+
+		public static readonly StringName _currentLiquidOverlayMaterial = "_currentLiquidOverlayMaterial";
+	}
+
+	public new class SignalName : Node2D.SignalName
+	{
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <ApplyLiquidOverlayInternal>d__65 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public NCreatureVisuals <>4__this;
+
+		public Color tint;
+
+		private TaskAwaiter<float> <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_015f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0132: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0147: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			NCreatureVisuals nCreatureVisuals = <>4__this;
+			try
+			{
+				TaskAwaiter<float> val;
+				if (num == 0)
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter<float>);
+					num = (<>1__state = -1);
+					goto IL_017b;
+				}
+				if (nCreatureVisuals.SpineBody != null)
+				{
+					nCreatureVisuals._savedNormalMaterial = nCreatureVisuals.SpineBody.GetNormalMaterial();
+					Material material = (ShaderMaterial)PreloadManager.Cache.GetMaterial("res://materials/vfx/potion/potion_liquid_overlay.tres");
+					nCreatureVisuals._currentLiquidOverlayMaterial = (ShaderMaterial)material.Duplicate();
+					nCreatureVisuals._currentLiquidOverlayMaterial.SetShaderParameter(_tint, tint);
+					nCreatureVisuals._currentLiquidOverlayMaterial.SetShaderParameter(_h, nCreatureVisuals._hue);
+					nCreatureVisuals._currentLiquidOverlayMaterial.SetShaderParameter(_overlayInfluence, 1f);
+					nCreatureVisuals.SpineBody.SetNormalMaterial(nCreatureVisuals._currentLiquidOverlayMaterial);
+					nCreatureVisuals._liquidOverlayTimer = 1.0;
+					goto IL_0183;
+				}
+				goto end_IL_000e;
+				IL_0183:
+				if (nCreatureVisuals._liquidOverlayTimer > 0.0)
+				{
+					double num2 = (1.0 - nCreatureVisuals._liquidOverlayTimer) / 1.0;
+					nCreatureVisuals._currentLiquidOverlayMaterial.SetShaderParameter(_overlayInfluence, 1.0 - num2);
+					nCreatureVisuals._liquidOverlayTimer -= nCreatureVisuals.GetProcessDeltaTime();
+					val = nCreatureVisuals.AwaitProcessFrame(nCreatureVisuals._cts.Token).GetAwaiter();
+					if (!val.IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter<float>, <ApplyLiquidOverlayInternal>d__65>(ref val, ref this);
+						return;
+					}
+					goto IL_017b;
+				}
+				nCreatureVisuals.SpineBody.SetNormalMaterial(nCreatureVisuals._savedNormalMaterial);
+				nCreatureVisuals._currentLiquidOverlayMaterial = null;
+				goto end_IL_000e;
+				IL_017b:
+				val.GetResult();
+				goto IL_0183;
+				end_IL_000e:;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	private static readonly StringName _overlayInfluence = new StringName("overlay_influence");
+
+	private static readonly StringName _h = new StringName("h");
+
+	private static readonly StringName _tint = new StringName("tint");
+
+	private const double _baseLiquidOverlayDuration = 1.0;
+
+	private Node2D _body;
+
+	private Node2D? _phobiaModeBody;
+
+	private float _hue = 1f;
+
+	private double _liquidOverlayTimer;
+
+	private Material? _savedNormalMaterial;
+
+	private ShaderMaterial? _currentLiquidOverlayMaterial;
+
+	private CancellationTokenSource _cts = new CancellationTokenSource();
+
+	[field: CompilerGenerated]
+	public Control Bounds
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public Marker2D IntentPosition
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public Marker2D OrbPosition
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public Marker2D? TalkPosition
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	private bool IsSpineNode
+	{
+		get
+		{
+			if (GodotObject.IsInstanceValid(_body))
+			{
+				return _body.GetClass() == "SpineSprite";
+			}
+			return false;
+		}
+	}
+
+	public bool HasSpineAnimation => SpineBody != null;
+
+	public bool IsUsingPhobiaModeBody => _phobiaModeBody == GetCurrentBody();
+
+	[field: CompilerGenerated]
+	public Control? FormVfxHolder
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public MegaSprite? SpineBody
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	public SpineAnimationAccess SpineAnimation => new SpineAnimationAccess(SpineBody);
+
+	[field: CompilerGenerated]
+	public Marker2D VfxSpawnPosition
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public float DefaultScale
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		set;
+	} = 1f;
+
+	public Node2D Body => _body;
+
+	public Node2D GetCurrentBody()
+	{
+		Node2D phobiaModeBody = _phobiaModeBody;
+		if (phobiaModeBody == null || !phobiaModeBody.Visible)
+		{
+			return _body;
+		}
+		return _phobiaModeBody;
+	}
+
+	public override void _Ready()
+	{
+		_body = GetNode<Node2D>("%Visuals");
+		_phobiaModeBody = GetNodeOrNull<Node2D>("%PhobiaModeVisuals");
+		FormVfxHolder = GetNodeOrNull<Control>("%FormVfx");
+		Bounds = GetNode<Control>("%Bounds");
+		IntentPosition = GetNode<Marker2D>("%IntentPos");
+		VfxSpawnPosition = GetNode<Marker2D>("%CenterPos");
+		OrbPosition = (HasNode("%OrbPos") ? GetNode<Marker2D>("%OrbPos") : IntentPosition);
+		TalkPosition = (HasNode("%TalkPos") ? GetNode<Marker2D>("%TalkPos") : null);
+		if (IsSpineNode)
+		{
+			SpineBody = new MegaSprite(_body);
+			if (SpineBody.GetSkeleton()?.GetData() == null)
+			{
+				GD.PushWarning($"Spine skeleton data failed to load for {base.Name}, disabling spine animation.");
+				SpineBody = null;
+			}
+		}
+		_savedNormalMaterial = null;
+		_currentLiquidOverlayMaterial = null;
+	}
+
+	public void AddFormVfx(NFormVfx formVfx)
+	{
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		if (FormVfxHolder == null)
+		{
+			throw new InvalidOperationException("This creature has no form holder to put this form vfx");
+		}
+		FormVfxHolder.FreeChildren();
+		FormVfxHolder.AddChildSafely(formVfx);
+		formVfx.Position = Vector2.Zero;
+	}
+
+	public void RemoveFormVfx()
+	{
+		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+		if (FormVfxHolder == null)
+		{
+			throw new InvalidOperationException("This creature has no form holder to put this form vfx");
+		}
+		FormVfxHolder.FreeChildren();
+	}
+
+	public override void _EnterTree()
+	{
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000b: Expected O, but got Unknown
+		_cts = new CancellationTokenSource();
+	}
+
+	public override void _ExitTree()
+	{
+		_cts.Cancel();
+	}
+
+	public void UpdatePhobiaMode(MonsterModel? model)
+	{
+		if (_phobiaModeBody != null)
+		{
+			_phobiaModeBody.Visible = SaveManager.Instance.PrefsSave.PhobiaMode;
+			_body.Visible = !_phobiaModeBody.Visible;
+		}
+		if (SpineBody != null)
+		{
+			MegaSkeleton skeleton = SpineBody.GetSkeleton();
+			if (skeleton != null)
+			{
+				model?.OnPhobiaModeToggled(SaveManager.Instance.PrefsSave.PhobiaMode, SpineBody, skeleton);
+			}
+		}
+	}
+
+	public void SetUpSkin(MonsterModel model)
+	{
+		if (SpineBody != null)
+		{
+			MegaSkeleton skeleton = SpineBody.GetSkeleton();
+			if (skeleton != null)
+			{
+				model.SetupSkins(SpineBody, skeleton);
+			}
+		}
+	}
+
+	public void SetScaleAndHue(float scale, float hue)
+	{
+		DefaultScale = scale;
+		base.Scale = Vector2.One * scale;
+		_hue = hue;
+		if (!Mathf.IsEqualApprox(hue, 0f) && SpineBody != null)
+		{
+			Material normalMaterial = SpineBody.GetNormalMaterial();
+			ShaderMaterial shaderMaterial;
+			if (normalMaterial == null)
+			{
+				Material material = (ShaderMaterial)PreloadManager.Cache.GetMaterial("res://materials/vfx/hsv.tres");
+				shaderMaterial = (ShaderMaterial)material.Duplicate();
+				SpineBody.SetNormalMaterial(shaderMaterial);
+			}
+			else
+			{
+				shaderMaterial = (ShaderMaterial)normalMaterial;
+			}
+			shaderMaterial.SetShaderParameter(_h, hue);
+		}
+	}
+
+	public bool IsPlayingHurtAnimation()
+	{
+		return SpineAnimation.GetCurrentAnimationName() == "hurt";
+	}
+
+	public bool IsPlayingIdleAnimation()
+	{
+		if (!(SpineAnimation.GetCurrentAnimationName() == "idle_loop"))
+		{
+			return SpineAnimation.GetCurrentAnimationName() == "low_health_loop";
+		}
+		return true;
+	}
+
+	public void TryApplyLiquidOverlay(Color tint)
+	{
+		if (_currentLiquidOverlayMaterial != null)
+		{
+			_currentLiquidOverlayMaterial.SetShaderParameter(_tint, tint);
+			_liquidOverlayTimer = 1.0;
+		}
+		else
+		{
+			TaskHelper.RunSafely(ApplyLiquidOverlayInternal(tint));
+		}
+	}
+
+	[AsyncStateMachine(typeof(<ApplyLiquidOverlayInternal>d__65))]
+	private System.Threading.Tasks.Task ApplyLiquidOverlayInternal(Color tint)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<ApplyLiquidOverlayInternal>d__65 <ApplyLiquidOverlayInternal>d__66 = default(<ApplyLiquidOverlayInternal>d__65);
+		<ApplyLiquidOverlayInternal>d__66.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<ApplyLiquidOverlayInternal>d__66.<>4__this = this;
+		<ApplyLiquidOverlayInternal>d__66.tint = tint;
+		<ApplyLiquidOverlayInternal>d__66.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <ApplyLiquidOverlayInternal>d__66.<>t__builder)).Start<<ApplyLiquidOverlayInternal>d__65>(ref <ApplyLiquidOverlayInternal>d__66);
+		return ((AsyncTaskMethodBuilder)(ref <ApplyLiquidOverlayInternal>d__66.<>t__builder)).Task;
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	internal static List<MethodInfo> GetGodotMethodList()
+	{
+		List<MethodInfo> val = new List<MethodInfo>(10);
+		val.Add(new MethodInfo(MethodName.GetCurrentBody, new PropertyInfo(Variant.Type.Object, "", PropertyHint.None, "", PropertyUsageFlags.Default, new StringName("Node2D"), exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName._Ready, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		StringName addFormVfx = MethodName.AddFormVfx;
+		PropertyInfo returnVal = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags = 1L;
+		List<PropertyInfo> obj = new List<PropertyInfo>();
+		obj.Add(new PropertyInfo(Variant.Type.Object, "formVfx", PropertyHint.None, "", PropertyUsageFlags.Default, new StringName("Node2D"), exported: false));
+		val.Add(new MethodInfo(addFormVfx, returnVal, (MethodFlags)flags, obj, null));
+		val.Add(new MethodInfo(MethodName.RemoveFormVfx, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName._EnterTree, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName._ExitTree, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		StringName setScaleAndHue = MethodName.SetScaleAndHue;
+		PropertyInfo returnVal2 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags2 = 1L;
+		List<PropertyInfo> obj2 = new List<PropertyInfo>();
+		obj2.Add(new PropertyInfo(Variant.Type.Float, "scale", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		obj2.Add(new PropertyInfo(Variant.Type.Float, "hue", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		val.Add(new MethodInfo(setScaleAndHue, returnVal2, (MethodFlags)flags2, obj2, null));
+		val.Add(new MethodInfo(MethodName.IsPlayingHurtAnimation, new PropertyInfo(Variant.Type.Bool, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.IsPlayingIdleAnimation, new PropertyInfo(Variant.Type.Bool, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		StringName tryApplyLiquidOverlay = MethodName.TryApplyLiquidOverlay;
+		PropertyInfo returnVal3 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags3 = 1L;
+		List<PropertyInfo> obj3 = new List<PropertyInfo>();
+		obj3.Add(new PropertyInfo(Variant.Type.Color, "tint", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		val.Add(new MethodInfo(tryApplyLiquidOverlay, returnVal3, (MethodFlags)flags3, obj3, null));
+		return val;
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool InvokeGodotClassMethod(in godot_string_name method, NativeVariantPtrArgs args, out godot_variant ret)
+	{
+		if (method == MethodName.GetCurrentBody && args.Count == 0)
+		{
+			ret = VariantUtils.CreateFrom<Node2D>(GetCurrentBody());
+			return true;
+		}
+		if (method == MethodName._Ready && args.Count == 0)
+		{
+			_Ready();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.AddFormVfx && args.Count == 1)
+		{
+			AddFormVfx(VariantUtils.ConvertTo<NFormVfx>(in args[0]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.RemoveFormVfx && args.Count == 0)
+		{
+			RemoveFormVfx();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName._EnterTree && args.Count == 0)
+		{
+			_EnterTree();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName._ExitTree && args.Count == 0)
+		{
+			_ExitTree();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.SetScaleAndHue && args.Count == 2)
+		{
+			SetScaleAndHue(VariantUtils.ConvertTo<float>(in args[0]), VariantUtils.ConvertTo<float>(in args[1]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.IsPlayingHurtAnimation && args.Count == 0)
+		{
+			ret = VariantUtils.CreateFrom<bool>(IsPlayingHurtAnimation());
+			return true;
+		}
+		if (method == MethodName.IsPlayingIdleAnimation && args.Count == 0)
+		{
+			ret = VariantUtils.CreateFrom<bool>(IsPlayingIdleAnimation());
+			return true;
+		}
+		if (method == MethodName.TryApplyLiquidOverlay && args.Count == 1)
+		{
+			TryApplyLiquidOverlay(VariantUtils.ConvertTo<Color>(in args[0]));
+			ret = default(godot_variant);
+			return true;
+		}
+		return base.InvokeGodotClassMethod(in method, args, out ret);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool HasGodotClassMethod(in godot_string_name method)
+	{
+		if (method == MethodName.GetCurrentBody)
+		{
+			return true;
+		}
+		if (method == MethodName._Ready)
+		{
+			return true;
+		}
+		if (method == MethodName.AddFormVfx)
+		{
+			return true;
+		}
+		if (method == MethodName.RemoveFormVfx)
+		{
+			return true;
+		}
+		if (method == MethodName._EnterTree)
+		{
+			return true;
+		}
+		if (method == MethodName._ExitTree)
+		{
+			return true;
+		}
+		if (method == MethodName.SetScaleAndHue)
+		{
+			return true;
+		}
+		if (method == MethodName.IsPlayingHurtAnimation)
+		{
+			return true;
+		}
+		if (method == MethodName.IsPlayingIdleAnimation)
+		{
+			return true;
+		}
+		if (method == MethodName.TryApplyLiquidOverlay)
+		{
+			return true;
+		}
+		return base.HasGodotClassMethod(in method);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool SetGodotClassPropertyValue(in godot_string_name name, in godot_variant value)
+	{
+		if (name == PropertyName.Bounds)
+		{
+			Bounds = VariantUtils.ConvertTo<Control>(in value);
+			return true;
+		}
+		if (name == PropertyName.IntentPosition)
+		{
+			IntentPosition = VariantUtils.ConvertTo<Marker2D>(in value);
+			return true;
+		}
+		if (name == PropertyName.OrbPosition)
+		{
+			OrbPosition = VariantUtils.ConvertTo<Marker2D>(in value);
+			return true;
+		}
+		if (name == PropertyName.TalkPosition)
+		{
+			TalkPosition = VariantUtils.ConvertTo<Marker2D>(in value);
+			return true;
+		}
+		if (name == PropertyName.FormVfxHolder)
+		{
+			FormVfxHolder = VariantUtils.ConvertTo<Control>(in value);
+			return true;
+		}
+		if (name == PropertyName.VfxSpawnPosition)
+		{
+			VfxSpawnPosition = VariantUtils.ConvertTo<Marker2D>(in value);
+			return true;
+		}
+		if (name == PropertyName.DefaultScale)
+		{
+			DefaultScale = VariantUtils.ConvertTo<float>(in value);
+			return true;
+		}
+		if (name == PropertyName._body)
+		{
+			_body = VariantUtils.ConvertTo<Node2D>(in value);
+			return true;
+		}
+		if (name == PropertyName._phobiaModeBody)
+		{
+			_phobiaModeBody = VariantUtils.ConvertTo<Node2D>(in value);
+			return true;
+		}
+		if (name == PropertyName._hue)
+		{
+			_hue = VariantUtils.ConvertTo<float>(in value);
+			return true;
+		}
+		if (name == PropertyName._liquidOverlayTimer)
+		{
+			_liquidOverlayTimer = VariantUtils.ConvertTo<double>(in value);
+			return true;
+		}
+		if (name == PropertyName._savedNormalMaterial)
+		{
+			_savedNormalMaterial = VariantUtils.ConvertTo<Material>(in value);
+			return true;
+		}
+		if (name == PropertyName._currentLiquidOverlayMaterial)
+		{
+			_currentLiquidOverlayMaterial = VariantUtils.ConvertTo<ShaderMaterial>(in value);
+			return true;
+		}
+		return base.SetGodotClassPropertyValue(in name, in value);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool GetGodotClassPropertyValue(in godot_string_name name, out godot_variant value)
+	{
+		Control from;
+		if (name == PropertyName.Bounds)
+		{
+			from = Bounds;
+			value = VariantUtils.CreateFrom(in from);
+			return true;
+		}
+		Marker2D from2;
+		if (name == PropertyName.IntentPosition)
+		{
+			from2 = IntentPosition;
+			value = VariantUtils.CreateFrom(in from2);
+			return true;
+		}
+		if (name == PropertyName.OrbPosition)
+		{
+			from2 = OrbPosition;
+			value = VariantUtils.CreateFrom(in from2);
+			return true;
+		}
+		if (name == PropertyName.TalkPosition)
+		{
+			from2 = TalkPosition;
+			value = VariantUtils.CreateFrom(in from2);
+			return true;
+		}
+		bool from3;
+		if (name == PropertyName.IsSpineNode)
+		{
+			from3 = IsSpineNode;
+			value = VariantUtils.CreateFrom(in from3);
+			return true;
+		}
+		if (name == PropertyName.HasSpineAnimation)
+		{
+			from3 = HasSpineAnimation;
+			value = VariantUtils.CreateFrom(in from3);
+			return true;
+		}
+		if (name == PropertyName.IsUsingPhobiaModeBody)
+		{
+			from3 = IsUsingPhobiaModeBody;
+			value = VariantUtils.CreateFrom(in from3);
+			return true;
+		}
+		if (name == PropertyName.FormVfxHolder)
+		{
+			from = FormVfxHolder;
+			value = VariantUtils.CreateFrom(in from);
+			return true;
+		}
+		if (name == PropertyName.VfxSpawnPosition)
+		{
+			from2 = VfxSpawnPosition;
+			value = VariantUtils.CreateFrom(in from2);
+			return true;
+		}
+		if (name == PropertyName.DefaultScale)
+		{
+			value = VariantUtils.CreateFrom<float>(DefaultScale);
+			return true;
+		}
+		if (name == PropertyName.Body)
+		{
+			value = VariantUtils.CreateFrom<Node2D>(Body);
+			return true;
+		}
+		if (name == PropertyName._body)
+		{
+			value = VariantUtils.CreateFrom(in _body);
+			return true;
+		}
+		if (name == PropertyName._phobiaModeBody)
+		{
+			value = VariantUtils.CreateFrom(in _phobiaModeBody);
+			return true;
+		}
+		if (name == PropertyName._hue)
+		{
+			value = VariantUtils.CreateFrom(in _hue);
+			return true;
+		}
+		if (name == PropertyName._liquidOverlayTimer)
+		{
+			value = VariantUtils.CreateFrom(in _liquidOverlayTimer);
+			return true;
+		}
+		if (name == PropertyName._savedNormalMaterial)
+		{
+			value = VariantUtils.CreateFrom(in _savedNormalMaterial);
+			return true;
+		}
+		if (name == PropertyName._currentLiquidOverlayMaterial)
+		{
+			value = VariantUtils.CreateFrom(in _currentLiquidOverlayMaterial);
+			return true;
+		}
+		return base.GetGodotClassPropertyValue(in name, out value);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	internal static List<PropertyInfo> GetGodotPropertyList()
+	{
+		List<PropertyInfo> val = new List<PropertyInfo>();
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName._body, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName._phobiaModeBody, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.Bounds, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.IntentPosition, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.OrbPosition, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.TalkPosition, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Bool, PropertyName.IsSpineNode, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Bool, PropertyName.HasSpineAnimation, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Bool, PropertyName.IsUsingPhobiaModeBody, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.FormVfxHolder, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.VfxSpawnPosition, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Float, PropertyName.DefaultScale, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Float, PropertyName._hue, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Float, PropertyName._liquidOverlayTimer, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName._savedNormalMaterial, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName._currentLiquidOverlayMaterial, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.Body, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		return val;
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override void SaveGodotObjectData(GodotSerializationInfo info)
+	{
+		base.SaveGodotObjectData(info);
+		info.AddProperty(PropertyName.Bounds, Variant.From<Control>(Bounds));
+		info.AddProperty(PropertyName.IntentPosition, Variant.From<Marker2D>(IntentPosition));
+		info.AddProperty(PropertyName.OrbPosition, Variant.From<Marker2D>(OrbPosition));
+		info.AddProperty(PropertyName.TalkPosition, Variant.From<Marker2D>(TalkPosition));
+		info.AddProperty(PropertyName.FormVfxHolder, Variant.From<Control>(FormVfxHolder));
+		info.AddProperty(PropertyName.VfxSpawnPosition, Variant.From<Marker2D>(VfxSpawnPosition));
+		info.AddProperty(PropertyName.DefaultScale, Variant.From<float>(DefaultScale));
+		info.AddProperty(PropertyName._body, Variant.From(in _body));
+		info.AddProperty(PropertyName._phobiaModeBody, Variant.From(in _phobiaModeBody));
+		info.AddProperty(PropertyName._hue, Variant.From(in _hue));
+		info.AddProperty(PropertyName._liquidOverlayTimer, Variant.From(in _liquidOverlayTimer));
+		info.AddProperty(PropertyName._savedNormalMaterial, Variant.From(in _savedNormalMaterial));
+		info.AddProperty(PropertyName._currentLiquidOverlayMaterial, Variant.From(in _currentLiquidOverlayMaterial));
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override void RestoreGodotObjectData(GodotSerializationInfo info)
+	{
+		base.RestoreGodotObjectData(info);
+		if (info.TryGetProperty(PropertyName.Bounds, out var value))
+		{
+			Bounds = value.As<Control>();
+		}
+		if (info.TryGetProperty(PropertyName.IntentPosition, out var value2))
+		{
+			IntentPosition = value2.As<Marker2D>();
+		}
+		if (info.TryGetProperty(PropertyName.OrbPosition, out var value3))
+		{
+			OrbPosition = value3.As<Marker2D>();
+		}
+		if (info.TryGetProperty(PropertyName.TalkPosition, out var value4))
+		{
+			TalkPosition = value4.As<Marker2D>();
+		}
+		if (info.TryGetProperty(PropertyName.FormVfxHolder, out var value5))
+		{
+			FormVfxHolder = value5.As<Control>();
+		}
+		if (info.TryGetProperty(PropertyName.VfxSpawnPosition, out var value6))
+		{
+			VfxSpawnPosition = value6.As<Marker2D>();
+		}
+		if (info.TryGetProperty(PropertyName.DefaultScale, out var value7))
+		{
+			DefaultScale = value7.As<float>();
+		}
+		if (info.TryGetProperty(PropertyName._body, out var value8))
+		{
+			_body = value8.As<Node2D>();
+		}
+		if (info.TryGetProperty(PropertyName._phobiaModeBody, out var value9))
+		{
+			_phobiaModeBody = value9.As<Node2D>();
+		}
+		if (info.TryGetProperty(PropertyName._hue, out var value10))
+		{
+			_hue = value10.As<float>();
+		}
+		if (info.TryGetProperty(PropertyName._liquidOverlayTimer, out var value11))
+		{
+			_liquidOverlayTimer = value11.As<double>();
+		}
+		if (info.TryGetProperty(PropertyName._savedNormalMaterial, out var value12))
+		{
+			_savedNormalMaterial = value12.As<Material>();
+		}
+		if (info.TryGetProperty(PropertyName._currentLiquidOverlayMaterial, out var value13))
+		{
+			_currentLiquidOverlayMaterial = value13.As<ShaderMaterial>();
+		}
+	}
+}
+
+// ===== MegaCrit.Sts2.Core.Nodes.Combat.NCreatureVisuals.MethodName =====
+// ERROR: Could not find type definition MegaCrit.Sts2.Core.Nodes.Combat.NCreatureVisuals.MethodName in type system.
+// ===== MegaCrit.Sts2.Core.Nodes.Combat.NCreatureVisuals.PropertyName =====
+// ERROR: Could not find type definition MegaCrit.Sts2.Core.Nodes.Combat.NCreatureVisuals.PropertyName in type system.
+// ===== MegaCrit.Sts2.Core.Nodes.Combat.NCreatureVisuals.SignalName =====
+// ERROR: Could not find type definition MegaCrit.Sts2.Core.Nodes.Combat.NCreatureVisuals.SignalName in type system.
+// ===== MegaCrit.Sts2.Core.Nodes.Combat.NCreatureVisuals.<ApplyLiquidOverlayInternal>d__65 =====
+// ERROR: Could not find type definition MegaCrit.Sts2.Core.Nodes.Combat.NCreatureVisuals.<ApplyLiquidOverlayInternal>d__65 in type system.

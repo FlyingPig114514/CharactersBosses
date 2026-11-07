@@ -1,0 +1,219 @@
+﻿// ===== MegaCrit.Sts2.Core.Models.Orbs.DarkOrb =====
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using Godot;
+using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Nodes.Rooms;
+using MegaCrit.Sts2.Core.ValueProps;
+
+namespace MegaCrit.Sts2.Core.Models.Orbs;
+
+public class DarkOrb : OrbModel
+{
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <BeforeTurnEndOrbTrigger>d__9 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public DarkOrb <>4__this;
+
+		public PlayerChoiceContext choiceContext;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			DarkOrb darkOrb = <>4__this;
+			try
+			{
+				TaskAwaiter val;
+				if (num != 0)
+				{
+					val = darkOrb.TriggerPassive(choiceContext, null).GetAwaiter();
+					if (!((TaskAwaiter)(ref val)).IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <BeforeTurnEndOrbTrigger>d__9>(ref val, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+				}
+				((TaskAwaiter)(ref val)).GetResult();
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <Evoke>d__11 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder<System.Collections.Generic.IEnumerable<Creature>> <>t__builder;
+
+		public DarkOrb <>4__this;
+
+		public PlayerChoiceContext playerChoiceContext;
+
+		private Creature <weakestEnemy>5__2;
+
+		private TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>> <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			DarkOrb darkOrb = <>4__this;
+			System.Collections.Generic.IEnumerable<Creature> result;
+			try
+			{
+				TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>> val;
+				if (num == 0)
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>>);
+					num = (<>1__state = -1);
+					goto IL_00ea;
+				}
+				System.Collections.Generic.IReadOnlyList<Creature> hittableEnemies = darkOrb.CombatState.HittableEnemies;
+				if (((System.Collections.Generic.IReadOnlyCollection<Creature>)hittableEnemies).Count != 0)
+				{
+					darkOrb.PlayEvokeSfx();
+					<weakestEnemy>5__2 = Enumerable.MinBy<Creature, int>((System.Collections.Generic.IEnumerable<Creature>)hittableEnemies, (Func<Creature, int>)((Creature c) => c.CurrentHp));
+					darkOrb.ActivateEvoke(new Creature[1] { <weakestEnemy>5__2 });
+					val = CreatureCmd.Damage(playerChoiceContext, <weakestEnemy>5__2, darkOrb.EvokeVal, ValueProp.Unpowered, darkOrb.Owner.Creature).GetAwaiter();
+					if (!val.IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter<System.Collections.Generic.IEnumerable<DamageResult>>, <Evoke>d__11>(ref val, ref this);
+						return;
+					}
+					goto IL_00ea;
+				}
+				result = System.Array.Empty<Creature>();
+				goto end_IL_000e;
+				IL_00ea:
+				val.GetResult();
+				result = new global::<>z__ReadOnlySingleElementList<Creature>(<weakestEnemy>5__2);
+				end_IL_000e:;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<weakestEnemy>5__2 = null;
+				<>t__builder.SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<weakestEnemy>5__2 = null;
+			<>t__builder.SetResult(result);
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			<>t__builder.SetStateMachine(stateMachine);
+		}
+	}
+
+	private decimal _evokeVal = 6m;
+
+	protected override string ChannelSfx => "event:/sfx/characters/defect/defect_dark_channel";
+
+	public override Color DarkenedColor => new Color("9001d3");
+
+	public override decimal PassiveVal => ModifyOrbValue(6m);
+
+	public override decimal EvokeVal => _evokeVal;
+
+	[AsyncStateMachine(typeof(<BeforeTurnEndOrbTrigger>d__9))]
+	public override System.Threading.Tasks.Task BeforeTurnEndOrbTrigger(PlayerChoiceContext choiceContext)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<BeforeTurnEndOrbTrigger>d__9 <BeforeTurnEndOrbTrigger>d__10 = default(<BeforeTurnEndOrbTrigger>d__9);
+		<BeforeTurnEndOrbTrigger>d__10.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<BeforeTurnEndOrbTrigger>d__10.<>4__this = this;
+		<BeforeTurnEndOrbTrigger>d__10.choiceContext = choiceContext;
+		<BeforeTurnEndOrbTrigger>d__10.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <BeforeTurnEndOrbTrigger>d__10.<>t__builder)).Start<<BeforeTurnEndOrbTrigger>d__9>(ref <BeforeTurnEndOrbTrigger>d__10);
+		return ((AsyncTaskMethodBuilder)(ref <BeforeTurnEndOrbTrigger>d__10.<>t__builder)).Task;
+	}
+
+	public override System.Threading.Tasks.Task Passive(PlayerChoiceContext choiceContext, Creature? target)
+	{
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+		if (target != null)
+		{
+			throw new InvalidOperationException("Dark orbs cannot target creatures.");
+		}
+		ActivatePassive();
+		_evokeVal += PassiveVal;
+		NCombatRoom.Instance?.GetCreatureNode(base.Owner.Creature)?.OrbManager?.UpdateVisuals(OrbEvokeType.None);
+		return System.Threading.Tasks.Task.CompletedTask;
+	}
+
+	[AsyncStateMachine(typeof(<Evoke>d__11))]
+	public override async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Creature>> Evoke(PlayerChoiceContext playerChoiceContext)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		System.Collections.Generic.IReadOnlyList<Creature> hittableEnemies = base.CombatState.HittableEnemies;
+		if (((System.Collections.Generic.IReadOnlyCollection<Creature>)hittableEnemies).Count == 0)
+		{
+			return System.Array.Empty<Creature>();
+		}
+		PlayEvokeSfx();
+		Creature weakestEnemy = Enumerable.MinBy<Creature, int>((System.Collections.Generic.IEnumerable<Creature>)hittableEnemies, (Func<Creature, int>)((Creature c) => c.CurrentHp));
+		ActivateEvoke(new Creature[1] { weakestEnemy });
+		await CreatureCmd.Damage(playerChoiceContext, weakestEnemy, EvokeVal, ValueProp.Unpowered, base.Owner.Creature);
+		return new global::<>z__ReadOnlySingleElementList<Creature>(weakestEnemy);
+	}
+}
+

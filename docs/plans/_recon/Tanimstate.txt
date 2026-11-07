@@ -1,0 +1,193 @@
+﻿// ===== MegaCrit.Sts2.Core.Animation.AnimState =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
+
+namespace MegaCrit.Sts2.Core.Animation;
+
+public class AnimState
+{
+	private struct Branch
+	{
+		public AnimState state;
+
+		public Func<bool>? condition;
+	}
+
+	public const string attackAnim = "attack";
+
+	public const string castAnim = "cast";
+
+	public const string dieAnim = "die";
+
+	public const string hurtAnim = "hurt";
+
+	public const string idleAnim = "idle_loop";
+
+	public const string lowHealthIdleAnim = "low_health_loop";
+
+	public const string reviveAnim = "revive";
+
+	public const string stunAnim = "stun";
+
+	private readonly Dictionary<string, List<Branch>> _triggerBranchedStates;
+
+	private readonly List<Branch> _nextStates;
+
+	[field: CompilerGenerated]
+	public string Id
+	{
+		[CompilerGenerated]
+		get;
+	}
+
+	[field: CompilerGenerated]
+	public bool IsLooping
+	{
+		[CompilerGenerated]
+		get;
+	}
+
+	[field: CompilerGenerated]
+	public bool HasLooped
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public AnimState? NextState
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		set;
+	}
+
+	[field: CompilerGenerated]
+	public string? BoundsContainer
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		init;
+	}
+
+	public AnimState? GetNextState()
+	{
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+		Enumerator<Branch> enumerator = _nextStates.GetEnumerator();
+		try
+		{
+			while (enumerator.MoveNext())
+			{
+				Branch current = enumerator.Current;
+				Func<bool>? condition = current.condition;
+				if (condition == null || condition.Invoke())
+				{
+					return current.state;
+				}
+			}
+		}
+		finally
+		{
+			((System.IDisposable)enumerator/*cast due to .constrained prefix*/).Dispose();
+		}
+		return NextState;
+	}
+
+	public AnimState(string id, bool isLooping = false)
+	{
+		Id = id;
+		IsLooping = isLooping;
+		_triggerBranchedStates = new Dictionary<string, List<Branch>>();
+		_nextStates = new List<Branch>();
+	}
+
+	public void AddNextState(AnimState state)
+	{
+		AddNextState(state, () => true);
+	}
+
+	public void AddNextState(AnimState state, Func<bool>? condition)
+	{
+		Branch branch = new Branch
+		{
+			state = state,
+			condition = condition
+		};
+		_nextStates.Add(branch);
+	}
+
+	public void AddBranch(string trigger, AnimState state, Func<bool>? condition = null)
+	{
+		Branch branch = new Branch
+		{
+			state = state,
+			condition = condition
+		};
+		List<Branch> val = default(List<Branch>);
+		if (!_triggerBranchedStates.TryGetValue(trigger, ref val))
+		{
+			val = new List<Branch>();
+			_triggerBranchedStates[trigger] = val;
+		}
+		val.Add(branch);
+	}
+
+	public void RemoveBranch(string trigger, string stateId)
+	{
+		List<Branch> branches = default(List<Branch>);
+		if (_triggerBranchedStates.TryGetValue(trigger, ref branches))
+		{
+			List<Branch> val = Enumerable.ToList<Branch>(Enumerable.Where<Branch>((System.Collections.Generic.IEnumerable<Branch>)branches, (Func<Branch, bool>)((Branch b) => b.state.Id == stateId)));
+			val.ForEach((Action<Branch>)delegate(Branch b)
+			{
+				branches.Remove(b);
+			});
+		}
+	}
+
+	public AnimState? CallTrigger(string trigger)
+	{
+		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+		List<Branch> val = default(List<Branch>);
+		if (_triggerBranchedStates.TryGetValue(trigger, ref val))
+		{
+			Enumerator<Branch> enumerator = val.GetEnumerator();
+			try
+			{
+				while (enumerator.MoveNext())
+				{
+					Branch current = enumerator.Current;
+					Func<bool>? condition = current.condition;
+					if (condition == null || condition.Invoke())
+					{
+						return current.state;
+					}
+				}
+			}
+			finally
+			{
+				((System.IDisposable)enumerator/*cast due to .constrained prefix*/).Dispose();
+			}
+		}
+		return null;
+	}
+
+	public bool HasTrigger(string trigger)
+	{
+		return _triggerBranchedStates.ContainsKey(trigger);
+	}
+
+	public void MarkHasLooped()
+	{
+		HasLooped = true;
+	}
+}
+

@@ -1,0 +1,103 @@
+{
+  "IRONCLAD_BOSS_ENCOUNTER.title": "Demirkaplı",
+  "IRONCLAD_BOSS_ENCOUNTER.loss": "{character}, [gold]Demirkaplı[/gold] tarafından paramparça edildi.",
+
+  "IRONCLAD_ANGER_BOSS_ENCOUNTER.title": "Demirkaplı",
+  "IRONCLAD_ANGER_BOSS_ENCOUNTER.loss": "{character}, [gold]Demirkaplı[/gold]'nın öfkesinde küle döndü.",
+
+  "IRONCLAD_VULN_BOSS_ENCOUNTER.title": "Demirkaplı",
+  "IRONCLAD_VULN_BOSS_ENCOUNTER.loss": "{character}, [gold]Demirkaplı[/gold] tarafından katman katman yarıldı.",
+
+  "SILENT_BOSS_ENCOUNTER.title": "Sessiz",
+  "SILENT_BOSS_ENCOUNTER.loss": "{character}, [gold]Sessiz[/gold]'i son ana kadar göremedi.",
+
+  "SILENT_ENVENOM_BOSS_ENCOUNTER.title": "Sessiz",
+  "SILENT_ENVENOM_BOSS_ENCOUNTER.loss": "{character}, [gold]Sessiz[/gold]'in [gold]Zehir[/gold]'iyle tükendi.",
+
+  "SILENT_SHIV_BOSS_ENCOUNTER.title": "Sessiz",
+  "SILENT_SHIV_BOSS_ENCOUNTER.loss": "{character}, [gold]Sessiz[/gold]'in bıçak yağmurunda boğuldu.",
+
+  "SILENT_SLY_BOSS_ENCOUNTER.title": "Sessiz",
+  "SILENT_SLY_BOSS_ENCOUNTER.loss": "{character}, [gold]Sessiz[/gold] tarafından [gold]Atık Deste[/gold]'ye atıldı.",
+
+  "SILENT_BREWER_BOSS_ENCOUNTER.title": "Sessiz",
+  "SILENT_BREWER_BOSS_ENCOUNTER.loss": "{character}, [gold]Sessiz[/gold]'in iksirlerle ördüğü bariyeri aşamadı.",
+
+  "DEFECT_BOSS_ENCOUNTER.title": "Arıza",
+  "DEFECT_BOSS_ENCOUNTER.loss": "{character}, [gold]Arıza[/gold] tarafından analiz edilip silindi.",
+
+  "DEFECT_AI_BOSS_ENCOUNTER.title": "Arıza",
+  "DEFECT_AI_BOSS_ENCOUNTER.loss": "{character}'ın oynadığı her kart [gold]Arıza[/gold]'nın modeline işlendi.",
+
+  "DEFECT_CLAW_BOSS_ENCOUNTER.title": "Arıza",
+  "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character}, [gold]Arıza[/gold]'nın [gold]Hiper Işın[/gold]'ıyla yok edildi.",
+
+  "NECROBINDER_BOSS_ENCOUNTER.title": "Ölübağlayan",
+  "NECROBINDER_BOSS_ENCOUNTER.loss": "{character}'ın ruhu [gold]Ölübağlayan[/gold] tarafından alındı.",
+
+  "NECROBINDER_DOOM_BOSS_ENCOUNTER.title": "Ölübağlayan",
+  "NECROBINDER_DOOM_BOSS_ENCOUNTER.loss": "[gold]Ölübağlayan[/gold], {character}'ı [gold]Kader[/gold]'in sonuna çağırdı.",
+
+  "NECROBINDER_SOUL_BOSS_ENCOUNTER.title": "Ölübağlayan",
+  "NECROBINDER_SOUL_BOSS_ENCOUNTER.loss": "{character}'ın ruhu [gold]Ölübağlayan[/gold] tarafından alındı.",
+
+  "NECROBINDER_ERADICATE_BOSS_ENCOUNTER.title": "Ölübağlayan",
+  "NECROBINDER_ERADICATE_BOSS_ENCOUNTER.loss": "{character}, anılarıyla birlikte [gold]Ölübağlayan[/gold] tarafından kökünden kazındı.",
+
+  "REGENT_BOSS_ENCOUNTER.title": "Naip",
+  "REGENT_BOSS_ENCOUNTER.loss": "{character}, [gold]Naip[/gold] tarafından yargılandı.",
+
+  "REGENT_DEBRIS_BOSS_ENCOUNTER.title": "Naip",
+  "REGENT_DEBRIS_BOSS_ENCOUNTER.loss": "{character}, [gold]Naip[/gold]'in [gold]Moloz[/gold]'u altında kaldı.",
+
+  "REGENT_FORGE_BOSS_ENCOUNTER.title": "Naip",
+  "REGENT_FORGE_BOSS_ENCOUNTER.loss": "{character}, [gold]Naip[/gold]'in kılıcında bir çentik oldu.",
+
+  "REGENT_COLORLESS_BOSS_ENCOUNTER.title": "Naip",
+  "REGENT_COLORLESS_BOSS_ENCOUNTER.loss": "{character}, [gold]Naip[/gold] tarafından renginden sıyrıldı.",
+
+  "REGENT_STAR_BOSS_ENCOUNTER.title": "Naip",
+  "REGENT_STAR_BOSS_ENCOUNTER.loss": "{character}, [gold]Naip[/gold]'in parlayan yıldızları altında toz oldu.",
+
+  "REGENT_KING_BOSS_ENCOUNTER.title": "Naip",
+  "REGENT_KING_BOSS_ENCOUNTER.loss": "{character}, [gold]Naip[/gold]'in tacı altında ezildi.",
+
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.title": "Demirkaplı",
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "{character}, [gold]Demirkaplı[/gold]'nın gitgide artan [gold]Kuvvet[/gold]'i altında ezildi.",
+
+  "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.title": "Demirkaplı",
+  "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss": "{character}, [gold]Demirkaplı[/gold] tarafından hokkabazlık edilir gibi oynatıldı ve sonunda kendi kopyaları altında kaldı.",
+  "IRONCLAD_BOULDER_BOSS_ENCOUNTER.title": "Demirkaplı",
+  "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss": "{character}, [gold]Demirkaplı[/gold]'nın [gold]Devasa Kaya[/gold]'larıyla toz haline getirildi.",
+
+  "DEFECT_DARK_BOSS_ENCOUNTER.title": "Arıza",
+  "DEFECT_DARK_BOSS_ENCOUNTER.loss": "{character}, [gold]Arıza[/gold]'nın [gold]Karanlık[/gold] küreleri tarafından yutuldu.",
+
+  "IRONCLAD_BOSS_NORMAL_ENCOUNTER.title": "Demirkaplı",
+  "IRONCLAD_BOSS_NORMAL_ENCOUNTER.loss": "{character}, [gold]Demirkaplı[/gold] tarafından paramparça edildi.",
+  "SILENT_BOSS_NORMAL_ENCOUNTER.title": "Sessiz",
+  "SILENT_BOSS_NORMAL_ENCOUNTER.loss": "{character}, [gold]Sessiz[/gold]'i son ana kadar göremedi.",
+  "SILENT_ENVENOM_BOSS_NORMAL_ENCOUNTER.title": "Sessiz",
+  "SILENT_ENVENOM_BOSS_NORMAL_ENCOUNTER.loss": "{character}, [gold]Sessiz[/gold]'in [gold]Zehir[/gold]'iyle tükendi.",
+  "SILENT_SLY_BOSS_NORMAL_ENCOUNTER.title": "Sessiz",
+  "SILENT_SLY_BOSS_NORMAL_ENCOUNTER.loss": "{character}, [gold]Sessiz[/gold] tarafından [gold]Atık Deste[/gold]'ye atıldı.",
+  "SILENT_SHIV_BOSS_NORMAL_ENCOUNTER.title": "Sessiz",
+  "SILENT_SHIV_BOSS_NORMAL_ENCOUNTER.loss": "{character}, [gold]Sessiz[/gold]'in bıçak yağmurunda boğuldu.",
+  "DEFECT_BOSS_NORMAL_ENCOUNTER.title": "Arıza",
+  "DEFECT_BOSS_NORMAL_ENCOUNTER.loss": "{character}, [gold]Arıza[/gold] tarafından analiz edilip silindi.",
+  "NECROBINDER_BOSS_NORMAL_ENCOUNTER.title": "Ölübağlayan",
+  "NECROBINDER_BOSS_NORMAL_ENCOUNTER.loss": "{character}'ın ruhu [gold]Ölübağlayan[/gold] tarafından alındı.",
+  "REGENT_BOSS_NORMAL_ENCOUNTER.title": "Naip",
+  "REGENT_BOSS_NORMAL_ENCOUNTER.loss": "{character}, [gold]Naip[/gold] tarafından yargılandı.",
+
+  "TELEMETRY_PROMPT_HEADER": "Oyun Verilerini Yükle (CharacterBosses)",
+  "TELEMETRY_PROMPT_BODY": "Bu mod, hataları düzeltmek ve boss savaşlarını dengelemek için bazı oyun verilerini toplamak istiyor:\nher boss savaşı için sonuç, bölüm/savaş, yükseliş, oyuncu sayısı, boss CP'si, tur sayısı ve tohum; ayrıca bu modun kendi hata satırları.\n\nVeriler önce [b]yerel bir dosyaya[/b] kaydedilir; yazar bir toplama sunucusu yapılandırdıysa aynı anonim veriler [b]yazara da yüklenir[/b].\n\nHiçbir kişisel bilgi toplanmaz (Steam kimliği / takma ad yazılmaz).\n\nBunu istediğin zaman “Mod Ayarları → CharacterBosses → A5” yolundan değiştirebilirsin. Şimdi etkinleştirilsin mi?",
+  "TELEMETRY_PROMPT_YES": "Etkinleştir",
+  "TELEMETRY_PROMPT_NO": "Kapalı kalsın",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.title":  "The Necrobinder",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character} was dragged into the grave by the [gold]Necrobinder[/gold]\u0027s Osty.",
+    "SILENT_SNECKO_BOSS_ENCOUNTER.title":  "The Silent",
+    "SILENT_SNECKO_BOSS_ENCOUNTER.loss":  "{character} was sent to the grave by the [gold]Silent[/gold]\u0027s dice.",
+  "DEFECT_EVENT_BOSS_ENCOUNTER.loss": "[gold]Arıza[/gold], {character}'ı Atık Deste'den geri çekti.",
+  "DEFECT_EVENT_BOSS_ENCOUNTER.title": "Arıza"
+}

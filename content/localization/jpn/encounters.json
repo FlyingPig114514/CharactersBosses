@@ -1,0 +1,103 @@
+{
+  "IRONCLAD_BOSS_ENCOUNTER.title": "アイアンクラッド",
+  "IRONCLAD_BOSS_ENCOUNTER.loss": "{character}は[gold]アイアンクラッド[/gold]に打ち砕かれた。",
+
+  "IRONCLAD_ANGER_BOSS_ENCOUNTER.title": "アイアンクラッド",
+  "IRONCLAD_ANGER_BOSS_ENCOUNTER.loss": "{character}は[gold]アイアンクラッド[/gold]の怒りに焼かれ、灰になった。",
+
+  "IRONCLAD_VULN_BOSS_ENCOUNTER.title": "アイアンクラッド",
+  "IRONCLAD_VULN_BOSS_ENCOUNTER.loss": "{character}は[gold]アイアンクラッド[/gold]に一層ずつ傷を広げられた。",
+
+  "SILENT_BOSS_ENCOUNTER.title": "サイレント",
+  "SILENT_BOSS_ENCOUNTER.loss": "{character}は最期まで[gold]サイレント[/gold]の姿を捉えられなかった。",
+
+  "SILENT_ENVENOM_BOSS_ENCOUNTER.title": "サイレント",
+  "SILENT_ENVENOM_BOSS_ENCOUNTER.loss": "{character}は[gold]サイレント[/gold]の毒に命を削られた。",
+
+  "SILENT_SHIV_BOSS_ENCOUNTER.title": "サイレント",
+  "SILENT_SHIV_BOSS_ENCOUNTER.loss": "{character}は[gold]サイレント[/gold]のナイフの雨に呑まれた。",
+
+  "SILENT_SLY_BOSS_ENCOUNTER.title": "サイレント",
+  "SILENT_SLY_BOSS_ENCOUNTER.loss": "{character}は[gold]サイレント[/gold]に捨て札へ放り込まれた。",
+
+  "SILENT_BREWER_BOSS_ENCOUNTER.title": "サイレント",
+  "SILENT_BREWER_BOSS_ENCOUNTER.loss": "{character}は[gold]サイレント[/gold]のポーションで築かれた障壁を打ち破れなかった。",
+
+  "DEFECT_BOSS_ENCOUNTER.title": "ディフェクト",
+  "DEFECT_BOSS_ENCOUNTER.loss": "{character}は[gold]ディフェクト[/gold]に分析され、削除された。",
+
+  "DEFECT_AI_BOSS_ENCOUNTER.title": "ディフェクト",
+  "DEFECT_AI_BOSS_ENCOUNTER.loss": "{character}のプレイしたカードはすべて[gold]ディフェクト[/gold]のモデルに取り込まれた。",
+
+  "DEFECT_CLAW_BOSS_ENCOUNTER.title": "ディフェクト",
+  "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character}は[gold]ディフェクト[/gold]の[gold]ハイパービーム[/gold]に消し飛ばされた。",
+
+  "NECROBINDER_BOSS_ENCOUNTER.title": "ネクロバインダー",
+  "NECROBINDER_BOSS_ENCOUNTER.loss": "{character}の魂は[gold]ネクロバインダー[/gold]に奪われた。",
+
+  "NECROBINDER_DOOM_BOSS_ENCOUNTER.title": "ネクロバインダー",
+  "NECROBINDER_DOOM_BOSS_ENCOUNTER.loss": "[gold]ネクロバインダー[/gold]は{character}を[gold]破滅[/gold]の果てへと招いた。",
+
+  "NECROBINDER_SOUL_BOSS_ENCOUNTER.title": "ネクロバインダー",
+  "NECROBINDER_SOUL_BOSS_ENCOUNTER.loss": "{character}の魂は[gold]ネクロバインダー[/gold]に奪われた。",
+
+  "NECROBINDER_ERADICATE_BOSS_ENCOUNTER.title": "ネクロバインダー",
+  "NECROBINDER_ERADICATE_BOSS_ENCOUNTER.loss": "{character}は記憶ごと[gold]ネクロバインダー[/gold]に根絶された。",
+
+  "REGENT_BOSS_ENCOUNTER.title": "リージェント",
+  "REGENT_BOSS_ENCOUNTER.loss": "{character}は[gold]リージェント[/gold]に裁かれた。",
+
+  "REGENT_DEBRIS_BOSS_ENCOUNTER.title": "リージェント",
+  "REGENT_DEBRIS_BOSS_ENCOUNTER.loss": "{character}は[gold]リージェント[/gold]の[gold]デブリ[/gold]に埋もれた。",
+
+  "REGENT_FORGE_BOSS_ENCOUNTER.title": "リージェント",
+  "REGENT_FORGE_BOSS_ENCOUNTER.loss": "{character}は[gold]リージェント[/gold]の剣に刻まれた一本の傷になった。",
+
+  "REGENT_COLORLESS_BOSS_ENCOUNTER.title": "リージェント",
+  "REGENT_COLORLESS_BOSS_ENCOUNTER.loss": "{character}は[gold]リージェント[/gold]に色を奪い尽くされた。",
+
+  "REGENT_STAR_BOSS_ENCOUNTER.title": "リージェント",
+  "REGENT_STAR_BOSS_ENCOUNTER.loss": "{character}は[gold]リージェント[/gold]の輝く星に塵と化すまで挽かれた。",
+
+  "REGENT_KING_BOSS_ENCOUNTER.title": "リージェント",
+  "REGENT_KING_BOSS_ENCOUNTER.loss": "{character}は[gold]リージェント[/gold]の王権に踏み潰された。",
+
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.title": "アイアンクラッド",
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "{character}は戦うほど強くなる[gold]アイアンクラッド[/gold]の[gold]筋力[/gold]に潰された。",
+
+    "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.title": "アイアンクラッド",
+  "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss": "{character}は[gold]アイアンクラッド[/gold]に弄ばれ、最後は自分のコピーに埋め尽くされた。",
+"IRONCLAD_BOULDER_BOSS_ENCOUNTER.title": "アイアンクラッド",
+  "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss": "{character}は[gold]アイアンクラッド[/gold]の[gold]巨大な岩[/gold]に粉々にされた。",
+
+  "DEFECT_DARK_BOSS_ENCOUNTER.title": "ディフェクト",
+  "DEFECT_DARK_BOSS_ENCOUNTER.loss": "{character}は[gold]ディフェクト[/gold]のダークオーブに呑み込まれた。",
+
+  "IRONCLAD_BOSS_NORMAL_ENCOUNTER.title": "アイアンクラッド",
+  "IRONCLAD_BOSS_NORMAL_ENCOUNTER.loss": "{character}は[gold]アイアンクラッド[/gold]に打ち砕かれた。",
+  "SILENT_BOSS_NORMAL_ENCOUNTER.title": "サイレント",
+  "SILENT_BOSS_NORMAL_ENCOUNTER.loss": "{character}は最期まで[gold]サイレント[/gold]の姿を捉えられなかった。",
+  "SILENT_ENVENOM_BOSS_NORMAL_ENCOUNTER.title": "サイレント",
+  "SILENT_ENVENOM_BOSS_NORMAL_ENCOUNTER.loss": "{character}は[gold]サイレント[/gold]の毒に命を削られた。",
+  "SILENT_SLY_BOSS_NORMAL_ENCOUNTER.title": "サイレント",
+  "SILENT_SLY_BOSS_NORMAL_ENCOUNTER.loss": "{character}は[gold]サイレント[/gold]に捨て札へ放り込まれた。",
+  "SILENT_SHIV_BOSS_NORMAL_ENCOUNTER.title": "サイレント",
+  "SILENT_SHIV_BOSS_NORMAL_ENCOUNTER.loss": "{character}は[gold]サイレント[/gold]のナイフの雨に呑まれた。",
+  "DEFECT_BOSS_NORMAL_ENCOUNTER.title": "ディフェクト",
+  "DEFECT_BOSS_NORMAL_ENCOUNTER.loss": "{character}は[gold]ディフェクト[/gold]に分析され、削除された。",
+  "NECROBINDER_BOSS_NORMAL_ENCOUNTER.title": "ネクロバインダー",
+  "NECROBINDER_BOSS_NORMAL_ENCOUNTER.loss": "{character}の魂は[gold]ネクロバインダー[/gold]に奪われた。",
+  "REGENT_BOSS_NORMAL_ENCOUNTER.title": "リージェント",
+  "REGENT_BOSS_NORMAL_ENCOUNTER.loss": "{character}は[gold]リージェント[/gold]に裁かれた。",
+
+  "TELEMETRY_PROMPT_HEADER": "プレイデータの送信（CharacterBosses）",
+  "TELEMETRY_PROMPT_BODY": "このMODはバグ修正とボス難易度の調整のため、いくつかのプレイデータを収集します：\n各ボス戦の勝敗、アクト／試合、アセンション、人数、ボスのHP、ターン数とシード、そしてこのMOD自身のエラー行。\n\nデータはまず[b]ローカルファイル[/b]に保存されます。作者が収集サーバーを設定している場合は、同じ匿名データを[b]作者へも送信[/b]します。\n\n個人情報は一切収集しません（SteamID／ニックネームは記録しません）。\n\n「MOD設定 → CharacterBosses → A5」でいつでも変更できます。今すぐ有効にしますか？",
+  "TELEMETRY_PROMPT_YES": "有効にする",
+  "TELEMETRY_PROMPT_NO": "オフのまま",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.title":  "The Necrobinder",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character} was dragged into the grave by the [gold]Necrobinder[/gold]\u0027s Osty.",
+    "SILENT_SNECKO_BOSS_ENCOUNTER.title":  "The Silent",
+    "SILENT_SNECKO_BOSS_ENCOUNTER.loss":  "{character} was sent to the grave by the [gold]Silent[/gold]\u0027s dice.",
+  "DEFECT_EVENT_BOSS_ENCOUNTER.loss": "{character}は[gold]ディフェクト[/gold]に捨て札から引き戻された。",
+  "DEFECT_EVENT_BOSS_ENCOUNTER.title": "ディフェクト"
+}

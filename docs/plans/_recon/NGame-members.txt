@@ -1,0 +1,141 @@
+﻿// ===== MegaCrit.Sts2.Core.Nodes.NGame (base Control) =====
+  M public System.Void _EnterTree()
+  M private System.Void OnFilesDropped(System.String[] files)
+  M public System.Void _Ready()
+  M private System.Threading.Tasks.Task GameStartupWrapper()
+  M private System.Threading.Tasks.Task TryErrorInit()
+  M private System.Threading.Tasks.Task GameStartupError()
+  M private System.Threading.Tasks.Task GameStartup()
+  M private System.Threading.Tasks.Task DoCloudSync()
+  M private System.Void OnWindowChange()
+  M public static System.Boolean IsMainThread()
+  M public System.Void _ExitTree()
+  M public static System.Boolean IsReleaseGame()
+  M private System.Void InitializeGraphicsPreferences()
+  M public System.Void ApplyDisplaySettings()
+  M public MegaCrit.Sts2.Core.Nodes.Screens.InspectScreens.NInspectRelicScreen GetInspectRelicScreen()
+  M public MegaCrit.Sts2.Core.Nodes.Screens.NInspectCardScreen GetInspectCardScreen()
+  M public static System.Void ApplySyncSetting()
+  M public static System.Void Reset()
+  M public System.Void _Notification(System.Int32 what)
+  M public System.Void Quit()
+  M private System.Threading.Tasks.Task LaunchMainMenu(System.Boolean skipLogo)
+  M private System.Threading.Tasks.Task LoadDeferredStartupAssetsAsync()
+  M public System.Threading.Tasks.Task GoToTimelineAfterRun()
+  M public System.Threading.Tasks.Task ReturnToMainMenuAfterRun()
+  M public System.Threading.Tasks.Task ReturnToMainMenuWithInternalError(System.Exception e)
+  M public System.Threading.Tasks.Task GoToTimeline()
+  M public System.Threading.Tasks.Task ReturnToMainMenu()
+  M public System.Void Relocalize()
+  M public System.Void ReloadMainMenu()
+  M private System.Threading.Tasks.Task LoadMainMenu(System.Boolean openTimeline)
+  M public System.Threading.Tasks.Task`1[[MegaCrit.Sts2.Core.Runs.RunState]] StartNewSingleplayerRun(MegaCrit.Sts2.Core.Models.CharacterModel character, System.Boolean shouldSave, System.Collections.Generic.IReadOnlyList`1[[MegaCrit.Sts2.Core.Models.ActModel]] acts, System.Collections.Generic.IReadOnlyList`1[[MegaCrit.Sts2.Core.Models.ModifierModel]] modifiers, System.String seed, MegaCrit.Sts2.Core.Runs.GameMode gameMode, System.Int32 ascensionLevel, System.Nullable`1[[System.DateTimeOffset]] dailyTime)
+  M public System.Threading.Tasks.Task`1[[MegaCrit.Sts2.Core.Runs.RunState]] StartNewMultiplayerRun(MegaCrit.Sts2.Core.Multiplayer.Game.Lobby.StartRunLobby lobby, System.Boolean shouldSave, System.Collections.Generic.IReadOnlyList`1[[MegaCrit.Sts2.Core.Models.ActModel]] acts, System.Collections.Generic.IReadOnlyList`1[[MegaCrit.Sts2.Core.Models.ModifierModel]] modifiers, System.String seed, System.Int32 ascensionLevel, System.Nullable`1[[System.DateTimeOffset]] dailyTime)
+  M public System.Threading.Tasks.Task LoadRun(MegaCrit.Sts2.Core.Runs.RunState runState, MegaCrit.Sts2.Core.Saves.Runs.SerializableRoom preFinishedRoom)
+  M private System.Threading.Tasks.Task StartRun(MegaCrit.Sts2.Core.Runs.RunState runState)
+  M public System.Void _Input(Godot.InputEvent inputEvent)
+  M private System.Void ToggleFullscreen()
+  M private System.Void DebugModifyTimescale(System.Double offset)
+  M public Godot.WorldEnvironment ActivateWorldEnvironment()
+  M public System.Void DeactivateWorldEnvironment()
+  M public System.Void SetScreenShakeTarget(Godot.Control target)
+  M public System.Void ClearScreenShakeTarget()
+  M public System.Void ScreenShake(MegaCrit.Sts2.Core.Nodes.Vfx.Utilities.ShakeStrength strength, MegaCrit.Sts2.Core.Nodes.Vfx.Utilities.ShakeDuration duration, System.Single degAngle)
+  M public System.Void ScreenRumble(MegaCrit.Sts2.Core.Nodes.Vfx.Utilities.ShakeStrength strength, MegaCrit.Sts2.Core.Nodes.Vfx.Utilities.ShakeDuration duration, MegaCrit.Sts2.Core.Nodes.Vfx.Utilities.RumbleStyle style)
+  M public System.Void ScreenShakeTrauma(MegaCrit.Sts2.Core.Nodes.Vfx.Utilities.ShakeStrength strength)
+  M public System.Void DoHitStop(MegaCrit.Sts2.Core.Nodes.Vfx.Utilities.ShakeStrength strength, MegaCrit.Sts2.Core.Nodes.Vfx.Utilities.ShakeDuration duration)
+  M public static System.Void ToggleTrailerMode()
+  M public System.Void SetScreenshakeMultiplier(System.Single multiplier)
+  M private System.Void InitPools()
+  M private System.Void OnNewModDetected(MegaCrit.Sts2.Core.Modding.Mod mod)
+  M public System.Void CheckShowSaveFileError(MegaCrit.Sts2.Core.Saves.ReadSaveResult`1[[MegaCrit.Sts2.Core.Saves.SerializableProgress]] progressReadResult, MegaCrit.Sts2.Core.Saves.ReadSaveResult`1[[MegaCrit.Sts2.Core.Saves.PrefsSave]] prefsReadResult, MegaCrit.Sts2.Core.Saves.ReadSaveResult`1[[MegaCrit.Sts2.Core.Saves.SettingsSave]] settingsReadResult)
+  M private System.Void CheckShowLocalizationOverrideErrors()
+  M private System.Void CheckShowModdedSaveFilePopup()
+  M private System.Threading.Tasks.Task`1[[System.Boolean]] InitializePlatform()
+  M private System.Void OnSteamNoLongerRunning()
+  M public static System.Void LogResourceStats(System.String context)
+  M internal static System.String FormatBytes(System.UInt64 bytes)
+  M public static System.Boolean IsGameFocusedWindow()
+  M public MegaCrit.Sts2.Core.Nodes.Screens.FeedbackScreen.NSendFeedbackScreen GetOrCreateFeedbackScreen()
+  M public static System.String GetGameVersion()
+  M internal static System.Collections.Generic.List`1[[Godot.Bridge.MethodInfo]] GetGodotMethodList()
+  M protected System.Boolean InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name& method, Godot.NativeInterop.NativeVariantPtrArgs args, Godot.NativeInterop.godot_variant& ret)
+  M internal static System.Boolean InvokeGodotClassStaticMethod(Godot.NativeInterop.godot_string_name& method, Godot.NativeInterop.NativeVariantPtrArgs args, Godot.NativeInterop.godot_variant& ret)
+  M protected System.Boolean HasGodotClassMethod(Godot.NativeInterop.godot_string_name& method)
+  M protected System.Boolean SetGodotClassPropertyValue(Godot.NativeInterop.godot_string_name& name, Godot.NativeInterop.godot_variant& value)
+  M protected System.Boolean GetGodotClassPropertyValue(Godot.NativeInterop.godot_string_name& name, Godot.NativeInterop.godot_variant& value)
+  M internal static System.Collections.Generic.List`1[[Godot.Bridge.PropertyInfo]] GetGodotPropertyList()
+  M protected System.Void SaveGodotObjectData(Godot.Bridge.GodotSerializationInfo info)
+  M protected System.Void RestoreGodotObjectData(Godot.Bridge.GodotSerializationInfo info)
+  M internal static System.Collections.Generic.List`1[[Godot.Bridge.MethodInfo]] GetGodotSignalList()
+  M protected System.Void EmitSignalWindowChange()
+  M protected System.Void EmitSignalPhobiaModeToggled()
+  M protected System.Void RaiseGodotClassSignalCallbacks(Godot.NativeInterop.godot_string_name& signal, Godot.NativeInterop.NativeVariantPtrArgs args)
+  M protected System.Boolean HasGodotClassSignal(Godot.NativeInterop.godot_string_name& signal)
+  M public System.Void .ctor()
+  M private static System.Void .cctor()
+  P MegaCrit.Sts2.Core.Nodes.NGame Instance { get; set; }
+  P MegaCrit.Sts2.Core.Nodes.NSceneContainer RootSceneContainer { get; set; }
+  P Godot.Node HoverTipsContainer { get; set; }
+  P MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenu MainMenu { get; }
+  P MegaCrit.Sts2.Core.Nodes.NRun CurrentRunNode { get; }
+  P MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NLogoAnimation LogoAnimation { get; }
+  P MegaCrit.Sts2.Core.Nodes.NTransition Transition { get; set; }
+  P MegaCrit.Sts2.Core.Nodes.Multiplayer.NMultiplayerTimeoutOverlay TimeoutOverlay { get; set; }
+  P MegaCrit.Sts2.Core.Nodes.Audio.NAudioManager AudioManager { get; set; }
+  P MegaCrit.Sts2.Core.Nodes.Multiplayer.NRemoteMouseCursorContainer RemoteCursorContainer { get; set; }
+  P MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager InputManager { get; set; }
+  P MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager HotkeyManager { get; set; }
+  P MegaCrit.Sts2.Core.Nodes.Screens.FeedbackScreen.NSendFeedbackScreen FeedbackScreen { get; set; }
+  P MegaCrit.Sts2.Core.Nodes.Reaction.NReactionWheel ReactionWheel { get; set; }
+  P MegaCrit.Sts2.Core.Nodes.Reaction.NReactionContainer ReactionContainer { get; set; }
+  P MegaCrit.Sts2.Core.Nodes.CommonUi.NCursorManager CursorManager { get; set; }
+  P MegaCrit.Sts2.Core.Audio.Debug.NDebugAudioManager DebugAudio { get; set; }
+  P System.String DebugSeedOverride { get; set; }
+  P System.Boolean StartOnMainMenu { get; set; }
+  P System.Threading.Tasks.Task GameStartupComplete { get; }
+  P System.Boolean IsTrailerMode { get; set; }
+  P System.Boolean IsDebugHidingHoverTips { get; set; }
+  P System.Boolean IsDebugHidingProceedButton { get; set; }
+  P MegaCrit.Sts2.Core.Nodes.Screens.InspectScreens.NInspectRelicScreen InspectRelicScreen { get; set; }
+  P MegaCrit.Sts2.Core.Nodes.Screens.NInspectCardScreen InspectCardScreen { get; set; }
+  P Godot.Control ScreenshakeTarget { get; }
+  P Godot.WorldEnvironment WorldEnvironment { get; set; }
+  P MegaCrit.Sts2.Core.Nodes.Vfx.Utilities.NHitStop HitStop { get; set; }
+  F static Godot.Vector2 devResolution
+  F static MegaCrit.Sts2.Core.Nodes.NGame <Instance>k__BackingField
+  F MegaCrit.Sts2.Core.Nodes.NSceneContainer <RootSceneContainer>k__BackingField
+  F Godot.Node <HoverTipsContainer>k__BackingField
+  F MegaCrit.Sts2.Core.Nodes.NTransition <Transition>k__BackingField
+  F MegaCrit.Sts2.Core.Nodes.Multiplayer.NMultiplayerTimeoutOverlay <TimeoutOverlay>k__BackingField
+  F MegaCrit.Sts2.Core.Nodes.Audio.NAudioManager <AudioManager>k__BackingField
+  F MegaCrit.Sts2.Core.Nodes.Multiplayer.NRemoteMouseCursorContainer <RemoteCursorContainer>k__BackingField
+  F MegaCrit.Sts2.Core.Nodes.CommonUi.NInputManager <InputManager>k__BackingField
+  F MegaCrit.Sts2.Core.Nodes.CommonUi.NHotkeyManager <HotkeyManager>k__BackingField
+  F MegaCrit.Sts2.Core.Nodes.Screens.FeedbackScreen.NSendFeedbackScreen <FeedbackScreen>k__BackingField
+  F MegaCrit.Sts2.Core.Nodes.Reaction.NReactionWheel <ReactionWheel>k__BackingField
+  F MegaCrit.Sts2.Core.Nodes.Reaction.NReactionContainer <ReactionContainer>k__BackingField
+  F MegaCrit.Sts2.Core.Nodes.CommonUi.NCursorManager <CursorManager>k__BackingField
+  F MegaCrit.Sts2.Core.Audio.Debug.NDebugAudioManager <DebugAudio>k__BackingField
+  F System.String <DebugSeedOverride>k__BackingField
+  F System.Boolean <StartOnMainMenu>k__BackingField
+  F System.Threading.Tasks.TaskCompletionSource _gameStartupComplete
+  F static System.Boolean <IsTrailerMode>k__BackingField
+  F static System.Boolean <IsDebugHidingHoverTips>k__BackingField
+  F static System.Boolean <IsDebugHidingProceedButton>k__BackingField
+  F System.Action DebugToggleProceedButton
+  F MegaCrit.Sts2.Core.Nodes.Screens.InspectScreens.NInspectRelicScreen <InspectRelicScreen>k__BackingField
+  F MegaCrit.Sts2.Core.Nodes.Screens.NInspectCardScreen <InspectCardScreen>k__BackingField
+  F Godot.WorldEnvironment <WorldEnvironment>k__BackingField
+  F MegaCrit.Sts2.Core.Nodes.Vfx.Utilities.NHitStop <HitStop>k__BackingField
+  F Godot.Control _inspectionContainer
+  F MegaCrit.Sts2.Core.Nodes.Vfx.Utilities.NScreenShake _screenShake
+  F static System.Nullable`1[[System.Int32]] _mainThreadId
+  F static Godot.Window _window
+  F System.Threading.CancellationTokenSource _logoCancelToken
+  F MegaCrit.Sts2.Core.Platform.Steam.SteamJoinCallbackHandler _joinCallbackHandler
+  F MegaCrit.Sts2.Core.Nodes.NGame+WindowChangeEventHandler backing_WindowChange
+  F MegaCrit.Sts2.Core.Nodes.NGame+PhobiaModeToggledEventHandler backing_PhobiaModeToggled
+  E System.Action DebugToggleProceedButton
+  E MegaCrit.Sts2.Core.Nodes.NGame+WindowChangeEventHandler WindowChange
+  E MegaCrit.Sts2.Core.Nodes.NGame+PhobiaModeToggledEventHandler PhobiaModeToggled

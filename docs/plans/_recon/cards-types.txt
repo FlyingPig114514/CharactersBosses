@@ -1,0 +1,8 @@
+﻿MegaCrit.Sts2.Core.Nodes.Cards.NCard
+MegaCrit.Sts2.Core.Nodes.Cards.NCardBundle
+MegaCrit.Sts2.Core.Nodes.Cards.NCardGrid
+MegaCrit.Sts2.Core.Nodes.Cards.NCardHighlight
+MegaCrit.Sts2.Core.Nodes.Cards.NEnchantPreview
+MegaCrit.Sts2.Core.Nodes.Cards.NTinyCard
+MegaCrit.Sts2.Core.Nodes.Cards.NTransformPreview
+MegaCrit.Sts2.Core.Nodes.Cards.NUpgradePreview

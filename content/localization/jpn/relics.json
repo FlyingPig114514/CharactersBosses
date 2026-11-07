@@ -1,0 +1,6 @@
+{
+  "NEOW_BLESSING.title":  "ネオウの祝福",
+  "NEOW_BLESSING.description":  "手に取った時、最大HPを[blue]120[/blue]得る。\nポーションスロットをすべて失う。\n各ターン開始時にカードを[blue]2[/blue]枚少なく引き、エナジーを[blue]1[/blue]失う。\n新しいアクトに入るたび、最大HPを[blue]180[/blue]得る。\n戦闘開始時に特殊効果を得る。",
+  "NEOW_BLESSING.eventDescription":  "[gold]ネオウの祝福[/gold]：最大HPを[blue]120[/blue]得る。ただし、あなたのターンは小さくなる。",
+  "NEOW_BLESSING.flavor":  "血と引き換えに与えられる祝福。"
+}

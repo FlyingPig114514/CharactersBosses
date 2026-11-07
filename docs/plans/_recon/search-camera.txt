@@ -1,0 +1,24 @@
+﻿// --- MegaCrit.Sts2.Core.Models.EncounterModel
+  M public virtual System.Single GetCameraScaling()
+  M public virtual Godot.Vector2 GetCameraOffset()
+// --- MegaCrit.Sts2.Core.Models.Encounters.AeonglassBoss
+  M public System.Single GetCameraScaling()
+  M public Godot.Vector2 GetCameraOffset()
+// --- MegaCrit.Sts2.Core.Models.Encounters.BygoneEffigyElite
+  M public System.Single GetCameraScaling()
+  M public Godot.Vector2 GetCameraOffset()
+// --- MegaCrit.Sts2.Core.Models.Encounters.CeremonialBeastBoss
+  M public System.Single GetCameraScaling()
+  M public Godot.Vector2 GetCameraOffset()
+// --- MegaCrit.Sts2.Core.Models.Encounters.DecimillipedeElite
+  M public System.Single GetCameraScaling()
+  M public Godot.Vector2 GetCameraOffset()
+// --- MegaCrit.Sts2.Core.Models.Encounters.FabricatorNormal
+  M public System.Single GetCameraScaling()
+  M public Godot.Vector2 GetCameraOffset()
+// --- MegaCrit.Sts2.Core.Models.Encounters.KaiserCrabBoss
+  M public System.Single GetCameraScaling()
+  M public Godot.Vector2 GetCameraOffset()
+// --- MegaCrit.Sts2.Core.Models.Encounters.KnightsElite
+  M public System.Single GetCameraScaling()
+  M public Godot.Vector2 GetCameraOffset()

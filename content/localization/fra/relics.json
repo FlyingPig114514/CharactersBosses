@@ -1,0 +1,6 @@
+{
+  "NEOW_BLESSING.title": "Bénédiction de Neow",
+  "NEOW_BLESSING.description": "Lorsque vous l'obtenez, gagnez [blue]120[/blue] PV Max.\nPerdez tous vos emplacements de potion.\nAu début de chaque tour, piochez [blue]2[/blue] cartes de moins et perdez [blue]1[/blue] [gold]Énergie[/gold].\nChaque fois que vous entrez dans un nouvel acte, gagnez [blue]180[/blue] PV Max.\nAu début du combat, gagnez un effet spécial.",
+  "NEOW_BLESSING.eventDescription": "[gold]Bénédiction de Neow[/gold] : gagnez [blue]120[/blue] PV Max et donnez une raison à votre réserve de vie démesurée — le prix, ce sont des tours plus petits.",
+  "NEOW_BLESSING.flavor": "Une bénédiction payée de sang et de retenue."
+}

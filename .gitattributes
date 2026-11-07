@@ -1,0 +1,23 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Force batch files to use CRLF
+*.bat text eol=crlf
+
+# Force PowerShell scripts to use LF
+*.ps1 text eol=lf
+
+# Force C# files to use LF
+*.cs text eol=lf
+
+# Force JSON files to use LF
+*.json text eol=lf
+
+# Force Markdown files to use LF
+*.md text eol=lf
+
+# Keep binary files unchanged
+*.dll binary
+*.exe binary
+*.pck binary
+*.pdb binary

@@ -1,0 +1,6 @@
+{
+  "NEOW_BLESSING.title": "Bendición de Neow",
+  "NEOW_BLESSING.description": "Al recogerla, obtienes [blue]120[/blue] de PV máx.\nPierdes todos tus espacios de poción.\nAl inicio de cada turno, robas [blue]2[/blue] cartas menos y pierdes [blue]1[/blue] de energía.\nCada vez que entras en un acto nuevo, obtienes [blue]180[/blue] de PV máx.\nAl inicio del combate, obtienes un efecto especial.",
+  "NEOW_BLESSING.eventDescription": "[gold]Bendición de Neow[/gold]: obtienes [blue]120[/blue] de PV máx., una explicación para una reserva de vida desmedida — el precio es que tus turnos se vuelven más pequeños.",
+  "NEOW_BLESSING.flavor": "Una bendición pagada con sangre y contención."
+}

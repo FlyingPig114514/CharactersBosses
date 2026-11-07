@@ -1,0 +1,3748 @@
+{
+  "version": 1,
+  "scannedAt": 1792662829174,
+  "totalFiles": 231,
+  "totalLines": 40065,
+  "dirs": [
+    {
+      "path": "",
+      "files": 231,
+      "lines": 40065,
+      "bytes": 2896855748
+    },
+    {
+      "path": "content",
+      "files": 10,
+      "lines": 141,
+      "bytes": 10557
+    },
+    {
+      "path": "content/localization",
+      "files": 10,
+      "lines": 141,
+      "bytes": 10557
+    },
+    {
+      "path": "content/localization/eng",
+      "files": 5,
+      "lines": 70,
+      "bytes": 6366
+    },
+    {
+      "path": "content/localization/zhs",
+      "files": 5,
+      "lines": 71,
+      "bytes": 4191
+    },
+    {
+      "path": "docs",
+      "files": 65,
+      "lines": 19389,
+      "bytes": 2420327
+    },
+    {
+      "path": "docs/plans",
+      "files": 65,
+      "lines": 19389,
+      "bytes": 2420327
+    },
+    {
+      "path": "docs/plans/_recon",
+      "files": 36,
+      "lines": 12133,
+      "bytes": 1639008
+    },
+    {
+      "path": "src",
+      "files": 99,
+      "lines": 15979,
+      "bytes": 582730
+    },
+    {
+      "path": "src/Hooks",
+      "files": 96,
+      "lines": 15900,
+      "bytes": 580516
+    },
+    {
+      "path": "src/Hooks/Core",
+      "files": 37,
+      "lines": 7482,
+      "bytes": 281234
+    },
+    {
+      "path": "src/Hooks/Encounters",
+      "files": 1,
+      "lines": 331,
+      "bytes": 11302
+    },
+    {
+      "path": "src/Hooks/Monsters",
+      "files": 6,
+      "lines": 1218,
+      "bytes": 46980
+    },
+    {
+      "path": "src/Hooks/Patches",
+      "files": 23,
+      "lines": 2083,
+      "bytes": 73011
+    },
+    {
+      "path": "src/Hooks/Powers",
+      "files": 10,
+      "lines": 1469,
+      "bytes": 52987
+    },
+    {
+      "path": "src/Hooks/Relics",
+      "files": 1,
+      "lines": 98,
+      "bytes": 3204
+    },
+    {
+      "path": "src/Hooks/UI",
+      "files": 18,
+      "lines": 3219,
+      "bytes": 111798
+    },
+    {
+      "path": "sts2-mod-uploader-main",
+      "files": 22,
+      "lines": 1139,
+      "bytes": 2373999
+    },
+    {
+      "path": "sts2-mod-uploader-main/sts2-mod-uploader-main",
+      "files": 22,
+      "lines": 1139,
+      "bytes": 2373999
+    },
+    {
+      "path": "sts2-mod-uploader-main/sts2-mod-uploader-main/src",
+      "files": 8,
+      "lines": 976,
+      "bytes": 35314
+    },
+    {
+      "path": "sts2-mod-uploader-main/sts2-mod-uploader-main/steam",
+      "files": 5,
+      "lines": 0,
+      "bytes": 2320791
+    },
+    {
+      "path": "sts2-mod-uploader-main/sts2-mod-uploader-main/template",
+      "files": 4,
+      "lines": 58,
+      "bytes": 12932
+    },
+    {
+      "path": "sts2-mod-uploader-main/sts2-mod-uploader-main/template/content",
+      "files": 1,
+      "lines": 1,
+      "bytes": 35
+    },
+    {
+      "path": "tools",
+      "files": 12,
+      "lines": 1086,
+      "bytes": 43764
+    },
+    {
+      "path": "tools/pck_builder",
+      "files": 1,
+      "lines": 122,
+      "bytes": 3745
+    }
+  ],
+  "files": [
+    {
+      "path": "HOWTO-new-mod.md",
+      "size": 3854,
+      "lines": 107,
+      "lang": "md",
+      "tokens": 964,
+      "mtimeMs": 1792061325647.218,
+      "skipped": false,
+      "summary": "这个目录是**复用资产库**，不是可以直接开工的项目根 —— 里面的 `src/` 是原始脚手架",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "LICENSE",
+      "size": 1086,
+      "lines": 21,
+      "lang": "text",
+      "tokens": 272,
+      "mtimeMs": 1791185998992.1807,
+      "skipped": false,
+      "summary": "MIT License",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "README.md",
+      "size": 6132,
+      "lines": 251,
+      "lang": "md",
+      "tokens": 1533,
+      "mtimeMs": 1791185998992.1807,
+      "skipped": false,
+      "summary": "零配置杀戮尖塔 2 Mod 开发脚手架，支持 AI 辅助的 Vibe Coding。克隆、运行 `install.bat`、开始编码。",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "README_en.md",
+      "size": 8260,
+      "lines": 250,
+      "lang": "md",
+      "tokens": 2065,
+      "mtimeMs": 1791185998992.1807,
+      "skipped": false,
+      "summary": "A zero-config scaffold for Slay the Spire 2 mod development with AI-assisted vibe coding. Clone, run `install.bat`, start coding.",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "content/localization/eng/encounters.json",
+      "size": 1077,
+      "lines": 21,
+      "lang": "json",
+      "tokens": 270,
+      "mtimeMs": 1792418121885.3345,
+      "skipped": false,
+      "summary": "{",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "content/localization/eng/intents.json",
+      "size": 122,
+      "lines": 4,
+      "lang": "json",
+      "tokens": 31,
+      "mtimeMs": 1792303160581.7915,
+      "skipped": false,
+      "summary": "{",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "content/localization/eng/monsters.json",
+      "size": 2281,
+      "lines": 19,
+      "lang": "json",
+      "tokens": 571,
+      "mtimeMs": 1792645155609.4844,
+      "skipped": false,
+      "summary": "{",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "content/localization/eng/powers.json",
+      "size": 2295,
+      "lines": 20,
+      "lang": "json",
+      "tokens": 574,
+      "mtimeMs": 1792652093302.2405,
+      "skipped": false,
+      "summary": "{",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "content/localization/eng/relics.json",
+      "size": 591,
+      "lines": 6,
+      "lang": "json",
+      "tokens": 148,
+      "mtimeMs": 1792222078469.0498,
+      "skipped": false,
+      "summary": "{",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "content/localization/zhs/encounters.json",
+      "size": 906,
+      "lines": 22,
+      "lang": "json",
+      "tokens": 227,
+      "mtimeMs": 1792418121830.3354,
+      "skipped": false,
+      "summary": "{",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "content/localization/zhs/intents.json",
+      "size": 78,
+      "lines": 4,
+      "lang": "json",
+      "tokens": 20,
+      "mtimeMs": 1792303159071.6428,
+      "skipped": false,
+      "summary": "{",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "content/localization/zhs/monsters.json",
+      "size": 1407,
+      "lines": 19,
+      "lang": "json",
+      "tokens": 352,
+      "mtimeMs": 1792661238668.6082,
+      "skipped": false,
+      "summary": "{",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "content/localization/zhs/powers.json",
+      "size": 1434,
+      "lines": 20,
+      "lang": "json",
+      "tokens": 359,
+      "mtimeMs": 1792661238666.6099,
+      "skipped": false,
+      "summary": "{",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "content/localization/zhs/relics.json",
+      "size": 366,
+      "lines": 6,
+      "lang": "json",
+      "tokens": 92,
+      "mtimeMs": 1792222078499.5623,
+      "skipped": false,
+      "summary": "{",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/_recon/NGame-members.txt",
+      "size": 11761,
+      "lines": 141,
+      "lang": "text",
+      "tokens": 2941,
+      "mtimeMs": 1791189935114.9265,
+      "skipped": false,
+      "summary": "M public System.Void _EnterTree()",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/_recon/NRun-members.txt",
+      "size": 2806,
+      "lines": 36,
+      "lang": "text",
+      "tokens": 702,
+      "mtimeMs": 1791189920827.0107,
+      "skipped": false,
+      "summary": "M public static MegaCrit.Sts2.Core.Nodes.NRun Create(MegaCrit.Sts2.Core.Runs.RunState state)",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/_recon/TMegaCrit__Sts2__Core__Nodes__Cards__NCard.txt",
+      "size": 210166,
+      "lines": 0,
+      "lang": "text",
+      "tokens": 52542,
+      "mtimeMs": 1791189830652.674,
+      "skipped": true,
+      "summary": "[file too large]",
+      "symbols": []
+    },
+    {
+      "path": "docs/plans/_recon/TMegaCrit__Sts2__Core__Nodes__Combat__NCombatUi.txt",
+      "size": 52505,
+      "lines": 1480,
+      "lang": "text",
+      "tokens": 13127,
+      "mtimeMs": 1791189828964.0176,
+      "skipped": false,
+      "summary": "namespace MegaCrit.Sts2.Core.Nodes.Combat;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/_recon/TMegaCrit__Sts2__Core__Nodes__Combat__NCreature.txt",
+      "size": 146704,
+      "lines": 0,
+      "lang": "text",
+      "tokens": 36676,
+      "mtimeMs": 1791189826979.2954,
+      "skipped": true,
+      "summary": "[file too large]",
+      "symbols": []
+    },
+    {
+      "path": "docs/plans/_recon/TMegaCrit__Sts2__Core__Nodes__Combat__NCreatureStateDisplay.txt",
+      "size": 26601,
+      "lines": 726,
+      "lang": "text",
+      "tokens": 6651,
+      "mtimeMs": 1791189836357.348,
+      "skipped": false,
+      "summary": "namespace MegaCrit.Sts2.Core.Nodes.Combat;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/_recon/TMegaCrit__Sts2__Core__Nodes__Combat__NCreatureVisuals.txt",
+      "size": 30990,
+      "lines": 879,
+      "lang": "text",
+      "tokens": 7748,
+      "mtimeMs": 1791189835632.454,
+      "skipped": false,
+      "summary": "namespace MegaCrit.Sts2.Core.Nodes.Combat;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/_recon/TMegaCrit__Sts2__Core__Nodes__Combat__NHealthBar.txt",
+      "size": 43540,
+      "lines": 1143,
+      "lang": "text",
+      "tokens": 10885,
+      "mtimeMs": 1791189833051.7412,
+      "skipped": false,
+      "summary": "namespace MegaCrit.Sts2.Core.Nodes.Combat;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/_recon/TMegaCrit__Sts2__Core__Nodes__Combat__NIntent.txt",
+      "size": 21125,
+      "lines": 594,
+      "lang": "text",
+      "tokens": 5282,
+      "mtimeMs": 1791189832295.0457,
+      "skipped": false,
+      "summary": "namespace MegaCrit.Sts2.Core.Nodes.Combat;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/_recon/TMegaCrit__Sts2__Core__Nodes__Combat__NPlayerHand.txt",
+      "size": 91122,
+      "lines": 0,
+      "lang": "text",
+      "tokens": 22781,
+      "mtimeMs": 1791189834855.0085,
+      "skipped": true,
+      "summary": "[file too large]",
+      "symbols": []
+    },
+    {
+      "path": "docs/plans/_recon/TMegaCrit__Sts2__Core__Nodes__Combat__NSelectionReticle.txt",
+      "size": 7618,
+      "lines": 225,
+      "lang": "text",
+      "tokens": 1905,
+      "mtimeMs": 1791189837848.1567,
+      "skipped": false,
+      "summary": "namespace MegaCrit.Sts2.Core.Nodes.Combat;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/_recon/TMegaCrit__Sts2__Core__Nodes__Combat__NTargetManager.txt",
+      "size": 40434,
+      "lines": 1127,
+      "lang": "text",
+      "tokens": 10109,
+      "mtimeMs": 1791189837254.14,
+      "skipped": false,
+      "summary": "namespace MegaCrit.Sts2.Core.Nodes.Combat;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/_recon/TMegaCrit__Sts2__Core__Nodes__Rooms__NCombatRoom.txt",
+      "size": 60688,
+      "lines": 1671,
+      "lang": "text",
+      "tokens": 15172,
+      "mtimeMs": 1791189828004.92,
+      "skipped": false,
+      "summary": "namespace MegaCrit.Sts2.Core.Nodes.Rooms;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/_recon/TMegaCrit__Sts2__Core__Nodes__Screens__Overlays__IOverlayScreen.txt",
+      "size": 488,
+      "lines": 21,
+      "lang": "text",
+      "tokens": 122,
+      "mtimeMs": 1791189831639.0193,
+      "skipped": false,
+      "summary": "namespace MegaCrit.Sts2.Core.Nodes.Screens.Overlays;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/_recon/TMegaCrit__Sts2__Core__Nodes__Screens__Overlays__NOverlayStack.txt",
+      "size": 16175,
+      "lines": 498,
+      "lang": "text",
+      "tokens": 4044,
+      "mtimeMs": 1791189831365.594,
+      "skipped": false,
+      "summary": "namespace MegaCrit.Sts2.Core.Nodes.Screens.Overlays;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/_recon/TMegaCrit__Sts2__Core__Nodes__Vfx__NDamageNumVfx.txt",
+      "size": 15160,
+      "lines": 413,
+      "lang": "text",
+      "tokens": 3790,
+      "mtimeMs": 1791189833708.9485,
+      "skipped": false,
+      "summary": "namespace MegaCrit.Sts2.Core.Nodes.Vfx;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/_recon/Tanimator.txt",
+      "size": 6747,
+      "lines": 225,
+      "lang": "text",
+      "tokens": 1687,
+      "mtimeMs": 1791189876911.1814,
+      "skipped": false,
+      "summary": "namespace MegaCrit.Sts2.Core.Animation;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/_recon/Tanimstate.txt",
+      "size": 4376,
+      "lines": 193,
+      "lang": "text",
+      "tokens": 1094,
+      "mtimeMs": 1791189877449.6108,
+      "skipped": false,
+      "summary": "namespace MegaCrit.Sts2.Core.Animation;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/_recon/Tattackcommand.txt",
+      "size": 39886,
+      "lines": 1143,
+      "lang": "text",
+      "tokens": 9972,
+      "mtimeMs": 1791189893106.0713,
+      "skipped": false,
+      "summary": "namespace MegaCrit.Sts2.Core.Commands.Builders;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/_recon/Tattackcontext.txt",
+      "size": 7072,
+      "lines": 216,
+      "lang": "text",
+      "tokens": 1768,
+      "mtimeMs": 1791189884371.0063,
+      "skipped": false,
+      "summary": "namespace MegaCrit.Sts2.Core.Commands.Builders;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/_recon/Tcombatmanager.txt",
+      "size": 295780,
+      "lines": 0,
+      "lang": "text",
+      "tokens": 73945,
+      "mtimeMs": 1791190001678.7153,
+      "skipped": true,
+      "summary": "[file too large]",
+      "symbols": []
+    },
+    {
+      "path": "docs/plans/_recon/Tcommonbanner.txt",
+      "size": 10549,
+      "lines": 311,
+      "lang": "text",
+      "tokens": 2638,
+      "mtimeMs": 1791189978435.1235,
+      "skipped": false,
+      "summary": "namespace MegaCrit.Sts2.Core.Nodes.CommonUi;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/_recon/Tcreaturecmd.txt",
+      "size": 162218,
+      "lines": 0,
+      "lang": "text",
+      "tokens": 40555,
+      "mtimeMs": 1791189967542.9387,
+      "skipped": true,
+      "summary": "[file too large]",
+      "symbols": []
+    },
+    {
+      "path": "docs/plans/_recon/Tglobalui.txt",
+      "size": 21836,
+      "lines": 628,
+      "lang": "text",
+      "tokens": 5459,
+      "mtimeMs": 1791189924915.1887,
+      "skipped": false,
+      "summary": "namespace MegaCrit.Sts2.Core.Nodes.CommonUi;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/_recon/Tngame.txt",
+      "size": 169904,
+      "lines": 0,
+      "lang": "text",
+      "tokens": 42476,
+      "mtimeMs": 1791189939066.8762,
+      "skipped": true,
+      "summary": "[file too large]",
+      "symbols": []
+    },
+    {
+      "path": "docs/plans/_recon/Tplayerbanner.txt",
+      "size": 12630,
+      "lines": 342,
+      "lang": "text",
+      "tokens": 3158,
+      "mtimeMs": 1791189977884.2363,
+      "skipped": false,
+      "summary": "namespace MegaCrit.Sts2.Core.Nodes.Combat;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/_recon/anim-types.txt",
+      "size": 241,
+      "lines": 5,
+      "lang": "text",
+      "tokens": 61,
+      "mtimeMs": 1791189870766.6262,
+      "skipped": false,
+      "summary": "MegaCrit.Sts2.Core.Animation.AnimState",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/_recon/camera-types.txt",
+      "size": 0,
+      "lines": 0,
+      "lang": "text",
+      "tokens": 1,
+      "mtimeMs": 1791189822101.151,
+      "skipped": false,
+      "summary": "",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/_recon/cards-types.txt",
+      "size": 360,
+      "lines": 8,
+      "lang": "text",
+      "tokens": 90,
+      "mtimeMs": 1791189821775.3289,
+      "skipped": false,
+      "summary": "MegaCrit.Sts2.Core.Nodes.Cards.NCard",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/_recon/combat-core-types.txt",
+      "size": 551,
+      "lines": 13,
+      "lang": "text",
+      "tokens": 138,
+      "mtimeMs": 1791189881523.1558,
+      "skipped": false,
+      "summary": "MegaCrit.Sts2.Core.Combat.CombatId",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/_recon/combat-types.txt",
+      "size": 1665,
+      "lines": 34,
+      "lang": "text",
+      "tokens": 417,
+      "mtimeMs": 1791189821636.8982,
+      "skipped": false,
+      "summary": "MegaCrit.Sts2.Core.Nodes.Combat.NCardPlay",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/_recon/nodes-all.txt",
+      "size": 123964,
+      "lines": 0,
+      "lang": "text",
+      "tokens": 30991,
+      "mtimeMs": 1791189816772.1306,
+      "skipped": true,
+      "summary": "[file too large]",
+      "symbols": []
+    },
+    {
+      "path": "docs/plans/_recon/overlays-types.txt",
+      "size": 399,
+      "lines": 6,
+      "lang": "text",
+      "tokens": 100,
+      "mtimeMs": 1791189822093.7583,
+      "skipped": false,
+      "summary": "MegaCrit.Sts2.Core.Nodes.Screens.Overlays.IOverlayScreen",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/_recon/rooms-types.txt",
+      "size": 475,
+      "lines": 10,
+      "lang": "text",
+      "tokens": 119,
+      "mtimeMs": 1791189821936.7654,
+      "skipped": false,
+      "summary": "MegaCrit.Sts2.Core.Nodes.Rooms.IRoomWithProceedButton",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/_recon/search-cam-lower.txt",
+      "size": 1263,
+      "lines": 21,
+      "lang": "text",
+      "tokens": 316,
+      "mtimeMs": 1791189949030.4126,
+      "skipped": false,
+      "summary": "F static System.Text.Json.JsonEncodedText PropName_campfireUpgrades",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/_recon/search-camera.txt",
+      "size": 1209,
+      "lines": 24,
+      "lang": "text",
+      "tokens": 303,
+      "mtimeMs": 1791189853556.8938,
+      "skipped": false,
+      "summary": "M public virtual System.Single GetCameraScaling()",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/act3-boss-eradicate-bone.md",
+      "size": 2691,
+      "lines": 82,
+      "lang": "md",
+      "tokens": 673,
+      "mtimeMs": 1792589803047.4204,
+      "skipped": false,
+      "summary": "> 状态：**待实现**。用户设计，逐字要点见 §1；ID 已核对（§2）。",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/boss-silent-bladedancer.md",
+      "size": 4444,
+      "lines": 109,
+      "lang": "md",
+      "tokens": 1111,
+      "mtimeMs": 1792377920811.2998,
+      "skipped": false,
+      "summary": "> 用户设计。前两个 Boss：灾厄骨（亡灵契约师，第一幕）、能力机（故障机器人，第三幕）。",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/boss-silent-poisoner.md",
+      "size": 3554,
+      "lines": 100,
+      "lang": "md",
+      "tokens": 889,
+      "mtimeMs": 1792394939906.204,
+      "skipped": false,
+      "summary": "> 用户设计。当前**只做特殊效果**，卡组 / 遗物 / 意图尚未设计（先用占位卡组）。",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/cards-colorless.md",
+      "size": 3976,
+      "lines": 84,
+      "lang": "md",
+      "tokens": 994,
+      "mtimeMs": 1792071539378.7488,
+      "skipped": false,
+      "summary": "> 自动生成。任何角色都能往卡组里塞无色牌。",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/cards-defect.md",
+      "size": 6469,
+      "lines": 146,
+      "lang": "md",
+      "tokens": 1618,
+      "mtimeMs": 1792071533807.5337,
+      "skipped": false,
+      "summary": "> 自动生成（`tools\\gen-card-lists.ps1`）：费用/类型/稀有度/数值来自 `sts2.dll` 反编译，名字/效果来自游戏官方中文本地化。",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/cards-ironclad.md",
+      "size": 6514,
+      "lines": 144,
+      "lang": "md",
+      "tokens": 1629,
+      "mtimeMs": 1792071530063.0686,
+      "skipped": false,
+      "summary": "> 自动生成（`tools\\gen-card-lists.ps1`）：费用/类型/稀有度/数值来自 `sts2.dll` 反编译，名字/效果来自游戏官方中文本地化。",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/cards-necrobinder.md",
+      "size": 6722,
+      "lines": 146,
+      "lang": "md",
+      "tokens": 1681,
+      "mtimeMs": 1792071536296.2285,
+      "skipped": false,
+      "summary": "> 自动生成（`tools\\gen-card-lists.ps1`）：费用/类型/稀有度/数值来自 `sts2.dll` 反编译，名字/效果来自游戏官方中文本地化。",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/cards-regent.md",
+      "size": 6700,
+      "lines": 146,
+      "lang": "md",
+      "tokens": 1675,
+      "mtimeMs": 1792071538545.7634,
+      "skipped": false,
+      "summary": "> 自动生成（`tools\\gen-card-lists.ps1`）：费用/类型/稀有度/数值来自 `sts2.dll` 反编译，名字/效果来自游戏官方中文本地化。",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/cards-silent.md",
+      "size": 6385,
+      "lines": 146,
+      "lang": "md",
+      "tokens": 1597,
+      "mtimeMs": 1792071531021.1387,
+      "skipped": false,
+      "summary": "> 自动生成（`tools\\gen-card-lists.ps1`）：费用/类型/稀有度/数值来自 `sts2.dll` 反编译，名字/效果来自游戏官方中文本地化。",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/charbosses.md",
+      "size": 114500,
+      "lines": 0,
+      "lang": "md",
+      "tokens": 28625,
+      "mtimeMs": 1792332858932.523,
+      "skipped": true,
+      "summary": "[file too large]",
+      "symbols": []
+    },
+    {
+      "path": "docs/plans/game-object-lookup.tsv",
+      "size": 24980,
+      "lines": 1074,
+      "lang": "text",
+      "tokens": 6245,
+      "mtimeMs": 1791189853354.8867,
+      "skipped": false,
+      "summary": "kind\tid\tname\towner\tmod",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/handover-2026-10-17.md",
+      "size": 9163,
+      "lines": 234,
+      "lang": "md",
+      "tokens": 2291,
+      "mtimeMs": 1792252721730.6724,
+      "skipped": false,
+      "summary": "> 写于 2026-10-17 深夜。作者交接给下一个会话/下一个人。",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/handover-multiplayer.md",
+      "size": 5311,
+      "lines": 75,
+      "lang": "md",
+      "tokens": 1328,
+      "mtimeMs": 1792661919141.8242,
+      "skipped": false,
+      "summary": "> 用途：换新对话时先读本文件 + `docs/plans/multiplayer-lockon.md` + `docs/plans/multiplayer-cards.md`。",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/handover-osty-facing.md",
+      "size": 7862,
+      "lines": 196,
+      "lang": "md",
+      "tokens": 1966,
+      "mtimeMs": 1792335872290.3267,
+      "skipped": false,
+      "summary": "> 写给**下一个会话**。这份文件是为了让接手者**不要再重走已经试过的六条死路**。",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/handover-regent-boss.LATEST.md",
+      "size": 4597,
+      "lines": 78,
+      "lang": "md",
+      "tokens": 1150,
+      "mtimeMs": 1792468665439.2231,
+      "skipped": false,
+      "summary": "> 给下一个会话：先读完这一页再动手。所有结论都是本会话**实机验证过**的（`mod_log.txt` 有日志行）。",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/handover-regent-boss.md",
+      "size": 7358,
+      "lines": 137,
+      "lang": "md",
+      "tokens": 1840,
+      "mtimeMs": 1792500974008.802,
+      "skipped": false,
+      "summary": "> 给下一个会话：先读完这一页再动手。所有结论都是本会话**实机验证过**的（`mod_log.txt` 有日志行）。",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/multiplayer-cards.md",
+      "size": 3115,
+      "lines": 74,
+      "lang": "md",
+      "tokens": 779,
+      "mtimeMs": 1792661824993.8364,
+      "skipped": false,
+      "summary": "> 状态：**设计已定，代码未实现**。用户 2026-10-22 口头给出三条，本文件是唯一权威记录。",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/multiplayer-lockon.md",
+      "size": 7201,
+      "lines": 147,
+      "lang": "md",
+      "tokens": 1801,
+      "mtimeMs": 1792652744667.908,
+      "skipped": false,
+      "summary": "> 状态：**阶段 1 代码已落地，待实机验证**（2026-10-22 更新）。阶段 2～4 未开始。",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/osty-facing-body.md",
+      "size": 4666,
+      "lines": 115,
+      "lang": "md",
+      "tokens": 1167,
+      "mtimeMs": 1792336257146.3318,
+      "skipped": false,
+      "summary": "> 承接 `docs/plans/handover-osty-facing.md`。目标是**先把证据摆齐，再一次只改一处**。",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/osty-fix-2026-10-20.md",
+      "size": 1902,
+      "lines": 41,
+      "lang": "md",
+      "tokens": 476,
+      "mtimeMs": 1792500959696.7815,
+      "skipped": false,
+      "summary": "> 这一整串症状的**唯一根因**是：`src/Hooks/Core/BossOsty.cs` 的 `DropDeadPets()` 里",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/recon-card-play.md",
+      "size": 61552,
+      "lines": 1251,
+      "lang": "md",
+      "tokens": 15388,
+      "mtimeMs": 1791190044238.1199,
+      "skipped": false,
+      "summary": "presentation delay AFTER the player commits a card but BEFORE effects (damage/powers) resolve**.",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/recon-charboss-sts2.md",
+      "size": 127159,
+      "lines": 0,
+      "lang": "md",
+      "tokens": 31790,
+      "mtimeMs": 1792066336506.2498,
+      "skipped": true,
+      "summary": "[file too large]",
+      "symbols": []
+    },
+    {
+      "path": "docs/plans/recon-combat-ui.md",
+      "size": 57509,
+      "lines": 1211,
+      "lang": "md",
+      "tokens": 14378,
+      "mtimeMs": 1791190199521.8228,
+      "skipped": false,
+      "summary": "目标 Mod 需求：Darkest Dungeon 风格「行动演出」——找到每个 `Creature` 的屏幕节点、读取屏幕坐标/尺寸、遮挡/高亮任意生物、在角落画 HUD 横幅与完整卡牌、可选缩放/平移镜头。",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/recon-damage-powers.md",
+      "size": 115838,
+      "lines": 0,
+      "lang": "md",
+      "tokens": 28960,
+      "mtimeMs": 1791190237075.998,
+      "skipped": true,
+      "summary": "[file too large]",
+      "symbols": []
+    },
+    {
+      "path": "docs/plans/recon-downfall-charbosses.md",
+      "size": 116499,
+      "lines": 0,
+      "lang": "md",
+      "tokens": 29125,
+      "mtimeMs": 1792066410141.6804,
+      "skipped": true,
+      "summary": "[file too large]",
+      "symbols": []
+    },
+    {
+      "path": "docs/plans/recon-monster-intents.md",
+      "size": 53246,
+      "lines": 1264,
+      "lang": "md",
+      "tokens": 13312,
+      "mtimeMs": 1791190106470.2861,
+      "skipped": false,
+      "summary": "目标：为 Harmony Mod 定位「特定 BOSS 使用特定大招时、在效果结算**之前**播放过场动画」的 Hook 点，",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/recon-tooling.md",
+      "size": 1081,
+      "lines": 33,
+      "lang": "md",
+      "tokens": 271,
+      "mtimeMs": 1791189792499.0247,
+      "skipped": false,
+      "summary": "因为当前会话没有 ILSpy MCP 工具绑定，用 `tools/ilspy-cli` 代替。",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/relics-shared.md",
+      "size": 6673,
+      "lines": 125,
+      "lang": "md",
+      "tokens": 1669,
+      "mtimeMs": 1792071540251.657,
+      "skipped": false,
+      "summary": "> 自动生成。这些遗物不属于某个角色，原版里任何角色开箱/商店都可能拿到，Boss 也可以配。",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "docs/plans/workshop-upload.md",
+      "size": 3652,
+      "lines": 98,
+      "lang": "md",
+      "tokens": 913,
+      "mtimeMs": 1791990089804.7686,
+      "skipped": false,
+      "summary": "上传器：`sts2-mod-uploader-main/`（独立仓库，`dotnet run -- upload <工作区目录>`）。",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "install-mod.bat",
+      "size": 4909,
+      "lines": 142,
+      "lang": "bat",
+      "tokens": 1228,
+      "mtimeMs": 1792246865901.2288,
+      "skipped": false,
+      "summary": "@echo off",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "install.bat",
+      "size": 75,
+      "lines": 2,
+      "lang": "bat",
+      "tokens": 19,
+      "mtimeMs": 1791185998994.1814,
+      "skipped": false,
+      "summary": "@echo off",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "install.ps1",
+      "size": 40193,
+      "lines": 972,
+      "lang": "ps1",
+      "tokens": 10049,
+      "mtimeMs": 1791185998994.1814,
+      "skipped": false,
+      "summary": "[CmdletBinding()]",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "rules.md",
+      "size": 13960,
+      "lines": 245,
+      "lang": "md",
+      "tokens": 3490,
+      "mtimeMs": 1791185998995.1814,
+      "skipped": false,
+      "summary": "```",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "rules_en.md",
+      "size": 15873,
+      "lines": 245,
+      "lang": "md",
+      "tokens": 3969,
+      "mtimeMs": 1791185998995.1814,
+      "skipped": false,
+      "summary": "```",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/CharacterBosses.csproj",
+      "size": 919,
+      "lines": 30,
+      "lang": "text",
+      "tokens": 230,
+      "mtimeMs": 1792066416308.679,
+      "skipped": false,
+      "summary": "<Project Sdk=\"Microsoft.NET.Sdk\">",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/CharacterBosses.json",
+      "size": 336,
+      "lines": 11,
+      "lang": "json",
+      "tokens": 84,
+      "mtimeMs": 1792066432680.697,
+      "skipped": false,
+      "summary": "Replaces each act boss with a vanilla playable character that fights you with its own deck and relics.",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/Core/BladesGrowth.cs",
+      "size": 8963,
+      "lines": 222,
+      "lang": "cs",
+      "tokens": 2241,
+      "mtimeMs": 1792594295658.3877,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [
+        "BladesGrowth"
+      ],
+      "symbolLines": [
+        {
+          "name": "BladesGrowth",
+          "line": 30,
+          "endLine": 222,
+          "tokens": 1999
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Core/BossActIndex.cs",
+      "size": 1992,
+      "lines": 62,
+      "lang": "cs",
+      "tokens": 498,
+      "mtimeMs": 1792228722597.5208,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [
+        "BossActIndex"
+      ],
+      "symbolLines": [
+        {
+          "name": "BossActIndex",
+          "line": 20,
+          "endLine": 62,
+          "tokens": 320
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Core/BossCardSelector.cs",
+      "size": 3767,
+      "lines": 105,
+      "lang": "cs",
+      "tokens": 942,
+      "mtimeMs": 1792376349380.9004,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/Core/BossDamagePredictor.cs",
+      "size": 9462,
+      "lines": 255,
+      "lang": "cs",
+      "tokens": 2366,
+      "mtimeMs": 1792594929227.8584,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [
+        "BossDamagePredictor"
+      ],
+      "symbolLines": [
+        {
+          "name": "BossDamagePredictor",
+          "line": 23,
+          "endLine": 255,
+          "tokens": 2134
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Core/BossDefValidator.cs",
+      "size": 3992,
+      "lines": 121,
+      "lang": "cs",
+      "tokens": 998,
+      "mtimeMs": 1792072399278.9338,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [
+        "BossDefValidator"
+      ],
+      "symbolLines": [
+        {
+          "name": "BossDefValidator",
+          "line": 17,
+          "endLine": 121,
+          "tokens": 896
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Core/BossDefinition.cs",
+      "size": 5743,
+      "lines": 150,
+      "lang": "cs",
+      "tokens": 1436,
+      "mtimeMs": 1792497401553.5762,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/Core/BossDefs.cs",
+      "size": 13733,
+      "lines": 330,
+      "lang": "cs",
+      "tokens": 3434,
+      "mtimeMs": 1792628828549.8938,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [
+        "BossDefs"
+      ],
+      "symbolLines": [
+        {
+          "name": "BossDefs",
+          "line": 16,
+          "endLine": 330,
+          "tokens": 3250
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Core/BossHookBridge.SideTurn.cs",
+      "size": 14976,
+      "lines": 370,
+      "lang": "cs",
+      "tokens": 3744,
+      "mtimeMs": 1792474726393.8955,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/Core/BossHookBridge.cs",
+      "size": 5747,
+      "lines": 165,
+      "lang": "cs",
+      "tokens": 1437,
+      "mtimeMs": 1792471692170.4092,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [
+        "GetTurnNumber",
+        "Snapshot"
+      ],
+      "symbolLines": [
+        {
+          "name": "GetTurnNumber",
+          "line": 107,
+          "endLine": 142,
+          "tokens": 289
+        },
+        {
+          "name": "Snapshot",
+          "line": 142,
+          "endLine": 165,
+          "tokens": 193
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Core/BossIntentBuilder.cs",
+      "size": 15526,
+      "lines": 409,
+      "lang": "cs",
+      "tokens": 3882,
+      "mtimeMs": 1792646040983.8513,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [
+        "BossIntentBuilder"
+      ],
+      "symbolLines": [
+        {
+          "name": "BossIntentBuilder",
+          "line": 21,
+          "endLine": 409,
+          "tokens": 3712
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Core/BossLoadout.cs",
+      "size": 6019,
+      "lines": 170,
+      "lang": "cs",
+      "tokens": 1505,
+      "mtimeMs": 1792072450046.1414,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [
+        "BossLoadout"
+      ],
+      "symbolLines": [
+        {
+          "name": "BossLoadout",
+          "line": 18,
+          "endLine": 170,
+          "tokens": 1385
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Core/BossLockOn.cs",
+      "size": 12310,
+      "lines": 334,
+      "lang": "cs",
+      "tokens": 3078,
+      "mtimeMs": 1792652328212.994,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [
+        "BossLockOn"
+      ],
+      "symbolLines": [
+        {
+          "name": "BossLockOn",
+          "line": 20,
+          "endLine": 334,
+          "tokens": 2922
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Core/BossOrbMath.cs",
+      "size": 4376,
+      "lines": 126,
+      "lang": "cs",
+      "tokens": 1094,
+      "mtimeMs": 1792295251857.4639,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [
+        "BossOrbMath"
+      ],
+      "symbolLines": [
+        {
+          "name": "BossOrbMath",
+          "line": 22,
+          "endLine": 126,
+          "tokens": 917
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Core/BossOrbSim.cs",
+      "size": 8659,
+      "lines": 249,
+      "lang": "cs",
+      "tokens": 2165,
+      "mtimeMs": 1792477998296.9429,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/Core/BossOsty.cs",
+      "size": 43840,
+      "lines": 1115,
+      "lang": "cs",
+      "tokens": 10960,
+      "mtimeMs": 1792646942136.2932,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/Core/BossPiles.cs",
+      "size": 1896,
+      "lines": 64,
+      "lang": "cs",
+      "tokens": 474,
+      "mtimeMs": 1792375108953.487,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [
+        "BossPiles"
+      ],
+      "symbolLines": [
+        {
+          "name": "BossPiles",
+          "line": 14,
+          "endLine": 64,
+          "tokens": 381
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Core/BossPlanner.cs",
+      "size": 7644,
+      "lines": 201,
+      "lang": "cs",
+      "tokens": 1911,
+      "mtimeMs": 1792646557421.2307,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [
+        "BossPlanner"
+      ],
+      "symbolLines": [
+        {
+          "name": "BossPlanner",
+          "line": 44,
+          "endLine": 201,
+          "tokens": 1523
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Core/BossRunStats.cs",
+      "size": 1300,
+      "lines": 41,
+      "lang": "cs",
+      "tokens": 325,
+      "mtimeMs": 1792232885354.7158,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [
+        "BossRunStats"
+      ],
+      "symbolLines": [
+        {
+          "name": "BossRunStats",
+          "line": 21,
+          "endLine": 41,
+          "tokens": 166
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Core/BossScript.cs",
+      "size": 14879,
+      "lines": 425,
+      "lang": "cs",
+      "tokens": 3720,
+      "mtimeMs": 1792662475502.2434,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [
+        "BossScriptRunner"
+      ],
+      "symbolLines": [
+        {
+          "name": "BossScriptRunner",
+          "line": 162,
+          "endLine": 425,
+          "tokens": 2433
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Core/BossScriptPlanner.cs",
+      "size": 14399,
+      "lines": 358,
+      "lang": "cs",
+      "tokens": 3600,
+      "mtimeMs": 1792646245336.4795,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [
+        "BossScriptPlanner",
+        "Matches"
+      ],
+      "symbolLines": [
+        {
+          "name": "BossScriptPlanner",
+          "line": 18,
+          "endLine": 211,
+          "tokens": 2111
+        },
+        {
+          "name": "Matches",
+          "line": 211,
+          "endLine": 358,
+          "tokens": 1296
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Core/BossShadowPets.cs",
+      "size": 17305,
+      "lines": 468,
+      "lang": "cs",
+      "tokens": 4327,
+      "mtimeMs": 1792503379666.711,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [
+        "BossShadowPets"
+      ],
+      "symbolLines": [
+        {
+          "name": "BossShadowPets",
+          "line": 25,
+          "endLine": 468,
+          "tokens": 4134
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Core/DebrisRegentScript.cs",
+      "size": 3523,
+      "lines": 98,
+      "lang": "cs",
+      "tokens": 881,
+      "mtimeMs": 1792642146994.14,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [
+        "DebrisRegentScript"
+      ],
+      "symbolLines": [
+        {
+          "name": "DebrisRegentScript",
+          "line": 27,
+          "endLine": 98,
+          "tokens": 673
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Core/DebugMode.cs",
+      "size": 3539,
+      "lines": 123,
+      "lang": "cs",
+      "tokens": 885,
+      "mtimeMs": 1792375140895.412,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [
+        "DebugMode"
+      ],
+      "symbolLines": [
+        {
+          "name": "DebugMode",
+          "line": 17,
+          "endLine": 123,
+          "tokens": 767
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Core/DefectScript.cs",
+      "size": 4114,
+      "lines": 102,
+      "lang": "cs",
+      "tokens": 1029,
+      "mtimeMs": 1792478586645.0588,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [
+        "DefectScript"
+      ],
+      "symbolLines": [
+        {
+          "name": "DefectScript",
+          "line": 23,
+          "endLine": 102,
+          "tokens": 858
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Core/MultiBossPlan.cs",
+      "size": 5248,
+      "lines": 153,
+      "lang": "cs",
+      "tokens": 1312,
+      "mtimeMs": 1792648628578.7527,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [
+        "MultiBossPlan",
+        "EncounterRunStateCapturePatch"
+      ],
+      "symbolLines": [
+        {
+          "name": "MultiBossPlan",
+          "line": 21,
+          "endLine": 146,
+          "tokens": 1116
+        },
+        {
+          "name": "EncounterRunStateCapturePatch",
+          "line": 146,
+          "endLine": 153,
+          "tokens": 51
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Core/MultiplayerCardSwap.cs",
+      "size": 2276,
+      "lines": 64,
+      "lang": "cs",
+      "tokens": 569,
+      "mtimeMs": 1792661802656.3325,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [
+        "MultiplayerCardSwap"
+      ],
+      "symbolLines": [
+        {
+          "name": "MultiplayerCardSwap",
+          "line": 19,
+          "endLine": 64,
+          "tokens": 445
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Core/NecrobinderAct3Script.cs",
+      "size": 3391,
+      "lines": 91,
+      "lang": "cs",
+      "tokens": 848,
+      "mtimeMs": 1792594307322.4946,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [
+        "NecrobinderAct3Script"
+      ],
+      "symbolLines": [
+        {
+          "name": "NecrobinderAct3Script",
+          "line": 20,
+          "endLine": 91,
+          "tokens": 697
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Core/NecrobinderScript.cs",
+      "size": 4262,
+      "lines": 107,
+      "lang": "cs",
+      "tokens": 1066,
+      "mtimeMs": 1792463247990.642,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [
+        "NecrobinderScript"
+      ],
+      "symbolLines": [
+        {
+          "name": "NecrobinderScript",
+          "line": 25,
+          "endLine": 107,
+          "tokens": 869
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Core/NeowBlessingToggle.cs",
+      "size": 1023,
+      "lines": 39,
+      "lang": "cs",
+      "tokens": 256,
+      "mtimeMs": 1792222033488.8909,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [
+        "NeowBlessingToggle"
+      ],
+      "symbolLines": [
+        {
+          "name": "NeowBlessingToggle",
+          "line": 13,
+          "endLine": 39,
+          "tokens": 190
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Core/RawAttackIntent.cs",
+      "size": 2808,
+      "lines": 81,
+      "lang": "cs",
+      "tokens": 702,
+      "mtimeMs": 1792476953593.9685,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/Core/RegentScript.cs",
+      "size": 9022,
+      "lines": 219,
+      "lang": "cs",
+      "tokens": 2256,
+      "mtimeMs": 1792637424600.5662,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [
+        "RegentScript"
+      ],
+      "symbolLines": [
+        {
+          "name": "RegentScript",
+          "line": 26,
+          "endLine": 219,
+          "tokens": 1988
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Core/SacrificeIntent.cs",
+      "size": 1260,
+      "lines": 33,
+      "lang": "cs",
+      "tokens": 315,
+      "mtimeMs": 1792303140252.6938,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/Core/ShadowPlayerFactory.cs",
+      "size": 7686,
+      "lines": 199,
+      "lang": "cs",
+      "tokens": 1922,
+      "mtimeMs": 1792497095723.5195,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [
+        "ShadowPlayerFactory"
+      ],
+      "symbolLines": [
+        {
+          "name": "ShadowPlayerFactory",
+          "line": 15,
+          "endLine": 199,
+          "tokens": 1823
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Core/ShivPlays.cs",
+      "size": 3241,
+      "lines": 96,
+      "lang": "cs",
+      "tokens": 811,
+      "mtimeMs": 1792376312410.5688,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [
+        "ShivPlays"
+      ],
+      "symbolLines": [
+        {
+          "name": "ShivPlays",
+          "line": 26,
+          "endLine": 96,
+          "tokens": 605
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Core/SilentBlades.cs",
+      "size": 4295,
+      "lines": 118,
+      "lang": "cs",
+      "tokens": 1074,
+      "mtimeMs": 1792409733633.2188,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [
+        "SilentBlades"
+      ],
+      "symbolLines": [
+        {
+          "name": "SilentBlades",
+          "line": 27,
+          "endLine": 118,
+          "tokens": 826
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Core/SilentPoisonScript.cs",
+      "size": 4403,
+      "lines": 107,
+      "lang": "cs",
+      "tokens": 1101,
+      "mtimeMs": 1792394213003.8704,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [
+        "SilentPoisonScript"
+      ],
+      "symbolLines": [
+        {
+          "name": "SilentPoisonScript",
+          "line": 24,
+          "endLine": 107,
+          "tokens": 884
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Core/SilentScript.cs",
+      "size": 4615,
+      "lines": 112,
+      "lang": "cs",
+      "tokens": 1154,
+      "mtimeMs": 1792497118838.5547,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Core;",
+      "symbols": [
+        "SilentScript"
+      ],
+      "symbolLines": [
+        {
+          "name": "SilentScript",
+          "line": 23,
+          "endLine": 112,
+          "tokens": 958
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Encounters/CharBossEncounters.cs",
+      "size": 11302,
+      "lines": 331,
+      "lang": "cs",
+      "tokens": 2826,
+      "mtimeMs": 1792649870456.2622,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Encounters;",
+      "symbols": [
+        "IroncladBossEncounter",
+        "SilentBossEncounter",
+        "SilentPoisonBossEncounter",
+        "SilentShivBossEncounter",
+        "DefectBossEncounter",
+        "NecrobinderBossEncounter",
+        "RegentBossEncounter",
+        "CharBossEncounters"
+      ],
+      "symbolLines": [
+        {
+          "name": "IroncladBossEncounter",
+          "line": 13,
+          "endLine": 17,
+          "tokens": 37
+        },
+        {
+          "name": "SilentBossEncounter",
+          "line": 17,
+          "endLine": 26,
+          "tokens": 87
+        },
+        {
+          "name": "SilentPoisonBossEncounter",
+          "line": 26,
+          "endLine": 35,
+          "tokens": 91
+        },
+        {
+          "name": "SilentShivBossEncounter",
+          "line": 35,
+          "endLine": 40,
+          "tokens": 56
+        },
+        {
+          "name": "DefectBossEncounter",
+          "line": 40,
+          "endLine": 50,
+          "tokens": 123
+        },
+        {
+          "name": "NecrobinderBossEncounter",
+          "line": 50,
+          "endLine": 54,
+          "tokens": 38
+        },
+        {
+          "name": "RegentBossEncounter",
+          "line": 54,
+          "endLine": 172,
+          "tokens": 977
+        },
+        {
+          "name": "CharBossEncounters",
+          "line": 172,
+          "endLine": 331,
+          "tokens": 1451
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Monsters/BossThinkState.cs",
+      "size": 893,
+      "lines": 30,
+      "lang": "cs",
+      "tokens": 224,
+      "mtimeMs": 1792066669548.1636,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Monsters;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/Monsters/BossVisuals.cs",
+      "size": 2872,
+      "lines": 85,
+      "lang": "cs",
+      "tokens": 718,
+      "mtimeMs": 1792218434580.4602,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Monsters;",
+      "symbols": [
+        "BossVisuals"
+      ],
+      "symbolLines": [
+        {
+          "name": "BossVisuals",
+          "line": 15,
+          "endLine": 85,
+          "tokens": 628
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Monsters/CharBossMonster.Descriptor.cs",
+      "size": 3590,
+      "lines": 90,
+      "lang": "cs",
+      "tokens": 898,
+      "mtimeMs": 1792470930196.0942,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Monsters;",
+      "symbols": [
+        "BeforeRemovedFromRoom"
+      ],
+      "symbolLines": [
+        {
+          "name": "BeforeRemovedFromRoom",
+          "line": 85,
+          "endLine": 90,
+          "tokens": 71
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Monsters/CharBossMonster.Turn.cs",
+      "size": 14321,
+      "lines": 350,
+      "lang": "cs",
+      "tokens": 3581,
+      "mtimeMs": 1792646562615.7234,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Monsters;",
+      "symbols": [
+        "IsChargeBattery"
+      ],
+      "symbolLines": [
+        {
+          "name": "IsChargeBattery",
+          "line": 314,
+          "endLine": 350,
+          "tokens": 339
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Monsters/CharBossMonster.cs",
+      "size": 24258,
+      "lines": 626,
+      "lang": "cs",
+      "tokens": 6065,
+      "mtimeMs": 1792633470931.1367,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Monsters;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/Monsters/CharacterBosses.cs",
+      "size": 1046,
+      "lines": 37,
+      "lang": "cs",
+      "tokens": 262,
+      "mtimeMs": 1792069097873.587,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Monsters;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/Patches/BossEnemySpreadPatch.cs",
+      "size": 2826,
+      "lines": 80,
+      "lang": "cs",
+      "tokens": 707,
+      "mtimeMs": 1792651773534.8748,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Patches;",
+      "symbols": [
+        "BossEnemySpreadPatch"
+      ],
+      "symbolLines": [
+        {
+          "name": "BossEnemySpreadPatch",
+          "line": 20,
+          "endLine": 80,
+          "tokens": 554
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Patches/BossFrameTickPatch.cs",
+      "size": 14100,
+      "lines": 376,
+      "lang": "cs",
+      "tokens": 3525,
+      "mtimeMs": 1792652941404.3396,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Patches;",
+      "symbols": [
+        "BossFrameTickStarPatch",
+        "BossFrameTickEnergyPatch",
+        "BossBladeHoverPositionPatch",
+        "BossFrameTickBladePatch",
+        "BossFrameTick"
+      ],
+      "symbolLines": [
+        {
+          "name": "BossFrameTickStarPatch",
+          "line": 30,
+          "endLine": 38,
+          "tokens": 77
+        },
+        {
+          "name": "BossFrameTickEnergyPatch",
+          "line": 38,
+          "endLine": 50,
+          "tokens": 126
+        },
+        {
+          "name": "BossBladeHoverPositionPatch",
+          "line": 50,
+          "endLine": 64,
+          "tokens": 117
+        },
+        {
+          "name": "BossFrameTickBladePatch",
+          "line": 64,
+          "endLine": 78,
+          "tokens": 106
+        },
+        {
+          "name": "BossFrameTick",
+          "line": 78,
+          "endLine": 376,
+          "tokens": 2868
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Patches/BossHandUiPatches.cs",
+      "size": 857,
+      "lines": 34,
+      "lang": "cs",
+      "tokens": 215,
+      "mtimeMs": 1792470927727.2173,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Patches;",
+      "symbols": [
+        "ClearHandUiOnCombatEndPatch",
+        "ClearHandUiOnCombatVictoryPatch"
+      ],
+      "symbolLines": [
+        {
+          "name": "ClearHandUiOnCombatEndPatch",
+          "line": 15,
+          "endLine": 26,
+          "tokens": 81
+        },
+        {
+          "name": "ClearHandUiOnCombatVictoryPatch",
+          "line": 26,
+          "endLine": 34,
+          "tokens": 52
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Patches/BossMultiplayerHpPatch.cs",
+      "size": 1227,
+      "lines": 39,
+      "lang": "cs",
+      "tokens": 307,
+      "mtimeMs": 1792588611195.4558,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Patches;",
+      "symbols": [
+        "BossNoMultiplayerHpScalePatch"
+      ],
+      "symbolLines": [
+        {
+          "name": "BossNoMultiplayerHpScalePatch",
+          "line": 19,
+          "endLine": 39,
+          "tokens": 147
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Patches/BossReplacementPatches.cs",
+      "size": 3295,
+      "lines": 85,
+      "lang": "cs",
+      "tokens": 824,
+      "mtimeMs": 1792648621369.8857,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Patches;",
+      "symbols": [
+        "PullNextEncounterPatch"
+      ],
+      "symbolLines": [
+        {
+          "name": "PullNextEncounterPatch",
+          "line": 17,
+          "endLine": 85,
+          "tokens": 700
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Patches/BossSlotPatches.cs",
+      "size": 4898,
+      "lines": 131,
+      "lang": "cs",
+      "tokens": 1225,
+      "mtimeMs": 1792591618076.1797,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Patches;",
+      "symbols": [
+        "BossSlotAssignmentPatch",
+        "BossSlotGenerateRoomsPatch",
+        "BossSlotValidateAfterLoadPatch",
+        "SecondBossEncounterGetPatch"
+      ],
+      "symbolLines": [
+        {
+          "name": "BossSlotAssignmentPatch",
+          "line": 84,
+          "endLine": 93,
+          "tokens": 92
+        },
+        {
+          "name": "BossSlotGenerateRoomsPatch",
+          "line": 93,
+          "endLine": 101,
+          "tokens": 89
+        },
+        {
+          "name": "BossSlotValidateAfterLoadPatch",
+          "line": 101,
+          "endLine": 109,
+          "tokens": 93
+        },
+        {
+          "name": "SecondBossEncounterGetPatch",
+          "line": 109,
+          "endLine": 131,
+          "tokens": 190
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Patches/BossSpecialPowerIconPatch.cs",
+      "size": 1908,
+      "lines": 53,
+      "lang": "cs",
+      "tokens": 477,
+      "mtimeMs": 1792651336250.3926,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Patches;",
+      "symbols": [
+        "BossSpecialPowerIconPatch"
+      ],
+      "symbolLines": [
+        {
+          "name": "BossSpecialPowerIconPatch",
+          "line": 17,
+          "endLine": 53,
+          "tokens": 330
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Patches/CharbossIsolationPatches.cs",
+      "size": 1005,
+      "lines": 37,
+      "lang": "cs",
+      "tokens": 252,
+      "mtimeMs": 1792066684779.1584,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Patches;",
+      "symbols": [
+        "ShadowPlayerIsolationPatch"
+      ],
+      "symbolLines": [
+        {
+          "name": "ShadowPlayerIsolationPatch",
+          "line": 18,
+          "endLine": 37,
+          "tokens": 108
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Patches/CombatContainsSafePatch.cs",
+      "size": 1558,
+      "lines": 47,
+      "lang": "cs",
+      "tokens": 390,
+      "mtimeMs": 1792251085902.9912,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Patches;",
+      "symbols": [
+        "CombatContainsSafePatch"
+      ],
+      "symbolLines": [
+        {
+          "name": "CombatContainsSafePatch",
+          "line": 31,
+          "endLine": 47,
+          "tokens": 133
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Patches/CombatSidePatches.cs",
+      "size": 9450,
+      "lines": 286,
+      "lang": "cs",
+      "tokens": 2363,
+      "mtimeMs": 1792594925586.8586,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Patches;",
+      "symbols": [
+        "HittableEnemiesSidePatch",
+        "ShadowPetNotHittablePatch",
+        "ShadowPetNeverHittablePatch",
+        "ShadowPetIsSecondaryEnemyPatch",
+        "ShadowPetNotPrimaryEnemyPatch",
+        "ShadowPetNotAnOpponentPatch",
+        "ShadowPetDamageProbePatch"
+      ],
+      "symbolLines": [
+        {
+          "name": "HittableEnemiesSidePatch",
+          "line": 22,
+          "endLine": 72,
+          "tokens": 421
+        },
+        {
+          "name": "ShadowPetNotHittablePatch",
+          "line": 72,
+          "endLine": 129,
+          "tokens": 526
+        },
+        {
+          "name": "ShadowPetNeverHittablePatch",
+          "line": 129,
+          "endLine": 169,
+          "tokens": 350
+        },
+        {
+          "name": "ShadowPetIsSecondaryEnemyPatch",
+          "line": 169,
+          "endLine": 194,
+          "tokens": 200
+        },
+        {
+          "name": "ShadowPetNotPrimaryEnemyPatch",
+          "line": 194,
+          "endLine": 228,
+          "tokens": 268
+        },
+        {
+          "name": "ShadowPetNotAnOpponentPatch",
+          "line": 228,
+          "endLine": 272,
+          "tokens": 372
+        },
+        {
+          "name": "ShadowPetDamageProbePatch",
+          "line": 272,
+          "endLine": 286,
+          "tokens": 137
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Patches/CometDebrisPatch.cs",
+      "size": 5848,
+      "lines": 142,
+      "lang": "cs",
+      "tokens": 1462,
+      "mtimeMs": 1792633463371.198,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Patches;",
+      "symbols": [
+        "CometDebrisRedirect",
+        "MakeItSoNoReturnPatch"
+      ],
+      "symbolLines": [
+        {
+          "name": "CometDebrisRedirect",
+          "line": 22,
+          "endLine": 116,
+          "tokens": 1076
+        },
+        {
+          "name": "MakeItSoNoReturnPatch",
+          "line": 116,
+          "endLine": 142,
+          "tokens": 216
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Patches/CrackedCoreOncePatch.cs",
+      "size": 1876,
+      "lines": 53,
+      "lang": "cs",
+      "tokens": 469,
+      "mtimeMs": 1792474512297.872,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Patches;",
+      "symbols": [
+        "CrackedCoreOncePatch"
+      ],
+      "symbolLines": [
+        {
+          "name": "CrackedCoreOncePatch",
+          "line": 27,
+          "endLine": 53,
+          "tokens": 228
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Patches/FencingManualOncePatch.cs",
+      "size": 1917,
+      "lines": 52,
+      "lang": "cs",
+      "tokens": 480,
+      "mtimeMs": 1792472702852.618,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Patches;",
+      "symbols": [
+        "FencingManualForgeOncePatch"
+      ],
+      "symbolLines": [
+        {
+          "name": "FencingManualForgeOncePatch",
+          "line": 27,
+          "endLine": 52,
+          "tokens": 260
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Patches/ModRelicPoolPatch.cs",
+      "size": 1223,
+      "lines": 43,
+      "lang": "cs",
+      "tokens": 306,
+      "mtimeMs": 1792233873495.7385,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Patches;",
+      "symbols": [
+        "ModRelicPoolPatch"
+      ],
+      "symbolLines": [
+        {
+          "name": "ModRelicPoolPatch",
+          "line": 19,
+          "endLine": 43,
+          "tokens": 160
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Patches/OrbLocalVisualPatch.cs",
+      "size": 2192,
+      "lines": 64,
+      "lang": "cs",
+      "tokens": 548,
+      "mtimeMs": 1792287220383.0955,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Patches;",
+      "symbols": [
+        "OrbAddSlotLocalPatch",
+        "OrbAddOrbLocalPatch",
+        "OrbEvokeLocalPatch",
+        "OrbStateChangedLocalPatch"
+      ],
+      "symbolLines": [
+        {
+          "name": "OrbAddSlotLocalPatch",
+          "line": 27,
+          "endLine": 34,
+          "tokens": 69
+        },
+        {
+          "name": "OrbAddOrbLocalPatch",
+          "line": 34,
+          "endLine": 41,
+          "tokens": 69
+        },
+        {
+          "name": "OrbEvokeLocalPatch",
+          "line": 41,
+          "endLine": 60,
+          "tokens": 182
+        },
+        {
+          "name": "OrbStateChangedLocalPatch",
+          "line": 60,
+          "endLine": 64,
+          "tokens": 43
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Patches/OstyNoCombatStartSummonPatch.cs",
+      "size": 2057,
+      "lines": 65,
+      "lang": "cs",
+      "tokens": 515,
+      "mtimeMs": 1792336166217.2087,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Patches;",
+      "symbols": [
+        "OstyNoCombatStartSummonPatch"
+      ],
+      "symbolLines": [
+        {
+          "name": "OstyNoCombatStartSummonPatch",
+          "line": 31,
+          "endLine": 65,
+          "tokens": 239
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Patches/OstyPoisonImmunePatch.cs",
+      "size": 1839,
+      "lines": 57,
+      "lang": "cs",
+      "tokens": 460,
+      "mtimeMs": 1792407525686.5483,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Patches;",
+      "symbols": [
+        "OstyPoisonImmunePatch"
+      ],
+      "symbolLines": [
+        {
+          "name": "OstyPoisonImmunePatch",
+          "line": 36,
+          "endLine": 57,
+          "tokens": 157
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Patches/PoisonTimingPatch.cs",
+      "size": 1795,
+      "lines": 59,
+      "lang": "cs",
+      "tokens": 449,
+      "mtimeMs": 1792383198679.3179,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Patches;",
+      "symbols": [
+        "PoisonTimingPatch"
+      ],
+      "symbolLines": [
+        {
+          "name": "PoisonTimingPatch",
+          "line": 25,
+          "endLine": 59,
+          "tokens": 254
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Patches/PoisonTriggerBlockablePatch.cs",
+      "size": 1353,
+      "lines": 41,
+      "lang": "cs",
+      "tokens": 339,
+      "mtimeMs": 1792394919553.584,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Patches;",
+      "symbols": [
+        "PoisonTriggerBlockablePatch"
+      ],
+      "symbolLines": [
+        {
+          "name": "PoisonTriggerBlockablePatch",
+          "line": 22,
+          "endLine": 41,
+          "tokens": 155
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Patches/ScriptedCardGenerationPatch.cs",
+      "size": 5253,
+      "lines": 160,
+      "lang": "cs",
+      "tokens": 1314,
+      "mtimeMs": 1792568435707.3923,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Patches;",
+      "symbols": [
+        "ShadowBossNoRandomCardPatch",
+        "BossScriptTakeQueue"
+      ],
+      "symbolLines": [
+        {
+          "name": "ShadowBossNoRandomCardPatch",
+          "line": 27,
+          "endLine": 54,
+          "tokens": 191
+        },
+        {
+          "name": "BossScriptTakeQueue",
+          "line": 54,
+          "endLine": 160,
+          "tokens": 910
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Patches/ShadowEnvenomPerHitPatch.cs",
+      "size": 3020,
+      "lines": 75,
+      "lang": "cs",
+      "tokens": 755,
+      "mtimeMs": 1792408709865.402,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Patches;",
+      "symbols": [
+        "ShadowEnvenomPerHitPatch"
+      ],
+      "symbolLines": [
+        {
+          "name": "ShadowEnvenomPerHitPatch",
+          "line": 34,
+          "endLine": 75,
+          "tokens": 444
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Patches/ShadowGainStarsPatch.cs",
+      "size": 1631,
+      "lines": 49,
+      "lang": "cs",
+      "tokens": 408,
+      "mtimeMs": 1792630065229.2913,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Patches;",
+      "symbols": [
+        "ShadowGainStarsPatch"
+      ],
+      "symbolLines": [
+        {
+          "name": "ShadowGainStarsPatch",
+          "line": 23,
+          "endLine": 49,
+          "tokens": 212
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Patches/ShadowRedMaskPatch.cs",
+      "size": 1883,
+      "lines": 55,
+      "lang": "cs",
+      "tokens": 471,
+      "mtimeMs": 1792406822841.7317,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Patches;",
+      "symbols": [
+        "ShadowRedMaskTurnStartPatch"
+      ],
+      "symbolLines": [
+        {
+          "name": "ShadowRedMaskTurnStartPatch",
+          "line": 33,
+          "endLine": 55,
+          "tokens": 183
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/Powers/BorrowedTimeBossPower.cs",
+      "size": 4281,
+      "lines": 127,
+      "lang": "cs",
+      "tokens": 1071,
+      "mtimeMs": 1792593801139.8699,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Powers;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/Powers/CometBossPower.cs",
+      "size": 3977,
+      "lines": 110,
+      "lang": "cs",
+      "tokens": 995,
+      "mtimeMs": 1792661233593.767,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Powers;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/Powers/DeviationPower.Mirror.cs",
+      "size": 2763,
+      "lines": 76,
+      "lang": "cs",
+      "tokens": 691,
+      "mtimeMs": 1792287833050.7761,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Powers;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/Powers/DeviationPower.cs",
+      "size": 5998,
+      "lines": 183,
+      "lang": "cs",
+      "tokens": 1500,
+      "mtimeMs": 1792286245050.9614,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Powers;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/Powers/KnowThyPlacePower.cs",
+      "size": 7134,
+      "lines": 202,
+      "lang": "cs",
+      "tokens": 1784,
+      "mtimeMs": 1792502510802.9534,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Powers;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/Powers/LockOnPower.cs",
+      "size": 4766,
+      "lines": 126,
+      "lang": "cs",
+      "tokens": 1192,
+      "mtimeMs": 1792652102982.6128,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Powers;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/Powers/NotYetPower.cs",
+      "size": 9465,
+      "lines": 247,
+      "lang": "cs",
+      "tokens": 2367,
+      "mtimeMs": 1792461507348.5447,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Powers;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/Powers/PoisonStrikePower.cs",
+      "size": 7203,
+      "lines": 191,
+      "lang": "cs",
+      "tokens": 1801,
+      "mtimeMs": 1792402458269.884,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Powers;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/Powers/ResonancePower.cs",
+      "size": 4205,
+      "lines": 116,
+      "lang": "cs",
+      "tokens": 1052,
+      "mtimeMs": 1792644798645.4075,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Powers;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/Powers/SleeveTrickPower.cs",
+      "size": 3195,
+      "lines": 91,
+      "lang": "cs",
+      "tokens": 799,
+      "mtimeMs": 1792376314459.965,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Powers;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/Relics/NeowBlessing.cs",
+      "size": 3204,
+      "lines": 98,
+      "lang": "cs",
+      "tokens": 801,
+      "mtimeMs": 1792222033540.391,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.Relics;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/UI/BossCardShowcase.cs",
+      "size": 3408,
+      "lines": 99,
+      "lang": "cs",
+      "tokens": 852,
+      "mtimeMs": 1792469222184.105,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.UI;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/UI/BossExtraStatusRow.cs",
+      "size": 3521,
+      "lines": 96,
+      "lang": "cs",
+      "tokens": 881,
+      "mtimeMs": 1792662484998.551,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.UI;",
+      "symbols": [
+        "BossExtraStatusRow"
+      ],
+      "symbolLines": [
+        {
+          "name": "BossExtraStatusRow",
+          "line": 20,
+          "endLine": 96,
+          "tokens": 748
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/UI/BossHandAnchor.cs",
+      "size": 3247,
+      "lines": 93,
+      "lang": "cs",
+      "tokens": 812,
+      "mtimeMs": 1792301263124.7886,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.UI;",
+      "symbols": [
+        "BossHandAnchor"
+      ],
+      "symbolLines": [
+        {
+          "name": "BossHandAnchor",
+          "line": 13,
+          "endLine": 93,
+          "tokens": 731
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/UI/BossHandCard.Hover.cs",
+      "size": 1907,
+      "lines": 60,
+      "lang": "cs",
+      "tokens": 477,
+      "mtimeMs": 1792287780306.4514,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.UI;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/UI/BossHandCard.cs",
+      "size": 7106,
+      "lines": 195,
+      "lang": "cs",
+      "tokens": 1777,
+      "mtimeMs": 1792469194975.2893,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.UI;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/UI/BossHandPanel.Extra.cs",
+      "size": 6983,
+      "lines": 208,
+      "lang": "cs",
+      "tokens": 1746,
+      "mtimeMs": 1792570874113.2556,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.UI;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/UI/BossHandPanel.Layout.cs",
+      "size": 6335,
+      "lines": 168,
+      "lang": "cs",
+      "tokens": 1584,
+      "mtimeMs": 1792301717453.2646,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.UI;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/UI/BossHandPanel.cs",
+      "size": 8124,
+      "lines": 266,
+      "lang": "cs",
+      "tokens": 2031,
+      "mtimeMs": 1792471531802.5574,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.UI;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/UI/BossHandUi.cs",
+      "size": 6089,
+      "lines": 194,
+      "lang": "cs",
+      "tokens": 1523,
+      "mtimeMs": 1792646917796.2146,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.UI;",
+      "symbols": [
+        "BossHandUi"
+      ],
+      "symbolLines": [
+        {
+          "name": "BossHandUi",
+          "line": 14,
+          "endLine": 194,
+          "tokens": 1446
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/UI/BossOrbDisplay.Highlight.cs",
+      "size": 4295,
+      "lines": 128,
+      "lang": "cs",
+      "tokens": 1074,
+      "mtimeMs": 1792288121000.4868,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.UI;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/UI/BossOrbDisplay.cs",
+      "size": 8485,
+      "lines": 238,
+      "lang": "cs",
+      "tokens": 2122,
+      "mtimeMs": 1792475093944.1218,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.UI;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/UI/BossSovereignBlade.cs",
+      "size": 10579,
+      "lines": 296,
+      "lang": "cs",
+      "tokens": 2645,
+      "mtimeMs": 1792636635562.508,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.UI;",
+      "symbols": [
+        "BossSovereignBlade"
+      ],
+      "symbolLines": [
+        {
+          "name": "BossSovereignBlade",
+          "line": 22,
+          "endLine": 296,
+          "tokens": 2462
+        }
+      ]
+    },
+    {
+      "path": "src/Hooks/UI/BossSpecialUi.cs",
+      "size": 6930,
+      "lines": 210,
+      "lang": "cs",
+      "tokens": 1733,
+      "mtimeMs": 1792650800410.365,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.UI;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/UI/BossStatusRow.Icons.cs",
+      "size": 16604,
+      "lines": 455,
+      "lang": "cs",
+      "tokens": 4151,
+      "mtimeMs": 1792652903541.7708,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.UI;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/UI/BossStatusRow.Pin.cs",
+      "size": 3505,
+      "lines": 96,
+      "lang": "cs",
+      "tokens": 877,
+      "mtimeMs": 1792652925131.7183,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.UI;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/UI/BossStatusRow.cs",
+      "size": 6250,
+      "lines": 183,
+      "lang": "cs",
+      "tokens": 1563,
+      "mtimeMs": 1792652911088.8042,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.UI;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/UI/BossUiTuning.cs",
+      "size": 4979,
+      "lines": 144,
+      "lang": "cs",
+      "tokens": 1245,
+      "mtimeMs": 1792310332836.505,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.UI;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/Hooks/UI/OrbLocalVisuals.cs",
+      "size": 3451,
+      "lines": 90,
+      "lang": "cs",
+      "tokens": 863,
+      "mtimeMs": 1792288083600.6995,
+      "skipped": false,
+      "summary": "namespace CharacterBosses.UI;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "src/ModEntry.cs",
+      "size": 959,
+      "lines": 38,
+      "lang": "cs",
+      "tokens": 240,
+      "mtimeMs": 1792066416335.68,
+      "skipped": false,
+      "summary": "namespace CharacterBosses;",
+      "symbols": [
+        "ModEntry",
+        "Logger"
+      ],
+      "symbolLines": [
+        {
+          "name": "ModEntry",
+          "line": 7,
+          "endLine": 20,
+          "tokens": 92
+        },
+        {
+          "name": "Logger",
+          "line": 20,
+          "endLine": 38,
+          "tokens": 127
+        }
+      ]
+    },
+    {
+      "path": "sts2-mod-uploader-main/sts2-mod-uploader-main/ModUploader.csproj",
+      "size": 2385,
+      "lines": 57,
+      "lang": "text",
+      "tokens": 597,
+      "mtimeMs": 1791955930336.0552,
+      "skipped": false,
+      "summary": "<Project Sdk=\"Microsoft.NET.Sdk\">",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "sts2-mod-uploader-main/sts2-mod-uploader-main/ModUploader.sln",
+      "size": 774,
+      "lines": 16,
+      "lang": "text",
+      "tokens": 194,
+      "mtimeMs": 1791955930344.046,
+      "skipped": false,
+      "summary": "Microsoft Visual Studio Solution File, Format Version 12.00",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "sts2-mod-uploader-main/sts2-mod-uploader-main/README.md",
+      "size": 1525,
+      "lines": 19,
+      "lang": "md",
+      "tokens": 382,
+      "mtimeMs": 1791955930350.049,
+      "skipped": false,
+      "summary": "1. Double-clicking on the ModUploader.exe file should create a new folder called `NewModWorkspace`.",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "sts2-mod-uploader-main/sts2-mod-uploader-main/global.json",
+      "size": 106,
+      "lines": 7,
+      "lang": "json",
+      "tokens": 27,
+      "mtimeMs": 1791955930356.0461,
+      "skipped": false,
+      "summary": "{",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "sts2-mod-uploader-main/sts2-mod-uploader-main/nuget.config",
+      "size": 172,
+      "lines": 6,
+      "lang": "text",
+      "tokens": 43,
+      "mtimeMs": 1791955930363.055,
+      "skipped": false,
+      "summary": "<?xml version=\"1.0\" encoding=\"utf-8\"?>",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "sts2-mod-uploader-main/sts2-mod-uploader-main/src/Log.cs",
+      "size": 1056,
+      "lines": 48,
+      "lang": "cs",
+      "tokens": 264,
+      "mtimeMs": 1791955930385.047,
+      "skipped": false,
+      "summary": "namespace ModUploader;",
+      "symbols": [
+        "Log"
+      ],
+      "symbolLines": [
+        {
+          "name": "Log",
+          "line": 3,
+          "endLine": 48,
+          "tokens": 258
+        }
+      ]
+    },
+    {
+      "path": "sts2-mod-uploader-main/sts2-mod-uploader-main/src/ModConfig.cs",
+      "size": 323,
+      "lines": 13,
+      "lang": "cs",
+      "tokens": 81,
+      "mtimeMs": 1791955930391.067,
+      "skipped": false,
+      "summary": "namespace ModUploader;",
+      "symbols": [
+        "ModConfig"
+      ],
+      "symbolLines": [
+        {
+          "name": "ModConfig",
+          "line": 3,
+          "endLine": 13,
+          "tokens": 74
+        }
+      ]
+    },
+    {
+      "path": "sts2-mod-uploader-main/sts2-mod-uploader-main/src/NewCommand.cs",
+      "size": 1675,
+      "lines": 46,
+      "lang": "cs",
+      "tokens": 419,
+      "mtimeMs": 1791955930396.0461,
+      "skipped": false,
+      "summary": "namespace ModUploader;",
+      "symbols": [
+        "NewCommand"
+      ],
+      "symbolLines": [
+        {
+          "name": "NewCommand",
+          "line": 3,
+          "endLine": 46,
+          "tokens": 413
+        }
+      ]
+    },
+    {
+      "path": "sts2-mod-uploader-main/sts2-mod-uploader-main/src/Program.cs",
+      "size": 5073,
+      "lines": 136,
+      "lang": "cs",
+      "tokens": 1269,
+      "mtimeMs": 1791955930400.0544,
+      "skipped": false,
+      "summary": "namespace ModUploader;",
+      "symbols": [
+        "Program"
+      ],
+      "symbolLines": [
+        {
+          "name": "Program",
+          "line": 6,
+          "endLine": 136,
+          "tokens": 1251
+        }
+      ]
+    },
+    {
+      "path": "sts2-mod-uploader-main/sts2-mod-uploader-main/src/RemoveCommand.cs",
+      "size": 2605,
+      "lines": 83,
+      "lang": "cs",
+      "tokens": 652,
+      "mtimeMs": 1791955930405.0461,
+      "skipped": false,
+      "summary": "namespace ModUploader;",
+      "symbols": [
+        "RemoveCommand"
+      ],
+      "symbolLines": [
+        {
+          "name": "RemoveCommand",
+          "line": 6,
+          "endLine": 83,
+          "tokens": 634
+        }
+      ]
+    },
+    {
+      "path": "sts2-mod-uploader-main/sts2-mod-uploader-main/src/SourceGenerationContext.cs",
+      "size": 250,
+      "lines": 6,
+      "lang": "cs",
+      "tokens": 63,
+      "mtimeMs": 1791955930409.0547,
+      "skipped": false,
+      "summary": "namespace ModUploader;",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "sts2-mod-uploader-main/sts2-mod-uploader-main/src/SteamCallResult.cs",
+      "size": 808,
+      "lines": 34,
+      "lang": "cs",
+      "tokens": 202,
+      "mtimeMs": 1791955930413.0464,
+      "skipped": false,
+      "summary": "namespace ModUploader;",
+      "symbols": [
+        "SteamCallResult"
+      ],
+      "symbolLines": [
+        {
+          "name": "SteamCallResult",
+          "line": 5,
+          "endLine": 34,
+          "tokens": 191
+        }
+      ]
+    },
+    {
+      "path": "sts2-mod-uploader-main/sts2-mod-uploader-main/src/UploadCommand.cs",
+      "size": 23524,
+      "lines": 610,
+      "lang": "cs",
+      "tokens": 5881,
+      "mtimeMs": 1791955930418.047,
+      "skipped": false,
+      "summary": "namespace ModUploader;",
+      "symbols": [
+        "UploadCommand",
+        "AdditionalPreview",
+        "WorkshopItemDetails"
+      ],
+      "symbolLines": [
+        {
+          "name": "UploadCommand",
+          "line": 6,
+          "endLine": 10,
+          "tokens": 34
+        },
+        {
+          "name": "AdditionalPreview",
+          "line": 10,
+          "endLine": 16,
+          "tokens": 41
+        },
+        {
+          "name": "WorkshopItemDetails",
+          "line": 16,
+          "endLine": 610,
+          "tokens": 5808
+        }
+      ]
+    },
+    {
+      "path": "sts2-mod-uploader-main/sts2-mod-uploader-main/steam/Steamworks.NET.15.0.1.nupkg",
+      "size": 1192304,
+      "lines": 0,
+      "lang": "text",
+      "tokens": 298076,
+      "mtimeMs": 1791955930437.047,
+      "skipped": true,
+      "summary": "[file too large]",
+      "symbols": []
+    },
+    {
+      "path": "sts2-mod-uploader-main/sts2-mod-uploader-main/steam/libsteam_api.dylib",
+      "size": 427968,
+      "lines": 0,
+      "lang": "text",
+      "tokens": 106992,
+      "mtimeMs": 1791955930446.0464,
+      "skipped": true,
+      "summary": "[file too large]",
+      "symbols": []
+    },
+    {
+      "path": "sts2-mod-uploader-main/sts2-mod-uploader-main/steam/libsteam_api.so",
+      "size": 383432,
+      "lines": 0,
+      "lang": "text",
+      "tokens": 95858,
+      "mtimeMs": 1791955930454.0486,
+      "skipped": true,
+      "summary": "[file too large]",
+      "symbols": []
+    },
+    {
+      "path": "sts2-mod-uploader-main/sts2-mod-uploader-main/steam/steam_api64.dll",
+      "size": 317080,
+      "lines": 0,
+      "lang": "text",
+      "tokens": 79270,
+      "mtimeMs": 1791955930464.0469,
+      "skipped": true,
+      "summary": "[file too large]",
+      "symbols": []
+    },
+    {
+      "path": "sts2-mod-uploader-main/sts2-mod-uploader-main/steam/steam_appid.txt",
+      "size": 7,
+      "lines": 0,
+      "lang": "text",
+      "tokens": 2,
+      "mtimeMs": 1791955930473.0576,
+      "skipped": false,
+      "summary": "2868840",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "sts2-mod-uploader-main/sts2-mod-uploader-main/template/README.md",
+      "size": 2424,
+      "lines": 48,
+      "lang": "md",
+      "tokens": 606,
+      "mtimeMs": 1791955930483.047,
+      "skipped": false,
+      "summary": "This should be at least a JSON file, and probably a PCK & DLL.",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "sts2-mod-uploader-main/sts2-mod-uploader-main/template/content/README.md",
+      "size": 35,
+      "lines": 1,
+      "lang": "md",
+      "tokens": 9,
+      "mtimeMs": 1791955930501.0474,
+      "skipped": false,
+      "summary": "Place the content of the mod here.",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "sts2-mod-uploader-main/sts2-mod-uploader-main/template/image.png",
+      "size": 10276,
+      "lines": 0,
+      "lang": "binary",
+      "tokens": 2569,
+      "mtimeMs": 1791955930489.0576,
+      "skipped": true,
+      "summary": "[binary]",
+      "symbols": []
+    },
+    {
+      "path": "sts2-mod-uploader-main/sts2-mod-uploader-main/template/workshop.json",
+      "size": 197,
+      "lines": 9,
+      "lang": "json",
+      "tokens": 50,
+      "mtimeMs": 1791955930494.046,
+      "skipped": false,
+      "summary": "{",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "tools/charbosses-mod.ps1",
+      "size": 2508,
+      "lines": 67,
+      "lang": "ps1",
+      "tokens": 627,
+      "mtimeMs": 1792068904250.8394,
+      "skipped": false,
+      "summary": "param(",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "tools/charbosses-smoke-test.ps1",
+      "size": 7310,
+      "lines": 174,
+      "lang": "ps1",
+      "tokens": 1828,
+      "mtimeMs": 1792069485620.375,
+      "skipped": false,
+      "summary": "param(",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "tools/check-loc-keys.ps1",
+      "size": 3964,
+      "lines": 96,
+      "lang": "ps1",
+      "tokens": 991,
+      "mtimeMs": 1792072844761.113,
+      "skipped": false,
+      "summary": "param(",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "tools/close_sts2.ps1",
+      "size": 98,
+      "lines": 3,
+      "lang": "ps1",
+      "tokens": 25,
+      "mtimeMs": 1791185998996.1814,
+      "skipped": false,
+      "summary": "taskkill /F /IM \"SlayTheSpire2.exe\" 2>$null",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "tools/extract-card-meta.ps1",
+      "size": 5882,
+      "lines": 129,
+      "lang": "ps1",
+      "tokens": 1471,
+      "mtimeMs": 1792071120835.7947,
+      "skipped": false,
+      "summary": "param(",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "tools/gen-card-lists.ps1",
+      "size": 10645,
+      "lines": 238,
+      "lang": "ps1",
+      "tokens": 2662,
+      "mtimeMs": 1792071120940.434,
+      "skipped": false,
+      "summary": "param(",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "tools/launch_sts2.ps1",
+      "size": 991,
+      "lines": 31,
+      "lang": "ps1",
+      "tokens": 248,
+      "mtimeMs": 1791185998997.1814,
+      "skipped": false,
+      "summary": "function Wait-SteamReady {",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "tools/pck_builder/build_pck.gd",
+      "size": 3745,
+      "lines": 122,
+      "lang": "text",
+      "tokens": 937,
+      "mtimeMs": 1792246897143.2166,
+      "skipped": false,
+      "summary": "extends SceneTree",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "tools/read_sts2_logs.ps1",
+      "size": 232,
+      "lines": 8,
+      "lang": "ps1",
+      "tokens": 58,
+      "mtimeMs": 1791185998997.1814,
+      "skipped": false,
+      "summary": "$logPath = \"$env:APPDATA\\SlayTheSpire2\\logs\\godot.log\"",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "tools/rename-scaffold.ps1",
+      "size": 4936,
+      "lines": 128,
+      "lang": "ps1",
+      "tokens": 1234,
+      "mtimeMs": 1791185998998.181,
+      "skipped": false,
+      "summary": "param(",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "tools/scan-card-mechanics.ps1",
+      "size": 2792,
+      "lines": 73,
+      "lang": "ps1",
+      "tokens": 698,
+      "mtimeMs": 1792071687195.7566,
+      "skipped": false,
+      "summary": "param(",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "tools/wait_sts2.ps1",
+      "size": 661,
+      "lines": 17,
+      "lang": "ps1",
+      "tokens": 166,
+      "mtimeMs": 1791185998998.181,
+      "skipped": false,
+      "summary": "param([int]$TimeoutSeconds = 60)",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "uninstall-mod.bat",
+      "size": 2503,
+      "lines": 96,
+      "lang": "bat",
+      "tokens": 626,
+      "mtimeMs": 1791185998998.181,
+      "skipped": false,
+      "summary": "@echo off",
+      "symbols": [],
+      "symbolLines": []
+    },
+    {
+      "path": "屏幕录制 2026-10-18 112548.mp4",
+      "size": 18422658,
+      "lines": 0,
+      "lang": "text",
+      "tokens": 4605665,
+      "mtimeMs": 1792293948262.1753,
+      "skipped": true,
+      "summary": "[file too large]",
+      "symbols": []
+    },
+    {
+      "path": "屏幕录制 2026-10-18 134739.mp4",
+      "size": 77335661,
+      "lines": 0,
+      "lang": "text",
+      "tokens": 19333916,
+      "mtimeMs": 1792302459358.757,
+      "skipped": true,
+      "summary": "[file too large]",
+      "symbols": []
+    },
+    {
+      "path": "屏幕录制 2026-10-18 161703.mp4",
+      "size": 29405712,
+      "lines": 0,
+      "lang": "text",
+      "tokens": 7351428,
+      "mtimeMs": 1792311423395.5703,
+      "skipped": true,
+      "summary": "[file too large]",
+      "symbols": []
+    },
+    {
+      "path": "屏幕录制 2026-10-18 162713.mp4",
+      "size": 70043354,
+      "lines": 0,
+      "lang": "text",
+      "tokens": 17510839,
+      "mtimeMs": 1792312033423.2942,
+      "skipped": true,
+      "summary": "[file too large]",
+      "symbols": []
+    },
+    {
+      "path": "屏幕录制 2026-10-18 165829.mp4",
+      "size": 224089195,
+      "lines": 0,
+      "lang": "text",
+      "tokens": 56022299,
+      "mtimeMs": 1792313909657.3545,
+      "skipped": true,
+      "summary": "[file too large]",
+      "symbols": []
+    },
+    {
+      "path": "屏幕录制 2026-10-18 180914.mp4",
+      "size": 231882433,
+      "lines": 0,
+      "lang": "text",
+      "tokens": 57970609,
+      "mtimeMs": 1792318154515.0989,
+      "skipped": true,
+      "summary": "[file too large]",
+      "symbols": []
+    },
+    {
+      "path": "屏幕录制 2026-10-18 182005.mp4",
+      "size": 220058592,
+      "lines": 0,
+      "lang": "text",
+      "tokens": 55014648,
+      "mtimeMs": 1792318805223.616,
+      "skipped": true,
+      "summary": "[file too large]",
+      "symbols": []
+    },
+    {
+      "path": "屏幕录制 2026-10-18 220604.mp4",
+      "size": 253549476,
+      "lines": 0,
+      "lang": "text",
+      "tokens": 63387369,
+      "mtimeMs": 1792332364656.8064,
+      "skipped": true,
+      "summary": "[file too large]",
+      "symbols": []
+    },
+    {
+      "path": "屏幕录制 2026-10-18 221041.mp4",
+      "size": 105811787,
+      "lines": 0,
+      "lang": "text",
+      "tokens": 26452947,
+      "mtimeMs": 1792332641423.9978,
+      "skipped": true,
+      "summary": "[file too large]",
+      "symbols": []
+    },
+    {
+      "path": "屏幕录制 2026-10-19 094626.mp4",
+      "size": 397529078,
+      "lines": 0,
+      "lang": "text",
+      "tokens": 99382270,
+      "mtimeMs": 1792374386719.302,
+      "skipped": true,
+      "summary": "[file too large]",
+      "symbols": []
+    },
+    {
+      "path": "屏幕录制 2026-10-19 221748.mp4",
+      "size": 7858781,
+      "lines": 0,
+      "lang": "text",
+      "tokens": 1964696,
+      "mtimeMs": 1792419468063.8386,
+      "skipped": true,
+      "summary": "[file too large]",
+      "symbols": []
+    },
+    {
+      "path": "屏幕录制 2026-10-19 224149.mp4",
+      "size": 11805676,
+      "lines": 0,
+      "lang": "text",
+      "tokens": 2951419,
+      "mtimeMs": 1792420909588.6057,
+      "skipped": true,
+      "summary": "[file too large]",
+      "symbols": []
+    },
+    {
+      "path": "屏幕录制 2026-10-22 124807.mp4",
+      "size": 1243535123,
+      "lines": 0,
+      "lang": "text",
+      "tokens": 310883781,
+      "mtimeMs": 1792644487095.757,
+      "skipped": true,
+      "summary": "[file too large]",
+      "symbols": []
+    }
+  ]
+}

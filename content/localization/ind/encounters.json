@@ -1,0 +1,103 @@
+{
+  "IRONCLAD_BOSS_ENCOUNTER.title": "Si Ironclad",
+  "IRONCLAD_BOSS_ENCOUNTER.loss": "{character} dihancurkan oleh [gold]Si Ironclad[/gold].",
+
+  "IRONCLAD_ANGER_BOSS_ENCOUNTER.title": "Si Ironclad",
+  "IRONCLAD_ANGER_BOSS_ENCOUNTER.loss": "{character} hangus menjadi abu oleh murkanya [gold]Si Ironclad[/gold].",
+
+  "IRONCLAD_VULN_BOSS_ENCOUNTER.title": "Si Ironclad",
+  "IRONCLAD_VULN_BOSS_ENCOUNTER.loss": "{character} dibelah lapis demi lapis oleh [gold]Si Ironclad[/gold].",
+
+  "SILENT_BOSS_ENCOUNTER.title": "Si Silent",
+  "SILENT_BOSS_ENCOUNTER.loss": "{character} sampai akhir tidak pernah melihat [gold]Si Silent[/gold].",
+
+  "SILENT_ENVENOM_BOSS_ENCOUNTER.title": "Si Silent",
+  "SILENT_ENVENOM_BOSS_ENCOUNTER.loss": "{character} terkuras habis oleh [gold]Racun[/gold] milik [gold]Si Silent[/gold].",
+
+  "SILENT_SHIV_BOSS_ENCOUNTER.title": "Si Silent",
+  "SILENT_SHIV_BOSS_ENCOUNTER.loss": "{character} terkubur dalam hujan [gold]Belati[/gold] milik [gold]Si Silent[/gold].",
+
+  "SILENT_SLY_BOSS_ENCOUNTER.title": "Si Silent",
+  "SILENT_SLY_BOSS_ENCOUNTER.loss": "{character} dilempar ke [gold]Tumpukan Singkir[/gold] oleh [gold]Si Silent[/gold].",
+
+  "SILENT_BREWER_BOSS_ENCOUNTER.title": "Si Silent",
+  "SILENT_BREWER_BOSS_ENCOUNTER.loss": "{character} tidak bisa menembus benteng ramuan milik [gold]Si Silent[/gold].",
+
+  "DEFECT_BOSS_ENCOUNTER.title": "Si Defect",
+  "DEFECT_BOSS_ENCOUNTER.loss": "{character} dianalisis lalu dihapus oleh [gold]Si Defect[/gold].",
+
+  "DEFECT_AI_BOSS_ENCOUNTER.title": "Si Defect",
+  "DEFECT_AI_BOSS_ENCOUNTER.loss": "Setiap kartu yang dimainkan {character} dimasukkan ke dalam model [gold]Si Defect[/gold].",
+
+  "DEFECT_CLAW_BOSS_ENCOUNTER.title": "Si Defect",
+  "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character} dilenyapkan oleh [gold]Sinar Hyper[/gold] milik [gold]Si Defect[/gold].",
+
+  "NECROBINDER_BOSS_ENCOUNTER.title": "Si Necrobinder",
+  "NECROBINDER_BOSS_ENCOUNTER.loss": "Jiwa {character} diambil oleh [gold]Si Necrobinder[/gold].",
+
+  "NECROBINDER_DOOM_BOSS_ENCOUNTER.title": "Si Necrobinder",
+  "NECROBINDER_DOOM_BOSS_ENCOUNTER.loss": "[gold]Si Necrobinder[/gold] memanggil {character} menuju ujung [gold]Maut[/gold].",
+
+  "NECROBINDER_SOUL_BOSS_ENCOUNTER.title": "Si Necrobinder",
+  "NECROBINDER_SOUL_BOSS_ENCOUNTER.loss": "Jiwa {character} diambil oleh [gold]Si Necrobinder[/gold].",
+
+  "NECROBINDER_ERADICATE_BOSS_ENCOUNTER.title": "Si Necrobinder",
+  "NECROBINDER_ERADICATE_BOSS_ENCOUNTER.loss": "{character} dibinasakan beserta ingatannya oleh [gold]Si Necrobinder[/gold].",
+
+  "REGENT_BOSS_ENCOUNTER.title": "Si Regent",
+  "REGENT_BOSS_ENCOUNTER.loss": "{character} dijatuhi hukuman oleh [gold]Si Regent[/gold].",
+
+  "REGENT_DEBRIS_BOSS_ENCOUNTER.title": "Si Regent",
+  "REGENT_DEBRIS_BOSS_ENCOUNTER.loss": "{character} terkubur di bawah [gold]Puing[/gold] milik [gold]Si Regent[/gold].",
+
+  "REGENT_FORGE_BOSS_ENCOUNTER.title": "Si Regent",
+  "REGENT_FORGE_BOSS_ENCOUNTER.loss": "{character} menjadi satu goresan pada pedang [gold]Si Regent[/gold].",
+
+  "REGENT_COLORLESS_BOSS_ENCOUNTER.title": "Si Regent",
+  "REGENT_COLORLESS_BOSS_ENCOUNTER.loss": "{character} dilucuti seluruh warnanya oleh [gold]Si Regent[/gold].",
+
+  "REGENT_STAR_BOSS_ENCOUNTER.title": "Si Regent",
+  "REGENT_STAR_BOSS_ENCOUNTER.loss": "{character} digiling menjadi debu oleh bintang gemerlap [gold]Si Regent[/gold].",
+
+  "REGENT_KING_BOSS_ENCOUNTER.title": "Si Regent",
+  "REGENT_KING_BOSS_ENCOUNTER.loss": "{character} remuk di bawah mahkota [gold]Si Regent[/gold].",
+
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.title": "Si Ironclad",
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "{character} dihancurkan oleh [gold]Kekuatan[/gold] [gold]Si Ironclad[/gold] yang terus bertambah.",
+
+  "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.title": "Si Ironclad",
+  "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss": "{character} dipermainkan [gold]Si Ironclad[/gold] bagai lempar tangkap, lalu terkubur oleh salinannya sendiri.",
+  "IRONCLAD_BOULDER_BOSS_ENCOUNTER.title": "Si Ironclad",
+  "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss": "{character} dihancurkan menjadi serpihan oleh [gold]Batu Raksasa[/gold] milik [gold]Si Ironclad[/gold].",
+
+  "DEFECT_DARK_BOSS_ENCOUNTER.title": "Si Defect",
+  "DEFECT_DARK_BOSS_ENCOUNTER.loss": "{character} ditelan oleh Bola [gold]Kegelapan[/gold] milik [gold]Si Defect[/gold].",
+
+  "IRONCLAD_BOSS_NORMAL_ENCOUNTER.title": "Si Ironclad",
+  "IRONCLAD_BOSS_NORMAL_ENCOUNTER.loss": "{character} dihancurkan oleh [gold]Si Ironclad[/gold].",
+  "SILENT_BOSS_NORMAL_ENCOUNTER.title": "Si Silent",
+  "SILENT_BOSS_NORMAL_ENCOUNTER.loss": "{character} sampai akhir tidak pernah melihat [gold]Si Silent[/gold].",
+  "SILENT_ENVENOM_BOSS_NORMAL_ENCOUNTER.title": "Si Silent",
+  "SILENT_ENVENOM_BOSS_NORMAL_ENCOUNTER.loss": "{character} terkuras habis oleh [gold]Racun[/gold] milik [gold]Si Silent[/gold].",
+  "SILENT_SLY_BOSS_NORMAL_ENCOUNTER.title": "Si Silent",
+  "SILENT_SLY_BOSS_NORMAL_ENCOUNTER.loss": "{character} dilempar ke [gold]Tumpukan Singkir[/gold] oleh [gold]Si Silent[/gold].",
+  "SILENT_SHIV_BOSS_NORMAL_ENCOUNTER.title": "Si Silent",
+  "SILENT_SHIV_BOSS_NORMAL_ENCOUNTER.loss": "{character} terkubur dalam hujan [gold]Belati[/gold] milik [gold]Si Silent[/gold].",
+  "DEFECT_BOSS_NORMAL_ENCOUNTER.title": "Si Defect",
+  "DEFECT_BOSS_NORMAL_ENCOUNTER.loss": "{character} dianalisis lalu dihapus oleh [gold]Si Defect[/gold].",
+  "NECROBINDER_BOSS_NORMAL_ENCOUNTER.title": "Si Necrobinder",
+  "NECROBINDER_BOSS_NORMAL_ENCOUNTER.loss": "Jiwa {character} diambil oleh [gold]Si Necrobinder[/gold].",
+  "REGENT_BOSS_NORMAL_ENCOUNTER.title": "Si Regent",
+  "REGENT_BOSS_NORMAL_ENCOUNTER.loss": "{character} dijatuhi hukuman oleh [gold]Si Regent[/gold].",
+
+  "TELEMETRY_PROMPT_HEADER": "Unggah Data Permainan (CharacterBosses)",
+  "TELEMETRY_PROMPT_BODY": "Mod ini ingin mengumpulkan sebagian data permainan untuk memperbaiki bug dan menyeimbangkan pertarungan boss:\nuntuk setiap pertarungan boss-nya, hasil, bab/pertarungan, ascension, jumlah pemain, HP boss, jumlah giliran dan seed; ditambah baris kesalahan milik mod ini sendiri.\n\nData disimpan dulu ke [b]berkas lokal[/b]; jika penulis sudah mengatur server pengumpulan, data anonim yang sama [b]juga diunggah[/b] kepada penulis.\n\nTidak ada informasi pribadi yang dikumpulkan (tanpa SteamID / nama panggilan).\n\nKamu bisa mengubahnya kapan saja di “Konfigurasi Mod → CharacterBosses → A5”. Aktifkan sekarang?",
+  "TELEMETRY_PROMPT_YES": "Aktifkan",
+  "TELEMETRY_PROMPT_NO": "Biarkan nonaktif",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.title":  "The Necrobinder",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character} was dragged into the grave by the [gold]Necrobinder[/gold]\u0027s Osty.",
+    "SILENT_SNECKO_BOSS_ENCOUNTER.title":  "The Silent",
+    "SILENT_SNECKO_BOSS_ENCOUNTER.loss":  "{character} was sent to the grave by the [gold]Silent[/gold]\u0027s dice.",
+  "DEFECT_EVENT_BOSS_ENCOUNTER.loss": "[gold]Si Defect[/gold] menarik {character} keluar dari Tumpukan Singkir.",
+  "DEFECT_EVENT_BOSS_ENCOUNTER.title": "Si Defect"
+}

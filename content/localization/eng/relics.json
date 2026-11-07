@@ -1,0 +1,6 @@
+{
+  "NEOW_BLESSING.title": "Neow's Blessing",
+  "NEOW_BLESSING.description": "Upon pickup, gain [blue]120[/blue] Max HP.\nLose all potion slots.\nAt the start of each turn, draw [blue]2[/blue] fewer cards and lose [blue]1[/blue] Energy.\nWhenever you enter a new act, gain [blue]180[/blue] Max HP.\nAt the start of combat, gain a special effect.",
+  "NEOW_BLESSING.eventDescription": "[gold]Neow's Blessing[/gold]: gain [blue]120[/blue] Max HP and explain your enormous health pool — but your turns become smaller.",
+  "NEOW_BLESSING.flavor": "A blessing measured in blood and restraint."
+}

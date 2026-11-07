@@ -1,0 +1,1671 @@
+﻿// ===== MegaCrit.Sts2.Core.Nodes.Rooms.NCombatRoom =====
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
+using Godot;
+using Godot.Bridge;
+using Godot.NativeInterop;
+using MegaCrit.Sts2.Core.Assets;
+using MegaCrit.Sts2.Core.Combat;
+using MegaCrit.Sts2.Core.Context;
+using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.Helpers;
+using MegaCrit.Sts2.Core.Localization;
+using MegaCrit.Sts2.Core.Logging;
+using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Characters;
+using MegaCrit.Sts2.Core.Models.Monsters;
+using MegaCrit.Sts2.Core.Nodes.Combat;
+using MegaCrit.Sts2.Core.Nodes.CommonUi;
+using MegaCrit.Sts2.Core.Nodes.GodotExtensions;
+using MegaCrit.Sts2.Core.Nodes.Screens.ScreenContext;
+using MegaCrit.Sts2.Core.Nodes.Vfx;
+using MegaCrit.Sts2.Core.Random;
+using MegaCrit.Sts2.Core.Rooms;
+using MegaCrit.Sts2.Core.Runs;
+using MegaCrit.Sts2.Core.TestSupport;
+using MegaCrit.Sts2.addons.mega_text;
+
+namespace MegaCrit.Sts2.Core.Nodes.Rooms;
+
+[ScriptPath("res://src/Core/Nodes/Rooms/NCombatRoom.cs")]
+public class NCombatRoom : Control, IScreenContext, IRoomWithProceedButton
+{
+	private struct PlayerAndPets
+	{
+		public NCreature player;
+
+		public List<NCreature> pets;
+	}
+
+	public new class MethodName : Control.MethodName
+	{
+		public new static readonly StringName _Ready = "_Ready";
+
+		public new static readonly StringName _EnterTree = "_EnterTree";
+
+		public new static readonly StringName _ExitTree = "_ExitTree";
+
+		public static readonly StringName SubscribeToCombatEvents = "SubscribeToCombatEvents";
+
+		public static readonly StringName AdjustCreatureScaleForAspectRatio = "AdjustCreatureScaleForAspectRatio";
+
+		public static readonly StringName CreateAllyNodes = "CreateAllyNodes";
+
+		public static readonly StringName CreateEnemyNodes = "CreateEnemyNodes";
+
+		public static readonly StringName RemoveCreatureNode = "RemoveCreatureNode";
+
+		public static readonly StringName UpdateCreatureNavigation = "UpdateCreatureNavigation";
+
+		public static readonly StringName OnActiveScreenUpdated = "OnActiveScreenUpdated";
+
+		public static readonly StringName EnableControllerNavigation = "EnableControllerNavigation";
+
+		public static readonly StringName RandomizeEnemyScalesAndHues = "RandomizeEnemyScalesAndHues";
+
+		public static readonly StringName RadialBlur = "RadialBlur";
+
+		public static readonly StringName SetWaitingForOtherPlayersOverlayVisible = "SetWaitingForOtherPlayersOverlayVisible";
+
+		public static readonly StringName OnProceedButtonPressed = "OnProceedButtonPressed";
+	}
+
+	public new class PropertyName : Control.PropertyName
+	{
+		public static readonly StringName Ui = "Ui";
+
+		public static readonly StringName SceneContainer = "SceneContainer";
+
+		public static readonly StringName BgContainer = "BgContainer";
+
+		public static readonly StringName Background = "Background";
+
+		public static readonly StringName ProceedButton = "ProceedButton";
+
+		public static readonly StringName BackCombatVfxContainer = "BackCombatVfxContainer";
+
+		public static readonly StringName CombatVfxContainer = "CombatVfxContainer";
+
+		public static readonly StringName CreatedMsec = "CreatedMsec";
+
+		public static readonly StringName Mode = "Mode";
+
+		public static readonly StringName EncounterSlots = "EncounterSlots";
+
+		public static readonly StringName DefaultFocusedControl = "DefaultFocusedControl";
+
+		public static readonly StringName FocusedControlFromTopBar = "FocusedControlFromTopBar";
+
+		public static readonly StringName _allyContainer = "_allyContainer";
+
+		public static readonly StringName _enemyContainer = "_enemyContainer";
+
+		public static readonly StringName _radialBlur = "_radialBlur";
+
+		public static readonly StringName _proceedButton = "_proceedButton";
+
+		public static readonly StringName _waitingForOtherPlayersOverlay = "_waitingForOtherPlayersOverlay";
+
+		public static readonly StringName _window = "_window";
+	}
+
+	public new class SignalName : Control.SignalName
+	{
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <RemoveCreatureWhenGone>d__89 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public NCreature node;
+
+		public NCombatRoom <>4__this;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			NCombatRoom nCombatRoom = <>4__this;
+			try
+			{
+				TaskAwaiter val;
+				if (num != 0)
+				{
+					if (node.DeathAnimationTask == null)
+					{
+						goto IL_007b;
+					}
+					val = node.DeathAnimationTask.GetAwaiter();
+					if (!((TaskAwaiter)(ref val)).IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <RemoveCreatureWhenGone>d__89>(ref val, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+				}
+				((TaskAwaiter)(ref val)).GetResult();
+				goto IL_007b;
+				IL_007b:
+				if (nCombatRoom.IsValid())
+				{
+					nCombatRoom._removingCreatureNodes.Remove(node);
+				}
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	private const float _centerSafeZone = 150f;
+
+	private const float _defaultPadding = 70f;
+
+	private const float _minimumAutoPadding = 5f;
+
+	private const float _minAlternatingYPos = 40f;
+
+	private const float _maxAlternatingYPos = 60f;
+
+	private const float _alternateYPosBeginPadding = 30f;
+
+	private const float _yPos = 200f;
+
+	private static readonly LocString _waitingLoc = new LocString("gameplay_ui", "MULTIPLAYER_WAITING");
+
+	[CompilerGenerated]
+	private Action? m_ProceedButtonPressed;
+
+	private readonly List<NCreature> _creatureNodes = new List<NCreature>();
+
+	private readonly List<NCreature> _removingCreatureNodes = new List<NCreature>();
+
+	private Control _allyContainer;
+
+	private Control _enemyContainer;
+
+	private const string _scenePath = "res://scenes/rooms/combat_room.tscn";
+
+	private NRadialBlurVfx _radialBlur;
+
+	private NProceedButton _proceedButton;
+
+	private Control _waitingForOtherPlayersOverlay;
+
+	private ICombatRoomVisuals _visuals;
+
+	private Window _window;
+
+	public static NCombatRoom? Instance => NRun.Instance?.CombatRoom;
+
+	[field: CompilerGenerated]
+	public Creature? LastTargetedCreature
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		set;
+	}
+
+	[field: CompilerGenerated]
+	public NCombatUi Ui
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	public System.Collections.Generic.IEnumerable<NCreature> CreatureNodes => (System.Collections.Generic.IEnumerable<NCreature>)_creatureNodes;
+
+	public System.Collections.Generic.IEnumerable<NCreature> RemovingCreatureNodes => Enumerable.Where<NCreature>((System.Collections.Generic.IEnumerable<NCreature>)_removingCreatureNodes, (Func<NCreature, bool>)GodotObject.IsInstanceValid);
+
+	[field: CompilerGenerated]
+	public Control SceneContainer
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	private Control BgContainer
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		set;
+	}
+
+	[field: CompilerGenerated]
+	public NCombatBackground Background
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	public NProceedButton ProceedButton => _proceedButton;
+
+	[field: CompilerGenerated]
+	public Control BackCombatVfxContainer
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public Control CombatVfxContainer
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public ulong CreatedMsec
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	public CombatRoomMode Mode
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		private set;
+	}
+
+	[field: CompilerGenerated]
+	private Control? EncounterSlots
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		set;
+	}
+
+	public static System.Collections.Generic.IEnumerable<string> AssetPaths => new global::<>z__ReadOnlySingleElementList<string>("res://scenes/rooms/combat_room.tscn");
+
+	public Control DefaultFocusedControl => Ui.Hand.CardHolderContainer;
+
+	public Control FocusedControlFromTopBar => Enumerable.FirstOrDefault<NCreature>((System.Collections.Generic.IEnumerable<NCreature>)_creatureNodes, (Func<NCreature, bool>)delegate(NCreature c)
+	{
+		if (c != null && c.IsInteractable)
+		{
+			Control hitbox = c.Hitbox;
+			if (hitbox != null)
+			{
+				return hitbox.FocusMode == FocusModeEnum.All;
+			}
+		}
+		return false;
+	})?.Hitbox ?? DefaultFocusedControl;
+
+	public event Action ProceedButtonPressed
+	{
+		[CompilerGenerated]
+		add
+		{
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Expected O, but got Unknown
+			Action val = this.m_ProceedButtonPressed;
+			Action val2;
+			do
+			{
+				val2 = val;
+				Action val3 = (Action)System.Delegate.Combine((System.Delegate)(object)val2, (System.Delegate)(object)value);
+				val = Interlocked.CompareExchange<Action>(ref this.m_ProceedButtonPressed, val3, val2);
+			}
+			while (val != val2);
+		}
+		[CompilerGenerated]
+		remove
+		{
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Expected O, but got Unknown
+			Action val = this.m_ProceedButtonPressed;
+			Action val2;
+			do
+			{
+				val2 = val;
+				Action val3 = (Action)System.Delegate.Remove((System.Delegate)(object)val2, (System.Delegate)(object)value);
+				val = Interlocked.CompareExchange<Action>(ref this.m_ProceedButtonPressed, val3, val2);
+			}
+			while (val != val2);
+		}
+	}
+
+	public static NCombatRoom? Create(ICombatRoomVisuals visuals, CombatRoomMode mode)
+	{
+		if (TestMode.IsOn)
+		{
+			return null;
+		}
+		NCombatRoom nCombatRoom = PreloadManager.Cache.GetScene("res://scenes/rooms/combat_room.tscn").Instantiate<NCombatRoom>(PackedScene.GenEditState.Disabled);
+		nCombatRoom._visuals = visuals;
+		nCombatRoom.Mode = mode;
+		return nCombatRoom;
+	}
+
+	public override void _Ready()
+	{
+		//IL_02c2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_02cc: Expected O, but got Unknown
+		//IL_01f7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01fc: Unknown result type (might be due to invalid IL or missing references)
+		Ui = GetNode<NCombatUi>("%CombatUi");
+		Ui.Deactivate();
+		SceneContainer = GetNode<Control>("%CombatSceneContainer");
+		_allyContainer = GetNode<Control>("%AllyContainer");
+		_enemyContainer = GetNode<Control>("%EnemyContainer");
+		BackCombatVfxContainer = GetNode<Control>("%BackCombatVfxContainer");
+		CombatVfxContainer = GetNode<Control>("%CombatVfxContainer");
+		_radialBlur = GetNode<NRadialBlurVfx>("RadialBlur");
+		_waitingForOtherPlayersOverlay = GetNode<Control>("%WaitingForOtherPlayers");
+		_waitingForOtherPlayersOverlay.GetNode<MegaLabel>("Label").SetTextAutoSize(_waitingLoc.GetRawText());
+		_proceedButton = GetNode<NProceedButton>("%ProceedButton");
+		_proceedButton.UpdateText(NProceedButton.ProceedLoc);
+		if (Mode == CombatRoomMode.VisualOnly && NEventRoom.Instance == null)
+		{
+			_proceedButton.Visible = true;
+			_proceedButton.Connect(NClickableControl.SignalName.Released, Callable.From<NButton>((Action<NButton>)OnProceedButtonPressed));
+			_proceedButton.Enable();
+		}
+		BgContainer = GetNode<Control>("%BgContainer");
+		CreatedMsec = Time.GetTicksMsec();
+		Log.Info($"Creating NCombatRoom with mode={Mode} encounter={_visuals.Encounter.Id.Entry}.");
+		CreateAllyNodes();
+		if (Mode != CombatRoomMode.FinishedCombat)
+		{
+			CreateEnemyNodes();
+		}
+		if (Mode != CombatRoomMode.ActiveCombat)
+		{
+			Enumerator<NCreature> enumerator = _creatureNodes.GetEnumerator();
+			try
+			{
+				while (enumerator.MoveNext())
+				{
+					NCreature current = enumerator.Current;
+					current.Hitbox.FocusMode = FocusModeEnum.None;
+					SetCreatureIsInteractable(current.Entity, on: false);
+				}
+			}
+			finally
+			{
+				((System.IDisposable)enumerator/*cast due to .constrained prefix*/).Dispose();
+			}
+		}
+		SceneContainer.Scale = Vector2.One * _visuals.Encounter.GetCameraScaling();
+		SceneContainer.Position += _visuals.Encounter.GetCameraOffset();
+		SceneContainer.ZIndex = -10;
+		CombatVfxContainer.ZIndex = -9;
+		_window = GetTree().Root;
+		_window.Connect(Viewport.SignalName.SizeChanged, Callable.From(new Action(AdjustCreatureScaleForAspectRatio)));
+		AdjustCreatureScaleForAspectRatio();
+		NGame.Instance.SetScreenShakeTarget(SceneContainer);
+	}
+
+	public static Rng GenerateBackgroundRngForCurrentPoint(IRunState state)
+	{
+		uint num = 0u;
+		if (state.CurrentMapCoord.HasValue)
+		{
+			num = (uint)(state.CurrentMapCoord.Value.row + state.CurrentMapCoord.Value.col * 747);
+		}
+		return new Rng(state.Rng.Seed + num);
+	}
+
+	public override void _EnterTree()
+	{
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0016: Expected O, but got Unknown
+		ActiveScreenContext.Instance.Updated += new Action(OnActiveScreenUpdated);
+		if (Mode == CombatRoomMode.ActiveCombat)
+		{
+			SubscribeToCombatEvents();
+		}
+	}
+
+	public override void _ExitTree()
+	{
+		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0020: Expected O, but got Unknown
+		NGame.Instance.ClearScreenShakeTarget();
+		ActiveScreenContext.Instance.Updated -= new Action(OnActiveScreenUpdated);
+		CombatManager.Instance.CombatSetUp -= OnCombatSetUp;
+		CombatManager.Instance.CombatEnded -= RestrictControllerNavigation;
+		CombatManager.Instance.CombatWon -= RestrictControllerNavigation;
+	}
+
+	private void SubscribeToCombatEvents()
+	{
+		CombatManager.Instance.CombatSetUp += OnCombatSetUp;
+		CombatManager.Instance.CombatEnded += RestrictControllerNavigation;
+		CombatManager.Instance.CombatWon += RestrictControllerNavigation;
+	}
+
+	private void OnCombatSetUp(CombatState state)
+	{
+		Ui.Activate(((CombatRoom)_visuals).CombatState);
+		if (Background == null)
+		{
+			SetUpBackground(state.RunState);
+		}
+	}
+
+	public void SetUpBackground(IRunState state)
+	{
+		if (Background != null)
+		{
+			Log.Warn("Tried to set up background twice!");
+		}
+		Background = _visuals.Encounter.CreateBackground(_visuals.Act, GenerateBackgroundRngForCurrentPoint(state));
+		BgContainer.AddChildSafely(Background);
+	}
+
+	private void AdjustCreatureScaleForAspectRatio()
+	{
+		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+		_allyContainer.Scale = Vector2.One;
+		_enemyContainer.Scale = Vector2.One;
+		_enemyContainer.Position = SceneContainer.Size * 0.5f;
+		float num = 0f;
+		Enumerator<NCreature> enumerator = _creatureNodes.GetEnumerator();
+		try
+		{
+			while (enumerator.MoveNext())
+			{
+				NCreature current = enumerator.Current;
+				num = Math.Max(current.GlobalPosition.X + current.Visuals.Bounds.Size.X * 0.5f * SceneContainer.Scale.X, num);
+			}
+		}
+		finally
+		{
+			((System.IDisposable)enumerator/*cast due to .constrained prefix*/).Dispose();
+		}
+		num += 15f;
+		if (num > base.Size.X)
+		{
+			float num2 = base.Size.X / num;
+			_allyContainer.Scale = Vector2.One * num2;
+			_enemyContainer.Scale = Vector2.One * num2;
+			_enemyContainer.Position += Vector2.Left * (num - base.Size.X) * num2;
+		}
+	}
+
+	private void CreateAllyNodes()
+	{
+		//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+		List<Creature> allies = Enumerable.ToList<Creature>(_visuals.Allies);
+		Enumerator<Creature> enumerator = allies.GetEnumerator();
+		try
+		{
+			while (enumerator.MoveNext())
+			{
+				Creature current = enumerator.Current;
+				AddCreature(current);
+			}
+		}
+		finally
+		{
+			((System.IDisposable)enumerator/*cast due to .constrained prefix*/).Dispose();
+		}
+		PositionPlayersAndPets(Enumerable.ToList<NCreature>(Enumerable.Where<NCreature>((System.Collections.Generic.IEnumerable<NCreature>)_creatureNodes, (Func<NCreature, bool>)((NCreature c) => allies.Contains(c.Entity)))), _visuals.Encounter.GetCameraScaling(), _visuals.Encounter.FullyCenterPlayers);
+	}
+
+	private void CreateEnemyNodes()
+	{
+		//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+		if (_visuals.Encounter.HasScene)
+		{
+			EncounterSlots = _visuals.Encounter.CreateScene();
+		}
+		if (EncounterSlots != null)
+		{
+			_enemyContainer.AddChildSafely(EncounterSlots);
+			EncounterSlots.Position -= new Vector2(1920f, 1080f) * 0.5f;
+		}
+		List<Creature> enemies = Enumerable.ToList<Creature>(_visuals.Enemies);
+		Enumerator<Creature> enumerator = enemies.GetEnumerator();
+		try
+		{
+			while (enumerator.MoveNext())
+			{
+				Creature current = enumerator.Current;
+				AddCreature(current);
+			}
+		}
+		finally
+		{
+			((System.IDisposable)enumerator/*cast due to .constrained prefix*/).Dispose();
+		}
+		List<NCreature> creatures = Enumerable.ToList<NCreature>(Enumerable.Where<NCreature>((System.Collections.Generic.IEnumerable<NCreature>)_creatureNodes, (Func<NCreature, bool>)((NCreature c) => enemies.Contains(c.Entity))));
+		if (EncounterSlots != null)
+		{
+			PositionCreaturesWithSlots(creatures);
+		}
+		else
+		{
+			PositionEnemies(creatures, _visuals.Encounter.GetCameraScaling());
+		}
+		RandomizeEnemyScalesAndHues();
+	}
+
+	private void PositionCreaturesWithSlots(List<NCreature> creatures)
+	{
+		//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		Enumerator<NCreature> enumerator = creatures.GetEnumerator();
+		try
+		{
+			while (enumerator.MoveNext())
+			{
+				NCreature current = enumerator.Current;
+				string slotName = current.Entity.SlotName;
+				current.GlobalPosition = EncounterSlots.GetNode<Marker2D>(slotName).GlobalPosition;
+			}
+		}
+		finally
+		{
+			((System.IDisposable)enumerator/*cast due to .constrained prefix*/).Dispose();
+		}
+	}
+
+	private void PositionEnemies(List<NCreature> creatures, float scaling)
+	{
+		float num = 960f / scaling;
+		float num2 = 70f;
+		float num3 = Enumerable.Sum<NCreature>((System.Collections.Generic.IEnumerable<NCreature>)creatures, (Func<NCreature, float>)((NCreature n) => n.Visuals.Bounds.Size.X));
+		float num4 = num3 + (float)(creatures.Count - 1) * num2;
+		float num5 = (num - num4) * 0.5f;
+		num5 = Math.Max(num5, 150f);
+		float num6 = 0f;
+		if (num5 + num4 > num)
+		{
+			num2 = Math.Max((num - 150f - num3) / (float)(creatures.Count - 1), 5f);
+			num4 = num3 + (float)(creatures.Count - 1) * num2;
+			num5 = (num - num4) * 0.5f;
+			if (num2 < 30f)
+			{
+				num6 = float.Lerp(60f, 40f, (num2 - 5f) / 25f);
+			}
+			if (num5 + num4 > num)
+			{
+				Log.Warn("Creatures for current encounter (" + _visuals.Encounter.Title.GetFormattedText() + ") are being displayed off-screen because they are too wide!");
+			}
+		}
+		for (int num7 = 0; num7 < creatures.Count; num7++)
+		{
+			NCreature nCreature = creatures[num7];
+			nCreature.Position = new Vector2(num5 + nCreature.Visuals.Bounds.Size.X * 0.5f, 200f - ((num7 % 2 != 0) ? num6 : 0f));
+			num5 += nCreature.Visuals.Bounds.Size.X + num2;
+		}
+	}
+
+	public static void PositionPlayersAndPets(List<NCreature> creatureNodes, float scaling, bool fullyCenterPlayers)
+	{
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+		//IL_049e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_04a3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_040f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0414: Unknown result type (might be due to invalid IL or missing references)
+		List<PlayerAndPets> val = new List<PlayerAndPets>();
+		Enumerator<NCreature> enumerator = creatureNodes.GetEnumerator();
+		try
+		{
+			while (enumerator.MoveNext())
+			{
+				NCreature current = enumerator.Current;
+				if (current.Entity.IsPlayer)
+				{
+					PlayerAndPets playerAndPets = new PlayerAndPets
+					{
+						player = current,
+						pets = new List<NCreature>()
+					};
+					if (LocalContext.IsMe(current.Entity))
+					{
+						val.Insert(0, playerAndPets);
+					}
+					else
+					{
+						val.Add(playerAndPets);
+					}
+				}
+			}
+		}
+		finally
+		{
+			((System.IDisposable)enumerator/*cast due to .constrained prefix*/).Dispose();
+		}
+		Enumerator<NCreature> enumerator2 = creatureNodes.GetEnumerator();
+		try
+		{
+			while (enumerator2.MoveNext())
+			{
+				NCreature creature = enumerator2.Current;
+				if (!creature.Entity.IsPlayer)
+				{
+					Enumerable.First<PlayerAndPets>((System.Collections.Generic.IEnumerable<PlayerAndPets>)val, (Func<PlayerAndPets, bool>)((PlayerAndPets p) => p.player.Entity.Player == creature.Entity.PetOwner)).pets.Add(creature);
+				}
+			}
+		}
+		finally
+		{
+			((System.IDisposable)enumerator2/*cast due to .constrained prefix*/).Dispose();
+		}
+		float num = 960f / scaling;
+		float num2 = 70f;
+		int num3 = (int)Math.Ceiling(Math.Sqrt((double)val.Count));
+		int num4 = (int)Math.Ceiling((double)val.Count / (double)num3);
+		float num5 = Enumerable.Sum<NCreature>(Enumerable.Take<NCreature>((System.Collections.Generic.IEnumerable<NCreature>)creatureNodes, num3), (Func<NCreature, float>)((NCreature n) => n.Visuals.Bounds.Size.X));
+		float num6 = num5 + (float)(num3 - 1) * num2;
+		float num7 = num5 * 0.33f;
+		float num8 = ((num4 > 1) ? (num7 / (float)(num4 - 1)) : 0f);
+		float num9 = ((num4 > 1) ? (120f / (float)(num4 - 1)) : 0f);
+		float num10;
+		if (fullyCenterPlayers)
+		{
+			num10 = Enumerable.First<NCreature>((System.Collections.Generic.IEnumerable<NCreature>)creatureNodes, (Func<NCreature, bool>)((NCreature c) => c.Entity.IsPlayer)).Visuals.Bounds.Size.X * -0.5f;
+		}
+		else
+		{
+			num10 = (num - num6) * 0.5f;
+			num10 = Math.Max(num10, 150f);
+			if (val.Count >= num3 * 2)
+			{
+				num5 += num7;
+			}
+			if (num10 + num6 > num)
+			{
+				num2 = (num - 150f - num5) / (float)(num3 - 1);
+				num6 = num5 + (float)(num3 - 1) * num2;
+				num10 = (num - num6) * 0.5f;
+			}
+		}
+		for (int num11 = 0; num11 < num3; num11++)
+		{
+			float targetXPos = num10 + num8 * (float)num11;
+			for (int num12 = 0; num12 < num3; num12++)
+			{
+				int num13 = num11 * num3 + num12;
+				if (num13 >= val.Count)
+				{
+					break;
+				}
+				PlayerAndPets playerAndPets2 = val[num13];
+				NCreature player = playerAndPets2.player;
+				List<NCreature> pets = playerAndPets2.pets;
+				player.Position = new Vector2(0f - targetXPos - player.Visuals.Bounds.Size.X * 0.5f, 200f - num9 * (float)num11);
+				if (LocalContext.IsMe(player.Entity) && player.Entity.Player.Character is Necrobinder)
+				{
+					NCreature osty = null;
+					for (int num14 = 0; num14 < pets.Count; num14++)
+					{
+						NCreature nCreature = pets[num14];
+						if (nCreature.Entity.Monster is Osty)
+						{
+							osty = nCreature;
+							pets.RemoveAt(num14);
+							break;
+						}
+					}
+					PositionLocalPlayerOsty(ref targetXPos, player.Position.Y, player, osty);
+				}
+				float num15 = ((pets.Count > 1) ? (player.Visuals.Bounds.Size.X / (float)(pets.Count - 1)) : 0f);
+				for (int num16 = 0; num16 < pets.Count; num16++)
+				{
+					NCreature nCreature2 = pets[num16];
+					nCreature2.Position = new Vector2(0f - targetXPos + 20f - (float)num16 * num15 - nCreature2.Visuals.Bounds.Size.X * 0.5f, player.Position.Y + 10f);
+				}
+				if (num11 > 0)
+				{
+					playerAndPets2.player.Visuals.Modulate = new Color(0.5f, 0.5f, 0.5f);
+					Enumerator<NCreature> enumerator3 = pets.GetEnumerator();
+					try
+					{
+						while (enumerator3.MoveNext())
+						{
+							NCreature current2 = enumerator3.Current;
+							current2.Visuals.Modulate = new Color(0.5f, 0.5f, 0.5f);
+						}
+					}
+					finally
+					{
+						((System.IDisposable)enumerator3/*cast due to .constrained prefix*/).Dispose();
+					}
+				}
+				targetXPos += playerAndPets2.player.Visuals.Bounds.Size.X + num2;
+			}
+		}
+		Enumerator<PlayerAndPets> enumerator4 = val.GetEnumerator();
+		try
+		{
+			while (enumerator4.MoveNext())
+			{
+				PlayerAndPets current3 = enumerator4.Current;
+				current3.player.GetParent().MoveChildSafely(current3.player, 0);
+				for (int num17 = 0; num17 < current3.pets.Count; num17++)
+				{
+					NCreature nCreature3 = current3.pets[num17];
+					nCreature3.GetParent().MoveChildSafely(nCreature3, num17 + 1);
+					if (!LocalContext.IsMe(current3.player.Entity))
+					{
+						nCreature3.Visuals.Bounds.Visible = false;
+					}
+				}
+			}
+		}
+		finally
+		{
+			((System.IDisposable)enumerator4/*cast due to .constrained prefix*/).Dispose();
+		}
+	}
+
+	private static void PositionLocalPlayerOsty(ref float targetXPos, float playerYPosition, NCreature player, NCreature? osty)
+	{
+		Vector2 position = player.Position;
+		position.X = player.Position.X - 150f;
+		player.Position = position;
+		if (osty != null)
+		{
+			osty.Position = new Vector2(0f - targetXPos, playerYPosition) + NCreature.GetOstyOffsetFromPlayer(osty.Entity);
+		}
+		targetXPos += 100f;
+	}
+
+	public NCreature? GetCreatureNode(Creature? creature)
+	{
+		if (creature != null)
+		{
+			return Enumerable.FirstOrDefault<NCreature>(CreatureNodes, (Func<NCreature, bool>)((NCreature c) => c.Entity == creature));
+		}
+		return null;
+	}
+
+	public void RemoveCreatureNode(NCreature node)
+	{
+		_creatureNodes.Remove(node);
+		_removingCreatureNodes.Add(node);
+		UpdateCreatureNavigation();
+		if (GetViewport().GuiGetFocusOwner() == node.Hitbox)
+		{
+			_creatureNodes[0].Hitbox.TryGrabFocus();
+		}
+		TaskHelper.RunSafely(RemoveCreatureWhenGone(node));
+	}
+
+	[AsyncStateMachine(typeof(<RemoveCreatureWhenGone>d__89))]
+	private System.Threading.Tasks.Task RemoveCreatureWhenGone(NCreature node)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<RemoveCreatureWhenGone>d__89 <RemoveCreatureWhenGone>d__90 = default(<RemoveCreatureWhenGone>d__89);
+		<RemoveCreatureWhenGone>d__90.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<RemoveCreatureWhenGone>d__90.<>4__this = this;
+		<RemoveCreatureWhenGone>d__90.node = node;
+		<RemoveCreatureWhenGone>d__90.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <RemoveCreatureWhenGone>d__90.<>t__builder)).Start<<RemoveCreatureWhenGone>d__89>(ref <RemoveCreatureWhenGone>d__90);
+		return ((AsyncTaskMethodBuilder)(ref <RemoveCreatureWhenGone>d__90.<>t__builder)).Task;
+	}
+
+	public void AddCreature(Creature creature)
+	{
+		//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+		NCreature nCreature = NCreature.Create(creature);
+		_creatureNodes.Add(nCreature);
+		if (creature.IsPlayer || creature.PetOwner != null)
+		{
+			_allyContainer.AddChildSafely(nCreature);
+		}
+		else
+		{
+			_enemyContainer.AddChildSafely(nCreature);
+		}
+		if (creature.SlotName != null)
+		{
+			if (EncounterSlots == null)
+			{
+				throw new InvalidOperationException($"Creature {creature} has slot name '{creature.SlotName}' but NCombatRoom.EncounterSlots is null.");
+			}
+			nCreature.GlobalPosition = EncounterSlots.GetNode<Marker2D>(creature.SlotName).GlobalPosition;
+		}
+		UpdateCreatureNavigation();
+		if (creature.PetOwner == null)
+		{
+			return;
+		}
+		NCreature creatureNode = GetCreatureNode(creature.PetOwner.Creature);
+		Player player = creatureNode.Entity.Player;
+		List<NCreature> val = Enumerable.ToList<NCreature>(Enumerable.Where<NCreature>((System.Collections.Generic.IEnumerable<NCreature>)_creatureNodes, (Func<NCreature, bool>)((NCreature c) => c.Entity.PetOwner == player && (!(c.Entity.Monster is Osty) || !LocalContext.IsMe(player)))));
+		nCreature.GetParent().MoveChildSafely(nCreature, creatureNode.GetIndex() + 1);
+		if (creature.Monster is Osty && LocalContext.IsMe(player))
+		{
+			nCreature.OstyScaleToSize(creature.MaxHp, 0.0);
+			nCreature.GetParent().MoveChildSafely(nCreature, creatureNode.GetIndex());
+			return;
+		}
+		float num = ((val.Count > 1) ? (creatureNode.Visuals.Bounds.Size.X / (float)(val.Count - 1)) : 0f);
+		for (int num2 = 0; num2 < val.Count; num2++)
+		{
+			NCreature nCreature2 = val[num2];
+			nCreature2.Position = new Vector2(creatureNode.Position.X - 20f + (float)num2 * num + nCreature2.Visuals.Bounds.Size.X * 0.5f, creatureNode.Position.Y + 10f);
+			nCreature2.ToggleIsInteractable(on: false);
+		}
+		if (creatureNode.Position.Y < 199f)
+		{
+			nCreature.Visuals.Modulate = new Color(0.5f, 0.5f, 0.5f);
+		}
+	}
+
+	public void SetCreatureIsInteractable(Creature? creature, bool on)
+	{
+		GetCreatureNode(creature)?.ToggleIsInteractable(on);
+		UpdateCreatureNavigation();
+	}
+
+	private void UpdateCreatureNavigation()
+	{
+		List<NCreature> val = Enumerable.ToList<NCreature>((System.Collections.Generic.IEnumerable<NCreature>)Enumerable.OrderBy<NCreature, float>(Enumerable.Where<NCreature>((System.Collections.Generic.IEnumerable<NCreature>)_creatureNodes, (Func<NCreature, bool>)((NCreature c) => c.IsInteractable)), (Func<NCreature, float>)((NCreature n) => n.GlobalPosition.X)));
+		for (int num = 0; num < val.Count; num++)
+		{
+			Control hitbox = val[num].Hitbox;
+			NodePath path;
+			if (num <= 0)
+			{
+				path = val[val.Count - 1].Hitbox.GetPath();
+			}
+			else
+			{
+				path = val[num - 1].Hitbox.GetPath();
+			}
+			hitbox.FocusNeighborLeft = path;
+			val[num].Hitbox.FocusNeighborRight = ((num < val.Count - 1) ? val[num + 1].Hitbox.GetPath() : val[0].Hitbox.GetPath());
+			val[num].Hitbox.FocusNeighborBottom = Ui.Hand.CardHolderContainer.GetPath();
+			val[num].Hitbox.FocusNeighborTop = val[num].Hitbox.GetPath();
+			val[num].UpdateNavigation();
+		}
+		Ui.Hand.CardHolderContainer.FocusNeighborTop = Enumerable.FirstOrDefault<NCreature>(Instance.CreatureNodes)?.Hitbox.GetPath();
+	}
+
+	private void OnActiveScreenUpdated()
+	{
+		if (CombatManager.Instance.IsInProgress)
+		{
+			this.UpdateControllerNavEnabled();
+			if (ActiveScreenContext.Instance.IsCurrent(this))
+			{
+				Ui.Enable();
+			}
+			else
+			{
+				Ui.Disable();
+			}
+		}
+	}
+
+	private void RestrictControllerNavigation(CombatRoom _)
+	{
+		RestrictControllerNavigation(System.Array.Empty<Control>());
+	}
+
+	public void RestrictControllerNavigation(System.Collections.Generic.IEnumerable<Control> whitelist)
+	{
+		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+		Enumerator<NCreature> enumerator = _creatureNodes.GetEnumerator();
+		try
+		{
+			while (enumerator.MoveNext())
+			{
+				NCreature current = enumerator.Current;
+				Control hitbox = current.Hitbox;
+				bool flag = Enumerable.Contains<Control>(whitelist, hitbox);
+				hitbox.FocusMode = (FocusModeEnum)(flag ? 2 : 0);
+				hitbox.FocusNeighborBottom = current.Hitbox.GetPath();
+				current.OrbManager?.SetFocusBehaviorRecursive((FocusBehaviorRecursiveEnum)(flag ? 0 : 1));
+			}
+		}
+		finally
+		{
+			((System.IDisposable)enumerator/*cast due to .constrained prefix*/).Dispose();
+		}
+		Ui.Hand.DisableControllerNavigation();
+	}
+
+	public void EnableControllerNavigation()
+	{
+		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+		if (!IsInsideTree())
+		{
+			return;
+		}
+		Enumerator<NCreature> enumerator = _creatureNodes.GetEnumerator();
+		try
+		{
+			while (enumerator.MoveNext())
+			{
+				NCreature current = enumerator.Current;
+				if (!current.Entity.IsDead)
+				{
+					current.Hitbox.FocusMode = FocusModeEnum.All;
+					current.Hitbox.FocusNeighborBottom = Ui.Hand.CardHolderContainer.GetPath();
+					current.OrbManager?.SetFocusBehaviorRecursive(FocusBehaviorRecursiveEnum.Inherited);
+				}
+			}
+		}
+		finally
+		{
+			((System.IDisposable)enumerator/*cast due to .constrained prefix*/).Dispose();
+		}
+		UpdateCreatureNavigation();
+		Ui.Hand.EnableControllerNavigation();
+	}
+
+	private void RandomizeEnemyScalesAndHues()
+	{
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+		Dictionary<System.Type, List<NCreature>> val = new Dictionary<System.Type, List<NCreature>>();
+		Enumerator<NCreature> enumerator = _creatureNodes.GetEnumerator();
+		try
+		{
+			List<NCreature> val2 = default(List<NCreature>);
+			while (enumerator.MoveNext())
+			{
+				NCreature current = enumerator.Current;
+				if (current.Entity.Side != CombatSide.Player && current.Entity.Monster != null)
+				{
+					System.Type type = ((object)current.Entity.Monster).GetType();
+					if (!val.TryGetValue(type, ref val2))
+					{
+						val2 = (val[type] = new List<NCreature>());
+					}
+					val2.Add(current);
+				}
+			}
+		}
+		finally
+		{
+			((System.IDisposable)enumerator/*cast due to .constrained prefix*/).Dispose();
+		}
+		Enumerator<System.Type, List<NCreature>> enumerator2 = val.GetEnumerator();
+		try
+		{
+			while (enumerator2.MoveNext())
+			{
+				KeyValuePair<System.Type, List<NCreature>> current2 = enumerator2.Current;
+				if (current2.Value.Count == 1)
+				{
+					continue;
+				}
+				Enumerator<NCreature> enumerator3 = current2.Value.GetEnumerator();
+				try
+				{
+					while (enumerator3.MoveNext())
+					{
+						NCreature current3 = enumerator3.Current;
+						MonsterModel monster = current3.Entity.Monster;
+						int value = monster.Creature.MonsterMaxHpBeforeModification.Value;
+						float value2 = ((monster.MaxInitialHp != monster.MinInitialHp) ? (((float)(value - monster.MinInitialHp) / (float)(monster.MaxInitialHp - monster.MinInitialHp) - 0.5f) * 2f) : 0f);
+						value2 = Mathf.Clamp(value2, 0f, 1f);
+						float weight = Math.Max(current3.Visuals.Bounds.Size.X, current3.Visuals.Bounds.Size.Y);
+						float num = Mathf.Clamp(Mathf.InverseLerp(250f, 100f, weight), 0f, 1f);
+						float num2 = float.Lerp(0.1f, 0.15f, num);
+						current3.SetScaleAndHue(1f + value2 * num2, Rng.Chaotic.NextFloat(0.05f));
+					}
+				}
+				finally
+				{
+					((System.IDisposable)enumerator3/*cast due to .constrained prefix*/).Dispose();
+				}
+			}
+		}
+		finally
+		{
+			((System.IDisposable)enumerator2/*cast due to .constrained prefix*/).Dispose();
+		}
+	}
+
+	public void RadialBlur(VfxPosition vfxPosition = VfxPosition.Center)
+	{
+		_radialBlur.Activate(vfxPosition);
+	}
+
+	public void ShakeOstyIfDead(Player owner)
+	{
+		Enumerable.FirstOrDefault<NCreature>((System.Collections.Generic.IEnumerable<NCreature>)_creatureNodes, (Func<NCreature, bool>)((NCreature c) => c.Entity.Monster is Osty && c.Entity.PetOwner == owner))?.AnimShake();
+	}
+
+	public void PlaySplashVfx(Creature target, Color tint)
+	{
+		NCreature creatureNode = GetCreatureNode(target);
+		if (creatureNode != null)
+		{
+			Control combatVfxContainer = CombatVfxContainer;
+			combatVfxContainer.AddChildSafely(NSplashVfx.Create(creatureNode.GetBottomOfHitbox(), tint));
+			combatVfxContainer.AddChildSafely(NLiquidOverlayVfx.Create(target, tint));
+		}
+	}
+
+	public void SetWaitingForOtherPlayersOverlayVisible(bool visible)
+	{
+		_waitingForOtherPlayersOverlay.Visible = visible;
+	}
+
+	private void OnProceedButtonPressed(NButton button)
+	{
+		_proceedButton.Disable();
+		Action? obj = this.ProceedButtonPressed;
+		if (obj != null)
+		{
+			obj.Invoke();
+		}
+	}
+
+	public void TransitionToActiveCombat(CombatRoom combatRoom)
+	{
+		//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+		if (Mode != CombatRoomMode.VisualOnly)
+		{
+			throw new InvalidOperationException($"Cannot transition to {"ActiveCombat"} from {Mode}.");
+		}
+		Mode = CombatRoomMode.ActiveCombat;
+		_visuals = combatRoom;
+		Enumerator<NCreature> enumerator = _creatureNodes.GetEnumerator();
+		try
+		{
+			while (enumerator.MoveNext())
+			{
+				NCreature current = enumerator.Current;
+				current.Hitbox.FocusMode = FocusModeEnum.All;
+				SetCreatureIsInteractable(current.Entity, on: true);
+			}
+		}
+		finally
+		{
+			((System.IDisposable)enumerator/*cast due to .constrained prefix*/).Dispose();
+		}
+		SubscribeToCombatEvents();
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	internal static List<MethodInfo> GetGodotMethodList()
+	{
+		List<MethodInfo> val = new List<MethodInfo>(15);
+		val.Add(new MethodInfo(MethodName._Ready, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName._EnterTree, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName._ExitTree, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.SubscribeToCombatEvents, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.AdjustCreatureScaleForAspectRatio, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.CreateAllyNodes, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.CreateEnemyNodes, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		StringName removeCreatureNode = MethodName.RemoveCreatureNode;
+		PropertyInfo returnVal = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags = 1L;
+		List<PropertyInfo> obj = new List<PropertyInfo>();
+		obj.Add(new PropertyInfo(Variant.Type.Object, "node", PropertyHint.None, "", PropertyUsageFlags.Default, new StringName("Control"), exported: false));
+		val.Add(new MethodInfo(removeCreatureNode, returnVal, (MethodFlags)flags, obj, null));
+		val.Add(new MethodInfo(MethodName.UpdateCreatureNavigation, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.OnActiveScreenUpdated, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.EnableControllerNavigation, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		val.Add(new MethodInfo(MethodName.RandomizeEnemyScalesAndHues, new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false), MethodFlags.Normal, null, null));
+		StringName radialBlur = MethodName.RadialBlur;
+		PropertyInfo returnVal2 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags2 = 1L;
+		List<PropertyInfo> obj2 = new List<PropertyInfo>();
+		obj2.Add(new PropertyInfo(Variant.Type.Int, "vfxPosition", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		val.Add(new MethodInfo(radialBlur, returnVal2, (MethodFlags)flags2, obj2, null));
+		StringName setWaitingForOtherPlayersOverlayVisible = MethodName.SetWaitingForOtherPlayersOverlayVisible;
+		PropertyInfo returnVal3 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags3 = 1L;
+		List<PropertyInfo> obj3 = new List<PropertyInfo>();
+		obj3.Add(new PropertyInfo(Variant.Type.Bool, "visible", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false));
+		val.Add(new MethodInfo(setWaitingForOtherPlayersOverlayVisible, returnVal3, (MethodFlags)flags3, obj3, null));
+		StringName onProceedButtonPressed = MethodName.OnProceedButtonPressed;
+		PropertyInfo returnVal4 = new PropertyInfo(Variant.Type.Nil, "", PropertyHint.None, "", PropertyUsageFlags.Default, exported: false);
+		long flags4 = 1L;
+		List<PropertyInfo> obj4 = new List<PropertyInfo>();
+		obj4.Add(new PropertyInfo(Variant.Type.Object, "button", PropertyHint.None, "", PropertyUsageFlags.Default, new StringName("Control"), exported: false));
+		val.Add(new MethodInfo(onProceedButtonPressed, returnVal4, (MethodFlags)flags4, obj4, null));
+		return val;
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool InvokeGodotClassMethod(in godot_string_name method, NativeVariantPtrArgs args, out godot_variant ret)
+	{
+		if (method == MethodName._Ready && args.Count == 0)
+		{
+			_Ready();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName._EnterTree && args.Count == 0)
+		{
+			_EnterTree();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName._ExitTree && args.Count == 0)
+		{
+			_ExitTree();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.SubscribeToCombatEvents && args.Count == 0)
+		{
+			SubscribeToCombatEvents();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.AdjustCreatureScaleForAspectRatio && args.Count == 0)
+		{
+			AdjustCreatureScaleForAspectRatio();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.CreateAllyNodes && args.Count == 0)
+		{
+			CreateAllyNodes();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.CreateEnemyNodes && args.Count == 0)
+		{
+			CreateEnemyNodes();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.RemoveCreatureNode && args.Count == 1)
+		{
+			RemoveCreatureNode(VariantUtils.ConvertTo<NCreature>(in args[0]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.UpdateCreatureNavigation && args.Count == 0)
+		{
+			UpdateCreatureNavigation();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.OnActiveScreenUpdated && args.Count == 0)
+		{
+			OnActiveScreenUpdated();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.EnableControllerNavigation && args.Count == 0)
+		{
+			EnableControllerNavigation();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.RandomizeEnemyScalesAndHues && args.Count == 0)
+		{
+			RandomizeEnemyScalesAndHues();
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.RadialBlur && args.Count == 1)
+		{
+			RadialBlur(VariantUtils.ConvertTo<VfxPosition>(in args[0]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.SetWaitingForOtherPlayersOverlayVisible && args.Count == 1)
+		{
+			SetWaitingForOtherPlayersOverlayVisible(VariantUtils.ConvertTo<bool>(in args[0]));
+			ret = default(godot_variant);
+			return true;
+		}
+		if (method == MethodName.OnProceedButtonPressed && args.Count == 1)
+		{
+			OnProceedButtonPressed(VariantUtils.ConvertTo<NButton>(in args[0]));
+			ret = default(godot_variant);
+			return true;
+		}
+		return base.InvokeGodotClassMethod(in method, args, out ret);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool HasGodotClassMethod(in godot_string_name method)
+	{
+		if (method == MethodName._Ready)
+		{
+			return true;
+		}
+		if (method == MethodName._EnterTree)
+		{
+			return true;
+		}
+		if (method == MethodName._ExitTree)
+		{
+			return true;
+		}
+		if (method == MethodName.SubscribeToCombatEvents)
+		{
+			return true;
+		}
+		if (method == MethodName.AdjustCreatureScaleForAspectRatio)
+		{
+			return true;
+		}
+		if (method == MethodName.CreateAllyNodes)
+		{
+			return true;
+		}
+		if (method == MethodName.CreateEnemyNodes)
+		{
+			return true;
+		}
+		if (method == MethodName.RemoveCreatureNode)
+		{
+			return true;
+		}
+		if (method == MethodName.UpdateCreatureNavigation)
+		{
+			return true;
+		}
+		if (method == MethodName.OnActiveScreenUpdated)
+		{
+			return true;
+		}
+		if (method == MethodName.EnableControllerNavigation)
+		{
+			return true;
+		}
+		if (method == MethodName.RandomizeEnemyScalesAndHues)
+		{
+			return true;
+		}
+		if (method == MethodName.RadialBlur)
+		{
+			return true;
+		}
+		if (method == MethodName.SetWaitingForOtherPlayersOverlayVisible)
+		{
+			return true;
+		}
+		if (method == MethodName.OnProceedButtonPressed)
+		{
+			return true;
+		}
+		return base.HasGodotClassMethod(in method);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool SetGodotClassPropertyValue(in godot_string_name name, in godot_variant value)
+	{
+		if (name == PropertyName.Ui)
+		{
+			Ui = VariantUtils.ConvertTo<NCombatUi>(in value);
+			return true;
+		}
+		if (name == PropertyName.SceneContainer)
+		{
+			SceneContainer = VariantUtils.ConvertTo<Control>(in value);
+			return true;
+		}
+		if (name == PropertyName.BgContainer)
+		{
+			BgContainer = VariantUtils.ConvertTo<Control>(in value);
+			return true;
+		}
+		if (name == PropertyName.Background)
+		{
+			Background = VariantUtils.ConvertTo<NCombatBackground>(in value);
+			return true;
+		}
+		if (name == PropertyName.BackCombatVfxContainer)
+		{
+			BackCombatVfxContainer = VariantUtils.ConvertTo<Control>(in value);
+			return true;
+		}
+		if (name == PropertyName.CombatVfxContainer)
+		{
+			CombatVfxContainer = VariantUtils.ConvertTo<Control>(in value);
+			return true;
+		}
+		if (name == PropertyName.CreatedMsec)
+		{
+			CreatedMsec = VariantUtils.ConvertTo<ulong>(in value);
+			return true;
+		}
+		if (name == PropertyName.Mode)
+		{
+			Mode = VariantUtils.ConvertTo<CombatRoomMode>(in value);
+			return true;
+		}
+		if (name == PropertyName.EncounterSlots)
+		{
+			EncounterSlots = VariantUtils.ConvertTo<Control>(in value);
+			return true;
+		}
+		if (name == PropertyName._allyContainer)
+		{
+			_allyContainer = VariantUtils.ConvertTo<Control>(in value);
+			return true;
+		}
+		if (name == PropertyName._enemyContainer)
+		{
+			_enemyContainer = VariantUtils.ConvertTo<Control>(in value);
+			return true;
+		}
+		if (name == PropertyName._radialBlur)
+		{
+			_radialBlur = VariantUtils.ConvertTo<NRadialBlurVfx>(in value);
+			return true;
+		}
+		if (name == PropertyName._proceedButton)
+		{
+			_proceedButton = VariantUtils.ConvertTo<NProceedButton>(in value);
+			return true;
+		}
+		if (name == PropertyName._waitingForOtherPlayersOverlay)
+		{
+			_waitingForOtherPlayersOverlay = VariantUtils.ConvertTo<Control>(in value);
+			return true;
+		}
+		if (name == PropertyName._window)
+		{
+			_window = VariantUtils.ConvertTo<Window>(in value);
+			return true;
+		}
+		return base.SetGodotClassPropertyValue(in name, in value);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool GetGodotClassPropertyValue(in godot_string_name name, out godot_variant value)
+	{
+		if (name == PropertyName.Ui)
+		{
+			value = VariantUtils.CreateFrom<NCombatUi>(Ui);
+			return true;
+		}
+		Control from;
+		if (name == PropertyName.SceneContainer)
+		{
+			from = SceneContainer;
+			value = VariantUtils.CreateFrom(in from);
+			return true;
+		}
+		if (name == PropertyName.BgContainer)
+		{
+			from = BgContainer;
+			value = VariantUtils.CreateFrom(in from);
+			return true;
+		}
+		if (name == PropertyName.Background)
+		{
+			value = VariantUtils.CreateFrom<NCombatBackground>(Background);
+			return true;
+		}
+		if (name == PropertyName.ProceedButton)
+		{
+			value = VariantUtils.CreateFrom<NProceedButton>(ProceedButton);
+			return true;
+		}
+		if (name == PropertyName.BackCombatVfxContainer)
+		{
+			from = BackCombatVfxContainer;
+			value = VariantUtils.CreateFrom(in from);
+			return true;
+		}
+		if (name == PropertyName.CombatVfxContainer)
+		{
+			from = CombatVfxContainer;
+			value = VariantUtils.CreateFrom(in from);
+			return true;
+		}
+		if (name == PropertyName.CreatedMsec)
+		{
+			value = VariantUtils.CreateFrom<ulong>(CreatedMsec);
+			return true;
+		}
+		if (name == PropertyName.Mode)
+		{
+			value = VariantUtils.CreateFrom<CombatRoomMode>(Mode);
+			return true;
+		}
+		if (name == PropertyName.EncounterSlots)
+		{
+			from = EncounterSlots;
+			value = VariantUtils.CreateFrom(in from);
+			return true;
+		}
+		if (name == PropertyName.DefaultFocusedControl)
+		{
+			from = DefaultFocusedControl;
+			value = VariantUtils.CreateFrom(in from);
+			return true;
+		}
+		if (name == PropertyName.FocusedControlFromTopBar)
+		{
+			from = FocusedControlFromTopBar;
+			value = VariantUtils.CreateFrom(in from);
+			return true;
+		}
+		if (name == PropertyName._allyContainer)
+		{
+			value = VariantUtils.CreateFrom(in _allyContainer);
+			return true;
+		}
+		if (name == PropertyName._enemyContainer)
+		{
+			value = VariantUtils.CreateFrom(in _enemyContainer);
+			return true;
+		}
+		if (name == PropertyName._radialBlur)
+		{
+			value = VariantUtils.CreateFrom(in _radialBlur);
+			return true;
+		}
+		if (name == PropertyName._proceedButton)
+		{
+			value = VariantUtils.CreateFrom(in _proceedButton);
+			return true;
+		}
+		if (name == PropertyName._waitingForOtherPlayersOverlay)
+		{
+			value = VariantUtils.CreateFrom(in _waitingForOtherPlayersOverlay);
+			return true;
+		}
+		if (name == PropertyName._window)
+		{
+			value = VariantUtils.CreateFrom(in _window);
+			return true;
+		}
+		return base.GetGodotClassPropertyValue(in name, out value);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	internal static List<PropertyInfo> GetGodotPropertyList()
+	{
+		List<PropertyInfo> val = new List<PropertyInfo>();
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.Ui, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName._allyContainer, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName._enemyContainer, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.SceneContainer, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.BgContainer, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.Background, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName._radialBlur, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName._proceedButton, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.ProceedButton, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName._waitingForOtherPlayersOverlay, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.BackCombatVfxContainer, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.CombatVfxContainer, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Int, PropertyName.CreatedMsec, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Int, PropertyName.Mode, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.EncounterSlots, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName._window, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.DefaultFocusedControl, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		val.Add(new PropertyInfo(Variant.Type.Object, PropertyName.FocusedControlFromTopBar, PropertyHint.None, "", PropertyUsageFlags.ScriptVariable, exported: false));
+		return val;
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override void SaveGodotObjectData(GodotSerializationInfo info)
+	{
+		base.SaveGodotObjectData(info);
+		info.AddProperty(PropertyName.Ui, Variant.From<NCombatUi>(Ui));
+		info.AddProperty(PropertyName.SceneContainer, Variant.From<Control>(SceneContainer));
+		info.AddProperty(PropertyName.BgContainer, Variant.From<Control>(BgContainer));
+		info.AddProperty(PropertyName.Background, Variant.From<NCombatBackground>(Background));
+		info.AddProperty(PropertyName.BackCombatVfxContainer, Variant.From<Control>(BackCombatVfxContainer));
+		info.AddProperty(PropertyName.CombatVfxContainer, Variant.From<Control>(CombatVfxContainer));
+		info.AddProperty(PropertyName.CreatedMsec, Variant.From<ulong>(CreatedMsec));
+		info.AddProperty(PropertyName.Mode, Variant.From<CombatRoomMode>(Mode));
+		info.AddProperty(PropertyName.EncounterSlots, Variant.From<Control>(EncounterSlots));
+		info.AddProperty(PropertyName._allyContainer, Variant.From(in _allyContainer));
+		info.AddProperty(PropertyName._enemyContainer, Variant.From(in _enemyContainer));
+		info.AddProperty(PropertyName._radialBlur, Variant.From(in _radialBlur));
+		info.AddProperty(PropertyName._proceedButton, Variant.From(in _proceedButton));
+		info.AddProperty(PropertyName._waitingForOtherPlayersOverlay, Variant.From(in _waitingForOtherPlayersOverlay));
+		info.AddProperty(PropertyName._window, Variant.From(in _window));
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override void RestoreGodotObjectData(GodotSerializationInfo info)
+	{
+		base.RestoreGodotObjectData(info);
+		if (info.TryGetProperty(PropertyName.Ui, out var value))
+		{
+			Ui = value.As<NCombatUi>();
+		}
+		if (info.TryGetProperty(PropertyName.SceneContainer, out var value2))
+		{
+			SceneContainer = value2.As<Control>();
+		}
+		if (info.TryGetProperty(PropertyName.BgContainer, out var value3))
+		{
+			BgContainer = value3.As<Control>();
+		}
+		if (info.TryGetProperty(PropertyName.Background, out var value4))
+		{
+			Background = value4.As<NCombatBackground>();
+		}
+		if (info.TryGetProperty(PropertyName.BackCombatVfxContainer, out var value5))
+		{
+			BackCombatVfxContainer = value5.As<Control>();
+		}
+		if (info.TryGetProperty(PropertyName.CombatVfxContainer, out var value6))
+		{
+			CombatVfxContainer = value6.As<Control>();
+		}
+		if (info.TryGetProperty(PropertyName.CreatedMsec, out var value7))
+		{
+			CreatedMsec = value7.As<ulong>();
+		}
+		if (info.TryGetProperty(PropertyName.Mode, out var value8))
+		{
+			Mode = value8.As<CombatRoomMode>();
+		}
+		if (info.TryGetProperty(PropertyName.EncounterSlots, out var value9))
+		{
+			EncounterSlots = value9.As<Control>();
+		}
+		if (info.TryGetProperty(PropertyName._allyContainer, out var value10))
+		{
+			_allyContainer = value10.As<Control>();
+		}
+		if (info.TryGetProperty(PropertyName._enemyContainer, out var value11))
+		{
+			_enemyContainer = value11.As<Control>();
+		}
+		if (info.TryGetProperty(PropertyName._radialBlur, out var value12))
+		{
+			_radialBlur = value12.As<NRadialBlurVfx>();
+		}
+		if (info.TryGetProperty(PropertyName._proceedButton, out var value13))
+		{
+			_proceedButton = value13.As<NProceedButton>();
+		}
+		if (info.TryGetProperty(PropertyName._waitingForOtherPlayersOverlay, out var value14))
+		{
+			_waitingForOtherPlayersOverlay = value14.As<Control>();
+		}
+		if (info.TryGetProperty(PropertyName._window, out var value15))
+		{
+			_window = value15.As<Window>();
+		}
+	}
+}
+
+// ===== MegaCrit.Sts2.Core.Nodes.Rooms.NCombatRoom.PlayerAndPets =====
+// ERROR: Could not find type definition MegaCrit.Sts2.Core.Nodes.Rooms.NCombatRoom.PlayerAndPets in type system.
+// ===== MegaCrit.Sts2.Core.Nodes.Rooms.NCombatRoom.MethodName =====
+// ERROR: Could not find type definition MegaCrit.Sts2.Core.Nodes.Rooms.NCombatRoom.MethodName in type system.
+// ===== MegaCrit.Sts2.Core.Nodes.Rooms.NCombatRoom.PropertyName =====
+// ERROR: Could not find type definition MegaCrit.Sts2.Core.Nodes.Rooms.NCombatRoom.PropertyName in type system.
+// ===== MegaCrit.Sts2.Core.Nodes.Rooms.NCombatRoom.SignalName =====
+// ERROR: Could not find type definition MegaCrit.Sts2.Core.Nodes.Rooms.NCombatRoom.SignalName in type system.
+// ===== MegaCrit.Sts2.Core.Nodes.Rooms.NCombatRoom.<>O =====
+// ERROR: Could not find type definition MegaCrit.Sts2.Core.Nodes.Rooms.NCombatRoom.<>O in type system.
+// ===== MegaCrit.Sts2.Core.Nodes.Rooms.NCombatRoom.<>c =====
+// ERROR: Could not find type definition MegaCrit.Sts2.Core.Nodes.Rooms.NCombatRoom.<>c in type system.
+// ===== MegaCrit.Sts2.Core.Nodes.Rooms.NCombatRoom.<>c__DisplayClass103_0 =====
+// ERROR: Could not find type definition MegaCrit.Sts2.Core.Nodes.Rooms.NCombatRoom.<>c__DisplayClass103_0 in type system.

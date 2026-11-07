@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    ★ 双版本外壳（loader）：产出 `CharacterBosses.dll`（文件名必须等于模组 id，
+      游戏按 `<Mod>.json` 里的 id 找这个 dll）。
+
+    它只做两件事：判断当前游戏版本 → 加载同目录下的
+    `CharacterBosses.Impl107.dll` / `CharacterBosses.Impl111.dll` 并转发 Initialize()。
+
+    ⚠ 外壳必须只引用**两版都有**的游戏 API（这里只用到 `[ModInitializer]` 特性），
+      所以固定引用正式版（v0.107，最低版本）的程序集。
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>CharacterBosses</AssemblyName>
+    <RootNamespace>CharacterBosses</RootNamespace>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <OutputPath>bin\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <Sts2RefDir>$(MSBuildThisFileDirectory)..\.refs\</Sts2RefDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Loader.cs" />
+    <Reference Include="sts2">
+      <HintPath>$(Sts2RefDir)sts2_107.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,6 @@
+{
+  "NEOW_BLESSING.title": "涅奧的祝福",
+  "NEOW_BLESSING.description": "拾起時，獲得[blue]120[/blue]點最大生命值。\n失去所有藥水欄位。\n每回合開始時少抽[blue]2[/blue]張牌并失去[blue]1[/blue]點能量。\n每當你進入新的一幕時，獲得[blue]180[/blue]點最大生命值。\n戰斗開始時獲得一個特殊效果。",
+  "NEOW_BLESSING.eventDescription": "[gold]涅奧的祝福[/gold]：獲得[blue]120[/blue]點最大生命值，為夸張的血量給出一個說法 —— 代價是你的回合會變小。",
+  "NEOW_BLESSING.flavor": "以血與克制為代價的祝福。"
+}

@@ -1,0 +1,36 @@
+﻿// ===== MegaCrit.Sts2.Core.Nodes.NRun (base Control) =====
+  M public static MegaCrit.Sts2.Core.Nodes.NRun Create(MegaCrit.Sts2.Core.Runs.RunState state)
+  M public System.Void _Ready()
+  M public System.Void _Process(System.Double delta)
+  M public System.Void _Notification(System.Int32 what)
+  M public System.Void SetCurrentRoom(Godot.Control node)
+  M public System.Void ShowGameOverScreen(MegaCrit.Sts2.Core.Saves.SerializableRun serializableRun)
+  M internal static System.Collections.Generic.List`1[[Godot.Bridge.MethodInfo]] GetGodotMethodList()
+  M protected System.Boolean InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name& method, Godot.NativeInterop.NativeVariantPtrArgs args, Godot.NativeInterop.godot_variant& ret)
+  M protected System.Boolean HasGodotClassMethod(Godot.NativeInterop.godot_string_name& method)
+  M protected System.Boolean SetGodotClassPropertyValue(Godot.NativeInterop.godot_string_name& name, Godot.NativeInterop.godot_variant& value)
+  M protected System.Boolean GetGodotClassPropertyValue(Godot.NativeInterop.godot_string_name& name, Godot.NativeInterop.godot_variant& value)
+  M internal static System.Collections.Generic.List`1[[Godot.Bridge.PropertyInfo]] GetGodotPropertyList()
+  M protected System.Void SaveGodotObjectData(Godot.Bridge.GodotSerializationInfo info)
+  M protected System.Void RestoreGodotObjectData(Godot.Bridge.GodotSerializationInfo info)
+  M public System.Void .ctor()
+  P System.Collections.Generic.IEnumerable`1[[System.String]] AssetPaths { get; }
+  P MegaCrit.Sts2.Core.Nodes.NRun Instance { get; }
+  P MegaCrit.Sts2.Core.Nodes.Rooms.NCombatRoom CombatRoom { get; }
+  P MegaCrit.Sts2.Core.Nodes.Rooms.NTreasureRoom TreasureRoom { get; }
+  P MegaCrit.Sts2.Core.Nodes.Rooms.NEventRoom EventRoom { get; }
+  P MegaCrit.Sts2.Core.Nodes.Rooms.NRestSiteRoom RestSiteRoom { get; }
+  P MegaCrit.Sts2.Core.Nodes.Rooms.NMapRoom MapRoom { get; }
+  P MegaCrit.Sts2.Core.Nodes.Rooms.NMerchantRoom MerchantRoom { get; }
+  P MegaCrit.Sts2.Core.Nodes.CommonUi.NGlobalUi GlobalUi { get; set; }
+  P MegaCrit.Sts2.Core.Nodes.Audio.NRunMusicController RunMusicController { get; set; }
+  P MegaCrit.Sts2.Core.Multiplayer.Game.PeerInput.ScreenStateTracker ScreenStateTracker { get; set; }
+  F static System.String _scenePath
+  F Godot.PackedScene _cardScene
+  F MegaCrit.Sts2.Core.Runs.RunState _state
+  F MegaCrit.Sts2.Core.Nodes.NSceneContainer _roomContainer
+  F Godot.Button _testButton
+  F MegaCrit.Sts2.addons.mega_text.MegaLabel _seedLabel
+  F MegaCrit.Sts2.Core.Nodes.CommonUi.NGlobalUi <GlobalUi>k__BackingField
+  F MegaCrit.Sts2.Core.Nodes.Audio.NRunMusicController <RunMusicController>k__BackingField
+  F MegaCrit.Sts2.Core.Multiplayer.Game.PeerInput.ScreenStateTracker <ScreenStateTracker>k__BackingField
