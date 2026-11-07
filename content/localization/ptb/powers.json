@@ -30,7 +30,7 @@
     "BOSS_COOLANT_POWER.title": "Resfriamento",
     "BOSS_COOLANT_POWER.description":  "No início do combate, adicione 2 [gold]Luminescência[/gold]: uma na sua [gold]Pilha de Compra[/gold] e outra na sua [gold]Mão[/gold].\nNo final do seu turno, se uma [gold]Luminescência[/gold] ainda estiver na sua [gold]Mão[/gold], nenhuma das Orbes de [gold]Trevas[/gold] de O Defeituoso ativa sua passiva neste turno.",
     "BOSS_RAINBOW_POWER.title":  "Arco-íris",
-    "BOSS_RAINBOW_POWER.description":  "Sempre que o Defeito canaliza 5 orbes, ele ganha 1 Foco. Seus orbes Sombrios nunca ativam a passiva.\\nAVISO: orbes de Vidro causam dano sem fonte — uma invocação com «Morra por Você» não vai absorvê-lo.\\nAVISO: o Metrônomo causa 30 de dano sem fonte a todos os inimigos a cada 5 orbes canalizados — uma invocação com «Morra por Você» não vai absorvê-lo.",
+    "BOSS_RAINBOW_POWER.description":  "Sempre que o Defeito canaliza 5 orbes, ele ganha 1 Foco. Seus orbes Sombrios nunca ativam a passiva.\nAVISO: orbes de Vidro e o Metrônomo causam dano sem fonte — uma invocação com «Morra por Você» não vai absorvê-lo.",
     "GO_FOR_THE_EYES_AIM_POWER.title": "Mirar nos Olhos",
     "GO_FOR_THE_EYES_AIM_POWER.description": "O Defeituoso vai jogar [gold]Mirar nos Olhos[/gold] neste turno. Se você jogar um Ataque nele (ou um ataque em área que o atinja), esse [gold]Mirar nos Olhos[/gold] também aplica 1 de [gold]Fraqueza[/gold].",
     "SHARED_FATE_POWER.title": "Destino Compartilhado",

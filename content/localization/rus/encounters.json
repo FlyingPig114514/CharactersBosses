@@ -31,8 +31,8 @@
 
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "Дефект",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character} был испепелен «Гиперлучом» [gold]Дефекта[/gold].",
-  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title": "Радуга",
-  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss": "{character} был уничтожен [gold]Дефектом[/gold] и его Радугой.",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "Радуга",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "{character} был уничтожен [gold]Дефектом[/gold] и его Радугой.",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "Призывающая",
   "NECROBINDER_BOSS_ENCOUNTER.loss": "Душу {character} забрала [gold]Призывающая[/gold].",

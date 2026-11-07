@@ -31,8 +31,8 @@
 
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "นักเวทแปรพักตร์",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character} ถูก[gold]ลำแสงพิฆาต[/gold]ของ[gold]นักเวทแปรพักตร์[/gold]สลายจนสิ้นซาก",
-  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title": "รุ้ง",
-  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss": "{character} ถูก [gold]เดอะดีเฟกต์[/gold] ทำลายด้วยรุ้ง",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "รุ้ง",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "{character} ถูก [gold]เดอะดีเฟกต์[/gold] ทำลายด้วยรุ้ง",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "นักปลุกผีผูกจิต",
   "NECROBINDER_BOSS_ENCOUNTER.loss": "วิญญาณของ {character} ถูก[gold]นักปลุกผีผูกจิต[/gold]เก็บไป",

@@ -31,8 +31,8 @@
 
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "Defect",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "L'[gold]Iper-Raggio[/gold] del [gold]Defect[/gold] ha annientato {character}.",
-  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title": "Arcobaleno",
-  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss": "{character} è stato annientato dal [gold]Defect[/gold] con un Arcobaleno.",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "Arcobaleno",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "{character} è stato annientato dal [gold]Defect[/gold] con un Arcobaleno.",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "Necrobinder",
   "NECROBINDER_BOSS_ENCOUNTER.loss": "Il [gold]Necrobinder[/gold] ha reclamato l'anima di {character}.",

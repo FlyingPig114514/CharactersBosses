@@ -30,7 +30,7 @@
     "BOSS_COOLANT_POWER.title":  "Kühlung",
     "BOSS_COOLANT_POWER.description":  "Zu Beginn des Kampfes kommen 2 [gold]Leuchten[/gold] in deinen [gold]Nachziehstapel[/gold] und auf deine [gold]Hand[/gold].\nWenn am Ende deines Zuges noch ein [gold]Leuchten[/gold] auf deiner [gold]Hand[/gold] liegt, lösen in diesem Zug keine [gold]Schatten[/gold]-Orbs des Defekten ihre passive Fähigkeit aus.",
     "BOSS_RAINBOW_POWER.title":  "Regenbogen",
-    "BOSS_RAINBOW_POWER.description":  "Jedes Mal, wenn der Defekt 5 Kugeln kanalisiert, erhält er 1 Fokus. Seine Dunklen Kugeln lösen nie ihren Passiv-Effekt aus.\\nWARNUNG: Glaskugeln verursachen Schaden ohne Quelle – eine Beschwörung mit „Stirb für dich“ absorbiert ihn nicht.\\nWARNUNG: Das Metronom verursacht alle 5 kanalisierten Kugeln 30 Schaden ohne Quelle an alle Gegner – eine Beschwörung mit „Stirb für dich“ absorbiert ihn nicht.",
+    "BOSS_RAINBOW_POWER.description":  "Jedes Mal, wenn der Defekt 5 Kugeln kanalisiert, erhält es 1 Fokus. Seine Dunklen Kugeln lösen nie ihren Passiv-Effekt aus.\nWARNUNG: Glaskugeln und das Metronom verursachen Schaden ohne Quelle – eine Beschwörung mit „Stirb für dich“ absorbiert ihn nicht.",
     "GO_FOR_THE_EYES_AIM_POWER.title":  "In die Augen",
     "GO_FOR_THE_EYES_AIM_POWER.description":  "In diesem Zug will Das Defekte „[gold]In die Augen[/gold]“ spielen. Wenn du eine [gold]Angriffskarte[/gold] auf es spielst (oder ein Flächenschaden es trifft), wendet dieses „[gold]In die Augen[/gold]“ zusätzlich 1 [gold]Schwach[/gold] an.",
     "SHARED_FATE_POWER.title":  "Geteiltes Schicksal",

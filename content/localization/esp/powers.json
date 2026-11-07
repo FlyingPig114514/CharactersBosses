@@ -30,7 +30,7 @@
     "BOSS_COOLANT_POWER.title": "Refrigerante",
     "BOSS_COOLANT_POWER.description":  "Al inicio del combate, agregas 2 [gold]Luminiscencia[/gold]: una a tu [gold]mazo de robo[/gold] y otra a tu [gold]mano[/gold].\nAl final de tu turno, si una [gold]Luminiscencia[/gold] sigue en tu [gold]mano[/gold], ninguno de los orbes de [gold]oscuridad[/gold] de El Defectuoso activa su pasiva este turno.",
     "BOSS_RAINBOW_POWER.title":  "Arcoíris",
-    "BOSS_RAINBOW_POWER.description":  "Cada vez que el Defecto canaliza 5 orbes, gana 1 Concentración. Sus orbes Oscuros nunca activan su pasiva.\\nADVERTENCIA: los orbes de Cristal infligen daño sin fuente: una invocación con «Muere por ti» no lo absorberá.\\nADVERTENCIA: el Metrónomo inflige 30 de daño sin fuente a todos los enemigos cada 5 orbes canalizados: una invocación con «Muere por ti» no lo absorberá.",
+    "BOSS_RAINBOW_POWER.description":  "Cada vez que el Defecto canaliza 5 orbes, gana 1 Concentración. Sus orbes Oscuros nunca activan su pasiva.\nADVERTENCIA: los orbes de Cristal y el Metrónomo infligen daño sin fuente: una invocación con «Muere por ti» no lo absorberá.",
     "GO_FOR_THE_EYES_AIM_POWER.title": "Apunta a los ojos",
     "GO_FOR_THE_EYES_AIM_POWER.description": "El Defectuoso va a jugar [gold]Apunta a los ojos[/gold] este turno. Si le juegas una carta de ataque (o un ataque en área que le alcance), ese [gold]Apunta a los ojos[/gold] también aplica 1 de [gold]debilitamiento[/gold].",
     "SHARED_FATE_POWER.title": "Destino compartido",

@@ -31,8 +31,8 @@
 
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "Das Defekte",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character} wurde vom [gold]Hyperstrahl[/gold] des [gold]Defekten[/gold] ausgelöscht.",
-  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title": "Regenbogen",
-  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss": "{character} wurde vom [gold]Defekt[/gold] mit einem Regenbogen ausgelöscht.",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "Regenbogen",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "{character} wurde vom [gold]Defekt[/gold] mit einem Regenbogen ausgelöscht.",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "Die Totenbinderin",
   "NECROBINDER_BOSS_ENCOUNTER.loss": "Die Seele von {character} wurde von der [gold]Totenbinderin[/gold] eingefordert.",
