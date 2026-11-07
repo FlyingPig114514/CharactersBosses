@@ -2120,44 +2120,11 @@ public abstract partial class CharBossMonster : MonsterModel
         }
         catch (Exception e) { Logger.Log("[CharBoss] 剧本洗牌：洗牌失败 " + e.Message); }
 
-        // ★ 2026-11-05（用户：「他洗牌不应该给玩家塞煤灰，那是状态机的特殊效果」）：
-        //   「也给玩家塞一张煤灰」是**状态机（同步）**那一套的规则 —— 因为她的特殊效果会把
-        //   她生成的状态牌复制给玩家。其它带「大抱抱」的 Boss（比如仆从储）只该触发遗物本身
-        //   （煤灰进**她自己的抽牌堆**），不该往玩家弃牌堆里塞。所以这里加门槛。
-        bool isStatusMachine = false;
-        try { isStatusMachine = Creature?.GetPower<Powers.BossSyncPower>() != null; } catch { isStatusMachine = false; }
-        if (!isStatusMachine) return;
-
-        // 给玩家也塞一张煤灰（用户 2026-11-05：「大抱抱生成的煤灰也要给玩家也塞一张」）
-        try
-        {
-            var combat = CombatState;
-            if (combat == null) return;
-            var canonical = MegaCrit.Sts2.Core.Models.ModelDb.GetById<CardModel>(
-                MegaCrit.Sts2.Core.Models.ModelDb.GetId(typeof(MegaCrit.Sts2.Core.Models.Cards.Soot)));
-            if (canonical == null) return;
-
-            int given = 0;
-            // ★ 2026-11-07 用户：「同步是单体特殊效果，所以煤灰只塞给被锁定的玩家」——
-            //   以前是 foreach 所有真人玩家各塞一张（多人时塞给了没被锁的人），现在只给她锁定的那位。
-            var lockedPlayer = Core.BossLockOn.TargetFor(this);
-            foreach (var real in Core.BossLockOn.RealPlayers(combat))
-            {
-                if (lockedPlayer != null && !ReferenceEquals(real, lockedPlayer)) continue;
-                var pc = real?.Creature;
-                if (pc == null || !pc.IsAlive) continue;
-                var copy = combat.CreateCard(canonical, real!);
-                if (copy == null) continue;
-                var added = await MegaCrit.Sts2.Core.Commands.CardPileCmd.AddGeneratedCardToCombat(
-                    copy, MegaCrit.Sts2.Core.Entities.Cards.PileType.Discard, real!);
-                // 塞牌动画（和怪物给玩家塞牌一致）
-                try { MegaCrit.Sts2.Core.Commands.CardCmd.PreviewCardPileAdd(added); }
-                catch { /* 忽略 */ }
-                given++;
-            }
-            if (given > 0) Logger.Log($"[CharBoss] 大抱抱：给 {given} 名玩家各塞 1 张煤灰（第 {TurnNumber} 回合洗牌时）");
-        }
-        catch (Exception e) { Logger.Log("[CharBoss] 大抱抱：给玩家塞煤灰失败: " + e.Message); }
+        // ★ v0.2.474（玩家反馈：「状态机 1 次洗牌会塞 2 张煤灰」）：这里**不再手动塞煤灰**。
+        //   洗牌会让「大～抱抱」(BiiigHug) 生成 1 张煤灰，而她的特殊效果「同步」
+        //   (`Powers/BossSyncPower.AfterCardGeneratedForCombat`) 本来就会把**她生成的状态牌**复制一份
+        //   给被锁定的玩家 ⇒ 手动再塞一张就是**重复实现**，于是玩家收到 2 张。
+        //   「只给被锁定的人」这条规则也已经写在 BossSyncPower 里（`SpecialEffectAppliesTo`）。
     }
 #if STS2_107
     /// <summary>

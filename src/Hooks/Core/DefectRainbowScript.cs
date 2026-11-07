@@ -49,7 +49,7 @@ public static class DefectRainbowScript
                 Note = "1. 启动流程、彩虹+、碎片整理（单人）/ 模仿学习（多人）",
                 Cards = new List<ScriptCard>
                 {
-                    C<BootSequence>(), C<Rainbow>(true), C<Defragment>(),   // 顺序：先彩虹+，再碎片整理/模仿学习（用户 2026-11-07）
+                    C<BootSequence>(), C<Defragment>(), C<Rainbow>(true),   // 顺序：先彩虹+，再碎片整理/模仿学习（用户 2026-11-07）
                 },
             },
 
@@ -182,7 +182,7 @@ public static class DefectRainbowScript
     {
         typeof(CrackedCore),
         typeof(NeowBlessing),
-        typeof(Metronome),
+        // ★ 节拍器（Metronome）按用户 2026-11-07「意图还是显示不出来，算了直接去掉」移除
         typeof(PrismaticGem),
         typeof(WarPaint),
     };

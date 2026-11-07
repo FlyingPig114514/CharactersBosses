@@ -57,6 +57,9 @@ internal sealed class BossOrbSim
     /// <summary>本 mod 的「偏差认知」让力量与集中恒等 ⇒ 获得力量也等于获得集中。</summary>
     private readonly bool _focusFollowsStrength;
 
+    /// <summary>这只 Boss 的生物（用来读「雷霆」这类能力牌的层数）。</summary>
+    private readonly Creature? _bossCreature;
+
     /// <summary>
     /// 本回合**会被激发**的球（真实队列里的实例；模拟中新建的球不在里面，它们此刻还没画在屏幕上）。
     /// 球位 UI 用它决定哪些球显示「待激发」的蓝色激发值。
@@ -67,6 +70,7 @@ internal sealed class BossOrbSim
     {
         try
         {
+            _bossCreature = boss;
             _startFocus = BossOrbMath.FocusOf(boss);
             _focus = _startFocus;
             _focusFollowsStrength = boss?.GetPower<CharacterBosses.Powers.DeviationPower>() != null;
@@ -257,6 +261,22 @@ internal sealed class BossOrbSim
         // **不会**再被 Hook.ModifyDamage 加一次力量，所以可以放心把集中算进来。
         int baseDamage = BossOrbMath.EvokeDamageOf(orb, _startFocus);
         result.AddDamage(baseDamage + _focus, times);
+
+        // ★ v0.2.474（用户 2026-11-07：「激发电球似乎没有标注『雷霆』的伤害」）：
+        //   「雷霆」(`Thunder`) 是一张能力牌，效果是「每当你**激发**闪电充能球时，
+        //   对被命中的敌人造成 [ThunderPower] 点伤害」—— 反编译里挂在 `ThunderPower.AfterOrbEvoked`。
+        //   以前激发意图只画了球本身的激发值，那笔额外伤害完全没标。
+        if (orb is LightningOrb)
+        {
+            try
+            {
+                var thunder = _bossCreature?.GetPower<MegaCrit.Sts2.Core.Models.Powers.ThunderPower>();
+                int amount = 0;
+                if (thunder != null) amount = (int)Math.Round((double)thunder.Amount);
+                if (amount > 0) result.AddDamage(amount, times);
+            }
+            catch (Exception e) { Logger.Log("[CharBoss] 雷霆伤害计入激发意图失败: " + e.Message); }
+        }
     }
 
     /// <summary>

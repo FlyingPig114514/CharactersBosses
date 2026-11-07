@@ -436,28 +436,16 @@ private static int OrbPassiveDamageCore(CharBossMonster boss, bool quiet, ref in
             }
             catch { /* 忽略：算不出来就当没有 */ }
 
-            // ★ v0.2.473（用户 2026-11-07：「电球和玻璃球的被动预览都没考虑特殊效果『彩虹』带来的集中提升」）：
-            //   彩虹机每生成 **5 颗**充能球 ⇒ +1 集中。本回合计划里会新生成几颗球，这里就按 /5 折算成集中。
-            //   （她身上的 `BossRainbowPower` 才认这条，别的故障机器人一点不受影响。）
+            // ★ v0.2.474（用户 2026-11-07：「还是没有考虑特殊效果『彩虹』带来的集中，或者干脆在第 3、8 回合
+            //   提前多算 1 点集中得了」）：就用这条简单口径 —— 彩虹机这两回合各会生成够 5 颗球，
+            //   于是回合结束时的球被动按 **+1 集中** 算。别的故障机器人没有这层 Power ⇒ 一点不影响。
             try
             {
-                if (boss.Creature?.GetPower<CharacterBosses.Powers.BossRainbowPower>() != null)
+                if (boss.Creature?.GetPower<CharacterBosses.Powers.BossRainbowPower>() != null
+                    && (boss.TurnNumber == 3 || boss.TurnNumber == 8))
                 {
-                    int channeled = 0;
-                    foreach (var (previewCard, px) in cards)
-                    {
-                        if (previewCard == null) continue;
-                        string entryNow;
-                        try { entryNow = previewCard.Id.Entry; } catch { continue; }
-                        if (entryNow == "RAINBOW") { channeled += 3; continue; }   // 电+冰+暗
-                        if (Core.BossOrbMath.TryChannels(previewCard, px, out _, out int n2)) channeled += n2;
-                    }
-                    int rainbowFocus = channeled / 5;
-                    if (rainbowFocus != 0)
-                    {
-                        focusDelta += rainbowFocus;
-                        if (!quiet) Logger.Log($"[CharBoss] 球被动预告：特殊效果「彩虹」本回合生成 {channeled} 颗球 ⇒ +{rainbowFocus} 集中");
-                    }
+                    focusDelta += 1;
+                    if (!quiet) Logger.Log("[CharBoss] 球被动预告：特殊效果「彩虹」（第 " + boss.TurnNumber + " 回合）⇒ +1 集中");
                 }
             }
             catch { /* 忽略 */ }
