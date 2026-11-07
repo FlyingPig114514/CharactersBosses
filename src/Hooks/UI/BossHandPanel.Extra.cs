@@ -706,7 +706,7 @@ private static int OrbPassiveDamageCore(CharBossMonster boss, bool quiet, ref in
             float centerX = BossStatusRow.EnergyCenterX(_statusRow);
 
             _extraIntents.Size = new Vector2(w, h);
-            _extraIntents.Position = new Vector2(centerX - w * 0.5f - Core.RainbowMimic.IntentShiftFor(boss), intentTop + IntentShiftY * cardW);
+            _extraIntents.Position = new Vector2(centerX - w * 0.5f - Core.RainbowMimic.IntentShiftFor(_boss), intentTop + IntentShiftY * cardW);
         }
 
         PlaceLeftIntent(intentTop, cardW);
