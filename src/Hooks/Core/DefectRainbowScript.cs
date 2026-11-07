@@ -83,8 +83,17 @@ public static class DefectRainbowScript
             //   （`Metronome`：`AfterOrbChanneled` 里计数到 `OrbCount` 就
             //    `CreatureCmd.Damage(..., ValueProp.Unpowered, ...)` 打全体）。
             //   ⏳ 意图上那条 30 还没画（待办：需要改手牌栏的逐张意图渲染）。
-            Turn("8. 彩虹+、聚变、玻璃工艺（这张彩虹会触发节拍器：额外 30 无来源群伤）", 8,
-                C<Rainbow>(true), C<Fusion>(), C<Glasswork>()),
+            new BossTurn
+            {
+                Note = "8. 彩虹+、聚变、玻璃工艺（这张彩虹会触发节拍器：额外 30 无来源群伤）",
+                Cards = new List<ScriptCard>
+                {
+                    // ExtraAoe = 30 ⇒ 手牌栏会在这张牌下面标一条「30 无来源群伤」（用户 2026-11-07）
+                    new() { Card = typeof(Rainbow), Upgraded = true, From = "deck", ExtraAoe = 30 },
+                    C<Fusion>(), C<Glasswork>(),
+                },
+                Energy = TurnEnergy,
+            },
 
             // 9：热修复+(0) + 全息影像+(1) + 防御(1)
             Turn("9. 热修复+、全息影像+、防御", 9,

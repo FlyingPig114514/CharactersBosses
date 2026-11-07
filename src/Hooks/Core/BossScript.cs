@@ -151,6 +151,17 @@ public sealed class ScriptCard
     public bool DisplayOnly { get; init; }
 
     /// <summary>
+    /// 这张牌打出去时**还会额外造成多少「无来源群体伤害」**（0 = 没有）。
+    ///
+    /// 唯一用途（用户 2026-11-07 的彩虹机）：第 8 回合那张「彩虹+」会踩到遗物「节拍器」的第 5 颗球，
+    /// 于是额外对所有敌人造成 30 点无来源伤害。游戏里这 30 点是真的会打出来的（`Metronome.AfterOrbChanneled`），
+    /// 只是**意图上原来看不见** —— 用户要求把这条标在这张牌下面，所以剧本把数字写在这里，
+    /// 由 <c>UI/BossHandCard.AddExtraAoeLabel</c> 画出来。
+    /// ⚠ 只有**第一次**踩到的那回合标（循环里再打彩虹不会再触发节拍器：它的计数到 `OrbCount` 只结算一次）。
+    /// </summary>
+    public int ExtraAoe { get; init; }
+
+    /// <summary>
     /// 配合 <see cref="DisplayOnly"/>：这张展示牌**本回合真的会被打出去**（只是不在出牌阶段，
     /// 而是回合结束时从摸牌堆顶免费打出，见 <see cref="BossTurn.FreePlayTopEntry"/>）。
     ///

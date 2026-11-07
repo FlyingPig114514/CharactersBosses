@@ -835,6 +835,10 @@ public abstract partial class CharBossMonster : MonsterModel
         //   影子玩家不在 `CombatState.Players` 里 ⇒ 原版不会派发 ⇒ 必须自己扫一遍她的消耗牌堆。
         await PlayExhaustPrePlayCardsAsync(ctx, pcs);
 
+        // ★ 彩虹机：先把「模仿学习」攒下的复制品（以及「无尽刀刃」那张小刀）免费打出
+        try { await Core.RainbowMimic.PlayPendingAsync(this, pcs, ctx); }
+        catch (Exception e) { Logger.Log("[CharBoss] 彩虹机·模仿学习结算失败: " + e.Message); }
+
         foreach (var play in Plan.ToList())
         {
             if (Creature.IsDead) break;
@@ -867,6 +871,7 @@ public abstract partial class CharBossMonster : MonsterModel
                 else BladesGrowth.RecomputeAll(this, Plan, planTime: false);
 
                 await PlayOne(ctx, pcs, play);
+                try { Core.RainbowMimic.OnCardPlayed(this, play.Card); } catch { /* 忽略 */ }
                 lastMs = swAll.ElapsedMilliseconds;      // ← 之前一直没赋值（日志里「最后一张牌后」永远等于总时长）
 
                 // 小刀流：**生成刀的那张牌打出之后**，刀才进手牌 → 这时把它们摆到最前面
