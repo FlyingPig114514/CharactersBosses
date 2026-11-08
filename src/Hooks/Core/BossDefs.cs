@@ -449,13 +449,14 @@ public static class BossDefs
                 Script = Core.DefectRainbowScript.Build(),
                 SpecialLoc = "DEFECT_BOSS.rainbow",
                 SpecialPower = typeof(Powers.BossRainbowPower),
-                // 用户 2026-11-07：进阶 8 = 升级启动流程、冷却剂；进阶 9 = 升级冰雹风暴、同步。
+                // 用户 2026-11-07：进阶 8 = 升级启动流程、冷却剂；
+                // 用户 2026-11-08 改：进阶 9 = 升级**冰雹风暴、雷霆**（原来是「冰雹风暴、同步」）。
                 AscensionUpgrades = new List<(int, Type)>
                 {
                     (8, typeof(BootSequence)),
                     (8, typeof(Coolant)),
                     (9, typeof(Hailstorm)),
-                    (9, typeof(Synchronize)),
+                    (9, typeof(Thunder)),
                 },
             },
             // 三层故障机器人的**第二套设计「事件机」**（Key `DEFECT_EVENT`，用户 2026-11-03；
