@@ -623,30 +623,24 @@ public static class BossScriptRunner
                         {
                             bash.EnsureInit();
                             int bonus = bash.Pool;
-                            // ★ v0.2.478（用户 2026-11-07：「我打了打击，他的完美打击伤害还是没有减」）：
-                            //   完美打击的伤害里有一份是**原版按「手牌里打击张数」算出来的 CalculatedVar**
-                            //   （每张打击 +2/+3），它每次渲染都会重算，会盖掉我们改的 BaseValue。
-                            //   所以这里**把那份计算项清零**，整张牌的伤害完全由「卡面基础 + 痛击池子」决定
-                            //   ⇒ 池子一降，意图和实伤同时降。
+                            // ★ v0.2.479（读日志定位：完美打击**没有 `Damage` 变量** ——
+                            //   `card.DynamicVars.Damage` 直接抛 `The given key 'Damage' was not present`
+                            //   ⇒ v0.2.478 那次 BaseValue 根本没写进去）。
+                            //   反编译 `PerfectedStrike.CanonicalVars` 后它的伤害是：
+                            //       `CalculationBase`(基础 6) + `ExtraDamage`(每张打击 2／升级 3)
+                            //       × `CalculatedDamage` 的乘数（她**所有牌堆里带 Strike 标签**的牌数）
+                            //   所以只要把 **CalculationBase 设成 6 + 池子**、**ExtraDamage 设成 0**，
+                            //   原版自己算出来的最终伤害就正好是「6 + 池子」，意图与实伤同一个数。
                             try
                             {
-                                foreach (var dv in card.DynamicVars.Values)
-                                {
-                                    if (dv == null) continue;
-                                    string nm = string.Empty;
-                                    try { nm = dv.Name ?? string.Empty; } catch { nm = string.Empty; }
-                                    if (nm.IndexOf("Calc", StringComparison.OrdinalIgnoreCase) >= 0)
-                                    {
-                                        dv.BaseValue = 0m;
-                                        Logger.Log($"[CharBoss] 痛击：把完美打击的 {nm} 清零（不再按手牌打击张数加伤）");
-                                    }
-                                }
+                                var baseVar = card.DynamicVars["CalculationBase"];
+                                var extraVar = card.DynamicVars["ExtraDamage"];
+                                baseVar.BaseValue = 6m + bonus;
+                                extraVar.BaseValue = 0m;
+                                Logger.Log($"[CharBoss] 痛击：完美打击基础 6 + 池子 {bonus} = {baseVar.BaseValue}" +
+                                           $"（每张打击加成已置 0）");
                             }
-                            catch (Exception e) { Logger.Log("[CharBoss] 痛击：清零计算项失败: " + e.Message); }
-
-                            Logger.Log($"[CharBoss] 痛击：完美打击 +{bonus}（池子剩余）⇒ 实际 " +
-                                       $"{card.DynamicVars.Damage.BaseValue}（变量：" +
-                                       string.Join(",", card.DynamicVars.Values.Select(x => { try { return x.Name + "=" + x.BaseValue; } catch { return "?"; } })) + "）");
+                            catch (Exception e) { Logger.Log("[CharBoss] 痛击：设置完美打击变量失败: " + e.Message); }
                         }
                     }
                 }

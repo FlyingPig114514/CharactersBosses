@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.478 / 2026-11-07（痛击第 3 次修：完美打击的伤害里有一份「按手牌打击张数」的 CalculatedVar，每次渲染都重算、会盖掉我们改的 BaseValue ⇒ 现在把那份计算项清零，整张牌伤害只由「卡面基础 + 痛击池子」决定，并打出一行变量明细日志便于核对）";
+    public const string Tag = "v0.2.479 / 2026-11-07（痛击终于修对：读日志发现完美打击**没有 `Damage` 变量**（`DynamicVars.Damage` 直接抛 key 不存在），所以前两版改的都是空气。反编译 PerfectedStrike：伤害 = CalculationBase(6) + ExtraDamage(2／升级3) × 她所有牌堆里带 Strike 标签的牌数。现在把 CalculationBase 设成「6 + 痛击池子」、ExtraDamage 置 0 ⇒ 原版自己算出的最终伤害就是 6 + 池子，意图与实伤同源；池子下降时同步改 CalculationBase）";
 
     private static bool _logged;
 
