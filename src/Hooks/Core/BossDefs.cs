@@ -625,29 +625,13 @@ public static class BossDefs
         // 直到只剩 1 点生命，之后由她替它承担（与「为你而死」兼容、不递归）。
         VariantsByAct = new BossVariant?[]
         {
-            // ★ 一层铁甲战士的**第二套设计「打击战」**（Key `IRONCLAD_STRIKE`，用户 2026-11-07）。
-            //   特殊效果「痛击」见 Powers/BossBashPower.cs，剧本见 Core/IroncladStrikeScript.cs。
-            new BossVariant
-            {
-                Key = "IRONCLAD_STRIKE",
-                Enabled = Core.BossLineups.StrikeActive,
-                Deck = Core.IroncladStrikeScript.Deck(),
-                Relics = Core.IroncladStrikeScript.Relics(),
-                Script = Core.IroncladStrikeScript.Build(),
-                SpecialLoc = "IRONCLAD_BOSS.bash",
-                SpecialPower = typeof(Powers.BossBashPower),
-                // 用户 2026-11-07：进阶 8 = 升级岩石铠甲 + 获得护喉甲；进阶 9 = 升级完美打击、预备打击
-                AscensionUpgrades = new List<(int, Type)>
-                {
-                    (8, typeof(MegaCrit.Sts2.Core.Models.Cards.StoneArmor)),
-                    (9, typeof(MegaCrit.Sts2.Core.Models.Cards.PerfectedStrike)),
-                    (9, typeof(MegaCrit.Sts2.Core.Models.Cards.SetupStrike)),
-                },
-                AscensionRelics = new List<(int, Type)>
-                {
-                    (8, typeof(MegaCrit.Sts2.Core.Models.Relics.Gorget)),
-                },
-            }, null,
+            // ⚠ 这里以前**误粘了一份「一层铁甲战士第二套设计 打击战 IRONCLAD_STRIKE」**。
+            //   危害（玩家 2026-11-08 实测截图：「boss 杂交了，意图是打击战但人和初始遗物是亡灵契约师」）：
+            //   `StrikeActive()` 只看「本场遭遇/阵容里有没有 IRONCLAD_STRIKE」，**不看是谁的变体**
+            //   ⇒ 一层阵容里排到打击战时，**亡灵契约师这一档也命中** ⇒ 灾厄骨拿了打击战的
+            //   卡组 / 遗物（燃烧之血、护喉甲）/ 特殊效果（痛击）/ 剧本。
+            //   第一幕（灾厄骨）、第二幕（灵魂骨）本来就没有第二套设计 ⇒ 两个 null。
+            null, null,
             new BossVariant
             {
                 Key = "NECROBINDER_OSTY",

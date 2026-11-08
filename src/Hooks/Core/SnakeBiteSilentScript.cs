@@ -133,13 +133,21 @@ public static class SnakeBiteSilentScript
         typeof(Deflect), typeof(Deflect),
     };
 
-    /// <summary>遗物（用户 2026-11-08）：蛇之戒指 / 涅奥的祝福 / 斗篷扣 / 红面具。</summary>
+    /// <summary>
+    /// 遗物（用户 2026-11-08 第一次定稿）：蛇之戒指 / 涅奥的祝福 / 斗篷扣 / 红面具。
+    /// ★ 同一天第二次调整（用户：「另外增强一下蛇咬猎，红面具换闪亮口红」）：
+    ///   红面具只在**战斗开始**给玩家 1 层虚弱，对「拖着中毒慢慢耗」的她不划算；
+    ///   闪亮口红（`SparklingRouge`）在她**第 3 回合**（格挡清空那一刻，遗物自己的
+    ///   `AfterBlockCleared` + `TurnNumber == 3` 判定）**+1 力量 / +1 敏捷**，整场都吃 —— 是实打实的增强。
+    ///   ⚠ 影子玩家的回合数已经由 `CharBossMonster.PrepareTurn` 里的 `AlignTurnNumber` 对齐，
+    ///     所以这个「第 3 回合」判定对她成立（灾厄骨 / 辉星储 已经这么用）。
+    /// </summary>
     public static List<Type> Relics() => new()
     {
         typeof(RingOfTheSnake),
         typeof(NeowBlessing),
         typeof(CloakClasp),
-        typeof(RedMask),
+        typeof(SparklingRouge),
     };
 
     /// <summary>「保留不出」：回合结束时留在手里、这一回合**不参与出牌**。</summary>

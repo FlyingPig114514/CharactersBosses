@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.508 / 2026-11-08（手牌顺序：「保留不出」的牌（蛇咬/心神不宁/睡眠不佳…）连同循环成长加的蛇咬，一律放到手牌最右，不再夹在会被打出的牌中间）";
+    public const string Tag = "v0.2.509 / 2026-11-08（修 Boss 杂交：亡灵契约师的变体表里误粘了一整份「打击战 IRONCLAD_STRIKE」，一层阵容排到打击战时灾厄骨也会命中 ⇒ 外壳是亡灵契约师、卡组遗物和痛击都是铁甲战士；同时蛇咬猎的红面具换成闪亮口红）";
 
     private static bool _logged;
 

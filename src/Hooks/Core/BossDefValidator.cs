@@ -44,6 +44,7 @@ public static class BossDefValidator
             ValidateSkips(def);
             ValidateVariants(def);
         }
+        ValidateVariantOwnership();
         Logger.Log("[CharBoss] ===== 定义自检结束（卡名带 (!) 的表示找不到，请对照 docs\\plans\\cards-*.md 修正）=====");
     }
 
@@ -133,6 +134,44 @@ public static class BossDefValidator
                                "⇒ 摆错幕了。");
                 }
             }
+        }
+    }
+
+    /// <summary>
+    /// **同一个变体 Key 被挂到两个不同角色身上**的自检（v0.2.509 新增）。
+    ///
+    /// 为什么必须有（玩家 2026-11-08 实测截图：「boss 杂交了 —— 意图是打击战，但人和初始遗物是亡灵契约师」）：
+    /// 加「打击战」时把 `IRONCLAD_STRIKE` 那一整块**误粘进了亡灵契约师的 `VariantsByAct[0]`**。
+    /// 而变体的开关（`StrikeActive()`）只看「本场遭遇/阵容里有没有 IRONCLAD_STRIKE」，
+    /// **根本不看这只 Boss 是哪个角色** ⇒ 一层阵容排到打击战时，灾厄骨也命中同一套变体，
+    /// 于是「亡灵契约师的外壳 + 铁甲战士的卡组/遗物/痛击」。
+    ///
+    /// 检查方式：把所有定义（含 ExtraVariants）里的变体 Key 汇总，同一个 Key 出现在**两个不同角色**上就报错。
+    /// </summary>
+    private static void ValidateVariantOwnership()
+    {
+        var owner = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var def in BossDefs.ByCharacter)
+        {
+            void Note(string? key)
+            {
+                if (string.IsNullOrEmpty(key)) return;
+                if (owner.TryGetValue(key!, out var first))
+                {
+                    if (!string.Equals(first, def.Key, StringComparison.Ordinal))
+                    {
+                        Logger.Log($"[CharBoss]   ★★★ 变体 {key} 同时挂在 **{first}** 和 **{def.Key}** 两个角色上：" +
+                                   "它的开关函数不区分角色 ⇒ 会串台（表现：外壳是 A、卡组/遗物/特殊效果是 B）。" +
+                                   "请把多出来的那份删掉。");
+                    }
+                    return;
+                }
+                owner[key!] = def.Key;
+            }
+
+            foreach (var v in def.VariantsByAct) Note(v?.Key);
+            foreach (var pair in def.ExtraVariants)
+                foreach (var v in pair.Value) Note(v?.Key);
         }
     }
 
