@@ -552,7 +552,16 @@ public static class BossFrameTick
             try
             {
                 if (each?.Creature?.GetPower<CharacterBosses.Powers.BossBashPower>() == null) continue;
+                // ★ v0.2.486（用户 2026-11-08：「每回合第一次打出打击伤害会 −6」）：
+                //   重算之后必须**把面板也重画**，否则玩家看到的是上一帧那个「出牌中途」的错数（−6）。
+                int before = Core.BossScriptRunner.BashCalcSnapshot(each);
                 Core.BossScriptRunner.RetuneBashPerfectStrike(each);
+                int after = Core.BossScriptRunner.BashCalcSnapshot(each);
+                if (before != after && each.Plan.Count > 0)
+                {
+                    each.RefreshPlannedIntents();
+                    BossHandUi.RefreshForce(each);
+                }
             }
             catch { /* 忽略 */ }
         }

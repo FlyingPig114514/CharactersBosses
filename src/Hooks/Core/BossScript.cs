@@ -499,6 +499,25 @@ public static class BossScriptRunner
     }
 
     /// <summary>池子下降后重算她手上/牌堆里所有完美打击（Power 那边调用）。</summary>
+    /// <summary>她现在手上那张完美打击的 CalculationBase（用于判断重算有没有改变数值）。</summary>
+    internal static int BashCalcSnapshot(Monsters.CharBossMonster boss)
+    {
+        try
+        {
+            var all = boss?.Shadow?.PlayerCombatState?.AllCards;
+            if (all == null) return -1;
+            foreach (var card in all)
+            {
+                if (card == null) continue;
+                string entry;
+                try { entry = card.Id.Entry; } catch { continue; }
+                if (entry != "PERFECTED_STRIKE") continue;
+                try { return (int)Math.Round((double)card.DynamicVars["CalculationBase"].BaseValue); } catch { return -1; }
+            }
+        }
+        catch { /* 忽略 */ }
+        return -1;
+    }
     internal static void RetuneBashPerfectStrike(Monsters.CharBossMonster boss)
     {
         try
