@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.502 / 2026-11-08（修蛇咬猎的遭遇 id：类名 SilentSnakeBiteBossEncounter 会被转成 SILENT_SNAKE_BITE_…（中间多一个下划线），控制台 fight 找不到 ⇒ 改名 SilentSnakebiteBossEncounter，遭遇 id 现在是 SILENT_SNAKEBITE_BOSS_ENCOUNTER）";
+    public const string Tag = "v0.2.503 / 2026-11-08（修多人不同步的真凶：两端日志对比 —— 房主 ※本机生成※ 2 只 [IRONCLAD,REGENT]，客人 3 只 [REGENT,IRONCLAD,NECROBINDER]。原因是多人时主 Boss 候选表也读**本机勾选**（房主勾过 ⇒ 某角色一只不剩），而客人不读勾选、永远整张表 ⇒ 阵容长度都不同、轮次 1 立刻分叉。现在**多人局一律用整张花名册**，勾选只影响单人局）";
 
     private static bool _logged;
 
