@@ -35,17 +35,19 @@ internal static class HellraiserVfx
 
     private static bool _reported;
 
-    internal static void Spawn(Creature? her)
+    internal static void Spawn(Creature? her, Creature? target = null)
     {
         if (her == null) return;
 
         try { _ = CreatureCmd.TriggerAnim(her, "Cast", 0.6f); }
         catch (Exception e) { Logger.Log("[CharBoss] 地狱狂徒动作（Cast）失败（忽略）: " + e.Message); }
 
-        SpawnSmallBlades(her);
+        // ★ v0.2.490（用户 2026-11-08：「那个小刀阵应该在他攻击的敌人脚下」）：
+        //   刀阵挂在**被打的敌人**脚下（对应原版 `HitVfxSpawnedAtBase` 的语义），不是她自己脚下。
+        SpawnSmallBlades(target ?? her);
     }
 
-    private static void SpawnSmallBlades(Creature her)
+    private static void SpawnSmallBlades(Creature at)
     {
         try
         {
@@ -81,12 +83,12 @@ internal static class HellraiserVfx
             var container = room?.CombatVfxContainer;
             if (container == null) return;
 
-            // 位置：`WithHitVfxSpawnedAtBase` = 打在她**脚下**
+            // 位置：`WithHitVfxSpawnedAtBase` = 打在**被打的那个敌人**脚下
             try
             {
                 if (node is Node2D node2d)
                 {
-                    var visual = room?.GetCreatureNode(her);
+                    var visual = room?.GetCreatureNode(at);
                     if (visual != null) node2d.GlobalPosition = visual.GlobalPosition;
                 }
             }
@@ -100,5 +102,5 @@ internal static class HellraiserVfx
     private static string? _foundPath;
 
     /// <summary>兼容旧调用。</summary>
-    internal static void Flash(Creature? victim) => Spawn(victim);
+    internal static void Flash(Creature? victim) => Spawn(victim, victim);
 }

@@ -105,7 +105,7 @@ internal static class HellraiserPlays
             //   卡面停在空中、伤害不结算。这条路不能走，先撤掉压制，恢复「正常出牌 + 正常伤害」。
             //   专属演出的正确做法留待下一版（需要拿到 `vfx/hellraiser_attack_vfx` 的真实播放入口）。
             // 演出：铁山靠（Cast）+ 脚下一小片刀阵；**不压制任何动画**（压制会卡住出牌链）
-            try { CharacterBosses.Patches.HellraiserVfx.Spawn(boss.Creature); }
+            try { CharacterBosses.Patches.HellraiserVfx.Spawn(boss.Creature, victim); }   // 刀阵挂在被打的敌人脚下
             catch { /* 特效失败不影响出牌 */ }
             var task = CardCmd.AutoPlay(ctx, card, (Creature?)null, AutoPlayType.Default);
             var finished = await Task.WhenAny(task, Task.Delay(8000));
