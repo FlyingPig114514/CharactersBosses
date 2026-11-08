@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.505 / 2026-11-08（蛇咬猎循环成长从第 9 回合就开始：以前写成 TurnNumber>=13，第一次的第 9 回合没有多一张保留的蛇咬 ⇒ 飞镖还是 3 段；现在第 9 回合 +1、13 +2、17 +3…）";
+    public const string Tag = "v0.2.506 / 2026-11-08（修多人局「仆从储死后随从还活着」：死亡清理以前只认 PAELS_LEGION（佩尔的士兵），而征召上前召的是 MINION_STRIKE_MONSTER ⇒ 一个都没清。现在名字带 PAELS/MINION、或宠物主人是她的影子玩家的，都随她一起摘出战斗）";
 
     private static bool _logged;
 

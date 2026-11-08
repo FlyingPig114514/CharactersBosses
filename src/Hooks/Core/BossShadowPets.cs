@@ -108,7 +108,24 @@ public static class BossShadowPets
                         {
                             if (creature == null || Known.Contains(creature)) continue;
                             if (creature.Side != boss.Creature.Side) continue;
-                            if (!SafeEntry(creature).Contains("PAELS", StringComparison.OrdinalIgnoreCase)) continue;
+                            // ★ v0.2.506（玩家反馈：多人局「仆从储」死了以后他的随从还活着）：
+                            //   以前这里只认「佩尔的士兵」(PAELS_LEGION) 这一种装饰随从，
+                            //   而仆从储的「征召上前」召出来的是 **MINION_STRIKE_MONSTER**（打击仆从）⇒ 一个都没清掉。
+                            //   现在把「她召出来的仆从」也算进来：名字里带 PAELS / MINION，
+                            //   或者宠物主人是她的影子玩家（PetOwner / Player）。
+                            string petEntry = SafeEntry(creature);
+                            bool oursPet = petEntry.Contains("PAELS", StringComparison.OrdinalIgnoreCase)
+                                           || petEntry.Contains("MINION", StringComparison.OrdinalIgnoreCase);
+                            if (!oursPet)
+                            {
+                                try
+                                {
+                                    var owner = creature.PetOwner;
+                                    if (owner != null && boss.Shadow != null && ReferenceEquals(owner, boss.Shadow)) oursPet = true;
+                                }
+                                catch { /* 忽略 */ }
+                            }
+                            if (!oursPet) continue;
                             RemovePet(creature);
                             removed++;
                         }
