@@ -623,30 +623,12 @@ public static class BossScriptRunner
                         {
                             bash.EnsureInit();
                             int bonus = bash.Pool;
-                            // ★ v0.2.478（用户 2026-11-07：「我打了打击，他的完美打击伤害还是没有减」）：
-                            //   完美打击的伤害里有一份是**原版按「手牌里打击张数」算出来的 CalculatedVar**
-                            //   （每张打击 +2/+3），它每次渲染都会重算，会盖掉我们改的 BaseValue。
-                            //   所以这里**把那份计算项清零**，整张牌的伤害完全由「卡面基础 + 痛击池子」决定
-                            //   ⇒ 池子一降，意图和实伤同时降。
-                            try
+                            if (bonus > 0)
                             {
-                                foreach (var dv in card.DynamicVars.Values)
-                                {
-                                    if (dv == null) continue;
-                                    string nm = string.Empty;
-                                    try { nm = dv.Name ?? string.Empty; } catch { nm = string.Empty; }
-                                    if (nm.IndexOf("Calc", StringComparison.OrdinalIgnoreCase) >= 0)
-                                    {
-                                        dv.BaseValue = 0m;
-                                        Logger.Log($"[CharBoss] 痛击：把完美打击的 {nm} 清零（不再按手牌打击张数加伤）");
-                                    }
-                                }
+                                card.DynamicVars.Damage.BaseValue += bonus;
+                                Logger.Log($"[CharBoss] 痛击：完美打击 +{bonus}（池子剩余）⇒ " +
+                                           $"实际 {card.DynamicVars.Damage.BaseValue}");
                             }
-                            catch (Exception e) { Logger.Log("[CharBoss] 痛击：清零计算项失败: " + e.Message); }
-
-                            Logger.Log($"[CharBoss] 痛击：完美打击 +{bonus}（池子剩余）⇒ 实际 " +
-                                       $"{card.DynamicVars.Damage.BaseValue}（变量：" +
-                                       string.Join(",", card.DynamicVars.Values.Select(x => { try { return x.Name + "=" + x.BaseValue; } catch { return "?"; } })) + "）");
                         }
                     }
                 }
