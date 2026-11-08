@@ -52,6 +52,42 @@ try {
 } catch { }
 Write-Host ('[dist] 版本 ' + $version)
 
+# ★ 打包护栏（2026-11-08，玩家那次不同步的**真凶不在代码里，在打包里**）：
+#   玩家（beta / 111 端）发来的日志构建横幅是 `v0.2.502`，而他装的就是「刚打包的那一版」。
+#   查下来 `.dist\CharacterBosses-v0.2.503.zip` 里 **107=0.2.503、111=0.2.502**：
+#   打包前那一次 install-mod.bat 复制 Impl111 失败（游戏开着 ⇒ 文件被占用，copy 报错被 >nul 吞掉），
+#   于是包里的 beta 实现还是旧 DLL ⇒ 0.2.503 的多人阵容修复**从来没送到 beta 玩家手里**。
+#   ⇒ 打包前必须自己验一遍：两份实现的版本串都要等于清单版本，否则直接失败（不再产出混版包）。
+function Get-ImplVersion([string]$path) {
+    try {
+        $bytes = [System.IO.File]::ReadAllBytes($path)
+        # BuildInfo.Tag 里的 "v0.2.507" 在程序集里按 UTF-16 存（#US 堆），ASCII 兜底
+        $u = [System.Text.Encoding]::Unicode.GetString($bytes)
+        $m = [regex]::Match($u, 'v(\d+\.\d+\.\d+)')
+        if (-not $m.Success) {
+            $a = [System.Text.Encoding]::ASCII.GetString($bytes)
+            $m = [regex]::Match($a, 'v(\d+\.\d+\.\d+)')
+        }
+        if ($m.Success) { return $m.Groups[1].Value }
+    } catch { }
+    return ''
+}
+
+$badVersion = @()
+foreach ($n in @('CharacterBosses.Impl107.dll', 'CharacterBosses.Impl111.dll')) {
+    $p = Join-Path $Source $n
+    if (-not (Test-Path $p)) { continue }
+    $v = Get-ImplVersion $p
+    Write-Host ('[dist] ' + $n + ' 版本串: ' + ($(if ($v) { 'v' + $v } else { '<读不到>' })))
+    if ($v -ne $version) { $badVersion += ($n + '=' + $(if ($v) { 'v' + $v } else { '<读不到>' })) }
+}
+if ($badVersion.Count -gt 0) {
+    Write-Host ('[dist] ✗ 拒绝打包：源目录的实现版本与清单版本 v' + $version + ' 不一致 ⇒ ' + ($badVersion -join ', ')) -ForegroundColor Red
+    Write-Host '[dist]   最常见原因：游戏正开着，install-mod.bat 复制 Impl*.dll 时文件被占用（copy 失败被 >nul 吞掉）。' -ForegroundColor Yellow
+    Write-Host '[dist]   ⇒ 先完全退出游戏，再重跑 install-mod.bat（两个目标各编一次），然后再打包。' -ForegroundColor Yellow
+    exit 1
+}
+
 # 只搬这几个文件（游戏 mods 目录里还有 frames\ 等非工坊内容）
 $names = @(
     'CharacterBosses.dll',
