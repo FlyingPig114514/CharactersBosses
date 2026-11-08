@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.496 / 2026-11-08（① 彩虹机新增遗物「意外光滑的石头」ODDLY_SMOOTH_STONE，插在涅奥的祝福和棱彩宝石之间；② 蛇眼猎削弱：第 1 回合的「刺杀」换成一张**0 费**的「尖啸」PIERCING_WAIL）";
+    public const string Tag = "v0.2.497 / 2026-11-08（设置界面的 Boss 能力档案补上两个新面孔：打击战 IRONCLAD_STRIKE（循环 6~9／单体强／群攻偏弱／单体高压 3、9／特殊效果=单体）与彩虹机 DEFECT_RAINBOW（循环 8~12／单体很强／群攻很强／单体高压 6~8、12／群体高压 6、9、10／特殊效果=自身））";
 
     private static bool _logged;
 
