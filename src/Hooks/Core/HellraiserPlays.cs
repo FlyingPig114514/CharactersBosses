@@ -100,16 +100,10 @@ internal static class HellraiserPlays
             //   于是走的是这张打击牌自己的出牌动画（就是我们看到的那套动作）。
             //   我们之前①传了显式目标、②又额外调了 `TriggerAnim(victim, "Hit")`，
             //   后者会把出牌动画顶掉 ⇒ 看起来「没有特效」。现在**完全照原版**来。
-            // 专属演出：**只有** Cast（铁山靠）+ 脚下那小片刀阵；
-            // 自动打出期间把她自己的普通攻击动画压掉（用户 2026-11-08：「应该只有铁山靠，
-            // 没有后面那段原本的直接打出动画」）。
-            try
-            {
-                CharacterBosses.Patches.HellraiserVfx.BeginSuppress(boss.Creature);
-                CharacterBosses.Patches.HellraiserVfx.Spawn(boss.Creature);
-            }
-            catch { /* 特效失败不影响出牌 */ }
-
+            // ★ v0.2.488（用户 2026-11-08 实测：卡牌**卡在空中、不造成伤害**）：
+            //   上一版为了「只保留铁山靠」去压 `CreatureCmd.TriggerAnim`，结果**打断出牌动画的等待链** ——
+            //   卡面停在空中、伤害不结算。这条路不能走，先撤掉压制，恢复「正常出牌 + 正常伤害」。
+            //   专属演出的正确做法留待下一版（需要拿到 `vfx/hellraiser_attack_vfx` 的真实播放入口）。
             var task = CardCmd.AutoPlay(ctx, card, (Creature?)null, AutoPlayType.Default);
             var finished = await Task.WhenAny(task, Task.Delay(8000));
             // 演出结束（或超时）后才解除「压制攻击动画」，否则压不到后面的动画
