@@ -76,5 +76,7 @@
     "DEFECT_EVENT_BOSS_ENCOUNTER.loss":  "{character} 被[gold]故障機器人[/gold]從棄牌堆裡翻了回來。",
     "DEFECT_EVENT_BOSS_ENCOUNTER.title":  "故障機器人",
     "IRONCLAD_STRIKE_BOSS_ENCOUNTER.title":  "鐵甲戰士",
-    "IRONCLAD_STRIKE_BOSS_ENCOUNTER.loss":  "{character}被[gold]鐵甲戰士[/gold]的痛擊打碎了。"
+    "IRONCLAD_STRIKE_BOSS_ENCOUNTER.loss":  "{character}被[gold]鐵甲戰士[/gold]的痛擊打碎了。",
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "靜默獵手",
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.loss":  "{character}被[gold]靜默獵手[/gold]的蛇群淹沒了。"
 }

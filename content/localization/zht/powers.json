@@ -64,5 +64,7 @@
     "BOSS_LIGHTNING_ROD_POWER.title":  "引雷針",
     "BOSS_LIGHTNING_ROD_POWER.description":  "你每在一回合内打出 3 張牌，故障機器人本回合失去 1 點集中（回合結束時返還）。",
     "BOSS_BASH_POWER.title":  "痛擊",
-    "BOSS_BASH_POWER.description":  "你的名字中包含打擊的牌也會增加鐵甲戰士的完美打擊的傷害。每當你打出名字中包含打擊的牌時，鐵甲戰士的完美打擊的傷害就少受一張名字中包含打擊的牌的加成。"
+    "BOSS_BASH_POWER.description":  "你的名字中包含打擊的牌也會增加鐵甲戰士的完美打擊的傷害。每當你打出名字中包含打擊的牌時，鐵甲戰士的完美打擊的傷害就少受一張名字中包含打擊的牌的加成。",
+    "BOSS_SNAKE_FORM_POWER.title":  "群蛇形態",
+    "BOSS_SNAKE_FORM_POWER.description":  "靜默獵手的手牌數沒有上限。每當你或靜默獵手洗牌時，將一張蛇咬洗入自己的抽牌堆。"
 }

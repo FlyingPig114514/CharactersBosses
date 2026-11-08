@@ -48,5 +48,6 @@
     "MINION_DIVE_BOMB_MONSTER.title":  "俯衝僕從",
     "MINION_DIVE_BOMB_MONSTER.name":  "俯衝僕從",
     "MINION_STRIKE_MONSTER.name":  "打擊僕從",
-    "IRONCLAD_BOSS.bash":  "痛擊\\n你的名字中包含打擊的牌也會增加鐵甲戰士的完美打擊的傷害。每當你打出名字中包含打擊的牌時，鐵甲戰士的完美打擊的傷害就少受一張名字中包含打擊的牌的加成。"
+    "IRONCLAD_BOSS.bash":  "痛擊\\n你的名字中包含打擊的牌也會增加鐵甲戰士的完美打擊的傷害。每當你打出名字中包含打擊的牌時，鐵甲戰士的完美打擊的傷害就少受一張名字中包含打擊的牌的加成。",
+    "SILENT_BOSS.snake_form":  "群蛇形態\\n靜默獵手的手牌數沒有上限。每當你或靜默獵手洗牌時，將一張蛇咬洗入自己的抽牌堆。"
 }

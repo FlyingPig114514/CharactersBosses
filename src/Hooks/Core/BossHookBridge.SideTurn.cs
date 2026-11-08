@@ -754,6 +754,57 @@ public static partial class BossHookBridge
     /// 这里在战斗开始时按卡面补一次：对**所有真人玩家**各上 1 层易伤（applier = 她）。
     /// 注意：这也是「她给予易伤」⇒ 三层「易伤战」的「主宰」会顺带再给 1 层虚弱。
     /// </summary>
+    /// <summary>
+    /// 「红面具」（`RedMask`）：卡面 = 战斗开始时**给予所有敌人 1 层虚弱**。
+    /// 原版挂在 `AfterRoomEntered` 上 ⇒ 影子玩家收不到（和弹珠袋/护喉甲同一类问题），这里手动补一次。
+    /// 用户 2026-11-08：「蛇咬猎的红面具没有生效」。
+    /// </summary>
+    private static async Task GrantRedMaskWeakAtCombatStart(CharBossMonster boss, Player shadow, PlayerChoiceContext ctx)
+    {
+        try
+        {
+            var relics = shadow.Relics;
+            if (relics == null) return;
+
+            decimal amount = 0m;
+            for (int i = 0; i < relics.Count; i++)
+            {
+                var relic = relics[i];
+                if (relic == null) continue;
+                string entry;
+                try { entry = relic.Id.Entry; } catch { continue; }
+                if (entry != "RED_MASK") continue;
+                try { amount = relic.DynamicVars["Weak"].BaseValue; }
+                catch { amount = 1m; }
+                break;
+            }
+            if (amount <= 0m) return;
+
+            var me = boss.Creature;
+            var combat = me?.CombatState;
+            if (me == null || combat == null) return;
+
+            var targets = new List<Creature>();
+            try
+            {
+                foreach (var creature in combat.PlayerCreatures)
+                {
+                    if (creature == null || !creature.IsAlive) continue;
+                    if (creature.Monster != null || creature.Player == null) continue;   // 只要真人玩家
+                    targets.Add(creature);
+                }
+            }
+            catch { /* 取不到就空 */ }
+            if (targets.Count == 0) return;
+
+            await PowerCmd.Apply<MegaCrit.Sts2.Core.Models.Powers.WeakPower>(ctx, targets, amount, me, null);
+            Logger.Log($"[CharBoss] 红面具：战斗开始给 {targets.Count} 名玩家各 {amount} 层虚弱");
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 红面具补虚弱失败: " + e.Message);
+        }
+    }
     private static async Task GrantBagOfMarblesVulnerableAtCombatStart(CharBossMonster boss, Player shadow,
                                                                        PlayerChoiceContext ctx)
     {
@@ -1168,6 +1219,9 @@ public static partial class BossHookBridge
         // 用户 2026-10-24 要求：**玩家刚进战斗就要吃到易伤**。
         try { await GrantBagOfMarblesVulnerableAtCombatStart(boss, shadow, ctx); }
         catch (Exception e) { Logger.Log("[CharBoss] 弹珠袋补易伤失败: " + e.Message); }
+        // 红面具（用户 2026-11-08）：战斗开始给所有玩家 1 层虚弱
+        try { await GrantRedMaskWeakAtCombatStart(boss, shadow, ctx); }
+        catch (Exception e) { Logger.Log("[CharBoss] 红面具补虚弱失败: " + e.Message); }
 
         // 「贤者之石」（PhilosophersStone，用户 2026-10-31 给无色储君换上）：卡面是「每回合 +1 能量；
         //   每场战斗开始时所有**敌人** +1 力量」。对 Boss 来说「敌人」= 所有玩家 ⇒ 战斗开始给每人 +1 力量。

@@ -48,5 +48,6 @@
     "MINION_DIVE_BOMB_MONSTER.title":  "Dive Bomb Minion",
     "MINION_DIVE_BOMB_MONSTER.name":  "Dive Bomb Minion",
     "MINION_STRIKE_MONSTER.name":  "Strike Minion",
-    "IRONCLAD_BOSS.bash":  "Bash\\nCards in your deck whose name contains \"Strike\" also increase the Ironclad\u0027s Perfected Strike damage. Each time you play a card whose name contains \"Strike\", the Ironclad\u0027s Perfected Strike loses the bonus of one such card."
+    "IRONCLAD_BOSS.bash":  "Bash\\nCards in your deck whose name contains \"Strike\" also increase the Ironclad\u0027s Perfected Strike damage. Each time you play a card whose name contains \"Strike\", the Ironclad\u0027s Perfected Strike loses the bonus of one such card.",
+    "SILENT_BOSS.snake_form":  "Serpent Form\\nThe Silent has no hand size limit. Whenever you or the Silent shuffle, shuffle a Snakebite into your own draw pile."
 }

@@ -68,7 +68,7 @@ public static class SnakeBiteSilentScript
                 Note = "5. 投掷匕首（弃触不可及）、触不可及（奇巧）、孢子心灵、偏折",
                 Cards = new List<ScriptCard>
                 {
-                    C<DaggerThrow>(), Sly(C<Untouchable>()), C<SporeMind>(), C<Deflect>(),
+                    C<DaggerThrow>(), SlyDiscard<Untouchable>(), C<SporeMind>(), C<Deflect>(),
                     Kept<Restlessness>(), Kept<Snakebite>(), Kept<PoorSleep>(),
                 },
                 Energy = TurnEnergy,
@@ -81,7 +81,7 @@ public static class SnakeBiteSilentScript
                 ShuffleDrawPile = true,
                 Cards = new List<ScriptCard>
                 {
-                    C<DaggerThrow>(), Sly(C<FlickFlack>()), C<DefendSilent>(), C<DefendSilent>(),
+                    C<DaggerThrow>(), SlyDiscard<FlickFlack>(), C<DefendSilent>(), C<DefendSilent>(),
                     Kept<Restlessness>(), Kept<Snakebite>(), Kept<PoorSleep>(),
                 },
                 Energy = TurnEnergy,
@@ -89,12 +89,13 @@ public static class SnakeBiteSilentScript
 
             // 7：生存者（弃触不可及）、触不可及（奇巧）、突然一拳
             Turn("7. 生存者（弃触不可及）、触不可及（奇巧）、突然一拳", 7,
-                C<Survivor>(), Sly(C<Untouchable>()), C<SuckerPunch>(),
+                C<Survivor>(), SlyDiscard<Untouchable>(), C<SuckerPunch>(),
                 Kept<Restlessness>(), Kept<Snakebite>(), Kept<PoorSleep>()),
 
-            // 8：逃脱计划、残影、手上技法、打击（没费）
+            // 8：逃脱计划、残影、手上技法、打击（没费）+ 保留不出三张
             Turn("8. 逃脱计划、残影、手上技法、打击（没费）", 8,
-                C<EscapePlan>(), C<Blur>(), C<HandTrick>(), C<StrikeSilent>()),
+                C<EscapePlan>(), C<Blur>(), C<HandTrick>(), C<StrikeSilent>(),
+                Kept<Restlessness>(), Kept<Snakebite>(), Kept<PoorSleep>()),
 
             // 9：飞镖、偏折；保留不出：蛇咬（每循环 +1 张）、心神不宁、睡眠不佳
             Turn("9. 飞镖、偏折（保留不出：蛇咬、心神不宁、睡眠不佳）", 9,
@@ -145,6 +146,9 @@ public static class SnakeBiteSilentScript
     private static ScriptCard Kept<T>() where T : CardModel
         => new() { Card = typeof(T), From = "deck", Retain = true, DisplayOnly = true };
 
+    /// <summary>被上一张牌**丢弃**、并且带「奇巧」（丢弃时自动打出）的那张。</summary>
+    private static ScriptCard SlyDiscard<T>() where T : CardModel
+        => new() { Card = typeof(T), From = "deck", DiscardInstead = true, Sly = true };
     private static ScriptCard Sly(ScriptCard card)
         => new() { Card = card.Card, From = card.From, Sly = true };
 

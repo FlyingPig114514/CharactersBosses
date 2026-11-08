@@ -64,5 +64,7 @@
     "BOSS_LIGHTNING_ROD_POWER.title":  "Lightning Rod",
     "BOSS_LIGHTNING_ROD_POWER.description":  "Every time you play 3 cards in a turn, the Defect loses 1 Focus this turn (restored at end of turn).",
     "BOSS_BASH_POWER.title":  "Bash",
-    "BOSS_BASH_POWER.description":  "Cards in your deck whose name contains \"Strike\" also increase the Ironclad\u0027s Perfected Strike damage. Each time you play a card whose name contains \"Strike\", the Ironclad\u0027s Perfected Strike loses the bonus of one such card."
+    "BOSS_BASH_POWER.description":  "Cards in your deck whose name contains \"Strike\" also increase the Ironclad\u0027s Perfected Strike damage. Each time you play a card whose name contains \"Strike\", the Ironclad\u0027s Perfected Strike loses the bonus of one such card.",
+    "BOSS_SNAKE_FORM_POWER.title":  "Serpent Form",
+    "BOSS_SNAKE_FORM_POWER.description":  "The Silent has no hand size limit. Whenever you or the Silent shuffle, shuffle a Snakebite into your own draw pile."
 }

@@ -48,5 +48,6 @@
     "MINION_DIVE_BOMB_MONSTER.title":  "俯冲仆从",
     "MINION_DIVE_BOMB_MONSTER.name":  "俯冲仆从",
     "MINION_STRIKE_MONSTER.name":  "打击仆从",
-    "IRONCLAD_BOSS.bash":  "痛击\\n你的名字中包含打击的牌也会增加铁甲战士的完美打击的伤害。每当你打出名字中包含打击的牌时，铁甲战士的完美打击的伤害就少受一张名字中包含打击的牌的加成。"
+    "IRONCLAD_BOSS.bash":  "痛击\\n你的名字中包含打击的牌也会增加铁甲战士的完美打击的伤害。每当你打出名字中包含打击的牌时，铁甲战士的完美打击的伤害就少受一张名字中包含打击的牌的加成。",
+    "SILENT_BOSS.snake_form":  "群蛇形态\\n静默猎手的手牌数没有上限。每当你或静默猎手洗牌时，将一张蛇咬洗入自己的抽牌堆。"
 }

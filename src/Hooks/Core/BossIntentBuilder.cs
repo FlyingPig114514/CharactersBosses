@@ -548,6 +548,10 @@ public static class BossIntentBuilder
         //  （见 `BossDefinition.KeepsScriptedHandByAct`：抽牌照常、只把抽到的牌放回牌堆顶）。
         // 数值是 `Unpowered`（不吃力量/虚弱）⇒ 用 Raw 意图原样显示。
         int drawCount = DrawCountOf(card);
+        // ★ v0.2.504（用户 2026-11-08：「逃脱计划、投掷匕首下面没有标速行者的二点伤害」）：
+        //   这两张的抽牌写在 OnPlay 里、牌面没有 Cards 变量 ⇒ `DrawCountOf` 读不到。
+        //   它们确实各抽 1 张（真实伤害由原版 SpeedsterPower 结算），这里补齐显示。
+        if (drawCount == 0 && (entry == "ESCAPE_PLAN" || entry == "DAGGER_THROW")) drawCount = 1;
         if (drawCount > 0)
         {
             int perDraw = SpeedsterAmountOf(card);

@@ -78,5 +78,7 @@
     "DEFECT_EVENT_BOSS_ENCOUNTER.loss":  "{character} was pulled back out of the discard pile by [gold]the Defect[/gold].",
     "DEFECT_EVENT_BOSS_ENCOUNTER.title":  "The Defect",
     "IRONCLAD_STRIKE_BOSS_ENCOUNTER.title":  "The Ironclad",
-    "IRONCLAD_STRIKE_BOSS_ENCOUNTER.loss":  "{character} was crushed by [gold]The Ironclad[/gold]\u0027s Bash."
+    "IRONCLAD_STRIKE_BOSS_ENCOUNTER.loss":  "{character} was crushed by [gold]The Ironclad[/gold]\u0027s Bash.",
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "The Silent",
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.loss":  "{character} was swallowed by [gold]The Silent[/gold]\u0027s serpents."
 }

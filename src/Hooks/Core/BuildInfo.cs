@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.503 / 2026-11-08（修多人不同步的真凶：两端日志对比 —— 房主 ※本机生成※ 2 只 [IRONCLAD,REGENT]，客人 3 只 [REGENT,IRONCLAD,NECROBINDER]。原因是多人时主 Boss 候选表也读**本机勾选**（房主勾过 ⇒ 某角色一只不剩），而客人不读勾选、永远整张表 ⇒ 阵容长度都不同、轮次 1 立刻分叉。现在**多人局一律用整张花名册**，勾选只影响单人局）";
+    public const string Tag = "v0.2.504 / 2026-11-08（蛇咬猎按反馈修 5 条：① 红面具战斗开始给所有玩家 1 层虚弱（原版挂在 AfterRoomEntered，影子玩家收不到）；② 补上特殊效果「群蛇形态」的文案（zhs/zht/eng，monsters+powers+encounters）；③ 逃脱计划/投掷匕首的意图补上速行者的群伤（这两张的抽牌写在 OnPlay 里，DrawCountOf 读不到）；④ 第 5/6/7 回合被丢弃的那张补上 DiscardInstead+Sly（触不可及/翻越撑击要因奇巧打出）；⑤ 第 8 回合补上保留不出的三张）";
 
     private static bool _logged;
 
