@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Godot;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Nodes.Combat;
@@ -476,6 +476,18 @@ public static class BossFrameTick
             // ⚠ 这一帧里**只算一次**（原来下面被调用 5 次，每次都新建 List 并遍历 Enemies）。
             var everyBoss = AllBosses(boss);
 
+            // ★ v0.2.513：UI 会话刚重置过（进新战斗房的那一帧）⇒ 立刻把面板重建回来。
+            //   否则就是「Boss 的卡牌 / 遗物 / 能量整场都没有」（用户 2026-11-08 截图）。
+            if (CharacterBosses.UI.BossUiSession.ConsumeRebuildRequest() && everyBoss.Count > 0)
+            {
+                foreach (var each in everyBoss)
+                {
+                    try { CharacterBosses.UI.BossHandUi.RefreshForce(each); }
+                    catch (Exception e) { Logger.Log("[CharBoss] 会话重建面板失败: " + e.Message); }
+                }
+                Logger.Log($"[CharBoss] UI 会话重建：{everyBoss.Count} 只 Boss 的面板已重新挂上");
+            }
+
             // 药水真正变了（喝掉 / 炼出来 / 混沌药水补满）→ 立刻刷面板。
             // 有了这条，「哪段代码忘了调 Refresh」都不影响实时性：BossPotions.Version 是唯一真相。
             // 用 Refresh（增量）而不是 RefreshForce：只重画状态条与变了的格子，不整排清空。
@@ -705,7 +717,10 @@ public static class BossFrameTick
                     {
                         var combat = panelBoss.Creature?.CombatState;
                         if (combat != null && panelBoss.Creature != null)
-                            sameSide = combat.GetTeammatesOf(panelBoss.Creature).Count(t => t is CharBossMonster);
+                            // ⚠ `GetTeammatesOf` = **同一侧的全部生物（含自己）**，所以单 Boss 时是 1。
+                            //   判据要看 `Monster` 是不是我们的 Boss —— PR 原文写的是 `t is CharBossMonster`
+                            //   （t 是 Creature，恒为 false）⇒ 多人多 Boss 永远不会缩到 0.85，面板会互相压。
+                            sameSide = combat.GetTeammatesOf(panelBoss.Creature).Count(t => t?.Monster is CharBossMonster);
                     }
                     catch { /* 忽略 */ }
 

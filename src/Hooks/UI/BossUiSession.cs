@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Godot;
 using MegaCrit.Sts2.Core.Nodes.Rooms;
 
@@ -20,6 +20,25 @@ internal static class BossUiSession
 {
     private static ulong _roomId;
 
+    /// <summary>
+    /// 「刚刚重置过，需要把 Boss 面板重建回来」（v0.2.513）。
+    ///
+    /// 为什么必须补这一手：`EnsureFresh` 每帧在 `BossFrameTick.Tick` 开头判定，而**面板往往比它早一步
+    /// 建好**（进战斗房那一帧里 `PrepareTurn` 已经把面板和 6 张牌画出来了，下一帧 `NCombatRoom.Instance`
+    /// 才换成新实例）⇒ `Reset()` 里的 `BossHandUi.Clear()` 把刚画好的整块面板拆掉，而 `Refresh` 只在
+    /// 她回合开始/数据变化时才调 ⇒ **整场都没有卡牌、遗物、能量**（用户 2026-11-08 截图：
+    /// 「boss 的牌和遗物还有能量呢？」）。现在重置完记一个标记，由每帧驱动立刻重建一次。
+    /// </summary>
+    private static bool _rebuildRequested;
+
+    /// <summary>取走「需要重建面板」的标记（取一次就清掉）。</summary>
+    public static bool ConsumeRebuildRequest()
+    {
+        if (!_rebuildRequested) return false;
+        _rebuildRequested = false;
+        return true;
+    }
+
     /// <summary>每帧调一次；战斗房换了就做一次全量清理（幂等、便宜）。</summary>
     public static void EnsureFresh()
     {
@@ -34,6 +53,7 @@ internal static class BossUiSession
             if (id == 0) return;
 
             Reset("新的战斗房 " + id);
+            _rebuildRequested = true;      // 让每帧驱动立刻把面板重建回来（见字段注释）
         }
         catch (Exception e)
         {

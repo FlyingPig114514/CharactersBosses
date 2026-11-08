@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.512 / 2026-11-08（合入斗蛐蛐适配 PR #1：30 档设计各暴露成一个独立怪物类 + 只钉 pin 不改全局；正常局零变化 —— 说明框仍用原版 NHoverTipSet、飞牌动画只在装了斗蛐蛐时启用）";
+    public const string Tag = "v0.2.513 / 2026-11-08（修 Boss 的卡牌/遗物/能量整场不显示：进战斗房那一帧会话重置把刚建好的面板拆了 ⇒ 重置后立刻重建；同时修多人多 Boss 的面板缩放判据）";
 
     private static bool _logged;
 
