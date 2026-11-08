@@ -14,7 +14,31 @@ public abstract partial class CharBossMonster
     public const string ThinkStateId = "CHARBOSS_THINK";
     public const string PlayStateId = "CHARBOSS_PLAY";
 
-    public abstract BossDefinition Def { get; }
+    /// <summary>这个怪物类对应的**原始**设计（5 个基类各自返回 <c>BossDefs.Xxx</c>）。</summary>
+    public abstract BossDefinition DefSource { get; }
+
+    private BossDefinition? _defCache;
+
+    /// <summary>
+    /// 实际生效的设计。基类 = <see cref="DefSource"/> 本身（行为与以前完全一致）；
+    /// 「暴露给外部工具」的档位类会通过 <see cref="PinnedVariantKey"/> 钉死某一套设计，
+    /// 这里给它一份只改 pin 的副本并缓存（定义是全局单例，不能就地改）。
+    /// </summary>
+    public BossDefinition Def
+        => _defCache ??= PinnedVariantKey is { Length: > 0 } key ? DefSource.WithVariantPin(key) : DefSource;
+
+    /// <summary>
+    /// 本类钉死的**设计 Key**（`BossKeys.All` 里的那 29 个之一）；null = 按遭遇/种子正常判定。
+    /// 见 <see cref="CharacterBosses.Monsters.TierBossMonsters"/>。
+    /// </summary>
+    public virtual string? PinnedVariantKey => null;
+
+    /// <summary>
+    /// 本类钉死的**幕数**（0 起）；null = 按遭遇 / 真实幕数。
+    /// 斗蛐蛐里遭遇恒为 `CricketEncounter`（不实现 <see cref="IBossTierPin"/>），
+    /// 所以暴露类必须自己带幕数，否则永远打第一幕的配置。
+    /// </summary>
+    public virtual int? TierAct => null;
 
     /// <summary>
     /// 当前是第几幕（0 = 第一幕，1 = 第二幕，2 = 第三幕）—— 决定用哪一档 HP / 能量 / 手牌数 / 卡组。
@@ -31,6 +55,8 @@ public abstract partial class CharBossMonster
         get
         {
             if (DebugMode.ForcedActIndex >= 0) return DebugMode.ForcedActIndex;
+            // 外部暴露的档位类自带幕数（斗蛐蛐里问不到遭遇，只能靠这个）。
+            if (TierAct is int ownTier) return Math.Clamp(ownTier, 0, 2);
             var pinned = PinnedTier();
             if (pinned >= 0) return pinned;
             return BossActIndex.Resolve(() => CombatState);

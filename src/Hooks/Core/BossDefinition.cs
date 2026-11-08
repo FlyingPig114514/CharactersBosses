@@ -83,6 +83,28 @@ public sealed class BossDefinition
     /// </summary>
     public Dictionary<int, List<BossVariant>> ExtraVariants = new();
 
+    /// <summary>
+    /// 把**某一套设计**钉死在这一幕（非 null 时 <see cref="ActiveVariant"/> 只认这个 Key）。
+    ///
+    /// 用途：斗蛐蛐 / 控制台这类「外部指定要打哪一档」的入口 —— 它们的遭遇不是我们的
+    /// `XxxBossEncounter`，`Enabled()` 的遭遇判定全部落空，只能按种子随机；
+    /// 钉死之后同一只怪物每次进来都是同一套设计。
+    /// **null = 老行为**（按遭遇 → 按种子），对正常流程零影响。
+    /// </summary>
+    public string? PinnedVariantKey;
+
+    /// <summary>
+    /// 返回一个「钉死某套设计」的副本。
+    /// `BossDefs.Xxx` 是全局单例，不能就地改（同一角色在不同战斗里可能要用不同设计），
+    /// 所以这里 `MemberwiseClone` 出一份只改 pin 的浅拷贝（其余数组/列表都是只读共享）。
+    /// </summary>
+    public BossDefinition WithVariantPin(string key)
+    {
+        var clone = (BossDefinition)MemberwiseClone();
+        clone.PinnedVariantKey = key;
+        return clone;
+    }
+
     /// <summary>某一幕的全部备选设计（按判定顺序；没有就是空序列）。</summary>
     public IEnumerable<BossVariant> VariantsForAct(int act)
     {
@@ -336,6 +358,17 @@ public sealed class BossDefinition
     /// </summary>
     private BossVariant? ActiveVariant(int act)
     {
+        // 外部钉死的设计优先（斗蛐蛐 / 控制台）：只认这个 Key，判定函数一次都不问。
+        // 找不到 ⇒ 说明钉的是「这一幕的主设计」本身，返回 null 走主定义那条路（行为正确）。
+        if (PinnedVariantKey is { Length: > 0 } pinned)
+        {
+            foreach (var variant in VariantsForAct(act))
+            {
+                if (string.Equals(variant.Key, pinned, StringComparison.Ordinal)) return variant;
+            }
+            return null;
+        }
+
         if (VariantsByAct.Length == 0) return null;
         foreach (var variant in VariantsForAct(act))
         {

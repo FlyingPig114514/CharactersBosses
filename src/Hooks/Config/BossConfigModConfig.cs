@@ -54,6 +54,12 @@ public sealed class BossConfigModConfig : SimpleModConfig
             optionContainer.AddChild(CreateDividerControl());
             BuildTelemetrySection(optionContainer);
             optionContainer.AddChild(CreateDividerControl());
+            // 用户 2026-11-08：斗蛐蛐专用的那一节，**只有装了怪物乱斗才出现**。
+            if (CricketCompat.Installed)
+            {
+                BuildCricketSection(optionContainer);
+                optionContainer.AddChild(CreateDividerControl());
+            }
             optionContainer.AddChild(InfoLabel("改动立刻保存到：" + BossConfig.DescribeConfigPath() +
                                                "\n（用户数据目录，**不在**模组文件夹里 —— 创意工坊更新模组不会覆盖你的设置）"));
 
@@ -225,6 +231,91 @@ public sealed class BossConfigModConfig : SimpleModConfig
     }
 
     /// <summary>
+    // ── B1 · 斗蛐蛐 ───────────────────────────────────────
+
+    /// <summary>
+    /// B1：斗蛐蛐专用的几项（用户 2026-11-08）。
+    /// **只有装了怪物乱斗（CricketFightMod）才显示这一节**，否则整个不出现。
+    /// </summary>
+    private void BuildCricketSection(Control container)
+    {
+        container.AddChild(CreateSectionHeader("B1 · 斗蛐蛐（怪物乱斗）"));
+        container.AddChild(InfoLabel(
+            "这一节只在装了「怪物乱斗 / 斗蛐蛐（CricketFightMod）」时出现，调的是**斗蛐蛐战斗里**这套 UI 的表现。\n" +
+            "说明面板：左右上角那块小面板，按住可以拖动，位置会记住。\n" +
+            "出牌动画：Boss 打出一张牌时，那张牌从手牌栏飞向屏幕中间再淡出的节奏；\n" +
+            "默认 200 / 180 / 200 毫秒就是原版 AnimCardToPlayPile 的参数。"));
+
+        AddNumberRow(container, "CricketFontRow", BossConfig.CricketPanelFontSize, 9, 28, 1,
+            v => BossConfig.CricketPanelFontSize = v,
+            v => $"说明文字字号：{v}（9~28）");
+
+        AddToggleRow(container, "CricketFxRow", BossConfig.CricketFxEnabled,
+            "斗蛐蛐里播放 Boss 出牌动画",
+            v => BossConfig.CricketFxEnabled = v);
+
+        AddNumberRow(container, "CricketFlyRow", BossConfig.CricketFxFlyMs, 80, 600, 20,
+            v => BossConfig.CricketFxFlyMs = v,
+            v => $"出牌动画飞行时长：{v} 毫秒（越小越快）");
+
+        AddNumberRow(container, "CricketHoldRow", BossConfig.CricketFxHoldMs, 0, 600, 20,
+            v => BossConfig.CricketFxHoldMs = v,
+            v => $"出牌动画停留时长：{v} 毫秒（0 = 不停顿）");
+
+        AddNumberRow(container, "CricketFadeRow", BossConfig.CricketFxFadeMs, 60, 500, 20,
+            v => BossConfig.CricketFxFadeMs = v,
+            v => $"出牌动画淡出时长：{v} 毫秒");
+
+        AddToggleRow(container, "CricketOstyFlipRow", BossConfig.CricketOstyFlip,
+            "奥斯提（骨妹召唤物）额外翻转一次：画反了才勾",
+            v => BossConfig.CricketOstyFlip = v);
+    }
+
+    /// <summary>B1 的一行数字：左边 [−][+]，右边说明 + 当前值。</summary>
+    private void AddNumberRow(Control container, string rowName, int value, int min, int max, int step,
+                              Action<int> setter, Func<int, string> describe)
+    {
+        int current = Math.Clamp(value, min, max);
+        var label = RowLabel(describe(current));
+
+        var ctl = new HBoxContainer { Name = rowName };
+        ctl.AddThemeConstantOverride("separation", 10);
+
+        var minus = new Button { Text = "−", CustomMinimumSize = new Vector2(46, 36) };
+        var plus = new Button { Text = "+", CustomMinimumSize = new Vector2(46, 36) };
+        ctl.AddChild(minus);
+        ctl.AddChild(plus);
+
+        minus.Pressed += () =>
+        {
+            current = Math.Clamp(current - step, min, max);
+            setter(current);
+            try { label.Text = describe(current); } catch { /* 改字失败不影响功能 */ }
+        };
+        plus.Pressed += () =>
+        {
+            current = Math.Clamp(current + step, min, max);
+            setter(current);
+            try { label.Text = describe(current); } catch { /* 改字失败不影响功能 */ }
+        };
+
+        AddInlineRow(container, ctl, label, rowName + "Inline");
+    }
+
+    /// <summary>B1 的一行开关：勾选框 + 说明。</summary>
+    private void AddToggleRow(Control container, string rowName, bool value, string head, Action<bool> setter)
+    {
+        var label = RowLabel(StateText2(head, value));
+        var box = new CheckBoxButton();
+        box.Setup(value);
+        box.OnChanged = on =>
+        {
+            setter(on);
+            try { label.Text = StateText2(head, on); } catch { /* 改字失败不影响功能 */ }
+        };
+        AddInlineRow(container, box, label, rowName + "Inline");
+    }
+
     /// A5（用户 2026-10-30 新增）：**本地对战数据记录**，默认关。
     /// 打开 = 知情同意：只把「我们的 Boss 战结果」与「我们自己的报错行」写进本机文件，
     /// 不联网、不收集身份信息。想帮作者就把文件发出去。

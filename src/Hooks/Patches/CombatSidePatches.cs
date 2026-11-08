@@ -46,6 +46,17 @@ public static class HittableEnemiesSidePatch
     internal static int BossActingDepth;
 
     /// <summary>
+    /// 「正在出牌的 Boss **本身就在玩家侧**」的嵌套深度（斗蛐蛐红队：2026-11-08 用户实测
+    /// 「刀猎的伤害打在自己身上」）。
+    ///
+    /// 斗蛐蛐里红队战士是玩家侧的宠物，于是 <c>HittableEnemies</c>（= `Enemies`）**本来就是对面的
+    /// 蓝队 Boss** —— 这时再按「翻成玩家侧」去解析，就变成「打自己这一边」：
+    /// 群攻牌 <c>FAN_OF_KNIVES</c> 的目标直接选中了她自己。
+    /// 判据很简单：<c>BossActingDepth &gt; 0</c> 且出手的这只 Boss 的 <c>Side == Player</c> ⇒ 走原版。
+    /// </summary>
+    internal static int PlayerSideBossDepth;
+
+    /// <summary>
     /// 「**接下来这一段（可能跨 await/多帧）都按玩家侧解析 `HittableEnemies`**」的计数。
     ///
     /// ★ v0.2.308（玩家反馈：「倾泻打出巨石会打自己」）：
@@ -423,11 +434,15 @@ public static class HittableEnemiesSidePatch
             if (PlayerEffectDepth > 0) return true;
             if (ConsumeVanillaOnce()) return true;
 
-            // ①b ★ v0.2.293：**真人玩家自己的牌正在结算** ⇒ 一律走原版，不翻。
-            //     （玩家被打 →「百年积木」在敌方回合抽牌 →「地狱狂徒」自动打出那几张打击，
+            // ①b ★ v0.2.293：**真人玩家自己的牌正在结算** ⇒ 一律走原版，不翻。            //     （玩家被打 →「百年积木」在敌方回合抽牌 →「地狱狂徒」自动打出那几张打击，
             //      若不豁免就会在「玩家侧」里选靶 ⇒ 玩家自己的打击打自己；
             //      详见 RealPlayerCardDepth 的注释）
             if (RealPlayerCardDepth > 0 && !RealPlayerCardStale()) return true;
+
+            // ①c ★ 2026-11-08（斗蛐蛐红队实测「打自己」）：出手的 Boss 本身在**玩家侧**时，
+            //     `HittableEnemies` 的原版语义（`Enemies` = 对面蓝队）已经是正确的，
+            //     再翻成「玩家侧」就等于让她打自己和队友。⇒ 这段窗口里一律走原版。
+            if (PlayerSideBossDepth > 0) return true;
 
             // ② 敌方回合（她出牌的时段）才翻；玩家回合一律走原版
             // ★ v0.2.308：除了「敌方回合」，**她在出手的窗口内**（`BossActingDepth > 0`，覆盖

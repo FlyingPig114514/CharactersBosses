@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Godot;
 using MegaCrit.Sts2.Core.Animation;
 using MegaCrit.Sts2.Core.Bindings.MegaSpine;
@@ -14,6 +14,8 @@ namespace CharacterBosses.Monsters;
 /// </summary>
 public static class BossVisuals
 {
+    private static readonly System.Collections.Generic.HashSet<string> _warned = new();
+
     /// <summary>
     /// 建角色动画器（而不是怪物动画器）。
     ///
@@ -30,18 +32,25 @@ public static class BossVisuals
         try
         {
             var character = ModelDb.GetById<CharacterModel>(ModelDb.GetId(def.CharacterType));
-            if (character != null && monster.Creature != null)
+            // ⚠ `MonsterModel.Creature` 在「还没挂进战斗」时**会抛异常**（"Creature was accessed before
+            //   it was set."），而这里正好是建立绘的阶段 —— 直接读就会把整段 try 打断。
+            //   以前每次建立绘都刷一行「角色动画器创建失败」，日志里 50+ 行全是噪音。
+            MegaCrit.Sts2.Core.Entities.Creatures.Creature? creature = null;
+            try { creature = monster.Creature; } catch { /* 还没挂上，退回怪物动画器即可 */ }
+            if (character != null && creature != null)
             {
 #if STS2_107
                 return character.GenerateAnimator(controller);
 #else
-                return character.GenerateAnimator(controller, monster.Creature);
+                return character.GenerateAnimator(controller, creature!);
 #endif
             }
         }
         catch (Exception e)
         {
-            Logger.Log("[CharBoss] 角色动画器创建失败，退回怪物动画器: " + e.Message);
+            // 同一只 Boss 只报一次，避免立绘反复创建时刷屏。
+            if (_warned.Add(monster.GetType().Name))
+                Logger.Log("[CharBoss] 角色动画器创建失败，退回怪物动画器: " + e.Message);
         }
         return null;
     }

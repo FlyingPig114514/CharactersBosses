@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
@@ -106,6 +106,29 @@ public static class BossConfig
         /// 首次启动时那条「要不要记录本地游玩数据」的弹窗**问过没有**（用户 2026-10-30）。
         /// 问过一次就不再打扰（无论玩家选了是还是否）。
         /// </summary>
+        /// <summary>
+        /// B1（用户 2026-11-08）：斗蛐蛐里的说明面板**字号**（默认 13，范围 9~28）。
+        /// 只有装了「怪物乱斗（CricketFightMod）」才会在配置界面上看到这一节。
+        /// </summary>
+        [JsonPropertyName("cricketPanelFontSize")] public int CricketPanelFontSize { get; set; } = 13;
+
+        /// <summary>B1：斗蛐蛐里 Boss 出牌动画**飞向出牌区**的时长（毫秒，默认 200 = 原版参数）。</summary>
+        [JsonPropertyName("cricketFxFlyMs")] public int CricketFxFlyMs { get; set; } = 200;
+
+        /// <summary>B1：出牌动画在出牌区**停留**的时长（毫秒，默认 180）。</summary>
+        [JsonPropertyName("cricketFxHoldMs")] public int CricketFxHoldMs { get; set; } = 180;
+
+        /// <summary>B1：出牌动画**淡出**时长（毫秒，默认 200）。</summary>
+        [JsonPropertyName("cricketFxFadeMs")] public int CricketFxFadeMs { get; set; } = 200;
+
+        /// <summary>B1：斗蛐蛐里要不要播放 Boss 出牌动画。</summary>
+        [JsonPropertyName("cricketFxEnabled")] public bool CricketFxEnabled { get; set; } = true;
+        /// <summary>
+        /// B1（用户 2026-11-08）：**把奥斯提立绘再翻一次**。
+        /// 自动朝向是按「敌人在哪边」算的，如果某只 Boss 的召唤物画反了，勾上这个就能单独纠回来。
+        /// </summary>
+        [JsonPropertyName("cricketOstyFlip")] public bool CricketOstyFlip { get; set; }
+
         [JsonPropertyName("consentAsked")] public bool ConsentAsked { get; set; }
 
         /// <summary>
@@ -540,6 +563,96 @@ public static class BossConfig
         }
     }
 
+    // ── B1 · 斗蛐蛐（用户 2026-11-08）──────────────────────
+    // 只有装了「怪物乱斗（CricketFightMod）」时，配置界面才会出现这一节。
+
+    /// <summary>说明面板字号（9~28）。</summary>
+    public static int CricketPanelFontSize
+    {
+        get => Math.Clamp(Current.CricketPanelFontSize, 9, 28);
+        set
+        {
+            int v = Math.Clamp(value, 9, 28);
+            if (v == Current.CricketPanelFontSize) return;
+            Current.CricketPanelFontSize = v;
+            _dirty = true;
+            Save();
+            Logger.Log($"[CharBoss] 配置：斗蛐蛐说明字号 = {v}");
+        }
+    }
+
+    /// <summary>出牌动画飞行时长（毫秒，80~600）。</summary>
+    public static int CricketFxFlyMs
+    {
+        get => Math.Clamp(Current.CricketFxFlyMs, 80, 600);
+        set
+        {
+            int v = Math.Clamp(value, 80, 600);
+            if (v == Current.CricketFxFlyMs) return;
+            Current.CricketFxFlyMs = v;
+            _dirty = true;
+            Save();
+            Logger.Log($"[CharBoss] 配置：斗蛐蛐出牌动画飞行 = {v}ms");
+        }
+    }
+
+    /// <summary>出牌动画停留时长（毫秒，0~600）。</summary>
+    public static int CricketFxHoldMs
+    {
+        get => Math.Clamp(Current.CricketFxHoldMs, 0, 600);
+        set
+        {
+            int v = Math.Clamp(value, 0, 600);
+            if (v == Current.CricketFxHoldMs) return;
+            Current.CricketFxHoldMs = v;
+            _dirty = true;
+            Save();
+            Logger.Log($"[CharBoss] 配置：斗蛐蛐出牌动画停留 = {v}ms");
+        }
+    }
+
+    /// <summary>出牌动画淡出时长（毫秒，60~500）。</summary>
+    public static int CricketFxFadeMs
+    {
+        get => Math.Clamp(Current.CricketFxFadeMs, 60, 500);
+        set
+        {
+            int v = Math.Clamp(value, 60, 500);
+            if (v == Current.CricketFxFadeMs) return;
+            Current.CricketFxFadeMs = v;
+            _dirty = true;
+            Save();
+            Logger.Log($"[CharBoss] 配置：斗蛐蛐出牌动画淡出 = {v}ms");
+        }
+    }
+
+    /// <summary>斗蛐蛐里是否播放出牌动画。</summary>
+    public static bool CricketFxEnabled
+    {
+        get => Current.CricketFxEnabled;
+        set
+        {
+            if (value == Current.CricketFxEnabled) return;
+            Current.CricketFxEnabled = value;
+            _dirty = true;
+            Save();
+            Logger.Log($"[CharBoss] 配置：斗蛐蛐出牌动画 = {(value ? "开" : "关")}");
+        }
+    }
+
+    /// <summary>斗蛐蛐里把奥斯提立绘额外翻转一次（朝向画反时的手动纠正开关）。</summary>
+    public static bool CricketOstyFlip
+    {
+        get => Current.CricketOstyFlip;
+        set
+        {
+            if (value == Current.CricketOstyFlip) return;
+            Current.CricketOstyFlip = value;
+            _dirty = true;
+            Save();
+            Logger.Log($"[CharBoss] 配置：奥斯提额外翻转 = {(value ? "开" : "关")}");
+        }
+    }
     // ── A1 ────────────────────────────────────────────────
 
     /// <summary>

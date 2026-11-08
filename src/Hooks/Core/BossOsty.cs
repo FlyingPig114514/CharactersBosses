@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
@@ -121,6 +121,143 @@ internal static class BossOsty
         ///
     /// 幂等：已经是负的就不再翻（避免每回合翻回来）�?
         /// </summary>
+    /// <summary>把立绘骨架写回朝右（不镜像）。斗蛐蛐里 Boss 站在玩家侧时用。</summary>
+    internal static void UnmirrorBody(NCreature oc)
+    {
+        try
+        {
+            if (oc.Visuals == null) return;
+            var body = oc.Body;
+            if (body == null || !GodotObject.IsInstanceValid(body)) return;
+            var s = body.Scale;
+            if (s.X < 0f) body.Scale = new Vector2(-s.X, s.Y);
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 奥斯提 Body 取消镜像失败: " + e.Message);
+        }
+    }
+    /// <summary>
+    /// 朝向：**看敌人站在哪边**（真实几何），而不是看立绘的镜像符号。
+    /// 斗蛐蛐会把 Boss 塞进玩家侧（左边），这时 Visuals.Scale.X 的正负和"敌人方向"没有必然关系，
+    /// 只看符号就会出现"左边那只的奥斯提朝向反了"。
+    /// </summary>
+    /// <summary>
+    /// 取某只生物**真正属于自己**的节点：先走原版 <c>GetCreatureNode</c>，并校验 <c>Entity</c> 是否同一只，
+    /// 对不上（斗蛐蛐把红队战士挂在玩家侧时会发生）就全树搜一遍。
+    /// </summary>
+    internal static NCreature? NodeFor(Creature? creature)
+    {
+        if (creature == null) return null;
+        NCreature? direct = null;
+        try { direct = NCombatRoom.Instance?.GetCreatureNode(creature); } catch { /* 忽略 */ }
+
+        if (direct != null && GodotObject.IsInstanceValid(direct))
+        {
+            try { if (ReferenceEquals(direct.Entity, creature)) return direct; } catch { /* 忽略 */ }
+        }
+
+        try { return FindNodeInTree(NCombatRoom.Instance, creature) ?? direct; } catch { return direct; }
+    }
+
+    private static NCreature? FindNodeInTree(Node? node, Creature creature)
+    {
+        if (node == null) return null;
+        foreach (var child in node.GetChildren())
+        {
+            if (child is not Node n || !GodotObject.IsInstanceValid(n)) continue;
+            if (n is NCreature nc)
+            {
+                try { if (ReferenceEquals(nc.Entity, creature)) return nc; } catch { /* 忽略 */ }
+            }
+            var hit = FindNodeInTree(n, creature);
+            if (hit != null) return hit;
+        }
+        return null;
+    }
+
+    internal static float FacingDir(CharBossMonster boss, Node bossNode)
+    {
+        try
+        {
+            var self = boss.Creature;
+            if (self == null) return 1f;
+
+            // 斗蛐蛐（和原版战斗一样）：**玩家侧在左、敌人侧在右**。
+            // 原来按「对手节点的平均 X」算，斗蛐蛐里红队战士挂在玩家侧时 GetCreatureNode 会返回
+            // 真人占位节点，几何均值被拉偏 ⇒ 左边那只的奥斯提朝反（用户 2026-11-08 的反馈）。
+            // 阵营是确定的，直接按阵营定朝向，几何只用来打日志。
+            float bySide = self.Side == MegaCrit.Sts2.Core.Combat.CombatSide.Player ? 1f : -1f;
+
+            try
+            {
+                var combat = self.CombatState;
+                if (combat != null && bossNode is Node2D b2 && GodotObject.IsInstanceValid(bossNode))
+                {
+                    float sx = b2.GlobalPosition.X;
+                    float ox = 0f; int n = 0;
+                    foreach (var c in combat.GetOpponentsOf(self))
+                    {
+                        var nd = NodeFor(c);
+                        if (nd != null && GodotObject.IsInstanceValid(nd)) { ox += nd.GlobalPosition.X; n++; }
+                    }
+                    if (n > 0 && !_facingLogged.Contains(0UL))
+                    {
+                        Logger.Log("[CharBoss] 朝向判定 self=" + self.Side + " selfX=" + sx
+                                   + " oppX=" + (ox / n) + " ⇒ side=" + bySide
+                                   + " geom=" + (ox / n < sx ? -1 : 1));
+                    }
+                }
+            }
+            catch { /* 只打日志用 */ }
+
+            return bySide;
+        }
+        catch { /* 回退到立绘符号 */ }
+        try { if (bossNode is NCreature nc && nc.Visuals != null) return nc.Visuals.Scale.X < 0f ? -1f : 1f; } catch { }
+        return 1f;
+    }
+    private static readonly HashSet<ulong> _facingLogged = new();
+
+    /// <summary>
+    /// 让奥斯提朝 <paramref name="dir"/>（-1 = 朝左，+1 = 朝右）。
+    ///
+    /// 关键：**原版对敌方侧生物会把 <c>Visuals.Scale.X</c> 翻成负数**，我们再翻 <c>Body</c>
+    /// 就等于翻了两次 ⇒ 净朝向又变回去。用户 2026-11-08 说的「怪物侧的宠物朝向还是反的」就是这回事。
+    /// 所以这里按**净朝向**算：<c>Visuals 符号 × Body 符号</c> 要等于 dir。
+    /// </summary>
+    internal static void FaceToward(NCreature oc, float dir)
+    {
+        try
+        {
+            if (oc.Visuals == null) return;
+            var body = oc.Body;
+            if (body == null || !GodotObject.IsInstanceValid(body)) return;
+
+            float visualSign = oc.Visuals.Scale.X < 0f ? -1f : 1f;
+            float want = dir * visualSign;          // = dir / visualSign
+            if (CharacterBosses.Core.BossConfig.CricketOstyFlip) want = -want;   // 手动纠偏开关
+            float cur = body.Scale.X < 0f ? -1f : 1f;
+            if (Math.Abs(cur - want) < 0.001f)
+            {
+                if (!_facingLogged.Contains(oc.GetInstanceId()))
+                {
+                    _facingLogged.Add(oc.GetInstanceId());
+                    Logger.Log("[CharBoss] 奥斯提朝向(未改): dir=" + dir + " visual=" + visualSign
+                               + " body=" + cur + " (净朝向=" + (cur * visualSign) + ")");
+                }
+                return;
+            }
+
+            body.Scale = new Vector2(want * Math.Abs(body.Scale.X), body.Scale.Y);
+            Logger.Log("[CharBoss] 奥斯提朝向：dir=" + dir + " visual=" + visualSign
+                       + " body=" + want + " (净朝向=" + (want * visualSign) + ")");
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 奥斯提朝向设置失败: " + e.Message);
+        }
+    }
     internal static void MirrorBody(NCreature oc)
     {
         try
@@ -898,9 +1035,7 @@ internal static class BossOsty
 
             // �?只翻**立绘**（NCreature.Visuals），不要翻整�?NCreature�?
                 // 连节点一起翻会把血�?名字牌的字也镜像成反的（用户实测"字都是反�?）�?
-                float dir = 1f;
-            if (bossNode != null && GodotObject.IsInstanceValid(bossNode) && bossNode.Visuals != null)
-                dir = bossNode.Visuals.Scale.X < 0f ? -1f : 1f;
+                float dir = FacingDir(boss, bossNode);
 
             // 朝向不再靠容器：�?*节点**移进 Boss 所在的敌方容器只是为了让层�?站位�?
                 //（容器本身不参与它的朝向判定，handover §6 #4 已证）�?
@@ -923,7 +1058,10 @@ internal static class BossOsty
                 //   · OstyScaleToSize 的补间写的是**父级 Visuals.Scale**，碰不到 Body �?一次到位不回头�?
             if (ostyNode is NCreature ostyCreature)
             {
-                MirrorBody(ostyCreature);
+                // ⚠ 只有 Boss 真的朝左（敌方侧）才镜像：斗蛐蛐里 Boss 会被塞到玩家侧（朝右），
+                // 这时再镜像就是"方向反了"（用户实测：左边那只的奥斯提朝向相反）。
+                FaceToward(ostyCreature, dir);
+                // (已由 FaceToward 处理)
                 ProbeBody(ostyCreature);   // Body 探针：打印骨架节点信息，并抓"谁把符号写回正数"
             }
 
@@ -939,7 +1077,7 @@ internal static class BossOsty
             //   Osty.MinOffset=(150,-75)、MaxOffset=(250,-75) �?原版＝「主人右手边、比主人�?75」�?
                 // 敌方�?X 取负 �?站到�?*左手�?*、同一高度�?
                 //（旧做法是镜像「玩家那只奥斯提的屏幕坐标」再硬上�?100，偏高且不稳，已弃用。）
-            var offset = MirrorOstyOffset(bossNode, osty);
+            var offset = MirrorOstyOffset(bossNode, osty, dir < 0f);
             ostyNode.GlobalPosition = bossNode.GlobalPosition + offset;
             Logger.Log($"[CharBoss] 奥斯提站位: offset={offset}（原版公式 X 镜像）bossPos={bossNode.GlobalPosition}");
             ForceVisible(ostyNode);   // 血�?状态栏：非本地玩家的随从会被压掉，强制显示
@@ -965,7 +1103,7 @@ internal static class BossOsty
         /// �?<c>Osty.MinOffset=(150,-75)</c>�?c>MaxOffset=(250,-75)</c>
     /// �?原版＝「主�?*右手**边、比主人**�?75**」。敌方侧�?X 取负 �?站她**左手**边、同一高度�?
         /// </summary>
-    private static Vector2 MirrorOstyOffset(Node bossNode, Creature osty)
+    private static Vector2 MirrorOstyOffset(Node bossNode, Creature osty, bool mirror = true)
     {
         Vector2 offset;
         try
@@ -978,7 +1116,8 @@ internal static class BossOsty
             var lerped = MegaCrit.Sts2.Core.Models.Monsters.Osty.MinOffset
                 .Lerp(MegaCrit.Sts2.Core.Models.Monsters.Osty.MaxOffset, t);
 
-            offset = new Vector2(-(halfWidth + lerped.X), lerped.Y);
+            float dx = halfWidth + lerped.X;
+            offset = new Vector2(mirror ? -dx : dx, lerped.Y);
             if (float.IsNaN(offset.X) || float.IsInfinity(offset.X)) offset = DefaultOffset(bossNode);
         }
         catch
@@ -1030,11 +1169,15 @@ internal static class BossOsty
             var bossNode = room.GetCreatureNode(boss.Creature);
             if (bossNode == null || !GodotObject.IsInstanceValid(bossNode)) return;
 
-            var want = bossNode.GlobalPosition + MirrorOstyOffset(bossNode, ostyNode.Entity);
+            // 站位方向跟着 Boss 的朝向走：朝左（敌方侧）站她左手边，朝右（斗蛐蛐里被塞进玩家侧）站右手边。
+            float dir = FacingDir(boss, bossNode);
+            var want = bossNode.GlobalPosition + MirrorOstyOffset(bossNode, ostyNode.Entity, dir < 0f);
 
-            // 判定「挂错边」：它跑到了 Boss 的**右手边**（正确位置在她左手边）。
+            // 判定「挂错边」：站在了背离敌人的那一侧。
             // 只要不在错误一侧就不插手 —— 这样她自己出手时奥斯提的攻击/受击位移不会被每帧拉回来。
-            bool wrongSide = ostyNode.GlobalPosition.X > bossNode.GlobalPosition.X;
+            bool wrongSide = dir < 0f
+                ? ostyNode.GlobalPosition.X > bossNode.GlobalPosition.X
+                : ostyNode.GlobalPosition.X < bossNode.GlobalPosition.X;
             if (!wrongSide && ostyNode.GlobalPosition.DistanceTo(want) < 400f) return;   // 差得不多 → 多半是它自己在动
 
             ostyNode.GlobalPosition = want;
@@ -1077,7 +1220,9 @@ internal static class BossOsty
             var ostyNode = HerLiveOstyNode(boss, room);
             if (ostyNode == null) return;
 
-            MirrorBody(ostyNode);     // 幂等：已经是负的就不再翻
+            // 朝向按"敌人在哪边"决定：朝左才镜像，朝右保持正数（幂等）。
+            FaceToward(ostyNode, FacingDir(boss, NodeFor(boss.Creature) ?? room.GetCreatureNode(boss.Creature)));
+            // (已由 FaceToward 处理)
             ForceVisible(ostyNode);   // 幂等：把状态显示容器点亮
 
             // 爪牙标记（MinionPower）：复活出来的是原版新建的生物，

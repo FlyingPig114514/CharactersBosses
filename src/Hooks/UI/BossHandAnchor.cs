@@ -1,4 +1,5 @@
 using Godot;
+using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Nodes.Combat;
 using MegaCrit.Sts2.Core.Nodes.Rooms;
 using CharacterBosses.Monsters;
@@ -17,12 +18,48 @@ public static class BossHandAnchor
     {
     }
 
+    /// <summary>
+    /// 取这只生物**真正属于自己的** <c>NCreature</c> 节点。
+    ///
+    /// 为什么不直接用 <c>NCombatRoom.GetCreatureNode</c>：斗蛐蛐把红队战士塞进「玩家侧」当宠物用，
+    /// 这时 <c>GetCreatureNode(宠物)</c> 会返回**真人玩家的占位节点**（实测两只 Boss 的手牌栏
+    /// 都锚到了同一个 <c>creature=(1386,800)</c>）。所以拿到节点后要校验 <c>Entity</c> 是不是同一只，
+    /// 对不上就全树搜一遍。
+    /// </summary>
+    private static NCreature? NodeFor(Creature? creature)
+    {
+        if (creature == null || NCombatRoom.Instance == null) return null;
+
+        NCreature? direct = null;
+        try { direct = NCombatRoom.Instance.GetCreatureNode(creature) as NCreature; } catch { /* 忽略 */ }
+
+        if (direct != null && GodotObject.IsInstanceValid(direct))
+        {
+            try { if (ReferenceEquals(direct.Entity, creature)) return direct; } catch { /* 忽略 */ }
+        }
+
+        return FindInTree(NCombatRoom.Instance, creature) ?? direct;
+    }
+
+    private static NCreature? FindInTree(Node node, Creature creature)
+    {
+        foreach (var child in node.GetChildren())
+        {
+            if (child is not Node n || !GodotObject.IsInstanceValid(n)) continue;
+            if (n is NCreature nc)
+            {
+                try { if (ReferenceEquals(nc.Entity, creature)) return nc; } catch { /* 忽略 */ }
+            }
+            var hit = FindInTree(n, creature);
+            if (hit != null) return hit;
+        }
+        return null;
+    }
+
     /// <summary>返回（水平中心, 顶部, 调试描述, 是否量到了真立绘包围盒）。</summary>
     public static (float X, float Top, string Debug, bool Trusted) Resolve(CharBossMonster? boss, Vector2 viewport)
     {
-        var creatureNode = boss != null && NCombatRoom.Instance != null
-            ? NCombatRoom.Instance.GetCreatureNode(boss.Creature)
-            : null;
+        var creatureNode = NodeFor(boss?.Creature);
 
         string? bossKey = null;
         try { bossKey = boss?.Def?.Key; } catch { /* 忽略 */ }
@@ -36,9 +73,7 @@ public static class BossHandAnchor
     /// </summary>
     public static (float Left, float Top, float Width, float Height) ResolveRect(CharBossMonster? boss, Vector2 viewport)
     {
-        var creatureNode = boss != null && NCombatRoom.Instance != null
-            ? NCombatRoom.Instance.GetCreatureNode(boss.Creature)
-            : null;
+        var creatureNode = NodeFor(boss?.Creature);
 
         if (creatureNode == null) return (0f, 0f, viewport.X, viewport.Y);
 

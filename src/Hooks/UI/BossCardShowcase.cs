@@ -34,8 +34,7 @@ internal static class BossCardShowcase
 
         try
         {
-            var ui = NCombatRoom.Instance?.Ui;
-            Node? parent = ui?.GetNodeOrNull<Control>("%PlayContainer") ?? (Node?)ui;
+            var parent = BossHudLayer.Resolve(out _);
             if (parent == null) return;
 
             var layer = new Control
