@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Entities.Powers;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 using CharacterBosses.Monsters;
 
@@ -90,7 +92,41 @@ public sealed class BossBashPower : PowerModel
         catch { /* 忽略 */ }
     }
 
-    /// <summary>完美打击**现在**应有的总伤害 = 卡面基础 6 + 每张加成 × 统计张数。</summary>
-    internal static int TargetDamage(CharBossMonster? boss)
-        => 6 + PerCard() * CountNow(boss);
+    /// <summary>
+    /// 你在本场战斗里**打出过**多少张名字含打击的牌。
+    ///
+    /// ★ v0.2.483（用户 2026-11-08 澄清）：「我打出打击他完美打击伤害减少仍然生效，
+    ///   只是**增加了**新的伤害增加／减少途径」——
+    ///   即：牌堆实时统计（印牌加、消耗不变、变化减）**之外**，打出 1 张打击仍然额外少一份加成。
+    ///   （打出的那张还在弃牌堆里被数到，所以净效果就是每打一张 −1 张的额度。）
+    /// </summary>
+    private int PlayedStrikes;
+
+    /// <summary>真人玩家打出一张「名字含打击」的牌 ⇒ 计数 +1（她自己打的不算）。</summary>
+    public override Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
+    {
+        try
+        {
+            var card = cardPlay?.Card;
+            if (card == null || !IsStrike(card)) return Task.CompletedTask;
+            var owner = card.Owner;
+            if (owner != null && ReferenceEquals(owner, Owner?.Player)) return Task.CompletedTask;
+
+            PlayedStrikes++;
+            Logger.Log($"[CharBoss] 痛击：你打出 {card.Id.Entry} ⇒ 已打出打击 {PlayedStrikes} 张" +
+                       $"（完美打击额度再少 {PerCard()}）");
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 痛击：记录打出打击失败: " + e.Message);
+        }
+        return Task.CompletedTask;
+    }
+
+    /// <summary>完美打击**现在**应有的总伤害 = 基础 6 + 每张加成 ×（牌堆统计张数 − 已打出的打击张数）。</summary>
+    internal int TargetDamage(CharBossMonster? boss)
+    {
+        int cards = Math.Max(0, CountNow(boss) - Math.Max(0, PlayedStrikes));
+        return 6 + PerCard() * cards;
+    }
 }

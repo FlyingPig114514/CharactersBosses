@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.482 / 2026-11-08（痛击改成**按牌堆实时统计**，按用户 2026-11-08 口径：统计你抽牌堆/手牌/弃牌堆/消耗堆里名字含打击的牌 + 她自己的 7 张 × 每张 2（进阶9~10 为 3），印出来的要加、消耗掉的照样算、变化掉的自动减；不再维护「池子」，所以不会「打出一张就永久少一份」；并且把这个张数加进帧指纹 —— 玩家回合里张数一变就立刻重算完美打击并重画面板，预览实时更新）";
+    public const string Tag = "v0.2.483 / 2026-11-08（痛击按用户澄清重算：牌堆实时统计（印牌加／消耗不变／变化减）**之外**，你每打出 1 张名字含打击的牌仍然再少一份加成（BossBashPower.PlayedStrikes）⇒ 目标 = 6 + 每张2或3 × max(0, 牌堆统计 − 已打出)）";
 
     private static bool _logged;
 

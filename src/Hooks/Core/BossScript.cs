@@ -482,7 +482,13 @@ public static class BossScriptRunner
             int baseVal = 6;
             int perCard = CharacterBosses.Powers.BossBashPower.PerCard();
 
-            int target = CharacterBosses.Powers.BossBashPower.TargetDamage(boss);
+            int target = 6;
+            try
+            {
+                var bashPower = boss.Creature?.GetPower<CharacterBosses.Powers.BossBashPower>();
+                if (bashPower != null) target = bashPower.TargetDamage(boss);
+            }
+            catch { target = 6; }
             int live = CountStrikeCardsInPiles(boss);
             int calc = Math.Max(0, target - perCard * Math.Max(0, live));
             card.DynamicVars["CalculationBase"].BaseValue = calc;
