@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.491 / 2026-11-08（① 薄荷尖塔的伤害预览把玻璃球的**群伤**被动也算进去（OrbPassiveDamage 拆出 aoe 后那边漏加）；② 16 种语言的彩虹「警告」去掉节拍器，只保留玻璃充能球）";
+    public const string Tag = "v0.2.492 / 2026-11-08（彩虹机：① 第 7/12 回合「战火铸就」换成「征召上前」SUMMON_FORTH（意图就是一条强化）；② 特斯拉线圈的意图现在把「触发所有闪电球被动」的伤害算进去（闪电球数 × (3+本回合集中)），以前只画了那 3 点）";
 
     private static bool _logged;
 

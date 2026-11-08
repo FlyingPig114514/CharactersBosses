@@ -111,6 +111,20 @@ internal sealed class BossOrbSim
                 Channel(orbType, channelCount, result);
             }
 
+            // ★ v0.2.492（用户 2026-11-08：「让特斯拉线圈的意图中计算它会触发的闪电充能球被动的伤害」）：
+            //   「特斯拉线圈」的原文是「造成 3 点伤害；**对该敌人触发你的所有闪电充能球的被动**」——
+            //   以前意图只画了那 3 点，球被动那一笔完全没算。
+            //   这里按当前队列里**闪电球的数量** ×（3 + 本回合投射的集中）补进去。
+            if (Entry(card) == "TESLA_COIL")
+            {
+                int lightning = 0;
+                foreach (var orb in _orbs) { if (orb is LightningOrb) lightning++; }
+                if (lightning > 0)
+                {
+                    int per = 3 + _focus;
+                    if (per > 0) result.AddDamage(per, lightning);
+                }
+            }
             // ③ 扩容加球位 —— **必须在「雷暴补球」之前**。
             //   原版顺序是：这张牌自己结算（扩容立刻 +2 槽）→ 牌打出后再触发雷暴/子程序这类
             //   `AfterCardPlayed` 能力 → 那时雷暴引导的球已经有空位、不会激发任何东西。

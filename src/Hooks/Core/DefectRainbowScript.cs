@@ -73,15 +73,15 @@ public static class DefectRainbowScript
             Turn("6. 同步、弹幕齐射、防御", 6,
                 C<Synchronize>(), C<Barrage>(), C<DefendDefect>()),
 
-            // 7：编译冲击（抽 5）+ 放血 + 残影 + 战火铸就 + 违逆 + 特斯拉线圈 + 君王之剑 + 防御×2（没费）
+            // 7：编译冲击（抽 5）+ 放血 + 残影 + 征召上前 + 违逆 + 特斯拉线圈 + 君王之剑 + 防御×2（没费）
             // 能量账（用户 2026-11-07）：3 基础 − 1 涅奥 + 1 棱彩宝石 + 1（本回合额外那点）+ 2（放血）= **6 费**，
-            // 编译冲击1 + 残影1 + 战火铸就2 + 违逆0 + 君王之剑2 刚好花完 ⇒ 两张防御都打不出。
+            // 编译冲击1 + 残影1 + 征召上前2 + 违逆0 + 君王之剑2 刚好花完 ⇒ 两张防御都打不出。
             new BossTurn
             {
-                Note = "7. 编译冲击（抽5）、放血、残影、战火铸就、违逆、特斯拉线圈、君王之剑、防御×2（没费）",
+                Note = "7. 编译冲击（抽5）、放血、残影、征召上前、违逆、特斯拉线圈、君王之剑、防御×2（没费）",
                 Cards = new List<ScriptCard>
                 {
-                    C<CompileDriver>(), C<Bloodletting>(), C<Blur>(), C<WroughtInWar>(), C<Defy>(),
+                    C<CompileDriver>(), C<Bloodletting>(), C<Blur>(), C<SummonForth>(), C<Defy>(),
                     C<TeslaCoil>(), C<SovereignBlade>(), C<DefendDefect>(), C<DefendDefect>(),
                 },
                 Energy = 6,
@@ -121,10 +121,10 @@ public static class DefectRainbowScript
             // 12：同第 7 回合
             new BossTurn
             {
-                Note = "12. 编译冲击（抽5）、放血、残影、战火铸就、违逆、特斯拉线圈、君王之剑、防御×2（没费）",
+                Note = "12. 编译冲击（抽5）、放血、残影、征召上前、违逆、特斯拉线圈、君王之剑、防御×2（没费）",
                 Cards = new List<ScriptCard>
                 {
-                    C<CompileDriver>(), C<Bloodletting>(), C<Blur>(), C<WroughtInWar>(), C<Defy>(),
+                    C<CompileDriver>(), C<Bloodletting>(), C<Blur>(), C<SummonForth>(), C<Defy>(),
                     C<TeslaCoil>(), C<SovereignBlade>(), C<DefendDefect>(), C<DefendDefect>(),
                 },
                 Energy = 6,
@@ -162,7 +162,7 @@ public static class DefectRainbowScript
         typeof(CompileDriver), typeof(CompileDriver),
         typeof(Bloodletting), typeof(Bloodletting),
         typeof(Blur), typeof(Blur),
-        typeof(WroughtInWar), typeof(WroughtInWar),
+        typeof(SummonForth), typeof(SummonForth),   // 征召上前（用户 2026-11-08：换掉战火铸就，意图就是一条强化）
         typeof(Defy), typeof(Defy),
         typeof(TeslaCoil), typeof(TeslaCoil),
         typeof(SovereignBlade),        // 只铸一把：剧本第 7/12 回合打的是同一把（TakeExistingBlade）
