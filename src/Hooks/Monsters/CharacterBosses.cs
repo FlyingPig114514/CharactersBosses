@@ -7,31 +7,31 @@ namespace CharacterBosses.Monsters;
 // 具体的 HP / 能量 / 手牌数 / 卡组 / 遗物 全部来自 BossDefinition，这里不写任何数值。
 
 /// <summary>铁甲战士 Boss（易伤流样板，三档已设计）。</summary>
-public sealed class IroncladBoss : CharBossMonster
+public class IroncladBoss : CharBossMonster
 {
-    public override BossDefinition Def => BossDefs.Ironclad;
+    public override BossDefinition DefSource => BossDefs.Ironclad;
 }
 
 /// <summary>静默猎手 Boss（卡组待设计，暂用起始卡组占位）。</summary>
-public sealed class SilentBoss : CharBossMonster
+public class SilentBoss : CharBossMonster
 {
-    public override BossDefinition Def => BossDefs.Silent;
+    public override BossDefinition DefSource => BossDefs.Silent;
 }
 
 /// <summary>故障机器人 Boss（卡组待设计，暂用起始卡组占位）。</summary>
-public sealed class DefectBoss : CharBossMonster
+public class DefectBoss : CharBossMonster
 {
-    public override BossDefinition Def => BossDefs.Defect;
+    public override BossDefinition DefSource => BossDefs.Defect;
 }
 
 /// <summary>亡灵契约师 Boss（卡组待设计，暂用起始卡组占位）。</summary>
-public sealed class NecrobinderBoss : CharBossMonster
+public class NecrobinderBoss : CharBossMonster
 {
-    public override BossDefinition Def => BossDefs.Necrobinder;
+    public override BossDefinition DefSource => BossDefs.Necrobinder;
 }
 
 /// <summary>储君 Boss（卡组待设计，暂用起始卡组占位）。</summary>
-public sealed class RegentBoss : CharBossMonster
+public class RegentBoss : CharBossMonster
 {
-    public override BossDefinition Def => BossDefs.Regent;
+    public override BossDefinition DefSource => BossDefs.Regent;
 }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Godot;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Nodes.Combat;
@@ -145,6 +145,8 @@ public static class BossFrameTick
     public static void Tick(string source)
     {
         var swTick = System.Diagnostics.Stopwatch.StartNew();
+        // 进新战斗房（斗蛐蛐连打第二场）时，把上一场留下的面板/层/翻侧计数全拆掉。
+        CharacterBosses.UI.BossUiSession.EnsureFresh();
         try { TickInner(source); }
         finally
         {
@@ -690,11 +692,24 @@ public static class BossFrameTick
             // 只缩我们挂上去的节点，不影响原版 UI；单人恢复 1.0。**每套面板各自缩**。
             try
             {
-                var want = everyBoss.Count >= 2 ? new Vector2(0.85f, 0.85f) : Vector2.One;
                 foreach (var panelBoss in BossHandUi.PanelBosses())
                 {
                     var uiPanel = BossHandUi.PanelFor(panelBoss);
                     if (uiPanel == null || !GodotObject.IsInstanceValid(uiPanel)) continue;
+
+                    // 只在「**同一侧**有两只以上我们的 Boss」时才缩。
+                    // 斗蛐蛐是红蓝各一只，按原来的 everyBoss.Count 会误判成多 Boss，
+                    // 于是每帧在 0.85 / 1.0 之间来回跳 —— 就是用户看到的「战斗卡回合时 UI 缩放」。
+                    int sameSide = 1;
+                    try
+                    {
+                        var combat = panelBoss.Creature?.CombatState;
+                        if (combat != null && panelBoss.Creature != null)
+                            sameSide = combat.GetTeammatesOf(panelBoss.Creature).Count(t => t is CharBossMonster);
+                    }
+                    catch { /* 忽略 */ }
+
+                    var want = sameSide >= 2 ? new Vector2(0.85f, 0.85f) : Vector2.One;
                     if (uiPanel.Scale.DistanceTo(want) > 0.001f) uiPanel.Scale = want;
                 }
             }
@@ -938,12 +953,7 @@ public static class BossFrameTick
     /// <summary>多 Boss 时**不显示**特殊效果详细说明框（用户要求：显示空间太紧张；单人不影响）。</summary>
     private static void EnsureSpecialUiForAll(System.Collections.Generic.List<Monsters.CharBossMonster> bosses)
     {
-        if (bosses.Count >= 2)
-        {
-            // 多人：一只都不挂（并把之前挂过的收掉）
-            try { CharacterBosses.UI.BossSpecialUi.Hide(); } catch { /* 忽略 */ }
-            return;
-        }
+        // 每只各自维护（同阵营多 Boss 的"不显示"规则在 BossSpecialUi.Ensure 里按阵营判断）。
         foreach (var each in bosses)
         {
             try { CharacterBosses.UI.BossSpecialUi.Ensure(each); } catch { /* 单只失败不影响其它 */ }

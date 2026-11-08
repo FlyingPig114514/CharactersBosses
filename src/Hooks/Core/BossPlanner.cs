@@ -217,6 +217,8 @@ public static class BossPlanner
     /// 安全网：**排除自己和自己的阵营**。影子 Player 挂在 Boss 生物上，一旦哪天 IsPlayer 的隔离补丁失效，
     /// <c>PlayerCreatures</c> 就会把 Boss 自己也列进去，"血最少优先"会让它打自己。
     /// </summary>
+    private static string Name(MegaCrit.Sts2.Core.Entities.Creatures.Creature? c)
+        => c == null ? "null" : (c.Monster?.GetType().Name ?? c.Name ?? "?");
     public static Creature? ChooseTarget(CharBossMonster boss, CardModel card)
     {
         var combat = boss.CombatState;
@@ -228,13 +230,36 @@ public static class BossPlanner
 
         // 多人「跟踪锁定」：单体/随机攻击**只打锁定这只 Boss 的玩家**（设计见 multiplayer-lockon.md §阶段 1）。
         // 单人时锁定的就是唯一玩家，和原来的「血最少」结果一致，行为不变。
+        // ⚠ 斗蛐蛐里 Boss 会被塞进「玩家侧」（作为玩家的宠物），此时锁定到的"玩家"和它同一阵营，
+        // 打过去就是"打自己人"（用户实测：左边那只怪一直打自己）。所以同阵营的锁定一律不采纳。
         var locked = BossLockOn.TargetFor(boss)?.Creature;
-        if (locked != null && locked.IsAlive && !locked.IsDead) return locked;
+        if (locked != null && locked.IsAlive && !locked.IsDead && (self == null || locked.Side != self.Side))
+        {
+            Logger.Log($"[CharBoss] 选靶(锁定): self={Name(self)}({self?.Side}) lock={Name(locked)}({locked.Side})");
+            return locked;
+        }
 
-        return combat.PlayerCreatures
+        var picked = combat.PlayerCreatures
             .Where(c => c.IsAlive && !c.IsDead)
             .Where(c => !ReferenceEquals(c, self) && (self == null || c.Side != self.Side))
             .OrderBy(c => c.CurrentHp)
             .FirstOrDefault();
+        if (picked != null)
+        {
+            Logger.Log($"[CharBoss] 选靶(玩家侧): self={Name(self)}({self?.Side}) -> {Name(picked)}({picked.Side})");
+            return picked;
+        }
+
+        // 全员同阵营（斗蛐蛐：对面那队才是真正的对手）→ 退回「真正意义上的敌方」。
+        try
+        {
+            var opp = combat.GetOpponentsOf(self)
+                .Where(c => c != null && c.IsAlive && !c.IsDead)
+                .OrderBy(c => c.CurrentHp)
+                .FirstOrDefault();
+            Logger.Log($"[CharBoss] 选靶(对手侧): self={Name(self)}({self?.Side}) -> {Name(opp)}({opp?.Side})");
+            return opp;
+        }
+        catch { return null; }
     }
 }

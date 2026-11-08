@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Nodes.Cards;
 using CharacterBosses.Monsters;
@@ -53,6 +54,8 @@ public partial class BossHandPanel : Control
     /// ——用户实测要求「不随打出卡牌向左移动」。
     /// </summary>
     private int _turnCards;
+    /// <summary>本场战斗见过的最大手牌数：整块宽度按它算，出牌/多抽牌都不再变宽变窄（用户 2026-11-08 要求）。</summary>
+    private int _widthCards;
 
     public override void _Ready()
     {
@@ -202,6 +205,7 @@ public partial class BossHandPanel : Control
             }
             // 新回合/新计划：以这一次的手牌数作为整块宽度的基准
             _turnCards = wanted.Count;
+            if (wanted.Count > _widthCards) _widthCards = wanted.Count;
         }
         else
         {
@@ -210,10 +214,26 @@ public partial class BossHandPanel : Control
             {
                 if (wanted.Any(c => ReferenceEquals(c, _cells[i].Card))) continue;
 
-                if (IsInstanceValid(_cells[i].Node))
+                var cell = _cells[i];
+                if (IsInstanceValid(cell.Node))
                 {
-                    BossHandCard.ReleaseCell(_cells[i].Node);
-                    _cells[i].Node.QueueFree();
+                    // 这一回合**真的要打**的牌 ⇒ 给它一段「飞向目标」的出牌动画（用户 2026-11-08 要求）；
+                    // 其它情况（回合结束弃牌、被击晕后清空）仍然直接消失。
+                    // 注意：Fly 会接管这一格的释放，这里不能先 ReleaseCell/QueueFree。
+                    var planned = stunned
+                        ? null
+                        : (boss.Plan.FirstOrDefault(p => ReferenceEquals(p.Card, cell.Card))
+                           ?? boss.DisplayPlays.FirstOrDefault(p => ReferenceEquals(p.Card, cell.Card)));
+
+                    if (planned != null)
+                    {
+                        BossHandPlayFx.Fly(cell.Node, boss, planned.Target);
+                    }
+                    else
+                    {
+                        BossHandCard.ReleaseCell(cell.Node);
+                        cell.Node.QueueFree();
+                    }
                 }
                 _cells.RemoveAt(i);
             }
@@ -237,6 +257,39 @@ public partial class BossHandPanel : Control
         // （原来这里每 60 次打一条，而真正的大头 LayoutCells/建节点 其实没被单独计时）
         try { Core.PerfLog.NoteRebuild(swDbg.Elapsed.TotalMilliseconds); }
         catch { /* 忽略 */ }
+    }
+
+    /// <summary>
+    /// 这张牌**现在真的打出去了** ⇒ 把对应格子从手牌栏里摘出来，播一段「飞向目标」的动画。
+    ///
+    /// 为什么不在 <see cref="Rebuild"/> 里顺手做（用户 2026-11-08：卡牌没有打出动画）：
+    /// 出牌循环结束时 `Plan` 往往会先被清掉，等 Rebuild 发现「手牌少了一张」时已经拿不到
+    /// 这张牌的目标了；所以由出牌循环在出手那一刻直接调用这里（详见 CharBossMonster 的播放循环）。
+    /// </summary>
+    public void PlayCardFx(CardModel card, Creature? target)
+    {
+        try
+        {
+            for (int i = _cells.Count - 1; i >= 0; i--)
+            {
+                if (!ReferenceEquals(_cells[i].Card, card)) continue;
+
+                var cell = _cells[i];
+                _cells.RemoveAt(i);
+                if (IsInstanceValid(cell.Node) && _boss != null)
+                {
+                    BossHandPlayFx.Fly(cell.Node, _boss, target);
+                }
+                break;
+            }
+
+            _layoutDirty = true;
+            LayoutCells();
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] play card fx failed: " + e.Message);
+        }
     }
 
     public void Reset()

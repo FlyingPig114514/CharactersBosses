@@ -1333,6 +1333,11 @@ public abstract partial class CharBossMonster : MonsterModel
             if (WantsOpponent(play.Card))
             {
                 var live = CharacterBosses.Core.BossLockOn.TargetFor(this)?.Creature;
+                // ⚠ 斗蛐蛐里 Boss 可能被塞进玩家侧：此时"锁定到的玩家"和它同阵营，
+                //   实时改判会把正确目标（对面那只怪）覆盖成自己人 ⇒ 必须做同阵营过滤。
+                bool sameSide = live != null && Creature != null && live.Side == Creature.Side;
+                if (sameSide) Logger.Log($"[CharBoss] {play.Card.Id.Entry} 忽略同阵营实时锁定：{DescribePlayer(live)}");
+                live = sameSide ? null : live;
                 if (live != null && live.IsAlive && !live.IsDead && !ReferenceEquals(live, target))
                 {
                     Logger.Log($"[CharBoss] {play.Card.Id.Entry} 的出牌目标按实时锁定改判：" +
@@ -1451,8 +1456,13 @@ public abstract partial class CharBossMonster : MonsterModel
         // 群蛇形态那套全局收窄会串到别人的牌上，播种因此只打了一个人）。
         try { CharacterBosses.Patches.HittableEnemiesSidePatch.ResetNarrowing(); } catch { /* 忽略 */ }
 
-        Logger.Log($"[CharBoss] PLAY {play.Card.Id.Entry} (cost {play.Cost}) -> {DescribePlayer(target)}" +
+        Logger.Log($"[CharBoss] PLAY {play.Card.Id.Entry} (cost {play.Cost}) self={GetType().Name}(side={SafeSide(Creature)}) -> {DescribePlayer(target)}" +
                    $"（hp={target.CurrentHp} side={SafeSide(target)}）");
+
+        // 出牌动画（用户 2026-11-08：「卡牌没有正确的打出动画」）：把这一格从手牌栏里摘出来飞向目标。
+        // 只能在**真的出手这一刻**做 —— 回合结束时 Plan 已清空，Rebuild 那时只能看到「牌少了一张」。
+        try { CharacterBosses.UI.BossHandUi.PanelFor(this)?.PlayCardFx(play.Card, target); }
+        catch (Exception e) { Logger.Log("[CharBoss] 出牌动画调用失败: " + e.Message); }
 
         // 群攻牌诊断（用户 2026-10-29：「灾厄骨的播种不群攻」）：
         // 把「这张牌打出那一刻，`HittableEnemies` 到底解析成谁」打出来 ——
@@ -1502,6 +1512,9 @@ public abstract partial class CharBossMonster : MonsterModel
         //   （亡灵精通的奥斯提反伤、崩坠「灼魂」引爆都会打到玩家自己）。
         //   现在只在她真的打这张牌的这段时间翻（计数跨越 await，覆盖整个 AutoPlay 生命周期）。
         Patches.HittableEnemiesSidePatch.BossActingDepth++;
+        // 斗蛐蛐红队：她自己就在玩家侧 ⇒ 不能把「可命中敌人」翻成玩家侧，否则打自己（见该字段注释）
+        bool playerSideBoss = SafeSide(Creature) == "Player";
+        if (playerSideBoss) Patches.HittableEnemiesSidePatch.PlayerSideBossDepth++;
         // 冰寒（Chill）不需要额外处理：用户 2026-10-24 订正为「只检测玩家数量」，
         // 而上面那条翻侧规则本来就把「可命中敌人」解释成**真人玩家**（宠物/召唤物不算），
         // 于是原版 `Chill` 自然就是「每有一名玩家 → 生成 1 个冰霜球」。以前那套
@@ -1590,6 +1603,8 @@ public abstract partial class CharBossMonster : MonsterModel
         finally
         {
             Patches.HittableEnemiesSidePatch.BossActingDepth--;
+            if (playerSideBoss && Patches.HittableEnemiesSidePatch.PlayerSideBossDepth > 0)
+                Patches.HittableEnemiesSidePatch.PlayerSideBossDepth--;
             if (multiTargetCard && Patches.HittableEnemiesSidePatch.MultiTargetCardDepth > 0)
                 Patches.HittableEnemiesSidePatch.MultiTargetCardDepth--;
             DrawBlockEntry = null;      // 出牌结束就撤掉（只影响这一次出牌里的抽牌）

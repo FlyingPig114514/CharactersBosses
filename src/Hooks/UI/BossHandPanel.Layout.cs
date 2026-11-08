@@ -87,7 +87,7 @@ public partial class BossHandPanel
         float cardTop = statusH + StatusGap;
         float intentTop = cardTop + cardH + IntentGap;
         // 宽度按「本回合最多几张牌」算，不随出牌缩小（否则状态条/能量会往左滑）
-        int sizing = Math.Max(_turnCards, _cells.Count);
+        int sizing = Math.Max(Math.Max(_turnCards, _widthCards), _cells.Count);
         float total = sizing * cardW + Math.Max(0, sizing - 1) * Gap;
         float panelH = intentTop + IntentBoxHeight;
 

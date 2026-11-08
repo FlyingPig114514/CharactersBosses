@@ -24,10 +24,6 @@ namespace CharacterBosses.UI;
 /// </summary>
 public static class BossHandUi
 {
-    private const int HudLayer = 80;
-
-    private static CanvasLayer? _layer;
-
     /// <summary>按 Boss 各一份手牌栏（多人「双 Boss 两套面板」的关键；单人只有一份）。</summary>
     private static readonly Dictionary<CharBossMonster, BossHandPanel> Panels = new();
 
@@ -185,23 +181,29 @@ public static class BossHandUi
     private static BossHandPanel? EnsurePanel(SceneTree tree, CharBossMonster boss)
     {
         var existing = PanelFor(boss);
-        if (existing != null) return existing;
+        if (existing != null)
+        {
+            // 父节点可能在战斗中途变得不可见（斗蛐蛐进场、原版把界面收掉）⇒ 跟着搬
+            var want = ResolveParent(tree, out _);
+            if (want != null && existing.GetParent() != want) existing.Reparent(want);
+            return existing;
+        }
 
         // 优先挂到**战斗房自己的 UI 层**（NCombatRoom.Ui，全屏 Control）：
         //   · 坐标系与屏幕一致（0,0 1920x1080）；
         //   · 和游戏 UI 在同一个节点树里，所以遗物悬浮说明/弹窗这些全局 UI 会画在我们**上面**
         //     （之前挂在自己的 CanvasLayer 上，层级比它们高，导致遗物说明被卡牌盖住）；
         //   · 战斗房销毁时跟着消失，不会残留在别的界面上。
-        var ui = NCombatRoom.Instance?.Ui;
-        Node parent = ui?.GetNodeOrNull<Control>("%PlayContainer") ?? (Node?)ui ?? (Node?)tree.Root;
-        if (ui == null)
+        //
+        // ⚠ 但斗蛐蛐会把整个 CombatUi 隐藏（2026-11-08 实测 `CombatUi.Visible=false`：
+        //   链路上 `PlayContainer(v=True,t=False) < CombatUi(v=False,t=False)`），挂在下面的面板
+        //   全部 IsVisibleInTree()=false —— 表现就是卡牌/遗物不显示 + tooltip 每 400ms 重建导致闪烁。
+        //   所以这里改成按**可见性**挑父节点。
+        var parent = ResolveParent(tree, out var why);
+        if (parent == null)
         {
-            if (_layer == null || !GodotObject.IsInstanceValid(_layer))
-            {
-                _layer = new CanvasLayer { Name = "CharacterBossesHud", Layer = HudLayer };
-                tree.Root.AddChild(_layer);
-            }
-            parent = _layer;
+            Logger.Log("[CharBoss] hand ui: 没有可用的父节点（战斗 UI 不可见，自建层也建不出来）");
+            return null;
         }
 
         var panel = new BossHandPanel
@@ -212,10 +214,16 @@ public static class BossHandUi
         };
         parent.AddChild(panel);
         Panels[boss] = panel;
-        Logger.Log($"[CharBoss] hand ui: 挂到 {parent.Name}（战斗房 UI 层）" +
+        Logger.Log($"[CharBoss] hand ui: 挂到 {parent.Name}（{why}）" +
                    $"boss={SafeKey(boss)}（本场共 {Panels.Count} 套面板）");
         return panel;
     }
+
+    /// <summary>
+    /// 挑手牌栏的父节点：战斗房 UI 可见就挂它（原版弹窗能盖住我们），
+    /// 不可见（斗蛐蛐）就退回自建 HUD 层。具体判定在 <see cref="BossHudLayer.Resolve"/>。
+    /// </summary>
+    private static Node? ResolveParent(SceneTree tree, out string why) => BossHudLayer.Resolve(out why);
 
     private static string SafeKey(CharBossMonster boss)
     {
@@ -292,14 +300,13 @@ public static class BossHandUi
     {
         try
         {
-            if (_layer != null && GodotObject.IsInstanceValid(_layer)) _layer.QueueFree();
-            _layer = null;
-
+            // 自建 HUD 层（战斗 UI 不可见时用）—— 一场结束就释放，下一场按需重建
+            BossHudLayer.Release();
             // 下一场战斗要重新量一次锚点（Boss 立绘/位置可能不一样）
             BossHandAnchor.ResetLock();
 
             // 说明框挂在全局的悬浮说明层上，界面收掉时必须显式移除
-            BossSpecialUi.Hide();
+            BossSpecialUi.HideAll();
             BossOrbDisplay.ClearHighlight(null);
         }
         catch (Exception e)
