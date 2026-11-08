@@ -542,6 +542,21 @@ public static class BossFrameTick
         //   她身上「力量 / 集中 / 球的构成」被**外部**改动时不刷新。这里按指纹兜底：一变就强制重画。
         foreach (var each in everyBoss) RefreshPanelIfStatsChanged(each);
 
+        // ★ v0.2.484（用户 2026-11-08：「为什么我打一张打击伤害−6？」）：
+        //   根因是**时序**：打出的那张打击在「出牌中」的短暂几帧里既不在手牌也不在弃牌堆，
+        //   于是牌堆统计少 1（−3）、已打出计数又多 1（−3）⇒ 被算成 −6，而且那一刻算出来的数值会**粘住**。
+        //   这里改成：**每帧**都按当前真实牌堆重算一次（只对挂着 BossBashPower 的她，成本可忽略），
+        //   等那张牌落进弃牌堆后下一帧就会自动修正回 −3。
+        foreach (var each in everyBoss)
+        {
+            try
+            {
+                if (each?.Creature?.GetPower<CharacterBosses.Powers.BossBashPower>() == null) continue;
+                Core.BossScriptRunner.RetuneBashPerfectStrike(each);
+            }
+            catch { /* 忽略 */ }
+        }
+
             // ① 手牌栏跟随 Boss（原先写在 OnFrame 里，等于从没跑过）
             //    多人「双 Boss 两套面板」：**每只 Boss 各跑一次自己的面板**
             //    （每套面板只跟自己的 Boss，见 BossHandUi 的多实例改造）。
