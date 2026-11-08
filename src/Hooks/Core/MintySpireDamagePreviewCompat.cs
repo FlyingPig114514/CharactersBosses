@@ -222,7 +222,9 @@ internal static class MintySpireDamagePreviewCompat
         // 充能球被动：单体随机 ⇒ 本地玩家不是被锁的人时不算
         try
         {
-            int orbs = BossHandPanel.OrbPassiveDamage(boss, quiet: true);
+            // ★ v0.2.491（用户 2026-11-08：「玻璃球的被动没有被薄荷尖塔的伤害预览计算」）
+            //   `OrbPassiveDamage` 把群伤（玻璃球）拆到 out 参数了，这里要的是「总共会挨多少」⇒ 一起算
+            int orbs = BossHandPanel.OrbPassiveDamage(boss, true, out int orbsAoe) + orbsAoe;
             if (orbs > 0 && BossIntentBuilder.RandomAimIsElsewhere(boss)) orbs = 0;
             total += orbs;
         }

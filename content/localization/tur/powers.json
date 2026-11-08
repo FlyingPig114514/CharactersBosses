@@ -30,7 +30,7 @@
     "BOSS_COOLANT_POWER.title": "Soğutucu",
     "BOSS_COOLANT_POWER.description":  "Savaşın başında [gold]Çekme Deste[/gold]'ne ve [gold]El[/gold]'ine 2 [gold]Aydınlat[/gold] ekle.\nTurun sonunda [gold]El[/gold]'inde hâlâ [gold]Aydınlat[/gold] varsa, bu tur Arıza'nın hiçbir [gold]Karanlık[/gold] küresi pasif etkisini tetiklemez.",
     "BOSS_RAINBOW_POWER.title":  "Gökkuşağı",
-    "BOSS_RAINBOW_POWER.description":  "Defekt her 5 küre kanalize ettiğinde 1 Odak kazanır. Karanlık küreleri pasiflerini asla tetiklemez.\nUYARI: Cam küreler ve Metronom kaynaksız hasar verir – «Senin İçin Öl» özellikli bir çağrı bunu senin yerine emmez.",
+    "BOSS_RAINBOW_POWER.description":  "Defekt her 5 küre kanalize ettiğinde 1 Odak kazanır. Karanlık küreleri pasiflerini asla tetiklemez.\nUYARI: Cam küreler kaynaksız hasar verir – «Senin İçin Öl» özellikli bir çağrı bunu senin yerine emmez.",
     "GO_FOR_THE_EYES_AIM_POWER.title": "Gözlere Çalış",
     "GO_FOR_THE_EYES_AIM_POWER.description": "Bu tur Arıza [gold]Gözlere Çalış[/gold] oynayacak. Ona bir Atak kartı oynarsan (veya alan saldırın ona isabet ederse), bu [gold]Gözlere Çalış[/gold] ek olarak 1 [gold]Zayıf[/gold] uygular.",
     "SHARED_FATE_POWER.title": "Ortak Kader",

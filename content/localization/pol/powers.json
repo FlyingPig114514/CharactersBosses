@@ -30,7 +30,7 @@
     "BOSS_COOLANT_POWER.title":  "Chłodziwo",
     "BOSS_COOLANT_POWER.description":  "Na początku walki dodaj 2 karty „Luminescencja” do stosu rozgrywającego i do ręki.\nPod koniec twojej tury, jeśli w ręce pozostanie „Luminescencja”, żadna Sfera Ciemności Defekta nie aktywuje w tej turze swojej umiejętności biernej.",
     "BOSS_RAINBOW_POWER.title":  "Tęcza",
-    "BOSS_RAINBOW_POWER.description":  "Za każdym razem, gdy Defekt skanalizuje 5 kul, zyskuje 1 Skupienie. Jego Ciemne kule nigdy nie uruchamiają efektu biernego.\nOSTRZEŻENIE: kule Szklane i Metronom zadają obrażenia bez źródła – przywołanie z „Umrę za Ciebie“ go nie pochłonie.",
+    "BOSS_RAINBOW_POWER.description":  "Za każdym razem, gdy Defekt skanalizuje 5 kul, zyskuje 1 Skupienie. Jego Ciemne kule nigdy nie uruchamiają efektu biernego.\nOSTRZEŻENIE: kule Szklane zadają obrażenia bez źródła – przywołanie z „Umrę za Ciebie“ go nie pochłonie.",
     "GO_FOR_THE_EYES_AIM_POWER.title":  "Celuj w oczy",
     "GO_FOR_THE_EYES_AIM_POWER.description":  "W tej turze Defekt zamierza zagrać „Celuj w oczy”. Jeśli zagrasz przeciw niemu kartę Ataku (albo trafi go atak obszarowy), to „Celuj w oczy” nałoży dodatkowo 1 pkt. Słabości.",
     "SHARED_FATE_POWER.title":  "Wspólny los",

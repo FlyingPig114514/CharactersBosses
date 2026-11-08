@@ -30,7 +30,7 @@
     "BOSS_COOLANT_POWER.title":  "冷却剂",
     "BOSS_COOLANT_POWER.description":  "战斗开始时，将 2 张「冷光」分别加入你的抽牌堆和手牌。\n在你的回合结束时，若你手牌中保留着「冷光」，本回合故障机器人的所有暗黑充能球不触发被动效果。",
     "BOSS_RAINBOW_POWER.title":  "彩虹",
-    "BOSS_RAINBOW_POWER.description":  "故障机器人每生成 5 个充能球，就获得 1 点集中。它的黑暗充能球不会触发被动效果。\n警告：玻璃充能球和节拍器属于无来源伤害，带有「为你而死」的召唤物不会替你承受该伤害。",
+    "BOSS_RAINBOW_POWER.description":  "故障机器人每生成 5 个充能球，就获得 1 点集中。它的黑暗充能球不会触发被动效果。\n警告：玻璃充能球属于无来源伤害，带有「为你而死」的召唤物不会替你承受该伤害。",
     "GO_FOR_THE_EYES_AIM_POWER.title":  "眼部攻击",
     "GO_FOR_THE_EYES_AIM_POWER.description":  "本回合故障机器人将要打出「眼部攻击」。如果你对它打出攻击牌（或群攻波及到它），这记「眼部攻击」就会额外给予 1 层虚弱。",
     "SHARED_FATE_POWER.title":  "命运同担",

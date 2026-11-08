@@ -41,7 +41,7 @@
     "REGENT_BOSS.orbital":  "环绕轨道\n你以 1 层[gold]光谱偏移[/gold]开始战斗。\n儲君第一回合被击晕；第二回合打出[gold]轰击[/gold]后他一直被击晕，而[gold]轰击[/gold]在他的[gold]消耗牌堆[/gold]里[gold]每回合自动复燃[/gold]。\n当你在第 5 个「打出过无色牌的回合」之后他会醒来 —— 并且[gold]轰击[/gold]反过来打他自己。",
     "REGENT_BOSS.minion":  "征召上前\n每當儲君打出僕從牌时，若其僕從数不足 2，改为召喚对应種類的僕從。\n每當儲君用卡牌獲得力量时，他的其它友方也獲得等量力量。",
     "DEFECT_BOSS.thunder":  "引雷針\n你每在一回合内打出 3 張牌，故障機器人本回合失去 1 點集中（每滿 3 张扣 1 点，回合結束時返還）。",
-    "DEFECT_BOSS.rainbow":  "彩虹\n故障機器人每生成 5 個充能球，就獲得 1 點集中。它的黑暗充能球不會觸發被動效果。\n警告：玻璃充能球和節拍器屬於無來源傷害，帶有「為你而死」的召喚物不會替你承受該傷害。",
+    "DEFECT_BOSS.rainbow":  "彩虹\n故障機器人每生成 5 個充能球，就獲得 1 點集中。它的黑暗充能球不會觸發被動效果。\n警告：玻璃充能球屬於無來源傷害，帶有「為你而死」的召喚物不會替你承受該傷害。",
     "MINION_STRIKE_MONSTER.title":  "打擊僕從",
     "MINION_SACRIFICE_MONSTER.title":  "捐軀僕從",
     "MINION_SACRIFICE_MONSTER.name":  "捐軀僕從",

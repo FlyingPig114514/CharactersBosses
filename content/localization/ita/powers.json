@@ -30,7 +30,7 @@
     "BOSS_COOLANT_POWER.title":  "Refrigerante",
     "BOSS_COOLANT_POWER.description":  "All'inizio del combattimento, aggiungi 2 [gold]Brillare[/gold] al tuo [gold]mazzo di pesca[/gold] e alla tua [gold]mano[/gold].\nAlla fine del tuo turno, se un [gold]Brillare[/gold] è ancora nella tua [gold]mano[/gold], nessuno dei [gold]Tetroglobi[/gold] del Defect attiva il suo effetto passivo in questo turno.",
     "BOSS_RAINBOW_POWER.title":  "Arcobaleno",
-    "BOSS_RAINBOW_POWER.description":  "Ogni volta che il Defect incanala 5 orb, guadagna 1 Concentrazione. I suoi orb Oscuri non attivano mai la loro passiva.\nAVVISO: gli orb di Vetro e il Metronomo infliggono danni senza fonte: una evocazione con «Muori per me» non li assorbirà.",
+    "BOSS_RAINBOW_POWER.description":  "Ogni volta che il Defect incanala 5 orb, guadagna 1 Concentrazione. I suoi orb Oscuri non attivano mai la loro passiva.\nAVVISO: gli orb di Vetro infliggono danni senza fonte: una evocazione con «Muori per me» non li assorbirà.",
     "GO_FOR_THE_EYES_AIM_POWER.title":  "Agli Occhi!",
     "GO_FOR_THE_EYES_AIM_POWER.description":  "In questo turno il Defect giocherà \"[gold]Agli Occhi![/gold]\". Se giochi una carta [gold]Attacco[/gold] contro di lui (o un attacco ad area lo colpisce), quel \"[gold]Agli Occhi![/gold]\" applica anche 1 di [gold]Debolezza[/gold].",
     "SHARED_FATE_POWER.title":  "Fato Condiviso",

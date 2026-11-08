@@ -41,7 +41,7 @@
     "REGENT_BOSS.orbital":  "Orbital Bombardment\nYou start combat with 1 stack of [gold]Spectrum Shift[/gold].\nThe Regent is [gold]Stunned[/gold] on turn 1; after playing [gold]Bombardment[/gold] he stays Stunned while it [gold]re-fires every turn[/gold] from his [gold]Exhaust Pile[/gold].\nOn your 5th turn in which you played a Colorless card he wakes up — and the [gold]Bombardment[/gold] starts hitting HIM instead.",
     "REGENT_BOSS.minion":  "Call to Arms\nWhenever the Regent plays a Minion card, if he has fewer than 2 Minions, summon the matching Minion instead.\nWhenever the Regent gains Strength from a card, his other allies gain the same amount.",
     "DEFECT_BOSS.thunder":  "Lightning Rod\nEvery time you play 3 cards in a turn, the Defect loses 1 Focus this turn (1 per 3 cards, restored at end of turn).",
-    "DEFECT_BOSS.rainbow":  "Rainbow\nEvery 5 orbs the Defect channels, it gains 1 Focus. Its Dark orbs never trigger their passive.\nWARNING: Glass orbs and Metronome deal sourceless damage - a summon with \"Die for You\" will not absorb it for you.",
+    "DEFECT_BOSS.rainbow":  "Rainbow\nEvery 5 orbs the Defect channels, it gains 1 Focus. Its Dark orbs never trigger their passive.\nWARNING: Glass orbs deal sourceless damage - a summon with \"Die for You\" will not absorb it for you.",
     "MINION_STRIKE_MONSTER.title":  "Strike Minion",
     "MINION_SACRIFICE_MONSTER.title":  "Sacrifice Minion",
     "MINION_SACRIFICE_MONSTER.name":  "Sacrifice Minion",

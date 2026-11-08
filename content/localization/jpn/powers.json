@@ -30,7 +30,7 @@
     "BOSS_COOLANT_POWER.title":  "冷却材",
     "BOSS_COOLANT_POWER.description":  "戦闘開始時、[gold]発光[/gold]を2枚、山札と手札に加える。\nあなたのターン終了時、手札に[gold]発光[/gold]が残っている場合、このターン中ディフェクトのダークオーブはパッシブ効果を発動しない。",
     "BOSS_RAINBOW_POWER.title":  "虹",
-    "BOSS_RAINBOW_POWER.description":  "ディフェクトがオーブを5個チャネルするたび、集中を1得る。そのダークオーブはパッシブを発動しない。\n警告：ガラスオーブとメトロノームは発生源なしのダメージを与える。「君がために死す」を持つ召喚物は肩代わりできない。",
+    "BOSS_RAINBOW_POWER.description":  "ディフェクトがオーブを5個チャネルするたび、集中を1得る。そのダークオーブはパッシブを発動しない。\n警告：ガラスオーブは発生源なしのダメージを与える。「君がために死す」を持つ召喚物は肩代わりできない。",
     "GO_FOR_THE_EYES_AIM_POWER.title":  "目潰し",
     "GO_FOR_THE_EYES_AIM_POWER.description":  "このターン、ディフェクトは「[gold]目潰し[/gold]」をプレイしようとしている。あなたが攻撃カードを彼にプレイする（または全体攻撃が彼に当たる）と、その「[gold]目潰し[/gold]」は追加で[gold]脱力[/gold]を1付与する。",
     "SHARED_FATE_POWER.title":  "運命を共に",

@@ -30,7 +30,7 @@
     "BOSS_COOLANT_POWER.title":  "Ventilation",
     "BOSS_COOLANT_POWER.description":  "Au début du combat, ajoutez 2 [gold]Éclat[/gold] à votre [gold]Pioche[/gold] et à votre [gold]Main[/gold].\nÀ la fin de votre tour, si un [gold]Éclat[/gold] reste dans votre [gold]Main[/gold], aucun [gold]Orbe ténébreux[/gold] du Défectueux ne déclenche sa capacité passive ce tour-ci.",
     "BOSS_RAINBOW_POWER.title":  "Arc-en-ciel",
-    "BOSS_RAINBOW_POWER.description":  "Chaque fois que le Defect canalise 5 orbes, il gagne 1 Concentration. Ses orbes Ténus ne déclenchent jamais leur passif.\nAVERTISSEMENT : les orbes de Verre et le Métronome infligent des dégâts sans source – une invocation avec « Meurs pour toi » ne les absorbera pas.",
+    "BOSS_RAINBOW_POWER.description":  "Chaque fois que le Defect canalise 5 orbes, il gagne 1 Concentration. Ses orbes Ténus ne déclenchent jamais leur passif.\nAVERTISSEMENT : les orbes de Verre infligent des dégâts sans source – une invocation avec « Meurs pour toi » ne les absorbera pas.",
     "GO_FOR_THE_EYES_AIM_POWER.title":  "Viser les yeux",
     "GO_FOR_THE_EYES_AIM_POWER.description":  "Ce tour-ci, Le Défectueux va jouer « [gold]Viser les yeux[/gold] ». Si vous jouez une carte [gold]Attaque[/gold] sur lui (ou qu'une attaque de zone le touche), ce « [gold]Viser les yeux[/gold] » applique 1 [gold]Affaibli[/gold] supplémentaire.",
     "SHARED_FATE_POWER.title":  "Destin partagé",
