@@ -1,7 +1,7 @@
 {
     "id": "CharacterBosses",
     "name": "玩家角色Boss (Characters Bosses)",
-    "version": "0.2.509",
+    "version": "0.2.510",
     "author": "飞猪",
     "description": "每一幕的 Boss 都换成原版可玩角色：自带卡组、遗物、出牌剧本与跟踪锁定，支持多人联机。/ Replaces each act boss with a vanilla playable character that fights you with its own deck, relics and scripted plays.",
     "pck_name": "CharacterBosses",

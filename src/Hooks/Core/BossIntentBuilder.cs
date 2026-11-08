@@ -824,6 +824,7 @@ public static class BossIntentBuilder
     public static int PendingRise(Creature? boss)
     {
         if (boss == null) return 0;
+        int total = 0;
         try
         {
             var relics = boss.Player?.Relics;
@@ -832,16 +833,53 @@ public static class BossIntentBuilder
             {
                 var relic = relics[i];
                 if (relic == null) continue;
-                if (relic.Id.Entry != "TOASTY_MITTENS") continue;
-                try { return Math.Max(0, (int)relic.DynamicVars["Strength"].BaseValue); }
-                catch { return 1; }
+                if (relic.Id.Entry == "TOASTY_MITTENS")
+                {
+                    try { total += Math.Max(0, (int)relic.DynamicVars["Strength"].BaseValue); }
+                    catch { total += 1; }
+                    continue;
+                }
+                // ★ v0.2.510（用户 2026-11-08：「第三回合飞镖的伤害预览没有计算口红会给她的力量」）：
+                //   闪亮口红（`SparklingRouge`）反编译确认：
+                //     AfterBlockCleared(creature) 里 `creature == Owner.Creature
+                //       && Owner.PlayerCombatState.TurnNumber == 3` ⇒ +力量 / +敏捷（各 1）。
+                //   也就是**她第 3 回合的格挡被清空那一刻**才到账，而规划是在玩家回合开始就做完的
+                //   （那时她的格挡还挂着 ⇒ 还没到账）⇒ 所有吃力量的意图都少 1（飞镖这种多段牌最明显）。
+                //
+                //   判据：① 当前这一手是她第 3 回合（`TurnNumber == 3`）；
+                //         ② 她的格挡**还没被清**（`Block > 0`）——格挡已经清空说明这一笔已经到账
+                //            （或者这一回合本来没格挡、遗物根本不会触发）⇒ 不再补，避免重复计入。
+                if (relic.Id.Entry == "SPARKLING_ROUGE")
+                {
+                    try
+                    {
+                        if (boss.Monster is CharacterBosses.Monsters.CharBossMonster charBoss
+                            && charBoss.TurnNumber == 3
+                            && boss.Block > 0)
+                        {
+                            int gain = 1;
+                            try { gain = Math.Max(0, (int)relic.DynamicVars["Strength"].BaseValue); }
+                            catch { gain = 1; }
+                            total += gain;
+                            Logger.Log($"[CharBoss] 闪亮口红：她第 3 回合的格挡还没清 ⇒ 预览先补 {gain} 点力量" +
+                                       $"（当前格挡 {boss.Block}，力量 {SafeStrength(boss)}）");
+                        }
+                    }
+                    catch { /* 读不到就按 0 */ }
+                }
             }
         }
         catch (Exception e)
         {
             Logger.Log("[CharBoss] 估算「回合前涨力量」失败: " + e.Message);
         }
-        return 0;
+        return total;
+    }
+
+    private static int SafeStrength(Creature c)
+    {
+        try { return c.GetPowerAmount<MegaCrit.Sts2.Core.Models.Powers.StrengthPower>(); }
+        catch { return 0; }
     }
 
     /// <summary>
