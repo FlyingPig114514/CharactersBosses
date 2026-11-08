@@ -312,7 +312,7 @@ internal static class BossKeys
         {
             case "IRONCLAD_ANGER": return ModelDb.Encounter<IroncladAngerBossEncounter>();
             case "IRONCLAD_STRIKE": return ModelDb.Encounter<IroncladStrikeBossEncounter>();
-            case "SILENT_SNAKEBITE": return ModelDb.Encounter<SilentSnakeBiteBossEncounter>();
+            case "SILENT_SNAKEBITE": return ModelDb.Encounter<SilentSnakebiteBossEncounter>();
             case "IRONCLAD_VULN": return ModelDb.Encounter<IroncladVulnBossEncounter>();
             case "IRONCLAD_BOULDER": return ModelDb.Encounter<IroncladBoulderBossEncounter>();
             case "NECROBINDER_DOOM": return ModelDb.Encounter<NecrobinderDoomBossEncounter>();

@@ -130,7 +130,7 @@ public sealed class DefectThunderBossEncounter : DefectBossEncounter
 /// 一层静默猎手的**第二套设计「蛇咬猎」**（Key `SILENT_SNAKEBITE`，用户 2026-11-08）。
 /// 特殊效果「群蛇形态」见 <c>Powers/BossSnakeFormPower.cs</c>，剧本见 <c>Core/SnakeBiteSilentScript.cs</c>。
 /// </summary>
-public sealed class SilentSnakeBiteBossEncounter : SilentBossEncounter
+public sealed class SilentSnakebiteBossEncounter : SilentBossEncounter
 {
     public override int? TierAct => 0;
 }

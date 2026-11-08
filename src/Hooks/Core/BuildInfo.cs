@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.501 / 2026-11-08（新 Boss：一层静默猎手 2 号「蛇咬猎」SILENT_SNAKEBITE —— 9 回合剧本循环 6~9；特殊效果「群蛇形态」(单体)：她洗牌时自己抽牌堆 +1 蛇咬（无动画）、被她锁定的玩家洗牌时往那人抽牌堆塞 1 张（带塞牌动画）；循环每个第 9 回合多塞一张保留的蛇咬（飞镖段数增加）；逃脱计划打出前先往抽牌堆顶放一张防御 ⇒ 必定抽到技能牌、必定吃满格挡；遗物 蛇之戒指/涅奥的祝福/斗篷扣/红面具；进阶 8 升残影+逃脱计划、进阶 9 升背刺+飞镖）";
+    public const string Tag = "v0.2.502 / 2026-11-08（修蛇咬猎的遭遇 id：类名 SilentSnakeBiteBossEncounter 会被转成 SILENT_SNAKE_BITE_…（中间多一个下划线），控制台 fight 找不到 ⇒ 改名 SilentSnakebiteBossEncounter，遭遇 id 现在是 SILENT_SNAKEBITE_BOSS_ENCOUNTER）";
 
     private static bool _logged;
 
