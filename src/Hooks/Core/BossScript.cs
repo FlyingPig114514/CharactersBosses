@@ -471,7 +471,7 @@ public static class BossScriptRunner
     ///   `CalculationBase = target − perCard × 牌堆里实际张数`。
     /// （第二次尝试在 `ExtraDamage` 上归零，结果卡面文案变成「伤害增加 0」，所以回滚了 —— 那条路是错的。）
     /// </summary>
-    private static void ApplyBashToPerfectStrike(CardModel card, Monsters.CharBossMonster boss, int pool)
+    private static void ApplyBashToPerfectStrike(CardModel card, Monsters.CharBossMonster boss)
     {
         try
         {
@@ -482,18 +482,18 @@ public static class BossScriptRunner
             int baseVal = 6;
             int perCard = CharacterBosses.Powers.BossBashPower.PerCard();
 
-            int target = baseVal + Math.Max(0, pool);
+            int target = CharacterBosses.Powers.BossBashPower.TargetDamage(boss);
             int live = CountStrikeCardsInPiles(boss);
             int calc = Math.Max(0, target - perCard * Math.Max(0, live));
             card.DynamicVars["CalculationBase"].BaseValue = calc;
-            Logger.Log($"[CharBoss] 痛击：完美打击目标 {target}（基础 {baseVal} + 池子 {pool}）" +
+            Logger.Log($"[CharBoss] 痛击：完美打击目标 {target}（基础 {baseVal} + {perCard}×统计张数）" +
                        $"牌堆现算 {live} 张 × {perCard} ⇒ CalculationBase = {calc}");
         }
         catch (Exception e) { Logger.Log("[CharBoss] 痛击：写完美打击失败: " + e.Message); }
     }
 
     /// <summary>池子下降后重算她手上/牌堆里所有完美打击（Power 那边调用）。</summary>
-    internal static void RetuneBashPerfectStrike(Monsters.CharBossMonster boss, int pool)
+    internal static void RetuneBashPerfectStrike(Monsters.CharBossMonster boss)
     {
         try
         {
@@ -505,7 +505,7 @@ public static class BossScriptRunner
                 string entry;
                 try { entry = card.Id.Entry; } catch { continue; }
                 if (entry != "PERFECTED_STRIKE") continue;
-                ApplyBashToPerfectStrike(card, boss, pool);
+                ApplyBashToPerfectStrike(card, boss);
             }
         }
         catch (Exception e) { Logger.Log("[CharBoss] 痛击：重算完美打击失败: " + e.Message); }
@@ -677,8 +677,7 @@ public static class BossScriptRunner
                         var bash = cardBoss.Creature?.GetPower<CharacterBosses.Powers.BossBashPower>();
                         if (bash != null)
                         {
-                            bash.EnsureInit();
-                            ApplyBashToPerfectStrike(card, cardBoss, bash.Pool);
+                            ApplyBashToPerfectStrike(card, cardBoss);
                         }
                     }
                 }

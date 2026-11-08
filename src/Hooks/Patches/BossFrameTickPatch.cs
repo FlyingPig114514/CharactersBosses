@@ -1052,6 +1052,15 @@ public static class BossFrameTick
                 var names = new List<string>();
                 if (orbs != null) { foreach (var o in orbs) names.Add(o == null ? "-" : o.GetType().Name); }
                 print = strength + "/" + focus + "/" + string.Join(",", names);
+                // ★ v0.2.482（用户 2026-11-08：「我打出打击，当回合完美打击的伤害预览不会变，应该实时计算」）：
+                //   痛击现在是**按牌堆实时统计**的 ⇒ 把「名字含打击的牌数」也放进指纹。
+                //   数字一变就在玩家回合里立刻重算完美打击并重画面板（只对挂着 BossBashPower 的她生效）。
+                try
+                {
+                    if (boss.Creature.GetPower<CharacterBosses.Powers.BossBashPower>() != null)
+                        print += "/strike=" + CharacterBosses.Powers.BossBashPower.CountNow(boss);
+                }
+                catch { /* 忽略 */ }
             }
             catch { return; }
 
@@ -1062,6 +1071,14 @@ public static class BossFrameTick
             bool playerSide;
             try { playerSide = boss.CombatState?.CurrentSide == MegaCrit.Sts2.Core.Combat.CombatSide.Player; }
             catch { playerSide = false; }
+            // 打击战：数字变了先把他手上/牌堆里的完美打击按新统计重算，再重画面板
+            try
+            {
+                if (boss.Creature?.GetPower<CharacterBosses.Powers.BossBashPower>() != null)
+                    Core.BossScriptRunner.RetuneBashPerfectStrike(boss);
+            }
+            catch { /* 忽略 */ }
+
             if (!playerSide) return;      // 她自己回合里数值本来就在变，交给原来的流程
 
             Logger.Log($"[CharBoss] {boss.Id.Entry} 力量/集中/球 变化（{last} → {print}）⇒ 重画面板（球被动随之更新）");
