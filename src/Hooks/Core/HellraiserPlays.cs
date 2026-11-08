@@ -94,14 +94,13 @@ internal static class HellraiserPlays
             Logger.Log($"[CharBoss] 地狱狂徒：自动免费打出 {card.Id.Entry}" +
                        $" → {(victim == null ? "<无目标>" : victim.Name)}（目标=被锁定玩家）");
 
-            // 特效：先给目标一次受击动画，再打出牌（AutoPlay 自带卡面飞出的演出）
-            try
-            {
-                if (victim != null) CharacterBosses.Patches.HellraiserVfx.Flash(victim);
-            }
-            catch { /* 忽略：特效失败不影响出牌 */ }
-
-            var task = CardCmd.AutoPlay(ctx, card, victim, AutoPlayType.Default);
+            // ★ v0.2.485（用户 2026-11-08：「地狱狂徒打出的打击还是要原版那种铁山靠 + 脚下浮刀的演出」）：
+            //   反编译 `HellraiserPower.AfterCardDrawnEarly` 后确认：**原版根本没有单独的 VFX**，
+            //   它就是 `CardCmd.AutoPlay(ctx, card, null)` —— 目标传 **null**（自动选），
+            //   于是走的是这张打击牌自己的出牌动画（就是我们看到的那套动作）。
+            //   我们之前①传了显式目标、②又额外调了 `TriggerAnim(victim, "Hit")`，
+            //   后者会把出牌动画顶掉 ⇒ 看起来「没有特效」。现在**完全照原版**来。
+            var task = CardCmd.AutoPlay(ctx, card, null, AutoPlayType.Default);
             var finished = await Task.WhenAny(task, Task.Delay(8000));
             if (!ReferenceEquals(finished, task))
             {
