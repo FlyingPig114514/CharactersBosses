@@ -4702,3 +4702,4 @@ Chronological action log.
 | 2026-11-08 10:30 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Powers/BossBashPower.cs` | ok | 0 |
 | 2026-11-08 10:43 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/HellraiserPlays.cs` | ok | 0 |
 | 2026-11-08 11:20 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Powers/BossBashPower.cs` | error | 0 |
+| 2026-11-08 20:15 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/SnakeBiteSilentScript.cs` | ok | 0 |
