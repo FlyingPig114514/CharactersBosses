@@ -100,7 +100,7 @@ internal static class HellraiserPlays
             //   于是走的是这张打击牌自己的出牌动画（就是我们看到的那套动作）。
             //   我们之前①传了显式目标、②又额外调了 `TriggerAnim(victim, "Hit")`，
             //   后者会把出牌动画顶掉 ⇒ 看起来「没有特效」。现在**完全照原版**来。
-            var task = CardCmd.AutoPlay(ctx, card, null, AutoPlayType.Default);
+            var task = CardCmd.AutoPlay(ctx, card, (Creature?)null, AutoPlayType.Default);
             var finished = await Task.WhenAny(task, Task.Delay(8000));
             if (!ReferenceEquals(finished, task))
             {

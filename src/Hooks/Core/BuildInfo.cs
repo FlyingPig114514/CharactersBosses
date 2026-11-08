@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.485 / 2026-11-08（地狱狂徒演出：反编译 HellraiserPower.AfterCardDrawnEarly 确认原版就是 `CardCmd.AutoPlay(ctx, card, null)`，没有单独 VFX；我们之前传了显式目标、还额外 TriggerAnim(victim,"Hit") 把出牌动画顶掉 ⇒ 现在完全照原版调用（目标传 null、不再触发受击动画），打出的打击用这张牌自己的出牌演出）";
+    public const string Tag = "v0.2.485 / 2026-11-08（地狱狂徒演出：反编译 HellraiserPower.AfterCardDrawnEarly 确认原版就是 `CardCmd.AutoPlay(ctx, card, null)`，没有单独 VFX；我们之前传了显式目标、还额外 TriggerAnim(victim, Hit) 把出牌动画顶掉 ⇒ 现在完全照原版调用（目标传 null、不再触发受击动画），打出的打击用这张牌自己的出牌演出）";
 
     private static bool _logged;
 
