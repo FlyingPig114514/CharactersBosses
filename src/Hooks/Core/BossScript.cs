@@ -650,6 +650,13 @@ public static class BossScriptRunner
         //   （用户 2026-11-02 实测：该按 7 张算成 43，实际按 10 张算成 57）。
         try { PurgeStaleStrikeCards(pcs, cardBoss); } catch { /* 忽略 */ }
 
+        // ★ v0.2.508（用户 2026-11-08：「这张加的蛇咬能不能放在所有会被打出的牌的右边？现在这样看着很怪」）：
+        //   手牌显示顺序 = 牌堆顺序（`Hand.AddInternal(card, -1, …)` 追加到末尾 = 最右）。
+        //   而「保留不出」的牌（蛇咬 / 心神不宁 / 睡眠不佳…）以前是**按剧本里的位置**混进去的，
+        //   循环成长那几张更是在处理 `turn.Cards[0]` 时就塞进手里 ⇒ 会夹在要打出的牌中间。
+        //   现在统一记一份，整手建完之后再把它们挪到手牌最右（`MoveToBottomInternal` = 移到末尾）。
+        var keptToRight = new List<CardModel>();
+
         foreach (var entry in turn.Cards)
         {
             var cardType = MultiplayerCardSwap.Resolve(entry.Card, cardBoss!);
@@ -692,41 +699,6 @@ public static class BossScriptRunner
                     catch (Exception e) { Logger.Log("[CharBoss] 加「奇巧」失败: " + e.Message); }
                 }
                 // 伤害覆盖（剧本写死这张牌打多少）：改这一张实例的 Damage 变量 ⇒ 意图与实际伤害都跟着变
-                // ★ v0.2.501（用户 2026-11-08）：蛇咬猎的循环成长 —— 第 13、17… 回合（每个循环的第 9 回合）
-                //   额外塞 (回合号−9)/4 张「保留 + 不出」的蛇咬，让她的「飞镖」多一段伤害。
-                if (turn.Cards.Count > 0 && ReferenceEquals(entry, turn.Cards[0])
-                    && cardBoss != null
-                    && string.Equals(cardBoss.SpawnVariantKey, "SILENT_SNAKEBITE", StringComparison.Ordinal)
-                    && cardBoss.TurnNumber >= 9)
-                {
-                    try
-                    {
-                        // ★ v0.2.507（用户 2026-11-08：「第十回合开始第一次循环后，并没有像第九回合那样
-                        //   保留 2 张蛇咬，还是一张」）：这些蛇咬是**保留牌**，所以从第 9 回合起
-                        //   **每一回合**都要带着，而不是只在第 9/13/17 那一回合加。
-                        //   口径：第 9~12 回合 = +1 张；13~16 = +2；17~20 = +3…
-                        int extra = 1 + (cardBoss.TurnNumber - 9) / 4;
-                        var snakeCanonical = ModelDb.GetById<CardModel>(
-                            ModelDb.GetId(typeof(MegaCrit.Sts2.Core.Models.Cards.Snakebite)));
-                        if (snakeCanonical != null && extra > 0)
-                        {
-                            for (int k = 0; k < extra; k++)
-                            {
-                                var extraCard = combat.CreateCard(snakeCanonical, shadow);
-                                if (extraCard == null) break;
-                                try
-                                {
-                                    MegaCrit.Sts2.Core.Commands.CardCmd.ApplyKeyword(
-                                        extraCard, MegaCrit.Sts2.Core.Entities.Cards.CardKeyword.Retain);
-                                }
-                                catch { /* 忽略 */ }
-                                pcs.Hand.AddInternal(extraCard);
-                            }
-                            Logger.Log($"[CharBoss] 蛇咬猎：第 {cardBoss.TurnNumber} 回合 ⇒ 循环成长再塞 {extra} 张「保留的蛇咬」");
-                        }
-                    }
-                    catch (Exception e0) { Logger.Log("[CharBoss] 蛇咬猎循环成长失败: " + e0.Message); }
-                }
                 // ★ 打击战「痛击」（用户 2026-11-07）：她的**完美打击**伤害 = 卡面基础 6 + 池子剩余额度。
                 //   实现**复用杂耍战那套接管**（见 `ApplyBashToPerfectStrike` 的注释）：
                 //   只改 `CalculationBase`，`ExtraDamage` 保持原样 ⇒ 卡面仍然写「每张 +2／+3」，不会变成 +0。
@@ -1017,11 +989,64 @@ public static class BossScriptRunner
                     catch (Exception e) { Logger.Log("[CharBoss] 疯狂科学设类型失败: " + e.Message); }
                 }
                 if (!pcs.Hand.Cards.Contains(card)) pcs.Hand.AddInternal(card, -1, true);
+                // 「保留不出」的牌（DisplayOnly + Retain，且本回合不会被打出）记一份，整手建完挪到最右
+                if (entry.Retain && entry.DisplayOnly && !entry.AutoPlayed) keptToRight.Add(card);
             }
             catch (Exception e)
             {
                 Logger.Log($"[CharBoss] 剧本卡 {canonical.Id.Entry} 造牌失败: {e.Message}");
             }
+        }
+
+        // ★ v0.2.501 / v0.2.507 / v0.2.508（用户 2026-11-08）：蛇咬猎的循环成长 —— 第 9 回合起**每一回合**
+        //   额外塞 (1 + (回合号−9)/4) 张「保留 + 不出」的蛇咬（第 9~12 回合 +1、13~16 +2、17~20 +3…），
+        //   让她的「飞镖」多段伤害。
+        //   位置：从**循环内**搬到这里（原来挂在 `turn.Cards[0]` 上处理时就塞牌 ⇒ 那几张蛇咬会插在手牌中间，
+        //   用户 2026-11-08：「这张加的蛇咬能不能放在所有会被打出的牌的右边？」）。
+        if (cardBoss != null
+            && turn.Cards.Count > 0
+            && string.Equals(cardBoss.SpawnVariantKey, "SILENT_SNAKEBITE", StringComparison.Ordinal)
+            && cardBoss.TurnNumber >= 9)
+        {
+            try
+            {
+                int extra = 1 + (cardBoss.TurnNumber - 9) / 4;
+                var snakeCanonical = ModelDb.GetById<CardModel>(
+                    ModelDb.GetId(typeof(MegaCrit.Sts2.Core.Models.Cards.Snakebite)));
+                if (snakeCanonical != null && extra > 0)
+                {
+                    for (int k = 0; k < extra; k++)
+                    {
+                        var extraCard = combat.CreateCard(snakeCanonical, shadow);
+                        if (extraCard == null) break;
+                        try
+                        {
+                            MegaCrit.Sts2.Core.Commands.CardCmd.ApplyKeyword(
+                                extraCard, MegaCrit.Sts2.Core.Entities.Cards.CardKeyword.Retain);
+                        }
+                        catch { /* 忽略 */ }
+                        pcs.Hand.AddInternal(extraCard);
+                        keptToRight.Add(extraCard);
+                    }
+                    Logger.Log($"[CharBoss] 蛇咬猎：第 {cardBoss.TurnNumber} 回合 ⇒ 循环成长再塞 {extra} 张「保留的蛇咬」（放最右）");
+                }
+            }
+            catch (Exception e0) { Logger.Log("[CharBoss] 蛇咬猎循环成长失败: " + e0.Message); }
+        }
+
+        // 把「保留不出」的牌统一挪到手牌最右（`MoveToBottomInternal` = 移到 `_cards` 末尾 = 画面最右）
+        if (keptToRight.Count > 0)
+        {
+            try
+            {
+                foreach (var kept in keptToRight)
+                {
+                    if (kept == null) continue;
+                    if (!pcs.Hand.Cards.Contains(kept)) continue;
+                    pcs.Hand.MoveToBottomInternal(kept);
+                }
+            }
+            catch (Exception e) { Logger.Log("[CharBoss] 手牌排序（保留牌挪到最右）失败: " + e.Message); }
         }
         // ★ v0.2.346（用户 2026-11-03 再确认）：「谋杀」是**同一张牌**（她一直把它保留在手里），
         //   ⇒ 加伤**只增不减**：起点只在它**第一次进她手牌**时钉一次，之后整场都不再重置，

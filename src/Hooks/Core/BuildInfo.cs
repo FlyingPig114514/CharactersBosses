@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.507 / 2026-11-08（蛇咬猎的保留蛇咬从第 9 回合起**每回合**都带着：第 9~12 回合 +1 张、13~16 +2、17~20 +3…（以前只在 9/13/17 那一回合加，第 10 回合就掉回 1 张））";
+    public const string Tag = "v0.2.508 / 2026-11-08（手牌顺序：「保留不出」的牌（蛇咬/心神不宁/睡眠不佳…）连同循环成长加的蛇咬，一律放到手牌最右，不再夹在会被打出的牌中间）";
 
     private static bool _logged;
 
