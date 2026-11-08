@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.504 / 2026-11-08（蛇咬猎按反馈修 5 条：① 红面具战斗开始给所有玩家 1 层虚弱（原版挂在 AfterRoomEntered，影子玩家收不到）；② 补上特殊效果「群蛇形态」的文案（zhs/zht/eng，monsters+powers+encounters）；③ 逃脱计划/投掷匕首的意图补上速行者的群伤（这两张的抽牌写在 OnPlay 里，DrawCountOf 读不到）；④ 第 5/6/7 回合被丢弃的那张补上 DiscardInstead+Sly（触不可及/翻越撑击要因奇巧打出）；⑤ 第 8 回合补上保留不出的三张）";
+    public const string Tag = "v0.2.505 / 2026-11-08（蛇咬猎循环成长从第 9 回合就开始：以前写成 TurnNumber>=13，第一次的第 9 回合没有多一张保留的蛇咬 ⇒ 飞镖还是 3 段；现在第 9 回合 +1、13 +2、17 +3…）";
 
     private static bool _logged;
 
