@@ -100,12 +100,20 @@ internal static class HellraiserPlays
             //   于是走的是这张打击牌自己的出牌动画（就是我们看到的那套动作）。
             //   我们之前①传了显式目标、②又额外调了 `TriggerAnim(victim, "Hit")`，
             //   后者会把出牌动画顶掉 ⇒ 看起来「没有特效」。现在**完全照原版**来。
-            // 专属演出：脚下浮刀 + 施法/铁山靠动作（反编译 Hellraiser 卡与 HellraiserPower 得到）
-            try { CharacterBosses.Patches.HellraiserVfx.Spawn(boss.Creature); }
+            // 专属演出：**只有** Cast（铁山靠）+ 脚下那小片刀阵；
+            // 自动打出期间把她自己的普通攻击动画压掉（用户 2026-11-08：「应该只有铁山靠，
+            // 没有后面那段原本的直接打出动画」）。
+            try
+            {
+                CharacterBosses.Patches.HellraiserVfx.BeginSuppress(boss.Creature);
+                CharacterBosses.Patches.HellraiserVfx.Spawn(boss.Creature);
+            }
             catch { /* 特效失败不影响出牌 */ }
 
             var task = CardCmd.AutoPlay(ctx, card, (Creature?)null, AutoPlayType.Default);
             var finished = await Task.WhenAny(task, Task.Delay(8000));
+            // 演出结束（或超时）后才解除「压制攻击动画」，否则压不到后面的动画
+            try { CharacterBosses.Patches.HellraiserVfx.EndSuppress(); } catch { /* 忽略 */ }
             if (!ReferenceEquals(finished, task))
             {
                 Logger.Log("[CharBoss] 地狱狂徒：自动打出超时(8s)，跳过");

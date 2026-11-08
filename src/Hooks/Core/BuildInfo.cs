@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.486 / 2026-11-08（地狱狂徒专属演出 + 首次打击 −6 修正：① 反编译确认专属动画 = 卡自己往 NCombatRoom.CombatVfxContainer 加 NHellraiserVfx（脚下浮刀）+ TriggerAnim(Cast) + 命中特效 vfx/hellraiser_attack_vfx，现在自动打出前手动补上；② 每帧重算完美打击后若数值变化就强制重画面板，不再让「出牌中途」那个 −6 的错数粘在屏幕上）";
+    public const string Tag = "v0.2.487 / 2026-11-08（地狱狂徒演出按用户纠正重做：① 去掉用错的 NHellraiserVfx（那是「打出地狱狂徒这张牌」的大刀阵）；② 改成按路径 vfx/hellraiser_attack_vfx 播脚下一小片刀阵（反射找 VfxCmd 的 (string,Creature) 入口，拿不到就跳过）；③ 只保留 Cast（铁山靠）动作，自动打出期间用 TriggerAnim 前缀**只压制她自己的普通攻击动画**，await 演出结束后立即解除；其它生物/其它动作零影响）";
 
     private static bool _logged;
 
