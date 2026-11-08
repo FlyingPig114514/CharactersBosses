@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.495 / 2026-11-08（「同步」的临时集中现在也计入**球模拟**：以前只有手牌栏那条「充能球被动」用了 FocusDeltaOf 认同步，模拟器里根本没算 ⇒ 同回合后续牌的激发/被动预览偏小。现在按「不同球种类数 × (升级?2:1)」逐张推进地加进投射集中）";
+    public const string Tag = "v0.2.496 / 2026-11-08（① 彩虹机新增遗物「意外光滑的石头」ODDLY_SMOOTH_STONE，插在涅奥的祝福和棱彩宝石之间；② 蛇眼猎削弱：第 1 回合的「刺杀」换成一张**0 费**的「尖啸」PIERCING_WAIL）";
 
     private static bool _logged;
 

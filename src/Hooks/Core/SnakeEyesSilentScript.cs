@@ -38,13 +38,13 @@ public static class SnakeEyesSilentScript
     {
         var turns = new List<BossTurn>
         {
-            // 1：背刺 0、刺杀 0（手里的子弹时间 3 费保留着）
+            // 1：背刺 0、尖啸 0（用户 2026-11-08 削弱：原来的「刺杀」换成一张零费的「尖啸」）
             new()
             {
-                Note = "1. 背刺(0)、刺杀(0)；不出：子弹时间(3,保留)、先制打击(1)、打击(1)、防御(2)、匕首雨(1)",
+                Note = "1. 背刺(0)、尖啸(0)；不出：子弹时间(3,保留)、先制打击(1)、打击(1)、防御(2)、匕首雨(1)",
                 ForceZeroEnergy = true,
                 Cards = Cards(
-                    Play<Backstab>(0), Play<Assassinate>(0),
+                    Play<Backstab>(0), Play<PiercingWail>(0),
                     Hold<BulletTime>(3, retain: true), Hold<LeadingStrike>(1), Hold<StrikeSilent>(1),
                     Hold<DefendSilent>(2), Hold<DaggerSpray>(1)),
             },
@@ -121,7 +121,7 @@ public static class SnakeEyesSilentScript
     /// <summary>卡组（剧本出现过的牌各一份；「不出」的那些也留在卡组里，只是剧本不让打）。</summary>
     public static List<Type> Deck() => new()
     {
-        typeof(Backstab), typeof(Assassinate), typeof(BulletTime), typeof(LeadingStrike),
+        typeof(Backstab), typeof(PiercingWail), typeof(BulletTime), typeof(LeadingStrike),
         typeof(StrikeSilent), typeof(DefendSilent), typeof(DaggerSpray), typeof(Dash),
         typeof(SuckerPunch), typeof(Slice), typeof(BladeDance), typeof(Tracking),
         typeof(Anticipate), typeof(DodgeAndRoll), typeof(CloakAndDagger), typeof(PiercingWail),

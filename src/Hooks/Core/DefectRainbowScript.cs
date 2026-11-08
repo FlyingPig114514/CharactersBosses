@@ -182,6 +182,7 @@ public static class DefectRainbowScript
     {
         typeof(CrackedCore),
         typeof(NeowBlessing),
+        typeof(OddlySmoothStone),  // 意外光滑的石头（用户 2026-11-08：插在涅奥的祝福和棱彩宝石之间）
         // ★ 节拍器（Metronome）按用户 2026-11-07「意图还是显示不出来，算了直接去掉」移除
         typeof(PrismaticGem),
         typeof(WarPaint),
