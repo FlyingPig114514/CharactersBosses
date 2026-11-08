@@ -116,7 +116,16 @@ public sealed class BossBashPower : PowerModel
             //   ⇒ 玩家回合里打掉打击之后，那张完美打击的数值不会变。现在池子一变就把她手里/牌堆里
             //   所有完美打击的伤害同步减下去（意图和实伤用的都是这个数）。
             int drop = before - Pool;
-            if (drop > 0) ApplyDrop(bossShadowCards(), drop);
+            if (drop > 0)
+            {
+                // 池子变了 ⇒ 让她所有完美打击按新池子重算（意图与实伤同一个数）
+                try
+                {
+                    var boss = Owner?.Monster as CharBossMonster;
+                    if (boss != null) Core.BossScriptRunner.RetuneBashPerfectStrike(boss, Pool);
+                }
+                catch (Exception e2) { Logger.Log("[CharBoss] 痛击：重算失败: " + e2.Message); }
+            }
             if (before != Pool && _logs++ < 40)
             {
                 Logger.Log($"[CharBoss] 痛击：你打出 {card.Id.Entry} ⇒ 完美打击加成 {before} → {Pool}" +

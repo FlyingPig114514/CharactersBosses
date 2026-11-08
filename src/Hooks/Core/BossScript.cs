@@ -463,6 +463,53 @@ public static class BossScriptRunner
         }
         catch { return 0; }
     }
+    /// <summary>
+    /// 打击战「痛击」：把**完美打击**的总伤害写成 <paramref name="target"/>。
+    ///
+    /// 原版公式（反编译）：`伤害 = CalculationBase + ExtraDamage × (她所有牌堆里带 Strike 标签的牌数)`。
+    /// 我们要「总数 = target、而卡面继续显示『每张 +2／+3』」⇒ **只改 CalculationBase**：
+    ///   `CalculationBase = target − perCard × 牌堆里实际张数`。
+    /// （第二次尝试在 `ExtraDamage` 上归零，结果卡面文案变成「伤害增加 0」，所以回滚了 —— 那条路是错的。）
+    /// </summary>
+    private static void ApplyBashToPerfectStrike(CardModel card, Monsters.CharBossMonster boss, int pool)
+    {
+        try
+        {
+            if (card == null) return;
+            int baseVal = 6, perCard = 3;
+            try { baseVal = Math.Max(1, (int)Math.Round((double)card.DynamicVars["CalculationBase"].BaseValue)); }
+            catch { baseVal = 6; }
+            try { perCard = Math.Max(1, (int)Math.Round((double)card.DynamicVars["ExtraDamage"].BaseValue)); }
+            catch { perCard = 3; }
+
+            int target = baseVal + Math.Max(0, pool);
+            int live = CountStrikeCardsInPiles(boss);
+            int calc = Math.Max(0, target - perCard * Math.Max(0, live));
+            card.DynamicVars["CalculationBase"].BaseValue = calc;
+            Logger.Log($"[CharBoss] 痛击：完美打击目标 {target}（基础 {baseVal} + 池子 {pool}）" +
+                       $"牌堆现算 {live} 张 × {perCard} ⇒ CalculationBase = {calc}");
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 痛击：写完美打击失败: " + e.Message); }
+    }
+
+    /// <summary>池子下降后重算她手上/牌堆里所有完美打击（Power 那边调用）。</summary>
+    internal static void RetuneBashPerfectStrike(Monsters.CharBossMonster boss, int pool)
+    {
+        try
+        {
+            var all = boss?.Shadow?.PlayerCombatState?.AllCards;
+            if (all == null) return;
+            foreach (var card in all)
+            {
+                if (card == null) continue;
+                string entry;
+                try { entry = card.Id.Entry; } catch { continue; }
+                if (entry != "PERFECTED_STRIKE") continue;
+                ApplyBashToPerfectStrike(card, boss, pool);
+            }
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 痛击：重算完美打击失败: " + e.Message); }
+    }
     private static void PurgeStaleStrikeCards(PlayerCombatState pcs, Monsters.CharBossMonster? boss)
     {
         try
@@ -610,10 +657,9 @@ public static class BossScriptRunner
                     catch (Exception e) { Logger.Log("[CharBoss] 加「奇巧」失败: " + e.Message); }
                 }
                 // 伤害覆盖（剧本写死这张牌打多少）：改这一张实例的 Damage 变量 ⇒ 意图与实际伤害都跟着变
-                // ★ 打击战「痛击」（用户 2026-11-07）：她的**完美打击**伤害 = 卡面基础 + 池子剩余额度。
-                //   池子在 `BossBashPower` 里（战斗开始按「你四个牌堆里名字含打击的牌 + 她自己的 7 张」结算，
-                //   你每打出一张名字含打击的牌就 −2／−3，最低 0）。造牌时加进去，
-                //   于是**意图和实际伤害用的是同一个数字**。
+                // ★ 打击战「痛击」（用户 2026-11-07）：她的**完美打击**伤害 = 卡面基础 6 + 池子剩余额度。
+                //   实现**复用杂耍战那套接管**（见 `ApplyBashToPerfectStrike` 的注释）：
+                //   只改 `CalculationBase`，`ExtraDamage` 保持原样 ⇒ 卡面仍然写「每张 +2／+3」，不会变成 +0。
                 try
                 {
                     if (card.Id.Entry == "PERFECTED_STRIKE" && cardBoss != null)
@@ -622,13 +668,7 @@ public static class BossScriptRunner
                         if (bash != null)
                         {
                             bash.EnsureInit();
-                            int bonus = bash.Pool;
-                            if (bonus > 0)
-                            {
-                                card.DynamicVars.Damage.BaseValue += bonus;
-                                Logger.Log($"[CharBoss] 痛击：完美打击 +{bonus}（池子剩余）⇒ " +
-                                           $"实际 {card.DynamicVars.Damage.BaseValue}");
-                            }
+                            ApplyBashToPerfectStrike(card, cardBoss, bash.Pool);
                         }
                     }
                 }
