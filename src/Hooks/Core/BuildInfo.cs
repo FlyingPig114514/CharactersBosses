@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.477 / 2026-11-07（打击战收口：接上「地狱狂徒」自动免费打出通道 —— 剧本标（地狱狂徒）的那几张牌由 HellraiserPlays 打出：0 费、**只打被跟踪锁定的玩家**、打出前给目标一次原版受击演出（特效），打完自动从手牌挪进弃牌堆；原版这张能力牌的钩子只派发给真人玩家，影子玩家收不到，所以必须由剧本点名。0.2.476：痛击池子同步降值、皇室认证附魔、第3回合旋风斩不出、烛台→手里剑）";
+    public const string Tag = "v0.2.478 / 2026-11-07（痛击第 3 次修：完美打击的伤害里有一份「按手牌打击张数」的 CalculatedVar，每次渲染都重算、会盖掉我们改的 BaseValue ⇒ 现在把那份计算项清零，整张牌伤害只由「卡面基础 + 痛击池子」决定，并打出一行变量明细日志便于核对）";
 
     private static bool _logged;
 
