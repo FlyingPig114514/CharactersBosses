@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.498 / 2026-11-08（结算/历史记录里的 Boss 头像：以前缺图时被换成**原版占位图**（同族小队脸），现在优先用我们自己的地图徽章 BossNodePath + .png（描边优先 _outline.png），取不到才退回占位图；顶栏/结算/历史都走这条）";
+    public const string Tag = "v0.2.499 / 2026-11-08（历史/结算 Boss 头像改用**原版角色头像图** res://images/ui/top_panel/character_icon_<角色>.png（和顶栏那颗 Boss 图标同一套美术），找不到才退回我们自己的地图徽章、再退回原版占位图）";
 
     private static bool _logged;
 

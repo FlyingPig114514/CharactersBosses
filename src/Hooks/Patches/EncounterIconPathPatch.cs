@@ -136,6 +136,32 @@ internal static class OurEncounterIconPaths
                 try { basePath = enc.BossNodePath; } catch { continue; }
                 if (string.IsNullOrEmpty(basePath)) continue;
 
+                // ★ v0.2.499（用户 2026-11-08：要的是「游戏内最上方那一栏放的头像」，不是地图徽章）：
+                //   那就是原版的**角色头像图** `res://images/ui/top_panel/character_icon_<角色>.png`
+                //   （顶栏那颗 Boss 图标用的同一套美术）。先找它，找不到再退回我们自己的地图徽章。
+                try
+                {
+                    var character = TopBarBossIconFallbackPatch.CharacterFor(enc);
+                    if (character != null)
+                    {
+                        string name = character.GetType().Name.ToLowerInvariant();   // ironclad / silent / defect / necrobinder / regent
+                        foreach (var cand in new[]
+                        {
+                            "res://images/ui/top_panel/character_icon_" + name + ".png",
+                            "res://images/ui/top_panel/character_icon_" + name + "_outline.png",
+                        })
+                        {
+                            if (outline && !cand.Contains("_outline")) continue;
+                            if (!outline && cand.Contains("_outline")) continue;
+                            if (ResourceLoader.Exists(cand)) return cand;
+                        }
+                        // 描边实在没有就用同一张头像
+                        string main = "res://images/ui/top_panel/character_icon_" + name + ".png";
+                        if (ResourceLoader.Exists(main)) return main;
+                    }
+                }
+                catch { /* 忽略，继续走地图徽章 */ }
+
                 string png = basePath + ".png";
                 if (ResourceLoader.Exists(png))
                 {
