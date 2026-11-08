@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.488 / 2026-11-08（紧急回滚 v0.2.487 的动画压制：压 TriggerAnim 会打断出牌动画的等待链 ⇒ 卡牌卡在空中且不结算伤害。现在地狱狂徒自动打出恢复成正常 AutoPlay（伤害正常、动画是这张打击本身的出牌动画）；专属演出（脚下一小片刀阵 + 只留铁山靠）留到拿到 vfx/hellraiser_attack_vfx 真实播放入口再做）";
+    public const string Tag = "v0.2.489 / 2026-11-08（地狱狂徒演出：找到专属节点 MegaCrit.Sts2.Core.Nodes.Vfx.Cards.NHellraiserAttackVfx —— 它就是「脚下一小片刀阵」。该节点没有静态 Create，只能从场景实例化，所以按 6 个候选 res:// 路径逐个探测、命中后实例化挂进 NCombatRoom.CombatVfxContainer 并对准她脚下；探测结果会打日志（找不到就只有铁山靠、不影响出牌）。不再压制任何动画）";
 
     private static bool _logged;
 
