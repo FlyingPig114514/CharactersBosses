@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.497 / 2026-11-08（设置界面的 Boss 能力档案补上两个新面孔：打击战 IRONCLAD_STRIKE（循环 6~9／单体强／群攻偏弱／单体高压 3、9／特殊效果=单体）与彩虹机 DEFECT_RAINBOW（循环 8~12／单体很强／群攻很强／单体高压 6~8、12／群体高压 6、9、10／特殊效果=自身））";
+    public const string Tag = "v0.2.498 / 2026-11-08（结算/历史记录里的 Boss 头像：以前缺图时被换成**原版占位图**（同族小队脸），现在优先用我们自己的地图徽章 BossNodePath + .png（描边优先 _outline.png），取不到才退回占位图；顶栏/结算/历史都走这条）";
 
     private static bool _logged;
 

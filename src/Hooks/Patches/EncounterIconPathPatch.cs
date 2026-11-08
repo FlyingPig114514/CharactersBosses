@@ -87,6 +87,19 @@ internal static class OurEncounterIconPaths
             if (!IsOurEncounter(modelId)) return;
             if (Godot.ResourceLoader.Exists(path)) return;    // 以后我们补了美术就自动恢复正常
 
+            // ★ v0.2.498（用户 2026-11-08：「历史记录里 boss 头像还是同族小队的，改成对应角色的头像」）：
+            //   以前这里直接换成**原版占位图**（TheKinBoss）⇒ 历史记录那排全是同族小队脸。
+            //   现在优先用**我们自己的地图徽章**（每个遭遇的 `BossNodePath + ".png"`，
+            //   那张图就在我们 pck 里），取不到才退回原版占位图。
+            string? ours = OurBadge(modelId, outline);
+            if (ours != null)
+            {
+                if (Logged.Add(path!))
+                    Logger.Log($"[CharBoss] 结算/历史图标 → 换成我们自己的角色徽章（{path} → {ours}）");
+                path = ours;
+                return;
+            }
+
             string? substitute = Fallback(outline);
             if (substitute == null)
             {
@@ -102,6 +115,40 @@ internal static class OurEncounterIconPaths
         catch { /* 出错就保持原样 */ }
     }
 
+    /// <summary>
+    /// 这套遭遇**自己的**徽章图（`BossNodePath + ".png"`，全在 `res://CharacterBosses/images/map/` 里）。
+    /// 描边优先用 `_outline.png`，没有就用同一张图。找不到返回 null。
+    /// </summary>
+    private static string? OurBadge(ModelId? modelId, bool outline)
+    {
+        try
+        {
+            string? entry = modelId?.Entry;
+            if (string.IsNullOrEmpty(entry)) return null;
+            foreach (var enc in Encounters.CharBossEncounters.AllTierEncounters())
+            {
+                if (enc == null) continue;
+                string id;
+                try { id = enc.Id.Entry; } catch { continue; }
+                if (!string.Equals(id, entry, StringComparison.Ordinal)) continue;
+
+                string basePath;
+                try { basePath = enc.BossNodePath; } catch { continue; }
+                if (string.IsNullOrEmpty(basePath)) continue;
+
+                string png = basePath + ".png";
+                if (ResourceLoader.Exists(png))
+                {
+                    if (!outline) return png;
+                    string outlinePng = basePath + "_outline.png";
+                    if (ResourceLoader.Exists(outlinePng)) return outlinePng;
+                    return png;
+                }
+            }
+        }
+        catch { /* 忽略 */ }
+        return null;
+    }
     /// <summary>原版占位 Boss 图标（TheKinBoss）的同款路径；取不到就返回 null。</summary>
     private static string? Fallback(bool outline)
     {
