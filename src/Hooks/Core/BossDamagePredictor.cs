@@ -622,7 +622,36 @@ public static class BossDamagePredictor
         {
             // ① 召唤牌
             int summon = (int)Math.Round(VarValue(card, "Summon", 0m));
-            if (summon > 0) return summon;
+            if (summon > 0)
+            {
+                // ★ v0.2.500（用户 2026-11-08 实测被这个假数字拍死）：反编译 `Spur`（增生）——
+                //   它有**两个**变量：`SummonVar(3)` + `HealVar(5)`，`OnPlay` 里先
+                //   `CreatureCmd.Heal(Owner.Osty, Heal)`、再 `OstyCmd.Summon(..., Summon, ...)`。
+                //   以前这里只返回 Summon ⇒ 奥斯提没满血时**治疗那部分（1~5 点）没预补**，
+                //   预览偏低，等真血涨上来才追上（日志：计划只预补 7，实际涨了 12）。
+                //   现在把「治疗但最多补到满血」的那部分加上。
+                int extraHeal = 0;
+                try
+                {
+                    int heal = (int)Math.Round(VarValue(card, "Heal", 0m));
+                    if (heal > 0)
+                    {
+                        var osty = card.Owner?.Osty;
+                        if (osty != null && osty.IsAlive)
+                        {
+                            int deficit = Math.Max(0, osty.MaxHp - osty.CurrentHp);
+                            extraHeal = Math.Min(heal, deficit);
+                            if (extraHeal > 0)
+                            {
+                                Logger.Log($"[CharBoss] 出击预补：{card.Id.Entry} 除召唤 {summon} 外还会治疗奥斯提 " +
+                                           $"{heal}（当前 {osty.CurrentHp}/{osty.MaxHp} ⇒ 实际加 {extraHeal}）");
+                            }
+                        }
+                    }
+                }
+                catch (Exception e) { Logger.Log("[CharBoss] 出击预补：治疗部分计算失败: " + e.Message); }
+                return summon + extraHeal;
+            }
 
             // ①b 兼容旧写法：有些牌用的是 Osty* 这类变量名
             foreach (var key in OstyHpVarKeys)

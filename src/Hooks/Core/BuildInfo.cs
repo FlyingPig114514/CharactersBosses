@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.499 / 2026-11-08（历史/结算 Boss 头像改用**原版角色头像图** res://images/ui/top_panel/character_icon_<角色>.png（和顶栏那颗 Boss 图标同一套美术），找不到才退回我们自己的地图徽章、再退回原版占位图）";
+    public const string Tag = "v0.2.500 / 2026-11-08（修灵魂骨「出击」意图偏低：反编译 Spur（增生）= SummonVar(3) + HealVar(5)，OnPlay 先治疗奥斯提再召唤；以前预补只算 Summon，奥斯提没满血时治疗那 1~5 点没算 ⇒ 预览偏低、等真血涨上来才追上（实测被这个假数字打死）。现在把「治疗但最多补到满血」的差额加进预补）";
 
     private static bool _logged;
 
