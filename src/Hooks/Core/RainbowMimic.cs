@@ -236,6 +236,10 @@ internal static class RainbowMimic
         }
     }
 
+    private static string SafeEntryOfCard(MegaCrit.Sts2.Core.Models.CardModel? card)
+    {
+        try { return card?.Id.Entry ?? string.Empty; } catch { return string.Empty; }
+    }
     private static async Task PlayCopyAsync(CharBossMonster self, PlayerCombatState pcs,
                                             PlayerChoiceContext ctx, Type cardType, string reason)
     {
@@ -275,6 +279,37 @@ internal static class RainbowMimic
                 Logger.Log("[CharBoss] 模仿学习的复制品超时(5s)，跳过");
                 return;
             }
+            // ★ v0.2.493（用户 2026-11-08：「模仿学习学到熔炉时，熔炉铸造的那把剑必须就是
+            //   它在循环内打的那一把」）：熔炉(`FURNACE`)会铸一把「君王之剑」，
+            //   而我们循环里那张「君王之剑」是靠 `TakeExistingBlade` 复用**已有的那把**。
+            //   这里在熔炉结算完之后，如果她牌堆里出现了**多把**君王之剑，只保留第一把，
+            //   其余从牌堆移除 —— 这样循环里打打的就是熔炉铸出来的那把，不会每次多一把。
+            try
+            {
+                if (SafeEntryOfCard(card) == "FURNACE")
+                {
+                    var pcsNow = self.Shadow?.PlayerCombatState;
+                    if (pcsNow != null)
+                    {
+                        bool kept = false;
+                        foreach (var pile in pcsNow.AllPiles)
+                        {
+                            if (pile?.Cards == null) continue;
+                            foreach (var blade in pile.Cards.ToList())
+                            {
+                                if (blade == null) continue;
+                                string be;
+                                try { be = blade.Id.Entry; } catch { continue; }
+                                if (be != "SOVEREIGN_BLADE") continue;
+                                if (!kept) { kept = true; continue; }      // 第一把留着 = 循环里打的那把
+                                try { pile.RemoveInternal(blade, true); } catch { /* 忽略 */ }
+                                Logger.Log("[CharBoss] 模仿学习·熔炉：清掉多出来的君王之剑（只留循环里那一把）");
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception e) { Logger.Log("[CharBoss] 模仿学习·熔炉去重失败: " + e.Message); }
             Logger.Log($"[CharBoss] 彩虹机·{reason}：已免费打出 {card.Id.Entry}（目标 {target?.Name}）");
         }
         catch (Exception e)

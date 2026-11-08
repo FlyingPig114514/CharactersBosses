@@ -304,6 +304,27 @@ internal sealed class BossOrbSim
         {
             if (card.DynamicVars.TryGetValue("Focus", out var focusVar) && focusVar != null)
                 gain += (int)Math.Round((double)focusVar.BaseValue);
+            else
+            {
+                // ★ v0.2.493（用户 2026-11-08：「彩虹机第一回合彩虹激发电球没有考虑本回合会获得的集中
+                //   （碎片整理）」）——「碎片整理」的集中变量**不叫 "Focus"**，而是 `PowerVar<FocusPower>`
+                //   （名字是 "FocusPower"），上面按 "Focus" 取不到 ⇒ 一直是 0，
+                //   于是同一回合后面那次激发用的还是旧集中。这里按**泛型类型**再兜一遍。
+                try
+                {
+                    foreach (var v in card.DynamicVars.Values)
+                    {
+                        if (v == null) continue;
+                        var vt = v.GetType();
+                        if (!vt.IsGenericType) continue;
+                        if (vt.GetGenericTypeDefinition() != typeof(MegaCrit.Sts2.Core.Localization.DynamicVars.PowerVar<>)) continue;
+                        if (vt.GetGenericArguments()[0] != typeof(MegaCrit.Sts2.Core.Models.Powers.FocusPower)) continue;
+                        gain += (int)Math.Round((double)v.BaseValue);
+                        break;
+                    }
+                }
+                catch { /* 忽略 */ }
+            }
         }
         catch { /* 没有就是 0 */ }
 
