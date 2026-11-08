@@ -124,6 +124,15 @@ public sealed class ScriptCard
     /// </summary>
     public bool EnchantSouls { get; init; }
 
+    /// <summary>这张牌造出来时**附魔「皇室认证」**（`Enchantments.RoyallyApproved`，用户 2026-11-07 的「打击战」）。</summary>
+    public bool EnchantRoyallyApproved { get; init; }
+
+    /// <summary>
+    /// 这张牌由「**地狱狂徒**」自动免费打出：打出时不扣费、**只打被跟踪锁定的那位玩家**，并带一次特效。
+    /// 用户 2026-11-07 的「打击战」第 6～9 回合那几张。
+    /// </summary>
+    public bool HellraiserFree { get; init; }
+
     /// <summary>
     /// **伤害覆盖**（0 = 用卡面数值）。
     /// 用途（用户 2026-10-23）：二层灵魂骨第 3 回合的「巨镰」要打 **23**。

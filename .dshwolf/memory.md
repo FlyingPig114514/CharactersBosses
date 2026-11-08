@@ -4698,3 +4698,4 @@ Chronological action log.
 | 2026-11-07 22:14 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/zhs/monsters.json` | ok | 0 |
 | 2026-11-07 22:14 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/eng/monsters.json` | error | 0 |
 | 2026-11-07 22:27 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/RainbowMimic.cs` | ok | 0 |
+| 2026-11-08 10:27 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/IroncladStrikeScript.cs` | ok | 0 |
