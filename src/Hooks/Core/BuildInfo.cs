@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.480 / 2026-11-08（痛击按「杂耍战」那套接管重写：只改 CalculationBase = 目标 − 每张加成 × 牌堆实际张数，**ExtraDamage 保持原样** ⇒ 卡面仍显示「每张 +2／+3」不会再变成 +0；目标 = 卡面基础 6 + 池子；你打出打击后池子降、立即按新池子重算她所有完美打击。已回滚 v0.2.478/0.2.479 两次错误尝试）";
+    public const string Tag = "v0.2.481 / 2026-11-08（痛击第 5 次修，根因找到了：v0.2.479 日志显示我们写进 42，紧接着又冒出「基础伤害 49」——**两套完美打击接管在互相覆盖**（「杂耍战」那套读回我们写的值当基础再算一次）。现在：① 杂耍战那套遇到 IRONCLAD_STRIKE 直接让路；② 打击战自己算时基础 6、每张 2／3 全部写死，不再读卡面值，彻底断掉反馈）";
 
     private static bool _logged;
 

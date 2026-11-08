@@ -476,11 +476,11 @@ public static class BossScriptRunner
         try
         {
             if (card == null) return;
-            int baseVal = 6, perCard = 3;
-            try { baseVal = Math.Max(1, (int)Math.Round((double)card.DynamicVars["CalculationBase"].BaseValue)); }
-            catch { baseVal = 6; }
-            try { perCard = Math.Max(1, (int)Math.Round((double)card.DynamicVars["ExtraDamage"].BaseValue)); }
-            catch { perCard = 3; }
+            // ★ v0.2.481：基础 6、每张 2／3（进阶 9~10 为 3）**写死**，
+            //   绝不再读卡上现在的 CalculationBase —— 上一版就是因为读写同一格，两套计算互相喂数
+            //   （日志：写进 42，下一行读出 49）。
+            int baseVal = 6;
+            int perCard = CharacterBosses.Powers.BossBashPower.PerCard();
 
             int target = baseVal + Math.Max(0, pool);
             int live = CountStrikeCardsInPiles(boss);
@@ -551,6 +551,16 @@ public static class BossScriptRunner
             string entry;
             try { entry = card.Id.Entry; } catch { return; }
             if (!string.Equals(entry, "PERFECTED_STRIKE", StringComparison.Ordinal)) return;
+
+            // ★ v0.2.481（读日志定位：v0.2.479 里我们写进去 42，紧接着又冒出「基础伤害 49」——
+            //   说明**两套接管在互相覆盖**：这套「杂耍战」的算完又读回我们写的值当基础再算一遍。）
+            //   打击战（IRONCLAD_STRIKE）由 `ApplyBashToPerfectStrike` 自己算，这里直接让路。
+            try
+            {
+                if (boss.SpawnVariantKey == "IRONCLAD_STRIKE") return;
+                if (boss.Def?.SpecialPowerForAct(boss.ActIndex) == typeof(CharacterBosses.Powers.BossBashPower)) return;
+            }
+            catch { /* 忽略 */ }
 
             int deckStrikes = 0;
             try
