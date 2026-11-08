@@ -697,14 +697,14 @@ public static class BossScriptRunner
                 if (turn.Cards.Count > 0 && ReferenceEquals(entry, turn.Cards[0])
                     && cardBoss != null
                     && string.Equals(cardBoss.SpawnVariantKey, "SILENT_SNAKEBITE", StringComparison.Ordinal)
-                    && cardBoss.TurnNumber >= 9
-                    && (cardBoss.TurnNumber - 9) % 4 == 0)      // 9、13、17…（每个循环的第 9 回合）
+                    && cardBoss.TurnNumber >= 9)
                 {
                     try
                     {
-                        // ★ v0.2.505（用户 2026-11-08：「第九回合没有多一张蛇咬被保留，飞镖还是 3 段」）：
-                        //   以前从**第 13 回合**才开始加（`>= 13`），所以第一次的第 9 回合没加成；
-                        //   现在第 9 回合就 +1，之后每个循环再 +1（13→+2、17→+3…）。
+                        // ★ v0.2.507（用户 2026-11-08：「第十回合开始第一次循环后，并没有像第九回合那样
+                        //   保留 2 张蛇咬，还是一张」）：这些蛇咬是**保留牌**，所以从第 9 回合起
+                        //   **每一回合**都要带着，而不是只在第 9/13/17 那一回合加。
+                        //   口径：第 9~12 回合 = +1 张；13~16 = +2；17~20 = +3…
                         int extra = 1 + (cardBoss.TurnNumber - 9) / 4;
                         var snakeCanonical = ModelDb.GetById<CardModel>(
                             ModelDb.GetId(typeof(MegaCrit.Sts2.Core.Models.Cards.Snakebite)));
