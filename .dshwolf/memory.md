@@ -4700,3 +4700,4 @@ Chronological action log.
 | 2026-11-07 22:27 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/RainbowMimic.cs` | ok | 0 |
 | 2026-11-08 10:27 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/IroncladStrikeScript.cs` | ok | 0 |
 | 2026-11-08 10:30 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Powers/BossBashPower.cs` | ok | 0 |
+| 2026-11-08 10:43 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/HellraiserPlays.cs` | ok | 0 |

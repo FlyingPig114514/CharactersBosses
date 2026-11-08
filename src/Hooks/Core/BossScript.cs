@@ -795,6 +795,12 @@ public static class BossScriptRunner
                 }
                 // ★ 打击战（用户 2026-11-07）：完美打击附魔「皇室认证」(`RoyallyApproved`)。
                 //   以前只写了设计稿没落地 ⇒ 卡面上看不到附魔。
+                // ★ 地狱狂徒（用户 2026-11-07）：这张牌由她的「地狱狂徒」自动免费打出（见 HellraiserPlays）
+                if (entry.HellraiserFree && cardBoss != null)
+                {
+                    HellraiserPlays.MarkFree(cardBoss, card);
+                    Logger.Log($"[CharBoss] 地狱狂徒：{card.Id.Entry} 已登记为本回合自动免费打出");
+                }
                 if (entry.EnchantRoyallyApproved)
                 {
                     try

@@ -1288,6 +1288,14 @@ public abstract partial class CharBossMonster : MonsterModel
         }
         catch { /* 忽略 */ }
 
+        // ★ 地狱狂徒（用户 2026-11-07）：标了「（地狱狂徒）」的牌由**自动免费打出**通道处理
+        //   —— 0 费、只打被锁定的玩家、带特效；成功就返回，不再走普通出牌。
+        try
+        {
+            if (await Core.HellraiserPlays.TryPlayAsync(this, pcs, ctx, play.Card)) return;
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 地狱狂徒通道异常（退回普通出牌）: " + e.Message); }
+
         var target = play.Target;
         if (target == null || target.IsDead || !target.IsAlive) target = BossPlanner.ChooseTarget(this, play.Card);
 
