@@ -328,6 +328,31 @@ internal sealed class BossOrbSim
         }
         catch { /* 没有就是 0 */ }
 
+        // ★ v0.2.495（用户 2026-11-08：「同步的你确定也对？」）—— 不够对：
+        //   `FocusGainOf` 只认牌面上的集中变量，而「同步」的集中是**按不同种类充能球**算的
+        //   （反编译：`CalculatedFocus = CalculationExtra × 不同球种类数`，升级时 CalculationExtra +1）。
+        //   以前这条在**球模拟里完全没算**（只有手牌栏那条「球被动」用了 FocusDeltaOf）⇒
+        //   同一回合里「同步」之后打的牌的激发/被动预览都少了这几点。
+        //   模拟是按牌逐张推进的，所以这里读 `_orbs` 正好就是「打出这张同步那一刻」的球种类数。
+        if (Entry(card) == "SYNCHRONIZE")
+        {
+            try
+            {
+                var kinds = new HashSet<string>(StringComparer.Ordinal);
+                foreach (var orb in _orbs)
+                {
+                    if (orb == null) continue;
+                    string id;
+                    try { id = orb.Id.Entry; } catch { continue; }
+                    kinds.Add(id);
+                }
+                int perKind = 1;
+                try { if (card.IsUpgraded) perKind = 2; } catch { perKind = 1; }
+                gain += kinds.Count * perKind;
+                Logger.Log($"[CharBoss] 球模拟：同步 = 不同球 {kinds.Count} 种 × {perKind} = +{kinds.Count * perKind} 集中（本回合）");
+            }
+            catch { /* 忽略 */ }
+        }
         if (_focusFollowsStrength)
         {
             try

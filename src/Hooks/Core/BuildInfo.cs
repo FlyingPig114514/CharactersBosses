@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.494 / 2026-11-08（彩虹机进阶 9 改成升级「冰雹风暴 + 雷霆」（原来是冰雹风暴 + 同步）。伤害预览无需另改：冰雹风暴那条读的是**手牌上那张牌**的 HailstormPower（升级后自动是升级值），雷霆那条读的是她身上 ThunderPower 的实时层数，特斯拉线圈的闪电球被动也是实时算的）";
+    public const string Tag = "v0.2.495 / 2026-11-08（「同步」的临时集中现在也计入**球模拟**：以前只有手牌栏那条「充能球被动」用了 FocusDeltaOf 认同步，模拟器里根本没算 ⇒ 同回合后续牌的激发/被动预览偏小。现在按「不同球种类数 × (升级?2:1)」逐张推进地加进投射集中）";
 
     private static bool _logged;
 
