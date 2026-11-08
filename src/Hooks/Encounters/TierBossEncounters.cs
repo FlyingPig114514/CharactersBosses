@@ -127,6 +127,14 @@ public sealed class DefectThunderBossEncounter : DefectBossEncounter
 }
 
 /// <summary>
+/// 一层静默猎手的**第二套设计「蛇咬猎」**（Key `SILENT_SNAKEBITE`，用户 2026-11-08）。
+/// 特殊效果「群蛇形态」见 <c>Powers/BossSnakeFormPower.cs</c>，剧本见 <c>Core/SnakeBiteSilentScript.cs</c>。
+/// </summary>
+public sealed class SilentSnakeBiteBossEncounter : SilentBossEncounter
+{
+    public override int? TierAct => 0;
+}
+/// <summary>
 /// 第二幕故障机器人的**第二套设计「彩虹机」**（Key `DEFECT_RAINBOW`，用户 2026-11-07）。
 /// 特殊效果「彩虹」见 <c>Powers/BossRainbowPower.cs</c>，剧本见 <c>Core/DefectRainbowScript.cs</c>。
 /// </summary>

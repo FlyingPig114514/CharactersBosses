@@ -692,6 +692,37 @@ public static class BossScriptRunner
                     catch (Exception e) { Logger.Log("[CharBoss] 加「奇巧」失败: " + e.Message); }
                 }
                 // 伤害覆盖（剧本写死这张牌打多少）：改这一张实例的 Damage 变量 ⇒ 意图与实际伤害都跟着变
+                // ★ v0.2.501（用户 2026-11-08）：蛇咬猎的循环成长 —— 第 13、17… 回合（每个循环的第 9 回合）
+                //   额外塞 (回合号−9)/4 张「保留 + 不出」的蛇咬，让她的「飞镖」多一段伤害。
+                if (turn.Cards.Count > 0 && ReferenceEquals(entry, turn.Cards[0])
+                    && cardBoss != null
+                    && string.Equals(cardBoss.SpawnVariantKey, "SILENT_SNAKEBITE", StringComparison.Ordinal)
+                    && cardBoss.TurnNumber >= 13)
+                {
+                    try
+                    {
+                        int extra = (cardBoss.TurnNumber - 9) / 4;
+                        var snakeCanonical = ModelDb.GetById<CardModel>(
+                            ModelDb.GetId(typeof(MegaCrit.Sts2.Core.Models.Cards.Snakebite)));
+                        if (snakeCanonical != null && extra > 0)
+                        {
+                            for (int k = 0; k < extra; k++)
+                            {
+                                var extraCard = combat.CreateCard(snakeCanonical, shadow);
+                                if (extraCard == null) break;
+                                try
+                                {
+                                    MegaCrit.Sts2.Core.Commands.CardCmd.ApplyKeyword(
+                                        extraCard, MegaCrit.Sts2.Core.Entities.Cards.CardKeyword.Retain);
+                                }
+                                catch { /* 忽略 */ }
+                                pcs.Hand.AddInternal(extraCard);
+                            }
+                            Logger.Log($"[CharBoss] 蛇咬猎：第 {cardBoss.TurnNumber} 回合 ⇒ 循环成长再塞 {extra} 张「保留的蛇咬」");
+                        }
+                    }
+                    catch (Exception e0) { Logger.Log("[CharBoss] 蛇咬猎循环成长失败: " + e0.Message); }
+                }
                 // ★ 打击战「痛击」（用户 2026-11-07）：她的**完美打击**伤害 = 卡面基础 6 + 池子剩余额度。
                 //   实现**复用杂耍战那套接管**（见 `ApplyBashToPerfectStrike` 的注释）：
                 //   只改 `CalculationBase`，`ExtraDamage` 保持原样 ⇒ 卡面仍然写「每张 +2／+3」，不会变成 +0。
@@ -1089,7 +1120,7 @@ public static class BossScriptRunner
             var turn = boss.Def?.ScriptForAct(boss.ActIndex)?.TurnAt(boss.TurnNumber);
             if (turn == null) return null;
             var type = card.GetType();
-            foreach (var entry in turn.Cards)
+        foreach (var entry in turn.Cards)
             {
                 if (entry?.Card == null) continue;
                 var want = MultiplayerCardSwap.ResolveQuiet(entry.Card, boss) ?? entry.Card;

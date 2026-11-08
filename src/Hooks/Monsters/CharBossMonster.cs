@@ -1296,6 +1296,27 @@ public abstract partial class CharBossMonster : MonsterModel
         }
         catch (Exception e) { Logger.Log("[CharBoss] 地狱狂徒通道异常（退回普通出牌）: " + e.Message); }
 
+        // ★ v0.2.501（用户 2026-11-08）：「令逃脱计划一定会抽到技能牌，每次她打出它都会获得对应格挡」
+        //   原版 EscapePlan = 「抽 1 张；若是技能牌则获得格挡」⇒ 先往她抽牌堆顶放一张「防御」（技能），
+        //   于是必定抽到技能牌、必定吃满格挡；抽牌本身照常发生（速行者照旧触发）。
+        try
+        {
+            if (SafeEntryOf(play.Card) == "ESCAPE_PLAN")
+            {
+                var defCanonical = MegaCrit.Sts2.Core.Models.ModelDb.GetById<MegaCrit.Sts2.Core.Models.CardModel>(
+                    MegaCrit.Sts2.Core.Models.ModelDb.GetId(typeof(MegaCrit.Sts2.Core.Models.Cards.DefendSilent)));
+                if (defCanonical != null)
+                {
+                    var put = CombatState?.CreateCard(defCanonical, Shadow!);
+                    if (put != null)
+                    {
+                        pcs.DrawPile.AddInternal(put, 0, true);
+                        Logger.Log("[CharBoss] 逃脱计划：已把一张「防御」放到抽牌堆顶（必定抽到技能牌）");
+                    }
+                }
+            }
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 逃脱计划放牌失败（忽略）: " + e.Message); }
         var target = play.Target;
         if (target == null || target.IsDead || !target.IsAlive) target = BossPlanner.ChooseTarget(this, play.Card);
 
@@ -2125,6 +2146,13 @@ public abstract partial class CharBossMonster : MonsterModel
         {
             await MegaCrit.Sts2.Core.Commands.CardPileCmd.Shuffle(ctx, shadow);
             Logger.Log("[CharBoss] 剧本洗牌：已洗她的抽牌堆（大抱抱会因此生成煤灰）");
+            // ★ 群蛇形态（用户 2026-11-08）：她洗牌 ⇒ 自己抽牌堆 +1 张蛇咬（不放动画）
+            try
+            {
+                if (Creature?.GetPower<Powers.BossSnakeFormPower>() != null)
+                    Powers.BossSnakeFormPower.AddSnakebiteToHer(this);
+            }
+            catch (Exception e2) { Logger.Log("[CharBoss] 群蛇形态：洗牌加蛇咬失败: " + e2.Message); }
         }
         catch (Exception e) { Logger.Log("[CharBoss] 剧本洗牌：洗牌失败 " + e.Message); }
 

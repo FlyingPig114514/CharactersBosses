@@ -885,6 +885,37 @@ internal static class BossLineups
     /// </summary>
     internal static bool SneckoActive() => Latched("SILENT_SNECKO", ComputeSnecko);
 
+    /// <summary>一层静默猎手用哪套设计：奇巧猎（主）还是**蛇咬猎**（用户 2026-11-08）。</summary>
+    internal static bool SnakeBiteActive() => Latched("SILENT_SNAKEBITE", ComputeSnakeBite);
+
+    private static (bool Value, bool Decisive) ComputeSnakeBite()
+    {
+        try
+        {
+            string? entry = CurrentEncounterEntry();
+            if (!string.IsNullOrEmpty(entry))
+            {
+                if (entry == "SILENT_SNAKEBITE_BOSS_ENCOUNTER") return (true, true);
+                if (entry == "SILENT_SLY_BOSS_ENCOUNTER") return (false, true);
+            }
+        }
+        catch { /* 继续往下判断 */ }
+        try
+        {
+            var lineup = CurrentFightLineup();
+            if (lineup != null)
+            {
+                foreach (var k in lineup)
+                {
+                    if (k == "SILENT_SNAKEBITE") return (true, true);
+                    if (k == "SILENT_SLY") return (false, true);
+                }
+            }
+        }
+        catch { /* 继续兜底 */ }
+        try { return (Roll(0, 63, 2) == 1, false); } catch { return (false, false); }
+    }
+
     /// <summary>
     /// 三层**故障机器人**这一档用哪套设计：**能力机**（第一套）还是**事件机**（第二套，用户 2026-11-03）。
     /// 判据同 <see cref="OstyActive"/>：以**房间遭遇**为准，拿不到遭遇才按种子 50/50（salt 57）。

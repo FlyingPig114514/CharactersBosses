@@ -402,6 +402,7 @@ public static class CharBossEncounters
         // 二层静默猎手的第二套设计（涂毒猎 / 蛇眼猎，用户 2026-11-03）
         ModelDb.Encounter<SilentSneckoBossEncounter>(),
         ModelDb.Encounter<SilentSlyBossEncounter>(),
+        ModelDb.Encounter<SilentSnakeBiteBossEncounter>(),    // 一层静默猎手第二套设计「蛇咬猎」（用户 2026-11-08）
         ModelDb.Encounter<DefectDarkBossEncounter>(),
         ModelDb.Encounter<IroncladBloodBossEncounter>(),
         // 二层铁甲战士的第二套设计（放血战 / 杂耍战，用户 2026-11-02）

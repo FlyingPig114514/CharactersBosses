@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.500 / 2026-11-08（修灵魂骨「出击」意图偏低：反编译 Spur（增生）= SummonVar(3) + HealVar(5)，OnPlay 先治疗奥斯提再召唤；以前预补只算 Summon，奥斯提没满血时治疗那 1~5 点没算 ⇒ 预览偏低、等真血涨上来才追上（实测被这个假数字打死）。现在把「治疗但最多补到满血」的差额加进预补）";
+    public const string Tag = "v0.2.501 / 2026-11-08（新 Boss：一层静默猎手 2 号「蛇咬猎」SILENT_SNAKEBITE —— 9 回合剧本循环 6~9；特殊效果「群蛇形态」(单体)：她洗牌时自己抽牌堆 +1 蛇咬（无动画）、被她锁定的玩家洗牌时往那人抽牌堆塞 1 张（带塞牌动画）；循环每个第 9 回合多塞一张保留的蛇咬（飞镖段数增加）；逃脱计划打出前先往抽牌堆顶放一张防御 ⇒ 必定抽到技能牌、必定吃满格挡；遗物 蛇之戒指/涅奥的祝福/斗篷扣/红面具；进阶 8 升残影+逃脱计划、进阶 9 升背刺+飞镖）";
 
     private static bool _logged;
 

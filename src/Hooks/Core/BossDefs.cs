@@ -293,7 +293,26 @@ public static class BossDefs
             //   v0.2.337 加「蛇眼猎」时把这一项**插到了数组最前面**（= 一层），
             //   于是二层等于没有变体（退回主设计 = 涂毒猎），而「炼药猎」也被挤到了下标 3（= 四层）。
             //   现在按幕摆正，并加上注释免得下次再插错位置。
-            null,
+            // ★ 一层静默猎手的**第二套设计「蛇咬猎」**（Key `SILENT_SNAKEBITE`，用户 2026-11-08）。
+            //   特殊效果「群蛇形态」见 Powers/BossSnakeFormPower.cs，剧本见 Core/SnakeBiteSilentScript.cs。
+            new BossVariant
+            {
+                Key = "SILENT_SNAKEBITE",
+                Enabled = Core.BossLineups.SnakeBiteActive,
+                Deck = Core.SnakeBiteSilentScript.Deck(),
+                Relics = Core.SnakeBiteSilentScript.Relics(),
+                Script = Core.SnakeBiteSilentScript.Build(),
+                SpecialLoc = "SILENT_BOSS.snake_form",
+                SpecialPower = typeof(Powers.BossSnakeFormPower),
+                // 用户 2026-11-08：进阶 8 = 升级残影、逃脱计划；进阶 9 = 升级背刺、飞镖
+                AscensionUpgrades = new List<(int, Type)>
+                {
+                    (8, typeof(Blur)),
+                    (8, typeof(EscapePlan)),
+                    (9, typeof(Backstab)),
+                    (9, typeof(Flechettes)),
+                },
+            },
             // 二层静默猎手的**第二套设计「蛇眼猎」**（Key `SILENT_SNECKO`，用户 2026-11-03；第一套是「涂毒猎」）。
             // 异蛇之眼轴：卡牌费用随机 —— 原版随机被拦掉，改由剧本逐张写死费用（`ScriptCard.CostThisTurn`）。
             // 特殊效果「计划妥当」：每回合第一次抽到 3 费牌 → 保留（剧本里 `ScriptCard.Retain`）。

@@ -53,6 +53,7 @@ internal static class BossKeys
         new("DEFECT_THUNDER",      2, 0, 2, typeof(DefectBoss)),          // 故障 2 号：电球机（用户 2026-11-05）
         new("IRONCLAD_ANGER",       0, 0, 1, typeof(IroncladBoss)),        // 铁甲 1 号：愤怒战
         new("IRONCLAD_STRIKE",      0, 0, 2, typeof(IroncladBoss)),        // 铁甲 2 号：打击战（用户 2026-11-07）
+        new("SILENT_SNAKEBITE",    1, 0, 2, typeof(SilentBoss)),          // 猎人 2 号：蛇咬猎（用户 2026-11-08）
         // ── 第二幕（巢穴）──
         new("SILENT_ENVENOM",       1, 1, 1, typeof(SilentBoss)),          // 猎人 1 号：涂毒猎
         new("SILENT_SNECKO",        1, 1, 2, typeof(SilentBoss)),          // 猎人 2 号：蛇眼猎
@@ -142,6 +143,7 @@ internal static class BossKeys
             "REGENT_BOMBARD",           // 一层 储君 2 号：轰击储
             "IRONCLAD_ANGER",           // 一层 铁甲 1 号：愤怒战
             "IRONCLAD_STRIKE",          // 一层 铁甲 2 号：打击战（用户 2026-11-07）
+            "SILENT_SNAKEBITE",         // 一层 猎人 2 号：蛇咬猎（用户 2026-11-08）
         };
     }
 
@@ -188,6 +190,7 @@ internal static class BossKeys
         ["DEFECT_THUNDER"] = "电球机",
         ["IRONCLAD_ANGER"] = "愤怒战",
         ["IRONCLAD_STRIKE"] = "打击战",
+        ["SILENT_SNAKEBITE"] = "蛇咬猎",
         ["REGENT_DEBRIS"] = "碎屑储",
         ["REGENT_BOMBARD"] = "轰击储",
         // 二层
@@ -272,6 +275,9 @@ internal static class BossKeys
             case "SILENT_SNECKO": return "SILENT_ENVENOM";
             case "IRONCLAD_ANGER": return "IRONCLAD_STRIKE";     // 一层铁甲的一对（愤怒战 / 打击战）
             case "IRONCLAD_STRIKE": return "IRONCLAD_ANGER";
+            // 一层静默猎人的一对（奇巧猎 / 蛇咬猎）
+            case "SILENT_SLY": return "SILENT_SNAKEBITE";
+            case "SILENT_SNAKEBITE": return "SILENT_SLY";
             case "IRONCLAD_BLOOD": return "IRONCLAD_JUGGLER";
             case "IRONCLAD_JUGGLER": return "IRONCLAD_BLOOD";
             // 三层亡灵契约师的一对变体（根除骨 / 养手骨）
@@ -306,6 +312,7 @@ internal static class BossKeys
         {
             case "IRONCLAD_ANGER": return ModelDb.Encounter<IroncladAngerBossEncounter>();
             case "IRONCLAD_STRIKE": return ModelDb.Encounter<IroncladStrikeBossEncounter>();
+            case "SILENT_SNAKEBITE": return ModelDb.Encounter<SilentSnakeBiteBossEncounter>();
             case "IRONCLAD_VULN": return ModelDb.Encounter<IroncladVulnBossEncounter>();
             case "IRONCLAD_BOULDER": return ModelDb.Encounter<IroncladBoulderBossEncounter>();
             case "NECROBINDER_DOOM": return ModelDb.Encounter<NecrobinderDoomBossEncounter>();
