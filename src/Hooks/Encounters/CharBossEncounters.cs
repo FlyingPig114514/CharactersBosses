@@ -395,6 +395,7 @@ public static class CharBossEncounters
     private static readonly Lazy<EncounterModel?[]> TierEncounters = new(() => new EncounterModel?[]
     {
         ModelDb.Encounter<IroncladAngerBossEncounter>(),
+        ModelDb.Encounter<IroncladStrikeBossEncounter>(),    // 一层铁甲第二套设计「打击战」（用户 2026-11-07）
         ModelDb.Encounter<IroncladVulnBossEncounter>(),
   ModelDb.Encounter<IroncladBoulderBossEncounter>(),
         ModelDb.Encounter<SilentEnvenomBossEncounter>(),

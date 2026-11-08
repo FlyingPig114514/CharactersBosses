@@ -610,6 +610,29 @@ public static class BossScriptRunner
                     catch (Exception e) { Logger.Log("[CharBoss] 加「奇巧」失败: " + e.Message); }
                 }
                 // 伤害覆盖（剧本写死这张牌打多少）：改这一张实例的 Damage 变量 ⇒ 意图与实际伤害都跟着变
+                // ★ 打击战「痛击」（用户 2026-11-07）：她的**完美打击**伤害 = 卡面基础 + 池子剩余额度。
+                //   池子在 `BossBashPower` 里（战斗开始按「你四个牌堆里名字含打击的牌 + 她自己的 7 张」结算，
+                //   你每打出一张名字含打击的牌就 −2／−3，最低 0）。造牌时加进去，
+                //   于是**意图和实际伤害用的是同一个数字**。
+                try
+                {
+                    if (card.Id.Entry == "PERFECTED_STRIKE" && cardBoss != null)
+                    {
+                        var bash = cardBoss.Creature?.GetPower<CharacterBosses.Powers.BossBashPower>();
+                        if (bash != null)
+                        {
+                            bash.EnsureInit();
+                            int bonus = bash.Pool;
+                            if (bonus > 0)
+                            {
+                                card.DynamicVars.Damage.BaseValue += bonus;
+                                Logger.Log($"[CharBoss] 痛击：完美打击 +{bonus}（池子剩余）⇒ " +
+                                           $"实际 {card.DynamicVars.Damage.BaseValue}");
+                            }
+                        }
+                    }
+                }
+                catch (Exception e) { Logger.Log("[CharBoss] 痛击加成计算失败: " + e.Message); }
                 if (entry.DamageOverride > 0)
                 {
                     try

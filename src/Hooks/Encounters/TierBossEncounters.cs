@@ -110,6 +110,14 @@ public sealed class DefectStatusBossEncounter : DefectBossEncounter
     public override int? TierAct => 2;
 }
 /// <summary>
+/// 第一幕铁甲战士的**第二套设计「打击战」**（Key `IRONCLAD_STRIKE`，用户 2026-11-07）。
+/// 特殊效果「痛击」见 <c>Powers/BossBashPower.cs</c>，剧本见 <c>Core/IroncladStrikeScript.cs</c>。
+/// </summary>
+public sealed class IroncladStrikeBossEncounter : IroncladBossEncounter
+{
+    public override int? TierAct => 0;
+}
+/// <summary>
 /// 第一幕故障机器人的**第二套设计「电球机」**（Key `DEFECT_THUNDER`，用户 2026-11-05）。
 /// 特殊效果「引雷针」见 <c>Powers/BossLightningRodPower.cs</c>，剧本见 <c>Core/DefectThunderScript.cs</c>。
 /// </summary>

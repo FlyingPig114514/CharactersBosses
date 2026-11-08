@@ -86,7 +86,29 @@ public static class BossDefs
         // 与三层静默猎手（刀猎 / 炼药猎）同一套机制：以**房间遭遇**为准，拿不到遭遇才按种子 50/50。
         VariantsByAct = new BossVariant?[]
         {
-            null,
+            // ★ 一层铁甲战士的**第二套设计「打击战」**（Key `IRONCLAD_STRIKE`，用户 2026-11-07）。
+            //   特殊效果「痛击」见 Powers/BossBashPower.cs，剧本见 Core/IroncladStrikeScript.cs。
+            new BossVariant
+            {
+                Key = "IRONCLAD_STRIKE",
+                Enabled = Core.BossLineups.StrikeActive,
+                Deck = Core.IroncladStrikeScript.Deck(),
+                Relics = Core.IroncladStrikeScript.Relics(),
+                Script = Core.IroncladStrikeScript.Build(),
+                SpecialLoc = "IRONCLAD_BOSS.bash",
+                SpecialPower = typeof(Powers.BossBashPower),
+                // 用户 2026-11-07：进阶 8 = 升级岩石铠甲 + 获得护喉甲；进阶 9 = 升级完美打击、预备打击
+                AscensionUpgrades = new List<(int, Type)>
+                {
+                    (8, typeof(MegaCrit.Sts2.Core.Models.Cards.StoneArmor)),
+                    (9, typeof(MegaCrit.Sts2.Core.Models.Cards.PerfectedStrike)),
+                    (9, typeof(MegaCrit.Sts2.Core.Models.Cards.SetupStrike)),
+                },
+                AscensionRelics = new List<(int, Type)>
+                {
+                    (8, typeof(MegaCrit.Sts2.Core.Models.Relics.Gorget)),
+                },
+            },
             // 二层铁甲战士的**第二套设计「杂耍战」**（用户 2026-11-02；第一套是「放血战」）。
             // 特殊效果「**燃烧契约**」：杂耍生成的攻击牌获得「虚无 + 消耗」——
             // 拦掉原版杂耍的复制（Patches/JugglingNoClonePatch），改由剧本提前把复制牌
@@ -583,7 +605,29 @@ public static class BossDefs
         // 直到只剩 1 点生命，之后由她替它承担（与「为你而死」兼容、不递归）。
         VariantsByAct = new BossVariant?[]
         {
-            null, null,
+            // ★ 一层铁甲战士的**第二套设计「打击战」**（Key `IRONCLAD_STRIKE`，用户 2026-11-07）。
+            //   特殊效果「痛击」见 Powers/BossBashPower.cs，剧本见 Core/IroncladStrikeScript.cs。
+            new BossVariant
+            {
+                Key = "IRONCLAD_STRIKE",
+                Enabled = Core.BossLineups.StrikeActive,
+                Deck = Core.IroncladStrikeScript.Deck(),
+                Relics = Core.IroncladStrikeScript.Relics(),
+                Script = Core.IroncladStrikeScript.Build(),
+                SpecialLoc = "IRONCLAD_BOSS.bash",
+                SpecialPower = typeof(Powers.BossBashPower),
+                // 用户 2026-11-07：进阶 8 = 升级岩石铠甲 + 获得护喉甲；进阶 9 = 升级完美打击、预备打击
+                AscensionUpgrades = new List<(int, Type)>
+                {
+                    (8, typeof(MegaCrit.Sts2.Core.Models.Cards.StoneArmor)),
+                    (9, typeof(MegaCrit.Sts2.Core.Models.Cards.PerfectedStrike)),
+                    (9, typeof(MegaCrit.Sts2.Core.Models.Cards.SetupStrike)),
+                },
+                AscensionRelics = new List<(int, Type)>
+                {
+                    (8, typeof(MegaCrit.Sts2.Core.Models.Relics.Gorget)),
+                },
+            }, null,
             new BossVariant
             {
                 Key = "NECROBINDER_OSTY",
