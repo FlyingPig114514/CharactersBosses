@@ -157,15 +157,12 @@ public sealed class BossBashPower : PowerModel
             {
                 try
                 {
-                    // ★ v0.2.479：完美打击没有 `Damage` 变量，改的是 `CalculationBase`
-                    //   （最终伤害 = CalculationBase + ExtraDamage×打击张数，我们已把 ExtraDamage 置 0）
-                    var baseVar = card.DynamicVars["CalculationBase"];
-                    decimal cur = baseVar.BaseValue;
+                    decimal cur = card.DynamicVars.Damage.BaseValue;
                     decimal next = System.Math.Max(0m, cur - drop);
-                    baseVar.BaseValue = next;
-                    Logger.Log($"[CharBoss] 痛击：完美打击基础伤害 {cur} → {next}（你打出打击，池子 −{drop}）");
+                    card.DynamicVars.Damage.BaseValue = next;
+                    Logger.Log($"[CharBoss] 痛击：完美打击伤害 {cur} → {next}（你打出打击，池子 −{drop}）");
                 }
-                catch (Exception e) { Logger.Log("[CharBoss] 痛击：降低完美打击数值失败: " + e.Message); }
+                catch { /* 忽略 */ }
             }
             try { CharacterBosses.UI.BossHandUi.RefreshForce(null); } catch { /* 刷新失败无所谓 */ }
         }
