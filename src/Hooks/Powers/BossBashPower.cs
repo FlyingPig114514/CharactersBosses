@@ -111,6 +111,12 @@ public sealed class BossBashPower : PowerModel
             int per = PerCard();
             int before = Pool;
             Pool = Math.Max(0, Pool - per);
+            // ★ v0.2.476（用户 2026-11-07：「我打出打击，他的完美打击的伤害并没有降低」）：
+            //   以前只在**造牌那一刻**把池子并进卡面，而她的手牌是在**玩家回合之前**造好的
+            //   ⇒ 玩家回合里打掉打击之后，那张完美打击的数值不会变。现在池子一变就把她手里/牌堆里
+            //   所有完美打击的伤害同步减下去（意图和实伤用的都是这个数）。
+            int drop = before - Pool;
+            if (drop > 0) ApplyDrop(bossShadowCards(), drop);
             if (before != Pool && _logs++ < 40)
             {
                 Logger.Log($"[CharBoss] 痛击：你打出 {card.Id.Entry} ⇒ 完美打击加成 {before} → {Pool}" +
@@ -122,6 +128,45 @@ public sealed class BossBashPower : PowerModel
             Logger.Log("[CharBoss] 痛击结算（玩家打出打击）失败: " + e.Message);
         }
         return Task.CompletedTask;
+    }
+
+    /// <summary>她（影子玩家）所有牌堆里的完美打击实例。</summary>
+    private IEnumerable<CardModel> bossShadowCards()
+    {
+        var pcs = Owner?.Player?.PlayerCombatState;
+        if (pcs == null) yield break;
+        foreach (var pile in pcs.AllPiles)
+        {
+            if (pile?.Cards == null) continue;
+            foreach (var card in pile.Cards)
+            {
+                if (card == null) continue;
+                string entry;
+                try { entry = card.Id.Entry; } catch { continue; }
+                if (entry == "PERFECTED_STRIKE") yield return card;
+            }
+        }
+    }
+
+    /// <summary>把池子的下降量从这些完美打击的伤害上减掉（最低 0）。</summary>
+    private static void ApplyDrop(IEnumerable<CardModel> cards, int drop)
+    {
+        try
+        {
+            foreach (var card in cards)
+            {
+                try
+                {
+                    decimal cur = card.DynamicVars.Damage.BaseValue;
+                    decimal next = System.Math.Max(0m, cur - drop);
+                    card.DynamicVars.Damage.BaseValue = next;
+                    Logger.Log($"[CharBoss] 痛击：完美打击伤害 {cur} → {next}（你打出打击，池子 −{drop}）");
+                }
+                catch { /* 忽略 */ }
+            }
+            try { CharacterBosses.UI.BossHandUi.RefreshForce(null); } catch { /* 刷新失败无所谓 */ }
+        }
+        catch { /* 忽略 */ }
     }
 
     private static int _logs;

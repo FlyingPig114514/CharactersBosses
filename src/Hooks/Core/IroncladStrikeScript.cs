@@ -41,7 +41,7 @@ public static class IroncladStrikeScript
 
             // 3：完美打击（皇室认证）、防御（没费）、旋风斩（没费）
             Turn("3. 完美打击（附魔皇室认证）、防御（没费）、旋风斩（没费）", 3,
-                RoyalPerfect(), C<DefendIronclad>(), C<Whirlwind>()),
+                RoyalPerfect(), C<DefendIronclad>(), NoEnergy<Whirlwind>()),   // 完美打击把 2 费吃光 ⇒ 旋风斩不出
 
             // 4：预备打击、灰烬打击、防御（没费）
             Turn("4. 预备打击、灰烬打击、防御（没费）", 4,
@@ -102,9 +102,12 @@ public static class IroncladStrikeScript
         typeof(BurningBlood),
         typeof(NeowBlessing),
         typeof(RoyalStamp),
-        typeof(Candelabra),
+        typeof(Shuriken),        // 手里剑（用户 2026-11-07：「烛台换成手里剑」）
     };
 
+    /// <summary>「没费所以不出」的展示牌：只摆在手牌栏里让玩家看见，不参与出牌。</summary>
+    private static ScriptCard NoEnergy<T>() where T : CardModel
+        => new() { Card = typeof(T), From = "deck", DisplayOnly = true };
     private static ScriptCard RoyalPerfect() => new()
     {
         Card = typeof(PerfectedStrike), From = "deck", EnchantRoyallyApproved = true,

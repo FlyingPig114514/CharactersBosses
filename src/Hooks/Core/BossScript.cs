@@ -793,7 +793,23 @@ public static class BossScriptRunner
                     }
                     catch (Exception e) { Logger.Log("[CharBoss] 王者之拳成长应用失败: " + e.Message); }
                 }
-                if (entry.EnchantSown)
+                // ★ 打击战（用户 2026-11-07）：完美打击附魔「皇室认证」(`RoyallyApproved`)。
+                //   以前只写了设计稿没落地 ⇒ 卡面上看不到附魔。
+                if (entry.EnchantRoyallyApproved)
+                {
+                    try
+                    {
+                        var royal = ModelDb.Enchantment<MegaCrit.Sts2.Core.Models.Enchantments.RoyallyApproved>();
+                        if (royal != null)
+                        {
+                            var mutableRoyal = royal.ToMutable();
+                            card.EnchantInternal(mutableRoyal ?? royal, 1m);
+                            Logger.Log($"[CharBoss] 附魔「皇室认证」已加在 {card.Id.Entry} 上");
+                        }
+                        else Logger.Log("[CharBoss] 取不到附魔「皇室认证」（RoyallyApproved）");
+                    }
+                    catch (Exception e) { Logger.Log("[CharBoss] 附魔皇室认证失败: " + e.Message); }
+                }                if (entry.EnchantSown)
                 {
                     try
                     {
