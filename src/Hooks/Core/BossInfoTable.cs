@@ -25,6 +25,15 @@ internal static class BossInfoTable
             "群体高压回合：无",
             "特殊效果类型：单体"),
 
+        ["SILENT_SNAKEBITE"] = Lines(
+            "循环：6~9",
+            "单体能力：中",
+            "群攻能力：偏弱",
+            "单体高压回合：3、9",
+            "群体高压回合：无",
+            "特殊效果类型：单体",
+            "塞牌能力：偏弱"),
+
         ["NECROBINDER_DOOM"] = Lines(
             "循环：7~11",
             "单体能力：强",

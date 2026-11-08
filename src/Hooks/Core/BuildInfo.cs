@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.510 / 2026-11-08（闪亮口红：她第 3 回合格挡清空时才到账的 +1 力量，预览先补上 —— 修「第三回合飞镖的伤害预览偏低 1」）";
+    public const string Tag = "v0.2.511 / 2026-11-08（配置界面补上蛇咬猎 SILENT_SNAKEBITE 的能力档案：循环 6~9／单体中／群攻偏弱／单体高压 3、9／群体高压无／特殊效果单体／塞牌偏弱）";
 
     private static bool _logged;
 
