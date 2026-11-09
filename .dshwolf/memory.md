@@ -4815,3 +4815,6 @@ Chronological action log.
 | 2026-11-09 18:00 | edit | `src/Hooks/Core/BossPotions.cs` | ok | 0 |
 | 2026-11-09 18:00 | edit | `src/Hooks/Core/BossPotions.cs` | ok | 0 |
 | 2026-11-09 18:01 | edit | `src/CharacterBosses.json` | ok | 0 |
+| 2026-11-09 18:01 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-09 18:11 | write | `src/Hooks/Patches/BrewerBossBlockableHpLossPatch.cs` | ok | 0 |
+| 2026-11-09 18:11 | edit | `src/CharacterBosses.json` | ok | 0 |

@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.529 / 2026-11-09（排查「炼药猎部分药水效果翻倍（例如镣铐药水）」：①`CombatSidePatches.PlayerCharacters` 加**引用去重** —— 镣铐药水/爆炸安瓿在反编译里都是对 `CombatState.HittableEnemies` 逐只结算，列表里同一只出现两次就是效果翻倍；②喝药前后各加一行诊断：`药水命中列表：… N 只 […]`（重复条目会直接标出来）与 `喝药结果：… powers(名:层)`，下一份玩家日志即可定性）";
+    public const string Tag = "v0.2.530 / 2026-11-09（炼药猎（且只有她）现在能用格挡挡下「失去生命」类效果，例如崩坠觉醒者的「法力灼烧」：原版 `DamageBlockInternal` 见到 `ValueProp.Unblockable` 就一点格挡都不吃，新补丁挂在 `Creature.LoseHpInternal` 这个公共出口上，先用原版逻辑吃掉格挡再扣血；普通伤害走不到那条分支所以零回归。上一版 v0.2.529：HittableEnemies 引用去重 + 喝药前后诊断（药水效果翻倍））";
 
     private static bool _logged;
 
