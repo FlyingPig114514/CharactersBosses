@@ -1214,8 +1214,12 @@ public static class BossIntentBuilder
         try
         {
             if (card == null) return false;
-            if (!string.Equals(SafeEntry(card), "HIDDEN_DAGGERS", StringComparison.Ordinal)) return false;
-            return card.IsUpgraded;
+            // ★ v0.2.522（用户 2026-11-09：「隐秘匕首+ 和钢铁风暴+ 给的小刀是升级的，基础伤害为 6」）：
+            //   这两张牌的**升级版**生成的是升级小刀（Shiv 4 → 6），预览必须跟着 +2。
+            string entry = SafeEntry(card);
+            bool upgradedGenerator = string.Equals(entry, "HIDDEN_DAGGERS", StringComparison.Ordinal)
+                                     || string.Equals(entry, "STORM_OF_STEEL", StringComparison.Ordinal);
+            return upgradedGenerator && card.IsUpgraded;
         }
         catch { return false; }
     }

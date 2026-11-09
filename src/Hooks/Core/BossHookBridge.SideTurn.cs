@@ -814,6 +814,7 @@ public static partial class BossHookBridge
             if (relics == null) return;
 
             decimal amount = 0m;
+            RelicModel? marbleRelic = null;
             for (int i = 0; i < relics.Count; i++)
             {
                 var relic = relics[i];
@@ -821,6 +822,7 @@ public static partial class BossHookBridge
                 string entry;
                 try { entry = relic.Id.Entry; } catch { continue; }
                 if (entry != "BAG_OF_MARBLES") continue;
+                marbleRelic = relic;
                 try { amount = relic.DynamicVars["Vulnerable"].BaseValue; }
                 catch { amount = 1m; }
                 break;
@@ -844,7 +846,17 @@ public static partial class BossHookBridge
             catch { /* 取不到就空 */ }
             if (targets.Count == 0) return;
 
+            // ⚠ v0.2.522：PowerCmd.Apply 的第 5 个参数是 **CardModel?**（卡牌来源），遗物传不进去，
+            //   所以这里仍然传 null（与反编译里原版 BagOfMarbles 自己那一句完全一致）。
+            //   另外补一行日志把**实际施加的层数**打出来，便于核对「下一回合有没有掉」。
             await PowerCmd.Apply<MegaCrit.Sts2.Core.Models.Powers.VulnerablePower>(ctx, targets, amount, me, null);
+            try
+            {
+                var t0 = targets[0];
+                int now = t0.GetPowerAmount<MegaCrit.Sts2.Core.Models.Powers.VulnerablePower>();
+                Logger.Log($"[CharBoss] 弹珠袋：施加后 {t0.Name} 的易伤层数 = {now}（遗物={marbleRelic?.Id.Entry}）");
+            }
+            catch { /* 忽略 */ }
             Logger.Log($"[CharBoss] 弹珠袋：战斗开始给 {targets.Count} 名玩家各 {amount} 层易伤");
         }
         catch (Exception e)

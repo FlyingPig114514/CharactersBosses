@@ -327,9 +327,13 @@ public sealed class BossCardSelector : ICardSelector
         _orderBoss = bossNow;
         _orderTurn = turnNow;
 
-        // ⓪ **剧本点名的「选择队列」**（<see cref="BossTurn.PickOrder"/>）最高优先 ——
-        //    「返顶王者之踢 / 王者之拳 / 所向无敌」「抉择抉择要打出宇宙冷漠」都靠它钉死。
-        if (count > 0)
+        // ⓪ 剧本点名的「选择队列」（`BossTurn.PickOrder`）—— **只在「这一次选择没有弃牌点名」时才用**。
+        //    ★ v0.2.522（用户 2026-11-09：「7、10 回合手上技法错误的给隐秘匕首添加了奇巧」）：
+        //      以前它无条件最先消耗，于是**杂技的「弃 1 张」也会把队列里的第一条吃掉**
+        //      （华丽猎第 7/10 回合队列 = 防御，本该留给「手上技法」加奇巧）⇒ 手上技法退化成兜底排序、
+        //      把奇巧给了隐秘匕首。现在带弃牌点名的选择交给下面的 ①/② 精确命中，队列留给真正需要点名的选择。
+        bool hasDiscardMarks = marks != null && (marks.Instances.Count > 0 || marks.Keys.Count > 0);
+        if (count > 0 && !hasDiscardMarks)
         {
             var forced = TakeForcedPick(bossNow, turnNow, rest);
             if (forced != null)
@@ -372,6 +376,7 @@ public sealed class BossCardSelector : ICardSelector
             }
             if (byKey > 0) rest = rest.Where(c => !picked.Contains(c)).ToList();
         }
+
 
         // ③ 兜底：奇巧优先 → 价值 → 费用
         if (picked.Count < count)

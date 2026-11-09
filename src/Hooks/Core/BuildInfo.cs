@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.521 / 2026-11-09（华丽猎六项修正：弹珠袋只给 1 层易伤 / 手上技法正确给防御奇巧 / 钢铁风暴显示小刀伤害 / 面板宽度每回合重置 + 压制悬停说明 / 第 7 回合丢钢铁风暴 / 铭记死亡与谋杀按弃牌和抽牌记账）";
+    public const string Tag = "v0.2.522 / 2026-11-09（华丽猎：保留牌不再带「保留」关键字（靠计划妥当）/ 隐秘匕首+ 与钢铁风暴+ 的小刀按 6 点算 / 手上技法的点名不再被杂技的弃牌吃掉 / 华丽收场在可打出的那一回合不再是红杠 / 弹珠袋补层数日志）";
 
     private static bool _logged;
 

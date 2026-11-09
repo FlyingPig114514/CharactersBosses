@@ -545,6 +545,29 @@ public static class BossScriptRunner
         }
         catch (Exception e) { Logger.Log("[CharBoss] 痛击：重算完美打击失败: " + e.Message); }
     }
+    /// <summary>把她的抽牌堆整堆挪进弃牌堆（让「华丽收场」满足原版的「抽牌堆为空」）。</summary>
+    internal static void ClearDrawPileFor(PlayerCombatState? pcs)
+    {
+        try
+        {
+            if (pcs == null) return;
+            var draw = new List<CardModel>();
+            foreach (var c in pcs.DrawPile.Cards) if (c != null) draw.Add(c);
+            if (draw.Count == 0) return;
+            foreach (var c in draw)
+            {
+                try
+                {
+                    pcs.DrawPile.RemoveInternal(c, true);
+                    pcs.DiscardPile.AddInternal(c, -1, true);
+                }
+                catch { /* 单张失败不影响其它 */ }
+            }
+            Logger.Log($"[CharBoss] 华丽收场：抽牌堆已清空（{draw.Count} 张进弃牌堆）⇒ 这一手它可打出");
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 清空抽牌堆失败: " + e.Message); }
+    }
+
     private static void PurgeStaleStrikeCards(PlayerCombatState pcs, Monsters.CharBossMonster? boss)
     {
         try
@@ -788,6 +811,16 @@ public static class BossScriptRunner
                 {
                     try { BossDamagePredictor.MakeGoldAxeCountOwnerOnly(card); } catch { /* 忽略 */ }
                 }
+                // ★ v0.2.522（用户 2026-11-09：「第 9 回合预览中的华丽收场不应该被标为不可打出
+                //   （1~3 回合的确实应该是不可打出）」）：
+                //   原版要求「抽牌堆为空」才能打出；以前是**出手那一刻**才清空 ⇒ 面板按当时的抽牌堆
+                //   判定成「不可打出」并给费用画红杠。现在改成**造手牌时**就清空（每回合只清一次），
+                //   于是标了 EmptyDrawPileFirst 的那一回合它从一进手就是可打出的；
+                //   其它回合（只显示、没标这个旗标）仍然是不可打出。
+                if (entry.EmptyDrawPileFirst)
+                {
+                    try { ClearDrawPileFor(pcs); } catch { /* 忽略 */ }
+                }
                 // 「燃烧契约」（二层杂耍战）：杂耍的复制牌自带「虚无 + 消耗」
                 if (entry.JugglingCopy)
                 {
@@ -1007,7 +1040,7 @@ public static class BossScriptRunner
                 }
                 if (!pcs.Hand.Cards.Contains(card)) pcs.Hand.AddInternal(card, -1, true);
                 // 「保留不出」的牌（DisplayOnly + Retain，且本回合不会被打出）记一份，整手建完挪到最右
-                if (entry.Retain && entry.DisplayOnly && !entry.AutoPlayed) keptToRight.Add(card);
+                // v0.2.522：不再要求 Retain（华丽猎的「保留不出」不加保留关键字，靠计划妥当）\r\n                if (entry.DisplayOnly && !entry.AutoPlayed) keptToRight.Add(card);
             }
             catch (Exception e)
             {

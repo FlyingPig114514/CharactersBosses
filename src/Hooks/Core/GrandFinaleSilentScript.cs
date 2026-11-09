@@ -240,9 +240,14 @@ public static class GrandFinaleSilentScript
         where T : MegaCrit.Sts2.Core.Models.CardModel
         => new() { Card = typeof(T), Upgraded = upgraded, From = "deck", EmptyDrawPileFirst = emptyDrawPileFirst };
 
-    /// <summary>「保留不出」：回合结束时留在手里，本回合**不参与出牌**（只显示）。</summary>
+    /// <summary>
+    /// 「保留不出」：本回合**不参与出牌**（只显示）。
+    /// ★ v0.2.522（用户 2026-11-09：「不用给我标注保留在手的那些牌添加保留，因为计划妥当就能做到这一点」）：
+    ///   这里**不再**加 Retain 关键字（那张牌上就不会显示「保留」字样）—— 第 1 回合打出「计划妥当」之后，
+    ///   原版能力本身就会让她的手牌在回合结束时不被弃掉。
+    /// </summary>
     private static ScriptCard Kept<T>() where T : MegaCrit.Sts2.Core.Models.CardModel
-        => new() { Card = typeof(T), From = "deck", Retain = true, DisplayOnly = true };
+        => new() { Card = typeof(T), From = "deck", DisplayOnly = true };
 
     /// <summary>被上一张牌**丢弃**的那张。</summary>
     private static ScriptCard Discard<T>() where T : MegaCrit.Sts2.Core.Models.CardModel
