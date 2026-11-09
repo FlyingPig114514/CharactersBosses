@@ -84,17 +84,23 @@ public sealed class BossCallToArmsPower : PowerModel
             var combat = owner.CombatState;
             if (combat == null) return;
             int given = 0;
+            var who = new List<string>();
             foreach (var ally in combat.Enemies)
             {
                 if (ally == null || !ally.IsAlive) continue;
                 if (ReferenceEquals(ally, owner)) continue;              // 她自己不加
+                // ★ v0.2.514（用户 2026-11-08：「仆从储也会给玩家加力量」）：只发给**她自己这一侧**。
+                //   写死按阵营过滤，是因为这条链路唯一可信的判据就是 `Side`：万一 `Enemies` 里
+                //   混进了玩家侧的东西（阴影玩家/宠物错绑），力量就会落到玩家头上。
+                try { if (ally.Side != owner.Side) continue; } catch { /* 读不到就不拦 */ }
                 await PowerCmd.Apply<StrengthPower>(choiceContext, ally, delta, owner, null, true);
                 given++;
+                if (who.Count < 6) who.Add(SafeName(ally));
             }
             if (given > 0 && _logs++ < 30)
             {
                 Logger.Log($"[CharBoss] 征召上前：储君用 {SafeEntry(card)} 获得 {delta} 点力量 ⇒ " +
-                           $"其它 {given} 个友方各获得 {delta} 点力量");
+                           $"其它 {given} 个友方各获得 {delta} 点力量（{string.Join("、", who)}）");
             }
         }
         catch (Exception e)
@@ -135,5 +141,17 @@ public sealed class BossCallToArmsPower : PowerModel
     private static string SafeEntry(CardModel? card)
     {
         try { return card?.Id.Entry ?? "?"; } catch { return "?"; }
+    }
+
+    /// <summary>日志用：`名字(Side)`，用来一眼看出力量到底发给了谁。</summary>
+    private static string SafeName(Creature? creature)
+    {
+        try
+        {
+            if (creature == null) return "?";
+            string name = creature.Monster?.Id.Entry ?? creature.Name ?? "?";
+            return $"{name}({creature.Side})";
+        }
+        catch { return "?"; }
     }
 }

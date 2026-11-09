@@ -52,7 +52,7 @@ public static class BossBgm
     ///   / 帝皇蟹 `kaiser_crab` / 无厌沙虫 `the_insatiable` / 女王 `queen`。
     ///
     /// 「其余全部 ⇒ 永世沙漏」：原版 `AeonglassBoss.CustomBgm` 就是 `act3_boss_queen`
-    /// （反编译实证 —— 永世沙漏自己**没有**独立曲目，所以兜底曲 = 女王那首），见 <see cref="Fallback"/>。
+    /// 没有单独指定曲目的 Boss 走 <see cref="DefaultForAct"/>（一层瀑布巨兽 / 二层帝皇蟹 / 三层女王）。
     /// </summary>
     private static readonly Dictionary<string, Track> FmodByEncounter = new(StringComparer.Ordinal)
     {
@@ -64,10 +64,13 @@ public static class BossBgm
         ["DEFECT_DARK_BOSS_ENCOUNTER"]        = new("event:/music/act1_b_boss_waterfall_giant",   0, "瀑布巨兽"),
         ["NECROBINDER_DOOM_BOSS_ENCOUNTER"]   = new("event:/music/act1_b_boss_soul_fysh",         0, "灵魂异鱼"),
 
-        // 一层「奇巧猎」按用户表是「乐加维林族母」——**原版那只 Boss 没有任何专属曲目**
-        // （`LagavulinMatriarchBoss` 没写 `CustomBgm`，它进 Boss 房放的就是本幕默认 Boss 音乐）。
-        // 所以这里也「不接管」，听到的与打乐加维林族母时一致。
-        ["SILENT_SLY_BOSS_ENCOUNTER"]         = KeepVanilla,
+        // 一层「奇巧猎」：**v0.2.514 起不再保持原版**。
+        // 原版的乐加维林族母没有专属曲目（进 Boss 房放的是本幕默认音乐），而用户 2026-11-08 要求
+        // 「所有**没有单独指定**音乐的 Boss 都要在 Boss 战里放音乐，默认一层=瀑布巨兽 / 二层=帝皇蟹 / 三层=女王」
+        // ⇒ 这里删掉 KeepVanilla，让它走 <see cref="DefaultForAct"/>（一层 = 瀑布巨兽）。
+        // ⚠ 保持原版时有一个副作用：我们自己不接管音乐 ⇒ `_playing` 为空 ⇒ 打死 Boss 时
+        //   `OnLastBossDied` 直接返回，**死亡/胜利段落（胜利音效）也不会播**。
+        //   仆从储就是这么暴露出来的（用户 2026-11-08：「击败仆从储时没有放胜利音效」）。
 
         // ── 第二幕（用户 2026-10-28 定稿：**二层全部 Boss 统一用帝皇蟹**）──
         // 原本「物理机 / 放血战 = 无厌沙虫（按玩家血量驱动 progress）」，但实测两条参数路线
@@ -93,11 +96,21 @@ public static class BossBgm
     };
 
     /// <summary>
-    /// 「其余所有 Boss ⇒ **永世沙漏**」。原版永世沙漏（`AeonglassBoss`）的 `CustomBgm` 就是女王那首，
-    /// 所以兜底曲 = `act3_boss_queen`。它属于第三幕 ⇒ 只有第三幕的兜底 Boss 会真的接管
-    /// （正好：刀猎 / 巨石战 / 能力机 / 根除骨 / 无色储君 / 辉星储 全是三层设计）。
+    /// **没有单独指定曲目的 Boss 用的默认曲**（用户 2026-11-08）：
+    ///   第一幕 = 瀑布巨兽 / 第二幕 = 帝皇蟹 / 第三幕（及以后）= 女王。
+    ///
+    /// 以前这里只有一条「其余全部 ⇒ 永世沙漏」（= 女王那首，属于第三幕）⇒ **第二幕那些没指定曲目的
+    /// Boss（例如仆从储）会因为「曲目属于别的幕」被判成不接管**：
+    ///   · 整场没有我们的音乐（日志：`曲目「永世沙漏」属于第 3 幕，当前是第 2 幕 ⇒ 不接管`）；
+    ///   · 而且连带 **没有胜利音效** —— 死亡段落（胜利音）是靠 `_playing` 那首曲子发
+    ///     `<boss>_progress = 5` 的，没接管就没有 `_playing`，`OnLastBossDied` 直接返回。
     /// </summary>
-    private static readonly Track Fallback = new("event:/music/act3_boss_queen", 2, "永世沙漏");
+    private static Track DefaultForAct(int act)
+    {
+        if (act <= 0) return new("event:/music/act1_b_boss_waterfall_giant", 0, "瀑布巨兽");
+        if (act == 1) return new("event:/music/act2_boss_kaiser_crab", 1, "帝皇蟹");
+        return new("event:/music/act3_boss_queen", 2, "女王");
+    }
 
     /// <summary>
     /// A3 选项②：一代曲目（PCK 里的 `res://` 路径）。
@@ -724,7 +737,7 @@ public static class BossBgm
     /// <summary>A3 选项①：按对照表播原版其他 Boss 的 FMOD 曲目。</summary>
     private static void PlayVanillaOther(string encounterEntry, int act)
     {
-        var track = Lookup(encounterEntry);
+        var track = Lookup(encounterEntry, act);
         if (track.IsKeepVanilla)
         {
             Stop("这一场保持原版默认 Boss 音乐");
@@ -837,8 +850,8 @@ public static class BossBgm
     }
 
     /// <summary>遭遇 → 曲目（查不到 = 兜底「永世沙漏」）。</summary>
-    private static Track Lookup(string encounterEntry)
-        => FmodByEncounter.TryGetValue(encounterEntry, out var track) ? track : Fallback;
+    private static Track Lookup(string encounterEntry, int act)
+        => FmodByEncounter.TryGetValue(encounterEntry, out var track) ? track : DefaultForAct(act);
 
 
     /// <summary>

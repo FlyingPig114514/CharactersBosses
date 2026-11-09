@@ -692,7 +692,9 @@ public abstract partial class CharBossMonster : MonsterModel
             if (creature == null || creature.IsDead) return;
             if (!seen.Add(creature)) return;
             string powers;
-            try { powers = string.Join(",", creature.Powers.Select(p => p.Id.Entry)); }
+            // ★ v0.2.514（用户 2026-11-08：「仆从储也会给玩家加力量」）：把**层数**也打出来 ——
+            //   以前只打能力名，看不出「力量到底涨没涨、涨了几点」，定位不了是谁给的。
+            try { powers = string.Join(",", creature.Powers.Select(p => p.Id.Entry + ":" + p.Amount)); }
             catch { powers = "?"; }
             string who = creature.Monster == null ? "真人玩家" : source;
             parts.Add($"{creature.Name}({who}) hp={creature.CurrentHp}/{creature.MaxHp} " +

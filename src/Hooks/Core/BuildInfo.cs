@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.513 / 2026-11-08（修 Boss 的卡牌/遗物/能量整场不显示：进战斗房那一帧会话重置把刚建好的面板拆了 ⇒ 重置后立刻重建；同时修多人多 Boss 的面板缩放判据）";
+    public const string Tag = "v0.2.514 / 2026-11-08（没单独指定曲目的 Boss 现在都按幕放音乐：一层瀑布巨兽 / 二层帝皇蟹 / 三层女王 —— 同时修好「击败仆从储没有胜利音效」：不再接管就没有死亡段落；另给「征召上前」加阵营过滤与力量层数诊断）";
 
     private static bool _logged;
 
