@@ -183,6 +183,10 @@ internal static class BossLineups
     /// </summary>
     internal static string[] For(int act, int fight)
     {
+        // ★ v0.2.535：房主在这里顺手把 pickset 广播一次（内容没变就不发；单人/客人什么都不做）。
+        //   放这里是因为「算阵容」这一刻必然已经有 RunManager + NetService，不需要额外的时机钩子。
+        try { Core.BossPicksSync.BroadcastIfHost(); } catch { /* 忽略 */ }
+
         var key = (CurrentSeed(), act, fight);
         lock (Cache)
         {
@@ -223,6 +227,15 @@ internal static class BossLineups
             }
             finally { Computing.Remove((act, fight)); }
         }
+    }
+
+    /// <summary>
+    /// 清空阵容缓存（勾选变了 / 收到房主的勾选之后调）。
+    /// ★ v0.2.535：客人收到房主 pickset 时用它 —— 之前算过的阵容是按「整张候补表」算的，必须重算。
+    /// </summary>
+    internal static void InvalidateCache()
+    {
+        try { lock (Cache) Cache.Clear(); } catch { /* 忽略 */ }
     }
 
     /// <summary>正在计算中的 (幕, 场) —— 重入保护用（见 <see cref="For"/>）。</summary>
@@ -280,8 +293,7 @@ internal static class BossLineups
         int need = PlayersPerFight();
 
         // ★ v0.2.453（A2 改成「每张地图的 Boss 勾选」）：
-        //   · **主 Boss** 从「房主勾选过的候补」里抽（单人 = 玩家自己的勾选；多人 = 房主的，
-        //     客人端通过同步的遭遇跟随，见 Core/BossSelection.cs 的类注释）；
+        //   · **主 Boss** 从「房主勾选过的候补」里抽；
         //   · **搭子**（第 2、3 只）**永远从整张候补表**抽 —— 搭子一旦掺进各机自己的配置文件，
         //     两端就会算出不同阵容 ⇒ 又是不不同步。单人局只有 1 只 Boss，勾选照样 100% 生效。
         // ★ v0.2.503（玩家实测的不同步，两端日志一对比就实锤）：
@@ -290,14 +302,23 @@ internal static class BossLineups
         //   原因：**多人时主 Boss 的候选表也读「本机勾选」**（房主挑过勾 ⇒ 某个角色一只都不剩），
         //   而客人按规则不读本机勾选、永远拿整张表 ⇒ 两端阵容长度都不一样 ⇒ 轮次 1 立刻分叉。
         //   修法：**多人局（≥2 名玩家）一律用整张花名册**（房主的勾选只影响单人局）。
+        //
+        // ★★ v0.2.535（用户 2026-11-09：「多人时所有 boss 都只用房主勾选的」）：
+        //   上面那条「多人一律用整张花名册」让勾选在多人里**完全失效**（用户：「那这勾不勾没啥区别」）。
+        //   现在房主通过 BaseLib 的自定义网络消息把 pickset 广播给所有客人（见 `Core/BossPicksSync.cs`），
+        //   两端拿到**同一套**候选 ⇒ 主 Boss 与搭子**都**按房主勾选来抽，仍然是确定性纯函数。
+        //   客人还没收到消息时 `AvailableFor` 返回整张表（旧行为，不会算错也不会卡住），
+        //   收到后会清缓存重算。
         bool multiplayer = false;
         try { multiplayer = Core.MultiBossPlan.WantsSecondBoss(out int mpPlayers) && mpPlayers >= 2; }
         catch { multiplayer = false; }
 
-        var mainRoster = multiplayer
-            ? BossKeys.RosterFor(act)
-            : BossSelection.AvailableFor(act, BossSelection.CurrentMapEntry());
-        var partnerRoster = BossKeys.RosterFor(act);
+        // 这一场对应的**地图 id**（按幕取，避免「预告第 2、3 幕时却读了当前幕的地图」）
+        string? mapEntry = null;
+        try { mapEntry = Core.BossSelection.MapEntryOfAct(act); } catch { mapEntry = null; }
+
+        var mainRoster = Core.BossSelection.AvailableFor(act, mapEntry);
+        var partnerRoster = mainRoster;      // v0.2.535：搭子也用同一套（房主勾选 / 单人勾选 / 未收到时的整张表）
 
         // ② 本幕前面那几场已经上过的 Key 全部排除（进阶 10 的两场：任何 Boss 都不重复）
         var usedInThisAct = new HashSet<string>(StringComparer.Ordinal);

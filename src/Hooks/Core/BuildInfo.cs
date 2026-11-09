@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.534 / 2026-11-09（修「骸骨军团给其它 Boss 召唤的奥斯提，血条/状态栏图层过高、开着设置界面都能看见」：`BossOsty.EnforcePlacement` 以前只管位置不管容器/层级，而 `MirrorAndPlace` 只在**她自己回合开始**才把奥斯提挪进 `EnemyContainer`，其它 Boss 名下那几只从来没被挪过。现在每次纠正站位时顺手把奥斯提节点**归一到它自己的 Boss 节点**（同父容器 + 同 ZIndex/ZAsRelative，只会持平或更低，绝不抬高），并打一行「奥斯提图层归一：父容器 X→Y、ZIndex a→b」的诊断）｜上一版 v0.2.533：群蛇形态锁定补丁从未安装 / 跟踪锁定末段取特殊效果 Power 的 title / 小刀只让首刀吃幻影之刃";
+    public const string Tag = "v0.2.535 / 2026-11-09（多人勾选真正生效：房主用 BaseLib 的自定义网络消息把「每张地图的 Boss 勾选」广播给所有客人（新文件 `Core/BossPicksSync.cs` / `BossPicksMessage`），两端算阵容用**同一套**候选 ⇒ **主 Boss 与搭子都只从房主勾选里抽**（以前多人局一律用整张花名册，勾选等于没用）。客人收到前先按整张表算、收到后清阵容缓存重算；阵容仍是 (种子,幕,场,勾选) 的纯函数。顺带把「预告第 2/3 幕时却读当前幕地图勾选」改成按幕取地图（`BossSelection.MapEntryOfAct`），配置界面文案同步改成「主 Boss 与搭子都以房主勾选为准」）｜v0.2.534：骸骨军团奥斯提图层归一";
 
     private static bool _logged;
 

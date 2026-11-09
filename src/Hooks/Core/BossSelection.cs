@@ -55,48 +55,107 @@ internal static class BossSelection
         var full = BossKeys.RosterFor(act);
         try
         {
+            string? entry = mapEntry ?? CurrentMapEntry();
+
+            // ★★ v0.2.535（用户 2026-11-09：「多人时所有 boss 都只用房主勾选的」）：
+            //   客人以前**直接返回整张候补表**（因为读不到房主的配置文件）⇒ 勾选在多人里等于没用。
+            //   现在房主会把 pickset 广播过来（`Core/BossPicksSync.cs`）：
+            //     · 收到了 ⇒ 用**房主那一套**（主 Boss 与搭子都按它抽，两端因此完全一致）；
+            //     · 还没收到 ⇒ 退回整张表（旧行为，不会算错也不会卡住，收到后会清缓存重算）。
             if (allowHost && !Authoritative)
             {
-                if (!_guestLogged)
+                var synced = BossPicksSync.HostPicksOf(entry);
+                if (synced == null)
                 {
-                    _guestLogged = true;
-                    Logger.Log("[CharBoss] Boss 选择：本机是客人 ⇒ 不读本机勾选（以房主为准，主 Boss 跟随同步遭遇）");
+                    if (!_guestLogged)
+                    {
+                        _guestLogged = true;
+                        Logger.Log("[CharBoss] Boss 选择：本机是客人，还没收到房主的勾选 ⇒ 先按整张候补表算" +
+                                   "（收到后会自动重算）");
+                    }
+                    return full;
                 }
-                return full;
+                return FilterByPicks(full, synced, entry);
             }
 
-            string? entry = mapEntry ?? CurrentMapEntry();
             var picks = BossConfig.BossPicksOf(entry);
             if (picks == null) return full;         // 没配过 = 全选
-
-            var keep = new HashSet<string>(StringComparer.Ordinal);
-            var unknown = new List<string>();
-            foreach (var key in picks)
-            {
-                if (string.IsNullOrWhiteSpace(key)) continue;
-                if (Array.IndexOf(full, key) >= 0) keep.Add(key);
-                else unknown.Add(key);
-            }
-            if (unknown.Count > 0)
-            {
-                Logger.Log($"[CharBoss] Boss 选择：地图 {entry} 的勾选里有 {unknown.Count} 个本幕不认识的 Key " +
-                           $"[{string.Join(",", unknown)}]（跨版本删掉的设计？已忽略）");
-            }
-            if (keep.Count == 0)
-            {
-                Logger.Log($"[CharBoss] Boss 选择：地图 {entry} 的勾选一个都不匹配 ⇒ 回退整张候补表");
-                return full;
-            }
-
-            var result = new List<string>(keep.Count);
-            foreach (var key in full) if (keep.Contains(key)) result.Add(key);   // 保持原顺序
-            return result.ToArray();
+            return FilterByPicks(full, picks, entry);
         }
         catch (Exception e)
         {
             Logger.Log("[CharBoss] Boss 选择：读取失败，回退整张候补表: " + e.Message);
             return full;
         }
+    }
+
+    /// <summary>把「整张候补表」按一份勾选过滤（保持候补表的原顺序）。</summary>
+    private static string[] FilterByPicks(string[] full, IEnumerable<string> picks, string? entry)
+    {
+        var keep = new HashSet<string>(StringComparer.Ordinal);
+        var unknown = new List<string>();
+        foreach (var key in picks)
+        {
+            if (string.IsNullOrWhiteSpace(key)) continue;
+            if (Array.IndexOf(full, key) >= 0) keep.Add(key);
+            else unknown.Add(key);
+        }
+        if (unknown.Count > 0)
+        {
+            Logger.Log($"[CharBoss] Boss 选择：地图 {entry} 的勾选里有 {unknown.Count} 个本幕不认识的 Key " +
+                       $"[{string.Join(",", unknown)}]（跨版本删掉的设计？已忽略）");
+        }
+        if (keep.Count == 0)
+        {
+            Logger.Log($"[CharBoss] Boss 选择：地图 {entry} 的勾选一个都不匹配 ⇒ 回退整张候补表");
+            return full;
+        }
+
+        var result = new List<string>(keep.Count);
+        foreach (var key in full) if (keep.Contains(key)) result.Add(key);   // 保持原顺序
+        return result.ToArray();
+    }
+
+    /// <summary>
+    /// **第 <paramref name="act"/> 幕对应的地图 id**（勾选是按地图存的）。
+    ///
+    /// 为什么不直接用 <see cref="CurrentMapEntry"/>：三层阵容是**开局那一刻就把第 1、2、3 幕全预告一遍**的，
+    /// 那时「当前幕」还是第 1 幕 ⇒ 用它会拿第 1 幕的勾选去算第 3 幕的阵容。
+    /// 这里优先按幕取 `ModelDb.ActsByIndex`，取不到才退回当前幕。
+    /// </summary>
+    internal static string? MapEntryOfAct(int act)
+    {
+        // ① 就是当前幕 ⇒ 直接用跑着的这张图（最准，模组加的地图也对）
+        try
+        {
+            var state = MultiBossPlan.RunStateOrNull();
+            if (state != null && act >= 0 && act == state.CurrentActIndex)
+            {
+                var entry = BossConfig.EntryOf(state.Act);
+                if (!string.IsNullOrEmpty(entry)) return entry;
+            }
+        }
+        catch { /* 走下一条 */ }
+
+        // ② 否则按幕序号从 `ModelDb.ActsByIndex` 取该幕的候选地图（取第一个能拿到 id 的）
+        try
+        {
+            var acts = MegaCrit.Sts2.Core.Models.ModelDb.ActsByIndex;
+            if (acts != null && act >= 0 && act < acts.Count)
+            {
+                var candidates = acts[act];
+                if (candidates != null)
+                {
+                    foreach (var candidate in candidates)
+                    {
+                        var entry = BossConfig.EntryOf(candidate);
+                        if (!string.IsNullOrEmpty(entry)) return entry;
+                    }
+                }
+            }
+        }
+        catch { /* 退回当前幕 */ }
+        return CurrentMapEntry();
     }
 
     /// <summary>本幕候补里这个角色一共有几只（≥1 才有意义）。</summary>

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
@@ -746,9 +746,23 @@ public static class BossConfig
     /// 多人客人不读本机这一项 —— 选择是「以房主为准的玩法设置」，客人端的结论
     /// 通过**同步的遭遇**（`act.BossEncounter` / `SecondBossEncounter`）落地，见 `Core/BossSelection.cs`。
     /// </summary>
-    public static List<string>? BossPicksOf(string? mapEntry)
+    /// <summary>
+    /// **本机所有地图的 Boss 勾选**（地图 id → Key 列表）。给「多人勾选同步」用
+    /// （房主广播、客人落库，见 `Core/BossPicksSync.cs`）；没配过返回空字典。
+    /// </summary>
+    internal static Dictionary<string, List<string>> AllBossPicks()
     {
-        if (string.IsNullOrEmpty(mapEntry)) return null;
+        try
+        {
+            var picks = Current.BossPicks;
+            if (picks == null || picks.Count == 0) return new Dictionary<string, List<string>>();
+            return new Dictionary<string, List<string>>(picks);
+        }
+        catch { return new Dictionary<string, List<string>>(); }
+    }
+
+    public static List<string>? BossPicksOf(string? mapEntry)
+    {        if (string.IsNullOrEmpty(mapEntry)) return null;
         try
         {
             if (Current.BossPicks != null
