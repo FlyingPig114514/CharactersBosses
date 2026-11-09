@@ -4861,3 +4861,8 @@ Chronological action log.
 | 2026-11-09 20:41 | edit | `src/Hooks/Core/BossPicksSync.cs` | ok | 0 |
 | 2026-11-09 20:42 | edit | `src/Hooks/Config/BossConfigModConfig.cs` | ok | 0 |
 | 2026-11-09 20:42 | edit | `src/CharacterBosses.json` | ok | 0 |
+| 2026-11-09 20:42 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-09 22:50 | edit | `docs/安装说明.txt` | ok | 0 |
+| 2026-11-09 22:50 | edit | `docs/安装说明.txt` | ok | 0 |
+| 2026-11-09 22:50 | edit | `docs/安装说明.txt` | ok | 0 |
+| 2026-11-09 22:50 | write | `workshop/changenote.txt` | ok | 0 |
