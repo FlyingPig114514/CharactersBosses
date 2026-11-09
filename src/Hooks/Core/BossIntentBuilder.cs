@@ -616,9 +616,24 @@ public static class BossIntentBuilder
             //     · 第一把 +`shivBonus`，其余原样（幻影只加一次，绝不会出现负数）。
             //   `Patches/PhantomBladesFirstShivPatch` 本来也只让第一把吃这 N 点，
             //   所以这里不再需要任何「扣回」逻辑。
-            if (shivBonus > 0)
+            //
+            // ★★ v0.2.533（玩家 2026-11-09：「刀扇那回合触发袖里乾坤 ⇒ 刀扇显示 17×4，
+            //   把幻影之刃算到每一刀上了；第 7 回合刀刃交响曲显示 20×2（7 力量 + 9 幻影），
+            //   应该是 20 和 11」）：
+            //   **幻影之刃已经挂在她身上**时（`phantomReal > 0`），`ShivDamagePerHit` 走的是
+            //   原版 `PhantomBladesPower.ModifyDamageAdditive` ⇒ **每一刀都 +N**；
+            //   而 `shivBonus`（= `BladesGrowth` 算出来的 `phantomHere`）只在「幻影之刃还只在手里」时才 > 0
+            //   ⇒ 上一版一旦 power 已经上身就掉进下面那个「不分段」的分支 ⇒ 整排都带 +9。
+            //   现在统一：`首刀加成 = max(shivBonus, 真正挂着的层数)`，只要它 > 0 就一律
+            //   「第一刀 +N、其余用干净伤害」，不管 power 是已经在身上还是还在手里。
+            int phantomNow = 0;
+            try { phantomNow = Math.Max(0, Core.PhantomShivs.AmountOf(shivBoss)); }
+            catch { phantomNow = 0; }
+            int firstShivBonus = Math.Max(shivBonus, phantomNow);
+
+            if (firstShivBonus > 0)
             {
-                int phantomBonus = shivBonus;
+                int phantomBonus = firstShivBonus;
                 // 第一把：**单段**（段数 1 不能画成「×1」）
                 intents.Add(new LiveDelegateSingleAttackIntent((targets, _) =>
                 {
@@ -687,8 +702,11 @@ public static class BossIntentBuilder
                 foreach (var mate in VolleyBossesOf(card))
                 {
                     int mateRise = Math.Max(0, PendingRise(mate.Creature));
-                    // 扔刀的目标是**各自的锁定者** —— 如果那不是本地玩家，就对本地玩家显示 0
-                    bool mateAimsElsewhere = AimsElsewhere(Core.BossLockOn.TargetFor(mate)?.Creature);
+                    // 扔刀的目标是**各自的锁定者** —— 如果那不是本地玩家，就对本地玩家显示 0。
+                    // ★ v0.2.533：但**刀扇**激活时小刀是群攻（`FanOfKnivesPower`），打到每个人 ⇒ 不能清零
+                    //   （与单卡那条 `shivAimedElsewhere = aimedElsewhere && !ShivsHitAll(card)` 同一规矩）。
+                    bool mateAimsElsewhere = !ShivsHitAll(card)
+                                             && AimsElsewhere(Core.BossLockOn.TargetFor(mate)?.Creature);
                     // 每把刀的伤害同样过一遍伤害管道（含她自己那份「一心化万」的 0 费攻击增伤、
                     // 力量与待到手的成长），与打出时一致 —— 见 ShivDamagePerHit 的注释。
                     // ★ v0.2.366：这里也必须用**渲染时重算**的动态意图（`Raw*` 是算死的常数 ⇒
@@ -701,13 +719,49 @@ public static class BossIntentBuilder
                     }
                     var mated = mate;
                     int matesRise = mateRise;
-                    if (each > 1)
+                    int mateShivBase = ShivBaseDamage + (GeneratesUpgradedShivs(card) ? 2 : 0);
+                    // ★★ v0.2.533：与单卡那条同一个规矩 —— **只有每回合第一把刀**吃幻影之刃的 +N。
+                    //   以前这里对每一把都走 `ShivDamagePerHit`（power 一上身就是「每把都 +9」），
+                    //   于是「斗篷与匕首+/刀刃交响曲」画成 `20×2`，正确应是 `20` 和 `11`。
+                    int matePhantom = 0;
+                    try { matePhantom = Math.Max(0, Core.PhantomShivs.AmountOf(mated)); }
+                    catch { matePhantom = 0; }
+                    if (matePhantom > 0)
+                    {
+                        int phantomHere = matePhantom;
+                        intents.Add(new LiveDelegateSingleAttackIntent((targets, _) =>
+                        {
+                            Creature? victim = ResolvePreviewVictim(mated, targets, card);
+                            return Math.Max(0, CleanShivDamage(mated, matesRise, victim, mateShivBase) + phantomHere);
+                        }));
+                        if (each > 1)
+                        {
+                            int restCount = each - 1;
+                            if (restCount > 1)
+                            {
+                                intents.Add(new LiveMultiAttackIntent((targets, _) =>
+                                {
+                                    Creature? victim = ResolvePreviewVictim(mated, targets, card);
+                                    return (CleanShivDamage(mated, matesRise, victim, mateShivBase), restCount);
+                                }));
+                            }
+                            else
+                            {
+                                intents.Add(new LiveDelegateSingleAttackIntent((targets, _) =>
+                                {
+                                    Creature? victim = ResolvePreviewVictim(mated, targets, card);
+                                    return CleanShivDamage(mated, matesRise, victim, mateShivBase);
+                                }));
+                            }
+                        }
+                    }
+                    else if (each > 1)
                     {
                         intents.Add(new LiveMultiAttackIntent((targets, _) =>
                         {
                             // 受害者只认真人玩家（见 ResolvePreviewVictim 的注释）
                             Creature? victim = ResolvePreviewVictim(mated, targets, card);
-                            return (ShivDamagePerHit(mated, matesRise, victim, ShivBaseDamage + (GeneratesUpgradedShivs(card) ? 2 : 0)), each);
+                            return (ShivDamagePerHit(mated, matesRise, victim, mateShivBase), each);
                         }));
                     }
                     else
@@ -716,7 +770,7 @@ public static class BossIntentBuilder
                         {
                             // 受害者只认真人玩家（见 ResolvePreviewVictim 的注释）
                             Creature? victim = ResolvePreviewVictim(mated, targets, card);
-                            return ShivDamagePerHit(mated, matesRise, victim, ShivBaseDamage + (GeneratesUpgradedShivs(card) ? 2 : 0));
+                            return ShivDamagePerHit(mated, matesRise, victim, mateShivBase);
                         }));
                     }
                     Logger.Log($"[CharBoss] 刀刃交响曲意图：{mate.Id.Entry} 打 {each} 把小刀（伤害每帧重算）");

@@ -168,12 +168,43 @@ public sealed class LockOnPower : PowerModel
             || powerType == typeof(KnowThyPlacePower);
     }
 
-    /// <summary>取特殊效果的名字（本地化文本的第一行，例如「彗星」「共鸣」）。</summary>
+    /// <summary>
+    /// 取特殊效果的**名字**（例如「同步」「彩虹」「群蛇形态」）。
+    ///
+    /// ★ v0.2.533（用户 2026-11-09 截图：「跟踪锁定」最后一段写成了
+    /// *「状态机」只对你生效* —— 那是**这套设计的名字**，不是特殊效果的名字）：
+    ///   以前这里取的是 `SpecialLoc`（`content/localization/*/monsters.json` 里
+    ///   `X_BOSS.<special>`）那条文本的**第一行**，而那条文本的第一行在多数设计里恰好就是
+    ///   特殊效果名（调制 / 灵魂绑定 / 彩虹…），**只有 16 个语言的 `DEFECT_BOSS.status` 例外**，
+    ///   第一行写的是设计名 `State Machine / 状态机`。
+    ///   ⇒ 现在优先取**特殊效果 Power 自己的 `.title`**（`powers` 表，例如
+    ///     `BossSyncPower` → `BOSS_SYNC_POWER.title` = 「同步」，16 个语言都有），
+    ///     取不到才退回原来那条 loc 的首行。
+    ///     （顺带：这样连「设计名 vs 效果名」这件事都不再依赖 monsters.json 的写法。）
+    /// </summary>
     private static string SpecialEffectName(Monsters.CharBossMonster? boss)
     {
         try
         {
             if (boss == null) return string.Empty;
+
+            // ① 特殊效果 Power 的 title（最准，且各语言都有官方译名）
+            try
+            {
+                var powerType = boss.Def.SpecialPowerForAct(boss.ActIndex);
+                var id = powerType != null
+                    ? MegaCrit.Sts2.Core.Models.ModelDb.GetId(powerType)?.Entry
+                    : null;
+                if (!string.IsNullOrEmpty(id))
+                {
+                    var title = new MegaCrit.Sts2.Core.Localization.LocString("powers", id + ".title")
+                        .GetFormattedText();
+                    if (Usable(title)) return title!.Trim();
+                }
+            }
+            catch { /* 退回 ② */ }
+
+            // ② 退回：特殊效果 loc 的第一行
             var key = boss.Def.SpecialLocForAct(boss.ActIndex);
             if (string.IsNullOrWhiteSpace(key)) return string.Empty;
             var text = new MegaCrit.Sts2.Core.Localization.LocString("monsters", key!).GetFormattedText();

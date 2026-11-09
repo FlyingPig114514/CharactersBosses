@@ -4837,3 +4837,10 @@ Chronological action log.
 | 2026-11-09 19:36 | edit | `src/Hooks/Monsters/CharBossMonster.Turn.cs` | ok | 0 |
 | 2026-11-09 19:36 | edit | `src/Hooks/Monsters/CharBossMonster.cs` | ok | 0 |
 | 2026-11-09 19:36 | edit | `src/CharacterBosses.json` | ok | 0 |
+| 2026-11-09 19:36 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-09 20:29 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-09 20:29 | edit | `src/Hooks/Patches/BossBlockAbsorbPatch.cs` | ok | 0 |
+| 2026-11-09 20:30 | edit | `src/Hooks/Powers/LockOnPower.cs` | ok | 0 |
+| 2026-11-09 20:31 | edit | `src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-09 20:31 | edit | `src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-09 20:32 | edit | `src/CharacterBosses.json` | ok | 0 |
