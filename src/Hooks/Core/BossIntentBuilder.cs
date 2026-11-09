@@ -91,7 +91,8 @@ public static class BossIntentBuilder
                                                   int strengthBonus = 0, int playsBeforeThisTurn = 0,
                                                   int smokePerHit = 0, int smokeHits = 0,
                                                   int letterOpenerHit = 0, int pendingStatusCards = 0,
-                                                  bool aoeFromCaller = false, bool minionSummon = false)
+                                                  bool aoeFromCaller = false, bool minionSummon = false,
+                                                  int shivOverride = 0)
     {
         var intents = new List<AbstractIntent>();
 
@@ -572,7 +573,9 @@ public static class BossIntentBuilder
         // 小刀是攻击牌，所以也吃 <paramref name="pendingRise"/> 那点成长（力量还没到手的部分）。
         // ⚠ 只有 **N > 1** 才用多段意图：N == 1 时是一个单段攻击，应显示「4」而不是「4×1」
         //（用户实测：斗篷与匕首降级后只给 1 把刀，意图却成了 4×1）。
-        int shivs = ShivsFrom(card);
+        // ★ v0.2.521：钢铁风暴（StormOfSteel）的小刀数量是**丢掉几张就生成几把**，牌面上没有变量
+        //   ⇒ 由调用方（剧本规划器）按本回合被丢弃的张数传进来。
+        int shivs = shivOverride > 0 ? shivOverride : ShivsFrom(card);
         // 小刀默认只打「锁定她的那位玩家」→ 打别人时对本地玩家显示 0；
         // 但**打出「刀扇」之后小刀改成全体攻击**（`FanOfKnivesPower`）⇒ 那时人人都该看到真实伤害。
         bool shivAimedElsewhere = aimedElsewhere && !ShivsHitAll(card);

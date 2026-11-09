@@ -341,6 +341,13 @@ public sealed class BossDefinition
     /// <summary>这一幕是不是由某个「备选设计」接管（接管时主定义这一幕的进阶行不生效）。</summary>
     public bool VariantTakesOver(int act) => ActiveVariant(act) != null;
 
+    /// <summary>这一幕**实际生效**的「谋杀按本场拿到过的牌数起步」开关（变体优先）。</summary>
+    public bool MurderCountsDrawnCardsFor(int act)
+    {
+        try { return ActiveVariant(act)?.MurderCountsDrawnCards == true; }
+        catch { return false; }
+    }
+
     /// <summary>这一幕**实际生效**的「拦掉夜魇复制印牌」开关（变体优先）。</summary>
     public bool BlocksNightmareClonesFor(int act)
     {
@@ -427,6 +434,16 @@ public sealed class BossVariant
     /// 用户 2026-11-09 的「华丽猎」：印出来的「杂技」剧本里已经写好了 ⇒ 不要再凭空多一份。
     /// </summary>
     public bool BlocksNightmareClones { get; init; }
+
+    /// <summary>
+    /// 这套设计的「谋杀」（Murder）加伤要不要按**本场她已经拿到过的牌数**起步。
+    ///
+    /// 默认行为（蛇眼猎那种）是「谋杀一直保留在手里、每次进手才累积」；而「华丽猎」的谋杀
+    /// 只在指定回合出现、每回合都是**新建实例** ⇒ 默认逻辑会把起点每次归零、伤害永远很小
+    /// （用户 2026-11-09：「她的谋杀没有计算她抽牌的数量而增加伤害（这个和蛇眼猎的不一样）」）。
+    /// 打开这条 ⇒ 第一次进手就用 CardsDrawnThisCombat 当起点。
+    /// </summary>
+    public bool MurderCountsDrawnCards { get; init; }
 
     public List<Type>? Potions { get; init; }
     public int HealPerPotion { get; init; }

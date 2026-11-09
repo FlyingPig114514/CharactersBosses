@@ -1051,12 +1051,39 @@ public static class BossScriptRunner
             catch (Exception e0) { Logger.Log("[CharBoss] 蛇咬猎循环成长失败: " + e0.Message); }
         }
 
+        // ★ v0.2.521（用户 2026-11-09：「应该让因为奇巧打出的防御不夹在不会打出的牌中间」）：
+        //   奇巧牌**会**（被丢弃后自动）打出去，所以它要和「本回合真的要打」的牌一样待在左边；
+        //   而「保留不出 / 只显示 / 被丢弃但不会打出」的牌全部挪到最右。
+        //   做法：先按剧本顺序建手，最后把「不会打出的」统一 MoveToBottomInternal（稳定分区）。
+        var toRight = new List<CardModel>(keptToRight);
+        foreach (var entry in turn.Cards)
+        {
+            try
+            {
+                bool willPlay = entry.Sly
+                                || (!entry.DisplayOnly && !entry.HoldInstead && !entry.DiscardInstead
+                                    && !entry.Burned && !entry.StampedePlay && !entry.JugglingCopy);
+                if (willPlay) continue;
+                // 找出这张剧本牌对应的手牌实例（按类型匹配，同名多张的取还没被收的）
+                foreach (var handCard in pcs.Hand.Cards)
+                {
+                    if (handCard == null) continue;
+                    if (toRight.Contains(handCard)) continue;
+                    if (handCard.GetType() != MultiplayerCardSwap.Resolve(entry.Card, cardBoss!)) continue;
+                    if (entry.Sly) continue;                 // 奇巧牌留在左边
+                    toRight.Add(handCard);
+                    break;
+                }
+            }
+            catch { /* 单张失败不影响其它 */ }
+        }
+
         // 把「保留不出」的牌统一挪到手牌最右（`MoveToBottomInternal` = 移到 `_cards` 末尾 = 画面最右）
         if (keptToRight.Count > 0)
         {
             try
             {
-                foreach (var kept in keptToRight)
+                foreach (var kept in toRight)
                 {
                     if (kept == null) continue;
                     if (!pcs.Hand.Cards.Contains(kept)) continue;
@@ -1095,7 +1122,14 @@ public static class BossScriptRunner
                     {
                         // 第一次进手：起点归零（**进手那一手不算加伤**）
                         cardBoss.MurderSeenInHand = true;
-                        cardBoss.MurderDrawProgress = 0;
+                        // ★ v0.2.521（用户 2026-11-09「华丽猎的谋杀不按抽牌数加伤」）：
+                        //   这套设计的谋杀只在指定回合出现、每次都是新建实例 ⇒ 归零会让伤害永远很小；
+                        //   变体声明了 MurderCountsDrawnCards 时改成**按本场她已经拿到过的牌数起步**。
+                        bool countDrawn = false;
+                        try { countDrawn = cardBoss.Def?.MurderCountsDrawnCardsFor(cardBoss.ActIndex) == true; }
+                        catch { countDrawn = false; }
+                        if (countDrawn) cardBoss.MurderDrawProgress = Math.Max(0, cardBoss.CardsDrawnThisCombat);
+                        else cardBoss.MurderDrawProgress = 0;
                         Logger.Log($"[CharBoss] 谋杀：第一次进她手牌 ⇒ 加伤起点归零" +
                                    $"（累计拿到过 {Math.Max(0, cardBoss.CardsDrawnThisCombat)} 张，之后只在她仍保留在手时累积）");
                     }

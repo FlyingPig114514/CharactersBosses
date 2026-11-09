@@ -62,5 +62,7 @@
     "BOSS_CALL_TO_ARMS_POWER.title":  "Call to Arms",
     "BOSS_CALL_TO_ARMS_POWER.description":  "Whenever the Regent plays a Minion card, if he has fewer than 2 Minions, summon the matching Minion instead.\nWhenever the Regent gains Strength from a card, his other allies gain the same amount.",
     "BOSS_LIGHTNING_ROD_POWER.title":  "Lightning Rod",
-    "BOSS_LIGHTNING_ROD_POWER.description":  "Every time you play 3 cards in a turn, the Defect loses 1 Focus this turn (restored at end of turn)."
+    "BOSS_LIGHTNING_ROD_POWER.description":  "Every time you play 3 cards in a turn, the Defect loses 1 Focus this turn (restored at end of turn).",
+    "BOSS_SUPPRESSION_POWER.title":  "Suppression",
+    "BOSS_SUPPRESSION_POWER.description":  "Whenever the Silent plays [gold]Grand Finale[/gold], put a [gold]Void[/gold] on top of every player's draw pile."
 }

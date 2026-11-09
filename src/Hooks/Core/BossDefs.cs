@@ -377,6 +377,8 @@ public static class BossDefs
                     BlocksVanillaDraw = true,
                     // 用户 2026-11-09：「拦掉夜魇印牌，因为印的杂技我都在剧本里写好了」
                     BlocksNightmareClones = true,
+                    // 用户 2026-11-09：「她的谋杀没有计算她抽牌的数量而增加伤害（这个和蛇眼猎的不一样）」
+                    MurderCountsDrawnCards = true,
                     // 进阶（用户 2026-11-09）：8 = 升级中和；9 = 升级背刺、钢铁风暴、隐秘匕首。
                     // （升级是**按类型**的 ⇒ 剧本里所有同名牌一起升级。）
                     AscensionUpgrades = new List<(int, Type)>

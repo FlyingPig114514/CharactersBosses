@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.520 / 2026-11-09（华丽猎三项修正：控制台 fight SILENT_GRAND_FINALE_BOSS_ENCOUNTER 不再被打成炼药猎；拦掉夜魇复制印牌；能量按肾上腺素/战术大师回费重算，规划器把奇巧丢弃回的能量记账）";
+    public const string Tag = "v0.2.521 / 2026-11-09（华丽猎六项修正：弹珠袋只给 1 层易伤 / 手上技法正确给防御奇巧 / 钢铁风暴显示小刀伤害 / 面板宽度每回合重置 + 压制悬停说明 / 第 7 回合丢钢铁风暴 / 铭记死亡与谋杀按弃牌和抽牌记账）";
 
     private static bool _logged;
 

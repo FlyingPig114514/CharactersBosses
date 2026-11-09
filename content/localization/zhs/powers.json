@@ -66,5 +66,7 @@
     "BOSS_BASH_POWER.title":  "痛击",
     "BOSS_BASH_POWER.description":  "你的名字中包含打击的牌也会增加铁甲战士的完美打击的伤害。每当你打出名字中包含打击的牌时，铁甲战士的完美打击的伤害就少受一张名字中包含打击的牌的加成。",
     "BOSS_SNAKE_FORM_POWER.title":  "群蛇形态",
-    "BOSS_SNAKE_FORM_POWER.description":  "静默猎手的手牌数没有上限。每当你或静默猎手洗牌时，将一张蛇咬洗入自己的抽牌堆。"
+    "BOSS_SNAKE_FORM_POWER.description":  "静默猎手的手牌数没有上限。每当你或静默猎手洗牌时，将一张蛇咬洗入自己的抽牌堆。",
+    "BOSS_SUPPRESSION_POWER.title":  "压制",
+    "BOSS_SUPPRESSION_POWER.description":  "每当静默猎手打出[gold]华丽收场[/gold]时，将一张[gold]虚空[/gold]放入所有玩家的抽牌堆顶部。"
 }

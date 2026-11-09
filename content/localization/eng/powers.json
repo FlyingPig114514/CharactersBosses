@@ -66,5 +66,7 @@
     "BOSS_BASH_POWER.title":  "Bash",
     "BOSS_BASH_POWER.description":  "Cards in your deck whose name contains \"Strike\" also increase the Ironclad\u0027s Perfected Strike damage. Each time you play a card whose name contains \"Strike\", the Ironclad\u0027s Perfected Strike loses the bonus of one such card.",
     "BOSS_SNAKE_FORM_POWER.title":  "Serpent Form",
-    "BOSS_SNAKE_FORM_POWER.description":  "The Silent has no hand size limit. Whenever you or the Silent shuffle, shuffle a Snakebite into your own draw pile."
+    "BOSS_SNAKE_FORM_POWER.description":  "The Silent has no hand size limit. Whenever you or the Silent shuffle, shuffle a Snakebite into your own draw pile.",
+    "BOSS_SUPPRESSION_POWER.title":  "Suppression",
+    "BOSS_SUPPRESSION_POWER.description":  "Whenever the Silent plays [gold]Grand Finale[/gold], put a [gold]Void[/gold] on top of every player's draw pile."
 }

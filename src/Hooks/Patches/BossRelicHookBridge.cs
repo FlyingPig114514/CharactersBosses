@@ -38,6 +38,16 @@ public static class BossRelicHookBridge
     /// <summary>这个遗物的主人是不是「要我们接管遗物钩子」的 Boss（给压制补丁用）。</summary>
     public static bool IsOurBossRelicPublic(RelicModel? relic) => IsOurBossRelic(relic);
 
+    /// <summary>
+    /// 这件遗物的主人是不是**任意一只我们的 Boss**（不要求 FireBossRelicHooks）。
+    /// 用于「原版钩子必须压掉、效果由我们统一补」的遗物（目前是弹珠袋）。
+    /// </summary>
+    public static bool IsOwnedByOurBoss(RelicModel? relic)
+    {
+        try { return relic?.Owner?.Creature?.Monster is CharBossMonster; }
+        catch { return false; }
+    }
+
     /// <summary>这个遗物的主人是不是「要我们接管遗物钩子」的 Boss。</summary>
     private static bool IsOurBossRelic(RelicModel? relic)
     {
@@ -267,7 +277,14 @@ public static class BossRelicSuppressBagOfMarblesPatch
     [HarmonyPrefix]
     public static bool Prefix(BagOfMarbles __instance, ref Task __result)
     {
-        if (!BossRelicHookBridge.IsOurBossRelicPublic(__instance)) return true;
+        // ★ v0.2.521（用户 2026-11-09：「弹珠袋被重复触发了，一共给了我三层易伤
+        //   （应该只在战斗开始时给所有玩家一层易伤）」）：
+        //   原来这里只对 FireBossRelicHooks = true 的 Boss 生效，而**静默猎手的定义没开那个开关**
+        //   ⇒ 华丽猎身上的弹珠袋走原版钩子触发了**两次**（FireCombatStart 替遗物补触发一次
+        //   + 她自己第 1 回合 BeforeSideTurnStart 一次，两次都满足 TurnNumber <= 1），
+        //   再加上我们在 FireCombatStart 里手动补的那一次 ⇒ 玩家一共 3 层易伤。
+        //   现在：**只要这件遗物的主人是我们的 Boss 生物**就压掉原版，唯一来源是手动那一次。
+        if (!BossRelicHookBridge.IsOwnedByOurBoss(__instance)) return true;
         __result = Task.CompletedTask;
         return false;
     }

@@ -77,7 +77,7 @@ public static class GrandFinaleSilentScript
                 Cards = new List<ScriptCard>
                 {
                     C<Neutralize>(), C<HandTrick>(), C<StormOfSteel>(),
-                    SlyDiscard<DefendSilent>(),
+                    Discard<DefendSilent>(),
                     Discard<Acrobatics>(), Discard<Acrobatics>(), Discard<Acrobatics>(),
                     Discard<GrandFinale>(),
                 },
@@ -129,8 +129,8 @@ public static class GrandFinaleSilentScript
                 {
                     C<Acrobatics>(), Discard<StrikeSilent>(),
                     C<HandTrick>(), C<StrikeSilent>(),
-                    C<HiddenDaggers>(), SlyDiscard<DefendSilent>(),
-                    Discard<ToolsOfTheTrade>(),
+                    C<HiddenDaggers>(), Discard<DefendSilent>(),
+                    Discard<StormOfSteel>(),          // 用户口径：被「必备工具」丢弃的是钢铁风暴
                 },
                 Energy = 3,
                 PickOrder = new List<Type> { typeof(DefendSilent) },
@@ -178,7 +178,7 @@ public static class GrandFinaleSilentScript
                 {
                     C<Acrobatics>(), Discard<DefendSilent>(),
                     C<HandTrick>(), C<StormOfSteel>(),
-                    SlyDiscard<DefendSilent>(),
+                    Discard<DefendSilent>(),
                     Discard<HiddenDaggers>(), Discard<StrikeSilent>(), Discard<StrikeSilent>(),
                     Discard<StrikeSilent>(),
                 },

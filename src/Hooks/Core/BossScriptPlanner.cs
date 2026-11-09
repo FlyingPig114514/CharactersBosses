@@ -162,6 +162,26 @@ public static class BossScriptPlanner
         //     · 手里剑（Shuriken）：每打出 3 张攻击牌 +1 力量（第 3 张**打完**才到账 ⇒ 第 4 张吃得到）。
         //   意图节点只加「此刻真实存在的力量」，这部分必须由规划期预补，否则后面的意图偏低。
         int inTurnStrength = 0;
+
+        // ★ v0.2.521（用户 2026-11-09：「铭记死亡的伤害预览没有考虑必备工具或杂技的弃牌」/
+        //   「钢铁风暴没有显示它生成的刀会造成的伤害」）：
+        //   · `discardsThisTurn`：本回合**到当前这张牌为止**已经被/将要被丢掉的张数（铭记死亡 +4 用）；
+        //     「必备工具」在她回合开始先丢 1 张 ⇒ 起算值就是 1。
+        //   · `stormDiscards`：本回合剧本里标了「被丢弃」的张数 —— 钢铁风暴把手牌全丢掉、
+        //     每丢一张生成一把小刀 ⇒ 它的 `x*x` 段数就是这个数（用户给的 5 / 4 张）。
+        int discardsThisTurn = HasToolsOfTrade(boss) ? 1 : 0;
+        int stormDiscards = 0;
+        {
+            bool multiNow = MultiplayerCardSwap.IsMultiplayer(boss);
+            foreach (var eachEntry in turn.Cards)
+            {
+                bool discardNow = eachEntry.DiscardInstead
+                                  || (eachEntry.DiscardInsteadWhenMultiplayer && multiNow)
+                                  || (eachEntry.DiscardInsteadSingleOnly && !multiNow);
+                if (discardNow) stormDiscards++;
+            }
+        }
+
         foreach (var entry in turn.Cards)
         {
             // ⚠ 多人换牌：手里那张是**换上的牌**（休眠 / 骸骨军团 / 刀刃交响曲），
@@ -227,6 +247,7 @@ public static class BossScriptPlanner
             {
                 BossCardSelector.MarkPreferDiscard(boss, turnNumber, card);
                 used.Add(card);
+                discardsThisTurn++;      // 铭记死亡的 +4 靠它（本回合到它为止被丢掉的张数）
 
                 // 被丢掉之后**自己会打出去**的牌（「奇巧」/Sly：磨蚀）：
                 // 它不在 Plan 里，但本回合确实会打出去 ⇒ 要画亮、并把意图也画出来
@@ -384,6 +405,10 @@ public static class BossScriptPlanner
                 // ★ v0.2.388：金斧的伤害 = 本场战斗打出的牌数，而意图是出手前算的
                 //   ⇒ 本回合排在它前面、还没打出来的牌要补上（规划期 `Plan` 还是空的，只能这样传）。
                 playsBeforeThisTurn: result.Count,
+                // 铭记死亡：本回合到它为止已经/将要丢掉的牌数（原版「本回合每丢一张 +4」）
+                discardsThisTurn: discardsThisTurn,
+                // 钢铁风暴：每丢一张生成一把小刀 ⇒ 段数 = 本回合剧本里被丢弃的张数
+                shivOverride: SafeEntry(card) == "STORM_OF_STEEL" ? stormDiscards : 0,
                 // 仆从储：这一张是不是「召唤」（按本回合前面已计划的仆从数量算）
                 minionSummon: IsMinionSummonHere(card, boss, ref plannedMinions));
             // ★ 2026-11-05：累加「本回合已生成的状态牌 / 已打出的技能牌」，供后面几张牌的意图用
@@ -416,7 +441,8 @@ public static class BossScriptPlanner
                 StarCost = starCost,
                 Intents = intents,
                 EvokeDamage = evoke.TotalDamage,
-                GeneratedShivs = BossIntentBuilder.ShivsFrom(card),
+                GeneratedShivs = BossIntentBuilder.ShivsFrom(card)
+                                 + (SafeEntry(card) == "STORM_OF_STEEL" ? stormDiscards : 0),
                 StampedeOnly = stampedeOnly,
                 // ★ v0.2.412：这三个数存下来，供「每帧重算」原样再用（否则序号会随出牌漂移）
                 SmokePerHit = smStackThisTurn,
@@ -791,6 +817,24 @@ public static class BossScriptPlanner
         return BossIntentBuilder.IntentsFor(card, target, pendingDrop, pendingRise,
             extraDamage: 0, extraHits: 0, strengthBonus: inTurnStrength);
     }
+    /// <summary>她身上有没有「必备工具」（每回合开始抽 1 丢 1 —— 那份弃牌要算进铭记死亡）。</summary>
+    private static bool HasToolsOfTrade(Monsters.CharBossMonster? boss)
+    {
+        try
+        {
+            var powers = boss?.Creature?.Powers;
+            if (powers == null) return false;
+            foreach (var p in powers)
+            {
+                string entry;
+                try { entry = p?.Id.Entry ?? string.Empty; } catch { continue; }
+                if (entry.Contains("TOOLS_OF_THE_TRADE")) return true;
+            }
+        }
+        catch { /* 忽略 */ }
+        return false;
+    }
+
     private static string SafeEntry(CardModel card)
     {
         try { return card.Id.Entry; }

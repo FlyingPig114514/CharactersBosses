@@ -205,7 +205,11 @@ public partial class BossHandPanel : Control
             }
             // 新回合/新计划：以这一次的手牌数作为整块宽度的基准
             _turnCards = wanted.Count;
-            if (wanted.Count > _widthCards) _widthCards = wanted.Count;
+            // ★ v0.2.521（用户 2026-11-09：「第四回合她的卡牌偏移了（太往左了）」）：
+            //   以前 _widthCards 是「本场见过的最多张数」，只涨不跌 —— 第 4 回合只有 3 张牌时
+            //   面板仍按 5 张的宽度排版，牌就整排偏到左边。现在**每回合重置**：
+            //   同一回合内出牌不会变窄（用户当初的要求），跨回合则跟着新手牌数走。
+            _widthCards = wanted.Count;
         }
         else
         {
