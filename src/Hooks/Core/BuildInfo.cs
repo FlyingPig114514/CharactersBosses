@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.524 / 2026-11-09（弹珠袋回归纯原版（不再手动施加/补衰减，走原版钩子与飘字音效）；力量/集中不再以 silent 施加（恢复原版飘字与音效）；必备工具的弃牌按剧本人名（修第 6 回合尖啸、第 7 回合误弃防御）；谋杀改按「每回合新进手牌」累计（排除夜魇印牌与计划妥当保留）";
+    public const string Tag = "v0.2.528 / 2026-11-09（配置界面补上华丽猎（SILENT_GRAND_FINALE）的「能力面板」：循环 8～10、单体能力极强、群攻能力极强、单体高压回合 2/3/8/9、群体高压回合 9、特殊效果类型 全局 —— 之前这一套设计没登记进 BossInfoTable，鼠标停在名字上什么都没有）；上一版 v0.2.527 的三条：钢铁风暴 shivOverride / 铭记死亡起算弃牌 / 必备工具弃牌避开计划牌";
 
     private static bool _logged;
 

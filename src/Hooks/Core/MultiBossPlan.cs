@@ -123,7 +123,9 @@ public static class MultiBossPlan
         var result = new List<(string, MonsterModel)>();
         try
         {
-            if (!WantsSecondBoss(out _)) return result;      // 单人：一只都不加
+            if (!WantsSecondBoss(out int playerCount)) return result;      // 单人：一只都不加
+            // 「只数 = 玩家数」⇒ 我之外还要几只（v0.2.526 起也用这个数当上限/下限）
+            int wantPartners = Math.Max(0, Math.Min(playerCount, 4) - 1);
 
             int act = 0;
             try { act = CurrentRunState()?.CurrentActIndex ?? 0; } catch { act = 0; }
@@ -147,9 +149,34 @@ public static class MultiBossPlan
             BossLineups.NoteCurrentFight(act, fight);
 
             var parts = new List<string>();
+
+            // ★ v0.2.526（`mod_log (25).txt` 的 2 人局只出 1 只 Boss）：
+            //   这里以前是「跳过所有与 `myKey` 相同的条目」。正常情况下阵容里每只都不一样，
+            //   跳过「我」正好剩下 `玩家数 − 1` 只；但旧版阵容会排出**同一只两次**
+            //   （`[DEFECT_RAINBOW, DEFECT_RAINBOW]`）⇒ 两个条目都被跳过 ⇒ **一只伙伴都不加**
+            //   ⇒ 2 人局只有 1 只 Boss、一名玩家连锁定图标都没有。
+            //   现在按「先要不同的、不够就把重复的那只也上」的顺序取，且**夹到 玩家数 − 1**。
+            var order = new List<string>();
             foreach (var key in lineup)
             {
+                if (order.Count >= wantPartners) break;
                 if (myKey != null && key == myKey) continue;
+                order.Add(key);
+            }
+            if (order.Count < wantPartners)
+            {
+                foreach (var key in lineup)
+                {
+                    if (order.Count >= wantPartners) break;
+                    if (myKey == null || key != myKey) continue;    // 只补「与我是同一只」的那些
+                    order.Add(key);
+                    Logger.Log($"[CharBoss] ⚠ 阵容里出现了两只同一款 Boss（{key}）⇒ 为了「只数 = 玩家数」仍然上第二只" +
+                               "（阵容重复本身是 bug，见 BossLineups.Build ⑥ 的注释）");
+                }
+            }
+
+            foreach (var key in order)
+            {
                 var type = BossKeys.MonsterTypeOf(key);
                 var mutable = type != null ? GetMonsterCanonical(type)?.ToMutable() : null;
                 if (mutable == null)
@@ -196,7 +223,17 @@ public static class MultiBossPlan
         if (synced >= 0)
         {
             var syncedLineup = BossLineups.For(act, synced);
-            if (syncedLineup.Length > 0) { lineup = syncedLineup; return synced; }
+            // ★ v0.2.526：**还要能对得上我**才算数。同步槽位可能指向另一场
+            //   （例如槽位里写的是第一场、而我们这只其实是第二场的主 Boss），
+            //   以前只要「阵容非空」就采用 ⇒ 拿到一场根本不含我的阵容 ⇒
+            //   伙伴数量随之算错（房主 2 只 / 客人 1 只那种）。
+            if (syncedLineup.Length > 0 && Array.IndexOf(syncedLineup, myKey) >= 0)
+            {
+                lineup = syncedLineup;
+                return synced;
+            }
+            Logger.Log($"[CharBoss] 取伙伴 Boss：同步槽位指向第 {synced + 1} 场，但那场阵容 " +
+                       $"[{string.Join(",", syncedLineup)}] 里没有我（{myKey}）⇒ 改按种子反推");
         }
 
         for (int fight = 0; fight < 2; fight++)

@@ -656,7 +656,12 @@ public static class BossIntentBuilder
                 {
                     // 受害者只认真人玩家（见 ResolvePreviewVictim 的注释）
                     Creature? victim = ResolvePreviewVictim(shivBoss, targets, card);
-                    return (ShivDamagePerHit(shivBoss, rise, victim), count);
+                    // ★ v0.2.525（用户 2026-11-09：「隐秘匕首和钢铁风暴还是一个都没有修好，预览仍是 4×2」）：
+                    //   这里**漏传了 `shivBase`**（默认值 = 未升级的 4）⇒ 升级版的生成者
+                    //   （隐秘匕首+ / 钢铁风暴+ 会给升级小刀，6 点）照样画成 4。
+                    //   `shivBase` 在函数上面已经算好了（`ShivBaseDamage + (GeneratesUpgradedShivs ? 2 : 0)`），
+                    //   只有「幻影之刃」那一支用到了它 —— 这条与下面那条是同一处遗漏。
+                    return (ShivDamagePerHit(shivBoss, rise, victim, shivBase), count);
                 }));
             }
             else
@@ -665,7 +670,7 @@ public static class BossIntentBuilder
                 {
                     // 受害者只认真人玩家（见 ResolvePreviewVictim 的注释）
                     Creature? victim = ResolvePreviewVictim(shivBoss, targets, card);
-                    return ShivDamagePerHit(shivBoss, rise, victim);
+                    return ShivDamagePerHit(shivBoss, rise, victim, shivBase);   // ★ v0.2.525：同上，别漏 shivBase
                 }));
             }
         }

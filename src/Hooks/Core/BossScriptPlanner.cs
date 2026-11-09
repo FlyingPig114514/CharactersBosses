@@ -173,8 +173,22 @@ public static class BossScriptPlanner
         int stormDiscards = 0;
         {
             bool multiNow = MultiplayerCardSwap.IsMultiplayer(boss);
+            // ★ v0.2.525（用户 2026-11-09：「钢铁风暴的 x*x = **丢几张打几刀**」）：
+            //   「钢铁风暴」丢的是**它出手那一刻手上剩下的**牌 ⇒ 段数 = 剧本里排在它**后面**、
+            //   会被丢掉的张数。
+            //   ⚠ 两个坑（旧写法直接数「本回合所有被丢弃的条目」）：
+            //     ① 排在她前面的被丢弃条目（已经不在手上了）不该算；
+            //     ② 「必备工具」在她**回合开始**就先丢掉 1 张，那张也不在手上了 ⇒ 要排除。
+            //   实测（第 10 回合）：旧写法算出 6，而用户设计的口径是 **4**（防御 + 隐秘匕首 + 打击×2）。
+            bool afterStorm = false;
             foreach (var eachEntry in turn.Cards)
             {
+                if (!afterStorm)
+                {
+                    if (EntryOfScriptType(eachEntry.Card) == "STORM_OF_STEEL") afterStorm = true;
+                    continue;
+                }
+                if (eachEntry.ToolsDiscard) continue;      // 回合开始就被必备工具丢掉了
                 bool discardNow = eachEntry.DiscardInstead
                                   || (eachEntry.DiscardInsteadWhenMultiplayer && multiNow)
                                   || (eachEntry.DiscardInsteadSingleOnly && !multiNow);
@@ -826,7 +840,7 @@ public static class BossScriptPlanner
             extraDamage: 0, extraHits: 0, strengthBonus: inTurnStrength);
     }
     /// <summary>她身上有没有「必备工具」（每回合开始抽 1 丢 1 —— 那份弃牌要算进铭记死亡）。</summary>
-    private static bool HasToolsOfTrade(Monsters.CharBossMonster? boss)
+    internal static bool HasToolsOfTrade(Monsters.CharBossMonster? boss)
     {
         try
         {
@@ -846,6 +860,17 @@ public static class BossScriptPlanner
     private static string SafeEntry(CardModel card)
     {
         try { return card.Id.Entry; }
+        catch { return string.Empty; }
+    }
+
+    /// <summary>剧本里那一项**声明的类型**对应的模型 entry（不构造卡实例，快且不会失败）。</summary>
+    private static string EntryOfScriptType(Type? cardType)
+    {
+        try
+        {
+            if (cardType == null) return string.Empty;
+            return ModelDb.GetId(cardType)?.Entry ?? string.Empty;
+        }
         catch { return string.Empty; }
     }
 

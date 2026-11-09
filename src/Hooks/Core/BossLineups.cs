@@ -366,17 +366,52 @@ internal static class BossLineups
         }
 
         // ⑥ 搭子：**每个角色最多一只** ⇒ 从**整张候补表**的桶里取 1 号键（桶内已按种子排好）。
-        //   主 Boss 的角色要跳过 —— 这个角色取「**同步遭遇**里的那个」而不是本机自己抽的那个，
-        //   这样房主与客人才会排除同一个角色（搭子因此两端一致）。
-        int mainChar = SyncedMainCharacter(act, fight,
-                         picked.Count > 0 ? BossKeys.CharacterOf(picked[0]) : -1);
+        //
+        // ★★ v0.2.526（玩家 2026-11-09 上报的多人不同步，`mod_log (25).txt`）：
+        //   这里**不再**去读「同步遭遇」里的主角色（原来的 `SyncedMainCharacter`）——
+        //   那个值来自 `act.BossEncounter` / `act.SecondBossEncounter`，而这两个 getter
+        //   我们自己的补丁会「按当前版本重算」，且**客人端不写同步状态、房主端会写**
+        //   ⇒ 同一时刻两端读到的可能不同 ⇒ 主角色判错 ⇒ 搭子没有跳过主角色 ⇒
+        //   阵容里出现**同一只 Boss 两次**。实测日志（同一名玩家、v0.2.513）：
+        //     第 2 层第 1 场阵容 … [故障 2 号（DEFECT_RAINBOW） | 故障 2 号（DEFECT_RAINBOW）]
+        //     第 3 层第 1 场阵容 … [猎人 1 号（SILENT_SHIV）  | 猎人 1 号（SILENT_SHIV）]
+        //   而 `MultiBossPlan.PartnersForWithKeys` 会跳过「与我同 Key」的条目
+        //   ⇒ **2 人局只出 1 只 Boss**，一人有锁定图标、另一人 0 个；
+        //   更糟的是两端一旦在这一步分叉，就是「房主 2 只 / 客人 1 只」那种轮次 1 校验和不同步。
+        //   ⇒ 现在阵容**只由（种子, 幕, 场）决定**：主角色直接用本机刚抽中的那只
+        //     （它本身就是种子派生的、两端必然一致），同步值只用来打诊断日志。
+        int mainChar = picked.Count > 0 ? BossKeys.CharacterOf(picked[0]) : -1;
+
+        try
+        {
+            int syncedCh = SyncedMainCharacter(act, fight, -1);
+            if (syncedCh >= 0 && mainChar >= 0 && syncedCh != mainChar)
+            {
+                Logger.Log($"[CharBoss] ⚠ 阵容自检：第 {act + 1} 层第 {fight + 1} 场「同步遭遇的主角色」={syncedCh}、" +
+                           $"「本机抽到的主角色」={mainChar} ⇒ **以本机为准**" +
+                           "（同步值只用于诊断，不再参与排阵容；以前它会让我们把同一只 Boss 排两次）");
+            }
+        }
+        catch { /* 纯诊断 */ }
+
+        var takenKeys = new HashSet<string>(picked, StringComparer.Ordinal);
         foreach (var ch in partnerChars)
         {
             if (picked.Count >= need) break;
             if (ch == mainChar) continue;
             var bucket = partnerBuckets[ch];
             if (bucket.Count == 0) continue;
-            picked.Add(bucket[0]);
+            // 同一个 Key 绝不重复 —— 重复会让「只数 = 玩家数」直接落空（见上面的注释）
+            string? choice = null;
+            foreach (var candidate in bucket)
+            {
+                if (takenKeys.Contains(candidate)) continue;
+                choice = candidate;
+                break;
+            }
+            if (choice == null) continue;
+            takenKeys.Add(choice);
+            picked.Add(choice);
         }
 
         if (picked.Count == 0) return Fallback(act);

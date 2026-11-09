@@ -1229,6 +1229,23 @@ public static class BossScriptRunner
                     catch { /* 读不到就用 1 / 1 */ }
 
                     int target = baseVal + perCard * since;
+
+                    // ★ v0.2.525（用户 2026-11-09 最终口径）：华丽猎的谋杀**直接按回合查表**
+                    //   （第 4 回合 20、第 8 回合 42、之后每回合 +7 ⇒ 第 11 回合 63、第 14 回合 84…）。
+                    //   理由见 `GrandFinaleSilentScript.MurderDamageForTurn` 的注释：
+                    //   记账口径（本场累计 / 每回合新进手牌）连改两版都被用户否掉，他直接给了数字。
+                    try
+                    {
+                        if (string.Equals(cardBoss.SpawnVariantKey, "SILENT_GRAND_FINALE", StringComparison.Ordinal))
+                        {
+                            int byTable = GrandFinaleSilentScript.MurderDamageForTurn(cardBoss.TurnNumber);
+                            Logger.Log($"[CharBoss] 谋杀：华丽猎按回合查表 ⇒ 第 {cardBoss.TurnNumber} 回合 = {byTable}" +
+                                       $"（记账口径本来会算出 {target}，已忽略）");
+                            target = byTable;
+                        }
+                    }
+                    catch { /* 查表失败就走记账口径 */ }
+
                     murder.DynamicVars["CalculationBase"].BaseValue = target;
                     Logger.Log($"[CharBoss] 谋杀：她**保留在手**期间抽到 {since} 张 ⇒ 伤害 {baseVal} + {perCard}×{since} = {target}" +
                                $"（卡面仍写「每抽一张 +{perCard}」；不在手的那几回合不计）");

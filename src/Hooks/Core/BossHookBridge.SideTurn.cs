@@ -858,8 +858,39 @@ public static partial class BossHookBridge
 
             // ⚠ v0.2.522：PowerCmd.Apply 的第 5 个参数是 **CardModel?**（卡牌来源），遗物传不进去，
             //   所以这里仍然传 null（与反编译里原版 BagOfMarbles 自己那一句完全一致）。
-            //   另外补一行日志把**实际施加的层数**打出来，便于核对「下一回合有没有掉」。
-            await PowerCmd.Apply<MegaCrit.Sts2.Core.Models.Powers.VulnerablePower>(ctx, targets, amount, me, null);
+            var applied = await PowerCmd.Apply<MegaCrit.Sts2.Core.Models.Powers.VulnerablePower>(
+                ctx, targets, amount, me, null);
+
+            // ★ v0.2.525（用户 2026-11-09：「而且你这易伤又持续三回合了」「那 1 层易伤必须在玩家
+            //   第 2 回合开始前消失」）—— 根因在 `PowerCmd.Apply` 自己那句话：
+            //   <code>
+            //   if (target.Side == CombatSide.Player &amp;&amp; power.Type == PowerType.Debuff)
+            //       power.SkipNextDurationTick = true;
+            //   </code>
+            //   而 `PowerCmd.TickDownDuration` 见到这个标记就**跳过这一次衰减**（并把标记清掉）。
+            //   易伤是挂在**玩家**身上的 Debuff ⇒ 我们一施加就带上了那个标记 ⇒
+            //   她第 1 回合结束那次本该把它 tick 成 0 的机会被跳过 ⇒ 它会一路挂到玩家第 3 回合。
+            //   这里施加完立刻把标记清掉：她第 1 回合结束时正常衰减到 0
+            //   ⇒ 玩家第 2 回合开始前就没有易伤了（用户要求的口径）。
+            //   只对**我们自己在战斗开始补的这一层**这么做（原版那次已被
+            //   `BossRelicSuppressBagOfMarblesPatch` 压掉），真人玩家的弹珠袋一点不变。
+            try
+            {
+                int cleared = 0;
+                if (applied != null)
+                {
+                    foreach (var power in applied)
+                    {
+                        if (power == null) continue;
+                        try { power.SkipNextDurationTick = false; cleared++; }
+                        catch { /* 单个失败不影响其它 */ }
+                    }
+                }
+                Logger.Log($"[CharBoss] 弹珠袋：清掉 {cleared} 个「跳过下一次衰减」标记" +
+                           " ⇒ 这层易伤在她第 1 回合结束就掉光（玩家第 2 回合开始前消失）");
+            }
+            catch (Exception e) { Logger.Log("[CharBoss] 弹珠袋：清衰减标记失败（忽略）: " + e.Message); }
+
             try
             {
                 var t0 = targets[0];
@@ -1151,7 +1182,8 @@ public static partial class BossHookBridge
                     // 战斗开始时她连回合都没开始，所以这里跳过它（用户实测：否则开局就站着个奥斯提）。
                     // 它由 FireSideTurnStart（每个 Boss 回合开始）负责召唤。
                     if (IsTurnStartRelic(relic)) continue;
-                    // 弹珠袋交给**原版**（她第 1 回合开始时触发一次，带飘字/音效）⇒ 这里不再补触发
+                    // 弹珠袋：**不走这里**，由 `GrantBagOfMarblesVulnerableAtCombatStart` 按玩家侧语义补一次
+                    // （原版那条钩子已被 `BossRelicSuppressBagOfMarblesPatch` 压掉，见那里的注释）
                     try { if (SafeEntry(relic) == "BAG_OF_MARBLES") continue; } catch { /* 忽略 */ }
                     await SafeRun(relic, "BeforeSideTurnStart",
                         () => relic.BeforeSideTurnStart(ctx, CombatSide.Player, participants, combat));
@@ -1160,7 +1192,7 @@ public static partial class BossHookBridge
                 foreach (var relic in Snapshot(relics))
                 {
                     if (IsTurnStartRelic(relic)) continue;
-                    // 弹珠袋交给**原版**（她第 1 回合开始时触发一次，带飘字/音效）⇒ 这里不再补触发
+                    // 同上：弹珠袋交给专门的补触发函数
                     try { if (SafeEntry(relic) == "BAG_OF_MARBLES") continue; } catch { /* 忽略 */ }
                     await SafeRun(relic, "AfterSideTurnStart",
                         () => relic.AfterSideTurnStart(CombatSide.Player, participants, combat));

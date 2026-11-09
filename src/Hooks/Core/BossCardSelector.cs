@@ -52,6 +52,18 @@ public sealed class BossCardSelector : ICardSelector
     internal static Monsters.CharBossMonster? ActingBoss;
     internal static int ActingTurn;
 
+    /// <summary>
+    /// **正在打出的那张牌**（由 <c>CharBossMonster.PlayOne</c> 设置）。
+    ///
+    /// ★ v0.2.525（用户 2026-11-09：「手上技法把奇巧给错牌」「必备工具弃错牌」「杂技丢了生存者的防御」）：
+    ///   以前「点名要丢的牌」只有一份**平铺名单**（`PreferByTurn`），于是同一回合里有**两个丢弃者**时
+    ///   谁先选谁就抢（华丽猎第 2 回合：杂技该丢战术大师、隐秘匕首该丢两张防御，
+    ///   结果杂技抢走了防御、战术大师被隐秘匕首丢掉）。而「手上技法」「夜魇」这类**不丢牌的**选择
+    ///   又把名单里最靠后的那张抢走，于是奇巧加到了杂技上。
+    ///   ⇒ 现在按「这次选择是**哪张牌**发起的」把名单切成一人一份（见 <see cref="MarksOfDiscarder"/>）。
+    /// </summary>
+    internal static MegaCrit.Sts2.Core.Models.CardModel? ActingCard;
+
     /// <summary>取某一回合的名单（没有就 null）。</summary>
     private static MarkSet? BucketOf(Monsters.CharBossMonster? boss, int turn)
     {
@@ -200,6 +212,130 @@ public sealed class BossCardSelector : ICardSelector
 
     private static readonly HashSet<(Monsters.CharBossMonster Boss, int Turn)> _seededLogged = new();
 
+    // ── 「按丢弃者分桶」的点名名单（v0.2.525） ─────────────────────────────
+
+    /// <summary>两个牌「类型 / 实例」是不是同一张牌（升级版与非升级版算同一种）。</summary>
+    private static bool SameCardType(Type? owner, MegaCrit.Sts2.Core.Models.CardModel? card,
+                                    Monsters.CharBossMonster? boss = null)
+    {
+        try
+        {
+            if (owner == null || card == null) return false;
+            var actual = card.GetType();
+            if (actual == owner) return true;
+
+            // 多人换牌：剧本写的是「刀刃交响曲」，她手里那张是换上的牌 ⇒ 也要认
+            try
+            {
+                var swapped = MultiplayerCardSwap.Resolve(owner, boss);
+                if (swapped != null && swapped != owner && actual == swapped) return true;
+            }
+            catch { /* 忽略 */ }
+
+            var ownerEntry = MegaCrit.Sts2.Core.Models.ModelDb.GetId(owner)?.Entry;
+            return ownerEntry != null && string.Equals(card.Id.Entry, ownerEntry, StringComparison.Ordinal);
+        }
+        catch { return false; }
+    }
+
+    /// <summary>
+    /// 这一回合的剧本有没有把「被丢弃」**挂到某张会打出的牌上**。
+    /// 返回 false 时（没有这类条目，或者条目出现在任何会打出的牌之前）走旧的平铺名单 —— 零回归。
+    /// </summary>
+    private static bool ScriptBindsDiscardsToCards(Monsters.CharBossMonster? boss, int turn)
+    {
+        try
+        {
+            if (boss == null) return false;
+            var scriptTurn = boss.Def?.ScriptForAct(boss.ActIndex)?.TurnAt(turn);
+            if (scriptTurn?.Cards == null) return false;
+
+            bool multi = MultiplayerCardSwap.IsMultiplayer(boss);
+            bool seenPlayed = false;
+            foreach (var entry in scriptTurn.Cards)
+            {
+                bool played = !entry.DiscardInstead && !entry.Burned
+                              && !entry.DisplayOnly && !entry.HoldInstead;
+                if (played) { seenPlayed = true; continue; }
+                if (entry.ToolsDiscard || entry.Burned) continue;
+                bool discardNow = entry.DiscardInstead
+                                  || (entry.DiscardInsteadWhenMultiplayer && multi)
+                                  || (entry.DiscardInsteadSingleOnly && !multi);
+                if (discardNow && seenPlayed) return true;
+            }
+            return false;
+        }
+        catch { return false; }
+    }
+
+    /// <summary>
+    /// 取「**某一张牌**这一次要丢的那些牌」：剧本里排在它后面、且标了「被丢弃」的条目。
+    ///
+    /// 为什么这样切：「某张牌（丢弃 X）」的写法本身就决定了 X 归谁丢 ——
+    /// 丢弃条目归属于**它前面最近一张真的会打出的牌**。
+    /// `ToolsDiscard`（必备工具在**回合开始**丢的那张）与 `Burned`（手套烧的）不属于任何牌，
+    /// 由 <see cref="TakeToolsDiscard"/> / 旧逻辑单独处理。
+    ///
+    /// <paramref name="actingCard"/> 为 null 时只取「回合开始那一次」的条目；两者都取不到就返回空。
+    /// </summary>
+    private static MarkSet? MarksOfDiscarder(Monsters.CharBossMonster? boss, int turn,
+                                             List<CardModel>? options,
+                                             MegaCrit.Sts2.Core.Models.CardModel? actingCard)
+    {
+        try
+        {
+            if (boss == null || options == null || options.Count == 0) return null;
+            var scriptTurn = boss.Def?.ScriptForAct(boss.ActIndex)?.TurnAt(turn);
+            if (scriptTurn?.Cards == null) return null;
+
+            bool multi = MultiplayerCardSwap.IsMultiplayer(boss);
+            var set = new MarkSet();
+            var used = new HashSet<CardModel>();
+            Type? owner = null;
+
+            foreach (var entry in scriptTurn.Cards)
+            {
+                bool played = !entry.DiscardInstead && !entry.Burned
+                              && !entry.DisplayOnly && !entry.HoldInstead;
+                if (played) { owner = entry.Card; continue; }
+
+                bool discardNow = entry.DiscardInstead
+                                  || (entry.DiscardInsteadWhenMultiplayer && multi)
+                                  || (entry.DiscardInsteadSingleOnly && !multi);
+                if (!discardNow) continue;
+
+                // 这一步筛出「归这次选择」的条目
+                if (actingCard == null)
+                {
+                    if (!entry.ToolsDiscard && !entry.Burned) continue;   // 回合开始那一次
+                }
+                else
+                {
+                    if (entry.ToolsDiscard || entry.Burned) continue;     // 那些不在她手里
+                    if (!SameCardType(owner, actingCard, boss)) continue;
+                }
+
+                foreach (var card in options)
+                {
+                    if (card == null || used.Contains(card)) continue;
+                    // 多人换牌：候选里那张可能是换上的牌 ⇒ 用同一个判据（也认升级版/未升级版）
+                    if (!SameCardType(entry.Card, card, boss)) continue;
+                    used.Add(card);
+                    set.Instances.Add(card);
+                    var key = KeyOf(card);
+                    if (key != null)
+                    {
+                        set.Keys.TryGetValue(key, out int n);
+                        set.Keys[key] = n + 1;
+                    }
+                    break;
+                }
+            }
+            return set;
+        }
+        catch { return null; }
+    }
+
     public static void MarkPreferDiscard(Monsters.CharBossMonster? boss, int turn, CardModel? card)
     {
         try
@@ -252,6 +388,22 @@ public sealed class BossCardSelector : ICardSelector
             if (ToolsDiscardDone.Contains(key)) return null;
             var scriptTurn = boss.Def?.ScriptForAct(boss.ActIndex)?.TurnAt(turn);
             if (scriptTurn?.Cards == null) return null;
+
+            // ★ v0.2.527（用户 2026-11-09：「第五回合怎么就打了一张打击？应该打 2 张弃 1 张」）：
+            //   以前这里**只按牌名挑第一张**，完全不看计划保留了哪几张实例 ⇒
+            //   手上有 3 张打击时，「必备工具」可能丢掉**计划要打的那一张**
+            //   ⇒ 出牌循环走到它时发现「这张已经不在手牌里」⇒ 静默跳过 ⇒ 只打出 1 张打击
+            //   （日志实证：规划 `打 [STRIKE,STRIKE,DEFEND]`，执行时计划里只剩 `STRIKE,DEFEND`）。
+            //   现在优先挑**不在计划里**的那张；一张都没有才退回第一张（宁可丢计划牌也不能一张不丢）。
+            var planned = new HashSet<CardModel>();
+            try
+            {
+                foreach (var play in boss.Plan)
+                    if (play?.Card != null) planned.Add(play.Card);
+            }
+            catch { /* 拿不到计划就按旧行为 */ }
+
+            CardModel? fallback = null;
             foreach (var entry in scriptTurn.Cards)
             {
                 if (!entry.ToolsDiscard) continue;
@@ -259,11 +411,22 @@ public sealed class BossCardSelector : ICardSelector
                 {
                     if (card == null) continue;
                     if (card.GetType() != entry.Card) continue;
+                    if (planned.Contains(card)) { fallback ??= card; continue; }
+
                     if (ToolsDiscardDone.Count > 256) ToolsDiscardDone.Clear();
                     ToolsDiscardDone.Add(key);
-                    Logger.Log($"[CharBoss] 自动选择：必备工具按剧本点名丢掉 {card.Id.Entry}（第 {turn} 回合）");
+                    Logger.Log($"[CharBoss] 自动选择：必备工具按剧本点名丢掉 {card.Id.Entry}（第 {turn} 回合；" +
+                               $"已避开计划要打的 {planned.Count} 张）");
                     return card;
                 }
+            }
+            if (fallback != null)
+            {
+                if (ToolsDiscardDone.Count > 256) ToolsDiscardDone.Clear();
+                ToolsDiscardDone.Add(key);
+                Logger.Log($"[CharBoss] 自动选择：⚠ 必备工具只能丢掉计划里的 {fallback.Id.Entry}（第 {turn} 回合）" +
+                           "——手牌里没有别的同名牌，这张这回合将打不出");
+                return fallback;
             }
         }
         catch { /* 忽略 */ }
@@ -351,7 +514,36 @@ public sealed class BossCardSelector : ICardSelector
         // 用 `ActingBoss/ActingTurn` 直接取会拿到上一回合的旧名单）。
         var bossNow = BossOf(list);
         int turnNow = bossNow?.TurnNumber ?? ActingTurn;
-        var marks = LiveMarks(bossNow, turnNow, list);
+
+        // ★ v0.2.525：先判断「这次选择是**哪张牌**发起的」。
+        //   `PlayOne` 会设 `ActingBoss/ActingTurn/ActingCard`；只有三者都对得上才是「她本次出牌」
+        //   （回合开始的那些选择 —— 必备工具的弃牌、手套的消耗 —— 仍按 null 处理，走旧路径）。
+        MegaCrit.Sts2.Core.Models.CardModel? actingCard = null;
+        try
+        {
+            if (bossNow != null && ReferenceEquals(ActingBoss, bossNow) && ActingTurn == turnNow)
+                actingCard = ActingCard;
+        }
+        catch { actingCard = null; }
+
+        MarkSet? marks;
+        bool byOwner = actingCard != null && ScriptBindsDiscardsToCards(bossNow, turnNow);
+        if (byOwner)
+        {
+            // 按丢弃者分桶：杂技只拿「杂技要丢的那张」、隐秘匕首只拿它自己的那些；
+            // 「手上技法 / 夜魇」这类不丢牌的选择拿到**空名单** ⇒ 自然落到下面的选择队列（`PickOrder`）。
+            marks = MarksOfDiscarder(bossNow, turnNow, list, actingCard);
+        }
+        else if (actingCard == null && ScriptBindsDiscardsToCards(bossNow, turnNow))
+        {
+            // 回合开始那一次（必备工具）：先试「回合开始桶」；没有就退回旧的平铺名单（零回归）。
+            var turnStart = MarksOfDiscarder(bossNow, turnNow, list, null);
+            marks = IsEmpty(turnStart) ? LiveMarks(bossNow, turnNow, list) : turnStart;
+        }
+        else
+        {
+            marks = LiveMarks(bossNow, turnNow, list);
+        }
         int turnTag = turnNow;
 
         // 兜底排序要知道「这一回合剧本要打哪些牌」（`Order()` 里用），这里显式传下去
@@ -446,9 +638,13 @@ public sealed class BossCardSelector : ICardSelector
             }
         }
 
+        string actingName;
+        try { actingName = actingCard != null ? actingCard.Id.Entry : "（回合开始）"; }
+        catch { actingName = "?"; }
         Logger.Log($"[CharBoss] 自动选择: 候选 {list.Count} 个（min={minSelect} max={maxSelect}）" +
                    $"→ 选 [{string.Join(",", picked.Select(c => c.Id.Entry))}]" +
-                   $"（第 {turnTag} 回合的点名：{byInstance} 张按实例 + {byKey} 张按牌名 + " +
+                   $"（第 {turnTag} 回合，发起者={actingName}{(byOwner ? "/按丢弃者分桶" : string.Empty)} 的点名：" +
+                   $"{byInstance} 张按实例 + {byKey} 张按牌名 + " +
                    $"其余 {picked.Count - byInstance - byKey} 张兜底；名单 {marks?.Instances.Count ?? 0} 条）");
         return Task.FromResult<IEnumerable<CardModel>>(picked);
     }

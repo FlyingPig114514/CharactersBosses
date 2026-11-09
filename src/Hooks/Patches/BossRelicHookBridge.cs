@@ -277,12 +277,18 @@ public static class BossRelicSuppressBagOfMarblesPatch
     [HarmonyPrefix]
     public static bool Prefix(BagOfMarbles __instance, ref Task __result)
     {
-        // ★ v0.2.524（用户 2026-11-09：「你就不能用原版的直接搞吗？」）：
-        //   弹珠袋现在**完全走原版**（含飘字与音效，且原版在她回合结束就会 tick 掉那层易伤）。
-        //   我们只在自己那次「替遗物补触发」的循环里跳过它（见 BossHookBridge.FireCombatStart），
-        //   所以这里不再压掉原版钩子。
-        return true;
-        __result = Task.CompletedTask;
+        // ★ v0.2.525（用户 2026-11-09 第三次口径：「**你拦掉原版的，然后仿照原版的在战斗开始时触发一次**。
+        //   而且你这易伤又持续三回合了」）：
+        //   v0.2.524 放行原版是错的 —— 反编译 `BagOfMarbles.BeforeSideTurnStart`：
+        //     `participants.Contains(Owner.Creature) && Owner.PlayerCombatState.TurnNumber <= 1`
+        //       → 对 `HittableEnemies` 施加易伤
+        //   它的判定是「可命中敌人」而不是阵营，而她把影子玩家的遗物也算成监听者
+        //   ⇒ 这条在我们**已经在战斗开始补过一次**之后又给玩家加了一层（实测日志同一次战斗里
+        //   「施加后 = 1」紧接着「玩家侧快照 = VULNERABLE:2」）。
+        //   所以这里必须**压掉**，只留我们自己那一次（见
+        //   `BossHookBridge.SideTurn.GrantBagOfMarblesVulnerableAtCombatStart`）。
+        if (!BossRelicHookBridge.IsOwnedByOurBoss(__instance)) return true;
+        __result = Task.CompletedTask;   // ⚠ 必须给：目标返回 Task，留 null 会让调用方 await null 崩
         return false;
     }
 }

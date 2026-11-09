@@ -1353,10 +1353,14 @@ public abstract partial class CharBossMonster : MonsterModel
     {
         // 告诉自动选择器「现在是谁的回合」——它按 (Boss, 回合号) 取「点名要丢的牌」，
         // 否则规划下一回合时那次清空会把本回合的点名抹掉（用户 2026-10-29：杂技丢了触不可及）。
+        // ★ v0.2.525：连「**是哪一张牌**在选牌」一起告诉它 —— 同一回合里两个丢弃者
+        //   （杂技丢战术大师 / 隐秘匕首丢两张防御）不会再互相抢牌，「手上技法」也不会
+        //   把别人要丢的那张抢去加奇巧（用户 2026-11-09 的第 4、5 条 bug）。
         try
         {
             Core.BossCardSelector.ActingBoss = this;
             Core.BossCardSelector.ActingTurn = TurnNumber;
+            Core.BossCardSelector.ActingCard = play.Card;
         }
         catch { /* 忽略 */ }
 

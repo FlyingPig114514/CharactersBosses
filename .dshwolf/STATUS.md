@@ -6415,6 +6415,70 @@ Y：上排 `baseY - SpreadY*0.65`、下排 `baseY + SpreadY*0.65`。
   行内状态文字随配置变化；键盘/鼠标点击**没有**在自动化里验证成功（合成鼠标事件进不去游戏窗口）。
 ## 🚀 Next phase
 
+> ### ⏳ v0.2.528：配置界面补上**华丽猎的能力面板**（`BossInfoTable`）
+>
+> `BossKeys.RosterFor` 里早就有 `SILENT_GRAND_FINALE`，但 `BossInfoTable` 没登记它 ⇒
+> 鼠标停在配置界面那个名字上什么都没有。已按用户原文补上：
+> `循环：8～10 / 单体能力：极强 / 群攻能力：极强 / 单体高压回合：2、3、8、9 / 群体高压回合：9 / 特殊效果类型：全局`
+> （「全局」= 特殊效果「压制」给**所有玩家**塞虚空）。
+> 查看位置：主菜单 →「模组配置」→ CharacterBosses → 三层那张表里「华丽猎」那一格，**鼠标停上去**。
+> ⚠ 这套字段表是硬编码在 `src/Hooks/Core/BossInfoTable.cs`（DLL 里），不走 pck/本地化。
+
+> ### ⏳ v0.2.527：华丽猎「每帧重算盖掉规划值」三条（用户第二轮截图 + 日志定位）
+>
+> **排查口诀（已进 cerebrum）**：规划日志对、面板不对 ⇒ 一定是 `BladesGrowth.RecomputeAll`（无球）
+> 或 `CharBossMonster.RefreshPlannedIntents`（有球）这条**每帧重算**路少传了参数。
+> 凡是牌面上没有、只能由剧本算出来的意图数值（`shivOverride`/`extraHits`/`discardsThisTurn`/`simBlock`…），
+> **三条路都要传**。
+>
+> 1. **钢铁风暴只有「强化」蓝箭头** → 两条重算路都没传 `shivOverride` ⇒ `ShivsFrom(STORM_OF_STEEL)`=0；两条路已补。
+> 2. **第 9 回合铭记死亡低 4** → `BladesGrowth.discardsSoFar` 从 0 起算，漏了「必备工具回合开始丢的 1 张」；已改成 `HasToolsOfTrade ? 1 : 0`。
+> 3. **第 5 回合只打出 1 张打击** → `TakeToolsDiscard` 只按牌名挑第一张、把**计划要打的那张**丢了，出牌循环「不在手牌」静默跳过；已改成优先挑不在 `boss.Plan` 里的那张。
+>
+> v0.2.525 已**实机验证通过**：弹珠袋只剩 1 层易伤、谋杀 20/42/63/84 逐回合吻合、
+> 选牌分桶把 4 处弃牌全对上（夜魇→杂技、杂技→战术大师、隐秘匕首→2 防御、手上技法→防御）、
+> 第 6 回合 `打 [PIERCING_WAIL,STRIKE,SURVIVOR]`。
+
+> ### ⏳ v0.2.526：**多人不同步**（玩家上报 `mod_log (25).txt`）
+>
+> 一句话：**阵容里出现「同一只 Boss 两次」**（实测 `[DEFECT_RAINBOW,DEFECT_RAINBOW]`、`[SILENT_SHIV,SILENT_SHIV]`、
+> 11-07 的 `[NECROBINDER_SOUL,NECROBINDER_SOUL]`）⇒ `PartnersForWithKeys` 跳过全部同 Key 条目
+> ⇒ **2 人局只出 1 只 Boss、一名玩家没有锁定图标**；而「阵容 = 玩家数」这件事正是上一轮
+> （`desync-2026-11-08-modlog23.md`，房主 2 只/客人 1 只）那种轮次 1 分叉的形态。
+> 对照很干净：**阵容不重复的场次（一层两场）完全没不同步**，重复的场次全中（本日志 3/3、11-08 那轮 4/4）。
+>
+> 根因（代码走查）：`BossLineups.Build` ⑥ 读 `SyncedMainCharacter`（= `act.BossEncounter` /
+> `act.SecondBossEncounter`，**客人不写、房主写、getter 还会按当前版本重算**）来判「主 Boss 的角色」，
+> 判错 ⇒ 搭子没跳过主角色 ⇒ 排出两只同款。**这是阵容里唯一依赖本机/同步时机的地方。**
+>
+> 改动（已在游戏目录）：阵容改成**只由（种子,幕,场）决定** + 同 Key 硬保险；`PartnersForWithKeys`
+> 按「只数=玩家数」补齐并夹上限；`FindFightOf` 采用同步槽位前要求「那场真的有我」；
+> 不同步摘要新增 `多人阵容：玩家=N 阵容指纹[…] 场上我方 Boss=M 只（两端这一行必须一致）`
+> ⇒ 以后**一份日志**就能判断是阵容分叉还是生成分叉。细节见 `docs/plans/desync-2026-11-09-modlog25.md`。
+>
+> **还要玩家做的**：创意工坊线上仍是 **v0.2.513**（这次修复没上传），要复现得先上传 + 四台机同一包；
+> 若仍不同步，这次请**每人各一份 `mod_log.txt`**（摘要里那两行并排一比即可）。
+> 已排除「混版」：0.2.513 的 zip 与 workshop 两份 Impl 都是 0.2.513。
+
+> ### ⏳ v0.2.525 华丽猎 6 条（`docs/plans/grand-finale-fixes-2026-11-09.md`）
+>
+> 一次改完、107/111 都编过、只部署了那一轮。要看的日志：
+> · 弹珠袋 —— `弹珠袋：清掉 N 个「跳过下一次衰减」标记`，且 `玩家侧快照（她第 2 回合出手前）` **不应**再有 `VULNERABLE_POWER`；
+> · 谋杀 —— `谋杀：华丽猎按回合查表 ⇒ 第 4 回合 = 20`（8→42、11→63、14→84）；
+> · 小刀 —— `小刀预览: 牌面 6 → …`、`小刀段数诊断：STORM_OF_STEEL … 剧本丢弃=5/4 张`；
+> · 选牌 —— 每次选牌日志现在带 `发起者=<牌名>（按丢弃者分桶）`；
+> · 第 6 回合 —— `剧本第 6 回合: 打 [PIERCING_WAIL,STRIKE_SILENT,SURVIVOR] 跳过 [DEFEND_SILENT(被丢弃)]`。
+>
+> **本轮的三个反编译定论（别再走回头路）**：
+> 1. `PowerCmd.Apply` 里有 `if (target.Side == Player && power.Type == Debuff) power.SkipNextDurationTick = true;`，
+>    而 `TickDownDuration` 见到它**跳过这一次衰减** ⇒ 这就是「易伤持续三回合」的唯一根因；施加完清掉即可。
+> 2. `BagOfMarbles.BeforeSideTurnStart` 判的是「可命中敌人」而不是阵营，影子玩家的遗物也算监听者
+>    ⇒ 必须**压掉它**，不能像 v0.2.524 那样放行（否则 1 层变 2 层）。
+> 3. `HiddenDaggers` 没有 `OnUpgrade` ⇒ 升级**不改 Shivs 张数**（仍 2 张），只把生成的刀升级成 6 点
+>    ⇒ 隐秘匕首 正确面板是 **6×2**（低进阶 4×2）。
+>
+> 创意工坊仍是 **v0.2.513**，`.dist` / `workshop\` 都没更新到 0.2.525。
+
 0. ✅ **（v0.2.384 完成）「Boss 被击晕时的整套行为」已实现并实机验收通过** ——
    压暗全部手牌 / 撤掉全部意图 / 本回合零出牌 / **下回合补打被打断的那一套（连晕两回合也一样）**。
    关键洞察：vanilla 的 `STUNNED` 空 MoveState 天然跳过了 `PlayPlannedCards`（计划与 TurnNumber 原封不动），

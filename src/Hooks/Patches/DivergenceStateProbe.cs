@@ -235,6 +235,48 @@ internal static class DivergenceStateProbe
             }
             catch { /* 忽略 */ }
 
+            // ── 多人阵容：阵容指纹 + 场上有几只我们的 Boss（v0.2.526 追加）──
+            // 为什么加：不同步最常见的一种是「两端生成的多 Boss 数量/顺序不同」
+            // （2026-11-08 那次：房主 2 只、客人 1 只）。可摘要里原来只有**本机**的 Boss 列表，
+            // 「该上几只」这件事根本看不到，所以只有一份日志时没法判断 ——
+            // 上一轮只能要求玩家「每人各发一份」。现在把**阵容指纹**也写进摘要：
+            // 两端这一行不同 ⇒ 就是阵容分叉；相同而 Boss 数不同 ⇒ 是生成阶段分叉。
+            try
+            {
+                int players2 = 0, act2 = 0;
+                try
+                {
+                    var state2 = MultiBossPlan.RunStateOrNull();
+                    players2 = state2?.Players?.Count ?? 0;
+                    act2 = state2?.CurrentActIndex ?? 0;
+                }
+                catch { /* 用 0 */ }
+
+                int bosses2 = 0;
+                try
+                {
+                    foreach (var c2 in combat.Enemies)
+                        if (c2?.Monster is CharBossMonster) bosses2++;
+                }
+                catch { /* 用 0 */ }
+
+                string fp = "?";
+                try
+                {
+                    if (act2 >= 0 && act2 <= 2)
+                    {
+                        var f0 = Core.BossLineups.FingerprintOf(Core.BossLineups.For(act2, 0));
+                        var f1 = Core.BossLineups.FingerprintOf(Core.BossLineups.For(act2, 1));
+                        fp = $"第1场={f0} 第2场={f1}";
+                    }
+                }
+                catch { fp = "?"; }
+
+                sb.Append($"\n  多人阵容：玩家={players2} 第 {act2 + 1} 层 阵容指纹[{fp}] " +
+                          $"场上我方 Boss={bosses2} 只（两端这一行必须一致）");
+            }
+            catch { /* 忽略 */ }
+
             // ── 每名真人玩家的锁定图标实例 ──
             var players = BossLockOn.RealPlayers(combat);
             players.Sort((a, b) =>

@@ -178,7 +178,13 @@ public static class BladesGrowth
             int dupLeft = SafePowerAmount<MegaCrit.Sts2.Core.Models.Powers.DuplicationPower>(boss);
             int burstLeft = SafePowerAmount<MegaCrit.Sts2.Core.Models.Powers.BurstPower>(boss);
             // 本回合「已经（将会）丢弃几张」：给「铭记死亡」的伤害用（沿计划累加，见 DiscardsOf）
-            int discardsSoFar = 0;
+            //
+            // ★ v0.2.527（用户 2026-11-09：「第九回合铭记死亡的伤害预览还是低了 4」）：
+            //   「必备工具」在**她回合开始**就先丢 1 张，那一刻发生在整套计划之前
+            //   ⇒ 铭记死亡打出时她本回合已经丢了 2 张（必备工具 1 + 杂技 1），预览只算了 1 张
+            //   ⇒ 少 4 点（`MementoMori` 每丢一张 +4）。实测日志：面板 13、真实 17。
+            //   规划期 `BossScriptPlanner` 早就有这个起算值，这里漏了 ⇒ 那条「每帧重算」把规划值盖掉。
+            int discardsSoFar = BossScriptPlanner.HasToolsOfTrade(boss) ? 1 : 0;
             // 本回合「打某张牌之前先喝一瓶」的队列（复制药水夹在牌中间那种）：按剧本顺序取用
             var pendingDrinks = new List<(Type Card, Type Potion)>();
             try { foreach (var d in boss.PlannedDrinks ?? new Queue<(Type Card, Type Potion)>()) pendingDrinks.Add(d); }
@@ -431,6 +437,16 @@ public static class BladesGrowth
                         letterOpenerHit: play.LetterOpenerHit,
                         pendingStatusCards: play.PendingStatusCards,
                         aoeFromCaller: true,
+                        // ★ v0.2.527（用户 2026-11-09 截图：「钢铁风暴还是**不显示伤害意图**」）：
+                        //   「钢铁风暴」的段数 = 本回合丢掉的张数，而牌面上**没有**这个变量
+                        //   ⇒ 规划期是靠 `BossScriptPlanner` 按剧本算好、用 `shivOverride` 传进去的
+                        //   （`PlannedPlay.GeneratedShivs` 里存的就是那个数）。
+                        //   可是这条「出牌期每帧重算」的路以前**没传** ⇒ 退化成 `ShivsFrom(card)` = 0
+                        //   （STORM_OF_STEEL 不在小刀生成者白名单里）⇒ 一条小刀意图都没有、
+                        //   只剩一个「强化」（蓝箭头）。规划期的日志是对的
+                        //   （`意图 STORM_OF_STEEL: [LiveMultiAttackIntent]`），面板上却被这里盖掉了。
+                        shivOverride: SafeEntry(card) == "STORM_OF_STEEL"
+                            ? Math.Max(0, play.GeneratedShivs) : 0,
                         // 烙印这类「本回合会加力量」的牌：后面的攻击先把这笔力量补上
                         //（⚠ v0.2.362：单独传，奥斯提的牌不吃她的力量）
                         strengthBonus: strengthPending);

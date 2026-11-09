@@ -1400,6 +1400,27 @@
       "fix": "v0.2.465：新增 DescribePlayFailure(e)，把栈里第一个非本模组/非原版的帧点出来写进日志，并注明「这张牌本体效果已结算，炸的只是第三方模组自己的统计」。不是我们的 bug，但以前日志只打一串栈，看不出是谁。",
       "file": "src/Hooks/Monsters/CharBossMonster.cs",
       "at": "2026-11-07T12:06:27.817Z"
+    },
+    {
+      "id": "bug-215-mw7us7cp",
+      "error_message": "打包出的 zip 里两份实现版本不一致（Impl107=v0.2.503、Impl111=v0.2.502），beta 玩家装的就是旧实现，导致「已修的多人不同步」在玩家机器上照旧复现（玩家日志构建横幅 0.2.502，而 zip 名是 0.2.503）",
+      "fix": "install-mod.bat 复制 Impl*.dll 时游戏开着 ⇒ 文件被占用、copy 报错被 >nul 吞掉，之后 pack-dist 把游戏目录原样搬走 ⇒ 混版包。已给 pack-dist.ps1 加护栏：打包前读两份 Impl DLL 的 BuildInfo.Tag 版本串，任一 ≠ 清单 version 就 exit 1 并提示先退游戏重跑 install-mod.bat；同时重新生成了两份都是 0.2.507 的 CharacterBosses-v0.2.507.zip。",
+      "file": "tools\\pack-dist.ps1",
+      "at": "2026-11-08T13:13:32.473Z"
+    },
+    {
+      "id": "bug-216-mw7vdo6e",
+      "error_message": "Boss「杂交」：外壳是亡灵契约师（灾厄骨），卡组/遗物（燃烧之血、护喉甲）/特殊效果（痛击 BASH）/剧本却是前一层铁甲战士的「打击战」；日志 NECROBINDER_BOSS act1 deck(17) 全是 STRIKE_IRONCLAD/SETUP_STRIKE/PERFECTED_STRIKE/STONE_ARMOR，且 NECROBINDER_BOSS 上被施加了 BossBashPower",
+      "fix": "加「打击战 IRONCLAD_STRIKE」时把整块 BossVariant 误粘进了 Necrobinder 定义的 VariantsByAct[0]；而变体开关 StrikeActive() 只看「本场遭遇/阵容里有没有 IRONCLAD_STRIKE」，不区分角色 ⇒ 一层阵容排到打击战时亡灵契约师也命中同一套变体。修：删掉误粘那份（恢复 null, null, OSTY），并在 BossDefValidator 增加 ValidateVariantOwnership()：同一个变体 Key 出现在两个不同角色定义上就开局自检里打 ★★★ 报错。",
+      "file": "src/Hooks/Core/BossDefs.cs",
+      "at": "2026-11-08T13:30:14.054Z"
+    },
+    {
+      "id": "bug-217-mw92e12k",
+      "error_message": "华丽猎：钢铁风暴只有「强化」意图没有小刀伤害意图；第 9 回合铭记死亡预览低 4（13 而真实 17）；第 5 回合只打出 1 张打击（规划是 2 张+1 防御）",
+      "fix": "①钢铁风暴段数牌面无变量、靠 shivOverride 从剧本传，BladesGrowth.RecomputeAll 与有球分支 RefreshPlannedIntents 两条重算路都没传 ⇒ 盖掉规划值，只剩 BuffIntent；两条路补 shivOverride: play.GeneratedShivs。②BladesGrowth.discardsSoFar 从 0 起算，漏了必备工具回合开始丢的 1 张 ⇒ 铭记死亡少 4；改成 HasToolsOfTrade ? 1 : 0。③TakeToolsDiscard 只按牌名挑第一张、不看 boss.Plan 保留了哪些实例 ⇒ 丢掉计划里要打的打击 ⇒ 出牌循环「不在手牌」静默跳过；改成优先挑不在 Plan 里的那张。",
+      "file": "src/Hooks/Core/BladesGrowth.cs / src/Hooks/Monsters/CharBossMonster.Turn.cs / src/Hooks/Core/BossCardSelector.cs",
+      "at": "2026-11-09T09:34:14.252Z"
     }
   ]
 }

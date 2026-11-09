@@ -412,6 +412,9 @@ public abstract partial class CharBossMonster
                     smokeHits: play.SmokeHits,
                     letterOpenerHit: play.LetterOpenerHit,
                     pendingStatusCards: play.PendingStatusCards,
+                    // ★ v0.2.527：钢铁风暴的段数（= 本回合丢掉的张数）牌面上没有变量，
+                    //   规划期由剧本算好存进 `GeneratedShivs`；这条重算路以前没传 ⇒ 面板只剩「强化」。
+                    shivOverride: entry == "STORM_OF_STEEL" ? Math.Max(0, play.GeneratedShivs) : 0,
                     aoeFromCaller: true);
                 BossOrbSim.AppendIntents(intents, sim.Predict(play.Card), 0, BossIntentBuilder.RandomAimIsElsewhere(play.Card));
                 play.Intents = intents;
