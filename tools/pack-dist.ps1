@@ -61,16 +61,50 @@ Write-Host ('[dist] 版本 ' + $version)
 function Get-ImplVersion([string]$path) {
     try {
         $bytes = [System.IO.File]::ReadAllBytes($path)
-        # BuildInfo.Tag 里的 "v0.2.507" 在程序集里按 UTF-16 存（#US 堆），ASCII 兜底
-        $u = [System.Text.Encoding]::Unicode.GetString($bytes)
-        $m = [regex]::Match($u, 'v(\d+\.\d+\.\d+)')
-        if (-not $m.Success) {
-            $a = [System.Text.Encoding]::ASCII.GetString($bytes)
-            $m = [regex]::Match($a, 'v(\d+\.\d+\.\d+)')
+        # ⚠ 2026-11-09 修正：**不能**把整份文件按 UTF-16 解一次再正则 —— #US 堆里每串的偏移
+        #   不一定是偶数，整份解码会错位，于是「明明有 v0.2.515」却被读成「读不到」
+        #   （差点误判部署失败）。现在直接在**字节层**找 UTF-16LE 的 'v<主>.<次>.' 前缀。
+        $probe = 'v' + $version
+        if (Test-BytesContain -hay $bytes -text $probe) { return $version }
+
+        # 版本对不上时，尽量把找到的那个版本号报出来（字节层扫描 'v0.2.' 后面 3 个字符）
+        $prefix = [System.Text.Encoding]::Unicode.GetBytes('v')
+        $dot = [System.Text.Encoding]::Unicode.GetBytes('.')
+        for ($i = 0; $i + 12 -lt $bytes.Length; $i += 2) {
+            if (-not ($bytes[$i] -eq $prefix[0] -and $bytes[$i + 1] -eq 0)) { continue }
+            # 形如 v 数字 . 数字 . 数字数字数字（UTF-16LE：每个字符 2 字节，第 2 字节为 0）
+            if ($bytes[$i + 3] -ne 0 -or $bytes[$i + 5] -ne 0) { continue }
+            if (-not ([char]$bytes[$i + 2] -match '\d')) { continue }
+            if (-not ([char]$bytes[$i + 4] -eq '.')) { continue }
+            $sb = New-Object System.Text.StringBuilder
+            $k = $i
+            while ($k + 1 -lt $bytes.Length -and $bytes[$k + 1] -eq 0 -and ([char]$bytes[$k] -match '[0-9a-zA-Z\.]')) {
+                [void]$sb.Append([char]$bytes[$k]); $k += 2
+                if ($sb.Length -gt 14) { break }
+            }
+            $txt = $sb.ToString()
+            if ($txt -match '^v\d+\.\d+\.\d+') { return $txt.TrimStart('v') }
         }
+        $a = [System.Text.Encoding]::ASCII.GetString($bytes)
+        $m = [regex]::Match($a, 'v(\d+\.\d+\.\d+)')
         if ($m.Success) { return $m.Groups[1].Value }
     } catch { }
     return ''
+}
+
+# 字节层子串查找（needle 按 UTF-16LE 编码）
+function Test-BytesContain([byte[]]$hay, [string]$text) {
+    $needle = [System.Text.Encoding]::Unicode.GetBytes($text)
+    if ($needle.Length -eq 0 -or $hay.Length -lt $needle.Length) { return $false }
+    for ($i = 0; $i -le $hay.Length - $needle.Length; $i++) {
+        if ($hay[$i] -ne $needle[0]) { continue }
+        $ok = $true
+        for ($j = 1; $j -lt $needle.Length; $j++) {
+            if ($hay[$i + $j] -ne $needle[$j]) { $ok = $false; break }
+        }
+        if ($ok) { return $true }
+    }
+    return $false
 }
 
 $badVersion = @()
