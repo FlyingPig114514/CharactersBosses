@@ -93,7 +93,7 @@ public sealed class BossCallToArmsPower : PowerModel
                 //   写死按阵营过滤，是因为这条链路唯一可信的判据就是 `Side`：万一 `Enemies` 里
                 //   混进了玩家侧的东西（阴影玩家/宠物错绑），力量就会落到玩家头上。
                 try { if (ally.Side != owner.Side) continue; } catch { /* 读不到就不拦 */ }
-                await PowerCmd.Apply<StrengthPower>(choiceContext, ally, delta, owner, null, true);
+                await PowerCmd.Apply<StrengthPower>(choiceContext, ally, delta, owner, null, false);
                 given++;
                 if (who.Count < 6) who.Add(SafeName(ally));
             }

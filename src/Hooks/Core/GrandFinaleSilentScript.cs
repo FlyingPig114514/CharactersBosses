@@ -103,7 +103,7 @@ public static class GrandFinaleSilentScript
                 Cards = new List<ScriptCard>
                 {
                     C<StrikeSilent>(), C<StrikeSilent>(), C<DefendSilent>(),
-                    Discard<StrikeSilent>(),
+                    ToolsDiscard(Discard<StrikeSilent>()),
                 },
                 Energy = 3,
             },
@@ -114,7 +114,10 @@ public static class GrandFinaleSilentScript
                 Note = "6. 生存者、打击、尖啸；防御（被生存者丢弃）",
                 Cards = new List<ScriptCard>
                 {
-                    C<Survivor>(), Discard<DefendSilent>(), C<StrikeSilent>(), C<PiercingWail>(),
+                    // ★ v0.2.524（用户 2026-11-09：「第六回合没打尖啸」）：必备工具从第 4 回合起每回合弃 1 张，
+                    //   不点名的话它会先弃掉「防御」⇒ 生存者只好去弃尖啸。这里把它点名到这张「打击」上，
+                    //   于是 生存者 弃防御、尖啸正常打出。
+                    C<Survivor>(), Discard<DefendSilent>(), ToolsDiscard(Discard<StrikeSilent>()), C<PiercingWail>(),
                 },
                 Energy = 3,
             },
@@ -130,7 +133,7 @@ public static class GrandFinaleSilentScript
                     C<Acrobatics>(), Discard<StrikeSilent>(),
                     C<HandTrick>(), C<StrikeSilent>(),
                     C<HiddenDaggers>(), Discard<DefendSilent>(),
-                    Discard<StormOfSteel>(),          // 用户口径：被「必备工具」丢弃的是钢铁风暴
+                    ToolsDiscard(Discard<StormOfSteel>()),   // 用户口径：被「必备工具」丢弃的是钢铁风暴
                 },
                 Energy = 3,
                 PickOrder = new List<Type> { typeof(DefendSilent) },
@@ -145,7 +148,7 @@ public static class GrandFinaleSilentScript
                 {
                     C<Acrobatics>(), SlyDiscard<Tactician>(),
                     C<Murder>(), C<Deflect>(),
-                    Discard<Survivor>(),
+                    ToolsDiscard(Discard<Survivor>()),
                     Kept<DefendSilent>(), Kept<StrikeSilent>(),
                 },
                 // 杂技(1) + 谋杀(3) + 偏折(0)，其中战术大师被杂技丢掉时（奇巧）回 1 费 ⇒ 起手 3 费够。
@@ -162,7 +165,7 @@ public static class GrandFinaleSilentScript
                     C<Acrobatics>(), Discard<DefendSilent>(),
                     C<MementoMori>(), C<Neutralize>(), C<DefendSilent>(),
                     C<GrandFinale>(emptyDrawPileFirst: true),
-                    Discard<StrikeSilent>(),
+                    ToolsDiscard(Discard<StrikeSilent>()),
                     Kept<DefendSilent>(), Kept<StrikeSilent>(),
                 },
                 Energy = 3,
@@ -180,7 +183,7 @@ public static class GrandFinaleSilentScript
                     C<HandTrick>(), C<StormOfSteel>(),
                     Discard<DefendSilent>(),
                     Discard<HiddenDaggers>(), Discard<StrikeSilent>(), Discard<StrikeSilent>(),
-                    Discard<StrikeSilent>(),
+                    ToolsDiscard(Discard<StrikeSilent>()),
                 },
                 Energy = 3,
                 PickOrder = new List<Type> { typeof(DefendSilent) },
@@ -248,6 +251,14 @@ public static class GrandFinaleSilentScript
     /// </summary>
     private static ScriptCard Kept<T>() where T : MegaCrit.Sts2.Core.Models.CardModel
         => new() { Card = typeof(T), From = "deck", DisplayOnly = true };
+
+    /// <summary>标成「被必备工具在她回合开始丢掉」的那一张。</summary>
+    private static ScriptCard ToolsDiscard(ScriptCard card)
+        => new()
+        {
+            Card = card.Card, From = card.From, DiscardInstead = true,
+            Sly = card.Sly, NotDrawn = card.NotDrawn, ToolsDiscard = true,
+        };
 
     /// <summary>标成「不是抽到的牌」（夜魇印出来的复制品）。</summary>
     private static ScriptCard NotDrawn(ScriptCard card)

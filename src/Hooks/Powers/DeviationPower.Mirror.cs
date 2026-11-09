@@ -59,7 +59,7 @@ public sealed partial class DeviationPower
         {
             Logger.Log($"[CharBoss] 偏差认知：镜像 {typeof(TPower).Name} {delta:+0;-0}");
             var ctx = choiceContext ?? new BlockingPlayerChoiceContext();
-            await PowerCmd.Apply<TPower>(ctx, owner, delta, owner, null, true);
+            await PowerCmd.Apply<TPower>(ctx, owner, delta, owner, null, false);
         }
         catch (Exception e)
         {

@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.523 / 2026-11-09（弹珠袋的易伤在她第 2 回合开始补一次衰减；谋杀改成数「每回合新进手牌」（夜魇印的与计划妥当保留的不算）；剧本点名在兜底阶段再用一次（修手上技法给杂技）；小刀段数与升级刀加诊断日志）";
+    public const string Tag = "v0.2.524 / 2026-11-09（弹珠袋回归纯原版（不再手动施加/补衰减，走原版钩子与飘字音效）；力量/集中不再以 silent 施加（恢复原版飘字与音效）；必备工具的弃牌按剧本人名（修第 6 回合尖啸、第 7 回合误弃防御）；谋杀改按「每回合新进手牌」累计（排除夜魇印牌与计划妥当保留）";
 
     private static bool _logged;
 

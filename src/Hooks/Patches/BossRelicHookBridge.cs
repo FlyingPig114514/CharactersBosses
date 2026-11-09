@@ -277,14 +277,11 @@ public static class BossRelicSuppressBagOfMarblesPatch
     [HarmonyPrefix]
     public static bool Prefix(BagOfMarbles __instance, ref Task __result)
     {
-        // ★ v0.2.521（用户 2026-11-09：「弹珠袋被重复触发了，一共给了我三层易伤
-        //   （应该只在战斗开始时给所有玩家一层易伤）」）：
-        //   原来这里只对 FireBossRelicHooks = true 的 Boss 生效，而**静默猎手的定义没开那个开关**
-        //   ⇒ 华丽猎身上的弹珠袋走原版钩子触发了**两次**（FireCombatStart 替遗物补触发一次
-        //   + 她自己第 1 回合 BeforeSideTurnStart 一次，两次都满足 TurnNumber <= 1），
-        //   再加上我们在 FireCombatStart 里手动补的那一次 ⇒ 玩家一共 3 层易伤。
-        //   现在：**只要这件遗物的主人是我们的 Boss 生物**就压掉原版，唯一来源是手动那一次。
-        if (!BossRelicHookBridge.IsOwnedByOurBoss(__instance)) return true;
+        // ★ v0.2.524（用户 2026-11-09：「你就不能用原版的直接搞吗？」）：
+        //   弹珠袋现在**完全走原版**（含飘字与音效，且原版在她回合结束就会 tick 掉那层易伤）。
+        //   我们只在自己那次「替遗物补触发」的循环里跳过它（见 BossHookBridge.FireCombatStart），
+        //   所以这里不再压掉原版钩子。
+        return true;
         __result = Task.CompletedTask;
         return false;
     }

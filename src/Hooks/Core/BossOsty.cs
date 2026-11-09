@@ -1014,7 +1014,7 @@ internal static class BossOsty
             if (osty.GetPower<MinionPower>() != null) return;
             var ctx = context ??
                 new BlockingPlayerChoiceContext();
-            TaskHelper.RunSafely(PowerCmd.Apply<MinionPower>(ctx, osty, 1, boss.Creature, null, true));
+            TaskHelper.RunSafely(PowerCmd.Apply<MinionPower>(ctx, osty, 1, boss.Creature, null, false));
             Logger.Log($"[CharBoss] {osty.Name} 已标记为爪牙（MinionPower）");
         }
         catch (Exception e)

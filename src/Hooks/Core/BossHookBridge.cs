@@ -151,7 +151,7 @@ public static partial class BossHookBridge
     private static async Task ApplySpecialPower<TPower>(PlayerChoiceContext ctx, Creature target)
         where TPower : PowerModel
     {
-        await PowerCmd.Apply<TPower>(ctx, target, 1m, target, null, true);
+        await PowerCmd.Apply<TPower>(ctx, target, 1m, target, null, false);
     }
 
     /// <summary>把影子 Player 的回合数对齐成 Boss 自己的回合数（很多遗物按它判定「第 N 回合」）。</summary>

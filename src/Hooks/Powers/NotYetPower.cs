@@ -173,7 +173,7 @@ public sealed class NotYetPower : PowerModel
             Logger.Log("[CharBoss] 直接减灾厄失败，退回 Apply: " + e.Message);
         }
 
-        await PowerCmd.Apply<DoomPower>(ctx, player, -use, Owner, null, true);
+        await PowerCmd.Apply<DoomPower>(ctx, player, -use, Owner, null, false);
         return use;
     }
 

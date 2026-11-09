@@ -90,6 +90,13 @@ public sealed class ScriptCard
     public bool NotDrawn { get; init; }
 
     /// <summary>
+    /// 这张是**被「必备工具」在她回合开始时丢掉**的那一张（不是被别的牌丢的）。
+    /// 用户 2026-11-09：「第七回合必备工具弃的牌也不对，提前把要上奇巧的防御给弃掉了」
+    /// ⇒ 回合开始那次「弃 1 张」要专挑这一张，不能按牌名首字母去抢别的点名牌。
+    /// </summary>
+    public bool ToolsDiscard { get; init; }
+
+    /// <summary>
     /// 「**万物一心**」（<c>AllForOne</c>）这一张要**返手**哪些牌（用户 2026-11-03 的三层「事件机」：
     /// 第 4 / 9 回合「万物一心(0费，返手超能光束，冰之长枪)」）。
     ///
@@ -1152,7 +1159,9 @@ public static class BossScriptRunner
                 {
                     if (sc.DisplayOnly && !sc.AutoPlayed) keptThisTurn.Add(sc.Card);
                     if (sc.NotDrawn) continue;
-                    if (sc.DisplayOnly && !sc.AutoPlayed && cardBoss.LastKeptTypes.Contains(sc.Card)) continue;
+                    // ★ v0.2.524（用户给的算法 1+5+8+3+3 ⇒ 20）：上一回合就被「计划妥当」留在手上的
+                    //   同类型牌**不算新进手牌**（哪怕这一回合它换了角色：上回合保留、这回合被丢弃）。
+                    if (cardBoss.LastKeptTypes.Contains(sc.Card)) continue;
                     fresh++;
                 }
                 cardBoss.LastKeptTypes = keptThisTurn;

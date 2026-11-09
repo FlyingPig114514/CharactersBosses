@@ -61,11 +61,11 @@ public sealed class BossLightningRodPower : PowerModel
             if (!Core.BossLockOn.SpecialEffectAppliesTo(owner.Monster as CharBossMonster, card.Owner)) return;
 
             int count = (int)Math.Round((double)Amount) + 1;
-            await PowerCmd.Apply<BossLightningRodPower>(choiceContext, owner, 1m, owner, null, true);
+            await PowerCmd.Apply<BossLightningRodPower>(choiceContext, owner, 1m, owner, null, false);
 
             if (count % CardsPerFocus != 0) return;
 
-            await PowerCmd.Apply<FocusPower>(choiceContext, owner, -1m, owner, null, true);
+            await PowerCmd.Apply<FocusPower>(choiceContext, owner, -1m, owner, null, false);
             _stolen++;
             if (_logs++ < 40)
             {
@@ -92,7 +92,7 @@ public sealed class BossLightningRodPower : PowerModel
             if (!participants.Contains(owner) && Amount > 0)
             {
                 // 玩家的回合开始：计数归零（用「减到 0」而不是直接改字段，保持与同步一致）
-                await PowerCmd.Apply<BossLightningRodPower>(null, owner, -Amount, owner, null, true);
+                await PowerCmd.Apply<BossLightningRodPower>(null, owner, -Amount, owner, null, false);
             }
         }
         catch (Exception e)
@@ -115,7 +115,7 @@ public sealed class BossLightningRodPower : PowerModel
 
             int give = _stolen;
             _stolen = 0;
-            await PowerCmd.Apply<FocusPower>(choiceContext, owner, give, owner, null, true);
+            await PowerCmd.Apply<FocusPower>(choiceContext, owner, give, owner, null, false);
             Logger.Log($"[CharBoss] 引雷针：她回合结束 ⇒ 把本回合扣掉的 {give} 点集中还回去");
         }
         catch (Exception e)

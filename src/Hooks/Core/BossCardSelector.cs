@@ -239,6 +239,37 @@ public sealed class BossCardSelector : ICardSelector
     }
 
     /// <summary>在 <c>using</c> 里推入自动选择器；作用域结束自动弹出。</summary>
+    /// <summary>「必备工具那一次弃牌」是否已经在本回合消费过。</summary>
+    private static readonly HashSet<(Monsters.CharBossMonster Boss, int Turn)> ToolsDiscardDone = new();
+
+    /// <summary>取这一次该被「必备工具」丢掉的那张（剧本标了 ToolsDiscard 的）。每回合只给一次。</summary>
+    private static CardModel? TakeToolsDiscard(Monsters.CharBossMonster? boss, int turn, List<CardModel> options)
+    {
+        try
+        {
+            if (boss == null || options == null || options.Count == 0) return null;
+            var key = (boss, turn);
+            if (ToolsDiscardDone.Contains(key)) return null;
+            var scriptTurn = boss.Def?.ScriptForAct(boss.ActIndex)?.TurnAt(turn);
+            if (scriptTurn?.Cards == null) return null;
+            foreach (var entry in scriptTurn.Cards)
+            {
+                if (!entry.ToolsDiscard) continue;
+                foreach (var card in options)
+                {
+                    if (card == null) continue;
+                    if (card.GetType() != entry.Card) continue;
+                    if (ToolsDiscardDone.Count > 256) ToolsDiscardDone.Clear();
+                    ToolsDiscardDone.Add(key);
+                    Logger.Log($"[CharBoss] 自动选择：必备工具按剧本点名丢掉 {card.Id.Entry}（第 {turn} 回合）");
+                    return card;
+                }
+            }
+        }
+        catch { /* 忽略 */ }
+        return null;
+    }
+
     public static IDisposable Push() => CardSelectCmd.PushSelector(Instance);
 
     /// <summary>
@@ -326,6 +357,19 @@ public sealed class BossCardSelector : ICardSelector
         // 兜底排序要知道「这一回合剧本要打哪些牌」（`Order()` 里用），这里显式传下去
         _orderBoss = bossNow;
         _orderTurn = turnNow;
+
+        // ⓠ **必备工具的「回合开始弃 1 张」**：优先挑剧本用 `ToolsDiscard` 点名的那一张
+        //   （用户 2026-11-09：「第七回合必备工具弃的牌也不对，提前把要上奇巧的防御给弃掉了」）。
+        //   每次 (Boss, 回合) 只消费一次；它排在所有其它点名之前，因为那一次弃牌发生在**出牌之前**。
+        if (count > 0)
+        {
+            var toolsCard = TakeToolsDiscard(bossNow, turnNow, rest);
+            if (toolsCard != null)
+            {
+                picked.Add(toolsCard);
+                rest.Remove(toolsCard);
+            }
+        }
 
         // ⓪ 剧本点名的「选择队列」（`BossTurn.PickOrder`）—— **只在「这一次选择没有弃牌点名」时才用**。
         //    ★ v0.2.522（用户 2026-11-09：「7、10 回合手上技法错误的给隐秘匕首添加了奇巧」）：

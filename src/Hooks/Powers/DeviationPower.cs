@@ -261,11 +261,11 @@ public sealed partial class DeviationPower : PowerModel
             var ctx = choiceContext ?? new BlockingPlayerChoiceContext();
             if (focusDelta)
             {
-                await PowerCmd.Apply<FocusPower>(ctx, owner, delta, owner, null, true);
+                await PowerCmd.Apply<FocusPower>(ctx, owner, delta, owner, null, false);
             }
             else
             {
-                await PowerCmd.Apply<StrengthPower>(ctx, owner, delta, owner, null, true);
+                await PowerCmd.Apply<StrengthPower>(ctx, owner, delta, owner, null, false);
             }
         }
         catch (System.Exception e)
