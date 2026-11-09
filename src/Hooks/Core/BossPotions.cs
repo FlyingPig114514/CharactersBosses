@@ -129,15 +129,10 @@ internal static class BossPotions
                 await HealAfterPotionAsync(shadow, healPerPotion, SafeName(potion));
                 return true;
             }
+            // ⚠ v0.2.531：这一行必须放在**强制翻侧之后**。以前放在 `ForceRelativeSide = true` 之前，
+            //   打出来的永远是「原版语义 = 怪物侧（她自己）」，看起来像「药水打到了她自己」，纯属误导。
             var target = ChooseTarget(shadow, potion);
             Logger.Log($"[CharBoss] 喝药水：{SafeName(potion)}（目标 {target?.Name ?? "无"}）");
-
-            // ★ v0.2.529（玩家 2026-11-09：「炼药猎的部分药水效果会翻倍，比如镣铐药水」）：
-            //   「对所有敌方生效」的药水（镣铐药水 / 爆炸安瓿…）内部是
-            //   `PowerCmd.Apply/Damage(… CombatState.HittableEnemies …)` —— **列表里有几只就结算几次**。
-            //   所以在喝之前把这份列表**逐只打出来**：一旦出现「同一只名字出现两次」，
-            //   那就是翻倍的直接原因（已经在 `CombatSidePatches.PlayerCharacters` 加了引用去重）。
-            LogHittableEnemies(shadow, potion);
 
             // 「喝药水不许改变这一回合的手牌」——她的手牌完全由剧本重建（BossScriptRunner.BuildHand
             // 每次都是**新建卡实例**，她真实那副卡组一直躺在抽牌堆里），所以任何「抽牌」类药水
@@ -157,6 +152,8 @@ internal static class BossPotions
             try
             {
                 Patches.HittableEnemiesSidePatch.ForceRelativeSide = true;
+                // ★ v0.2.529：翻侧生效**之后**再把这份列表打出来（这时候看到的才是它真正结算的对象）
+                LogHittableEnemies(shadow, potion);
                 await potion.OnUseWrapper(ctx, target);
             }
             finally

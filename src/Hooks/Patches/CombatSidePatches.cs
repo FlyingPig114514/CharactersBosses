@@ -152,15 +152,97 @@ public static class HittableEnemiesSidePatch
     /// 记实例能在 After 里精确摘掉那一个，再加一条「超过 15 秒还没等到 After 就整段作废」的兜底，
     /// 确保不会把翻侧永久关掉（翻侧关掉的后果是她自己的 AOE 打自己）。
     /// </summary>
-    internal static int RealPlayerCardDepth => _realPlayerPlays.Count + _realPlayerAutoPlays.Count;
+    internal static int RealPlayerCardDepth
+    {
+        get
+        {
+            PruneAutoPlays();
+            return _realPlayerPlays.Count + _realPlayerAutoPlays.Count;
+        }
+    }
 
-    /// <summary>`Hook.BeforeCardPlayed` 登记的 `CardPlay` 实例。</summary>
+    /// <summary>`Hook.BeforeCardPlayed` 登记的 `CardPlay` 实例（**有配对注销**，可以活到整段结算结束）。</summary>
     private static readonly HashSet<object> _realPlayerPlays = new(ReferenceEqualityComparer.Instance);
 
-    /// <summary>`CardCmd.AutoPlay` 入口登记的**卡牌**实例（目标就是在那之后选的）。</summary>
-    private static readonly HashSet<object> _realPlayerAutoPlays = new(ReferenceEqualityComparer.Instance);
+    /// <summary>
+    /// `CardCmd.AutoPlay` 入口登记的**卡牌**实例 → 登记时刻（秒）。
+    ///
+    /// ★★ v0.2.531（用户 2026-11-09：「炼药猎的**尖啸怎么给自己减力量了**？」）——
+    ///   **这条登记天生没有配对注销**：`CardCmd.AutoPlay` 里的很多分支（打不出的牌、预览/弃置路径、
+    ///   被后续逻辑吞掉的那几张）**根本不会派发 `Hook.AfterCardPlayed`** ⇒ 登记表只进不出。
+    ///   实测日志（她第 1 回合打尖啸那一刻）：
+    ///   <code>
+    ///   翻侧状态（出牌前 PIERCING_WAIL）：BossActingDepth=1 MultiTargetCardDepth=1
+    ///     真人出牌登记=0/自动=4 最近登记=8.7s前
+    ///   群攻牌 PIERCING_WAIL：HittableEnemies 解析到 1 个目标 [静默猎手(Enemy)]   ← 她自己
+    ///   </code>
+    ///   ⇒ `RealPlayerCardDepth = 4 > 0` 且「距上次登记 8.7s < 15s」⇒ 走「真人玩家出牌豁免」= 原版语义
+    ///     ⇒ 原版 `HittableEnemies` 恒等于**怪物侧** ⇒ 尖啸把她自己的力量减了。
+    ///   现在改成**逐条按时间过期**（<see cref="AutoPlayExemptSeconds"/>）：
+    ///   这份登记只在「选目标的那一瞬」有用（同帧内完成），给它 3 秒余量已经非常宽松，
+    ///   但绝不会像以前那样把她的**整回合**都毒掉。
+    /// </summary>
+    private static readonly Dictionary<object, double> _realPlayerAutoPlays =
+        new(ReferenceEqualityComparer.Instance);
+
+    /// <summary>AutoPlay 登记的存活时间（秒）。超过就当作「那条 After 没跑到」，自动作废。</summary>
+    private const double AutoPlayExemptSeconds = 3.0;
 
     private static double _realPlayerPlayAt;          // 最近一次登记的秒数（含兜底过期）
+
+    /// <summary>把过期的 AutoPlay 登记摘掉（每次查询都顺手做一次，成本可忽略）。</summary>
+    private static void PruneAutoPlays()
+    {
+        try
+        {
+            if (_realPlayerAutoPlays.Count == 0) return;
+            double now = NowSeconds();
+            List<object>? dead = null;
+            foreach (var kv in _realPlayerAutoPlays)
+            {
+                if (now - kv.Value <= AutoPlayExemptSeconds) continue;
+                (dead ??= new List<object>()).Add(kv.Key);
+            }
+            if (dead == null) return;
+            foreach (var k in dead) _realPlayerAutoPlays.Remove(k);
+            if (_prunedLogged++ < 5)
+            {
+                Logger.Log($"[CharBoss] 真人玩家自动出牌登记已过期 {dead.Count} 条" +
+                           $"（超过 {AutoPlayExemptSeconds:0.#}s 还没等到结算结束）⇒ 摘掉，" +
+                           "「可命中敌人」恢复翻成玩家侧");
+            }
+        }
+        catch { /* 忽略 */ }
+    }
+
+    private static int _prunedLogged;
+
+    /// <summary>
+    /// **她开始出牌之前**调（由 <c>CharBossMonster.PlayOne</c> 调）：把「真人玩家自动出牌登记」清空。
+    ///
+    /// ★ v0.2.531：这些登记是「进入 `CardCmd.AutoPlay` 时记、结算结束才摘」，而有些 AutoPlay 分支
+    ///   根本不会派发 `Hook.AfterCardPlayed` ⇒ 会残留几条。她**开始打自己一张牌**的这一刻，
+    ///   上一段遗留的登记一定已经没用了（那一张牌的目标早选完了）⇒ 直接清掉，
+    ///   免得「尖啸」这类群攻牌因为残留登记而走原版语义、把她自己的力量减掉。
+    ///   （她这次出牌**期间**新产生的登记不受影响：那些是在清空之后才写进来的。）
+    /// </summary>
+    internal static void ClearAutoPlaysOnBossPlay()
+    {
+        try
+        {
+            if (_realPlayerAutoPlays.Count == 0) return;
+            int n = _realPlayerAutoPlays.Count;
+            _realPlayerAutoPlays.Clear();
+            if (_clearedLogged++ < 5)
+            {
+                Logger.Log($"[CharBoss] 她开始出牌 ⇒ 清掉残留的 {n} 条「真人玩家自动出牌登记」" +
+                           "（否则她的群攻牌会走原版语义、打到自己身上）");
+            }
+        }
+        catch { /* 忽略 */ }
+    }
+
+    private static int _clearedLogged;
 
     /// <summary>这张牌是不是**真人玩家**打出的（不是她/影子玩家的）。</summary>
     internal static bool IsRealPlayerCard(MegaCrit.Sts2.Core.Entities.Cards.CardPlay? cardPlay)
@@ -197,8 +279,9 @@ public static class HittableEnemiesSidePatch
         try
         {
             if (card == null) return;
+            PruneAutoPlays();
             if (_realPlayerAutoPlays.Count > 32) _realPlayerAutoPlays.Clear();   // 兜底
-            _realPlayerAutoPlays.Add(card);
+            _realPlayerAutoPlays[card] = NowSeconds();                            // ★ v0.2.531：逐条记时刻
             _realPlayerPlayAt = NowSeconds();
             LogRealPlayerCardInEnemyTurn(combat, SafeEntry(card));
         }
@@ -265,6 +348,7 @@ public static class HittableEnemiesSidePatch
 
     /// <summary>登记表是否已经过期（超过 15 秒没动静 ⇒ 一定是有 After 没跑到）。</summary>
     internal static bool RealPlayerCardStale()    {
+        PruneAutoPlays();                       // ★ v0.2.531：先做逐条过期（AutoPlay 那半边）
         if (_realPlayerPlays.Count == 0 && _realPlayerAutoPlays.Count == 0) return false;
         if (NowSeconds() - _realPlayerPlayAt < 15.0) return false;
         _realPlayerPlays.Clear();
@@ -293,16 +377,27 @@ public static class HittableEnemiesSidePatch
         try
         {
             int plays = 0, autos = 0;
-            double age = 0;
+            double age = 0, autoAge = -1;
             try
             {
+                PruneAutoPlays();
                 plays = _realPlayerPlays.Count;
                 autos = _realPlayerAutoPlays.Count;
                 age = _realPlayerPlayAt > 0 ? Math.Max(0, NowSeconds() - _realPlayerPlayAt) : -1;
+                // 最新那条 AutoPlay 登记多大了 —— 这条记录就是「她的群攻会不会打自己」的直接线索
+                double now = NowSeconds();
+                foreach (var kv in _realPlayerAutoPlays)
+                {
+                    double a = now - kv.Value;
+                    if (autoAge < 0 || a < autoAge) autoAge = a;
+                }
             }
             catch { /* 忽略 */ }
             return $"BossActingDepth={BossActingDepth} MultiTargetCardDepth={MultiTargetCardDepth} " +
-                   $"NarrowToTargetDepth={NarrowToTargetDepth} 真人出牌登记={plays}/自动={autos} 最近登记={age:0.0}s前";
+                   $"NarrowToTargetDepth={NarrowToTargetDepth} 真人出牌登记={plays}/自动={autos} " +
+                   $"玩家效果深度={PlayerEffectDepth} " +
+                   $"最近登记={age:0.0}s前" +
+                   (autoAge >= 0 ? $"（最新自动登记 {autoAge:0.0}s 前，>{AutoPlayExemptSeconds:0.#}s 即作废）" : string.Empty);
         }
         catch { return "?"; }
     }

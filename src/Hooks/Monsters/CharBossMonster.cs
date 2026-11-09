@@ -1361,6 +1361,12 @@ public abstract partial class CharBossMonster : MonsterModel
             Core.BossCardSelector.ActingBoss = this;
             Core.BossCardSelector.ActingTurn = TurnNumber;
             Core.BossCardSelector.ActingCard = play.Card;
+            // ★ v0.2.531（用户 2026-11-09：「炼药猎的尖啸怎么给自己减力量了」）：
+            //   进入玩家回合时 `CardCmd.AutoPlay` 会登记「真人玩家的牌正在自动打出」，
+            //   而有些分支不会派发 `Hook.AfterCardPlayed` ⇒ 登记残留 ⇒ 她打群攻牌时
+            //   `HittableEnemies` 走原版语义（= 怪物侧 = 她自己）⇒ 尖啸把她自己的力量减掉。
+            //   她**开始打这张牌**的这一刻，上一段遗留的登记已经没用了 ⇒ 清掉。
+            Patches.HittableEnemiesSidePatch.ClearAutoPlaysOnBossPlay();
         }
         catch { /* 忽略 */ }
 

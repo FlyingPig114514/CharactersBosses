@@ -4818,3 +4818,14 @@ Chronological action log.
 | 2026-11-09 18:01 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
 | 2026-11-09 18:11 | write | `src/Hooks/Patches/BrewerBossBlockableHpLossPatch.cs` | ok | 0 |
 | 2026-11-09 18:11 | edit | `src/CharacterBosses.json` | ok | 0 |
+| 2026-11-09 18:11 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-09 19:32 | edit | `src/Hooks/Patches/CombatSidePatches.cs` | ok | 0 |
+| 2026-11-09 19:32 | edit | `src/Hooks/Patches/CombatSidePatches.cs` | ok | 0 |
+| 2026-11-09 19:32 | edit | `src/Hooks/Patches/CombatSidePatches.cs` | ok | 0 |
+| 2026-11-09 19:32 | edit | `src/Hooks/Patches/CombatSidePatches.cs` | ok | 0 |
+| 2026-11-09 19:33 | edit | `src/Hooks/Core/BossPotions.cs` | ok | 0 |
+| 2026-11-09 19:33 | edit | `src/Hooks/Core/BossPotions.cs` | ok | 0 |
+| 2026-11-09 19:33 | edit | `src/Hooks/Patches/CombatSidePatches.cs` | ok | 0 |
+| 2026-11-09 19:33 | edit | `src/Hooks/Monsters/CharBossMonster.cs` | ok | 0 |
+| 2026-11-09 19:33 | edit | `src/Hooks/Patches/CombatSidePatches.cs` | ok | 0 |
+| 2026-11-09 19:33 | edit | `src/CharacterBosses.json` | ok | 0 |
