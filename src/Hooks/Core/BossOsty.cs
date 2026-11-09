@@ -1169,6 +1169,17 @@ internal static class BossOsty
             var bossNode = room.GetCreatureNode(boss.Creature);
             if (bossNode == null || !GodotObject.IsInstanceValid(bossNode)) return;
 
+            // ★★ v0.2.534（玩家 2026-11-09：「多人时亡灵契约师用骸骨军团给**其它 Boss** 召唤的奥斯提，
+            //   血条和状态栏的「图层」过高，打开设置界面都能看见；自己那只正常」）：
+            //   这里以前**只管位置**，从来不管父容器 / 层级。而她自己那只奥斯提在创建时被
+            //   `MirrorAndPlace` 挪进了 `EnemyContainer`，骸骨军团给别的 Boss 召出来的那几只
+            //   （日志 20:18:42：4 只一次召齐，却没有一条「奥斯提节点已移入 Boss 容器」）
+            //   就一直留在原版给「随从」用的那个容器里 ⇒ 层级可能高过战斗房间。
+            //   现在统一**归一到它自己那只 Boss 的节点上**：同一个父容器 + 同一个 ZIndex / ZAsRelative。
+            //   （⚠ 绝不是「给我们的节点抬 ZIndex」——恰恰相反，是把它压到和 Boss 节点一致；
+            //     cerebrum 里那条「不要抬 ZIndex」的教训仍然是铁律。）
+            NormalizeNodeLayer(boss, ostyNode, bossNode);
+
             // 站位方向跟着 Boss 的朝向走：朝左（敌方侧）站她左手边，朝右（斗蛐蛐里被塞进玩家侧）站右手边。
             float dir = FacingDir(boss, bossNode);
             var want = bossNode.GlobalPosition + MirrorOstyOffset(bossNode, ostyNode.Entity, dir < 0f);
@@ -1191,6 +1202,66 @@ internal static class BossOsty
 
     /// <summary>每只 Boss 各记一份找到的奥斯提节点（多人同场时不能共用一个静态缓存）。</summary>
     private static readonly Dictionary<CharBossMonster, NCreature?> OstyNodeCache = new();
+
+    /// <summary>已经打过「图层归一」诊断的 Boss（每只一次，别刷屏）。</summary>
+    private static readonly HashSet<CharBossMonster> _layerLogged = new();
+
+    /// <summary>
+    /// 把这只奥斯提的节点**归一成和它自己的 Boss 节点一样**：同一父容器 + 同一 ZIndex / ZAsRelative。
+    ///
+    /// ★ v0.2.534（玩家 2026-11-09：骸骨军团给**其它 Boss** 召出来的奥斯提，血条/状态栏的图层
+    ///   高到「打开设置界面都能看见」，而她自己那只正常）。
+    ///   `MirrorAndPlace` 只在**她自己的回合开始**把奥斯提挪进 `EnemyContainer`；
+    ///   其它 Boss 名下那几只没有走到那一步（日志里 4 只一次召齐，却一条「已移入」都没有），
+    ///   于是留在原版给「随从」用的容器里 ⇒ 层级可能高于战斗房间。
+    ///   这里每次纠正站位时顺手归位（幂等：已经一致就什么都不做），并**在第一次时打一行**
+    ///   父容器/层级诊断 —— 下一份日志就能直接看出它们原先挂在哪。
+    ///
+    /// ⚠ 注意方向：这是把**我们的**节点压到和 Boss 节点一致（`ZIndex` 可能被调小），
+    ///   **不是**抬 ZIndex。cerebrum 里那条「绝不给我们自己的 UI 节点抬 ZIndex」照旧有效。
+    /// </summary>
+    private static void NormalizeNodeLayer(CharBossMonster boss, NCreature ostyNode, NCreature bossNode)
+    {
+        try
+        {
+            string beforeParent = "?";
+            try { beforeParent = ostyNode.GetParent()?.Name ?? "<null>"; } catch { /* 忽略 */ }
+            int beforeZ = 0;
+            bool beforeRel = true;
+            try { beforeZ = ostyNode.ZIndex; beforeRel = ostyNode.ZAsRelative; } catch { /* 忽略 */ }
+
+            // ① 父容器：和 Boss 节点同一个
+            Node? bossParent = null;
+            try { bossParent = bossNode.GetParent(); } catch { /* 忽略 */ }
+            bool reparented = false;
+            if (bossParent != null && GodotObject.IsInstanceValid(bossParent)
+                && !ReferenceEquals(ostyNode.GetParent(), bossParent))
+            {
+                ostyNode.Reparent(bossParent);
+                reparented = true;
+            }
+
+            // ② 层级：与 Boss 节点完全一致（只可能持平或更低，绝不会更高）
+            int bossZ = 0;
+            bool bossRel = true;
+            try { bossZ = bossNode.ZIndex; bossRel = bossNode.ZAsRelative; } catch { /* 忽略 */ }
+            if (beforeZ != bossZ) { try { ostyNode.ZIndex = bossZ; } catch { /* 忽略 */ } }
+            if (beforeRel != bossRel) { try { ostyNode.ZAsRelative = bossRel; } catch { /* 忽略 */ } }
+
+            if (!_layerLogged.Contains(boss) || reparented)
+            {
+                if (_layerLogged.Count < 24) _layerLogged.Add(boss);
+                Logger.Log($"[CharBoss] 奥斯提图层归一：{boss.Id.Entry} 的奥斯提 " +
+                           $"父容器 {beforeParent}→{ostyNode.GetParent()?.Name ?? "<null>"}、" +
+                           $"ZIndex {beforeZ}→{bossZ}、ZAsRelative {beforeRel}→{bossRel}" +
+                           $"（与它自己的 Boss 节点一致；reparent={reparented}）");
+            }
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 奥斯提图层归一失败（忽略）: " + e.Message);
+        }
+    }
 
     /// <summary>上次「扫全树找奥斯提」的时刻（<c>Time.GetTicksUsec</c>）；找不着时节流用。</summary>
     private static readonly Dictionary<CharBossMonster, ulong> OstyScanUsec = new();

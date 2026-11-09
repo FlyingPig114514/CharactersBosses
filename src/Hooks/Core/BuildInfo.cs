@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.533 / 2026-11-09（①修「炼药猎的群蛇形态多人时打其他玩家」：`SerpentFormLockOnPatch` / `DarkOrbLockOnPatch` 这两套手写 Harmony 的 `TryInstall()` **一个调用点都没有**、从来没生效过 ⇒ 已在 `BuildInfo.LogOnce` 里装上（`BossBlockAbsorbPatch` / `PlayerEffectExemption` 故意不装，见各自注释）；②修「跟踪锁定」末段写成设计名（`「状态机」只对你生效` ⇒ 应为「同步」）：特殊效果名改成优先取**特殊效果 Power 的 `.title`**（`BOSS_SYNC_POWER.title`=同步，16 语言都有），取不到才退回 monsters.json 首行；③修小刀意图把幻影之刃算进每一刀（刀扇 17×4 / 刀刃交响曲 20×2 ⇒ 应为首刀 +N、其余干净）：`首刀加成 = max(shivBonus, 真正挂着的幻影层数)`，单卡与刀刃交响曲两条路都按这个拆段；刀扇激活时小刀是群攻，不再按「打的是别人」清零）";
+    public const string Tag = "v0.2.534 / 2026-11-09（修「骸骨军团给其它 Boss 召唤的奥斯提，血条/状态栏图层过高、开着设置界面都能看见」：`BossOsty.EnforcePlacement` 以前只管位置不管容器/层级，而 `MirrorAndPlace` 只在**她自己回合开始**才把奥斯提挪进 `EnemyContainer`，其它 Boss 名下那几只从来没被挪过。现在每次纠正站位时顺手把奥斯提节点**归一到它自己的 Boss 节点**（同父容器 + 同 ZIndex/ZAsRelative，只会持平或更低，绝不抬高），并打一行「奥斯提图层归一：父容器 X→Y、ZIndex a→b」的诊断）｜上一版 v0.2.533：群蛇形态锁定补丁从未安装 / 跟踪锁定末段取特殊效果 Power 的 title / 小刀只让首刀吃幻影之刃";
 
     private static bool _logged;
 
