@@ -83,6 +83,13 @@ public sealed class ScriptCard
     public bool EmptyDrawPileFirst { get; init; }
 
     /// <summary>
+    /// 这张牌**不算「她抽到的牌」**（谋杀 Murder 的加伤不数它）。
+    /// 用途：华丽猎第 3 回合那三张「杂技」是**夜魇复制出来的**（剧本写在那儿），不是抽来的
+    /// （用户 2026-11-09 的算法：1+5+8+3+3 ⇒ 第 4 回合 20，其中 T3 只算 3 张）。
+    /// </summary>
+    public bool NotDrawn { get; init; }
+
+    /// <summary>
     /// 「**万物一心**」（<c>AllForOne</c>）这一张要**返手**哪些牌（用户 2026-11-03 的三层「事件机」：
     /// 第 4 / 9 回合「万物一心(0费，返手超能光束，冰之长枪)」）。
     ///
@@ -1135,6 +1142,31 @@ public static class BossScriptRunner
         //   （`CardsDrawnThisCombat` = 每回合手牌数累加），起点存 `MurderDrawBaseline`（-1 = 还没钉过）。
         if (cardBoss != null)
         {
+            // ★ v0.2.523：先算「这一回合真正新进她手牌的张数」（谋杀加伤用）：
+            //   排除夜魇印出来的（NotDrawn）与上一回合就被计划妥当留在手里的同类型保留牌。
+            try
+            {
+                var keptThisTurn = new HashSet<Type>();
+                int fresh = 0;
+                foreach (var sc in turn.Cards)
+                {
+                    if (sc.DisplayOnly && !sc.AutoPlayed) keptThisTurn.Add(sc.Card);
+                    if (sc.NotDrawn) continue;
+                    if (sc.DisplayOnly && !sc.AutoPlayed && cardBoss.LastKeptTypes.Contains(sc.Card)) continue;
+                    fresh++;
+                }
+                cardBoss.LastKeptTypes = keptThisTurn;
+                bool countsDrawn = false;
+                try { countsDrawn = cardBoss.Def?.MurderCountsDrawnCardsFor(cardBoss.ActIndex) == true; }
+                catch { countsDrawn = false; }
+                if (countsDrawn)
+                {
+                    cardBoss.MurderDrawnCounter += fresh;
+                    Logger.Log($"[CharBoss] 谋杀记账：本回合新进手牌 {fresh} 张 ⇒ 累计 {cardBoss.MurderDrawnCounter}");
+                }
+            }
+            catch { /* 忽略 */ }
+
             try
             {
                 int handNow = pcs.Hand.Cards.Count;
@@ -1161,7 +1193,8 @@ public static class BossScriptRunner
                         bool countDrawn = false;
                         try { countDrawn = cardBoss.Def?.MurderCountsDrawnCardsFor(cardBoss.ActIndex) == true; }
                         catch { countDrawn = false; }
-                        if (countDrawn) cardBoss.MurderDrawProgress = Math.Max(0, cardBoss.CardsDrawnThisCombat);
+                        // ★ v0.2.523：按「每回合新进手牌」累计（见 CharBossMonster.MurderDrawnCounter）
+                        if (countDrawn) cardBoss.MurderDrawProgress = Math.Max(0, cardBoss.MurderDrawnCounter);
                         else cardBoss.MurderDrawProgress = 0;
                         Logger.Log($"[CharBoss] 谋杀：第一次进她手牌 ⇒ 加伤起点归零" +
                                    $"（累计拿到过 {Math.Max(0, cardBoss.CardsDrawnThisCombat)} 张，之后只在她仍保留在手时累积）");

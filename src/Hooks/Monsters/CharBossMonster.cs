@@ -80,6 +80,17 @@ public abstract partial class CharBossMonster : MonsterModel
     internal int CardsDrawnThisCombat;
 
     /// <summary>
+    /// 「谋杀」（Murder）用的加伤计数：**每回合真正新进她手牌的张数**累加。
+    /// ★ v0.2.523（用户 2026-11-09 给的算法 1+5+8+3+3 ⇒ 第 4 回合 20；再 +4+4+7+7 ⇒ 第 8 回合 42）：
+    ///   · **夜魇复制出来的牌不算**（ScriptCard.NotDrawn）；
+    ///   · **被「计划妥当」留在手上的牌不算**（上一回合就已经在手、类型相同的那几张）。
+    /// </summary>
+    internal int MurderDrawnCounter;
+
+    /// <summary>上一回合「保留不出」的牌类型（用来判断这一回合哪些保留牌是新来的）。</summary>
+    internal HashSet<Type> LastKeptTypes = new();
+
+    /// <summary>
     /// 「谋杀」（`Murder`）**已经见过它在手牌里**没有（-1 时代已废弃，见下面两个字段）。
     /// </summary>
     internal int MurderDrawBaseline = -1;

@@ -36,6 +36,37 @@ public static partial class BossHookBridge
     ///   ② 红面具的虚弱已经在 <see cref="FireCombatStart"/> 里按玩家侧语义给过，
     ///      她回合开始那次由 <see cref="Patches.ShadowRedMaskTurnStartPatch"/> 拦掉。
     /// </summary>
+    /// <summary>
+    /// 把「开战时我们手动补的那层易伤」按原版节奏衰减掉（她第 2 回合开始时调一次）。
+    /// 只会动**真人玩家身上、层数 ≥1** 的易伤，且每场只做一次（`CombatStartVulnTicked`）。
+    /// </summary>
+    private static bool CombatStartVulnTicked;
+
+    private static void TickCombatStartVulnerable(CharBossMonster boss, PlayerChoiceContext context)
+    {
+        if (CombatStartVulnTicked) return;
+        CombatStartVulnTicked = true;
+        var combat = boss.CombatState;
+        if (combat == null) return;
+        var players = Core.BossLockOn.RealPlayers(combat);
+        if (players == null) return;
+        foreach (var p in players)
+        {
+            var c = p?.Creature;
+            if (c == null || !c.IsAlive) continue;
+            try
+            {
+                var vuln = c.GetPower<MegaCrit.Sts2.Core.Models.Powers.VulnerablePower>();
+                if (vuln == null) continue;
+                int now = vuln.Amount;
+                if (now <= 0) continue;
+                _ = MegaCrit.Sts2.Core.Commands.PowerCmd.TickDownDuration(vuln);
+                Logger.Log($"[CharBoss] 弹珠袋：她第 2 回合开始 ⇒ 为 {c.Name} 补一次易伤衰减（{now} → {Math.Max(0, now - 1)}）");
+            }
+            catch { /* 单个人失败不影响其它 */ }
+        }
+    }
+
     private static void FireSideTurnStart(CharBossMonster boss, PlayerChoiceContext context)
     {
         if (boss.Creature == null) return;
@@ -44,6 +75,16 @@ public static partial class BossHookBridge
         try { HappyFlowerPlays.OnBossTurnStart(boss, context); } catch { /* 忽略 */ }
         // ⚠ 这里**不再**补破损核心的球：改成战斗开始时引导（见 ChannelCrackedCoreOrbAtCombatStart），
         // 否则他第 1 回合会和原版遗物那条叠成两个（用户实测）。
+
+        // ★ v0.2.523（用户 2026-11-09：「第二回合我身上的易伤并没有衰减，应该在我第二回合开始的时候就没了」）：
+        //   反编译确认 VulnerablePower.AfterSideTurnEnd 只在 `side == CombatSide.Enemy` 时 tick，
+        //   而我们这份弹珠袋的易伤是**开战时由我们手动补**的（时间点比原版那次更靠后）⇒ 没吃到那次 tick，
+        //   于是第 2 回合还挂着。这里在她第 2 回合开始时**补 tick 一次**，行为与「原版第 1 回合的易伤」一致。
+        if (boss.TurnNumber == 2)
+        {
+            try { TickCombatStartVulnerable(boss, context); }
+            catch (Exception e) { Logger.Log("[CharBoss] 弹珠袋易伤补衰减失败: " + e.Message); }
+        }
 
         // 诊断：她这一回合开始时到底有多少力量（烘焙手套每回合 +1 —— 意图预测依赖它真的到账）
         try

@@ -78,7 +78,7 @@ public static class GrandFinaleSilentScript
                 {
                     C<Neutralize>(), C<HandTrick>(), C<StormOfSteel>(),
                     Discard<DefendSilent>(),
-                    Discard<Acrobatics>(), Discard<Acrobatics>(), Discard<Acrobatics>(),
+                    NotDrawn(Discard<Acrobatics>()), NotDrawn(Discard<Acrobatics>()), NotDrawn(Discard<Acrobatics>()),
                     Discard<GrandFinale>(),
                 },
                 Energy = 2,
@@ -248,6 +248,14 @@ public static class GrandFinaleSilentScript
     /// </summary>
     private static ScriptCard Kept<T>() where T : MegaCrit.Sts2.Core.Models.CardModel
         => new() { Card = typeof(T), From = "deck", DisplayOnly = true };
+
+    /// <summary>标成「不是抽到的牌」（夜魇印出来的复制品）。</summary>
+    private static ScriptCard NotDrawn(ScriptCard card)
+        => new()
+        {
+            Card = card.Card, From = card.From, DiscardInstead = card.DiscardInstead,
+            Sly = card.Sly, DisplayOnly = card.DisplayOnly, NotDrawn = true,
+        };
 
     /// <summary>被上一张牌**丢弃**的那张。</summary>
     private static ScriptCard Discard<T>() where T : MegaCrit.Sts2.Core.Models.CardModel

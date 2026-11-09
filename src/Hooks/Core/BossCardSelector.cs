@@ -378,6 +378,20 @@ public sealed class BossCardSelector : ICardSelector
         }
 
 
+        // ③ 兜底之前**再用一次剧本点名**（万一前面几段把游标挡住过）：这样「手上技法给防御加奇巧」
+        //    这类点名一定落在那张指定牌上，而不是按牌名首字母挑到「杂技」。
+        if (picked.Count < count)
+        {
+            var forced2 = TakeForcedPick(bossNow, turnNow, rest);
+            if (forced2 != null)
+            {
+                picked.Add(forced2);
+                rest.Remove(forced2);
+                string n2; try { n2 = forced2.Id.Entry; } catch { n2 = "?"; }
+                Logger.Log($"[CharBoss] 自动选择：兜底阶段按剧本**点名**挑中 {n2}（第 {turnNow} 回合的选择队列）");
+            }
+        }
+
         // ③ 兜底：奇巧优先 → 价值 → 费用
         if (picked.Count < count)
         {

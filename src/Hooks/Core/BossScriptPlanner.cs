@@ -431,6 +431,14 @@ public static class BossScriptPlanner
             try { if (card.EnergyCost.CostsX) xEnergyForOrbs = Math.Max(1, cost); } catch { xEnergyForOrbs = 0; }
             var evoke = orbSim.Predict(card, xEnergyForOrbs);
             BossOrbSim.AppendIntents(intents, evoke, pendingDrop, BossIntentBuilder.RandomAimIsElsewhere(card));
+            // 诊断（用户 2026-11-09「钢铁风暴的意图还是只有一个强化」/「隐秘匕首+ 还是 4×2」）：
+            // 把「剧本会丢几张 / 这张是不是升级版 / 最终意图条数」打出来，一眼能看出是哪一环没接上。
+            if (SafeEntry(card) == "STORM_OF_STEEL" || SafeEntry(card) == "HIDDEN_DAGGERS")
+            {
+                Logger.Log($"[CharBoss] 小刀段数诊断：{SafeEntry(card)}（升级={card.IsUpgraded}）" +
+                           $" 剧本丢弃={stormDiscards} 张 ⇒ 意图 {intents.Count} 条" +
+                           $"（升级刀基础={BossIntentBuilder.ShivBaseDamage + (BossIntentBuilder.GeneratesUpgradedShivs(card) ? 2 : 0)}）");
+            }
             Logger.Log($"[CharBoss] 意图 {SafeEntry(card)}: [{string.Join("+", intents.ConvertAll(i => i.GetType().Name))}]" +
                        $"（预补力量 +{inTurnStrength}、力量遗留 -{pendingDrop}、回合前 +{pendingRise}、费用 {cost}）");
             result.Add(new PlannedPlay
