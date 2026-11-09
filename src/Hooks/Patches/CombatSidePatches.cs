@@ -506,6 +506,14 @@ public static class HittableEnemiesSidePatch
         var list = new List<Creature>();
         try
         {
+            // ★ v0.2.529（玩家 2026-11-09 反馈「炼药猎的部分药水效果会翻倍，比如镣铐药水」）：
+            //   「对所有敌方生效」的药水（镣铐药水 / 爆炸安瓿…）在反编译里都是
+            //   `PowerCmd.Apply<X>(ctx, combatState.HittableEnemies, …)` / `Damage(… HittableEnemies …)`，
+            //   也就是**这份列表里有几只就结算几次**。以前这里没有任何去重 ⇒ 只要 `PlayerCreatures`
+            //   里同一个生物出现两次（或某个宠物没被 `Monster != null` / `IsPet` 两条判据挡住），
+            //   那位玩家身上就会吃到**两份**药水效果（镣铐 = 力量 -7 变 -14，正是玩家说的「翻倍」）。
+            //   这里按**引用**去重：同一只生物在一份「敌人列表」里出现两次永远是 bug。
+            var seen = new HashSet<Creature>();
             foreach (var creature in state.PlayerCreatures)
             {
                 if (creature == null || creature.Monster != null || creature.Player == null) continue;  // 宠物/召唤物跳过
@@ -514,6 +522,7 @@ public static class HittableEnemiesSidePatch
                 // 用户 2026-10-27 让核对「群蛇形态会不会打到玩家的奥斯提/火炬头」时补的这一道。
                 try { if (creature.IsPet) continue; } catch { /* 忽略 */ }
                 if (requireHittable ? !creature.IsHittable : (!creature.IsAlive || creature.IsDead)) continue;
+                if (!seen.Add(creature)) continue;     // ★ 同一只只算一次
                 list.Add(creature);
             }
         }

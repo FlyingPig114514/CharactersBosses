@@ -132,6 +132,13 @@ internal static class BossPotions
             var target = ChooseTarget(shadow, potion);
             Logger.Log($"[CharBoss] 喝药水：{SafeName(potion)}（目标 {target?.Name ?? "无"}）");
 
+            // ★ v0.2.529（玩家 2026-11-09：「炼药猎的部分药水效果会翻倍，比如镣铐药水」）：
+            //   「对所有敌方生效」的药水（镣铐药水 / 爆炸安瓿…）内部是
+            //   `PowerCmd.Apply/Damage(… CombatState.HittableEnemies …)` —— **列表里有几只就结算几次**。
+            //   所以在喝之前把这份列表**逐只打出来**：一旦出现「同一只名字出现两次」，
+            //   那就是翻倍的直接原因（已经在 `CombatSidePatches.PlayerCharacters` 加了引用去重）。
+            LogHittableEnemies(shadow, potion);
+
             // 「喝药水不许改变这一回合的手牌」——她的手牌完全由剧本重建（BossScriptRunner.BuildHand
             // 每次都是**新建卡实例**，她真实那副卡组一直躺在抽牌堆里），所以任何「抽牌」类药水
             // 都会在手里凭空多出一张**永远不会被计划到**的牌；如果抽到的正好是剧本里也有的那张，
@@ -158,6 +165,10 @@ internal static class BossPotions
                 Patches.PotionThrowAtPlayerPatch.Disarm();
             }
             KeepScriptedHand(shadow, handBefore);
+
+            // ★ v0.2.529：喝完把「真实结算结果」打出来 —— 药水效果是不是翻倍，看这一行最直接
+            //   （镣铐药水 → 玩家身上的 SHACKLING_POTION_POWER 应该是 7；爆炸安瓿 → HP 只掉一次）。
+            LogPotionResult(shadow, potion);
 
             // 「罐装幽灵」（GhostInAJar）的无实体：**给到 2 层**（用户 2026-10-27 实测要求）。
             //
@@ -225,9 +236,90 @@ internal static class BossPotions
         }
     }
 
-    /// <summary>记一笔「本回合已经喝掉一瓶」（爬行动物饰品的力量预补要用，见 BladesGrowth）。</summary>
-    private static void MarkPotionDrunk(Player shadow)
+    /// <summary>
+    /// 喝之前把「对所有敌方生效」的药水真正会命中的那份列表打出来（`CombatState.HittableEnemies`）。
+    ///
+    /// 为什么（玩家 2026-11-09：「部分药水效果会翻倍」）：镣铐药水 / 爆炸安瓿这些在反编译里是
+    /// `PowerCmd.Apply/Damage(… HittableEnemies …)` —— **列表里有几只就结算几次**。
+    /// 只要同一只玩家在这份列表里出现两次，效果就正好翻倍。
+    /// 这一行就是「翻倍到底是不是列表重复」的直接证据（也顺手记录当时强制翻侧开关的状态）。
+    /// </summary>
+    private static void LogHittableEnemies(Player shadow, PotionModel potion)
     {
+        try
+        {
+            var combat = shadow.Creature?.CombatState;
+            if (combat == null) return;
+            var names = new List<string>();
+            int dup = 0;
+            var seen = new HashSet<Creature>();
+            foreach (var c in combat.HittableEnemies)
+            {
+                if (c == null) continue;
+                if (!seen.Add(c)) dup++;
+                string who;
+                try
+                {
+                    string kind = c.Monster != null ? "怪" : (c.Player != null ? "玩家" : "?");
+                    string pet = c.IsPet ? "/宠物" : string.Empty;
+                    who = $"{c.Name}({kind}{pet})";
+                }
+                catch { who = "?"; }
+                names.Add(who);
+            }
+            Logger.Log($"[CharBoss] 药水命中列表：{SafeName(potion)} ⇒ {names.Count} 只 " +
+                       $"[{string.Join(",", names)}]" +
+                       (dup > 0 ? $"　⚠ 其中有 {dup} 个**重复条目**（这就是效果翻倍的原因）" : string.Empty) +
+                       $"（强制翻侧={Patches.HittableEnemiesSidePatch.ForceRelativeSide}）");
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 药水命中列表打印失败（忽略）: " + e.Message); }
+    }
+
+    /// <summary>
+    /// 喝完之后把「真实结算结果」打出来：每名真人玩家 + 她自己 的 HP / 格挡 / power 层数。
+    /// 药水效果有没有翻倍（镣铐药水应为 7 层、爆炸安瓿只该掉一次血）看这一行即可。
+    /// </summary>
+    private static void LogPotionResult(Player shadow, PotionModel potion)
+    {
+        try
+        {
+            var combat = shadow.Creature?.CombatState;
+            if (combat == null) return;
+            var parts = new List<string>();
+            foreach (var p in BossLockOn.RealPlayers(combat))
+            {
+                var c = p?.Creature;
+                if (c == null) continue;
+                parts.Add(DescribeCreature(c));
+            }
+            if (shadow.Creature != null) parts.Add("她=" + DescribeCreature(shadow.Creature));
+            Logger.Log($"[CharBoss] 喝药结果：{SafeName(potion)} ⇒ [{string.Join(" | ", parts)}]");
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 喝药结果打印失败（忽略）: " + e.Message); }
+    }
+
+    /// <summary>`名字 hp/max 格挡 powers(名:层, …)`。</summary>
+    private static string DescribeCreature(Creature c)
+    {
+        try
+        {
+            var powers = new List<string>();
+            foreach (var slot in c.Powers)
+            {
+                if (slot == null) continue;
+                string entry;
+                int amount;
+                try { entry = slot.Id.Entry; } catch { continue; }
+                try { amount = slot.Amount; } catch { amount = 0; }
+                powers.Add($"{entry}:{amount}");
+            }
+            return $"{c.Name} {c.CurrentHp}/{c.MaxHp} 格挡{c.Block} powers({string.Join(",", powers)})";
+        }
+        catch { return "?"; }
+    }
+
+    /// <summary>记一笔「本回合已经喝掉一瓶」（爬行动物饰品的力量预补要用，见 BladesGrowth）。</summary>
+    private static void MarkPotionDrunk(Player shadow)    {
         try
         {
             if (shadow.Creature?.Monster is CharBossMonster boss) boss.PotionsDrunkThisTurn++;

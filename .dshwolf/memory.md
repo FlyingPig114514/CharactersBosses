@@ -4809,3 +4809,9 @@ Chronological action log.
 | 2026-11-09 17:49 | edit | `docs/安装说明.txt` | ok | 0 |
 | 2026-11-09 17:49 | write | `workshop/changenote.txt` | ok | 0 |
 | 2026-11-09 17:49 | write | `workshop/changenote.txt` | ok | 0 |
+| 2026-11-09 18:00 | edit | `src/Hooks/Patches/CombatSidePatches.cs` | ok | 0 |
+| 2026-11-09 18:00 | edit | `src/Hooks/Core/BossPotions.cs` | ok | 0 |
+| 2026-11-09 18:00 | edit | `src/Hooks/Core/BossPotions.cs` | ok | 0 |
+| 2026-11-09 18:00 | edit | `src/Hooks/Core/BossPotions.cs` | ok | 0 |
+| 2026-11-09 18:00 | edit | `src/Hooks/Core/BossPotions.cs` | ok | 0 |
+| 2026-11-09 18:01 | edit | `src/CharacterBosses.json` | ok | 0 |
