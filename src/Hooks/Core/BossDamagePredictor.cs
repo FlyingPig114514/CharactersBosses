@@ -1219,7 +1219,7 @@ public static class BossDamagePredictor
     public static int GoldAxeDamage(CardModel card, int pendingPlays)
     {
         int finished = 0;
-        try { finished = CountOwnerPlays(card?.Owner?.Creature); }
+        try { finished = CountOurBossPlays(); }
         catch (Exception e)
         {
             Logger.Log("[CharBoss] 金斧：读战斗历史失败（退回牌面值）: " + e.Message);
@@ -1234,22 +1234,23 @@ public static class BossDamagePredictor
     }
 
     /// <summary>
-    /// 数「**这一位**打完了多少张牌」（`CardPlaysFinished` 里 `Actor` 是他的那些）。
+    /// 数「**我们这一方**打完了多少张牌」—— `CardPlaysFinished` 里 `Actor` 是**我们自己的 Boss**（影子玩家）的那些。
     ///
-    /// ★ v0.2.516（用户 2026-11-09：「bug：轰击储的金斧把玩家出牌也算上了」）：
-    ///   原版 `GoldAxe` 的倍率是 `CardPlaysFinished.Count()` —— **全场**的牌都算（玩家打的也算）。
-    ///   这只 Boss 按设计只该数**她自己**的牌 ⇒ 预览与真实伤害都改成只数她的。
+    /// ★ v0.2.517（用户 2026-11-09）：
+    ///   · 「bug：轰击储的金斧把玩家出牌也算上了」⇒ 玩家出的牌**不算**；
+    ///   · 「让多人时其它 boss 出牌能正常加成金斧的伤害」⇒ **其它角色 Boss 出的牌要算**。
+    ///   所以判据是 `Actor.Monster is CharBossMonster`（她的、联机时伙伴 Boss 的都算；
+    ///   真人玩家、仆从/宠物都不算）。原版是 `CardPlaysFinished.Count()`（全场都算）。
     /// </summary>
-    internal static int CountOwnerPlays(Creature? owner)
+    internal static int CountOurBossPlays()
     {
-        if (owner == null) return 0;
         int n = 0;
         try
         {
             foreach (var e in MegaCrit.Sts2.Core.Combat.CombatManager.Instance.History.CardPlaysFinished)
             {
                 if (e == null) continue;
-                try { if (ReferenceEquals(e.Actor, owner)) n++; }
+                try { if (e.Actor?.Monster is CharacterBosses.Monsters.CharBossMonster) n++; }
                 catch { /* 单条读不到就跳过 */ }
             }
         }
@@ -1257,14 +1258,14 @@ public static class BossDamagePredictor
         return n;
     }
 
-    private static readonly Func<CardModel, Creature?, decimal> OwnerPlaysOnlyMultiplier
-        = (card, _) => CountOwnerPlays(card?.Owner?.Creature);
+    private static readonly Func<CardModel, Creature?, decimal> OurBossPlaysOnlyMultiplier
+        = (card, _) => CountOurBossPlays();
 
     private static System.Reflection.FieldInfo? _multiplierField;
     private static bool _multiplierSearched;
 
     /// <summary>
-    /// 把这一张「金斧」的**倍率函数**换成「只数持有者自己的牌」。
+    /// 把这一张「金斧」的**倍率函数**换成「只数我们一方（她自己 + 联机时的伙伴 Boss）打完的牌」。
     ///
     /// 反编译依据：`CalculatedVar.WithMultiplier(Func&lt;CardModel, Creature?, decimal&gt;)` 把回调存进
     /// 私有字段 `_multiplierCalc`；`CalculatedDamageVar` 在预览/结算时都调它
@@ -1288,8 +1289,8 @@ public static class BossDamagePredictor
             }
             if (_multiplierField == null) return;
             if (!card.DynamicVars.TryGetValue("CalculatedDamage", out var dmg) || dmg == null) return;
-            _multiplierField.SetValue(dmg, OwnerPlaysOnlyMultiplier);
-            Logger.Log("[CharBoss] 金斧：倍率改成「只数她自己打完的牌」");
+            _multiplierField.SetValue(dmg, OurBossPlaysOnlyMultiplier);
+            Logger.Log("[CharBoss] 金斧：倍率改成「只数我们一方（她和联机伙伴）打完的牌」");
         }
         catch (Exception e)
         {
