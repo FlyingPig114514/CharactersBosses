@@ -137,5 +137,9 @@
     "IRONCLAD_BOULDER_BOSS.moves.CHARBOSS_PLAY.title":  "Play",
     "SILENT_SNAKEBITE_BOSS.name":  "Snakebite Hunter",
     "SILENT_SNAKEBITE_BOSS.title":  "Snakebite Hunter",
-    "SILENT_SNAKEBITE_BOSS.moves.CHARBOSS_PLAY.title":  "Play"
+    "SILENT_SNAKEBITE_BOSS.moves.CHARBOSS_PLAY.title":  "Play",
+    "SILENT_GRAND_FINALE_BOSS.name":  "Grand Finale",
+    "SILENT_GRAND_FINALE_BOSS.title":  "Grand Finale",
+    "SILENT_GRAND_FINALE_BOSS.moves.CHARBOSS_PLAY.title":  "Play",
+    "SILENT_BOSS.suppression":  "Suppression\nWhenever the Silent plays [gold]Grand Finale[/gold], put a [gold]Void[/gold] on top of every player's draw pile."
 }

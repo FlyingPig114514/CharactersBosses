@@ -847,6 +847,11 @@ public static class DownfallCollectibleCompat
                     upgraded = false;
                     Logger.Log("[CharBoss] 收藏家藏品：事件机 → 万物一心");
                     return true;
+                case "SILENT_GRAND_FINALE":  // 三层 华丽猎（用户 2026-11-09：藏品 = 计划妥当）
+                    cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.WellLaidPlans);
+                    upgraded = false;
+                    Logger.Log("[CharBoss] 收藏家藏品：华丽猎 → 计划妥当");
+                    return true;
             }
 
             string? entry = null;
@@ -871,6 +876,10 @@ public static class DownfallCollectibleCompat
                     return true;
 case "REGENT_STAR_BOSS_ENCOUNTER":         // 三层 辉星储
                     cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.VoidForm);        // 虚空形态
+                    upgraded = false;
+                    return true;
+                case "SILENT_GRAND_FINALE_BOSS_ENCOUNTER":   // 三层 华丽猎
+                    cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.WellLaidPlans);   // 计划妥当
                     upgraded = false;
                     return true;
                 case "NECROBINDER_OSTY_BOSS_ENCOUNTER":    // 三层 养手骨

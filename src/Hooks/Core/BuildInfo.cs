@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.518 / 2026-11-09（意图的能力指纹把玩家身上的能力也算进来：玩家在回合内失去易伤/获得无实体等，Boss 的伤害预览会立刻跟着重算 —— 修养手骨奥斯提攻击牌预览不降）";
+    public const string Tag = "v0.2.519 / 2026-11-09（新 Boss：三层静默猎手 3 号「华丽猎」SILENT_GRAND_FINALE —— 10 回合剧本 + 8~10 循环、特殊效果「压制」（打出华丽收场⇒所有玩家抽牌堆顶塞虚空，带原版塞牌动画）、藏品 计划妥当）";
 
     private static bool _logged;
 

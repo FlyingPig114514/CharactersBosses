@@ -138,5 +138,9 @@
     "IRONCLAD_BOULDER_BOSS.moves.CHARBOSS_PLAY.title":  "出牌",
     "SILENT_SNAKEBITE_BOSS.name":  "蛇咬猎",
     "SILENT_SNAKEBITE_BOSS.title":  "蛇咬猎",
-    "SILENT_SNAKEBITE_BOSS.moves.CHARBOSS_PLAY.title":  "出牌"
+    "SILENT_SNAKEBITE_BOSS.moves.CHARBOSS_PLAY.title":  "出牌",
+    "SILENT_GRAND_FINALE_BOSS.name":  "華麗獵",
+    "SILENT_GRAND_FINALE_BOSS.title":  "華麗獵",
+    "SILENT_GRAND_FINALE_BOSS.moves.CHARBOSS_PLAY.title":  "出牌",
+    "SILENT_BOSS.suppression":  "壓制\n每當靜默獵手打出[gold]華麗收場[/gold]時，將一張[gold]虛空[/gold]放入所有玩家的抽牌堆頂部。"
 }

@@ -59,7 +59,7 @@ internal static class ShadowBossNoDraw
             }
 
             bool soulBound = b.Creature?.GetPower<BossSoulBoundPower>() != null;
-            if (!soulBound && b.Def?.BlocksVanillaDraw != true) return false;
+            if (!soulBound && b.Def?.BlocksVanillaDrawFor(b.ActIndex) != true) return false;
             var state = player.Creature!.CombatState;
             if (state == null) return false;
 

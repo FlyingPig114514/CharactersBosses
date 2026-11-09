@@ -68,6 +68,7 @@ internal static class BossKeys
         // ── 第三幕（荣耀 + 另一个变体）──
         new("SILENT_SHIV",          1, 2, 1, typeof(SilentBoss)),          // 猎人 1 号：刀猎
         new("SILENT_BREWER",        1, 2, 2, typeof(SilentBoss)),          // 猎人 2 号：炼药猎
+        new("SILENT_GRAND_FINALE",  1, 2, 3, typeof(SilentBoss)),          // 猎人 3 号：华丽猎（用户 2026-11-09；内部名用「华丽收场」的英文）
         new("DEFECT_AI",            2, 2, 1, typeof(DefectBoss)),          // 故障 1 号：能力机
         new("DEFECT_EVENT",         2, 2, 2, typeof(DefectBoss)),          // 故障 2 号：事件机
         new("DEFECT_STATUS",        2, 2, 3, typeof(DefectBoss)),          // 故障 3 号：状态机（原本在二层，2026-11-05 挪到三层）
@@ -105,6 +106,7 @@ internal static class BossKeys
             {
                 "SILENT_SHIV",          // 3 层 1 号
                 "SILENT_BREWER",        // 3 层 2 号
+                "SILENT_GRAND_FINALE",  // 3 层 2.5 号（猎人第三套设计）
                 "DEFECT_AI",            // 3 层 3 号
                 "DEFECT_EVENT",         // 3 层 4 号
                 "DEFECT_STATUS",        // 3 层 5 号
@@ -207,6 +209,7 @@ internal static class BossKeys
         // 三层
         ["SILENT_SHIV"] = "刀猎",
         ["SILENT_BREWER"] = "炼药猎",
+        ["SILENT_GRAND_FINALE"] = "华丽猎",
         ["DEFECT_AI"] = "能力机",
         ["DEFECT_EVENT"] = "事件机",
         ["DEFECT_STATUS"] = "状态机",
@@ -264,7 +267,8 @@ internal static class BossKeys
         switch (key)
         {
             case "SILENT_SHIV": return "SILENT_BREWER";
-            case "SILENT_BREWER": return "SILENT_SHIV";
+            case "SILENT_BREWER": return "SILENT_GRAND_FINALE";
+            case "SILENT_GRAND_FINALE": return "SILENT_SHIV";
             case "IRONCLAD_VULN": return "IRONCLAD_BOULDER";
             case "IRONCLAD_BOULDER": return "IRONCLAD_VULN";
             case "REGENT_COLORLESS": return "REGENT_STAR";
@@ -328,6 +332,7 @@ internal static class BossKeys
             case "IRONCLAD_JUGGLER": return ModelDb.Encounter<IroncladJugglerBossEncounter>();
             case "SILENT_SHIV": return ModelDb.Encounter<SilentShivBossEncounter>();
             case "SILENT_BREWER": return ModelDb.Encounter<SilentBrewerBossEncounter>();
+            case "SILENT_GRAND_FINALE": return ModelDb.Encounter<SilentGrandFinaleBossEncounter>();
             case "DEFECT_AI": return ModelDb.Encounter<DefectAiBossEncounter>();
             case "DEFECT_CLAW": return ModelDb.Encounter<DefectClawBossEncounter>();
             case "DEFECT_RAINBOW": return ModelDb.Encounter<DefectRainbowBossEncounter>();

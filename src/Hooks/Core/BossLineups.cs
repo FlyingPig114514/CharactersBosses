@@ -629,6 +629,47 @@ internal static class BossLineups
     }
 
     /// <summary>
+    /// 三层静默猎手的**第三套设计「华丽猎」**（Key `SILENT_GRAND_FINALE`，用户 2026-11-09）。
+    /// 判据同 `BrewerActive`：以**房间遭遇**为准（控制台 `fight SILENT_GRAND_FINALE_BOSS_ENCOUNTER`
+    /// 点名也才会真的是华丽猎），拿不到遭遇才按种子兜底。
+    /// 注意判定顺序：`VariantsByAct[2]`（炼药猎）先问，问不到才轮到 `ExtraVariants[2]` 这一套。
+    /// </summary>
+    internal static bool GrandFinaleActive() => Latched("SILENT_GRAND_FINALE", ComputeGrandFinale);
+
+    private static (bool Value, bool Decisive) ComputeGrandFinale()
+    {
+        try
+        {
+            string? entry = CurrentEncounterEntry();
+            if (!string.IsNullOrEmpty(entry))
+            {
+                if (entry == "SILENT_GRAND_FINALE_BOSS_ENCOUNTER") return (true, true);
+                if (entry == "SILENT_SHIV_BOSS_ENCOUNTER") return (false, true);
+                if (entry == "SILENT_BREWER_BOSS_ENCOUNTER") return (false, true);
+            }
+        }
+        catch { /* 继续往下判断 */ }
+
+        try
+        {
+            var lineup = CurrentFightLineup();
+            if (lineup != null)
+            {
+                foreach (var k in lineup)
+                {
+                    if (k == "SILENT_GRAND_FINALE") return (true, true);
+                    if (k == "SILENT_SHIV") return (false, true);
+                    if (k == "SILENT_BREWER") return (false, true);
+                }
+            }
+        }
+        catch { /* 继续兜底 */ }
+
+        // 种子兜底：与炼药猎**错开**（那边用 salt 41，这里用 42，且只在炼药猎判否时才会被问到）
+        try { return (Roll(2, 42, 2) == 1, false); } catch { return (false, false); }
+    }
+
+    /// <summary>
     /// 三层**铁甲战士**的档位设计是不是「巨石战」（易伤战 / 巨石战 **50/50**）。
     ///
     /// ⚠ **用户 2026-10-27：暂时恒 false** ——「巨石战」先不进正常对局，只能用控制台点名

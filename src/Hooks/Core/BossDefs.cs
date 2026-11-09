@@ -355,6 +355,38 @@ public static class BossDefs
             },
             null,
         },
+        // ★ 三层静默猎手的**第三套设计「华丽猎」**（Key SILENT_GRAND_FINALE，用户 2026-11-09）。
+        //   一幕只能放一套 VariantsByAct（下标 2 已给炼药猎），第三套必须挂在 ExtraVariants：
+        //   判定顺序 = 先 VariantsByAct 那一套（炼药猎），再按本表顺序；取第一个 Enabled() 为真的。
+        //   特殊效果「压制」= Powers/BossSuppressionPower（她打出华丽收场 ⇒ 所有玩家抽牌堆顶塞虚空），
+        //   剧本 = Core/GrandFinaleSilentScript.cs（10 回合，之后 8~10 循环）。
+        ExtraVariants = new Dictionary<int, List<BossVariant>>
+        {
+            [2] = new List<BossVariant>
+            {
+                new BossVariant
+                {
+                    Key = "SILENT_GRAND_FINALE",
+                    Enabled = Core.BossLineups.GrandFinaleActive,
+                    Deck = Core.GrandFinaleSilentScript.Deck(),
+                    Relics = Core.GrandFinaleSilentScript.Relics(),
+                    Script = Core.GrandFinaleSilentScript.Build(),
+                    SpecialLoc = "SILENT_BOSS.suppression",       // 特殊效果「压制」
+                    SpecialPower = typeof(Powers.BossSuppressionPower),
+                    // 用户 2026-11-09：「拦掉原版的抽牌」—— 剧本手牌写死了，杂技/肾上腺素不再真抽
+                    BlocksVanillaDraw = true,
+                    // 进阶（用户 2026-11-09）：8 = 升级中和；9 = 升级背刺、钢铁风暴、隐秘匕首。
+                    // （升级是**按类型**的 ⇒ 剧本里所有同名牌一起升级。）
+                    AscensionUpgrades = new List<(int, Type)>
+                    {
+                        (8, typeof(Neutralize)),
+                        (9, typeof(Backstab)),
+                        (9, typeof(StormOfSteel)),
+                        (9, typeof(HiddenDaggers)),
+                    },
+                },
+            },
+        },
     };
 
     public static readonly BossDefinition Defect = new()

@@ -341,6 +341,17 @@ public sealed class BossDefinition
     /// <summary>这一幕是不是由某个「备选设计」接管（接管时主定义这一幕的进阶行不生效）。</summary>
     public bool VariantTakesOver(int act) => ActiveVariant(act) != null;
 
+    /// <summary>这一幕**实际生效**的「拦掉原版抽牌」开关（变体优先，没变体就看主定义）。</summary>
+    public bool BlocksVanillaDrawFor(int act)
+    {
+        try
+        {
+            var v = ActiveVariant(act);
+            return v != null ? v.BlocksVanillaDraw : BlocksVanillaDraw;
+        }
+        catch { return BlocksVanillaDraw; }
+    }
+
     /// <summary>
     /// 这一幕**变体自带的额外最大生命**（没有变体 / 变体没写就是 0）。
     /// 用户 2026-11-03：三层「事件机」因为带着「大蘑菇」+20（影子玩家收不到拾起钩子 ⇒ 手动加）。
@@ -393,6 +404,13 @@ public sealed class BossVariant
     public BossScript? Script { get; init; }
     public string? SpecialLoc { get; init; }
     public Type? SpecialPower { get; init; }
+    /// <summary>
+    /// 这套设计要不要**拦掉原版的抽牌**（ShadowBossNoDrawPatch）。默认 false = 跟主定义走。
+    /// 用户 2026-11-09 的「华丽猎」：剧本把手牌写死了，杂技/肾上腺素那些「抽 N 张」不该再从牌堆里
+    /// 抽进新牌（会把剧本手牌冲乱）⇒ 这一套单独打开。
+    /// </summary>
+    public bool BlocksVanillaDraw { get; init; }
+
     public List<Type>? Potions { get; init; }
     public int HealPerPotion { get; init; }
     public int PotionSlots { get; init; }

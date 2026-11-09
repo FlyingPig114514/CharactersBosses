@@ -703,6 +703,52 @@ public abstract partial class CharBossMonster : MonsterModel
         catch { /* 单个失败不影响其它 */ }
     }
 
+    /// <summary>
+    /// 这一张是不是剧本里标了「出手前先清空她的抽牌堆」的（`ScriptCard.EmptyDrawPileFirst`）。
+    /// 目前只有「华丽猎」第 9 回合的「华丽收场」（原版要求抽牌堆为空才能打出）。
+    /// </summary>
+    private bool ScriptCardWantsEmptyDrawPile(CardModel? card)
+    {
+        try
+        {
+            if (card == null) return false;
+            var turn = Def?.ScriptForAct(ActIndex)?.TurnAt(TurnNumber);
+            if (turn?.Cards == null) return false;
+            var type = card.GetType();
+            foreach (var sc in turn.Cards)
+            {
+                if (!sc.EmptyDrawPileFirst) continue;
+                if (sc.Card == type) return true;
+            }
+        }
+        catch { /* 忽略 */ }
+        return false;
+    }
+
+    /// <summary>把她自己的抽牌堆整堆挪进弃牌堆（为了让「华丽收场」满足「抽牌堆为空」）。</summary>
+    private void EmptyOwnDrawPile()
+    {
+        try
+        {
+            var pcs = Shadow?.PlayerCombatState;
+            if (pcs == null) return;
+            var draw = new List<CardModel>();
+            foreach (var c in pcs.DrawPile.Cards) if (c != null) draw.Add(c);
+            if (draw.Count == 0) return;
+            foreach (var c in draw)
+            {
+                try
+                {
+                    pcs.DrawPile.RemoveInternal(c, true);
+                    pcs.DiscardPile.AddInternal(c, -1, true);
+                }
+                catch { /* 单张失败不影响其它 */ }
+            }
+            Logger.Log($"[CharBoss] 华丽收场：先把她的抽牌堆清空（{draw.Count} 张进弃牌堆）⇒ 满足原版出牌条件");
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 清空抽牌堆失败: " + e.Message); }
+    }
+
     private async Task PlayPlannedCards(IReadOnlyList<Creature> targets)
     {
         // ★ v0.2.351：进这个方法的**第一行**就记日志 —— 事件机上「回合卡住」时，
@@ -1457,6 +1503,15 @@ public abstract partial class CharBossMonster : MonsterModel
         // 每次出牌前把「收窄选靶」的残留状态清干净（用户 2026-10-29 四人局实测：
         // 群蛇形态那套全局收窄会串到别人的牌上，播种因此只打了一个人）。
         try { CharacterBosses.Patches.HittableEnemiesSidePatch.ResetNarrowing(); } catch { /* 忽略 */ }
+
+        // ★ v0.2.519（华丽猎「华丽收场」）：原版这张牌要求**抽牌堆为空**才能打出，而我们的剧本手牌
+        //   是每回合新建的、抽牌堆里还留着开局灌进去的整副卡组 ⇒ 剧本标记了 `EmptyDrawPileFirst` 时
+        //   先把她自己的抽牌堆清空（都进弃牌堆），让这张牌真的打得出去。
+        try
+        {
+            if (ScriptCardWantsEmptyDrawPile(play.Card)) EmptyOwnDrawPile();
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 清空抽牌堆（华丽收场）失败: " + e.Message); }
 
         Logger.Log($"[CharBoss] PLAY {play.Card.Id.Entry} (cost {play.Cost}) self={GetType().Name}(side={SafeSide(Creature)}) -> {DescribePlayer(target)}" +
                    $"（hp={target.CurrentHp} side={SafeSide(target)}）");

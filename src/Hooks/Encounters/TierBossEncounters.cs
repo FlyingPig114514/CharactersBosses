@@ -264,6 +264,22 @@ public sealed class SilentBrewerBossEncounter : SilentBossEncounter
 }
 
 /// <summary>
+/// 第三幕「**华丽猎**」的固定档位版（用户 2026-11-09；三层静默猎人的**第三套设计**，
+/// 前两套是「刀猎」/「炼药猎」）。剧本 <c>Core/GrandFinaleSilentScript.cs</c>，
+/// 特殊效果「压制」= <c>Powers/BossSuppressionPower.cs</c>（她打出华丽收场 ⇒ 所有玩家抽牌堆顶塞虚空）。
+///
+/// 地图徽章：沿用同角色的 <c>silent_shiv</c>（刀猎那张）—— 本档位没有专属美术，
+/// 与炼药猎（<c>silent_poison</c>）区分开即可。
+/// 控制台：<c>fight SILENT_GRAND_FINALE_BOSS_ENCOUNTER</c>。
+/// </summary>
+public sealed class SilentGrandFinaleBossEncounter : SilentBossEncounter
+{
+    public override int? TierAct => 2;
+
+    public override string BossNodePath => "res://CharacterBosses/images/map/silent_shiv";
+}
+
+/// <summary>
 /// 二层「**蛇眼猎**」的固定档位版（用户 2026-11-03；二层静默猎手的**第二套设计**，第一套是「涂毒猎」）。
 /// 剧本 <c>Core/SnakeEyesSilentScript.cs</c>，特殊效果「计划妥当」= <c>Powers/BossWellLaidPlansPower.cs</c>。
 /// 异蛇之眼的费用随机被拦掉，改由剧本逐张写死（`ScriptCard.CostThisTurn`）。
