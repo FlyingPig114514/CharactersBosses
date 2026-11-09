@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.517 / 2026-11-09（金斧改数「我们一方」的牌：她自己 + 联机时的伙伴 Boss，玩家出的牌不算，预览同步；轰击储特殊效果描述改成用户给的三行版本，16 语言）";
+    public const string Tag = "v0.2.518 / 2026-11-09（意图的能力指纹把玩家身上的能力也算进来：玩家在回合内失去易伤/获得无实体等，Boss 的伤害预览会立刻跟着重算 —— 修养手骨奥斯提攻击牌预览不降）";
 
     private static bool _logged;
 

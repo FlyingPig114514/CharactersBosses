@@ -1055,6 +1055,26 @@ public static class BossFrameTick
             if (creature == null) return;
 
             var print = PowerPrintOf(creature);
+            // ★ v0.2.518（用户 2026-11-09：「玩家在回合内失去易伤（崩坠里有卡牌能减少负面层数）时，
+            //   养手骨的奥斯提攻击牌伤害预览不会跟着降」）：
+            //   以前指纹只含**她自己**的能力 ⇒ 玩家身上的易伤/无实体等「影响她打出伤害」的东西变了
+            //   不会触发重算，意图就停在旧值。现在把每个真人玩家的能力（id+层数）也拼进指纹。
+            try
+            {
+                var combat = boss.CombatState;
+                var players = CharacterBosses.Core.BossLockOn.RealPlayers(combat);
+                if (players != null)
+                {
+                    foreach (var p in players)
+                    {
+                        var pc = p?.Creature;
+                        if (pc == null) continue;
+                        print += "|P" + (p!.NetId) + ":" + PowerPrintOf(pc);
+                    }
+                }
+            }
+            catch { /* 拿不到玩家就只比她自己 */ }
+
             if (!LastPowerPrint.TryGetValue(boss, out var last))
             {
                 LastPowerPrint[boss] = print;      // 第一次见到这只：只记基线
