@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.531 / 2026-11-09（修「炼药猎的尖啸给自己减力量」：`CardCmd.AutoPlay` 的「真人玩家出牌登记」有分支不会派发 AfterCardPlayed ⇒ 登记残留（实测 4 条、最近 8.7s 前）⇒ 她打群攻牌时 `HittableEnemies` 走原版语义（= 怪物侧 = 她自己）。现在①每条登记各自 3 秒过期、②她**开始出牌那一刻**清掉残留登记、③翻侧状态日志补上「玩家效果深度」与「最新自动登记多久前」。顺带把「药水命中列表」的诊断挪到强制翻侧之后（以前打印的是翻侧前的原版语义，看着像药水打到她自己））";
+    public const string Tag = "v0.2.532 / 2026-11-09（修「灵魂骨第一回合打出切断」：`CardCmd.AutoPlay` 不扣费 ⇒ 打完牌 `pcs.Energy` 仍是满的，而「回合中又拿到资源 → 按剧本补打」会在回合中途重跑剧本规划、已打出的牌因「不在手牌」被跳过且费用不记账 ⇒ 等于把预算退还 ⇒ 第一回合凭空多打 切断(2)+防御(1)。现在新增 `CharBossMonster.ScriptEnergySpent`（`PlayOne` 逐张累加、`PrepareTurn` 清零），补打时预算 = 当前能量 − 本回合已花；真正中途到账的能量照样算得进来）";
 
     private static bool _logged;
 

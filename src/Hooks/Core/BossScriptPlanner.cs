@@ -18,7 +18,7 @@ namespace CharacterBosses.Core;
 public static class BossScriptPlanner
 {
     public static List<PlannedPlay> Plan(CharBossMonster boss, PlayerCombatState pcs,
-                                         BossTurn turn, int turnNumber)
+                                         BossTurn turn, int turnNumber, int spentThisTurn = 0)
     {
         // ★ 2026-11-05（状态机）：本回合到目前为止「她生成的状态牌张数」与「已打出的技能牌数」，
         //   用来把烟囱 / 开信刀的伤害挂到**触发它的那张牌**底下，并让散射炮算上本回合将生成的状态牌。
@@ -38,7 +38,17 @@ public static class BossScriptPlanner
         int smStackThisTurn = smStack;
         int loDamage = Core.StatusBossMath.LetterOpenerDamage(boss);
         var result = new List<PlannedPlay>();
-        int energy = pcs.Energy;
+        // ★★ v0.2.532（玩家 2026-11-09：「灵魂骨第一回合会打切断，可她那会儿还没打出自动化、费用根本不够」）：
+        //   `CardCmd.AutoPlay` **不扣费** ⇒ 她打完牌之后 `pcs.Energy` 一直是「本回合的总能量」原值。
+        //   而「回合中又拿到资源 → 按剧本补打」会在**回合中途**再跑一次本函数：
+        //   已经打出去的牌因为「不在手牌」被跳过、**不记这笔记账** ⇒ 它们的费用等于被退还
+        //   ⇒ 剩下的 切断(2)/防御(1) 在新预算里都「打得起了」，于是第一回合凭空多打两张。
+        //   实测日志（`mod_log.txt` 125461–125463 行）：
+        //     [14:45:21] 剧本第 1 回合: 打 [SEVERANCE,DEFEND_NECROBINDER] 跳过 [Delay(不在手牌),Automation(不在手牌),Dirge(不在手牌)] 余费=0
+        //     [14:45:21] 回合中又拿到资源 → 按剧本补打： [SEVERANCE,DEFEND_NECROBINDER]（余费 3）   ← 3 是**没扣过**的总能量
+        //   修法：补打时把「本回合已经花掉的能量」从预算里扣掉（`spentThisTurn`，由
+        //   `CharBossMonster.ScriptEnergySpent` 逐张累加）。真正中途到账的能量照样算得进来。
+        int energy = Math.Max(0, pcs.Energy - Math.Max(0, spentThisTurn));
         int energyAtStart = energy;      // 螺旋钻击的段数 = 本回合已花费的能量之和（见下面的 HELIX_DRILL）
         // ⚠ 规划发生在**玩家回合**，而「下回合辉星」（StarNextTurnPower）要到他回合开始才到账
         // ⇒ 规划期的星预算必须把这笔算进来，否则第 8 回合的「七星（7 星）」会被判成星不够而不打

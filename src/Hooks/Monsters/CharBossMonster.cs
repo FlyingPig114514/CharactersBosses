@@ -985,12 +985,17 @@ public abstract partial class CharBossMonster : MonsterModel
             if (honorLeftoverReplay && scriptedTurn != null && !Creature.IsDead
                 && pcs.Hand.Cards.Count > 0 && pcs.Energy > 0)
             {
-                var extra = Core.BossScriptPlanner.Plan(this, pcs, scriptedTurn, TurnNumber);
+                // ★ v0.2.532：把「本回合已经花掉的能量」扣掉再重算 —— `CardCmd.AutoPlay` 不扣费，
+                //   而已经打出去的牌又「不在手牌」⇒ 不扣的话它们的费用等于被退还，
+                //   第一回合就会凭空多打出「切断」+「防御」（玩家 2026-11-09 报的就是这个）。
+                var extra = Core.BossScriptPlanner.Plan(this, pcs, scriptedTurn, TurnNumber, ScriptEnergySpent);
                 if (extra.Count > 0)
                 {
                     Logger.Log($"[CharBoss] 回合中又拿到资源 → 按剧本补打" +
                                $"{(act3Turn3 ? "（三层第 3 回合：没费的牌有费就打）" : string.Empty)}： " +
-                               $"[{string.Join(",", extra.ConvertAll(x => x.Card.Id.Entry))}]（余费 {pcs.Energy}）");
+                               $"[{string.Join(",", extra.ConvertAll(x => x.Card.Id.Entry))}]" +
+                               $"（当前能量 {pcs.Energy} − 本回合已花 {ScriptEnergySpent} = " +
+                               $"{Math.Max(0, pcs.Energy - ScriptEnergySpent)}）");
                     foreach (var extraPlay in extra)
                     {
                         if (Creature.IsDead) break;
@@ -1349,6 +1354,17 @@ public abstract partial class CharBossMonster : MonsterModel
     /// <summary>
     /// 打出一张计划里的牌（主循环与小刀子循环共用）。
     /// </summary>
+    /// <summary>
+    /// **本回合她已经「花掉」多少能量**（`PlayOne` 每打一张就按 `play.Cost` 累加，`PrepareTurn` 清零）。
+    ///
+    /// ★ v0.2.532（玩家 2026-11-09：「灵魂骨第一回合会打切断，可她那会儿还没打出自动化、费用不够」）：
+    ///   `CardCmd.AutoPlay` 不走原版的扣费流程 ⇒ 打完牌之后 `pcs.Energy` 仍然是本回合的总能量。
+    ///   而「回合中又拿到资源 → 按剧本补打」会在回合中途重跑一次剧本规划，
+    ///   那些**已经打出去**的牌因为「不在手牌」被跳过、费用也就没被扣 ⇒ 等于把预算退回来，
+    ///   于是后面的牌凭空变得「费够」。这个计数器就是用来把那笔预算补扣回去的。
+    /// </summary>
+    internal int ScriptEnergySpent;
+
     private async Task PlayOne(PlayerChoiceContext ctx, PlayerCombatState pcs, PlannedPlay play)
     {
         // 告诉自动选择器「现在是谁的回合」——它按 (Boss, 回合号) 取「点名要丢的牌」，
@@ -1377,6 +1393,11 @@ public abstract partial class CharBossMonster : MonsterModel
             if (await Core.HellraiserPlays.TryPlayAsync(this, pcs, ctx, play.Card)) return;
         }
         catch (Exception e) { Logger.Log("[CharBoss] 地狱狂徒通道异常（退回普通出牌）: " + e.Message); }
+
+        // ★ v0.2.532：记账 —— 这张牌「花了她多少能量」。`CardCmd.AutoPlay` 不扣费，
+        //   所以「回合中又拿到资源 → 按剧本补打」重算预算时必须靠这个数把已花的部分扣回去
+        //   （否则第一回合会凭空多打出「切断」+「防御」，见 `ScriptEnergySpent` 的注释）。
+        try { ScriptEnergySpent += Math.Max(0, play.Cost); } catch { /* 忽略 */ }
 
         // ★ v0.2.501（用户 2026-11-08）：「令逃脱计划一定会抽到技能牌，每次她打出它都会获得对应格挡」
         //   原版 EscapePlan = 「抽 1 张；若是技能牌则获得格挡」⇒ 先往她抽牌堆顶放一张「防御」（技能），

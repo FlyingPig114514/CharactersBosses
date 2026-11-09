@@ -106,6 +106,7 @@ public abstract partial class CharBossMonster
             PlannedStrengthGainedThisTurn = 0;
             PendingReturnStrength = 0;     // 「一心化万」的待结算力量池：每回合从 0 起
             PotionsDrunkThisTurn = 0;      // 本回合还没喝药（爬行动物饰品的力量预补要用，见 BladesGrowth）
+            ScriptEnergySpent = 0;         // ★ v0.2.532：本回合「已花能量」从 0 起（补打重算预算要用）
             var script = Def.ScriptForAct(ActIndex);
             var scriptedTurn = script?.TurnAt(TurnNumber);
 

@@ -4829,3 +4829,11 @@ Chronological action log.
 | 2026-11-09 19:33 | edit | `src/Hooks/Monsters/CharBossMonster.cs` | ok | 0 |
 | 2026-11-09 19:33 | edit | `src/Hooks/Patches/CombatSidePatches.cs` | ok | 0 |
 | 2026-11-09 19:33 | edit | `src/CharacterBosses.json` | ok | 0 |
+| 2026-11-09 19:33 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-09 19:36 | edit | `src/Hooks/Core/BossScriptPlanner.cs` | ok | 0 |
+| 2026-11-09 19:36 | edit | `src/Hooks/Core/BossScriptPlanner.cs` | ok | 0 |
+| 2026-11-09 19:36 | edit | `src/Hooks/Monsters/CharBossMonster.cs` | ok | 0 |
+| 2026-11-09 19:36 | edit | `src/Hooks/Monsters/CharBossMonster.cs` | ok | 0 |
+| 2026-11-09 19:36 | edit | `src/Hooks/Monsters/CharBossMonster.Turn.cs` | ok | 0 |
+| 2026-11-09 19:36 | edit | `src/Hooks/Monsters/CharBossMonster.cs` | ok | 0 |
+| 2026-11-09 19:36 | edit | `src/CharacterBosses.json` | ok | 0 |
