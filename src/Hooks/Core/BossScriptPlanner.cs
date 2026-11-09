@@ -246,6 +246,22 @@ public static class BossScriptPlanner
                         StarCost = 0,
                         Intents = slyIntents,
                     });
+
+                    // ★ v0.2.520（用户 2026-11-09：「注意肾上腺素和战术大师都会给费」）：
+                    //   奇巧牌被丢弃时**会免费打出**，它给的能量/辉星也得记账 ——
+                    //   否则后面的牌会被误判成「费不够」而跳过（华丽猎第 2 回合的夜魇+ / 第 8 回合的谋杀）。
+                    try
+                    {
+                        int gained = Math.Max(0, (int)Math.Round(ReadVar(card, "Energy")));
+                        if (gained > 0)
+                        {
+                            energy += gained;
+                            Logger.Log($"[CharBoss] 规划：{card.Id.Entry}（奇巧，被丢弃后自动打出）+{gained} 能量");
+                        }
+                        stars += Math.Max(0, (int)Math.Round(ReadVar(card, "Stars")));
+                        stars += Math.Max(0, (int)Math.Round(ReadVar(card, "Star")));
+                    }
+                    catch { /* 忽略 */ }
                 }
                 skipped.Add(card.Id.Entry + (sly ? "(被丢弃 → 奇巧自动打出)" : "(被丢弃)"));
                 continue;

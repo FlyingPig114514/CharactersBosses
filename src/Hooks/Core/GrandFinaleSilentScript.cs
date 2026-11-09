@@ -63,7 +63,10 @@ public static class GrandFinaleSilentScript
                     C<MementoMori>(),
                     Kept<DefendSilent>(), Kept<GrandFinale>(),
                 },
-                Energy = 4,
+                // 用户 2026-11-09：「注意肾上腺素和战术大师都会给费」
+                //   ⇒ 起手只给 2 费：肾上腺素(+1) 打完就有 3，杂技丢掉战术大师(奇巧 +1) 再 +1，
+                //     够 夜魇+(2) + 杂技(1) + 铭记死亡(1)。
+                Energy = 2,
                 PickOrder = new List<Type> { typeof(Acrobatics) },   // 夜魇复制的就是「杂技」
             },
 
@@ -145,7 +148,8 @@ public static class GrandFinaleSilentScript
                     Discard<Survivor>(),
                     Kept<DefendSilent>(), Kept<StrikeSilent>(),
                 },
-                Energy = 4,
+                // 杂技(1) + 谋杀(3) + 偏折(0)，其中战术大师被杂技丢掉时（奇巧）回 1 费 ⇒ 起手 3 费够。
+                Energy = 3,
             },
 
             // 9：杂技（弃防御）、铭记死亡、中和、防御、华丽收场、打击（被必备工具丢弃）、

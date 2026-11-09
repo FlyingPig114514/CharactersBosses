@@ -605,6 +605,11 @@ internal static class BossLineups
             {
                 if (entry == "SILENT_BREWER_BOSS_ENCOUNTER") return (true, true);
                 if (entry == "SILENT_SHIV_BOSS_ENCOUNTER") return (false, true);
+                // ★ v0.2.520（用户 2026-11-09：ight SILENT_GRAND_FINALE_BOSS_ENCOUNTER 打成了炼药猎）：
+                //   炼药猎是 VariantsByAct[2]，**先于** ExtraVariants[2]（华丽猎）被问到；
+                //   以前它遇到新遭遇时 ①② 都不命中，就落到 ③ 按种子随机 ⇒ 一半概率抢走这一场。
+                //   现在把新遭遇显式判否，控制台点名就一定是华丽猎。
+                if (entry == "SILENT_GRAND_FINALE_BOSS_ENCOUNTER") return (false, true);
             }
         }
         catch { /* 继续往下判断 */ }

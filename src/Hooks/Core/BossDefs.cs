@@ -375,6 +375,8 @@ public static class BossDefs
                     SpecialPower = typeof(Powers.BossSuppressionPower),
                     // 用户 2026-11-09：「拦掉原版的抽牌」—— 剧本手牌写死了，杂技/肾上腺素不再真抽
                     BlocksVanillaDraw = true,
+                    // 用户 2026-11-09：「拦掉夜魇印牌，因为印的杂技我都在剧本里写好了」
+                    BlocksNightmareClones = true,
                     // 进阶（用户 2026-11-09）：8 = 升级中和；9 = 升级背刺、钢铁风暴、隐秘匕首。
                     // （升级是**按类型**的 ⇒ 剧本里所有同名牌一起升级。）
                     AscensionUpgrades = new List<(int, Type)>

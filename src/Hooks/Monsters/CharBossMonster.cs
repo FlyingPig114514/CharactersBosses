@@ -554,9 +554,22 @@ public abstract partial class CharBossMonster : MonsterModel
             var power = Creature?.GetPower<MegaCrit.Sts2.Core.Models.Powers.NightmarePower>();
             if (power == null || Shadow == null) return;
 
+            // ★ v0.2.520（用户 2026-11-09：「拦掉夜魇印牌，因为印的杂技我都在剧本里写好了」）：
+            //   「华丽猎」这一套的剧本已经把复制品写在后面几回合了 ⇒ 这里**只把 power 移除**，
+            //   不再凭空往手牌里塞 N 张复制（否则手牌里会多出一份，剧本的点名就对不上了）。
+            bool noClones = false;
+            try { noClones = Def?.BlocksNightmareClonesFor(ActIndex) == true; } catch { noClones = false; }
+
             int amount = 0;
             try { amount = (int)power.Amount; } catch { amount = 0; }
             MegaCrit.Sts2.Core.Models.CardModel? selected = SelectedCardOf(power, Shadow);
+
+            if (noClones)
+            {
+                Logger.Log("[CharBoss] 夜魇：这套设计拦掉复制印牌（复制品已写在剧本里）⇒ 只移除这层 power");
+                await PowerCmd.Remove(power);
+                return;
+            }
 
             if (selected != null && amount > 0)
             {
