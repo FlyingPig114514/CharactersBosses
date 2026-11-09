@@ -188,21 +188,48 @@ internal static class BossLineups
         {
             if (Cache.TryGetValue(key, out var cached)) return cached;
 
-            string[] result;
-            try { result = Build(act, fight); }
-            catch (Exception e)
+            // ★★ v0.2.515（用户 2026-11-09「进战斗的时候游戏怎么崩了？」—— 日志尾部几千行
+            //   `第 3 层第 2 场主 Boss = …` 刷屏）：
+            //   **重入会无限递归**。链路：`For(act,1)` → `Build` → ⑥ `SyncedMainCharacter` 读
+            //   `act.SecondBossEncounter` → 那个 getter 被我们自己的 `SecondBossEncounterGetPatch`
+            //   改成「按当前版本重算」→ `ForVanillaBoss` → 又回到 `BossLineups.For(act,1)`；
+            //   此时缓存还没写（Build 没返回）⇒ 再一次 Build ⇒ 递归到栈溢出、日志被刷爆、游戏崩。
+            //   这里加**重入保护**：同一 (幕, 场) 已在计算中就直接返回固定表（只影响这一次嵌套调用）。
+            if (!Computing.Add((act, fight)))
             {
-                Logger.Log("[CharBoss] 阵容随机失败，退回固定表: " + e.Message);
-                result = Fallback(act);
+                if (_reentryLogged.Add((act, fight)))
+                {
+                    Logger.Log($"[CharBoss] 阵容重入保护：第 {act + 1} 层第 {fight + 1} 场正在计算中" +
+                               "（触发源：`SecondBossEncounter` 读取兜底回调）⇒ 本次返回固定表，避免无限递归");
+                }
+                return Fallback(act);
             }
-            if (Cache.Count > 64) Cache.Clear();      // 长期在同一进程里反复开局别把字典撑爆
-            Cache[key] = result;
-            Logger.Log($"[CharBoss] 第 {act + 1} 层第 {fight + 1} 场阵容：" +
-                       $"（{PlayerCount()} 人局，进阶 {Ascension()}，种子 {CurrentSeed()}，指纹 {FingerprintOf(result)}）" +
-                       $"[{string.Join(" | ", System.Array.ConvertAll(result, k => BossKeys.LabelOf(k)))}]");
-            return result;
+
+            try
+            {
+                string[] result;
+                try { result = Build(act, fight); }
+                catch (Exception e)
+                {
+                    Logger.Log("[CharBoss] 阵容随机失败，退回固定表: " + e.Message);
+                    result = Fallback(act);
+                }
+                if (Cache.Count > 64) Cache.Clear();      // 长期在同一进程里反复开局别把字典撑爆
+                Cache[key] = result;
+                Logger.Log($"[CharBoss] 第 {act + 1} 层第 {fight + 1} 场阵容：" +
+                           $"（{PlayerCount()} 人局，进阶 {Ascension()}，种子 {CurrentSeed()}，指纹 {FingerprintOf(result)}）" +
+                           $"[{string.Join(" | ", System.Array.ConvertAll(result, k => BossKeys.LabelOf(k)))}]");
+                return result;
+            }
+            finally { Computing.Remove((act, fight)); }
         }
     }
+
+    /// <summary>正在计算中的 (幕, 场) —— 重入保护用（见 <see cref="For"/>）。</summary>
+    private static readonly HashSet<(int Act, int Fight)> Computing = new();
+
+    /// <summary>重入保护日志每个 (幕, 场) 只打一次。</summary>
+    private static readonly HashSet<(int Act, int Fight)> _reentryLogged = new();
 
     /// <summary>
     /// 阵容的**短指纹**（只用于联机对表）：两台机器的这一行必须完全一样。
@@ -399,11 +426,51 @@ internal static class BossLineups
         {
             var actModel = MultiBossPlan.RunStateOrNull()?.Act;
             if (actModel == null) return fallback;
-            var encounter = fight <= 0 ? actModel.BossEncounter : actModel.SecondBossEncounter;
+            // ★★ v0.2.515：这里**必须读存档里的原值**，不能走 `actModel.SecondBossEncounter` ——
+            //   那个 getter 被 `SecondBossEncounterGetPatch` 改成了「按当前版本重算」，
+            //   而重算会回来调 `For(act, 1)`，我们正处在 `Build(act,1)` 里面 ⇒ 无限递归（崩溃）。
+            //   原值在 `act._rooms.Boss / .SecondBoss`（反射读，见 `RawBossEncounters`）。
+            var (rawBoss, rawSecond) = RawBossEncounters(actModel);
+            var encounter = fight <= 0
+                ? (rawBoss ?? actModel.BossEncounter)
+                : (rawSecond ?? actModel.SecondBossEncounter);
             int ch = BossKeys.CharacterOf(BossKeys.KeyOfEncounter(encounter));
             return ch >= 0 ? ch : fallback;
         }
         catch { return fallback; }
+    }
+
+    private static System.Reflection.FieldInfo? _roomsField2;
+    private static System.Reflection.PropertyInfo? _roomBossProp;
+    private static System.Reflection.PropertyInfo? _roomSecondProp;
+    private static bool _roomsSearched2;
+
+    /// <summary>反射读 `act._rooms.Boss / .SecondBoss`（**绕过**我们自己的 getter 补丁）。</summary>
+    private static (MegaCrit.Sts2.Core.Models.EncounterModel? Boss,
+                    MegaCrit.Sts2.Core.Models.EncounterModel? Second) RawBossEncounters(
+                    MegaCrit.Sts2.Core.Models.ActModel act)
+    {
+        try
+        {
+            if (!_roomsSearched2)
+            {
+                _roomsSearched2 = true;
+                const System.Reflection.BindingFlags flags = System.Reflection.BindingFlags.Instance
+                    | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+                _roomsField2 = typeof(MegaCrit.Sts2.Core.Models.ActModel).GetField("_rooms", flags);
+                var roomSet = typeof(MegaCrit.Sts2.Core.Rooms.RoomSet);
+                _roomBossProp = roomSet.GetProperty("Boss", flags);
+                _roomSecondProp = roomSet.GetProperty("SecondBoss", flags);
+                if (_roomsField2 == null || _roomBossProp == null || _roomSecondProp == null)
+                    Logger.Log("[CharBoss] 读不到 RoomSet.Boss/SecondBoss（阵容主角色改用补丁后的 getter，已加重入保护）");
+            }
+            if (_roomsField2 == null || _roomBossProp == null || _roomSecondProp == null) return (null, null);
+            var rooms = _roomsField2.GetValue(act);
+            if (rooms == null) return (null, null);
+            return (_roomBossProp.GetValue(rooms) as MegaCrit.Sts2.Core.Models.EncounterModel,
+                    _roomSecondProp.GetValue(rooms) as MegaCrit.Sts2.Core.Models.EncounterModel);
+        }
+        catch { return (null, null); }
     }
     /// <summary>Key 的确定性排序权重（同种子下固定）。</summary>
     private static ulong RankOf(int act, int fight, string key)
