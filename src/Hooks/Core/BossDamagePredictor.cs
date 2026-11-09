@@ -1219,10 +1219,7 @@ public static class BossDamagePredictor
     public static int GoldAxeDamage(CardModel card, int pendingPlays)
     {
         int finished = 0;
-        try
-        {
-            foreach (var _ in MegaCrit.Sts2.Core.Combat.CombatManager.Instance.History.CardPlaysFinished) finished++;
-        }
+        try { finished = CountOwnerPlays(card?.Owner?.Creature); }
         catch (Exception e)
         {
             Logger.Log("[CharBoss] 金斧：读战斗历史失败（退回牌面值）: " + e.Message);
@@ -1234,5 +1231,69 @@ public static class BossDamagePredictor
         if (perCard <= 0) perCard = 1;
 
         return Math.Max(0, finished + Math.Max(0, pendingPlays)) * perCard;
+    }
+
+    /// <summary>
+    /// 数「**这一位**打完了多少张牌」（`CardPlaysFinished` 里 `Actor` 是他的那些）。
+    ///
+    /// ★ v0.2.516（用户 2026-11-09：「bug：轰击储的金斧把玩家出牌也算上了」）：
+    ///   原版 `GoldAxe` 的倍率是 `CardPlaysFinished.Count()` —— **全场**的牌都算（玩家打的也算）。
+    ///   这只 Boss 按设计只该数**她自己**的牌 ⇒ 预览与真实伤害都改成只数她的。
+    /// </summary>
+    internal static int CountOwnerPlays(Creature? owner)
+    {
+        if (owner == null) return 0;
+        int n = 0;
+        try
+        {
+            foreach (var e in MegaCrit.Sts2.Core.Combat.CombatManager.Instance.History.CardPlaysFinished)
+            {
+                if (e == null) continue;
+                try { if (ReferenceEquals(e.Actor, owner)) n++; }
+                catch { /* 单条读不到就跳过 */ }
+            }
+        }
+        catch { /* 拿不到历史 */ }
+        return n;
+    }
+
+    private static readonly Func<CardModel, Creature?, decimal> OwnerPlaysOnlyMultiplier
+        = (card, _) => CountOwnerPlays(card?.Owner?.Creature);
+
+    private static System.Reflection.FieldInfo? _multiplierField;
+    private static bool _multiplierSearched;
+
+    /// <summary>
+    /// 把这一张「金斧」的**倍率函数**换成「只数持有者自己的牌」。
+    ///
+    /// 反编译依据：`CalculatedVar.WithMultiplier(Func&lt;CardModel, Creature?, decimal&gt;)` 把回调存进
+    /// 私有字段 `_multiplierCalc`；`CalculatedDamageVar` 在预览/结算时都调它
+    /// （`IsInProgress` 才调，否则 0）。所以只要把**这一张实例**的回调换掉，
+    /// 卡面数字、意图预览、真正打出去的伤害三者就同时变成「只数她的牌」。
+    /// ⚠ 只改我们自己造的这张卡实例（`BuildHand` 里每回合新建）⇒ 玩家的金斧一个字都不动。
+    /// </summary>
+    internal static void MakeGoldAxeCountOwnerOnly(CardModel? card)
+    {
+        try
+        {
+            if (card == null) return;
+            if (!_multiplierSearched)
+            {
+                _multiplierSearched = true;
+                _multiplierField = typeof(MegaCrit.Sts2.Core.Localization.DynamicVars.CalculatedVar)
+                    .GetField("_multiplierCalc", System.Reflection.BindingFlags.Instance
+                                                | System.Reflection.BindingFlags.NonPublic);
+                if (_multiplierField == null)
+                    Logger.Log("[CharBoss] 金斧：读不到 CalculatedVar._multiplierCalc（预览仍按我们的算法，卡面沿用原版全场计数）");
+            }
+            if (_multiplierField == null) return;
+            if (!card.DynamicVars.TryGetValue("CalculatedDamage", out var dmg) || dmg == null) return;
+            _multiplierField.SetValue(dmg, OwnerPlaysOnlyMultiplier);
+            Logger.Log("[CharBoss] 金斧：倍率改成「只数她自己打完的牌」");
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 金斧倍率改写失败（退回原版全场计数）: " + e.Message);
+        }
     }
 }

@@ -266,10 +266,12 @@ public static class BossIntentBuilder
         }
 
         // ★ v0.2.388（用户 2026-11-05：「金斧的预览还是偏低，是不是没考虑他的轰击？或者力量？」）：
-        //   「金斧」的伤害 = （Base 0 + Extra 1）× **本场战斗已打完的牌数**（反编译见
-        //   <see cref="BossDamagePredictor.GoldAxeDamage"/>）—— 全场都算：玩家打的、她打的、
-        //   消耗牌堆里每回合复燃的「轰击」也算。而意图是在**玩家回合开始**算的，
-        //   那时玩家这回合的牌一张都还没打 ⇒ 牌面上的缓存值天然偏低。
+        //   「金斧」的伤害 = （Base 0 + Extra 1）× **她本场战斗已打完的牌数**
+        //   （反编译见 <see cref="BossDamagePredictor.GoldAxeDamage"/>）。
+        //   ★ v0.2.516 改口径（用户 2026-11-09：「bug：轰击储的金斧把玩家出牌也算上了」）：
+        //   原版倍率数的是 `CardPlaysFinished.Count()`（**全场**，玩家的牌也算），
+        //   现在只数**她自己**打完的牌（消耗堆里每回合复燃的「轰击」仍然算她的牌）。
+        //   意图是在**玩家回合开始**算的，那时她本回合的牌一张都还没打 ⇒ 牌面缓存值天然偏低。
         //   ⇒ 这条意图改成**每帧现算**（`LiveDelegateSingleAttackIntent`），基础值直接数战斗历史，
         //   再把本回合排在她前面、还没打出去的牌补上（规划期由 `BossScriptPlanner` 传
         //   `playsBeforeThisTurn`，出牌期按 `Plan` 剩余顺序数）。力量/虚弱/易伤仍由

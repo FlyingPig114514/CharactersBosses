@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.515 / 2026-11-09（修崩溃：三层第二场阵容计算读 SecondBossEncounter 时被我们自己的读取兜底补丁回调 ⇒ 无限递归把日志刷爆并崩溃；现在读存档原值 + 加重入保护）";
+    public const string Tag = "v0.2.516 / 2026-11-09（轰击储的金斧只数她自己打完的牌，不再把玩家出的牌算进去：卡面倍率、意图预览、真实伤害三处一致）";
 
     private static bool _logged;
 

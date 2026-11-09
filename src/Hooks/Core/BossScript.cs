@@ -771,6 +771,13 @@ public static class BossScriptRunner
                 // 完美打击：**不再接管数值**（用户 2026-11-02：卡面被改成「每有 1 张打击伤害 +0」）——
                 // 改成上面 PurgeStaleStrikeCards 修牌堆计数，原版公式与文案原样保留。
                 try { TakeOverPerfectedStrike(card, cardBoss); } catch { /* 忽略 */ }
+                // ★ v0.2.516（用户 2026-11-09：「轰击储的金斧把玩家出牌也算上了」）：
+                //   原版金斧的倍率是「本场战斗**所有人**打完的牌数」；这只 Boss 按设计只数她自己打的。
+                //   把这一张实例的倍率回调换掉 ⇒ 卡面、意图预览、真实伤害三处同时正确。
+                if (SafeEntryOf(card) == "GOLD_AXE")
+                {
+                    try { BossDamagePredictor.MakeGoldAxeCountOwnerOnly(card); } catch { /* 忽略 */ }
+                }
                 // 「燃烧契约」（二层杂耍战）：杂耍的复制牌自带「虚无 + 消耗」
                 if (entry.JugglingCopy)
                 {
