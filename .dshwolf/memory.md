@@ -4980,3 +4980,16 @@ Chronological action log.
 | 2026-11-10 14:10 | edit | `src/Hooks/UI/BossStatusRow.cs` | ok | 0 |
 | 2026-11-10 14:10 | edit | `src/Hooks/UI/BossStatusRow.cs` | ok | 0 |
 | 2026-11-10 14:11 | edit | `src/Hooks/UI/BossStatusRow.cs` | ok | 0 |
+| 2026-11-10 20:44 | write | `src/Hooks/Core/FleshBoneScript.cs` | ok | 0 |
+| 2026-11-10 20:46 | write | `src/Hooks/Core/FleshBone.cs` | ok | 0 |
+| 2026-11-10 20:46 | write | `src/Hooks/Powers/BossDevourLifePower.cs` | ok | 0 |
+| 2026-11-10 20:46 | write | `src/Hooks/Patches/SleightOfFleshBossPatch.cs` | ok | 0 |
+| 2026-11-10 20:47 | edit | `src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-10 20:47 | edit | `src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-10 20:47 | edit | `src/Hooks/UI/BossHandPanel.Extra.cs` | ok | 0 |
+| 2026-11-10 20:48 | edit | `src/Hooks/Core/BossDefs.cs` | ok | 0 |
+| 2026-11-10 20:48 | edit | `src/Hooks/Core/BossLineups.cs` | ok | 0 |
+| 2026-11-10 20:48 | edit | `src/Hooks/Monsters/TierBossMonsters.Act1.cs` | error | 0 |
+| 2026-11-10 20:48 | edit | `src/Hooks/Monsters/TierBossMonsters.Act1.cs` | ok | 0 |
+| 2026-11-10 20:48 | edit | `src/Hooks/Encounters/TierBossEncounters.cs` | ok | 0 |
+| 2026-11-10 20:57 | write | `docs/plans/boss-necrobinder-flesh.md` | ok | 0 |

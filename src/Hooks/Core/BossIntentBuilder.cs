@@ -879,6 +879,27 @@ public static class BossIntentBuilder
         if (hasDebuff) intents.Add(new DebuffIntent(false));
         if (hasSacrifice) intents.Add(new SacrificeIntent());   // 付出代价换强力效果（蓝色向下箭头）
 
+        // ★ 2026-11-10（用户「血肉骨」需求）：「要在会给予负面效果的牌的意图中加上血肉戏法的 9 点伤害」。
+        //   「血肉戏法」（`SleightOfFleshPower`）是她身上那层能力：她**每给目标上一个负面**就对那个目标
+        //   造成 `Amount` 点**无来源伤害**（反编译是 `ValueProp.Unpowered`）⇒ 意图必须补上这一笔，
+        //   否则玩家会少算 9 点。用 Raw 意图：无来源伤害不吃她的力量、也不吃目标的易伤。
+        //   ⚠ 数值可能要等这张牌**先打出「血肉戏法」**才上身 ⇒ `FleshBone.SleightPerHit` 会去 Plan 里
+        //     找排在这张之前的「血肉戏法」卡面值（规划期也能算对）。
+        if (hasDebuff)
+        {
+            try
+            {
+                var sleightBoss = card.Owner?.Creature?.Monster as Monsters.CharBossMonster;
+                int sleight = Core.FleshBone.SleightPerHit(sleightBoss, card);
+                if (sleight > 0)
+                {
+                    intents.Add(new RawAttackIntent(sleight));
+                    Logger.Log($"[CharBoss] 血肉戏法意图：{entry} 会给负面 ⇒ 额外 +{sleight}（无来源）");
+                }
+            }
+            catch { /* 算不出来就不加 */ }
+        }
+
         // 抽牌 / 回能量 / 回星 / 治疗 这类「对自己有利」的效果算强化
         // （小刀牌的 <c>Cards</c> 变量是"塞几把刀"，不是抽牌 → 排除，否则会多一个抽牌意图）
         // 「疯狂科学」恒定要一条强化（Chaos rider = 往手里塞一张牌、还能免费打出）。
@@ -888,6 +909,44 @@ public static class BossIntentBuilder
                            || Var(card, "MaxHp", 0) > 0 || hasBuff
                            || BuffVarCards.Contains(entry)));
         if (selfBenefit) intents.Add(new BuffIntent());
+
+        // ★ 2026-11-10（用户「血肉骨」需求）：「多人时，苦难会将被锁定玩家身上的 buff 传给其他玩家，
+        //   此时要在其他玩家的意图中提前显示会收到的血肉戏法的伤害（取决于被她锁定的玩家身上的负面
+        //   效果种类多少）」。
+        //   反编译 `Misery`：先按 `TypeForCurrentAmount == Debuff` 把**目标身上**的负面逐种克隆，
+        //   再对 `CombatState.HittableEnemies`（她视角 = 所有玩家，不含原目标）逐种 `PowerCmd.Apply`
+        //   ⇒ 每复制一种，她身上的血肉戏法就打那个玩家一次 ⇒ 其他玩家各挨 `Amount × 种类数`。
+        //   所以这里用「每帧现算」的委托意图：被锁定的那位本地玩家不显示（他只挨牌面的 7 点），
+        //   其他玩家各自显示 `血肉戏法 × 种类数`。
+        if (string.Equals(entry, "MISERY", StringComparison.Ordinal))
+        {
+            try
+            {
+                var miseryBoss = card.Owner?.Creature?.Monster as Monsters.CharBossMonster;
+                if (miseryBoss != null && Core.MultiplayerCardSwap.IsMultiplayer(miseryBoss))
+                {
+                    int per = Core.FleshBone.SleightPerHit(miseryBoss, card);
+                    if (per > 0)
+                    {
+                        intents.Add(new LiveDelegateSingleAttackIntent((targets, _) =>
+                        {
+                            try
+                            {
+                                var local = FirstPlayerTarget(targets);
+                                var locked = Core.BossLockOn.TargetFor(miseryBoss);
+                                if (local == null || locked?.Creature == null) return 0;
+                                if (ReferenceEquals(local, locked.Creature)) return 0;   // 被锁的那位只挨 7 点
+                                int kinds = Core.FleshBone.LockedPlayerDebuffKinds(miseryBoss);
+                                return per * Math.Max(0, kinds);
+                            }
+                            catch { return 0; }
+                        }));
+                        Logger.Log($"[CharBoss] 苦难（多人）：其他玩家按「被锁玩家负面种类数 × {per}」显示血肉戏法伤害");
+                    }
+                }
+            }
+            catch { /* 算不出来就不加 */ }
+        }
 
         if (intents.Count == 0)
         {

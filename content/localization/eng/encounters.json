@@ -82,5 +82,7 @@
     "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "The Silent",
     "SILENT_SNAKEBITE_BOSS_ENCOUNTER.loss":  "{character} was swallowed by [gold]The Silent[/gold]\u0027s serpents.",
     "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.title":  "Necrobinder",
-    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "{character} watches every card turn Ethereal at the hands of [gold]the Necrobinder[/gold]."
+    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "{character} watches every card turn Ethereal at the hands of [gold]the Necrobinder[/gold].",
+    "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "{character} is torn apart by [gold]the Necrobinder[/gold]'s sleight of flesh.",
+    "NECROBINDER_FLESH_BOSS_ENCOUNTER.title":  "Necrobinder"
 }

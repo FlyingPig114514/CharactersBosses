@@ -103,5 +103,7 @@
   "DEFECT_EVENT_BOSS_ENCOUNTER.loss": "{character}는 [gold]디펙트[/gold]에게 버린 카드 더미에서 다시 끌려 나왔습니다.",
   "DEFECT_EVENT_BOSS_ENCOUNTER.title": "디펙트",
     "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.title":  "Necrobinder",
-    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "{character} watches every card turn Ethereal at the hands of [gold]the Necrobinder[/gold]."
+    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "{character} watches every card turn Ethereal at the hands of [gold]the Necrobinder[/gold].",
+    "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "{character} is torn apart by [gold]the Necrobinder[/gold]'s sleight of flesh.",
+    "NECROBINDER_FLESH_BOSS_ENCOUNTER.title":  "Necrobinder"
 }

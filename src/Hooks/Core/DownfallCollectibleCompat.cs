@@ -852,6 +852,11 @@ public static class DownfallCollectibleCompat
                     upgraded = false;
                     Logger.Log("[CharBoss] 收藏家藏品：华丽猎 → 计划妥当");
                     return true;
+                case "NECROBINDER_FLESH":        // 一层 血肉骨（用户 2026-11-10：藏品 = 命运同担）
+                    cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.SharedFate);
+                    upgraded = false;
+                    Logger.Log("[CharBoss] 收藏家藏品：血肉骨 → 命运同担");
+                    return true;
                 case "NECROBINDER_ETHEREAL":     // 二层 虚无骨（用户 2026-11-09：藏品 = 幻景）
                     cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.Eidolon);
                     upgraded = false;
@@ -889,6 +894,10 @@ case "REGENT_STAR_BOSS_ENCOUNTER":         // 三层 辉星储
                     return true;
                 case "NECROBINDER_OSTY_BOSS_ENCOUNTER":    // 三层 养手骨
                     cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.Reanimate);      // 死者苏生
+                    upgraded = false;
+                    return true;
+                case "NECROBINDER_FLESH_BOSS_ENCOUNTER":       // 一层 血肉骨（用户 2026-11-10：藏品 = 命运同担）
+                    cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.SharedFate);
                     upgraded = false;
                     return true;
                 case "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER":    // 二层 虚无骨（用户 2026-11-09：藏品 = 幻景）

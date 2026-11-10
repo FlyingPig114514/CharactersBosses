@@ -82,5 +82,7 @@
     "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "静默猎手",
     "SILENT_SNAKEBITE_BOSS_ENCOUNTER.loss":  "{character}被[gold]静默猎手[/gold]的蛇群淹没了。",
     "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.title":  "亡灵契约师",
-    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "{character} 的每一张牌都化作了[gold]亡灵契约师[/gold]的虚无。"
+    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "{character} 的每一张牌都化作了[gold]亡灵契约师[/gold]的虚无。",
+    "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "{character}被[gold]亡灵契约师[/gold]的血肉戏法撕碎了。",
+    "NECROBINDER_FLESH_BOSS_ENCOUNTER.title":  "亡灵契约师"
 }

@@ -749,6 +749,7 @@ internal static class BossLineups
             {
                 if (entry == "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER") return (true, true);
                 if (entry == "NECROBINDER_SOUL_BOSS_ENCOUNTER") return (false, true);
+                if (entry == "NECROBINDER_FLESH_BOSS_ENCOUNTER") return (false, true);   // 一层血肉骨（用户 2026-11-10）
                 if (entry == "NECROBINDER_OSTY_BOSS_ENCOUNTER") return (false, true);
                 if (entry == "NECROBINDER_ERADICATE_BOSS_ENCOUNTER") return (false, true);
                 if (entry == "NECROBINDER_DOOM_BOSS_ENCOUNTER") return (false, true);
@@ -772,6 +773,50 @@ internal static class BossLineups
 
         // 种子兜底（仅在拿不到遭遇/阵容时才走到这里）：与灵魂骨 50/50
         try { return (Roll(1, 51, 2) == 1, false); } catch { return (false, false); }
+    }
+
+    /// <summary>
+    /// 第一幕**亡灵契约师**这一档用哪套设计：「灾厄骨」（主，<c>NECROBINDER_DOOM</c>）/
+    /// 「**血肉骨**」（用户 2026-11-10，<c>NECROBINDER_FLESH</c>）。
+    /// 与虚无骨同一套机制：以**房间遭遇**为准，拿不到遭遇/阵容时才按种子 50/50 兜底。
+    /// ⚠ 同层与二层/三层的亡灵契约师遭遇必须**显式判否**，别把别的场次抢走。
+    /// </summary>
+    internal static bool FleshActive() => Latched("NECROBINDER_FLESH", ComputeFlesh);
+
+    private static (bool Value, bool Decisive) ComputeFlesh()
+    {
+        try
+        {
+            string? entry = CurrentEncounterEntry();
+            if (!string.IsNullOrEmpty(entry))
+            {
+                if (entry == "NECROBINDER_FLESH_BOSS_ENCOUNTER") return (true, true);
+                if (entry == "NECROBINDER_DOOM_BOSS_ENCOUNTER") return (false, true);
+                if (entry == "NECROBINDER_SOUL_BOSS_ENCOUNTER") return (false, true);
+                if (entry == "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER") return (false, true);
+                if (entry == "NECROBINDER_OSTY_BOSS_ENCOUNTER") return (false, true);
+                if (entry == "NECROBINDER_ERADICATE_BOSS_ENCOUNTER") return (false, true);
+            }
+        }
+        catch { /* 继续往下判断 */ }
+
+        try
+        {
+            var lineup = CurrentFightLineup();
+            if (lineup != null)
+            {
+                foreach (var k in lineup)
+                {
+                    if (k == "NECROBINDER_FLESH") return (true, true);
+                    if (k == "NECROBINDER_DOOM") return (false, true);
+                    if (k == "NECROBINDER_SOUL") return (false, true);
+                }
+            }
+        }
+        catch { /* 继续兜底 */ }
+
+        // 种子兜底：与灾厄骨 50/50
+        try { return (Roll(0, 71, 2) == 1, false); } catch { return (false, false); }
     }
 
     /// <summary>

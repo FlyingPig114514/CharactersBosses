@@ -53,6 +53,7 @@ internal static class BossKeys
         new("DEFECT_THUNDER",      2, 0, 2, typeof(DefectBoss)),          // 故障 2 号：电球机（用户 2026-11-05）
         new("IRONCLAD_ANGER",       0, 0, 1, typeof(IroncladBoss)),        // 铁甲 1 号：愤怒战
         new("IRONCLAD_STRIKE",      0, 0, 2, typeof(IroncladBoss)),        // 铁甲 2 号：打击战（用户 2026-11-07）
+        new("NECROBINDER_FLESH",   3, 0, 2, typeof(NecrobinderBoss)),      // 亡灵 2 号：血肉骨（用户 2026-11-10）
         new("SILENT_SNAKEBITE",    1, 0, 2, typeof(SilentBoss)),          // 猎人 2 号：蛇咬猎（用户 2026-11-08）
         // ── 第二幕（巢穴）──
         new("SILENT_ENVENOM",       1, 1, 1, typeof(SilentBoss)),          // 猎人 1 号：涂毒猎
@@ -143,6 +144,7 @@ internal static class BossKeys
             "DEFECT_DARK",              // 一层 故障 1 号：黑球机
             "DEFECT_THUNDER",           // 一层 故障 2 号：电球机（用户 2026-11-05）
             "NECROBINDER_DOOM",         // 一层 亡灵 1 号：灾厄骨
+            "NECROBINDER_FLESH",        // 一层 亡灵 2 号：血肉骨（用户 2026-11-10）
             "REGENT_DEBRIS",            // 一层 储君 1 号：碎屑储君
             "REGENT_BOMBARD",           // 一层 储君 2 号：轰击储
             "IRONCLAD_ANGER",           // 一层 铁甲 1 号：愤怒战
@@ -218,6 +220,7 @@ internal static class BossKeys
         ["NECROBINDER_ERADICATE"] = "根除骨",
         ["NECROBINDER_OSTY"] = "养手骨",
         ["NECROBINDER_ETHEREAL"] = "虚无骨",
+        ["NECROBINDER_FLESH"] = "血肉骨",
         ["REGENT_COLORLESS"] = "无色储",
         ["REGENT_STAR"] = "辉星储",
         ["IRONCLAD_VULN"] = "易伤战",
@@ -323,6 +326,7 @@ internal static class BossKeys
             case "IRONCLAD_VULN": return ModelDb.Encounter<IroncladVulnBossEncounter>();
             case "IRONCLAD_BOULDER": return ModelDb.Encounter<IroncladBoulderBossEncounter>();
             case "NECROBINDER_DOOM": return ModelDb.Encounter<NecrobinderDoomBossEncounter>();
+            case "NECROBINDER_FLESH": return ModelDb.Encounter<NecrobinderFleshBossEncounter>();
             case "NECROBINDER_SOUL": return ModelDb.Encounter<NecrobinderSoulBossEncounter>();
             case "NECROBINDER_ETHEREAL": return ModelDb.Encounter<NecrobinderEtherealBossEncounter>();
             case "NECROBINDER_ERADICATE": return ModelDb.Encounter<NecrobinderEradicateBossEncounter>();

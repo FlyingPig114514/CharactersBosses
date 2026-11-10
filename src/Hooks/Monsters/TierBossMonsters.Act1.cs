@@ -43,6 +43,15 @@ public sealed class NecrobinderDoomBoss : NecrobinderBoss
     public override string? PinnedVariantKey => "NECROBINDER_DOOM";
 }
 
+/// <summary>血肉骨（第 1 层）—— 设计 Key <c>NECROBINDER_FLESH</c>（用户 2026-11-10）。</summary>
+public sealed class NecrobinderFleshBoss : NecrobinderBoss
+{
+    public NecrobinderFleshBoss() { SpawnVariantKey = "NECROBINDER_FLESH"; }
+
+    public override int? TierAct => 0;
+    public override string? PinnedVariantKey => "NECROBINDER_FLESH";
+}
+
 /// <summary>碎屑储君（第 1 层）—— 设计 Key <c>REGENT_DEBRIS</c>。</summary>
 public sealed class RegentDebrisBoss : RegentBoss
 {

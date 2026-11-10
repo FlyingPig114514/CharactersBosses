@@ -196,6 +196,19 @@ public sealed class NecrobinderEtherealBossEncounter : NecrobinderBossEncounter
 }
 
 /// <summary>
+/// 第一幕「**血肉骨**」的固定档位版（用户 2026-11-10；一层亡灵契约师的**第二套设计**，第一套是「灾厄骨」）。
+/// 剧本 <c>Core/FleshBoneScript.cs</c>，特殊效果「吞噬生命」= <c>Powers/BossDevourLifePower.cs</c>。
+///
+/// ⚠ 同层还有灾厄骨（<c>NECROBINDER_DOOM_BOSS_ENCOUNTER</c>）⇒ 遭遇 id 必须是独立的
+///   <c>NECROBINDER_FLESH_BOSS_ENCOUNTER</c>，控制台 `fight` 点名和阵容判定都不会串。
+/// 地图图标不覆写 `BossNodePath` ⇒ 走亡灵契约师的角色徽记（与虚无骨同一处理）。
+/// </summary>
+public sealed class NecrobinderFleshBossEncounter : NecrobinderBossEncounter
+{
+    public override int? TierAct => 0;
+}
+
+/// <summary>
 /// 第三幕「**养手骨**」的固定档位版（用户 2026-11-03；三层亡灵契约师的**第二套设计**，第一套是「根除骨」）。
 /// 剧本 <c>Core/OstyKeeperScript.cs</c>，特殊效果「不死」= <c>Powers/BossOstyUndyingPower.cs</c>。
 /// 与「刀猎/炼药猎」「易伤战/巨石战」「无色储君/辉星储」同一套机制：以**房间遭遇**为准，种子 50/50。

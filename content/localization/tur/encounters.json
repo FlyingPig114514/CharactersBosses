@@ -103,5 +103,7 @@
   "DEFECT_EVENT_BOSS_ENCOUNTER.loss": "[gold]Arıza[/gold], {character}'ı Atık Deste'den geri çekti.",
   "DEFECT_EVENT_BOSS_ENCOUNTER.title": "Arıza",
     "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.title":  "Necrobinder",
-    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "{character} watches every card turn Ethereal at the hands of [gold]the Necrobinder[/gold]."
+    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "{character} watches every card turn Ethereal at the hands of [gold]the Necrobinder[/gold].",
+    "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "{character} is torn apart by [gold]the Necrobinder[/gold]'s sleight of flesh.",
+    "NECROBINDER_FLESH_BOSS_ENCOUNTER.title":  "Necrobinder"
 }

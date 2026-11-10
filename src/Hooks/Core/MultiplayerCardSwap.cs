@@ -26,6 +26,12 @@ public static class MultiplayerCardSwap
         (2, typeof(DefectBoss), typeof(Glacier), typeof(Hibernate)),
 #endif
 
+        // A10. 血肉骨（一层亡灵契约师，用户 2026-11-10）：吸引仇恨 → 骸骨军团
+        //      （用户：「多人：将吸引仇恨替换为骸骨军团（升级与否相同）」⇒ 不进 UpgradeRows）。
+        //      两张都是 2 费 ⇒ 第 5/7 回合的能量账不变；单人的灾厄骨剧本里没有吸引仇恨，
+        //      所以这条只对血肉骨生效。
+        (0, typeof(NecrobinderBoss), typeof(PullAggro), typeof(LegionOfBone)),
+
         // A2. 根除骨（三层亡灵契约师）：吸引仇恨 → 骸骨军团（只给 Boss 奥斯提）
         (2, typeof(NecrobinderBoss), typeof(PullAggro), typeof(LegionOfBone)),
 

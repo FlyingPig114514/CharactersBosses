@@ -666,9 +666,29 @@ public static class BossDefs
             //   `StrikeActive()` 只看「本场遭遇/阵容里有没有 IRONCLAD_STRIKE」，**不看是谁的变体**
             //   ⇒ 一层阵容里排到打击战时，**亡灵契约师这一档也命中** ⇒ 灾厄骨拿了打击战的
             //   卡组 / 遗物（燃烧之血、护喉甲）/ 特殊效果（痛击）/ 剧本。
-            //   第一幕（灾厄骨）本来就没有第二套设计 ⇒ null；
-            //   第二幕 = 虚无骨（下面这块，用户 2026-11-09）；第三幕 = 养手骨。
-            null,
+            //   第一幕 = **血肉骨**（下面这块，用户 2026-11-10；剧本 <c>Core/FleshBoneScript.cs</c>）；
+            //   第二幕 = 虚无骨（用户 2026-11-09）；第三幕 = 养手骨。
+            new BossVariant
+            {
+                Key = "NECROBINDER_FLESH",
+                Enabled = Core.BossLineups.FleshActive,
+                Deck = Core.FleshBoneScript.Deck(),
+                Relics = Core.FleshBoneScript.Relics(),
+                Script = Core.FleshBoneScript.Build(),
+                SpecialLoc = "NECROBINDER_BOSS.devour_life",   // 特殊效果「吞噬生命」
+                SpecialPower = typeof(Powers.BossDevourLifePower),
+                // 进阶（用户 2026-11-10）：8 = 升级护卫、吸引仇恨（多人换上的骸骨军团同样吃这一条：
+                //   进阶升级是**按卡类型**生效的，剧本里那张吸引仇恨换成骸骨军团后仍按同一套走）；
+                //   9 = 升级苦难、摧残、出击。
+                AscensionUpgrades = new List<(int, Type)>
+                {
+                    (8, typeof(Bodyguard)),
+                    (8, typeof(PullAggro)),
+                    (9, typeof(Misery)),
+                    (9, typeof(Debilitate)),
+                    (9, typeof(Unleash)),
+                },
+            },
             new BossVariant
             {
                 Key = "NECROBINDER_ETHEREAL",

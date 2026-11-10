@@ -165,6 +165,16 @@ public partial class BossHandPanel
             if (orbs > 0) damages.Add((orbs, "充能球被动（单体）"));
             // 玻璃球被动是**群体**：另起一条，不和单体那个数字混在一起
             if (orbsAoe > 0) damages.Add((orbsAoe, "充能球被动（群体）"));
+
+            // ★ 2026-11-10（用户「血肉骨」需求）：「如果回合结束时她的格挡会不小于 10 点，
+            //   在显示电球、炸弹等的位置显示招架盾的 6 点伤害，记得考虑她特殊效果和骇人头盔
+            //   为她带来的格挡」。
+            //   反编译 `ParryingShield`：`AfterSideTurnEnd` 里若 `Block >= 10` ⇒ 对 `HittableEnemies`
+            //   **随机一个**造成 6 点 `ValueProp.Unpowered` 伤害。因为是无来源伤害，用 Raw 意图
+            //   （不吃她的力量、也不吃目标的易伤）正合适。
+            //   格挡预测见 `Core.FleshBone.EndOfTurnBlock`（plan 里的 Block 变量 + 骇人头盔 + 吞噬生命）。
+            int parry = Core.FleshBone.ParryDamage(boss);
+            if (parry > 0) damages.Add((parry, "招架盾"));
         }
         catch (Exception e)
         {
