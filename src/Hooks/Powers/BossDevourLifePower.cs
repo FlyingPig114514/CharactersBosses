@@ -6,6 +6,7 @@ using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.ValueProps;
+using MegaCrit.Sts2.Core.Models.Powers;
 using CharacterBosses.Core;
 
 namespace CharacterBosses.Powers;
@@ -41,7 +42,12 @@ public sealed class BossDevourLifePower : PowerModel
 
     private int _logs;
 
-    /// <summary>每次她给目标上负面 ⇒ 自己获得 4 点格挡。</summary>
+    private static string SafeEntry(PowerModel? power)
+    {
+        try { return power?.Id.Entry ?? "?"; } catch { return "?"; }
+    }
+
+    /// <summary>每次她给目标上负面 ⇒ 自己获得 4 点格挡（并补血肉戏法的伤害）。</summary>
     public override async Task AfterPowerAmountChanged(PlayerChoiceContext choiceContext, PowerModel power,
                                                       decimal amount, Creature? applier, CardModel? cardSource)
     {
@@ -49,12 +55,17 @@ public sealed class BossDevourLifePower : PowerModel
         {
             var owner = Owner;
             if (owner == null || !owner.IsAlive) return;
-            // ★ 2026-11-10（用户：「她现在使用命运同担不会对玩家造成伤害。是不是之前修…拦多了？」）：
-            //   **拦多了** —— 原版那条判据是 `amount != 0`，因为「失去力量」这种负面是**负数**送进来的
-            //   （`PowerCmd.Apply<StrengthPower>(ctx, target, -2, ...)` ⇒ amount = -2）。
-            //   以前这里写 `amount <= 0` 就把「命运同担 / 黑暗镣铐」这类**扣层数**的负面全挡掉了。
-            //   现在与血肉戏法（`SleightOfFleshPower`）同一口径：只要求 `amount != 0`，
-            //   是不是负面交给下面的 `GetTypeForAmount`。
+
+            // 诊断（限流）：先记一行「钩子确实被叫到了」，含目标与施加者。
+            // 用户 2026-11-10 报「命运同担不对玩家造成伤害」时，日志里连一行都没有 ⇒ 需要先确认
+            // 这个钩子在这条路径上到底有没有被派发（`PowerCmd.ModifyAmount` 里
+            // `if (modifiedOffset != 0) await Hook.AfterPowerAmountChanged(...)`）。
+            if (_logs++ < 30)
+            {
+                Logger.Log($"[CharBoss] 吞噬生命钩子：power={SafeEntry(power)} amount={amount:0.#} " +
+                           $"目标={power?.Owner?.Name ?? "?"} 施加者={(power?.Applier?.Name ?? applier?.Name ?? "null")}");
+            }
+
             if (power == null || amount == 0m) return;
 
             // 是不是「负面」：原版用 `GetTypeForAmount` 判（负数力量那种也认）
@@ -75,11 +86,26 @@ public sealed class BossDevourLifePower : PowerModel
             if (!ReferenceEquals(giver, owner)) return;
 
             await CreatureCmd.GainBlock(owner, FleshBone.DevourBlock, ValueProp.Unpowered, null);
-            if (_logs++ < 40)
+
+            // ★ 2026-11-10 第二轮（用户：「命运同担还是不对玩家造成伤害」）：
+            //   以前「血肉戏法」那 9 点放在 `Patches/SleightOfFleshBossPatch` 里（接管**她身上那层
+            //   `SleightOfFleshPower`** 的回调）。但那条链要靠原版把这层 power 也派发一遍，
+            //   一旦某次派发没走到（实测 22:42 那次 `STRENGTH_POWER −2` 连本行日志都没有），
+            //   9 点就整条丢掉。而「吞噬生命」是她**必然带着**的特殊效果 —— 同一次派发里一定会到。
+            //   ⇒ 把 9 点挪到这里一起算：只要她身上有血肉戏法（`SleightOfFleshPower`），
+            //     就对那个玩家补一次 `Amount` 点**无来源伤害**（与反编译原版那一句完全一致）。
+            int sleight = 0;
+            try { sleight = Math.Max(0, owner.GetPowerAmount<SleightOfFleshPower>()); }
+            catch { sleight = 0; }
+
+            if (sleight > 0)
             {
-                Logger.Log($"[CharBoss] 吞噬生命：她给 {target.Name} 上了 {power.Id.Entry}" +
-                           $"（{amount:0.#}）⇒ 获得 {FleshBone.DevourBlock} 点格挡");
+                await CreatureCmd.Damage(choiceContext, target, sleight, ValueProp.Unpowered, owner);
             }
+
+            Logger.Log($"[CharBoss] 吞噬生命：她给 {target.Name} 上了 {SafeEntry(power)}" +
+                       $"（{amount:0.#}）⇒ 获得 {FleshBone.DevourBlock} 点格挡" +
+                       (sleight > 0 ? $" + 血肉戏法 {sleight} 点无来源伤害" : ""));
         }
         catch (Exception e)
         {

@@ -81,36 +81,23 @@ internal static class SleightOfFleshBossPatch
             var giver = power!.Applier ?? applier;
             if (!ReferenceEquals(giver, owner)) { __result = Task.CompletedTask; return false; }
 
-            // —— 到这里才接管：照原版那条 Damage 原样补一次（Amount 就是血肉戏法的 9/13）
-            int per = 0;
-            try { per = Math.Max(0, (int)Math.Round((double)__instance!.Amount)); } catch { per = 0; }
-            if (per <= 0) { __result = Task.CompletedTask; return false; }
-
-            __result = DealAsync(choiceContext, boss, victim, per);
+            // ★ 2026-11-10 第二轮：**这里不再负责结算伤害**。
+            //   用户实测「命运同担还是不对玩家造成伤害」时，这条链（原版把这层 power 也派发一遍）
+            //   有一次整段没走到 ⇒ 9 点丢了。伤害已经挪进 `BossDevourLifePower`（她必然带着的特殊效果，
+            //   同一次派发一定到）。这里只保留一件事：**把她身上这层 power 的原版回调整条压掉**，
+            //   免得她给自己上负面（命运同担那一半）时被自己的血肉戏法打 9 点。
+            __result = Task.CompletedTask;
             return false;
         }
         catch (Exception e)
         {
-            try { Logger.Log("[CharBoss] 血肉戏法（Boss 版）判定失败，放行原版: " + e.Message); } catch { /* 忽略 */ }
+            try { Logger.Log("[CharBoss] 血肉戏法（Boss 版）压制失败，放行原版: " + e.Message); } catch { /* 忽略 */ }
             return true;
         }
     }
 
-    private static async Task DealAsync(MegaCrit.Sts2.Core.GameActions.Multiplayer.PlayerChoiceContext choiceContext,
-                                        Monsters.CharBossMonster boss,
-                                        MegaCrit.Sts2.Core.Entities.Creatures.Creature victim, int per)
+    private static string SafeName(MegaCrit.Sts2.Core.Entities.Creatures.Creature? creature)
     {
-        try
-        {
-            // 原版就是 Unpowered（无来源伤害）⇒ 带「为你而死」的召唤物不会替玩家承受，
-            // 正好符合用户写在特殊效果里的那句警告。
-            await MegaCrit.Sts2.Core.Commands.CreatureCmd.Damage(
-                choiceContext, victim, per, MegaCrit.Sts2.Core.ValueProps.ValueProp.Unpowered, boss.Creature);
-            Logger.Log($"[CharBoss] 血肉戏法：她给 {victim.Name} 上了负面 ⇒ 造成 {per} 点无来源伤害");
-        }
-        catch (Exception e)
-        {
-            Logger.Log("[CharBoss] 血肉戏法（Boss 版）结算失败: " + e.Message);
-        }
+        try { return creature?.Name ?? "?"; } catch { return "?"; }
     }
 }

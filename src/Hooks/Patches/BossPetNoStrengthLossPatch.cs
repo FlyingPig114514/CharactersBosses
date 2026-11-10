@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Powers;
@@ -36,15 +37,23 @@ public static class BossPetNoStrengthLossPatch
         try
         {
             if (!IsBossPet(target)) return true;
-            // 只拦「外部来源」：施加者是**真人玩家**（`Monster == null`）。
-            // Boss 自己的效果、我们模组的标记（施加者为空/是她自己）照旧。
-            if (applier == null || applier.Monster != null) return true;
 
-            // 用户 2026-10-23 追加：奥斯提**不受任何其它正面/负面效果影响**（不只减力量）。
-            // 原来只拦 `TemporaryStrengthPower` / 负力量，现在一律拦 —— 尖啸、易伤、虚弱、
-            // 中毒、灾厄……玩家侧给它的东西全都不上。
-            Logger.Log($"[CharBoss] Boss 随从免疫外部效果：跳过 {SafeEntry(power)} {amount:+0;-0} → " +
-                       $"{target.Name}（施加者 {applier.Name}）");
+            // ★ 2026-11-10（用户：「奥斯提不应该会获得负面效果」——实测王储的**临时减力量**能落到她那只
+            //   奥斯提身上）：以前只在「施加者是真人玩家」时才拦，于是**她自己/她的牌**给的负面
+            //   （王储系的减力量、群体减益……施加者是 Boss 本人）照样落到了随从身上。
+            //   现在改成两条独立判据，任一命中就跳过：
+            //     ① **任何来源的负面效果**都不给随从上（`GetTypeForAmount` 判 Debuff，负数力量也算）；
+            //     ② 施加者是**真人玩家**时，正面效果也不给（用户 2026-10-23 的原始要求：
+            //        「奥斯提不受任何其它正面/负面效果影响」）。
+            bool fromPlayer = applier != null && applier.Monster == null;
+            bool debuff = false;
+            try { if (power != null && amount != 0m) debuff = power.GetTypeForAmount(amount) == PowerType.Debuff; }
+            catch { debuff = false; }
+
+            if (!debuff && !fromPlayer) return true;      // 她自己给的正面效果 → 照常
+
+            Logger.Log($"[CharBoss] Boss 随从免疫{(debuff ? "负面" : "外部")}效果：跳过 {SafeEntry(power)} " +
+                       $"{amount:+0;-0} → {target.Name}（施加者 {(applier == null ? "null" : applier.Name)}）");
             __result = Task.CompletedTask;                  // ⚠ 返回 false 必须给 Task，否则 await null 崩
             return false;
         }

@@ -275,3 +275,37 @@ if (power.GetTypeForAmount(amount) != PowerType.Debuff) { /* 跳过 */ }
 群体减益能力：极强
 群体增益能力：弱
 ```
+## 13. 第二轮修「命运同担不造成伤害」+ 随从不吃负面（v0.2.555）
+
+### 13.1 9 点改由「吞噬生命」结算（不再依赖她那层 power 的回调）
+
+日志取证（同一只血肉骨、同一张命运同担）：
+```
+[22:25:49] 吞噬生命：她给 亡灵契约师 上了 STRENGTH_POWER（-2）⇒ 获得 4 点格挡
+[22:25:49] 血肉戏法：她给 亡灵契约师 上了负面 ⇒ 造成 9 点无来源伤害
+[22:41:23] 吞噬生命：… VULNERABLE_POWER（2）…        ← 22:41 这场（0.2.554）违逆/恐惧 都正常
+[22:41:32] 血肉戏法：…
+[22:42:01] （命运同担的 STRENGTH_POWER -2：**一行日志都没有**）   ← 这一次整条派发没走到
+```
+⇒ 放在 `SleightOfFleshBossPatch`（接管**她身上那层 `SleightOfFleshPower`** 的回调）里的那 9 点
+不可靠：原版要不要把这层 power 也派发一遍，取决于派发链，实测确实会漏。
+
+现在把 9 点挪进 `BossDevourLifePower`（她的特殊效果，同一次派发**一定**会到）：
+```csharp
+await CreatureCmd.GainBlock(owner, 4, ValueProp.Unpowered, null);          // 吞噬生命
+int sleight = owner.GetPowerAmount<SleightOfFleshPower>();                 // 她身上有血肉戏法吗
+if (sleight > 0) await CreatureCmd.Damage(ctx, target, sleight, ValueProp.Unpowered, owner);
+```
+`SleightOfFleshBossPatch` 现在只做一件事：把她身上这层 power 的原版回调整条压掉
+（免得她给自己上负面时被自己的血肉戏法打 9 点）。
+另外在 `BossDevourLifePower` 开头加了一行限流诊断（30 条）：
+`吞噬生命钩子：power=… amount=… 目标=… 施加者=…` —— 下次再「没伤害」先看这行在不在。
+
+### 13.2 奥斯提不吃任何负面效果
+
+用户：「奥斯提不应该会被王储减临时力量（奥斯提不应该会获得负面效果）」。
+`BossPetNoStrengthLossPatch` 以前只在「施加者是真人玩家」时才拦，于是**她自己/她的牌**给的负面
+（王储系的临时减力量、群体减益…施加者是 Boss 本人）照样落到随从身上。现在两条独立判据：
+1. **任何来源的负面效果**都不给随从（`GetTypeForAmount(amount) == Debuff`，负数力量也算）；
+2. 施加者是真人玩家时，正面效果也拦（用户 2026-10-23 的原始要求）。
+她自己给的正面效果（骸骨军团之类）照常。
