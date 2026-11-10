@@ -4942,3 +4942,12 @@ Chronological action log.
 | 2026-11-10 12:42 | edit | `src/Hooks/Core/BossVoice.cs` | ok | 0 |
 | 2026-11-10 12:42 | edit | `src/Hooks/Core/BossVoice.cs` | ok | 0 |
 | 2026-11-10 12:43 | write | `docs/plans/ironclad-boss-voice-2026-11-10.md` | ok | 0 |
+| 2026-11-10 12:52 | edit | `src/Hooks/Core/BossVoice.cs` | ok | 0 |
+| 2026-11-10 12:52 | edit | `src/Hooks/Core/BossVoice.cs` | ok | 0 |
+| 2026-11-10 12:52 | edit | `src/Hooks/Monsters/CharBossMonster.cs` | ok | 0 |
+| 2026-11-10 12:52 | edit | `src/Hooks/Monsters/CharBossMonster.cs` | ok | 0 |
+| 2026-11-10 12:52 | edit | `src/Hooks/Monsters/CharBossMonster.cs` | ok | 0 |
+| 2026-11-10 12:52 | write | `src/Hooks/Patches/IroncladBossAttackVoicePatch.cs` | ok | 0 |
+| 2026-11-10 12:54 | edit | `docs/plans/ironclad-boss-voice-2026-11-10.md` | ok | 0 |
+| 2026-11-10 12:54 | edit | `docs/plans/ironclad-boss-voice-2026-11-10.md` | ok | 0 |
+| 2026-11-10 12:54 | edit | `docs/plans/ironclad-boss-voice-2026-11-10.md` | ok | 0 |

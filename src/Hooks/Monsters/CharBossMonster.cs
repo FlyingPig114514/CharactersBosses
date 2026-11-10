@@ -338,6 +338,16 @@ public abstract partial class CharBossMonster : MonsterModel
     internal int AttacksPlayed;
 
     /// <summary>
+    /// 铁甲战士系列的攻击语音「待播」标记：本回合已经打出那 8 张牌之一，但**伤害还没落地**
+    /// （用户 2026-11-10：「等他的攻击牌造成伤害的时候再放」）。
+    /// 由 <c>Patches.IroncladBossAttackVoicePatch</c> 的 AutoPlay 前缀置位、`Hook.AfterDamageGiven` 前缀清掉。
+    /// </summary>
+    internal bool VoiceArmed;
+
+    /// <summary>本回合的语音已经喊过了（每回合最多一次，`PrepareTurn` 清零）。</summary>
+    internal bool VoiceFiredThisTurn;
+
+    /// <summary>
     /// 她**回合开始时**（手套那 +1 已到账之后）的力量快照。
     /// 出牌期算"手里剑这把到底涨了多少"时靠它：<c>当前力量 − 快照</c> 才是本回合真实获得的量，
     /// 补正只补"还没到账"的部分（获得几点撤几点）。
@@ -875,6 +885,9 @@ public abstract partial class CharBossMonster : MonsterModel
         LogPlayerSideSnapshot();
 
         AttacksPlayed = 0;   // 新的一回合：攻击牌计数从 0 开始（终结技段数靠它）
+        // 语音（铁甲战士系列）：每回合最多喊一次，待播标记也一起清掉
+        VoiceArmed = false;
+        VoiceFiredThisTurn = false;
         // 力量快照要在 FireTurnStart 之后取：烘焙手套每回合那 +1 已经到账，
         // 这样"本回合真实获得的力量"就只反映手里剑这类出牌过程中触发的成长。
         StrengthAtTurnStart = Core.BladesGrowth.CurrentStrength(this);
@@ -1689,20 +1702,12 @@ public abstract partial class CharBossMonster : MonsterModel
             // 这里在出牌前后各拍一次「持有者格挡」，**原版没给就补上**（给了就不动，避免双份）。
             var sneakyBefore = Patches.SneakyOnBossAttack.Snapshot(this, play.Card, out var sneakyAmount);
 
-            // ★ 2026-11-10（用户需求）：**铁甲战士 boss 本回合打出第一张攻击牌时喊一声**。
-            //   一代崩坠给 CharBossIronclad 覆写了 `onPlayAttackCardSound` ⇒ 每次出攻击牌从
-            //   VO_IRONCLAD_1a/1b/1c 里随机喊一句；用户要的就是这个效果，语音已打进我们自己的 PCK。
-            //   判据：本回合已打出的攻击牌数 == 0（`AttacksPlayed` 在 `PrepareTurn` 里清零），
-            //   而且**要在 AutoPlay 之前**播 —— 原版就是这么「出牌的同时出声」。
-            try
-            {
-                if (this is Monsters.IroncladBoss && AttacksPlayed == 0
-                    && play.Card.Type == MegaCrit.Sts2.Core.Entities.Cards.CardType.Attack)
-                {
-                    Core.BossVoice.PlayFirstAttackVoice(Creature);
-                }
-            }
-            catch { /* 忽略：语音绝不影响出牌 */ }
+            // ★ 2026-11-10（用户需求，第二批改法）：**不再**在出牌前播语音 ——
+            //   「音效稍微有点早，等他的攻击牌造成伤害的时候再放」。
+            //   现在这里什么都不做，改由 `Patches.IroncladBossAttackVoicePatch`：
+            //   ① `CardCmd.AutoPlay` 前缀（本文件下一行）给「本回合第一张 痛击/完美打击/… 那 8 张」挂上待播标记；
+            //   ② `Hook.AfterDamageGiven` 前缀在**她的伤害落地那一刻**才真正播。
+            //   这样连「彼岸咆哮」那种回合结束从消耗堆自动打出的牌也能覆盖（它不走 PlayOne）。
 
             playTask = CardCmd.AutoPlay(ctx, play.Card, target, AutoPlayType.Default);
             // ★ v0.2.450（联机不同步取证）：出牌前后各记一次「翻侧决策的全部输入」。

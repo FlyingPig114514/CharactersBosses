@@ -24,7 +24,7 @@ public static class BossVoice
 {
     private const string ResDir = "res://CharacterBosses/audio/voice/";
 
-    /// <summary>本回合打出第一张攻击牌时喊的（崩坠里是 1a/1b/1c）。</summary>
+    /// <summary>本回合打出这些牌时喊的（崩坠里是 1a/1b/1c）。</summary>
     private static readonly string[] FirstAttack = { "STS_VO_Ironclad_1a", "STS_VO_Ironclad_1b", "STS_VO_Ironclad_1c" };
 
     /// <summary>死亡时喊的（崩坠里是 2a/2b/2c）。</summary>
@@ -34,8 +34,24 @@ public static class BossVoice
     private static readonly Random Rng = new();
     private static readonly HashSet<string> LoggedMissing = new(StringComparer.Ordinal);
 
-    /// <summary>她本回合打出**第一张攻击牌**时喊一声（与她出牌同时播，不打断原版音效）。</summary>
-    public static bool PlayFirstAttackVoice(Creature? boss) => Play(FirstAttack, boss, "本回合首张攻击牌");
+    /// <summary>
+    /// **只有这几张牌**会触发攻击语音（用户 2026-11-10 第二批要求：
+    /// 「音效有点太频繁了，改成每回合第一次打出以下牌的时候放：痛击、完美打击、突破、全身撞击、巨石、彼岸咆哮、闪电霹雳、欺凌」）。
+    /// 条目名就是 `card.Id.Entry`（类名的 SCREAMING_SNAKE）：
+    /// 痛击 = `BASH`、完美打击 = `PERFECTED_STRIKE`、突破 = `BREAKTHROUGH`、全身撞击 = `BODY_SLAM`、
+    /// 巨石 = `GIANT_ROCK`、彼岸咆哮 = `HOWL_FROM_BEYOND`、闪电霹雳 = `THUNDERCLAP`、欺凌 = `BULLY`。
+    /// </summary>
+    public static readonly HashSet<string> AttackVoiceCards = new(StringComparer.Ordinal)
+    {
+        "BASH", "PERFECTED_STRIKE", "BREAKTHROUGH", "BODY_SLAM",
+        "GIANT_ROCK", "HOWL_FROM_BEYOND", "THUNDERCLAP", "BULLY",
+    };
+
+    /// <summary>
+    /// 这几张牌**造成伤害的那一刻**喊一声（用户 2026-11-10：「音效稍微有点早，等他的攻击牌造成伤害的时候再放」）。
+    /// 由 `Patches.IroncladBossAttackVoicePatch` 在 `Hook.AfterDamageGiven` 里调。
+    /// </summary>
+    public static bool PlayAttackVoice(Creature? boss) => Play(FirstAttack, boss, "攻击牌造成伤害");
 
     /// <summary>
     /// 她**死亡**时喊一声（调用方负责压掉原版死亡音）。
