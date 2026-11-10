@@ -677,16 +677,16 @@ public static class BossDefs
                 Script = Core.FleshBoneScript.Build(),
                 SpecialLoc = "NECROBINDER_BOSS.devour_life",   // 特殊效果「吞噬生命」
                 SpecialPower = typeof(Powers.BossDevourLifePower),
-                // 进阶（用户 2026-11-10）：8 = 升级护卫、吸引仇恨（多人换上的骸骨军团同样吃这一条：
-                //   进阶升级是**按卡类型**生效的，剧本里那张吸引仇恨换成骸骨军团后仍按同一套走）；
-                //   9 = 升级苦难、摧残、出击。
+                // 进阶（用户 2026-11-10 第二轮改稿）：8 = 升级护卫、吸引仇恨；
+                //                                  9 = 升级**恐惧**、摧残。
+                //   ⚠ 剧本里 5/7 回合的吸引仇恨本来就写明是「吸引仇恨+」，8 这一条是给多人换上的
+                //     骸骨军团，以及别的回合用的（按**卡类型**生效）。
                 AscensionUpgrades = new List<(int, Type)>
                 {
                     (8, typeof(Bodyguard)),
                     (8, typeof(PullAggro)),
-                    (9, typeof(Misery)),
+                    (9, typeof(Fear)),
                     (9, typeof(Debilitate)),
-                    // ★ 2026-11-10（用户更正）：「进阶9不再升级出击」⇒ 出击保持不升级。
                 },
             },
             new BossVariant
