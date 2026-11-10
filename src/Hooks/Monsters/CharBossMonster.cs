@@ -1689,6 +1689,21 @@ public abstract partial class CharBossMonster : MonsterModel
             // 这里在出牌前后各拍一次「持有者格挡」，**原版没给就补上**（给了就不动，避免双份）。
             var sneakyBefore = Patches.SneakyOnBossAttack.Snapshot(this, play.Card, out var sneakyAmount);
 
+            // ★ 2026-11-10（用户需求）：**铁甲战士 boss 本回合打出第一张攻击牌时喊一声**。
+            //   一代崩坠给 CharBossIronclad 覆写了 `onPlayAttackCardSound` ⇒ 每次出攻击牌从
+            //   VO_IRONCLAD_1a/1b/1c 里随机喊一句；用户要的就是这个效果，语音已打进我们自己的 PCK。
+            //   判据：本回合已打出的攻击牌数 == 0（`AttacksPlayed` 在 `PrepareTurn` 里清零），
+            //   而且**要在 AutoPlay 之前**播 —— 原版就是这么「出牌的同时出声」。
+            try
+            {
+                if (this is Monsters.IroncladBoss && AttacksPlayed == 0
+                    && play.Card.Type == MegaCrit.Sts2.Core.Entities.Cards.CardType.Attack)
+                {
+                    Core.BossVoice.PlayFirstAttackVoice(Creature);
+                }
+            }
+            catch { /* 忽略：语音绝不影响出牌 */ }
+
             playTask = CardCmd.AutoPlay(ctx, play.Card, target, AutoPlayType.Default);
             // ★ v0.2.450（联机不同步取证）：出牌前后各记一次「翻侧决策的全部输入」。
             //   这套记账（深度计数 + 真人出牌登记 + 15 秒过期）是纯本机的，一旦两端不同，
