@@ -61,6 +61,9 @@ public static partial class BossStatusRow
     /// </summary>
     private static readonly System.Collections.Generic.Dictionary<Control, (int Relics, int Potions, int PotionSum, int Energy, int Stars, int PotionVersion, int PotionPlan, int Stunned)> FillStamps = new();
 
+    /// <summary>能量球挂载日志限流（2026-11-10 排查「前两个回合能量图标不见了」加的）。</summary>
+    private static int _energyAttachLogs;
+
     /// <summary>
     /// 每一行上次画出来的**遗物节点**（顺序 = 显示顺序，下标 0 在最右）。
     ///
@@ -81,7 +84,8 @@ public static partial class BossStatusRow
     ///     药水/遗物被挤到屏幕外（日志实测 rowW 从 872 跳到 2050、x 变成 -180）。
     /// 现在先 RemoveChild 再 QueueFree，排版看到的**只有**这一轮真正要画的格子。
     /// </summary>
-    public static void Fill(Control row, CharBossMonster boss)
+    /// <param name="primaryRow">是否**主面板**的那条状态栏（主面板永远该显示能量球；给多 Boss 的备用行传 false）。</param>
+    public static void Fill(Control row, CharBossMonster boss, bool primaryRow = true)
     {
         if (row == null || !GodotObject.IsInstanceValid(row)) return;
 
@@ -129,6 +133,20 @@ public static partial class BossStatusRow
 
         // 这一轮能复用的节点：能量球（避免反复播粒子特效）+ 遗物图标（顺序没变就不用重建）
         var energy = EnergyOf(row);
+        // ★ 2026-11-10（用户：「前两个回合能量图标不见了」，14:07 的 mod_log 里
+        //   `独立意图定位：能量中心 x=0` 反复出现 ⇒ `EnergyOf(row)` 拿到了 null / 失效节点）：
+        //   `EnergyByRow` 是**按行实例**登记的，状态条每次重建、新行第一次进 Fill 时必然是 null；
+        //   这时如果行里已经挂着那颗从上一行搬过来的能量球，它就会被下面那段「清空」当垃圾删掉
+        //   ⇒ 界面上能量球消失，而下次又要 `NEnergyCounter.Create` 重建一次（还会重播粒子特效）。
+        //   所以再按**影武者缓存**兜一层：缓存里那颗只要确实挂在本行，就同样算「可复用」。
+        if ((energy == null || !GodotObject.IsInstanceValid(energy))
+            && shadow != null
+            && EnergyCounters.TryGetValue(shadow, out var cachedEnergy)
+            && cachedEnergy != null && GodotObject.IsInstanceValid(cachedEnergy)
+            && ReferenceEquals(cachedEnergy.GetParent(), row))
+        {
+            energy = cachedEnergy;
+        }
         var reusableRelics = ReusableRelics(row, ordered);
 
         // ── 清空：**同步 RemoveChild 再 QueueFree** ──
@@ -188,13 +206,51 @@ public static partial class BossStatusRow
         {
             // ⚠ 能量球是**按影武者缓存的**（一个影武者只有一个），所以它可能已经挂在别的那一行上
             // （多 Boss 的「补一条状态栏」共用同一个 Player）—— 那种情况不要抢、也不要参与本行排序。
-            if (ReferenceEquals(energyNode.GetParent(), row)) target.Add(energyNode);
-            else if (energyNode.GetParent() == null)
+            //
+            // ★ 2026-11-10（用户：「前两个回合能量图标不见了」）：以前只处理「已挂在本行」和
+            //   「完全没有父节点」两种；而它挂在**上一条（已 QueueFree、正在等本帧末销毁的）状态条**上时
+            //   两个分支都不成立 ⇒ 既没加进 `target`、也没搬过来，随后随旧行一起被销毁
+            //   ⇒ 这一行压根没有能量球，`EnergyCenterX` 一路返回 0。
+            //   现在把「父节点已失效/排着队要删」也算作可接管，直接搬到本行。
+            var parent = energyNode.GetParent();
+            bool parentHidden = parent is Godot.CanvasItem ci && !ci.IsVisibleInTree();
+            bool parentDead = parent == null
+                              || !GodotObject.IsInstanceValid(parent)
+                              || (parent is Godot.Node pn && pn.IsQueuedForDeletion())
+                              || parentHidden;
+            // 「另一条**还活着且看得见**的状态栏」= 真正多 Boss 同场，那颗球归它，本行不抢；
+            // 看不见的（上一个面板残留 / 还没显示出来的行）= 抢过来，否则这一行永远没有能量球。
+            // ★ 主面板（primaryRow）一律**抢过来**：能量球只有一个，主面板必须显示它。
+            //   备用行（多 Boss）才遵守「别抢还活着的那条」。
+            //   ⚠ 再加一条：**本行自己不可见**时也不抢（否则一条藏起来的面板会把球抢走藏起来）。
+            bool rowVisible = row is Godot.CanvasItem rci && rci.IsVisibleInTree();
+            bool parentIsOtherLiveRow = !parentDead && !ReferenceEquals(parent, row) && !(primaryRow && rowVisible);
+
+            if (!parentIsOtherLiveRow)
             {
-                row.AddChild(energyNode);
-                target.Add(energyNode);
+                if (parent != null && GodotObject.IsInstanceValid(parent) && !ReferenceEquals(parent, row))
+                {
+                    parent.RemoveChild(energyNode);
+                }
+                if (energyNode.GetParent() == null) row.AddChild(energyNode);
+                if (_energyAttachLogs++ < 11)
+                {
+                    Logger.Log($"[CharBoss] 能量球挂载：原父节点={(parent == null ? "无" : parent.Name.ToString())}" +
+                               $"（可见={!(parent is Godot.CanvasItem c2) || c2.IsVisibleInTree()}）" +
+                               $" ⇒ {(parentDead ? "旧行已失效/不可见，搬到本行" : "挂到本行")}");
+                }
             }
-            SetEnergyOf(row, energyNode);
+
+            // 只有真的挂在本行才登记给本行（否则 EnergyCenterX 会用错的坐标系）
+            if (ReferenceEquals(energyNode.GetParent(), row))
+            {
+                target.Add(energyNode);
+                SetEnergyOf(row, energyNode);
+            }
+            else if (_energyAttachLogs++ < 22)
+            {
+                Logger.Log($"[CharBoss] 能量球挂载：这颗球挂在**另一条还活着的**状态栏上（多 Boss），本行不抢");
+            }
         }
 
         // 只调顺序、不重建：MoveChild 不会触发 _ExitTree/_EnterTree

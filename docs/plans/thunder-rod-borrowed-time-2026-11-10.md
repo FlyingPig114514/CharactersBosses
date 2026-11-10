@@ -134,3 +134,39 @@ float x = Math.Max(natural, intentsRight + Gap);       // 不许压到卡牌意�
 
 日志（新增，限 10 条）：
 `独立意图定位：能量中心 x=… / 行宽 … ⇒ 自然 x=…；卡牌意图右缘 … ⇒ 实际 x=…（面板宽 …）`
+## 6. 能量球在头两个回合不见了（v0.2.544）
+
+**用户原话**：「前两个回合能量图标不见了」（附 `屏幕录制 2026-11-10 140730.mp4`，抽帧确认：第 1～2 回合
+面板上没有那个「3/2」能量球，第 3 回合起才出现）。
+
+**日志取证**（`mod_log.txt` 14:06:38～14:07:28）：
+```
+[14:06:38] 状态条 Fill: 药水=0 遗物=4 复用遗物=否 清掉=0 rowChildren=5/5 rowW=376   ← 有能量球
+[14:06:38] 状态条 Fill: 药水=0 遗物=4 复用遗物=否 清掉=0 rowChildren=4/4 rowW=242   ← 没有能量球！
+[14:06:50] 独立意图定位：能量中心 x=0 …（反复出现到 14:07:03）
+[14:07:05] 独立意图定位：能量中心 x=355.6 / x=241.6                                  ← 这一刻才有
+```
+`EnergyCenterX()` 返回 0 就说明 `EnergyOf(row)` 拿不到有效节点 ⇒ 能量球确实没挂在这一行。
+两条 Fill（rowChildren 5/5 与 4/4）说明同一帧里存在**两条状态栏**，球被第一条拿走了。
+
+**根因**：`BossStatusRow.Fill` 里能量球是**按影武者缓存**的单例节点（`EnergyCounters[shadow]`），
+旧代码只处理两种情形：
+```csharp
+if (ReferenceEquals(energyNode.GetParent(), row)) target.Add(energyNode);
+else if (energyNode.GetParent() == null) { row.AddChild(energyNode); target.Add(energyNode); }
+SetEnergyOf(row, energyNode);
+```
+「挂在**另一条**（残留面板 / 备用行 / 还没显示出来的行）上」时**两个分支都不成立** ⇒ 这颗球既不搬过来、
+也没被排进本行，本行就永远没有能量球；而 `SetEnergyOf` 又照样登记，于是 `EnergyCenterX` 用一个
+坐标系不对的节点算 → 0。更糟的是「清空」那一步只认 `EnergyOf(row)`（按行登记），
+新行第一次进来是 null，行里那颗正在用的球会被当垃圾删掉。
+
+**修法**（三处）：
+1. 「可复用」判定再按**影武者缓存**兜一层：缓存里那颗只要确实挂在本行，就不能被清掉；
+2. 父节点**已失效 / 排队销毁 / 不可见**（`IsVisibleInTree()` 为 false）⇒ 直接搬到本行；
+3. `Fill` 新增 `bool primaryRow = true`：**主面板**（`BossHandPanel` 那条）一律把球抢过来
+   （而且是「本行可见」时才抢），只有 `BossExtraStatusRow`（多 Boss 的备用行）才遵守
+   「别抢还活着的那条」。`BossExtraStatusRow` 已改为传 `primaryRow: false`。
+
+新增日志（限 22 条）：
+`能量球挂载：原父节点=<名字>（可见=…）⇒ 旧行已失效/不可见，搬到本行 | 挂到本行 | 挂在另一条还活着的状态栏上（多 Boss），本行不抢`

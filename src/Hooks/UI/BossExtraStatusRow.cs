@@ -61,7 +61,7 @@ public static class BossExtraStatusRow
                 if (Fingerprints.TryGetValue(boss, out var old) && old == fp) { /* 位置仍要跟一下 */ }
                 else
                 {
-                    BossStatusRow.Fill(row, boss);
+                    BossStatusRow.Fill(row, boss, primaryRow: false);
                     BossStatusRow.Place(row, panel.Size.X);
                     Fingerprints[boss] = fp;
                 }

@@ -4972,3 +4972,11 @@ Chronological action log.
 | 2026-11-10 13:37 | edit | `src/Hooks/Powers/BossLightningRodPower.cs` | ok | 0 |
 | 2026-11-10 13:45 | edit | `src/Hooks/UI/BossHandPanel.Extra.cs` | ok | 0 |
 | 2026-11-10 13:45 | edit | `src/Hooks/UI/BossHandPanel.Extra.cs` | ok | 0 |
+| 2026-11-10 14:09 | edit | `src/Hooks/UI/BossStatusRow.cs` | ok | 0 |
+| 2026-11-10 14:09 | edit | `src/Hooks/UI/BossStatusRow.cs` | ok | 0 |
+| 2026-11-10 14:09 | edit | `src/Hooks/UI/BossStatusRow.cs` | ok | 0 |
+| 2026-11-10 14:10 | edit | `src/Hooks/UI/BossStatusRow.cs` | ok | 0 |
+| 2026-11-10 14:10 | edit | `src/Hooks/UI/BossStatusRow.cs` | ok | 0 |
+| 2026-11-10 14:10 | edit | `src/Hooks/UI/BossStatusRow.cs` | ok | 0 |
+| 2026-11-10 14:10 | edit | `src/Hooks/UI/BossStatusRow.cs` | ok | 0 |
+| 2026-11-10 14:11 | edit | `src/Hooks/UI/BossStatusRow.cs` | ok | 0 |
