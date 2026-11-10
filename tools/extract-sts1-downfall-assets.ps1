@@ -30,7 +30,14 @@ if (-not (Test-Path -LiteralPath $Jar)) { throw "找不到 Downfall.jar：$Jar" 
 
 if (Test-Path -LiteralPath $Out) {
     if ($KeepOld) { Write-Host "保留已有目录：$Out" }
-    else { Write-Host "清空旧目录：$Out"; Remove-Item -LiteralPath $Out -Recurse -Force }
+    else {
+        # ⚠ 别整目录删：`14-角色Boss语音(取自塔1原版VO)` 是**另一个脚本**从塔 1 原版包里提的
+        #   （tools\extract-sts1-charboss-voices.ps1），重跑本脚本不该把它一起清掉。
+        Write-Host "清空旧目录（保留 14 语音目录）：$Out"
+        Get-ChildItem -LiteralPath $Out -Force |
+            Where-Object { $_.Name -notlike '14-*' } |
+            Remove-Item -Recurse -Force
+    }
 }
 New-Item -ItemType Directory -Force -Path $Out | Out-Null
 
@@ -238,7 +245,15 @@ $($summary -join "`r`n")
 ``13`` 的内容 + 反编译结论见该目录里的 ``对照表.md``：charbosses 那套**只自带 5 组专属立绘**，
 其余幕数直接借塔 1 原版角色的骨骼动画（``images/characters/…``，在 ``desktop-1.0.jar``，本次没提）。
 
-重新生成：``pwsh -File tools\extract-sts1-downfall-assets.ps1``
+## ``14-角色Boss语音`` 是另一个脚本产的
+
+``13`` 里的 boss 立绘是 mod 自己的，但**它们的语音**（打攻击牌时喊的那一声）不在 mod 里 ——
+崩坠只调用了塔 1 原版的 ``VO_IRONCLAD_*`` / ``VO_SILENT_*`` / ``VO_GREMLINCALM_*`` / ``VO_NEOW_2B`` / ``VO_CULTIST_*``。
+那批文件由 ``tools\extract-sts1-charboss-voices.ps1`` 从 ``desktop-1.0.jar`` 提取到 ``14-角色Boss语音(取自塔1原版VO)\``，
+重跑本脚本时**不会**删掉它。
+
+重新生成：``powershell -ExecutionPolicy Bypass -File tools\extract-sts1-downfall-assets.ps1``
+（语音另跑：``tools\extract-sts1-charboss-voices.ps1``）
 "@
 Set-Content -LiteralPath (Join-Path $Out 'README.md') -Value $readme -Encoding utf8
 
