@@ -27,14 +27,14 @@ namespace CharacterBosses.Core;
 /// >  1.血肉戏法、鬼火、护卫
 /// >  2.出击、恐惧+、打击（没费）
 /// >  3.违逆、防御、苦难
-/// >  4.撕碎、防御、防御（没费）
+/// >  4.玷污、防御、防御（没费）
 /// >  5.吸引仇恨、摧残(没费)、打击(没费)
 /// >  6.打击、防御、命运同担
 /// >  7.吸引仇恨、打击(没费)、打击(没费)
 /// >  8.出击、摧残、防御(没费)
 /// >  9.防御、恐惧+、打击(没费)
 /// >  10.违逆、防御、苦难
-/// >  11.撕碎、护卫、防御（没费）
+/// >  11.玷污、护卫、防御（没费）
 /// >  之后7～11循环
 ///
 /// ## 能量账
@@ -44,7 +44,7 @@ namespace CharacterBosses.Core;
 ///   · 第 3/10 回合 违逆(1) + 防御(1) + 苦难(0)；
 ///   · 第 5/7 回合 吸引仇恨(2)（多人 = 骸骨军团）⇒ 后面两张没费；
 ///   · 第 6 回合 打击(1) + 防御(1) + 命运同担(0)；
-///   · 第 4/11 回合 撕碎(1) + 防御/护卫(1) + 一张没费。
+///   · 第 4/11 回合 玷污(1) + 防御/护卫(1) + 一张没费。
 ///
 /// ## 循环
 /// 用户：「之后 7～11 循环」⇒ <c>LoopFrom = 7, LoopLength = 5</c>。
@@ -82,12 +82,12 @@ public static class FleshBoneScript
                 Cards = Cards(Play<Defy>(1), Play<DefendNecrobinder>(1), Play<Misery>(0)),
             },
 
-            // 4：撕碎(1) + 防御(1)；第二张防御没费
+            // 4：玷污(1) + 防御(1)；第二张防御没费
             new BossTurn
             {
-                Note = "4. 撕碎(1)、防御(1)；防御（没费）",
+                Note = "4. 玷污(1)、防御(1)；防御（没费）",
                 Energy = TurnEnergy,
-                Cards = Cards(Play<Rend>(1), Play<DefendNecrobinder>(1), Hold<DefendNecrobinder>(1)),
+                Cards = Cards(Play<Defile>(1), Play<DefendNecrobinder>(1), Hold<DefendNecrobinder>(1)),
             },
 
             // 5：吸引仇恨(2)（多人 = 骸骨军团）；摧残、打击没费
@@ -139,12 +139,12 @@ public static class FleshBoneScript
                 Cards = Cards(Play<Defy>(1), Play<DefendNecrobinder>(1), Play<Misery>(0)),
             },
 
-            // 11：撕碎(1) + 护卫(1)；防御没费
+            // 11：玷污(1) + 护卫(1)；防御没费
             new BossTurn
             {
-                Note = "11. 撕碎(1)、护卫(1)；防御（没费）",
+                Note = "11. 玷污(1)、护卫(1)；防御（没费）",
                 Energy = TurnEnergy,
-                Cards = Cards(Play<Rend>(1), Play<Bodyguard>(1), Hold<DefendNecrobinder>(1)),
+                Cards = Cards(Play<Defile>(1), Play<Bodyguard>(1), Hold<DefendNecrobinder>(1)),
             },
         };
 
@@ -169,7 +169,7 @@ public static class FleshBoneScript
         // 第 7 回合要「留两张打击」⇒ 需要两张
         typeof(StrikeNecrobinder), typeof(StrikeNecrobinder),
         typeof(Defy),
-        typeof(Rend),
+        typeof(Defile),
         typeof(PullAggro),
         typeof(Debilitate),
         typeof(Misery),
