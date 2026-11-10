@@ -48,6 +48,7 @@ $CatDirs = [ordered]@{
     '10' = '10-怪物与Boss Monsters-Bosses'
     '11' = '11-特效与能量球 VFX-Orbs'
     '12' = '12-杂项与源文件 Misc-Source'
+    '13' = '13-角色当Boss(把可玩角色做成boss) CharBosses'
 }
 
 function Get-CharLabel([string]$first) {
@@ -71,6 +72,11 @@ function Get-Category([string]$full, [string]$ext) {
     $artish = $ext -in @('.png', '.jpg', '.jpeg', '.atlas', '.json', '.scml', '.pdn', '.xcf')
 
     if ($artish) {
+        # ★ 第一优先：「角色当 boss」那几组专属立绘（expansioncontentResources/images/bosses/**）。
+        #   反编译确认（class 常量池）：`charbosses/bosses/<角色>/(NewAge|Simpler)/ArchetypeAct*`
+        #   直接引用这一批文件；其余幕数则**直接借塔1原版角色骨骼**（images/characters/…，在
+        #   desktop-1.0.jar 里，按用户要求不提）。
+        if ($p -match '/images/bosses/') { return '13' }
         # 顺序有讲究：先判「角色/立绘/动画」，再判卡牌/遗物/能力，最后才是通用 UI
         # ⚠ `mainChar` 里没有 `/char` 这一段（是 `/mainchar`），漏了它整份角色立绘会掉进 12 —— 踩过。
         if ($p -match '/(char|charselect|mainchar|characters|spriter|animation|static_character|portrait|corpse)') { return '03' }
@@ -131,7 +137,10 @@ try {
         }
         $rel = if ($rest.Length -gt 0) { $rest -join '/' } else { $e.Name }
 
-        $dest = Join-Path (Join-Path (Join-Path $Out $CatDirs[$cat]) $char) $rel
+        # 13 是专题目录：那一批立绘全来自 expansioncontentResources，再套一层角色名没意义 ⇒ 拍平
+        if ($cat -eq '13') { $char = '' }
+        $catDir = Join-Path $Out $CatDirs[$cat]
+        $dest = if ($char) { Join-Path (Join-Path $catDir $char) $rel } else { Join-Path $catDir $rel }
         $destDir = Split-Path -Parent $dest
         if (-not (Test-Path -LiteralPath $destDir)) { New-Item -ItemType Directory -Force -Path $destDir | Out-Null }
 
@@ -146,6 +155,34 @@ try {
         $n++
         $bytes += $e.Length
         if ($n % 500 -eq 0) { Write-Host ("  已提取 {0} 个文件…" -f $n) }
+    }
+
+    # ── 「角色当 boss」专题：把散落在各处的零碎图**再复制一份**到 13，方便一次看完 ──
+    #    来源是反编译 class 常量池里实际引用的路径（见 Get-Category 里那段注释）。
+    $curated = @(
+        @{ Match = '^downfallResources/images/bgShrooms\.png$'; Sub = 'Ironclad蘑菇boss背景' }
+        @{ Match = '^downfallResources/images/fgShrooms\.png$'; Sub = 'Ironclad蘑菇boss背景' }
+        @{ Match = '^downfallResources/images/vfx/CultistPotion\.png$'; Sub = 'Hermit第3幕Doomsday' }
+        @{ Match = '^downfallResources/images/powers/infinite_blades_marker\.png$'; Sub = '卡牌高亮标记' }
+        @{ Match = '^downfallResources/images/powers/inverse_bias_marker\.png$'; Sub = '卡牌高亮标记' }
+        # ⚠ 这几张（Blood / Strength / HeartOfIron / PowerPotion…）在 jar 里**不存在** ——
+        #   那几条是塔 1 原版 images/vfx/… 的引用，所以干脆整个 vfx 目录一起复制
+        @{ Match = '^downfallResources/images/vfx/'; Sub = '通用特效(boss与药水卡)' }
+        @{ Match = '^hermitResources/images/char/hermit/'; Sub = '隐士Hermit立绘' }
+        @{ Match = '^downfallResources/images/charBoss/Crowbot/'; Sub = 'Crowbot-boss立绘' }
+    )
+    foreach ($c in $curated) {
+        foreach ($e in $zip.Entries) {
+            if ([string]::IsNullOrEmpty($e.Name)) { continue }
+            if ($e.FullName -notmatch $c.Match) { continue }
+            $sub = $e.FullName -replace $c.Match, ''
+            if ([string]::IsNullOrWhiteSpace($sub)) { $sub = $e.Name }   # 精确命中的单文件 ⇒ 用文件名
+            $sub = $sub.TrimStart('/')
+            $dest = Join-Path (Join-Path (Join-Path $Out $CatDirs['13']) $c.Sub) $sub
+            $destDir = Split-Path -Parent $dest
+            if (-not (Test-Path -LiteralPath $destDir)) { New-Item -ItemType Directory -Force -Path $destDir | Out-Null }
+            [System.IO.Compression.ZipFileExtensions]::ExtractToFile($e, $dest, $true)
+        }
     }
 }
 finally { $zip.Dispose() }
@@ -189,9 +226,75 @@ $($summary -join "`r`n")
   是作者打包的原始素材，可能需要再解一层。
 - 全部路径对照表在 ``素材索引.csv``（可排序/筛选，含原始 jar 内路径）。
 
+## ``13-角色当Boss`` 是专题目录
+
+崩坠有两套完全相反的设计，别混：
+
+| | 方向 | 例子 | 在哪 |
+| --- | --- | --- | --- |
+| A | **塔 1 原版 boss → 可玩角色** | 守卫者 / 六火亡魂 / 勇士 / 收藏家 / 觉醒者 / 黏液 / 蛇眼 / 青铜…… | ``03``、``04``（``bg_boss_*`` 卡框）、``reskinContent`` |
+| B | **可玩角色 → boss**（charbosses 包） | 铁甲战士 / 静默猎手 / 故障机器人 / 观者 / 隐士 / 商人 | **``13``** |
+
+``13`` 的内容 + 反编译结论见该目录里的 ``对照表.md``：charbosses 那套**只自带 5 组专属立绘**，
+其余幕数直接借塔 1 原版角色的骨骼动画（``images/characters/…``，在 ``desktop-1.0.jar``，本次没提）。
+
 重新生成：``pwsh -File tools\extract-sts1-downfall-assets.ps1``
 "@
 Set-Content -LiteralPath (Join-Path $Out 'README.md') -Value $readme -Encoding utf8
+
+# ── 13 的对照表（内容来自对 class 常量池的实际扫描，不是猜的） ────────────────
+$charbossMd = @"
+# 角色当 Boss（`charbosses` 包）素材对照表
+
+崩坠的 ``charbosses`` 包 = **把可玩角色做成 boss**（铁甲战士 / 静默猎手 / 故障机器人 / 观者 / 隐士 / 商人）。
+它分幕、且每幕有 ``Simpler`` 与 ``NewAge`` 两套牌组（archetype）。
+
+## 结论先说
+
+**这个包几乎不自带美术。** 立绘/战斗动画都是直接加载**塔 1 原版角色的骨骼**：
+
+| boss | 立绘来源（class 常量池实证） | 是不是 mod 自己的 |
+| --- | --- | --- |
+| 铁甲战士 | ``images/characters/ironclad/idle/skeleton.atlas/.json`` | ❌ 塔 1 原版 |
+| 静默猎手 | ``images/characters/theSilent/idle/skeleton.*`` | ❌ 塔 1 原版 |
+| 故障机器人 | ``images/characters/defect/idle/skeleton.*`` | ❌ 塔 1 原版 |
+| 观者 | ``images/characters/watcher/idle/skeleton.*`` + ``eye_anim`` | ❌ 塔 1 原版 |
+| 商人（第 3 幕） | ``images/monsters/merchant/noShadow/skeleton.*`` + ``skeletonGlow`` | ❌ 塔 1 原版 |
+| 隐士 | ``hermitResources/images/char/hermit/Hermit.atlas/.json`` | ✅ mod 自己的（见 ``隐士Hermit立绘\``） |
+
+## mod 自带的几组专属立绘（本目录 ``bosses\<角色>\<幕>\``）
+
+| 幕 | archetype（Simpler 与 NewAge 共用同一张） | 立绘 |
+| --- | --- | --- |
+| 故障机器人 第 1 幕 | ``ArchetypeAct1VoidsSimple`` / ``ArchetypeAct1TurboNewAge`` | ``defect/1/Defect_thief.png`` |
+| 故障机器人 第 2 幕 | ``ArchetypeAct2ClawSimple`` / ``ArchetypeAct2ClawNewAge`` | ``defect/2/clockworkDefect.png`` |
+| 静默猎手 第 1 幕 | ``ArchetypeAct1PoisonSimple`` / ``ArchetypeAct1PoisonNewAge`` | ``silent/1/Poison_Silent.png`` |
+| 隐士 第 1 幕 | ``ArchetypeAct1SharpshooterSimple`` / ``...NewAge`` | ``hermit/1/Hermit_Sharp.png`` |
+| 铁甲战士 第 2 幕 | ``ArchetypeAct2MushroomsSimple`` / ``...NewAge`` | ``ironclad/2/Mushroomskeleton.png`` ⚠ 见下 |
+| （小怪）虱子 Tangerine | ``charbosses/monsters/LouseTangerine`` | ``hermit/1/tangerine/skeleton_2.png`` |
+
+⚠ ``Mushroomskeleton`` 在整个 jar 里**找不到任何引用它的 class**（只有它自己的 .atlas）⇒ 大概率是
+没启用的残留资源；铁甲战士第 2 幕实际用的仍是塔 1 原版骨骼 + 下面那两个蘑菇图。
+
+## 本目录其它子文件夹
+
+| 子目录 | 内容 | 被谁用 |
+| --- | --- | --- |
+| ``Ironclad蘑菇boss背景\`` | ``bgShrooms.png`` / ``fgShrooms.png`` | ``CharBossIronclad`` 战斗场景的前景/背景蘑菇 |
+| ``Hermit第3幕Doomsday\`` | ``CultistPotion.png`` | ``ArchetypeAct3DoomsdayNewAge`` |
+| ``卡牌高亮标记\`` | ``infinite_blades_marker.png`` / ``inverse_bias_marker.png`` | ``charbosses/bosses/HighlightCards``（把手牌里关键牌点亮） |
+| ``通用特效(boss与药水卡)\`` | 整个 ``downfallResources/images/vfx``（15 张） | ``charbosses/cards/colorless/potioncards/*`` 等 |
+| ``隐士Hermit立绘\`` | ``Hermit.atlas/.json/.png`` + ``Spriter/`` + ``orb/`` | 隐士 boss 本体立绘（同时是隐士这个可玩角色的立绘） |
+| ``Crowbot-boss立绘\`` | ``crowbot.atlas/.json/.png`` | 只在 boss 战出现的角色（``downfallResources/images/charBoss/Crowbot``） |
+
+## 卡图：boss 出牌用的牌面
+
+``charbosses/cards/`` 下的红/绿/蓝/紫牌（55/50/62/72 张）是**原版牌的 boss 版**，
+牌面直接借塔 1 原版卡图（``images/cards/…``）⇒ 本次没提；隐士那 51 张（``En*``）用的是
+``hermitResources/images/cards/*.png``，已经在 ``04-卡牌图与卡框 Cards\hermit\cards\`` 里，
+部分是上面那两个 ``marker`` 图之外就没了。诅咒/无色/药水卡同理。
+"@
+Set-Content -LiteralPath (Join-Path $Out (Join-Path $CatDirs['13'] '对照表.md')) -Value $charbossMd -Encoding utf8
 
 Write-Host ''
 Write-Host "完成：$n 个文件 / $([math]::Round($bytes/1MB,1)) MB → $Out"
