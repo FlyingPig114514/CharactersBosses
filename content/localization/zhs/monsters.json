@@ -144,5 +144,5 @@
     "SILENT_GRAND_FINALE_BOSS.moves.CHARBOSS_PLAY.title":  "出牌",
     "SILENT_BOSS.suppression":  "压制\n每当静默猎手打出[gold]华丽收场[/gold]时，将一张[gold]虚空[/gold]放入所有玩家的抽牌堆顶部。",
     "NECROBINDER_BOSS.void_call":  "虚空之唤\n亡灵契约师首次打出[gold]女妖之嚎[/gold]时，所有玩家的所有卡牌获得[gold]虚无[/gold]，直到亡灵契约师死亡。",
-    "NECROBINDER_BOSS.devour_life":  "吞噬生命\n每当亡灵契约师给予负面效果时，她获得[gold]4[/gold]点格挡。\n[red]警告：[/red][gold]血肉戏法[/gold]和[gold]招架盾[/gold]属于无来源伤害，带有[gold]为你而死[/gold]的召唤物不会替你承受该伤害。"
+    "NECROBINDER_BOSS.devour_life":  "吞噬生命\n每当亡灵契约师给予负面效果时，她获得[gold]4[/gold]点格挡。\n[red]警告：[/red][gold]血肉戏法[/gold]属于无来源伤害，带有[gold]为你而死[/gold]的召唤物不会替你承受该伤害。"
 }
