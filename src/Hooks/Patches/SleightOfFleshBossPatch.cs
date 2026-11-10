@@ -67,7 +67,11 @@ internal static class SleightOfFleshBossPatch
             var victim = power?.Owner;
             if (victim == null) { __result = Task.CompletedTask; return false; }
             if (victim.Monster != null) { __result = Task.CompletedTask; return false; }   // 她自己/别的怪：不打
-            if (amount <= 0m) { __result = Task.CompletedTask; return false; }
+            // ★ 2026-11-10（用户：「她现在使用命运同担不会对玩家造成伤害。是不是…拦多了？」）：
+            //   **拦多了** —— 原版判据是 `amount != 0`：「失去力量」这种负面是**负数**送进来的
+            //   （`PowerCmd.Apply<StrengthPower>(ctx, target, -2, …)` ⇒ amount = -2），
+            //   以前写 `amount <= 0` 正好把命运同担这一路挡掉了，于是那 9 点血肉戏法不触发。
+            if (amount == 0m) { __result = Task.CompletedTask; return false; }
 
             PowerType kind;
             try { kind = power!.GetTypeForAmount(amount); } catch { return true; }

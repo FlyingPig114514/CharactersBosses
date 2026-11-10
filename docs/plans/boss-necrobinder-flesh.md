@@ -234,3 +234,44 @@ new DynamicVar("PlayerStrengthLoss", 2m)   // 自己失去 X 力量
 
 顺带一个正确的副作用：它现在算「会给予负面效果」，所以**血肉戏法那 +9 也会显示**在它下面
 （`SHARED_FATE` 确实会给那个玩家上 `StrengthPower -2`，血肉戏法该打）。
+## 11. 「拦多了」—— 命运同担不触发（v0.2.553）
+
+用户：「bug：她现在使用命运同担不会对玩家造成伤害。是不是之前修命运同担会对她自己造成伤害的时候拦多了？」
+**就是拦多了。**
+
+反编译原版那条判据是 `amount != 0`，因为「**失去力量**」这种负面是**负数**送进来的：
+```csharp
+// SharedFate
+PowerCmd.Apply<StrengthPower>(ctx, cardPlay.Target, -EnemyStrengthLoss, Owner.Creature, card);   // amount = -2
+```
+而我上一版（v0.2.546）为了「别打到她自己」写成了：
+
+```csharp
+if (amount <= 0m) { __result = Task.CompletedTask; return false; }   // ← 把负数负面全挡掉了
+```
+
+⇒ 命运同担那条 `StrengthPower -2` 被整条跳过：**血肉戏法的 9 点不触发**，
+`BossDevourLifePower` 的 `amount <= 0m` 同样让她**不加那 4 点格挡**。
+
+修法：两处都改成「只排除 0」，是不是负面交给 `GetTypeForAmount(amount)`（原版口径）：
+```csharp
+if (amount == 0m) { /* 跳过 */ }
+if (power.GetTypeForAmount(amount) != PowerType.Debuff) { /* 跳过 */ }
+```
+已用 `ilspycli` 反编译部署后的 `CharacterBosses.Impl111.dll` 复核：
+`SleightOfFleshBossPatch` 里是 `if (amount == 0m)`、`BossDevourLifePower` 里是
+`!(amount == 0m) && GetTypeForAmount(...) == Debuff && !(power is ITemporaryPower)`。
+
+## 12. 能力面板（v0.2.553，用户给的数据）
+
+```
+血肉骨
+循环：7～11
+单体能力：强
+群攻能力：强
+单体高压回合：3、5、11
+群体高压回合：4、10
+特殊效果类型：自身
+群体减益能力：极强
+群体增益能力：弱
+```

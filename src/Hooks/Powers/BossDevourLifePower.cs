@@ -49,7 +49,13 @@ public sealed class BossDevourLifePower : PowerModel
         {
             var owner = Owner;
             if (owner == null || !owner.IsAlive) return;
-            if (power == null || amount <= 0m) return;                  // 只在下「正向层数」的负面时触发
+            // ★ 2026-11-10（用户：「她现在使用命运同担不会对玩家造成伤害。是不是之前修…拦多了？」）：
+            //   **拦多了** —— 原版那条判据是 `amount != 0`，因为「失去力量」这种负面是**负数**送进来的
+            //   （`PowerCmd.Apply<StrengthPower>(ctx, target, -2, ...)` ⇒ amount = -2）。
+            //   以前这里写 `amount <= 0` 就把「命运同担 / 黑暗镣铐」这类**扣层数**的负面全挡掉了。
+            //   现在与血肉戏法（`SleightOfFleshPower`）同一口径：只要求 `amount != 0`，
+            //   是不是负面交给下面的 `GetTypeForAmount`。
+            if (power == null || amount == 0m) return;
 
             // 是不是「负面」：原版用 `GetTypeForAmount` 判（负数力量那种也认）
             PowerType kind;
