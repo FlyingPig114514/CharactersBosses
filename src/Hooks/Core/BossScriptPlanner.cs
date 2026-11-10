@@ -415,14 +415,10 @@ public static class BossScriptPlanner
                 //   而剧本里排在它前面的紧追不放/重压都已经让奥斯提打过了（用户实测口径）。
                 extraHits: (IsBlade(card) ? pendingBladeHits : 0) + xHits
                            + HelixExtraHits(card, energyAtStart - energy)
-                           + (SafeEntry(card) == "RATTLE" ? ostyAttacksThisTurn : 0)
-                           // ★ 2026-11-10（用户：「致死性也算虚无牌」）：
-                           //   「亡魂牵引」（`PULL_FROM_BELOW`）的段数 = **本场打出过的虚无牌数**
-                           //   （反编译 `CalculatedHits` 数的是战斗历史）。而意图是在玩家回合里算的 ——
-                           //   那一刻她本回合的牌一张都还没打，历史里也就没有「致死性」那张虚无牌
-                           //   ⇒ 预览少一段（5 点）。
-                           //   这里把**本回合计划里排在它前面、且带「虚无」关键字**的牌数补上。
-                           + (SafeEntry(card) == "PULL_FROM_BELOW" ? etherealPlanned : 0),
+                           + (SafeEntry(card) == "RATTLE" ? ostyAttacksThisTurn : 0),
+                // ⚠ 「亡魂牵引」的段数（本回合已打出的虚无牌）走 `etherealBefore`（见函数末尾那个参数）：
+                //   规划期 `boss.Plan` 还是空的 ⇒ 只能由这里按剧本顺序数；出牌期的「每帧重算」
+                //   则由 `BossIntentBuilder.PlannedEtherealBefore` 按 `Plan` 自己数。两边取较大值，不会双算。
                 xHits: xHits,
                 // 全身撞击：用「出手时会有多少格挡」覆盖牌面（见上面 simBlock 注释）
                 bodySlamBlock: SafeEntry(card) == "BODY_SLAM" ? simBlock : -1,
@@ -444,7 +440,10 @@ public static class BossScriptPlanner
                 // 钢铁风暴：每丢一张生成一把小刀 ⇒ 段数 = 本回合剧本里被丢弃的张数
                 shivOverride: SafeEntry(card) == "STORM_OF_STEEL" ? stormDiscards : 0,
                 // 仆从储：这一张是不是「召唤」（按本回合前面已计划的仆从数量算）
-                minionSummon: IsMinionSummonHere(card, boss, ref plannedMinions));
+                minionSummon: IsMinionSummonHere(card, boss, ref plannedMinions),
+                // ★ 2026-11-10：亡魂牵引的段数 = 本场打出的虚无牌数，而本回合排它前面的那几张
+                //   （例如致死性 `Lethality` 本身就是虚无牌）在规划期战斗历史里还没有 ⇒ 由这里按剧本顺序数给它。
+                etherealBefore: etherealPlanned);
             // ★ 2026-11-05：累加「本回合已生成的状态牌 / 已打出的技能牌」，供后面几张牌的意图用
             statusesThisTurn += Core.StatusBossMath.StatusCardsGenerated(card);
             if (Core.StatusBossMath.IsSkill(card)) skillsThisTurn++;

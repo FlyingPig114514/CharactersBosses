@@ -92,7 +92,7 @@ public static class BossIntentBuilder
                                                   int smokePerHit = 0, int smokeHits = 0,
                                                   int letterOpenerHit = 0, int pendingStatusCards = 0,
                                                   bool aoeFromCaller = false, bool minionSummon = false,
-                                                  int shivOverride = 0)
+                                                  int shivOverride = 0, int etherealBefore = 0)
     {
         var intents = new List<AbstractIntent>();
 
@@ -235,6 +235,35 @@ public static class BossIntentBuilder
             catch { /* 数不出来就按原版 */ }
         }
 
+        // ★ 2026-11-10（用户实测：第五回合亡魂牵引预览 7×**3**、真实 6×**4**）：
+        //   「亡魂牵引」（`PULL_FROM_BELOW`）的段数 = 本场战斗里**她打出的虚无牌数**
+        //   （反编译 `CalculatedHits`：`e.CardPlay.Player == card.Owner && e.WasEthereal`）——
+        //   数的是战斗历史。可这条意图是在**玩家回合**里算的：那时她本回合那张「致死性」
+        //   （虚无牌）还没打出去，历史里没有它 ⇒ 永远少一段。
+        //   ⇒ 把「本回合计划里排在它前面的虚无牌」补上（`PlannedEtherealBefore`）。
+        //   注意**不会双算**：她真打完那张牌之后 `CharBossMonster.PlayOne` 会把它从 `Plan` 里摘掉，
+        //   而历史里已经记上它了 —— 两个来源在时间上互斥。
+        if (entry == "PULL_FROM_BELOW")
+        {
+            try
+            {
+                var pullBoss = card.Owner?.Creature?.Monster as Monsters.CharBossMonster;
+                int fromPlan = PlannedEtherealBefore(pullBoss, card);
+                // ⚠ **规划期 `boss.Plan` 还是空的**（`BossScriptPlanner.Plan` 先算出 intents、最后才写 Plan），
+                //   所以规划期必须用调用方按剧本顺序数好的 `etherealBefore`；
+                //   出牌期的「每帧重算」则没有调用方上下文，靠 `Plan` 里的剩余顺序。
+                //   两条路取**较大值**而不是相加 —— 同一个来源被两边各数一次时不会翻倍。
+                int planned = Math.Max(fromPlan, Math.Max(0, etherealBefore));
+                if (planned > 0)
+                {
+                    Logger.Log($"[CharBoss] 亡魂牵引：本回合排它前面的虚无牌 {planned} 张" +
+                               $"（计划内 {fromPlan} / 调用方 {etherealBefore}）⇒ 意图段数 {hits} → {hits + planned}");
+                    hits += planned;
+                }
+            }
+            catch { /* 数不出来就按原版 */ }
+        }
+
         // 「疯狂科学」：把那个**假的**攻击伤害清零（它真正的效果是格挡 + Chaos rider）。
         // 清零必须放在下面 `if (damage > 0)` 之前，否则还是会画出攻势意图。
         if (madScience)
@@ -350,8 +379,15 @@ public static class BossIntentBuilder
         //   那一刻她本回合的「致死性」还没打出去、power 不在身上 ⇒
         //   `Hook.ModifyDamage` 那一路乘不出那 50%。
         //   所以：**她身上还没有这层 power**（= 只可能是「本回合计划里排在她前面」的那种情况）
-        //   且这张是她本回合第一张攻击牌时，也在这里手工乘一次；
+        //   且这张是她本回合第一张攻击牌时，也要把这份加成算进预览；
         //   等 power 真上身之后（她回合里的每帧重算）就走上面那条原版管道，绝不双份。
+        //
+        // ★★ 2026-11-10 第二次修正（用户实测：预览 7×3、真实 6×4）：
+        //   **顺序**必须先算力量、**再**乘致死性：真实结算 `(5 + 力量 -1) × 1.5 = 6`，
+        //   而我上一版是「先把牌面 ×1.5 再走管道减力量」⇒ 5×1.5=8 → 8−1=7（多了 1 点）。
+        //   所以**非奥斯提**这条路不再改 `damage`，而是记下 `pendingLethalityPct`，
+        //   到建意图时用「先 `FinalDamage`（含力量/虚弱/易伤）再乘倍率并向下取整」的写法 ——
+        //   与真实结算的取整一致（StS2 是向下取整）。
         bool lethalityManual = fromOsty;
         if (!lethalityManual && damage > 0)
         {
@@ -363,6 +399,7 @@ public static class BossIntentBuilder
             }
             catch { lethalityManual = false; }
         }
+        int pendingLethalityPct = 0;
         if (lethalityManual && damage > 0)
         {
             try
@@ -373,9 +410,20 @@ public static class BossIntentBuilder
                     int pct = LethalityPercentFor(lethalBoss, card);
                     if (pct > 0)
                     {
-                        int before = damage;
-                        damage = Math.Max(0, (int)Math.Round(damage * (100 + pct) / 100.0));
-                        Logger.Log($"[CharBoss] 致死性：{entry} 是本回合第一张攻击牌 ⇒ 意图 {before} → {damage}（+{pct}%）");
+                        if (fromOsty)
+                        {
+                            // 奥斯提那几张走 Raw 意图、全程不过伤害管道 ⇒ 只能当场乘掉
+                            int before = damage;
+                            damage = Math.Max(0, (int)Math.Round(damage * (100 + pct) / 100.0));
+                            Logger.Log($"[CharBoss] 致死性：{entry} 是本回合第一张攻击牌 ⇒ 意图 {before} → {damage}（+{pct}%）");
+                        }
+                        else
+                        {
+                            // 普通攻击牌：留到建意图时**先走管道再乘**（见下面 pendingLethalityPct 的用法）
+                            pendingLethalityPct = pct;
+                            Logger.Log($"[CharBoss] 致死性：{entry} 是本回合第一张攻击牌 ⇒ 预览将在「力量之后」×" +
+                                       $"{(100 + pct) / 100.0:0.##}（+{pct}%，与真实结算同序）");
+                        }
                     }
                 }
             }
@@ -464,6 +512,32 @@ public static class BossIntentBuilder
                         int times = BossDamagePredictor.EchoingSlashHits(card, echoBase, victim) * plays;
                         return (Math.Max(0, perHit), Math.Max(1, times));
                     }));
+                }
+                // ★ 2026-11-10：「致死性」的 +N% 必须**排在力量和易伤之后**（真实结算
+                //   `(5 + 力量 -1) × 1.5 = 6`，而先把牌面乘 1.5 再减力量会得到 7）。
+                //   所以她身上还没有这层 power（= 本回合计划里排她前面）时，这里改成
+                //   「先 `FinalDamage` 跑完整条原版管道，再乘倍率并向下取整」。
+                else if (pendingLethalityPct > 0)
+                {
+                    int lethalBase = damage;
+                    int lethalPct = pendingLethalityPct;
+                    if (totalHits > 1)
+                    {
+                        intents.Add(new LiveMultiAttackIntent((targets, owner) =>
+                        {
+                            var victim = FirstPlayerTarget(targets) ?? owner;
+                            int perHit = BossDamagePredictor.FinalDamage(card, lethalBase, victim);
+                            return (Math.Max(0, ApplyPct(perHit, lethalPct)), totalHits);
+                        }));
+                    }
+                    else
+                    {
+                        intents.Add(new LiveDelegateSingleAttackIntent((targets, owner) =>
+                        {
+                            var victim = FirstPlayerTarget(targets) ?? owner;
+                            return ApplyPct(BossDamagePredictor.FinalDamage(card, lethalBase, victim), lethalPct);
+                        }));
+                    }
                 }
                 else intents.Add(totalHits > 1
                     ? new LiveMultiAttackIntent((targets, owner) =>
@@ -1618,8 +1692,59 @@ public static class BossIntentBuilder
         catch { /* 忽略 */ }
         return Math.Max(0, fallbackBefore);
     }
+    /// <summary>
+    /// 把「致死性」的 +<paramref name="pct"/>% 乘到**已经跑完原版伤害管道**的单段伤害上。
+    ///
+    /// 顺序必须是「力量/虚弱/易伤 → 致死性」，与真实结算同序（`(5 + 力量 -1) × 1.5 = 6`）；
+    /// 取整用**向下取整**（原版伤害一律 floor，见 <see cref="BossDamagePredictor.FloorToInt"/>），
+    /// 用 `Math.Round` 会在 `.5` 处多给 1 点（用户实测 5×1.5=8 而非 7 的同类问题）。
+    /// </summary>
+    private static int ApplyPct(int damage, int pct)
+    {
+        if (damage <= 0 || pct == 0) return Math.Max(0, damage);
+        return Math.Max(0, (int)Math.Floor(damage * (100.0 + pct) / 100.0));
+    }
+
     private static int PlannedCardsBefore(Monsters.CharBossMonster? boss, CardModel card)
         => PlannedCardsBefore(boss, card, out _);
+
+    /// <summary>
+    /// 「亡魂牵引」的段数补正：**本回合排在它前面、且带「虚无」关键字的牌**有几张。
+    ///
+    /// 反编译 `PullFromBelow`：`CalculatedHits` 数的是战斗历史里
+    /// `e.CardPlay.Player == 卡主 &amp;&amp; e.WasEthereal` 的条目数。而意图是在**玩家回合**里算的 ——
+    /// 那一刻她本回合一张牌都还没打，历史里没有「致死性」那张虚无牌 ⇒ 预览少一段。
+    /// （用户 2026-11-10：「没有把致死性这张虚无牌算上」，实测预览 3 段、真实 4 段。）
+    ///
+    /// ★ 为什么放在**这里**而不是由规划器传参：这个数会被**三条路**各算一次
+    ///   （规划期 / `BladesGrowth.RecomputeAll` / 有球 Boss 的 `RefreshPlannedIntents`），
+    ///   传参只要漏一条，面板显示就不对（v0.2.537 就是这样丢的）。按 `boss.Plan` 自己数，
+    ///   三条路都自动一致。
+    /// </summary>
+    private static int PlannedEtherealBefore(Monsters.CharBossMonster? boss, CardModel card)
+    {
+        try
+        {
+            var plan = boss?.Plan;
+            if (plan == null || card == null) return 0;
+            int n = 0;
+            foreach (var play in plan)
+            {
+                if (play?.Card == null) continue;
+                if (ReferenceEquals(play.Card, card)) return n;
+                bool ethereal = false;
+                try
+                {
+                    ethereal = play.Card.Keywords != null
+                               && play.Card.Keywords.Contains(MegaCrit.Sts2.Core.Entities.Cards.CardKeyword.Ethereal);
+                }
+                catch { ethereal = false; }
+                if (ethereal) n++;
+            }
+        }
+        catch { /* 忽略 */ }
+        return 0;
+    }
 
     /// <summary>同上，另外告诉调用方「这张牌还在计划里吗」（不在 ⇒ 调用方用自己的兜底值）。</summary>
     private static int PlannedCardsBefore(Monsters.CharBossMonster? boss, CardModel card, out bool inPlan)
