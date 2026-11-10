@@ -54,3 +54,22 @@
 - 优先用 RunState.Rng.Seed（多个候选属性名都试，联机两端一致）；
 - 读不到就**每次开局重新摇一个本地随机种子**，并按 RunState 实例判断「换了一局」（换局时清缓存）；
 - 日志会打 `阵容随机种子 = N（来源：RunState.Rng.Seed / 本地随机）`，下一版直接能看出是哪条路。
+
+## 顶栏两个 Boss 头像一样（v0.2.558）
+
+用户 2026-11-10：「剪影说明 boss 是一个亡灵契约师和一个储君，但最上方一栏却显示两个亡灵契约师的头像」。
+
+`TopBarBossIconFallbackPatch` 两颗图标各自按**遭遇**解析角色（`CharacterFor(encounter)` =
+`encounter.AllPossibleMonsters[0].Id.Entry` → `BossDefs` → 角色）。而第二槽的遭遇很容易解析回
+**第一槽那只角色**（第二槽复用第一槽的遭遇 / `SecondBossEncounter` 的读取兜底没换成伙伴那套）⇒ 两颗一样。
+
+补一道：两颗解析出**同一只角色**时，第二颗改用**我们阵容里的第二只设计**：
+- 多人同场（`BossLineups.LineupNow()` 长度 ≥2）= 本场阵容的 partner（`lineup[1]`）；
+- 否则（进阶 10 第三幕连打两只）= `BossLineups.For(act, 1)[0]`。
+设计 Key → 角色：`BossKeys.MonsterTypeOf(key)` → 怪物 id → `BossDefs.All[...].CharacterType`。
+
+日志：
+```
+顶栏 Boss 图标：第二槽与第一槽都被解析成 NECROBINDER ⇒ 按阵容第二只（REGENT_KING）改成 REGENT
+顶栏 Boss 图标：第二槽与第一槽都是 NECROBINDER，而阵容给不出不同的第二只（key=…）
+```

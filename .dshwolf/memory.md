@@ -5010,3 +5010,5 @@ Chronological action log.
 | 2026-11-10 22:47 | edit | `src/Hooks/Patches/BossPetNoStrengthLossPatch.cs` | ok | 0 |
 | 2026-11-10 22:53 | edit | `src/Hooks/Powers/BossDevourLifePower.cs` | ok | 0 |
 | 2026-11-10 22:57 | edit | `src/Hooks/Powers/BossDevourLifePower.cs` | ok | 0 |
+| 2026-11-10 23:03 | edit | `src/Hooks/Patches/TopBarBossIconFallbackPatch.cs` | ok | 0 |
+| 2026-11-10 23:03 | write | `src/Hooks/Patches/TopBarBossIconFallbackPatch.cs` | ok | 0 |

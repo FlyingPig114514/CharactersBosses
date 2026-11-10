@@ -949,6 +949,9 @@ internal static class BossLineups
     /// 当前这一场的阵容（**从同步数据推**）：拿存档里的主 Boss 遭遇 → 反查是哪一场的阵容。
     /// 拿不到返回 null。这样「第几场」不再依赖本机记账（`_currentFightAct`），两端一致。
     /// </summary>
+    /// <summary>当前这一场的阵容（拿不到就 null）—— 给顶栏头像这类 UI 用。</summary>
+    internal static string[]? LineupNow() => CurrentFightLineup();
+
     private static string[]? CurrentFightLineup()
     {
         try
