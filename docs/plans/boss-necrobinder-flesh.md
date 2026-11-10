@@ -309,3 +309,26 @@ if (sleight > 0) await CreatureCmd.Damage(ctx, target, sleight, ValueProp.Unpowe
 1. **任何来源的负面效果**都不给随从（`GetTypeForAmount(amount) == Debuff`，负数力量也算）；
 2. 施加者是真人玩家时，正面效果也拦（用户 2026-10-23 的原始要求）。
 她自己给的正面效果（骸骨军团之类）照常。
+## 14. 「命运同担」不触发血肉戏法 —— 第三刀（v0.2.556）
+
+上一版把 9 点挪进 `BossDevourLifePower` 之后，日志证明**钩子确实被派发**了：
+
+```
+[22:52:15] 吞噬生命钩子：power=STRENGTH_POWER amount=-2 目标=亡灵契约师 施加者=亡灵契约师
+[22:51:57] 吞噬生命：她给 亡灵契约师 上了 VULNERABLE_POWER（2）⇒ 获得 4 点格挡 + 血肉戏法 9 点无来源伤害
+[22:52:02] 吞噬生命：她给 亡灵契约师 上了 WEAK_POWER（1）⇒ 获得 4 点格挡 + 血肉戏法 9 点无来源伤害
+```
+—— `VULNERABLE +2` / `WEAK +1` 都正常打出 9 点（`效果追踪 HP Necrobinder −9 props=Unpowered`），
+唯独 `STRENGTH_POWER −2`（命运同担）没有下文 ⇒ 掐在「**是不是负面**」这一步：
+`power.GetTypeForAmount(-2)` 对 `STRENGTH_POWER` 认不出是 Debuff。
+
+修法：与 `BossIntentBuilder.ClassifyPowers` 同一把尺子 ——
+```csharp
+bool harmful = kind == PowerType.Debuff || amount < 0m;
+```
+（对玩家目标而言「层数变负」永远是负面，`VULNERABLE −1` 那种也覆盖到。）
+
+诊断行也扩成一次打全，下次一眼定位：
+```
+吞噬生命钩子：power=… amount=… 目标=…(side=…, monster=有/无) 施加者=…(是我=…) 类型=… temp=…
+```

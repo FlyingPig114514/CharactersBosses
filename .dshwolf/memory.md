@@ -5008,3 +5008,4 @@ Chronological action log.
 | 2026-11-10 22:30 | write | `src/Hooks/Patches/BossPowerApplyTracePatch.cs` | ok | 0 |
 | 2026-11-10 22:47 | edit | `src/Hooks/Powers/BossDevourLifePower.cs` | ok | 0 |
 | 2026-11-10 22:47 | edit | `src/Hooks/Patches/BossPetNoStrengthLossPatch.cs` | ok | 0 |
+| 2026-11-10 22:53 | edit | `src/Hooks/Powers/BossDevourLifePower.cs` | ok | 0 |

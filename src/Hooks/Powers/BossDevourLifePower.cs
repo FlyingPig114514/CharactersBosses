@@ -56,23 +56,32 @@ public sealed class BossDevourLifePower : PowerModel
             var owner = Owner;
             if (owner == null || !owner.IsAlive) return;
 
-            // 诊断（限流）：先记一行「钩子确实被叫到了」，含目标与施加者。
-            // 用户 2026-11-10 报「命运同担不对玩家造成伤害」时，日志里连一行都没有 ⇒ 需要先确认
-            // 这个钩子在这条路径上到底有没有被派发（`PowerCmd.ModifyAmount` 里
-            // `if (modifiedOffset != 0) await Hook.AfterPowerAmountChanged(...)`）。
-            if (_logs++ < 30)
+            // 诊断（限流）：把所有「会不会继续走」的输入一次打全 —— user 2026-11-10 报
+            // 「命运同担还是不触发血肉戏法」时，光有钩子被叫到的那一行还不够定位是哪一条判据掐的。
+            if (_logs++ < 40)
             {
+                string kindNow = "?";
+                try { kindNow = power == null ? "-" : power.GetTypeForAmount(amount).ToString(); } catch { kindNow = "抛异常"; }
+                var t0 = power?.Owner;
                 Logger.Log($"[CharBoss] 吞噬生命钩子：power={SafeEntry(power)} amount={amount:0.#} " +
-                           $"目标={power?.Owner?.Name ?? "?"} 施加者={(power?.Applier?.Name ?? applier?.Name ?? "null")}");
+                           $"目标={t0?.Name ?? "?"}(side={t0?.Side.ToString() ?? "-"}, monster={(t0?.Monster != null ? "有" : "无")}) " +
+                           $"施加者={(power?.Applier?.Name ?? applier?.Name ?? "null")}" +
+                           $"(是我={ReferenceEquals(power?.Applier ?? applier, owner)}) " +
+                           $"类型={kindNow} temp={power is ITemporaryPower}");
             }
 
             if (power == null || amount == 0m) return;
 
-            // 是不是「负面」：原版用 `GetTypeForAmount` 判（负数力量那种也认）
+            // 是不是「负面」：原版用 `GetTypeForAmount` 判；
+            // ★ 2026-11-10 补充：**负数层数**（「失去 2 点力量」这种）一律当负面处理 ——
+            //   与 `BossIntentBuilder.ClassifyPowers` 里 `harmful = kind == Debuff || amount < 0` 同一把尺子。
+            //   实测 `STRENGTH_POWER −2` 这一次 `GetTypeForAmount` 认不出是负面（于是 9 点没打），
+            //   而 `VULNERABLE_POWER +2` / `WEAK_POWER +1` 都正常。
             PowerType kind;
             try { kind = power.GetTypeForAmount(amount); }
-            catch { return; }
-            if (kind != PowerType.Debuff) return;
+            catch { kind = PowerType.Buff; }
+            bool harmful = kind == PowerType.Debuff || amount < 0m;
+            if (!harmful) return;
 
             // 「临时降集中」那类（ITemporaryPower）不算 —— 与血肉戏法同一口径
             if (power is ITemporaryPower) return;
