@@ -4907,3 +4907,4 @@ Chronological action log.
 | 2026-11-10 11:14 | edit | `src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
 | 2026-11-10 11:14 | edit | `src/Hooks/Core/BossScriptPlanner.cs` | ok | 0 |
 | 2026-11-10 11:14 | edit | `src/Hooks/Core/BossScriptPlanner.cs` | ok | 0 |
+| 2026-11-10 11:16 | write | `docs/plans/boss-ethereal-bone.md` | ok | 0 |
