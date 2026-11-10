@@ -4963,3 +4963,10 @@ Chronological action log.
 | 2026-11-10 13:28 | edit | `src/Hooks/UI/BossOrbDisplay.Highlight.cs` | ok | 0 |
 | 2026-11-10 13:28 | edit | `src/Hooks/Monsters/CharBossMonster.Turn.cs` | ok | 0 |
 | 2026-11-10 13:29 | write | `docs/plans/thunder-rod-borrowed-time-2026-11-10.md` | ok | 0 |
+| 2026-11-10 13:36 | edit | `src/Hooks/Powers/BossLightningRodPower.cs` | ok | 0 |
+| 2026-11-10 13:36 | edit | `src/Hooks/Powers/BossLightningRodPower.cs` | ok | 0 |
+| 2026-11-10 13:36 | edit | `src/Hooks/Powers/BossLightningRodPower.cs` | ok | 0 |
+| 2026-11-10 13:36 | edit | `src/Hooks/Powers/BossLightningRodPower.cs` | ok | 0 |
+| 2026-11-10 13:37 | edit | `src/Hooks/Powers/BossLightningRodPower.cs` | ok | 0 |
+| 2026-11-10 13:37 | edit | `src/Hooks/Powers/BossLightningRodPower.cs` | error | 0 |
+| 2026-11-10 13:37 | edit | `src/Hooks/Powers/BossLightningRodPower.cs` | ok | 0 |

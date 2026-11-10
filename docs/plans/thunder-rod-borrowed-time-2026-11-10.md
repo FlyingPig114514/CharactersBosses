@@ -50,11 +50,38 @@ if (power.ShouldRemoveDueToAmount()) await Remove(power);   // ← 数量到 0 �
 ⇒ **每回合刚开始这层特殊效果就被删了**，之后玩家出牌没人计数 ⇒ 集中永远不掉。
 （`BorrowedTimeBossPower` 早就踩过同一个坑，所以它把图标数字钳在 1..10。）
 
-**修法**：
+**修法（计数部分）**：
 - 计数改存**字段** `_playedThisTurn`，不再依赖 `Amount`；
 - `Amount` 只当显示用，**永远 ≥ 1**：`SyncAmount()` 写「**还差几张牌**触发」（3 → 2 → 1）；
 - `AfterSideTurnStart` 只清字段 + `SyncAmount()`，**不再** `Apply(-Amount)`；
 - `AfterApplied` 把图标刷成 3。
+
+**修法（减集中 + 返还，v0.2.542 按用户新要求改成「超能光束」那套）**：
+
+用户：「让『引雷针』的减集中并返还通过超能光束 buff 和减集中实现」。反编译确认那套机制在
+`MegaCrit.Sts2.Core.Models.Powers.TemporaryFocusPower`（抽象基类，**107/111 都有**）：
+
+```csharp
+// ① 应用 / 叠加时：把集中按 Sign × amount 打进去（IsPositive=false ⇒ Sign = -1）
+await PowerCmd.Apply<FocusPower>(ctx, Owner, Sign * amount, applier, cardSource, silent: true);
+
+// ② 自己这一侧回合结束：移除这层 power
+if (participants.Contains(Owner)) { Flash(); await PowerCmd.Remove(this); }
+//    移除时把累计的 Amount 全数还回来：
+await PowerCmd.Apply<FocusPower>(ctx, Owner, -Sign * Amount, Owner, null);
+```
+`HyperbeamFocusDownPower : TemporaryFocusPower` 就是「超能光束」打出去给自己挂的那层（`IsPositive => false`）。
+
+所以现在每满 3 张牌 ⇒ `PowerCmd.Apply<HyperbeamFocusDownPower>(owner, 1)`：
+- 立刻 **−1 集中**（原版结算）；
+- 她自己回合结束时**原版**移除该层并把集中全数还回来；
+- 它是 **debuff** ⇒ 人工制品能挡（和真正打「超能光束」完全一致），图标/文案也是原版那套；
+- 叠加即多层，回合结束一次性全还。
+
+⚠ **107 没有 `HyperbeamFocusDownPower`**（107 的「超能光束」是直接 `FocusPower −3`、不返还；
+临时降集中是 111 才有的）⇒ 用 `#if STS2_111 / #else` 分开：111 走原版那层，107 保持老写法
+（自己 `FocusPower −1`、自己回合结束 `+=` 还）。已按字节核对两个 dll：
+`Impl111` 里有 `HyperbeamFocusDownPower` 引用，`Impl107` 里没有（说明条件编译生效）。
 
 ## 3. 预借时间：被「历史课」这类自动打出的攻击牌错误计数
 
@@ -78,7 +105,7 @@ if (power.ShouldRemoveDueToAmount()) await Remove(power);   // ← 数量到 0 �
 
 - 暴风雨那回合：面板上「暴风雨」下面应该**稳定**有一条 `8×2`（或 N×M）的激发意图，不再闪；
   对应的球角标应变成**激发值**（蓝色）。
-- 引雷针：玩家回合开始后图标数字是 **3**；打 1 张变 2、再打变 1、第 3 张时她掉 1 点集中
+- 引雷针：玩家回合开始后图标数字是 **3**；打 1 张变 2、再打变 1、第 3 张时她身上会多一层「超能光束」式降集中（集中 −1）
   （日志 `引雷针：玩家本回合已打出 3 张牌 ⇒ 她本回合失去 1 点集中`）；她回合结束还回来
   （`引雷针：她回合结束 ⇒ 把本回合扣掉的 N 点集中还回去`）。
 - 预借时间：日志 `预借时间：XXX 是**自动打出**的（没花能量，不计入预借时间）`。
