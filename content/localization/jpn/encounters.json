@@ -101,5 +101,7 @@
     "SILENT_SNECKO_BOSS_ENCOUNTER.title":  "The Silent",
     "SILENT_SNECKO_BOSS_ENCOUNTER.loss":  "{character} was sent to the grave by the [gold]Silent[/gold]\u0027s dice.",
   "DEFECT_EVENT_BOSS_ENCOUNTER.loss": "{character}は[gold]ディフェクト[/gold]に捨て札から引き戻された。",
-  "DEFECT_EVENT_BOSS_ENCOUNTER.title": "ディフェクト"
+  "DEFECT_EVENT_BOSS_ENCOUNTER.title": "ディフェクト",
+    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.title":  "Necrobinder",
+    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "{character} watches every card turn Ethereal at the hands of [gold]the Necrobinder[/gold]."
 }

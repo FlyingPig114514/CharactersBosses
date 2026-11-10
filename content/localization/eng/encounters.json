@@ -80,5 +80,7 @@
     "IRONCLAD_STRIKE_BOSS_ENCOUNTER.title":  "The Ironclad",
     "IRONCLAD_STRIKE_BOSS_ENCOUNTER.loss":  "{character} was crushed by [gold]The Ironclad[/gold]\u0027s Bash.",
     "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "The Silent",
-    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.loss":  "{character} was swallowed by [gold]The Silent[/gold]\u0027s serpents."
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.loss":  "{character} was swallowed by [gold]The Silent[/gold]\u0027s serpents.",
+    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.title":  "Necrobinder",
+    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "{character} watches every card turn Ethereal at the hands of [gold]the Necrobinder[/gold]."
 }

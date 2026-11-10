@@ -671,11 +671,11 @@ public static class BossDefs
             null,
             new BossVariant
             {
-                Key = "NECROBINDER_VOID",
-                Enabled = Core.BossLineups.VoidActive,
-                Deck = Core.VoidBoneScript.Deck(),
-                Relics = Core.VoidBoneScript.Relics(),
-                Script = Core.VoidBoneScript.Build(),
+                Key = "NECROBINDER_ETHEREAL",
+                Enabled = Core.BossLineups.EtherealActive,
+                Deck = Core.EtherealBoneScript.Deck(),
+                Relics = Core.EtherealBoneScript.Relics(),
+                Script = Core.EtherealBoneScript.Build(),
                 SpecialLoc = "NECROBINDER_BOSS.void_call",       // 特殊效果「虚空之唤」
                 SpecialPower = typeof(Powers.BossVoidCallPower),
                 // 进阶（用户 2026-11-09）：8 = 升级灰烬之灵、违逆；9 = 升级友谊。

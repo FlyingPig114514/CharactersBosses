@@ -80,5 +80,7 @@
     "IRONCLAD_STRIKE_BOSS_ENCOUNTER.title":  "铁甲战士",
     "IRONCLAD_STRIKE_BOSS_ENCOUNTER.loss":  "{character}被[gold]铁甲战士[/gold]的痛击打碎了。",
     "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "静默猎手",
-    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.loss":  "{character}被[gold]静默猎手[/gold]的蛇群淹没了。"
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.loss":  "{character}被[gold]静默猎手[/gold]的蛇群淹没了。",
+    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.title":  "亡灵契约师",
+    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "{character} 的每一张牌都化作了[gold]亡灵契约师[/gold]的虚无。"
 }

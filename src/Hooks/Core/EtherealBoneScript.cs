@@ -7,7 +7,7 @@ using CharacterBosses.Relics;
 namespace CharacterBosses.Core;
 
 /// <summary>
-/// 二层亡灵契约师**第二套设计「虚无骨」**（Key `NECROBINDER_VOID`，用户 2026-11-09 设计）。
+/// 二层亡灵契约师**第二套设计「虚无骨」**（Key `NECROBINDER_ETHEREAL`，用户 2026-11-09 设计）。
 /// 同层第一套是「灵魂骨」（<see cref="SoulBoneScript"/>）。
 ///
 /// 用户原话（逐条照抄，改设计时对着看）：
@@ -37,7 +37,7 @@ namespace CharacterBosses.Core;
 /// 用户给的剧本明确写了「第 4 回合**此时为 3 费**、第 7 回合 **0 费**」⇒ 这两张用
 /// `ScriptCard.CostThisTurn` **写死**。
 /// </summary>
-public static class VoidBoneScript
+public static class EtherealBoneScript
 {
     public static BossScript Build()
     {

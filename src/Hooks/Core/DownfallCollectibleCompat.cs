@@ -852,7 +852,7 @@ public static class DownfallCollectibleCompat
                     upgraded = false;
                     Logger.Log("[CharBoss] 收藏家藏品：华丽猎 → 计划妥当");
                     return true;
-                case "NECROBINDER_VOID":     // 二层 虚无骨（用户 2026-11-09：藏品 = 幻景）
+                case "NECROBINDER_ETHEREAL":     // 二层 虚无骨（用户 2026-11-09：藏品 = 幻景）
                     cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.Eidolon);
                     upgraded = false;
                     Logger.Log("[CharBoss] 收藏家藏品：虚无骨 → 幻景");
@@ -891,7 +891,7 @@ case "REGENT_STAR_BOSS_ENCOUNTER":         // 三层 辉星储
                     cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.Reanimate);      // 死者苏生
                     upgraded = false;
                     return true;
-                case "NECROBINDER_VOID_BOSS_ENCOUNTER":    // 二层 虚无骨（用户 2026-11-09：藏品 = 幻景）
+                case "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER":    // 二层 虚无骨（用户 2026-11-09：藏品 = 幻景）
                     cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.Eidolon);
                     upgraded = false;
                     return true;

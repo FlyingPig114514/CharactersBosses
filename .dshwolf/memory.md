@@ -4884,3 +4884,5 @@ Chronological action log.
 | 2026-11-10 10:49 | edit | `src/Hooks/Monsters/CharBossMonster.Descriptor.cs` | error | 0 |
 | 2026-11-10 10:49 | edit | `src/Hooks/Monsters/CharBossMonster.Descriptor.cs` | ok | 0 |
 | 2026-11-10 10:50 | edit | `src/CharacterBosses.json` | ok | 0 |
+| 2026-11-10 10:50 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-10 10:54 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |

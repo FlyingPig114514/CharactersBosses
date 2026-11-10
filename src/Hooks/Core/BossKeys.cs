@@ -60,7 +60,7 @@ internal static class BossKeys
         new("DEFECT_CLAW",          2, 1, 1, typeof(DefectBoss)),          // 故障 1 号：物理机
         new("DEFECT_RAINBOW",       2, 1, 2, typeof(DefectBoss)),          // 故障 2 号：彩虹机（用户 2026-11-07）
         new("NECROBINDER_SOUL",     3, 1, 1, typeof(NecrobinderBoss)),     // 亡灵 1 号：灵魂骨
-        new("NECROBINDER_VOID",     3, 1, 2, typeof(NecrobinderBoss)),     // 亡灵 2 号：虚无骨（用户 2026-11-09）
+        new("NECROBINDER_ETHEREAL",     3, 1, 2, typeof(NecrobinderBoss)),     // 亡灵 2 号：虚无骨（用户 2026-11-09）
         new("REGENT_FORGE",         4, 1, 1, typeof(RegentBoss)),          // 储君 1 号：铸剑储君
         new("REGENT_KING",          4, 1, 2, typeof(RegentBoss)),          // 储君 2 号：王储
         new("IRONCLAD_BLOOD",       0, 1, 1, typeof(IroncladBoss)),        // 铁甲 1 号：放血战
@@ -128,7 +128,7 @@ internal static class BossKeys
                 "DEFECT_CLAW",          // 二层 故障 1 号：物理机
                 "DEFECT_RAINBOW",       // 二层 故障 2 号：彩虹机（用户 2026-11-07）
                 "NECROBINDER_SOUL",     // 二层 亡灵 1 号：灵魂骨
-                "NECROBINDER_VOID",     // 二层 亡灵 2 号：虚无骨（用户 2026-11-09）
+                "NECROBINDER_ETHEREAL",     // 二层 亡灵 2 号：虚无骨（用户 2026-11-09）
                 "REGENT_FORGE",         // 二层 储君 1 号：铸剑储君
                 "REGENT_KING",          // 二层 储君 2 号：王储
                 "REGENT_MINION",        // 二层 储君 3 号：仆从储（用户 2026-11-05）
@@ -217,7 +217,7 @@ internal static class BossKeys
         ["DEFECT_STATUS"] = "状态机",
         ["NECROBINDER_ERADICATE"] = "根除骨",
         ["NECROBINDER_OSTY"] = "养手骨",
-        ["NECROBINDER_VOID"] = "虚无骨",
+        ["NECROBINDER_ETHEREAL"] = "虚无骨",
         ["REGENT_COLORLESS"] = "无色储",
         ["REGENT_STAR"] = "辉星储",
         ["IRONCLAD_VULN"] = "易伤战",
@@ -324,7 +324,7 @@ internal static class BossKeys
             case "IRONCLAD_BOULDER": return ModelDb.Encounter<IroncladBoulderBossEncounter>();
             case "NECROBINDER_DOOM": return ModelDb.Encounter<NecrobinderDoomBossEncounter>();
             case "NECROBINDER_SOUL": return ModelDb.Encounter<NecrobinderSoulBossEncounter>();
-            case "NECROBINDER_VOID": return ModelDb.Encounter<NecrobinderVoidBossEncounter>();
+            case "NECROBINDER_ETHEREAL": return ModelDb.Encounter<NecrobinderEtherealBossEncounter>();
             case "NECROBINDER_ERADICATE": return ModelDb.Encounter<NecrobinderEradicateBossEncounter>();
             case "SILENT_ENVENOM": return ModelDb.Encounter<SilentEnvenomBossEncounter>();
             case "SILENT_SLY": return ModelDb.Encounter<SilentSlyBossEncounter>();

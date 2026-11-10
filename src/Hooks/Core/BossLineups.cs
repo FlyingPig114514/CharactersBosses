@@ -731,23 +731,23 @@ internal static class BossLineups
     }
 
     /// <summary>
-    /// 二层亡灵契约师的**第二套设计「虚无骨」**（Key `NECROBINDER_VOID`，用户 2026-11-09）。
-    /// 判据与炼药猎/华丽猎同一套：**以房间遭遇为准**（控制台 `fight NECROBINDER_VOID_BOSS_ENCOUNTER`
+    /// 二层亡灵契约师的**第二套设计「虚无骨」**（Key `NECROBINDER_ETHEREAL`，用户 2026-11-09）。
+    /// 判据与炼药猎/华丽猎同一套：**以房间遭遇为准**（控制台 `fight NECROBINDER_ETHEREAL_BOSS_ENCOUNTER`
     /// 点名也才会真的是虚无骨），拿不到遭遇才按种子兜底（与灵魂骨 50/50）。
     ///
     /// ⚠ 用户 2026-11-09 特别提醒「别和同层的灵魂骨搞串」⇒ 这里把灵魂骨/养手骨/根除骨三个遭遇
     ///   **显式判否**，免得按种子兜底时把别的场次抢走。
     /// </summary>
-    internal static bool VoidActive() => Latched("NECROBINDER_VOID", ComputeVoid);
+    internal static bool EtherealActive() => Latched("NECROBINDER_ETHEREAL", ComputeEthereal);
 
-    private static (bool Value, bool Decisive) ComputeVoid()
+    private static (bool Value, bool Decisive) ComputeEthereal()
     {
         try
         {
             string? entry = CurrentEncounterEntry();
             if (!string.IsNullOrEmpty(entry))
             {
-                if (entry == "NECROBINDER_VOID_BOSS_ENCOUNTER") return (true, true);
+                if (entry == "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER") return (true, true);
                 if (entry == "NECROBINDER_SOUL_BOSS_ENCOUNTER") return (false, true);
                 if (entry == "NECROBINDER_OSTY_BOSS_ENCOUNTER") return (false, true);
                 if (entry == "NECROBINDER_ERADICATE_BOSS_ENCOUNTER") return (false, true);
@@ -763,7 +763,7 @@ internal static class BossLineups
             {
                 foreach (var k in lineup)
                 {
-                    if (k == "NECROBINDER_VOID") return (true, true);
+                    if (k == "NECROBINDER_ETHEREAL") return (true, true);
                     if (k == "NECROBINDER_SOUL") return (false, true);
                 }
             }
