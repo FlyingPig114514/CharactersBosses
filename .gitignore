@@ -80,3 +80,6 @@ mod_log*.txt
 # Excel workbooks (user-owned data + Excel lock/backup files)
 *.xlsx
 ~$*
+
+# 杀戮尖塔 1「崩坠」mod 素材提取产物（只本地浏览，不进仓库）
+/.assets-sts1-downfall/
