@@ -144,3 +144,29 @@ PowerCmd.Apply<StrengthPower>(ctx, Owner.Creature, -PlayerStrengthLoss, Owner.Cr
 ```
 招架盾预测：玩家回合 当前格挡不计 + 牌 11 + 骇人头盔 4 + 吞噬生命 8 = 23（门槛 10）
 ```
+## 8. 出击的伤害预览不跟奥斯提血量（v0.2.548）
+
+用户：「出击的伤害预览怎么不实时变化了？（根据奥斯提血量）」
+
+**机制**：「出击」`UNLEASH` 的伤害 = `CalculationBase + ExtraDamage × **奥斯提当前生命**`
+（反编译见 `BossDamagePredictor.OstyScaledDamage`，它每次调用都读 `card.Owner.Osty.CurrentHp`）。
+
+**根因**：意图数字是在**面板重建**时算一次就冻在 `PlannedPlay.Intents` 里的。而重建只由若干事件触发；
+`BossFrameTickPatch.RefreshIntentsIfPowersChanged` 每帧比对的指纹里只有「她的能力 + 每个真人玩家的能力」
+—— **玩家在她回合外把奥斯提打掉/治好、或奥斯提被召唤/死亡**时，能力层数一个都没变 ⇒ 指纹不变
+⇒ 不重建 ⇒ 出击的数字停在旧值（血肉骨的奥斯提来自「缚魂命匣」，玩家很容易在回合内把它打掉）。
+
+**修法**：把**她自己的奥斯提**（存活 + 当前生命 + 最大生命）也拼进那个每帧比对的指纹：
+
+```csharp
+var osty = boss.Shadow?.Osty;
+print += osty != null && osty.IsAlive ? $"|O{osty.CurrentHp}/{osty.MaxHp}" : "|O-";
+```
+一变就 `boss.IntentsDirty = true` ⇒ 下一帧由 `RefreshIntentsIfDrawsChanged` 消费
+⇒ `BladesGrowth.RecomputeAll(planTime: 玩家回合)` 重算整排意图（出击那条会重新读奥斯提血量，
+plan 里「护卫召唤」带来的待加生命仍由 `UnleashCompensation` 预补池负责）。
+
+同时加了一行限流日志（20 条）方便验证：
+```
+意图重算（能力/奥斯提变化）：|O24/30 → |O18/30
+```

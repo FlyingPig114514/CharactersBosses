@@ -1055,6 +1055,21 @@ public static class BossFrameTick
             if (creature == null) return;
 
             var print = PowerPrintOf(creature);
+            // ★ 2026-11-10（用户：「出击的伤害预览怎么不实时变化了？（根据奥斯提血量）」）：
+            //   「出击」`UNLEASH` 的伤害是 `CalculationBase + ExtraDamage × **奥斯提当前生命**`
+            //   （反编译见 `BossDamagePredictor.OstyScaledDamage`），而意图数字是在**面板重建**时算的。
+            //   玩家在她回合外打掉/治好奥斯提，或者奥斯提被召唤/死亡时，能力层数一个都没变
+            //   ⇒ 下面那串指纹不变 ⇒ 不重建 ⇒ 数字停在旧值。
+            //   所以把**她的奥斯提**（存在与否 + 当前生命 + 最大生命）也拼进指纹：
+            //   一有变化就 `IntentsDirty`，下一次面板刷新就会按新血量重算。
+            try
+            {
+                var osty = boss.Shadow?.Osty;
+                print += osty != null && osty.IsAlive
+                    ? $"|O{osty.CurrentHp}/{osty.MaxHp}"
+                    : "|O-";
+            }
+            catch { /* 拿不到奥斯提就只比能力 */ }
             // ★ v0.2.518（用户 2026-11-09：「玩家在回合内失去易伤（崩坠里有卡牌能减少负面层数）时，
             //   养手骨的奥斯提攻击牌伤害预览不会跟着降」）：
             //   以前指纹只含**她自己**的能力 ⇒ 玩家身上的易伤/无实体等「影响她打出伤害」的东西变了
@@ -1089,9 +1104,29 @@ public static class BossFrameTick
             catch { playerSide = false; }
             if (!playerSide) return;
 
-            if (boss.Plan.Count > 0) boss.IntentsDirty = true;
+            if (boss.Plan.Count > 0)
+            {
+                boss.IntentsDirty = true;
+                if (_ostyReprintLogs++ < 20)
+                {
+                    // 排查「出击的预览不跟奥斯提血量」用：把变化前后的尾部（含 |O… 段）打出来
+                    Logger.Log($"[CharBoss] 意图重算（能力/奥斯提变化）：{TailOf(last)} → {TailOf(print)}");
+                }
+            }
         }
         catch { /* 忽略：绝不影响战斗 */ }
+    }
+
+    /// <summary>意图重算日志限流。</summary>
+    private static int _ostyReprintLogs;
+
+    /// <summary>取指纹末尾一段（奥斯提 + 最后一个玩家的能力）用于日志。</summary>
+    private static string TailOf(string? s)
+    {
+        if (string.IsNullOrEmpty(s)) return "(空)";
+        int at = s.LastIndexOf("|O", StringComparison.Ordinal);
+        if (at < 0) return s.Length <= 40 ? s : s.Substring(s.Length - 40);
+        return s.Length - at <= 40 ? s.Substring(at) : s.Substring(at, 40);
     }
 
     /// <summary>
