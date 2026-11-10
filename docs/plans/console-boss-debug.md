@@ -52,6 +52,7 @@ id = 类名按 `StringHelper.Slugify`（驼峰断词 → 全大写）算出来�
 |---|---|---|---|
 | `fight IRONCLAD_ANGER_BOSS_ENCOUNTER` | 愤怒战 | 一层 | `Core/IroncladAngerScript.cs` |
 | `fight NECROBINDER_DOOM_BOSS_ENCOUNTER` | 灾厄骨 | 一层 | `Core/NecrobinderScript.cs` |
+| `fight NECROBINDER_FLESH_BOSS_ENCOUNTER` | **血肉骨** | 一层 | `Core/FleshBoneScript.cs`（用户 2026-11-10） |
 | `fight REGENT_DEBRIS_BOSS_ENCOUNTER` | 碎屑储君 | 一层 | `Core/DebrisRegentScript.cs` |
 | `fight IRONCLAD_VULN_BOSS_ENCOUNTER` | 易伤战 | 三层 | `Core/VulnIroncladScript.cs` |
 | `fight DEFECT_CLAW_BOSS_ENCOUNTER` | 物理机 | 二层 | `Core/ClawDefectScript.cs` |
