@@ -52,6 +52,15 @@ public sealed class NecrobinderSoulBoss : NecrobinderBoss
     public override string? PinnedVariantKey => "NECROBINDER_SOUL";
 }
 
+/// <summary>虚无骨（第 2 层）—— 设计 Key <c>NECROBINDER_VOID</c>（用户 2026-11-09）。</summary>
+public sealed class NecrobinderVoidBoss : NecrobinderBoss
+{
+    public NecrobinderVoidBoss() { SpawnVariantKey = "NECROBINDER_VOID"; }
+
+    public override int? TierAct => 1;
+    public override string? PinnedVariantKey => "NECROBINDER_VOID";
+}
+
 /// <summary>铸剑储君（第 2 层）—— 设计 Key <c>REGENT_FORGE</c>。</summary>
 public sealed class RegentForgeBoss : RegentBoss
 {

@@ -666,8 +666,26 @@ public static class BossDefs
             //   `StrikeActive()` 只看「本场遭遇/阵容里有没有 IRONCLAD_STRIKE」，**不看是谁的变体**
             //   ⇒ 一层阵容里排到打击战时，**亡灵契约师这一档也命中** ⇒ 灾厄骨拿了打击战的
             //   卡组 / 遗物（燃烧之血、护喉甲）/ 特殊效果（痛击）/ 剧本。
-            //   第一幕（灾厄骨）、第二幕（灵魂骨）本来就没有第二套设计 ⇒ 两个 null。
-            null, null,
+            //   第一幕（灾厄骨）本来就没有第二套设计 ⇒ null；
+            //   第二幕 = 虚无骨（下面这块，用户 2026-11-09）；第三幕 = 养手骨。
+            null,
+            new BossVariant
+            {
+                Key = "NECROBINDER_VOID",
+                Enabled = Core.BossLineups.VoidActive,
+                Deck = Core.VoidBoneScript.Deck(),
+                Relics = Core.VoidBoneScript.Relics(),
+                Script = Core.VoidBoneScript.Build(),
+                SpecialLoc = "NECROBINDER_BOSS.void_call",       // 特殊效果「虚空之唤」
+                SpecialPower = typeof(Powers.BossVoidCallPower),
+                // 进阶（用户 2026-11-09）：8 = 升级灰烬之灵、违逆；9 = 升级友谊。
+                AscensionUpgrades = new List<(int, Type)>
+                {
+                    (8, typeof(SpiritOfAsh)),
+                    (8, typeof(Defy)),
+                    (9, typeof(Friendship)),
+                },
+            },
             new BossVariant
             {
                 Key = "NECROBINDER_OSTY",

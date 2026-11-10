@@ -182,6 +182,20 @@ public sealed class NecrobinderSoulBossEncounter : NecrobinderBossEncounter
 }
 
 /// <summary>
+/// 第二幕「**虚无骨**」的固定档位版（用户 2026-11-09；二层亡灵契约师的**第二套设计**，第一套是「灵魂骨」）。
+/// 剧本 <c>Core/VoidBoneScript.cs</c>，特殊效果「虚空之唤」= <c>Powers/BossVoidCallPower.cs</c>。
+///
+/// ⚠ 用户 2026-11-09：「别和同层的灵魂骨搞串了（例如用她的地图图标、用打她的命令打的是灵魂骨）」——
+///   · **地图图标不覆写** `BossNodePath` ⇒ 走亡灵契约师的角色徽记，
+///     和灵魂骨那张专属的 <c>soul_bone</c> 天然区分；
+///   · 遭遇 id 是独立的 <c>NECROBINDER_VOID_BOSS_ENCOUNTER</c> ⇒ 控制台 `fight` 点名不会落到灵魂骨。
+/// </summary>
+public sealed class NecrobinderVoidBossEncounter : NecrobinderBossEncounter
+{
+    public override int? TierAct => 1;
+}
+
+/// <summary>
 /// 第三幕「**养手骨**」的固定档位版（用户 2026-11-03；三层亡灵契约师的**第二套设计**，第一套是「根除骨」）。
 /// 剧本 <c>Core/OstyKeeperScript.cs</c>，特殊效果「不死」= <c>Powers/BossOstyUndyingPower.cs</c>。
 /// 与「刀猎/炼药猎」「易伤战/巨石战」「无色储君/辉星储」同一套机制：以**房间遭遇**为准，种子 50/50。

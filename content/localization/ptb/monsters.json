@@ -141,5 +141,6 @@
     "SILENT_GRAND_FINALE_BOSS.name":  "Grand Finale",
     "SILENT_GRAND_FINALE_BOSS.title":  "Grand Finale",
     "SILENT_GRAND_FINALE_BOSS.moves.CHARBOSS_PLAY.title":  "Play",
-    "SILENT_BOSS.suppression":  "Suppression\nWhenever the Silent plays [gold]Grand Finale[/gold], put a [gold]Void[/gold] on top of every player's draw pile."
+    "SILENT_BOSS.suppression":  "Suppression\nWhenever the Silent plays [gold]Grand Finale[/gold], put a [gold]Void[/gold] on top of every player's draw pile.",
+    "NECROBINDER_BOSS.void_call":  "Call of the Void\nWhen the Necrobinder plays [gold]Banshee\u0027s Cry[/gold] for the first time, all of your cards gain [gold]Ethereal[/gold] until the Necrobinder dies."
 }

@@ -270,6 +270,18 @@ public abstract partial class CharBossMonster
         // 先算「她还活着吗」—— BGM 与数据记录都要用（快捷 SL/回滚时她是**活着**被移出房间的）。
         bool bossStillAlive = false;
         try { bossStillAlive = Creature != null && Creature.IsAlive; } catch { bossStillAlive = false; }
+
+        // ★ 2026-11-09（二层「虚无骨」）：特殊效果「虚空之唤」给所有玩家挂的**恶咒**（HexPower）
+        //   是以「亡灵契约师存活」为前提的 ⇒ 她一旦死亡/离场就必须**立刻**从所有玩家身上摘掉。
+        //   多人局里战斗还在继续（别的 Boss 还没打完），不能让恶咒挂到那之后。
+        try
+        {
+            if (!bossStillAlive && Creature?.GetPower<CharacterBosses.Powers.BossVoidCallPower>() != null)
+            {
+                CharacterBosses.Powers.BossVoidCallPower.ClearHexFromAllPlayers("虚无骨已死亡/离场");
+            }
+        }
+        catch { /* 忽略 */ }
         // ★ 2026-11-05（用户：「所有仆从带有爪牙，在储君死亡时死亡；其它 boss 死亡不会使储君的仆从死亡」）：
         //   仆从是**敌方怪物**（不是玩家宠物），原版 `MinionPower` 不会替我们处理
         //   「召唤者死亡 ⇒ 仆从死亡」，所以在这里统一清场 —— 只清**这只 boss 自己召唤的**那几只。

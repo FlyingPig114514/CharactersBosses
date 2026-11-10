@@ -142,5 +142,6 @@
     "SILENT_GRAND_FINALE_BOSS.name":  "華麗獵",
     "SILENT_GRAND_FINALE_BOSS.title":  "華麗獵",
     "SILENT_GRAND_FINALE_BOSS.moves.CHARBOSS_PLAY.title":  "出牌",
-    "SILENT_BOSS.suppression":  "壓制\n每當靜默獵手打出[gold]華麗收場[/gold]時，將一張[gold]虛空[/gold]放入所有玩家的抽牌堆頂部。"
+    "SILENT_BOSS.suppression":  "壓制\n每當靜默獵手打出[gold]華麗收場[/gold]時，將一張[gold]虛空[/gold]放入所有玩家的抽牌堆頂部。",
+    "NECROBINDER_BOSS.void_call":  "虛空之喚\n亡靈契約師首次打出[gold]女妖之嚎[/gold]時，所有玩家的所有卡牌獲得[gold]虛無[/gold]，直到亡靈契約師死亡。"
 }

@@ -142,5 +142,6 @@
     "SILENT_GRAND_FINALE_BOSS.name":  "华丽猎",
     "SILENT_GRAND_FINALE_BOSS.title":  "华丽猎",
     "SILENT_GRAND_FINALE_BOSS.moves.CHARBOSS_PLAY.title":  "出牌",
-    "SILENT_BOSS.suppression":  "压制\n每当静默猎手打出[gold]华丽收场[/gold]时，将一张[gold]虚空[/gold]放入所有玩家的抽牌堆顶部。"
+    "SILENT_BOSS.suppression":  "压制\n每当静默猎手打出[gold]华丽收场[/gold]时，将一张[gold]虚空[/gold]放入所有玩家的抽牌堆顶部。",
+    "NECROBINDER_BOSS.void_call":  "虚空之唤\n亡灵契约师首次打出[gold]女妖之嚎[/gold]时，所有玩家的所有卡牌获得[gold]虚无[/gold]，直到亡灵契约师死亡。"
 }

@@ -68,5 +68,8 @@
     "BOSS_SNAKE_FORM_POWER.title":  "群蛇形态",
     "BOSS_SNAKE_FORM_POWER.description":  "静默猎手的手牌数没有上限。每当你或静默猎手洗牌时，将一张蛇咬洗入自己的抽牌堆。",
     "BOSS_SUPPRESSION_POWER.title":  "压制",
-    "BOSS_SUPPRESSION_POWER.description":  "每当静默猎手打出[gold]华丽收场[/gold]时，将一张[gold]虚空[/gold]放入所有玩家的抽牌堆顶部。"
+    "BOSS_SUPPRESSION_POWER.description":  "每当静默猎手打出[gold]华丽收场[/gold]时，将一张[gold]虚空[/gold]放入所有玩家的抽牌堆顶部。",
+    "BOSS_VOID_CALL_POWER.title":  "虚空之唤",
+    "BOSS_VOID_CALL_POWER.description":  "虚空之唤\n亡灵契约师首次打出[gold]女妖之嚎[/gold]时，所有玩家的所有卡牌获得[gold]虚无[/gold]，直到亡灵契约师死亡。",
+    "BOSS_VOID_CALL_POWER.hexText":  "亡灵契约师存活时，你的所有卡牌都拥有[gold]虚无[/gold]。"
 }

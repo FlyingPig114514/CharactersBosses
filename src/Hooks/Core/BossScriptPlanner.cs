@@ -455,6 +455,12 @@ public static class BossScriptPlanner
             try { if (card.EnergyCost.CostsX) xEnergyForOrbs = Math.Max(1, cost); } catch { xEnergyForOrbs = 0; }
             var evoke = orbSim.Predict(card, xEnergyForOrbs);
             BossOrbSim.AppendIntents(intents, evoke, pendingDrop, BossIntentBuilder.RandomAimIsElsewhere(card));
+            // ★ 2026-11-09（二层「虚无骨」）：剧本点名要画**策略（减益）意图**的那一张（女妖之嚎第 4 回合）。
+            if (entry.ForceDebuffIntent)
+            {
+                intents.Add(new MegaCrit.Sts2.Core.MonsterMoves.Intents.DebuffIntent(false));
+                Logger.Log($"[CharBoss] 剧本点名：{SafeEntry(card)} 额外画一条策略（减益）意图");
+            }
             // 诊断（用户 2026-11-09「钢铁风暴的意图还是只有一个强化」/「隐秘匕首+ 还是 4×2」）：
             // 把「剧本会丢几张 / 这张是不是升级版 / 最终意图条数」打出来，一眼能看出是哪一环没接上。
             if (SafeEntry(card) == "STORM_OF_STEEL" || SafeEntry(card) == "HIDDEN_DAGGERS")
