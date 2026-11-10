@@ -332,3 +332,31 @@ bool harmful = kind == PowerType.Debuff || amount < 0m;
 ```
 吞噬生命钩子：power=… amount=… 目标=…(side=…, monster=有/无) 施加者=…(是我=…) 类型=… temp=…
 ```
+## 15. 第四刀：`power.Applier` 不能当判据（v0.2.557）
+
+用户：「还是没修好，你自己读日志吧」。日志（22:56:25，v0.2.556）直接指出来了：
+
+```
+吞噬生命钩子：power=STRENGTH_POWER amount=-2 目标=亡灵契约师(side=Enemy, monster=有) 施加者=…(是我=True)   ← 她自己那一半
+吞噬生命钩子：power=STRENGTH_POWER amount=-2 目标=亡灵契约师(side=Player, monster=无) 施加者=…(是我=False) ← 玩家这一半
+吞噬生命钩子：power=VULNERABLE_POWER amount=2 目标=…(side=Player) 施加者=…(是我=True)        ← 恐惧，正常
+```
+同一张命运同担，**目标是她自己**那次判对了，**目标是玩家**那次判成「不是她给的」。
+
+原因：判据用的是 `power.Applier ?? applier`，而 **`StrengthPower` 会复用已有实例** ——
+玩家早先给自己 +1 力量时创建的那份实例，`Applier` 一直停在**玩家自己**身上；
+`PowerCmd.Apply` 给同一份实例改层数时并不改 `Applier`。
+（虚弱 / 易伤每次都是新建实例，`Applier` 就是她 ⇒ 所以它们一直正常。）
+`ModifyAmount(ctx, power, amount, applier, …)` 里的 **`applier` 才是「这一次变化是谁造成的」**。
+
+修法：
+```csharp
+bool fromHer = ReferenceEquals(applier, owner)
+               || (applier == null && ReferenceEquals(power.Applier, owner) && amount > 0m);
+```
+- 主判据 = 钩子参数 `applier`（这次变化由谁造成）；
+- 只有 `applier` 为空时才回退到 `power.Applier`，且**要求 `amount > 0`** —— 这样
+  「衰减 −1」（`PowerCmd.TickDownDuration` / 覆甲每回合 −1）不会被误判成「她给了一个负面」。
+
+诊断行也把两个施加者分开打：
+`钩子施加者=X(是我=…) power.Applier=Y(是我=…)`。已用 `ilspycli` 反编译部署后的 dll 复核。

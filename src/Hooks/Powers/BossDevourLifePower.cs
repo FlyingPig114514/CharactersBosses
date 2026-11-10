@@ -65,8 +65,9 @@ public sealed class BossDevourLifePower : PowerModel
                 var t0 = power?.Owner;
                 Logger.Log($"[CharBoss] 吞噬生命钩子：power={SafeEntry(power)} amount={amount:0.#} " +
                            $"目标={t0?.Name ?? "?"}(side={t0?.Side.ToString() ?? "-"}, monster={(t0?.Monster != null ? "有" : "无")}) " +
-                           $"施加者={(power?.Applier?.Name ?? applier?.Name ?? "null")}" +
-                           $"(是我={ReferenceEquals(power?.Applier ?? applier, owner)}) " +
+                           $"钩子施加者={(applier == null ? "null" : applier.Name)}(是我={ReferenceEquals(applier, owner)}) " +
+                           $"power.Applier={(power?.Applier == null ? "null" : power.Applier.Name)}" +
+                           $"(是我={ReferenceEquals(power?.Applier, owner)}) " +
                            $"类型={kindNow} temp={power is ITemporaryPower}");
             }
 
@@ -75,8 +76,6 @@ public sealed class BossDevourLifePower : PowerModel
             // 是不是「负面」：原版用 `GetTypeForAmount` 判；
             // ★ 2026-11-10 补充：**负数层数**（「失去 2 点力量」这种）一律当负面处理 ——
             //   与 `BossIntentBuilder.ClassifyPowers` 里 `harmful = kind == Debuff || amount < 0` 同一把尺子。
-            //   实测 `STRENGTH_POWER −2` 这一次 `GetTypeForAmount` 认不出是负面（于是 9 点没打），
-            //   而 `VULNERABLE_POWER +2` / `WEAK_POWER +1` 都正常。
             PowerType kind;
             try { kind = power.GetTypeForAmount(amount); }
             catch { kind = PowerType.Buff; }
@@ -90,9 +89,21 @@ public sealed class BossDevourLifePower : PowerModel
             var target = power.Owner;
             if (target == null || target.Monster != null) return;
 
-            // 必须是她给的（applier 优先用 power 自己记的那份，拿不到再用钩子参数）
-            var giver = power.Applier ?? applier;
-            if (!ReferenceEquals(giver, owner)) return;
+            // ★★ 2026-11-10 第三刀（用户：「还是没修好，你自己读日志吧」）：
+            //   **必须只用钩子参数里的 `applier`，不能回退到 `power.Applier`**。
+            //   日志实证（22:56:25，命运同担）：
+            //     `STRENGTH_POWER −2 → 目标=亡灵契约师(side=Player) 钩子施加者=… power.Applier=…(是我=False)`
+            //   —— `StrengthPower` 是**复用已有实例**（玩家早先给自己 +1 力量时创建的那份），
+            //   实例上的 `Applier` 还停在**玩家自己**，所以「回退到 power.Applier」这条把整件事判成
+            //   「不是她给的」⇒ 9 点又丢了。（虚弱/易伤每次都新建实例，所以它们一直正常。）
+            //   而 `applier` 是「这一次变化是谁造成的」—— 正是我们要的。
+            //   反过来，**衰减**（`PowerCmd.TickDownDuration` / 覆甲每回合 −1）传的 `applier` 是 null，
+            //   这样也不会把「负面层数掉 1」误当成「她给了负面」。
+            bool fromHer = ReferenceEquals(applier, owner)
+                          || (applier == null                                   // 钩子没给施加者时（衰减之类）
+                              && ReferenceEquals(power.Applier, owner)
+                              && amount > 0m);                                  // 只认「加层」，衰减（−1）不算
+            if (!fromHer) return;
 
             await CreatureCmd.GainBlock(owner, FleshBone.DevourBlock, ValueProp.Unpowered, null);
 
