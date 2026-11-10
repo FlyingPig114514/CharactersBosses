@@ -44,7 +44,42 @@ public sealed class BossLightningRodPower : PowerModel
     /// <summary>本回合已经扣掉多少点集中（她回合结束时还回去）。</summary>
     private int _stolen;
 
+    /// <summary>
+    /// **本回合玩家已经打出几张牌**。
+    ///
+    /// ★ 2026-11-10（用户：「我打三张牌它集中不掉」）：以前这个计数直接存在 `Amount` 上，
+    /// 玩家回合开始时用 `Apply(-Amount)` 把它减到 0 —— 而反编译 `PowerCmd.ModifyAmount` 末尾是
+    /// <code>
+    /// power.SetAmount(newAmount, silent);
+    /// if (power.ShouldRemoveDueToAmount()) await Remove(power);   // ← 数量到 0 ⇒ **整条 power 被移除**
+    /// </code>
+    /// ⇒ 每回合刚开始这层特殊效果就被删掉了，之后玩家再怎么出牌都没人计数，集中当然不掉。
+    /// （`BorrowedTimeBossPower` 早就踩过同一个坑，所以它把图标数字钳在 1..10。）
+    /// 现在计数存在**字段**里，`Amount` 只负责显示「还差几张触发」，永远 ≥ 1。
+    /// </summary>
+    private int _playedThisTurn;
+
+    /// <summary>日志限流用。</summary>
     private int _logs;
+
+    /// <summary>图标数字 = **还差几张牌**触发（3 → 1，永远不为 0）。</summary>
+    private void SyncAmount()
+    {
+        try
+        {
+            int remain = CardsPerFocus - (_playedThisTurn % CardsPerFocus);   // 3,2,1
+            SetAmount(Math.Clamp(remain, 1, CardsPerFocus), true);
+        }
+        catch { /* 忽略 */ }
+    }
+
+    /// <summary>刚挂上时把图标数字刷成 3（还差 3 张），并清空计数。</summary>
+    public override Task AfterApplied(Creature applier, MegaCrit.Sts2.Core.Models.CardModel cardSource)
+    {
+        _playedThisTurn = 0;
+        SyncAmount();
+        return Task.CompletedTask;
+    }
 
     /// <summary>玩家打出牌 ⇒ 计数 +1，每满 3 张扣 1 点集中。</summary>
     public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
@@ -60,8 +95,9 @@ public sealed class BossLightningRodPower : PowerModel
             // 单体：只有被这只 Boss 锁定的那位玩家出的牌才算
             if (!Core.BossLockOn.SpecialEffectAppliesTo(owner.Monster as CharBossMonster, card.Owner)) return;
 
-            int count = (int)Math.Round((double)Amount) + 1;
-            await PowerCmd.Apply<BossLightningRodPower>(choiceContext, owner, 1m, owner, null, false);
+            _playedThisTurn++;
+            int count = _playedThisTurn;
+            SyncAmount();
 
             if (count % CardsPerFocus != 0) return;
 
@@ -79,26 +115,31 @@ public sealed class BossLightningRodPower : PowerModel
         }
     }
 
-    /// <summary>玩家回合开始 ⇒ 计数清零（每回合重新数）。</summary>
-    public override async Task AfterSideTurnStart(MegaCrit.Sts2.Core.Combat.CombatSide side,
-                                                  IReadOnlyList<Creature> participants,
-                                                  MegaCrit.Sts2.Core.Combat.ICombatState combatState)
+    /// <summary>玩家回合开始 ⇒ 计数清零（每回合重新数）。
+    /// ⚠ 只清**字段**，不再 `Apply(-Amount)` —— 那会把 `Amount` 减到 0，而原版
+    /// `PowerCmd.ModifyAmount` 一旦发现 `ShouldRemoveDueToAmount()` 就会把整条 power 移除
+    /// （这就是「集中不掉」的根因，见 <see cref="_playedThisTurn"/> 的注释）。</summary>
+    public override Task AfterSideTurnStart(MegaCrit.Sts2.Core.Combat.CombatSide side,
+                                            IReadOnlyList<Creature> participants,
+                                            MegaCrit.Sts2.Core.Combat.ICombatState combatState)
     {
         try
         {
             var owner = Owner;
-            if (owner == null) return;
-            if (side != MegaCrit.Sts2.Core.Combat.CombatSide.Player) return;
-            if (!participants.Contains(owner) && Amount > 0)
-            {
-                // 玩家的回合开始：计数归零（用「减到 0」而不是直接改字段，保持与同步一致）
-                await PowerCmd.Apply<BossLightningRodPower>(null, owner, -Amount, owner, null, false);
-            }
+            if (owner == null) return Task.CompletedTask;
+            if (side != MegaCrit.Sts2.Core.Combat.CombatSide.Player) return Task.CompletedTask;
+            if (participants.Contains(owner)) return Task.CompletedTask;   // 她自己的回合，不管
+            if (_playedThisTurn == 0) return Task.CompletedTask;
+
+            _playedThisTurn = 0;
+            SyncAmount();
+            Logger.Log("[CharBoss] 引雷针：玩家回合开始 ⇒ 计数清零（图标回到 3）");
         }
         catch (Exception e)
         {
             Logger.Log("[CharBoss] 引雷针（回合重置计数）失败: " + e.Message);
         }
+        return Task.CompletedTask;
     }
 
     /// <summary>她自己的回合结束 ⇒ 把本回合扣掉的集中还回来。</summary>

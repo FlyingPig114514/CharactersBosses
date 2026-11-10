@@ -417,7 +417,18 @@ public abstract partial class CharBossMonster
                     //   规划期由剧本算好存进 `GeneratedShivs`；这条重算路以前没传 ⇒ 面板只剩「强化」。
                     shivOverride: entry == "STORM_OF_STEEL" ? Math.Max(0, play.GeneratedShivs) : 0,
                     aoeFromCaller: true);
-                BossOrbSim.AppendIntents(intents, sim.Predict(play.Card), 0, BossIntentBuilder.RandomAimIsElsewhere(play.Card));
+                // ★ 2026-11-10（用户：「暴风雨激发电球的 8×2 意图被吃掉了（回合开始时闪了一下）」）：
+                //   `BossOrbSim.Predict(card, xEnergy)` 的 **X 是参数**，默认 0 —— 规划期
+                //   （`BossScriptPlanner`）会传「这张 X 费牌出手时还剩多少能量」，这里以前没传 ⇒
+                //   「暴风雨」重算时被当成生成 **0 颗**闪电球 ⇒ 激发意图整条消失。
+                //   所以规划期能看到 8×2、紧接着一重算就没了（用户看到的"闪一下"）。
+                //   规划期存的 `play.Cost` 对 X 费牌就是那个 X（见 BossScriptPlanner 的 IsXCost 分支：
+                //   `if (IsXCost(card)) cost = Math.Max(0, energy);`）。
+                int xEnergyForOrbs = 0;
+                try { if (play.Card.EnergyCost.CostsX) xEnergyForOrbs = Math.Max(1, play.Cost); }
+                catch { xEnergyForOrbs = 0; }
+                BossOrbSim.AppendIntents(intents, sim.Predict(play.Card, xEnergyForOrbs), 0,
+                                         BossIntentBuilder.RandomAimIsElsewhere(play.Card));
                 play.Intents = intents;
                 try
                 {

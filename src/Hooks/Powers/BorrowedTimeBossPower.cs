@@ -90,7 +90,25 @@ public sealed class BorrowedTimeBossPower : PowerModel
             //（单人恒为 true；其它 Boss 影子 Player 的出牌一律不算）
             if (!Core.BossLockOn.SpecialEffectAppliesTo(Owner.Monster as Monsters.CharBossMonster, actor)) return;
 
-            int cost = CostOf(cardPlay.Card);
+            // ★ 2026-11-10（用户：「由历史书打出攻击牌会错误的增加根除骨的预借时间计数」）：
+            //   她统计的是「玩家**花掉**的能量」，而 `CardEnergyCost.GetAmountToSpend()` 拿到的是
+            //   **牌面耗能**，跟真正扣没扣能量无关 —— 被别的东西**免费/自动打出**的牌
+            //   （历史书这类「帮你打一张攻击牌」的效果，`CardCmd.AutoPlay` 走的）本来一分能量都没花，
+            //   却被按牌面记了一笔。
+            //   判据两个，任一命中就是「没花能量」：
+            //     · `cardPlay.IsAutoPlay`（原版字段，自动打出的牌）；
+            //     · `cardPlay.Resources.EnergySpent == 0`（真实扣费记录）。
+            if (cardPlay.IsAutoPlay)
+            {
+                if (_autoSkips++ < 20)
+                {
+                    Logger.Log($"[CharBoss] 预借时间：{cardPlay.Card.Id.Entry} 是**自动打出**的" +
+                               "（没花能量，不计入预借时间）");
+                }
+                return;
+            }
+
+            int cost = ActualEnergySpent(cardPlay);
             if (cost <= 0) return;
 
             int spent = SpentOf(actor) + cost;
@@ -130,7 +148,26 @@ public sealed class BorrowedTimeBossPower : PowerModel
         }
     }
 
-    /// <summary>这张牌实际花了几点能量（拿不到就按 0）。</summary>
+    /// <summary>「自动打出」被跳过的次数（只为日志限流）。</summary>
+    private int _autoSkips;
+
+    /// <summary>
+    /// 这张牌**实际**花了几点能量：优先用原版的扣费记录 `CardPlay.Resources.EnergySpent`；
+    /// 它是 0（原版没填这个字段 / 这张牌本来就 0 费）时退回牌面耗能，保持老行为 —— 这样即便
+    /// 某个版本不填 `Resources`，预借时间也不会突然不触发。
+    /// </summary>
+    private static int ActualEnergySpent(CardPlay cardPlay)
+    {
+        int face = CostOf(cardPlay.Card);
+        try
+        {
+            int real = cardPlay.Resources.EnergySpent;
+            return real > 0 ? real : Math.Max(0, face);
+        }
+        catch { return face; }
+    }
+
+    /// <summary>这张牌牌面显示花几点能量（拿不到就按 0）。</summary>
     private static int CostOf(CardModel card)
     {
         try { return Math.Max(0, card.EnergyCost.GetAmountToSpend()); }

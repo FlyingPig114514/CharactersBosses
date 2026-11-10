@@ -4951,3 +4951,15 @@ Chronological action log.
 | 2026-11-10 12:54 | edit | `docs/plans/ironclad-boss-voice-2026-11-10.md` | ok | 0 |
 | 2026-11-10 12:54 | edit | `docs/plans/ironclad-boss-voice-2026-11-10.md` | ok | 0 |
 | 2026-11-10 12:54 | edit | `docs/plans/ironclad-boss-voice-2026-11-10.md` | ok | 0 |
+| 2026-11-10 13:26 | edit | `src/Hooks/Core/BossVoice.cs` | ok | 0 |
+| 2026-11-10 13:26 | edit | `src/Hooks/Core/BossVoice.cs` | ok | 0 |
+| 2026-11-10 13:26 | edit | `src/Hooks/Powers/BorrowedTimeBossPower.cs` | ok | 0 |
+| 2026-11-10 13:26 | edit | `src/Hooks/Powers/BorrowedTimeBossPower.cs` | ok | 0 |
+| 2026-11-10 13:26 | edit | `src/Hooks/Powers/BorrowedTimeBossPower.cs` | ok | 0 |
+| 2026-11-10 13:26 | edit | `src/Hooks/Powers/BorrowedTimeBossPower.cs` | ok | 0 |
+| 2026-11-10 13:27 | edit | `src/Hooks/Powers/BossLightningRodPower.cs` | ok | 0 |
+| 2026-11-10 13:27 | edit | `src/Hooks/Powers/BossLightningRodPower.cs` | ok | 0 |
+| 2026-11-10 13:27 | edit | `src/Hooks/Powers/BossLightningRodPower.cs` | ok | 0 |
+| 2026-11-10 13:28 | edit | `src/Hooks/UI/BossOrbDisplay.Highlight.cs` | ok | 0 |
+| 2026-11-10 13:28 | edit | `src/Hooks/Monsters/CharBossMonster.Turn.cs` | ok | 0 |
+| 2026-11-10 13:29 | write | `docs/plans/thunder-rod-borrowed-time-2026-11-10.md` | ok | 0 |

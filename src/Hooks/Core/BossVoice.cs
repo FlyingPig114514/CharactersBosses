@@ -72,7 +72,10 @@ public static class BossVoice
             var host = FindHost();
             if (host == null) { Logger.Log("[CharBoss] 语音：找不到可以挂 AudioStreamPlayer 的节点，跳过"); return false; }
 
-            var player = new AudioStreamPlayer { Stream = stream, VolumeDb = -4f, Autoplay = false };
+            // 音量：用户 2026-11-10「声音有点小，音量调大 50%」。
+            // 原来 `VolumeDb = -4`（线性 ≈ 0.63）⇒ 振幅 ×1.5 = 0.945 ⇒ **-0.5 dB**
+            //（换算：-4 + 20·log₁₀1.5 ≈ -4 + 3.52）。
+            var player = new AudioStreamPlayer { Stream = stream, VolumeDb = -0.5f, Autoplay = false };
             player.Name = "CharBossVoice_" + name;
             // 「SFX」总线路由 ⇒ 跟随玩家的音效音量设置（原版 `NDebugAudioManager` 也是这么设的）
             try { player.Bus = new StringName("SFX"); } catch { /* 没有这条总线就落回 Master */ }

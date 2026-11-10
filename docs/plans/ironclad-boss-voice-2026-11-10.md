@@ -37,7 +37,7 @@ tools\art\pck_extras.txt  追加 6 行 res://CharacterBosses/audio/voice/<name>.
 
 | 位置 | 干什么 |
 | --- | --- |
-| `src/Hooks/Core/BossVoice.cs`（新） | 载入 + 缓存 6 个 `AudioStream`，随机播一句；挂到 `NAudioManager` → `NRunMusicController` → 场景根，总线设 `SFX`，`Finished` 后 `QueueFree`；内含「会喊的 8 张牌」清单 |
+| `src/Hooks/Core/BossVoice.cs`（新） | 载入 + 缓存 6 个 `AudioStream`，随机播一句；挂到 `NAudioManager` → `NRunMusicController` → 场景根，总线设 `SFX`，音量 `VolumeDb = -0.5`（v0.2.541 起：原来是 -4，用户「有点小，调大 50%」⇒ 振幅 ×1.5），`Finished` 后 `QueueFree`；内含「会喊的 8 张牌」清单 |
 | `src/Hooks/Patches/IroncladBossAttackVoicePatch.cs`（新） | ①`CardCmd.AutoPlay` 前缀：打出那 8 张之一 ⇒ 挂「待播」标记；②`Hook.AfterDamageGiven` 前缀：**伤害落地那一刻**才真播（每回合最多一次，多段牌只响第一段） |
 | `src/Hooks/Monsters/CharBossMonster.cs` | 加了 `VoiceArmed` / `VoiceFiredThisTurn` 两个字段（`PrepareTurn` 清零）；`PlayOne` 里**不再**出牌前播（第一批的写法已删） |
 | `src/Hooks/Monsters/CharacterBosses.cs` `IroncladBoss` | `public override bool HasDeathSfx => false;` ⇒ 压掉原版死亡音 |

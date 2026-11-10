@@ -61,7 +61,19 @@ public static partial class BossOrbDisplay
             if (pcs != null && boss.Plan.Count > 0)
             {
                 var sim = new BossOrbSim(boss.Creature, pcs.OrbQueue);
-                foreach (var play in boss.Plan) sim.Predict(play.Card);
+                foreach (var play in boss.Plan)
+                {
+                    // ★ 2026-11-10：X 费牌（暴风雨）要把它**出手时还剩多少能量**传进去，
+                    //   否则这里模拟出 0 颗球 ⇒ 本该「待激发」的球不亮（回合开始时闪一下就没了）。
+                    //   规划期存的 `play.Cost` 对 X 费牌就是那个 X（见 BossScriptPlanner 的 IsXCost 分支）。
+                    int xEnergy = 0;
+                    try
+                    {
+                        if (play.Card.EnergyCost.CostsX) xEnergy = Math.Max(1, play.Cost);
+                    }
+                    catch { xEnergy = 0; }
+                    sim.Predict(play.Card, xEnergy);
+                }
                 foreach (var orb in sim.Evoked) mine.Add(orb);
             }
 
