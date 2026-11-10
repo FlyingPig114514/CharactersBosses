@@ -5005,3 +5005,4 @@ Chronological action log.
 | 2026-11-10 22:05 | write | `src/Hooks/Core/FleshBoneScript.cs` | ok | 0 |
 | 2026-11-10 22:05 | write | `src/Hooks/Patches/DebilitateTicksWithWeakPatch.cs` | ok | 0 |
 | 2026-11-10 22:20 | edit | `src/Hooks/Core/BossInfoTable.cs` | ok | 0 |
+| 2026-11-10 22:30 | write | `src/Hooks/Patches/BossPowerApplyTracePatch.cs` | ok | 0 |
