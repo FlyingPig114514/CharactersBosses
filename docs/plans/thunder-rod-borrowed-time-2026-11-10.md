@@ -56,12 +56,12 @@ if (power.ShouldRemoveDueToAmount()) await Remove(power);   // ← 数量到 0 �
 - `AfterSideTurnStart` 只清字段 + `SyncAmount()`，**不再** `Apply(-Amount)`；
 - `AfterApplied` 把图标刷成 3。
 
-## 3. 预借时间：被「历史书」这类自动打出的攻击牌错误计数
+## 3. 预借时间：被「历史课」这类自动打出的攻击牌错误计数
 
 **根因（一句话）**：计的是**牌面耗能**，不是**真正花掉的能量**。
 
-原实现 `CostOf(card) = card.EnergyCost.GetAmountToSpend()` —— 只读牌面，与「这张牌到底扣没扣能量」
-无关。被别的东西**免费/自动打出**的牌（`CardCmd.AutoPlay` 走的那类，例如「历史书」帮你打一张攻击牌）
+用户说的遗物是**历史课**（`HISTORY_COURSE`）：「在你的回合开始时，打出一张你上一回合最后打出的攻击牌的复制品」。反编译确认它走的是 `CardCmd.AutoPlay(choiceContext, cardModel.CreateDupe(player), null)` ⇒ `CardModel.OnPlayWrapper(..., bool isAutoPlay, ResourceInfo resources, ...)` ⇒ `new CardPlay { IsAutoPlay = isAutoPlay, Resources = resources, ... }`（`IsAutoPlay = true`），所以按 `IsAutoPlay` 跳过是准的。`n`n原实现 `CostOf(card) = card.EnergyCost.GetAmountToSpend()` —— 只读牌面，与「这张牌到底扣没扣能量」
+无关。被别的东西**免费/自动打出**的牌（`CardCmd.AutoPlay` 走的那类，例如「历史课」回合开始时帮你打一张攻击牌复制品）
 一分能量没花，却被记了一笔。
 
 **修法**（`Powers/BorrowedTimeBossPower.cs`）：
