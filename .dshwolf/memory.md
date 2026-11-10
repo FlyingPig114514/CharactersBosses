@@ -5012,3 +5012,4 @@ Chronological action log.
 | 2026-11-10 22:57 | edit | `src/Hooks/Powers/BossDevourLifePower.cs` | ok | 0 |
 | 2026-11-10 23:03 | edit | `src/Hooks/Patches/TopBarBossIconFallbackPatch.cs` | ok | 0 |
 | 2026-11-10 23:03 | write | `src/Hooks/Patches/TopBarBossIconFallbackPatch.cs` | ok | 0 |
+| 2026-11-10 23:10 | edit | `tools/upload-workshop.ps1` | ok | 0 |

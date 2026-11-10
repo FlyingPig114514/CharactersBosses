@@ -21,7 +21,10 @@
 # workspace (workshop\mod_id.txt) -- keep it, updates are matched by that id.
 [CmdletBinding()]
 param(
-    [string[]]$UploaderArgs = @('upload', '-w', '..\..\workshop'),
+    # ⚠ 2026-11-10：这里**必须是绝对路径** —— 传 `..\..\workshop` 时 Steamworks 会报
+    #   `k_EResultFileNotFound`（相对路径带着 `..`，Steam 那边解析不到），上传直接失败。
+    #   空 = 由下面按脚本位置算成绝对路径；想换目录再显式传 -UploaderArgs。
+    [string[]]$UploaderArgs = @(),
     [switch]$Help
 )
 
@@ -62,6 +65,11 @@ if (-not (Test-Path $appId) -and (Test-Path (Join-Path $Proj 'steam\steam_appid.
 
 # apphost needs to know where the private .NET runtime lives
 $env:DOTNET_ROOT = $DotnetRoot
+
+if ($UploaderArgs.Count -eq 0) {
+    $wsAbs = (Resolve-Path (Join-Path $Root 'workshop')).Path
+    $UploaderArgs = @('upload', '-w', $wsAbs)
+}
 
 Push-Location $Proj
 try {
