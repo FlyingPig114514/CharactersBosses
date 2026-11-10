@@ -343,7 +343,27 @@ public static class BossIntentBuilder
         //     · **奥斯提**那几张（击掌 / 紧追不放 / 猛晃 / 重压…）走 `AttackIntent.Raw`，
         //       渲染时**不过** `Hook.ModifyDamage` ⇒ 不自己乘就永远看不到这 50%（用户这次报的正是它）。
         //   所以只在 `fromOsty` 这一支手动乘一次。
-        if (fromOsty && damage > 0)
+        //
+        // ★ 2026-11-10（用户：「第五回合的亡魂牵引没有考虑致死性的增伤」）：
+        //   「亡魂牵引」（`PULL_FROM_BELOW`）是**普通攻击牌**，但它的伤害来自
+        //   `CalculatedHits`（本场打出过的虚无牌数），而意图是在**玩家回合**里算的 ——
+        //   那一刻她本回合的「致死性」还没打出去、power 不在身上 ⇒
+        //   `Hook.ModifyDamage` 那一路乘不出那 50%。
+        //   所以：**她身上还没有这层 power**（= 只可能是「本回合计划里排在她前面」的那种情况）
+        //   且这张是她本回合第一张攻击牌时，也在这里手工乘一次；
+        //   等 power 真上身之后（她回合里的每帧重算）就走上面那条原版管道，绝不双份。
+        bool lethalityManual = fromOsty;
+        if (!lethalityManual && damage > 0)
+        {
+            try
+            {
+                int onHer = card.Owner?.Creature?
+                    .GetPowerAmount<MegaCrit.Sts2.Core.Models.Powers.LethalityPower>() ?? 0;
+                lethalityManual = onHer <= 0;      // 还没上身 ⇒ 需要我们补
+            }
+            catch { lethalityManual = false; }
+        }
+        if (lethalityManual && damage > 0)
         {
             try
             {
@@ -982,7 +1002,16 @@ public static class BossIntentBuilder
     /// **不该给「强化」意图**的牌：它们的数据看起来像"给自己好处"，但用户不想要那个蓝色上箭头。
     /// 「如此甚好」（MAKE_IT_SO）就是 —— 它把打出的牌返手（用户实测：不该有强化意图）。
     /// </summary>
-    private static readonly HashSet<string> NoBuffIntentCards = new(StringComparer.Ordinal) { "MAKE_IT_SO" };
+    private static readonly HashSet<string> NoBuffIntentCards = new(StringComparer.Ordinal)
+    {
+        "MAKE_IT_SO",
+        // ★ 2026-11-10（用户：「第四回合女妖之嚎的意图应该是攻势+策略，而不是攻势+强化；
+        //   第七回合的就只有攻势（没有策略也没有强化）」）：
+        //   女妖之嚎（`BansheesCry`）只造成伤害、卡面上没有任何「给自己上能力」的变量，
+        //   但 `ClassifyPowers` 把它身上的某个变量认成了增益 ⇒ 多出一条「强化」。
+        //   这里点名禁掉；第 4 回合那条「策略」是剧本 `ScriptCard.ForceDebuffIntent` 单独画的。
+        "BANSHEES_CRY",
+    };
 
     /// <summary>
     /// 「给自己上能力，但牌面上不是 <c>PowerVar&lt;T&gt;</c>」的牌 —— <c>ClassifyPowers</c> 只认泛型

@@ -180,6 +180,9 @@ public static class BossScriptPlanner
         //   · `stormDiscards`：本回合剧本里标了「被丢弃」的张数 —— 钢铁风暴把手牌全丢掉、
         //     每丢一张生成一把小刀 ⇒ 它的 `x*x` 段数就是这个数（用户给的 5 / 4 张）。
         int discardsThisTurn = HasToolsOfTrade(boss) ? 1 : 0;
+        // ★ 2026-11-10（用户：「致死性也算虚无牌」）：「亡魂牵引」的段数要算上**本回合已经打出的虚无牌**，
+        //   而规划期战斗历史里还没有它们 ⇒ 这里按剧本顺序累加（只给 PULL_FROM_BELOW 用）。
+        int etherealPlanned = 0;
         int stormDiscards = 0;
         {
             bool multiNow = MultiplayerCardSwap.IsMultiplayer(boss);
@@ -412,7 +415,14 @@ public static class BossScriptPlanner
                 //   而剧本里排在它前面的紧追不放/重压都已经让奥斯提打过了（用户实测口径）。
                 extraHits: (IsBlade(card) ? pendingBladeHits : 0) + xHits
                            + HelixExtraHits(card, energyAtStart - energy)
-                           + (SafeEntry(card) == "RATTLE" ? ostyAttacksThisTurn : 0),
+                           + (SafeEntry(card) == "RATTLE" ? ostyAttacksThisTurn : 0)
+                           // ★ 2026-11-10（用户：「致死性也算虚无牌」）：
+                           //   「亡魂牵引」（`PULL_FROM_BELOW`）的段数 = **本场打出过的虚无牌数**
+                           //   （反编译 `CalculatedHits` 数的是战斗历史）。而意图是在玩家回合里算的 ——
+                           //   那一刻她本回合的牌一张都还没打，历史里也就没有「致死性」那张虚无牌
+                           //   ⇒ 预览少一段（5 点）。
+                           //   这里把**本回合计划里排在它前面、且带「虚无」关键字**的牌数补上。
+                           + (SafeEntry(card) == "PULL_FROM_BELOW" ? etherealPlanned : 0),
                 xHits: xHits,
                 // 全身撞击：用「出手时会有多少格挡」覆盖牌面（见上面 simBlock 注释）
                 bodySlamBlock: SafeEntry(card) == "BODY_SLAM" ? simBlock : -1,
@@ -494,6 +504,20 @@ public static class BossScriptPlanner
             {
                 bool isAttack = card.Type == MegaCrit.Sts2.Core.Entities.Cards.CardType.Attack;
                 if (isAttack && !stampedeOnly) attacksPlannedThisTurn++;
+
+                // ★ 2026-11-10：这张牌**是虚无牌**（带「虚无」关键字，例如致死性 `Lethality`）⇒
+                //   记一笔，供排在它后面的「亡魂牵引」算段数（见上面 etherealPlanned 的注释）。
+                try
+                {
+                    if (card.Keywords != null
+                        && card.Keywords.Contains(MegaCrit.Sts2.Core.Entities.Cards.CardKeyword.Ethereal))
+                    {
+                        etherealPlanned++;
+                        Logger.Log($"[CharBoss] 规划：{SafeEntry(card)} 是虚无牌 ⇒ 本回合虚无牌累计 {etherealPlanned} 张" +
+                                   "（亡魂牵引的段数要算上它）");
+                    }
+                }
+                catch { /* 忽略 */ }
 
                 // 「这张牌打完会给她自己多少力量」⇒ 排在它后面的攻击意图要预补。
                 // ★ v0.2.340（用户 2026-11-03：「伤害意图没有计算**疯狂进食**的临时力量」）：
