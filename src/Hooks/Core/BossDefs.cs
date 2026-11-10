@@ -686,7 +686,7 @@ public static class BossDefs
                     (8, typeof(PullAggro)),
                     (9, typeof(Misery)),
                     (9, typeof(Debilitate)),
-                    (9, typeof(Unleash)),
+                    // ★ 2026-11-10（用户更正）：「进阶9不再升级出击」⇒ 出击保持不升级。
                 },
             },
             new BossVariant

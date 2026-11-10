@@ -94,3 +94,35 @@ new BlockVar(10m, ValueProp.Unpowered), new DamageVar(6m, ValueProp.Unpowered)
 - 意图：恐惧+/违逆/摧残 那张牌下面会多一条 `9`（血肉戏法），日志 `血肉戏法意图：… 额外 +9`。
 - 回合结束格挡 ≥10 时，独立意图那行多一条 `6`（招架盾）。
 - 多人：苦难那回合，**非被锁玩家**的手牌栏会多一条 `9×N`；被锁玩家只有牌面的 7。
+## 7. 第二轮收口（v0.2.546，用户实机反馈四条）
+
+### 7.1 多人时招架盾只打她锁定的玩家
+反编译 `ParryingShield.AfterSideTurnEnd` 的目标是
+`Owner.RunState.Rng.CombatTargets.NextItem(CombatState.HittableEnemies)` —— **整份敌方列表随机一个**，
+多人局里会打到没被她锁定的人。新增 `Patches/ParryingShieldBossPatch`：遗物主人是我们的 Boss 时
+按原版条件（她这侧回合结束 + 格挡 ≥ `BlockVar`）结算，但目标固定成 `BossLockOn.TargetFor`；
+拿不到锁定对象才退回原版随机。真玩家自己的招架盾不受影响（`return true`）。
+
+### 7.2 命运同担会打到自己
+反编译 `SharedFate`（0 费技能）：
+```csharp
+PowerCmd.Apply<StrengthPower>(ctx, cardPlay.Target, -EnemyStrengthLoss, Owner.Creature, card);
+PowerCmd.Apply<StrengthPower>(ctx, Owner.Creature, -PlayerStrengthLoss, Owner.Creature, card);  // ← 她自己掉力量
+```
+「她自己掉力量」= 一次**目标为她自己**的 debuff，而她自己的生物 `Side == CombatSide.Enemy`，
+正好满足原版血肉戏法的 `power.Owner.IsEnemy` ⇒ **她被自己的血肉戏法打 9 点**。
+现在 `SleightOfFleshBossPatch` 对「持有者是我们 Boss」的情况**整条接管**：
+只有目标**是真人玩家**才结算，她给自己/给别的怪上负面一律不结算（压掉原版）。
+真玩家自己的血肉戏法仍然走原版。
+
+### 7.3 进阶 9 不再升级出击
+`BossDefs` 里血肉骨的 `AscensionUpgrades` 去掉 `(9, typeof(Unleash))`，只保留苦难、摧残。
+
+### 7.4 招架盾预测虚高
+`FleshBone.EndOfTurnBlock` 原来**无条件**把她当前格挡加进去。但格挡是在**她自己回合开始时清空**的：
+玩家回合（= 意图显示的时刻）她身上那份是上回合剩下的、下回合开始就没了 ⇒ 虚高。
+现在只在 `CombatState.CurrentSide == CombatSide.Enemy`（她回合内每帧重算）才计入。
+并加了一行预测明细日志（限 30 条）：
+```
+招架盾预测：玩家回合 当前格挡不计 + 牌 11 + 骇人头盔 4 + 吞噬生命 8 = 23（门槛 10）
+```

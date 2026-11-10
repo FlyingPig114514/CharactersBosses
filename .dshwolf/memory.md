@@ -4993,3 +4993,7 @@ Chronological action log.
 | 2026-11-10 20:48 | edit | `src/Hooks/Monsters/TierBossMonsters.Act1.cs` | ok | 0 |
 | 2026-11-10 20:48 | edit | `src/Hooks/Encounters/TierBossEncounters.cs` | ok | 0 |
 | 2026-11-10 20:57 | write | `docs/plans/boss-necrobinder-flesh.md` | ok | 0 |
+| 2026-11-10 21:18 | edit | `src/Hooks/Core/FleshBone.cs` | ok | 0 |
+| 2026-11-10 21:18 | edit | `src/Hooks/Patches/SleightOfFleshBossPatch.cs` | error | 0 |
+| 2026-11-10 21:18 | edit | `src/Hooks/Patches/SleightOfFleshBossPatch.cs` | ok | 0 |
+| 2026-11-10 21:18 | write | `src/Hooks/Patches/ParryingShieldBossPatch.cs` | ok | 0 |

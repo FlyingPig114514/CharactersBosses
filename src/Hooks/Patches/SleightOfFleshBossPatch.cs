@@ -55,18 +55,27 @@ internal static class SleightOfFleshBossPatch
             if (owner == null) return true;
             if (owner.Monster is not Monsters.CharBossMonster boss) return true;   // 只接管我们的 Boss
 
-            // 目标必须是真人玩家（她视角的敌人）；别的 Boss 的影子玩家不算
+            // ★ 2026-11-10（用户实测：「她打出命运同担的时候对自己也造成了伤害（应该只对玩家造成伤害）」）：
+            //   反编译 `SharedFate` 除了让目标掉力量，还**让她自己掉力量**：
+            //   `PowerCmd.Apply&lt;StrengthPower&gt;(ctx, Owner.Creature, -PlayerStrengthLoss, Owner.Creature, card)`。
+            //   而她自己的生物 `Side == CombatSide.Enemy` ⇒ 原版那句 `power.Owner.IsEnemy` **成立**
+            //   ⇒ 她给自己上负面时会被自己的血肉戏法打 9 点。
+            //   既然这层能力的持有者是我们的（影子玩家），就**整条接管**：
+            //     · 目标**是真人玩家**才打 9 点；
+            //     · 她给自己 / 给别的怪上负面 ⇒ 什么都不做（压掉原版）。
+            //   其它情况（真玩家自己的血肉戏法）仍然 return true 走原版，零回归。
             var victim = power?.Owner;
-            if (victim == null || victim.Monster != null) return true;
-            if (amount <= 0m) return true;
+            if (victim == null) { __result = Task.CompletedTask; return false; }
+            if (victim.Monster != null) { __result = Task.CompletedTask; return false; }   // 她自己/别的怪：不打
+            if (amount <= 0m) { __result = Task.CompletedTask; return false; }
 
             PowerType kind;
             try { kind = power!.GetTypeForAmount(amount); } catch { return true; }
-            if (kind != PowerType.Debuff) return true;
-            if (power is ITemporaryPower) return true;
+            if (kind != PowerType.Debuff) { __result = Task.CompletedTask; return false; }
+            if (power is ITemporaryPower) { __result = Task.CompletedTask; return false; }
 
             var giver = power!.Applier ?? applier;
-            if (!ReferenceEquals(giver, owner)) return true;
+            if (!ReferenceEquals(giver, owner)) { __result = Task.CompletedTask; return false; }
 
             // —— 到这里才接管：照原版那条 Damage 原样补一次（Amount 就是血肉戏法的 9/13）
             int per = 0;

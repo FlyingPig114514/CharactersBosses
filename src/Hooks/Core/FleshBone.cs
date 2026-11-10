@@ -155,27 +155,62 @@ public static class FleshBone
     {
         if (boss == null) return 0;
         int block = 0;
-        try { block += Math.Max(0, boss.Creature?.Block ?? 0); } catch { /* 忽略 */ }
+
+        // ★ 2026-11-10（用户实测：「招架盾预测有误，即使她会获得的格挡不足也会显示要造成伤害」）：
+        //   以前无条件把她**当前**格挡也算进去 —— 但格挡是在**她自己回合开始时清空**的，
+        //   所以在玩家回合（= 意图显示的时刻）她身上那份是**上回合剩下的、下一回合开始就没了**，
+        //   算进去就会虚高。只有「现在正轮到她出手（她自己回合内、每帧重算）」时，当前格挡才是真账。
+        bool herTurn = false;
+        try
+        {
+            herTurn = boss.CombatState?.CurrentSide == MegaCrit.Sts2.Core.Combat.CombatSide.Enemy;
+        }
+        catch { herTurn = false; }
+
+        if (herTurn)
+        {
+            try { block += Math.Max(0, boss.Creature?.Block ?? 0); } catch { /* 忽略 */ }
+        }
 
         bool helmet = HasRelic(boss, "INTIMIDATING_HELMET");
+        int fromCards = 0, fromHelmet = 0, fromDevour = 0;
         try
         {
             foreach (var play in boss.Plan)
             {
                 var card = play?.Card;
                 if (card == null) continue;
-                block += BossScriptPlanner.BlockGainOf(card);
+                int cardBlock = BossScriptPlanner.BlockGainOf(card);
+                fromCards += cardBlock;
+                block += cardBlock;
 
-                if (helmet && play.Cost >= HelmetEnergyThreshold) block += HelmetBlock;
+                if (helmet && play.Cost >= HelmetEnergyThreshold)
+                {
+                    fromHelmet += HelmetBlock;
+                    block += HelmetBlock;
+                }
 
-                // 吞噬生命：每施加一种负面 = 4 点格挡（多目标牌也只算她一次，保守取 1 种）
+                // 吞噬生命：每施加一种负面 = 4 点格挡
                 int kinds = DebuffKinds(card);
-                if (kinds > 0) block += DevourBlock * kinds;
+                if (kinds > 0)
+                {
+                    fromDevour += DevourBlock * kinds;
+                    block += DevourBlock * kinds;
+                }
             }
         }
         catch { /* 忽略 */ }
+
+        if (_blockLogs++ < 30)
+        {
+            Logger.Log($"[CharBoss] 招架盾预测：{(herTurn ? "她回合内" : "玩家回合")} 当前格挡{(herTurn ? (boss.Creature?.Block ?? 0).ToString() : "不计")}" +
+                       $" + 牌 {fromCards} + 骇人头盔 {fromHelmet} + 吞噬生命 {fromDevour} = {block}（门槛 {ParryBlockThreshold}）");
+        }
         return block;
     }
+
+    /// <summary>招架盾预测日志限流。</summary>
+    private static int _blockLogs;
 
     /// <summary>
     /// 招架盾这一手会造成几点伤害（0 = 不显示）。**无来源伤害**（`ValueProp.Unpowered`），
