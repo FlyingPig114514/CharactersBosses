@@ -1118,6 +1118,9 @@ public static class BossIntentBuilder
         "FRIENDSHIP", "NEUROSURGE", "BULK_UP",
         // 碎骨：牺牲奥斯提（它先攻击并给格挡，然后死去）
         "BONE_SHARDS",
+        // ★ 命运同担（SharedFate）：她自己也要**失去 X 点力量** ⇒ 牺牲（蓝下箭头）。
+        //   用户 2026-11-10：「命运同担的意图应该是策略和牺牲」。
+        "SHARED_FATE",
     };
 
     /// <summary>数据里看不出「强化」的牌（例如「能量汲取」升级弃牌堆里的牌）。</summary>
@@ -1173,6 +1176,11 @@ public static class BossIntentBuilder
         // 自动判定会当成「强化」（用户 2026-11-05 实测：被标成蓝色上箭头）。它是给敌人上虚弱+易伤
         // ⇒ 应为策略（红色下箭头）。
         "SHOCKWAVE",
+        // ★ 命运同担（SharedFate，用户 2026-11-10 血肉骨）：「失去 X 点力量；**敌人**失去 Y 点力量」，
+        //   两个变量都是普通 `DynamicVar`（`PlayerStrengthLoss` / `EnemyStrengthLoss`，不是 PowerVar）
+        //   ⇒ 自动判定什么都认不出来，会掉到「技能牌兜底 = 强化」上（蓝上箭头）。
+        //   用户要求：它应该是「**策略 + 牺牲**」（给敌人扣力量 = 策略；自己也扣力量 = 牺牲）。
+        "SHARED_FATE",
     };
 
     /// <summary>看这张牌施加的 power 是增益还是减益（数值为负的也算减益，如「下砸」减敌人力量）。</summary>

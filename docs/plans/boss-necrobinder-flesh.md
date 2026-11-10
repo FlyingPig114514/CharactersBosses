@@ -214,3 +214,23 @@ if (participants.Contains(Owner)) await PowerCmd.Decrement(this);
 新增 `Patches/DebilitateTicksWithWeakPatch`：只接管「持有者是真人玩家」，改成和虚弱/易伤完全一致的
 `side == Enemy ⇒ PowerCmd.TickDownDuration(this)`；怪物身上的摧残（玩家自己打出摧残打 Boss）照旧走原版。
 日志：`摧残（玩家身上）：她这一侧回合结束 ⇒ 2 → 1（与虚弱/易伤同步）`。
+## 10. 命运同担的意图 = 策略 + 牺牲（v0.2.552）
+
+用户：「命运同担的意图应该是策略和牺牲。」
+
+反编译 `SharedFate`：两个变量都是**普通 `DynamicVar`**，不是 `PowerVar<>`：
+```csharp
+new DynamicVar("EnemyStrengthLoss", 2m),   // 目标失去 Y 力量
+new DynamicVar("PlayerStrengthLoss", 2m)   // 自己失去 X 力量
+```
+而 `BossIntentBuilder.ClassifyPowers` 只认 `PowerVar<>` ⇒ **什么都认不出来** ⇒ `intents` 为空
+⇒ 掉到「技能牌兜底 = `BuffIntent`」上（蓝色上箭头）。它同时满足「策略」和「牺牲」两条，
+所以直接把 `SHARED_FATE` 加进两个点名表：
+
+| 表 | 效果 |
+| --- | --- |
+| `ForceDebuffCards` | 策略（红下箭头）—— 给敌人扣力量 |
+| `SacrificeCards` | 牺牲（蓝下箭头）—— 她自己也要扣力量 |
+
+顺带一个正确的副作用：它现在算「会给予负面效果」，所以**血肉戏法那 +9 也会显示**在它下面
+（`SHARED_FATE` 确实会给那个玩家上 `StrengthPower -2`，血肉戏法该打）。
