@@ -109,3 +109,28 @@ await PowerCmd.Apply<FocusPower>(ctx, Owner, -Sign * Amount, Owner, null);
   （日志 `引雷针：玩家本回合已打出 3 张牌 ⇒ 她本回合失去 1 点集中`）；她回合结束还回来
   （`引雷针：她回合结束 ⇒ 把本回合扣掉的 N 点集中还回去`）。
 - 预借时间：日志 `预借时间：XXX 是**自动打出**的（没花能量，不计入预借时间）`。
+## 5. 独立意图行「过于偏左、压到卡牌意图上」（v0.2.543）
+
+**用户原话**：「第二回合电球被动过于偏左，都和扫荡射线的叠在一起了」
+
+**根因**：`BossHandPanel.PlaceExtraIntents` 原来只用
+```csharp
+_extraIntents.Position = new Vector2(centerX - w * 0.5f - shift, intentTop + IntentShiftY * cardW);
+```
+而这一行（球被动 / 冰雹风暴 / 炸弹）和**卡面下方那排意图是同一高度** —— 只要横向区间相交就会压在一起。
+`centerX`（能量栏中心）随「本回合最大手牌数」和实际手牌张数变化，牌少或这一行偏宽时，
+左缘就滑进卡牌的意图区。
+
+**修法**：先**逐格测量所有卡牌意图行的真实右缘**，再让这一行的左缘至少落在它右边 `Gap` 处：
+```csharp
+float intentsRight = CardIntentRowsRightEdge(cardW);   // 逐格读 Position + 内容宽度
+float natural = centerX - w * 0.5f - shift;            // 原来的算法
+float x = Math.Max(natural, intentsRight + Gap);       // 不许压到卡牌意图
+```
+两个不能省的细节：
+- 意图行在**卡片节点内部**、并且整体左移了 `IntentShiftX × 卡宽`，内容还可能比卡面宽
+  （一张牌挂两条意图就溢出）⇒ 不能拿「卡面右缘」当边界，必须读真实的位置 + `GetCombinedMinimumSize().X`；
+- 彩虹机那笔「整体左移」必须算进 `max` 之前，否则左移又会把它压回卡牌意图上。
+
+日志（新增，限 10 条）：
+`独立意图定位：能量中心 x=… / 行宽 … ⇒ 自然 x=…；卡牌意图右缘 … ⇒ 实际 x=…（面板宽 …）`

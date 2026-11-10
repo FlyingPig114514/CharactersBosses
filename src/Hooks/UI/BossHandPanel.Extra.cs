@@ -693,11 +693,68 @@ private static int OrbPassiveDamageCore(CharBossMonster boss, bool quiet, ref in
             float h = min.Y > 1f ? min.Y : 32f;
             float centerX = BossStatusRow.EnergyCenterX(_statusRow);
 
+            // ★ 2026-11-10（用户：「第二回合电球被动过于偏左，都和扫荡射线的叠在一起了」）：
+            //   原来是 `centerX − w/2` 一算了事 —— 这一行和卡面下方那排意图是**同一高度**，
+            //   只要横向区间相交就会压在一起。能量栏中心随「本回合最大手牌数」和手牌张数变化，
+            //   牌少/这一行偏宽时左缘就会滑进卡牌的意图区。
+            //   ⇒ 现在先算出**所有卡牌意图行的真实右缘**，再让这一行的左缘至少落在它右边 Gap 处。
+            //     能量栏中心本身更靠右时仍用它（保持原来的观感）。
+            float intentsRight = CardIntentRowsRightEdge(cardW);
+            float shift = Core.RainbowMimic.IntentShiftFor(_boss);
+            float natural = centerX - w * 0.5f - shift;
+            // ⚠ 彩虹机那笔整体左移要算在 max 之前，否则左移又会把它压回卡牌的意图上
+            float x = Math.Max(natural, intentsRight + Gap);
+
             _extraIntents.Size = new Vector2(w, h);
-            _extraIntents.Position = new Vector2(centerX - w * 0.5f - Core.RainbowMimic.IntentShiftFor(_boss), intentTop + IntentShiftY * cardW);
+            _extraIntents.Position = new Vector2(x, intentTop + IntentShiftY * cardW);
+            if (_extraLayoutLogs++ < 10)
+            {
+                Logger.Log($"[CharBoss] 独立意图定位：能量中心 x={centerX:0.#} / 行宽 {w:0.#} ⇒ 自然 x={natural:0.#}；" +
+                           $"卡牌意图右缘 {intentsRight:0.#} ⇒ 实际 x={x:0.#}（面板宽 {Size.X:0.#}）");
+            }
         }
 
         PlaceLeftIntent(intentTop, cardW);
+    }
+
+    /// <summary>独立意图行定位日志限流。</summary>
+    private int _extraLayoutLogs;
+
+    /// <summary>
+    /// **所有卡牌下方意图行的最右缘**（面板局部坐标）。
+    ///
+    /// 意图行是在**卡片节点内部**、并且整体左移了 <c>IntentShiftX × 卡宽</c>，内容还可能比卡面宽
+    /// （一张牌挂两条意图时就会溢出），所以不能拿「卡牌右缘」当边界 —— 必须逐格读真实的
+    /// 位置 + 内容宽度。读不到就退回「面板宽度」（= 本回合最大牌数的右缘）。
+    /// </summary>
+    private float CardIntentRowsRightEdge(float cardW)
+    {
+        float right = 0f;
+        try
+        {
+            foreach (var cell in _cells)
+            {
+                var node = cell?.Node;
+                if (node == null || !IsInstanceValid(node)) continue;
+                foreach (var child in node.GetChildren())
+                {
+                    if (child is not Control row) continue;
+                    if (row.Name != BossHandCard.IntentsRowName) continue;
+                    float rowW = Math.Max(row.Size.X, row.GetCombinedMinimumSize().X);
+                    float edge = node.Position.X + row.Position.X + rowW;
+                    if (edge > right) right = edge;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 意图右缘测量失败: " + e.Message);
+        }
+        if (right <= 0f)
+        {
+            try { right = Math.Max(IntentShiftX * cardW, Size.X); } catch { right = 0f; }
+        }
+        return right;
     }
 
     /// <summary>
