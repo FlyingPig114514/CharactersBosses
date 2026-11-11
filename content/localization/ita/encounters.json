@@ -32,7 +32,7 @@
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "Defect",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "L'[gold]Iper-Raggio[/gold] del [gold]Defect[/gold] ha annientato {character}.",
   "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "Arcobaleno",
-  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "{character} è stato annientato dal [gold]Defect[/gold] con un Arcobaleno.",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "Il [gold]Defect[/gold] ha sciolto {character} nel suo [gold]Arcobaleno[/gold].",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "Necrobinder",
   "NECROBINDER_BOSS_ENCOUNTER.loss": "Il [gold]Necrobinder[/gold] ha reclamato l'anima di {character}.",
@@ -65,7 +65,7 @@
   "REGENT_KING_BOSS_ENCOUNTER.loss": "Il [gold]Regent[/gold] ha schiacciato {character} sotto la sua corona.",
 
   "IRONCLAD_BLOOD_BOSS_ENCOUNTER.title": "Ironclad",
-  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "La [gold]Forza[/gold] crescente dell'[gold]Ironclad[/gold] ha schiacciato {character}.",
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "Ogni goccia del sangue di {character} è stata versata nel corpo dell'[gold]Ironclad[/gold].",
 
     "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.title": "Ironclad",
   "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss": "L'[gold]Ironclad[/gold] ha fatto volteggiare {character} finché le sue stesse copie non hanno sommerso tutto.",
@@ -97,15 +97,22 @@
   "TELEMETRY_PROMPT_YES": "Attiva",
   "TELEMETRY_PROMPT_NO": "Lascia disattivata",
     "NECROBINDER_OSTY_BOSS_ENCOUNTER.title":  "The Necrobinder",
-    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character} was dragged into the grave by the [gold]Necrobinder[/gold]\u0027s Osty.",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character} è stato ridotto in poltiglia da [gold]Osty[/gold], il famiglio del [gold]Necrobinder[/gold].",
     "SILENT_SNECKO_BOSS_ENCOUNTER.title":  "The Silent",
     "SILENT_SNECKO_BOSS_ENCOUNTER.loss":  "{character} was sent to the grave by the [gold]Silent[/gold]\u0027s dice.",
   "DEFECT_EVENT_BOSS_ENCOUNTER.loss": "[gold]Defect[/gold] ha riportato {character} fuori dalla pila degli scarti.",
   "DEFECT_EVENT_BOSS_ENCOUNTER.title": "Defect",
     "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.title":  "Necrobinder",
-    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "{character} watches every card turn Ethereal at the hands of [gold]the Necrobinder[/gold].",
-    "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "{character} is torn apart by [gold]the Necrobinder[/gold]'s sleight of flesh.",
+    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "Il [gold]Necrobinder[/gold] ha trascinato {character} negli abissi del vuoto.",
+    "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "Ogni centimetro della carne di {character} è stato intrecciato dal [gold]Necrobinder[/gold] nella sua [gold]Manipolazione Corporea[/gold].",
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.title":  "Necrobinder",
     "REGENT_CHOICE_BOSS_ENCOUNTER.title":  "The Regent",
-    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions."
+    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions.",
+    "DEFECT_THUNDER_BOSS_ENCOUNTER.loss":  "{character} è stato ridotto in cenere nella [gold]Tempesta[/gold] del [gold]Defect[/gold].",
+    "REGENT_BOMBARD_BOSS_ENCOUNTER.loss":  "{character} è stato ridotto in terra bruciata dal [gold]Bombardamento[/gold] del [gold]Regent[/gold].",
+    "IRONCLAD_STRIKE_BOSS_ENCOUNTER.loss":  "L'[gold]Ironclad[/gold] ha spedito {character} all'inferno con un [gold]Colpo Perfetto[/gold].",
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.loss":  "Il [gold]Silent[/gold] ha sommerso {character} con il suo [gold]Morso Viperino[/gold].",
+    "REGENT_MINION_BOSS_ENCOUNTER.loss":  "{character} è stato linciato dal [gold]Regent[/gold] e dai suoi [gold]seguaci[/gold].",
+    "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.loss":  "{character} è stato l'ultimo atto del [gold]Gran Finale[/gold] del [gold]Silent[/gold].",
+    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "Il [gold]Defect[/gold] ha incenerito {character} con il suo [gold]Cannone Antiaereo[/gold], carte stato comprese."
 }

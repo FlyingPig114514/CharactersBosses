@@ -58,7 +58,7 @@
   "BOSS_ALL_FOR_ONE_POWER.description": "Карта [gold]«Все за одного»[/gold] у Дефекта возвращает в [gold]руку[/gold] только [gold]атаки[/gold] стоимостью 0 из [gold]стопки сброса[/gold], а не все карты стоимостью 0.\nКаждый раз, когда его карта возвращается из стопки сброса в руку, ВСЕ существа получают 1 ед. [gold]силы[/gold].",
   "BOSS_ALL_FOR_ONE_POWER.title": "Один за всех",
  "BOSS_ORBITAL_BOMBARD_POWER.title": "Orbital Bombardment",
-  "BOSS_ORBITAL_BOMBARD_POWER.description": "You start combat with 1 stack of [gold]Spectrum Shift[/gold].\nThe Regent is [gold]Stunned[/gold] on turn 1. After playing [gold]Bombardment[/gold] on turn 2 he stays Stunned, and the [gold]Bombardment[/gold] sitting in his [gold]Exhaust Pile[/gold] [gold]re-fires every turn[/gold].\nOn your 5th turn in which you played a Colorless card he wakes up — and the [gold]Bombardment[/gold] starts hitting HIM instead.",
+  "BOSS_ORBITAL_BOMBARD_POWER.description": "At the start of combat, you gain 1 stack of [gold]Spectrum Shift[/gold].\nThe Regent is Stunned on turn 1, plays 1 [gold]Bombardment[/gold] on turn 2, and is Stunned again after that.\nAfter 5 turns in which you played a colorless card, the Regent wakes up — and [gold]Bombardment[/gold] turns around and starts hitting the Regent himself.",
     "BOSS_CALL_TO_ARMS_POWER.title":  "Call to Arms",
     "BOSS_CALL_TO_ARMS_POWER.description":  "Whenever the Regent plays a Minion card, if he has fewer than 2 Minions, summon the matching Minion instead.\nWhenever the Regent gains Strength from a card, his other allies gain the same amount.",
     "BOSS_LIGHTNING_ROD_POWER.title":  "Lightning Rod",

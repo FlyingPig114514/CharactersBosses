@@ -32,7 +32,7 @@
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "Le Défectueux",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "L'[gold]Ultralaser[/gold] du [gold]Défectueux[/gold] a anéanti {character}.",
   "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "Arc-en-ciel",
-  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "{character} a été anéanti par l'[gold]Defect[/gold] et son Arc-en-ciel.",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "Le [gold]Défectueux[/gold] a fait fondre {character} dans son [gold]Arc-en-ciel[/gold].",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "La Tisse-Mort",
   "NECROBINDER_BOSS_ENCOUNTER.loss": "La [gold]Tisse-Mort[/gold] a ravi l'âme de {character}.",
@@ -65,7 +65,7 @@
   "REGENT_KING_BOSS_ENCOUNTER.loss": "Le [gold]Régent[/gold] a écrasé {character} sous sa couronne.",
 
   "IRONCLAD_BLOOD_BOSS_ENCOUNTER.title": "Le Soldat de Fer",
-  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "La [gold]Force[/gold] grandissante du [gold]Soldat de Fer[/gold] a écrasé {character}.",
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "Chaque goutte du sang de {character} s'est déversée dans le corps du [gold]Soldat de Fer[/gold].",
 
     "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.title": "Le Soldat de Fer",
   "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss": "Le [gold]Soldat de Fer[/gold] a fait jongler {character} jusqu'à ce que ses propres copies l'engloutissent.",
@@ -97,15 +97,22 @@
   "TELEMETRY_PROMPT_YES": "Activer",
   "TELEMETRY_PROMPT_NO": "Laisser désactivé",
     "NECROBINDER_OSTY_BOSS_ENCOUNTER.title":  "The Necrobinder",
-    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character} was dragged into the grave by the [gold]Necrobinder[/gold]\u0027s Osty.",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character} a été réduit en miettes par [gold]Titos[/gold], le compagnon de la [gold]Tisse-Mort[/gold].",
     "SILENT_SNECKO_BOSS_ENCOUNTER.title":  "The Silent",
     "SILENT_SNECKO_BOSS_ENCOUNTER.loss":  "{character} was sent to the grave by the [gold]Silent[/gold]\u0027s dice.",
   "DEFECT_EVENT_BOSS_ENCOUNTER.loss": "{character} a été ressorti de la défausse par [gold]le Défectueux[/gold].",
   "DEFECT_EVENT_BOSS_ENCOUNTER.title": "Le Défectueux",
     "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.title":  "Necrobinder",
-    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "{character} watches every card turn Ethereal at the hands of [gold]the Necrobinder[/gold].",
-    "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "{character} is torn apart by [gold]the Necrobinder[/gold]'s sleight of flesh.",
+    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "La [gold]Tisse-Mort[/gold] a traîné {character} dans les profondeurs du vide.",
+    "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "Chaque parcelle de chair de {character} a été tissée par la [gold]Tisse-Mort[/gold] dans son [gold]Tour de chair[/gold].",
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.title":  "Necrobinder",
     "REGENT_CHOICE_BOSS_ENCOUNTER.title":  "The Regent",
-    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions."
+    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions.",
+    "DEFECT_THUNDER_BOSS_ENCOUNTER.loss":  "{character} a été réduit en cendres dans l'[gold]Orage[/gold] du [gold]Défectueux[/gold].",
+    "REGENT_BOMBARD_BOSS_ENCOUNTER.loss":  "{character} a été changé en terre brûlée par le [gold]Bombardement[/gold] du [gold]Régent[/gold].",
+    "IRONCLAD_STRIKE_BOSS_ENCOUNTER.loss":  "Le [gold]Soldat de Fer[/gold] a envoyé {character} en enfer d'une [gold]Frappe perfectionnée[/gold].",
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.loss":  "La [gold]Silencieuse[/gold] a noyé {character} sous sa [gold]Morsure de serpent[/gold].",
+    "REGENT_MINION_BOSS_ENCOUNTER.loss":  "{character} a été lynché par le [gold]Régent[/gold] et ses [gold]sbires[/gold].",
+    "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.loss":  "{character} fut le dernier acte du [gold]Clou du spectacle[/gold] de la [gold]Silencieuse[/gold].",
+    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "Le [gold]Défectueux[/gold] a carbonisé {character} avec son [gold]Canon anti-aérien[/gold], cartes de statut comprises."
 }

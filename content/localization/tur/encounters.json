@@ -32,7 +32,7 @@
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "Arıza",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character}, [gold]Arıza[/gold]'nın [gold]Hiper Işın[/gold]'ıyla yok edildi.",
   "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "Gökkuşağı",
-  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "{character}, [gold]Defekt[/gold] ve Gökkuşağı tarafından yok edildi.",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "[gold]Arıza[/gold], {character}'ı [gold]Gökkuşağı[/gold]nda eritti.",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "Ölübağlayan",
   "NECROBINDER_BOSS_ENCOUNTER.loss": "{character}'ın ruhu [gold]Ölübağlayan[/gold] tarafından alındı.",
@@ -65,7 +65,7 @@
   "REGENT_KING_BOSS_ENCOUNTER.loss": "{character}, [gold]Naip[/gold]'in tacı altında ezildi.",
 
   "IRONCLAD_BLOOD_BOSS_ENCOUNTER.title": "Demirkaplı",
-  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "{character}, [gold]Demirkaplı[/gold]'nın gitgide artan [gold]Kuvvet[/gold]'i altında ezildi.",
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "{character}'ın kanının her damlası [gold]Demirkaplı[/gold]'nın bedenine akıtıldı.",
 
   "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.title": "Demirkaplı",
   "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss": "{character}, [gold]Demirkaplı[/gold] tarafından hokkabazlık edilir gibi oynatıldı ve sonunda kendi kopyaları altında kaldı.",
@@ -97,15 +97,22 @@
   "TELEMETRY_PROMPT_YES": "Etkinleştir",
   "TELEMETRY_PROMPT_NO": "Kapalı kalsın",
     "NECROBINDER_OSTY_BOSS_ENCOUNTER.title":  "The Necrobinder",
-    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character} was dragged into the grave by the [gold]Necrobinder[/gold]\u0027s Osty.",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character}, [gold]Ölübağlayan[/gold]'ın [gold]Osti[/gold]si tarafından paramparça edildi.",
     "SILENT_SNECKO_BOSS_ENCOUNTER.title":  "The Silent",
     "SILENT_SNECKO_BOSS_ENCOUNTER.loss":  "{character} was sent to the grave by the [gold]Silent[/gold]\u0027s dice.",
   "DEFECT_EVENT_BOSS_ENCOUNTER.loss": "[gold]Arıza[/gold], {character}'ı Atık Deste'den geri çekti.",
   "DEFECT_EVENT_BOSS_ENCOUNTER.title": "Arıza",
     "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.title":  "Necrobinder",
-    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "{character} watches every card turn Ethereal at the hands of [gold]the Necrobinder[/gold].",
-    "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "{character} is torn apart by [gold]the Necrobinder[/gold]'s sleight of flesh.",
+    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "[gold]Ölübağlayan[/gold], {character}'ı boşluğun derinliklerine sürükledi.",
+    "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "{character}'ın teninin her santimi [gold]Ölübağlayan[/gold] tarafından [gold]Bedensel Manipülasyon[/gold]a dokundu.",
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.title":  "Necrobinder",
     "REGENT_CHOICE_BOSS_ENCOUNTER.title":  "The Regent",
-    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions."
+    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions.",
+    "DEFECT_THUNDER_BOSS_ENCOUNTER.loss":  "{character}, [gold]Arıza[/gold]'nın [gold]Fırtına[/gold]sında küle döndü.",
+    "REGENT_BOMBARD_BOSS_ENCOUNTER.loss":  "{character}, [gold]Naip[/gold]'in [gold]Bombardıman[/gold]ıyla küle dönmüş toprağa çevrildi.",
+    "IRONCLAD_STRIKE_BOSS_ENCOUNTER.loss":  "[gold]Demirkaplı[/gold], [gold]Kusursuz Saldırı[/gold]sıyla {character}'ı cehenneme yolladı.",
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.loss":  "[gold]Sessiz[/gold], {character}'ı [gold]Yılan Isırığı[/gold]yla boğdu.",
+    "REGENT_MINION_BOSS_ENCOUNTER.loss":  "{character}, [gold]Naip[/gold] ve [gold]uşakları[/gold] tarafından dövülerek öldürüldü.",
+    "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.loss":  "{character}, [gold]Sessiz[/gold]'in [gold]Büyük Final[/gold]inin son perdesi oldu.",
+    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "[gold]Arıza[/gold], [gold]Uçaksavar[/gold]ıyla {character}'ı durum kartlarıyla birlikte yakıp kül etti."
 }

@@ -32,7 +32,7 @@
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "Дефект",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character} был испепелен «Гиперлучом» [gold]Дефекта[/gold].",
   "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "Радуга",
-  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "{character} был уничтожен [gold]Дефектом[/gold] и его Радугой.",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "[gold]Дефект[/gold] растворил {character} в своей [gold]Радуге[/gold].",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "Призывающая",
   "NECROBINDER_BOSS_ENCOUNTER.loss": "Душу {character} забрала [gold]Призывающая[/gold].",
@@ -65,7 +65,7 @@
   "REGENT_KING_BOSS_ENCOUNTER.loss": "{character} был раздавлен властью [gold]Наследника[/gold].",
 
   "IRONCLAD_BLOOD_BOSS_ENCOUNTER.title": "Латоносец",
-  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "{character} был раздавлен растущей силой [gold]Латоносца[/gold].",
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "Каждая капля крови {character} влилась в тело [gold]Латоносца[/gold].",
 
     "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.title": "Латоносец",
   "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss": "[gold]Латоносец[/gold] жонглировал {character}, пока того не погребли его собственные копии.",
@@ -97,15 +97,22 @@
   "TELEMETRY_PROMPT_YES": "Включить",
   "TELEMETRY_PROMPT_NO": "Оставить выключенным",
     "NECROBINDER_OSTY_BOSS_ENCOUNTER.title":  "The Necrobinder",
-    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character} was dragged into the grave by the [gold]Necrobinder[/gold]\u0027s Osty.",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character} был разбит вдребезги [gold]Костей[/gold], прислужником [gold]Призывающей[/gold].",
     "SILENT_SNECKO_BOSS_ENCOUNTER.title":  "The Silent",
     "SILENT_SNECKO_BOSS_ENCOUNTER.loss":  "{character} was sent to the grave by the [gold]Silent[/gold]\u0027s dice.",
   "DEFECT_EVENT_BOSS_ENCOUNTER.loss": "[gold]Дефект[/gold] вытащил {character} обратно из стопки сброса.",
   "DEFECT_EVENT_BOSS_ENCOUNTER.title": "Дефект",
     "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.title":  "Necrobinder",
-    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "{character} watches every card turn Ethereal at the hands of [gold]the Necrobinder[/gold].",
-    "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "{character} is torn apart by [gold]the Necrobinder[/gold]'s sleight of flesh.",
+    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "[gold]Призывающая[/gold] утащила {character} в глубины пустоты.",
+    "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "Каждый кусочек плоти {character} был вплетён [gold]Призывающей[/gold] в её [gold]Податливую плоть[/gold].",
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.title":  "Necrobinder",
     "REGENT_CHOICE_BOSS_ENCOUNTER.title":  "The Regent",
-    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions."
+    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions.",
+    "DEFECT_THUNDER_BOSS_ENCOUNTER.loss":  "{character} обратился в пепел в [gold]Шторме[/gold] [gold]Дефекта[/gold].",
+    "REGENT_BOMBARD_BOSS_ENCOUNTER.loss":  "{character} был стёрт в выжженную землю [gold]Бомбардировкой[/gold] [gold]Наследника[/gold].",
+    "IRONCLAD_STRIKE_BOSS_ENCOUNTER.loss":  "[gold]Латоносец[/gold] отправил {character} в ад [gold]Отточенным ударом[/gold].",
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.loss":  "[gold]Безмолвная[/gold] утопила {character} в своём [gold]Змеином укусе[/gold].",
+    "REGENT_MINION_BOSS_ENCOUNTER.loss":  "{character} был забит насмерть [gold]Наследником[/gold] и его [gold]слугами[/gold].",
+    "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.loss":  "{character} стал последним актом [gold]Кульминации[/gold] [gold]Безмолвной[/gold].",
+    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "[gold]Дефект[/gold] сжёг {character} своей [gold]Зенитной пушкой[/gold] вместе с картами статуса."
 }

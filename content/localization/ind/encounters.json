@@ -32,7 +32,7 @@
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "Si Defect",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character} dilenyapkan oleh [gold]Sinar Hyper[/gold] milik [gold]Si Defect[/gold].",
   "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "Pelangi",
-  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "{character} dimusnahkan oleh [gold]Defect[/gold] dengan Pelangi.",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "[gold]Si Defect[/gold] meleburkan {character} ke dalam [gold]Pelangi[/gold]nya.",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "Si Necrobinder",
   "NECROBINDER_BOSS_ENCOUNTER.loss": "Jiwa {character} diambil oleh [gold]Si Necrobinder[/gold].",
@@ -65,7 +65,7 @@
   "REGENT_KING_BOSS_ENCOUNTER.loss": "{character} remuk di bawah mahkota [gold]Si Regent[/gold].",
 
   "IRONCLAD_BLOOD_BOSS_ENCOUNTER.title": "Si Ironclad",
-  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "{character} dihancurkan oleh [gold]Kekuatan[/gold] [gold]Si Ironclad[/gold] yang terus bertambah.",
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "Setiap tetes darah {character} mengalir ke dalam tubuh [gold]Si Ironclad[/gold].",
 
   "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.title": "Si Ironclad",
   "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss": "{character} dipermainkan [gold]Si Ironclad[/gold] bagai lempar tangkap, lalu terkubur oleh salinannya sendiri.",
@@ -97,15 +97,22 @@
   "TELEMETRY_PROMPT_YES": "Aktifkan",
   "TELEMETRY_PROMPT_NO": "Biarkan nonaktif",
     "NECROBINDER_OSTY_BOSS_ENCOUNTER.title":  "The Necrobinder",
-    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character} was dragged into the grave by the [gold]Necrobinder[/gold]\u0027s Osty.",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character} remuk berkeping-keping oleh [gold]Osty[/gold], peliharaan [gold]Si Necrobinder[/gold].",
     "SILENT_SNECKO_BOSS_ENCOUNTER.title":  "The Silent",
     "SILENT_SNECKO_BOSS_ENCOUNTER.loss":  "{character} was sent to the grave by the [gold]Silent[/gold]\u0027s dice.",
   "DEFECT_EVENT_BOSS_ENCOUNTER.loss": "[gold]Si Defect[/gold] menarik {character} keluar dari Tumpukan Singkir.",
   "DEFECT_EVENT_BOSS_ENCOUNTER.title": "Si Defect",
     "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.title":  "Necrobinder",
-    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "{character} watches every card turn Ethereal at the hands of [gold]the Necrobinder[/gold].",
-    "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "{character} is torn apart by [gold]the Necrobinder[/gold]'s sleight of flesh.",
+    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "[gold]Si Necrobinder[/gold] menyeret {character} ke dasar kehampaan.",
+    "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "Setiap inci daging {character} ditenun oleh [gold]Si Necrobinder[/gold] menjadi bagian dari [gold]Kemahiran Kedagingan[/gold].",
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.title":  "Necrobinder",
     "REGENT_CHOICE_BOSS_ENCOUNTER.title":  "The Regent",
-    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions."
+    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions.",
+    "DEFECT_THUNDER_BOSS_ENCOUNTER.loss":  "{character} hangus menjadi arang dalam [gold]Badai[/gold] milik [gold]Si Defect[/gold].",
+    "REGENT_BOMBARD_BOSS_ENCOUNTER.loss":  "{character} diratakan menjadi tanah hangus oleh [gold]Pengeboman[/gold] [gold]Si Regent[/gold].",
+    "IRONCLAD_STRIKE_BOSS_ENCOUNTER.loss":  "[gold]Si Ironclad[/gold] menghempaskan {character} ke neraka dengan [gold]Tebasan Sempurna[/gold].",
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.loss":  "[gold]Si Silent[/gold] menenggelamkan {character} dengan [gold]Gigitan Ular[/gold]nya.",
+    "REGENT_MINION_BOSS_ENCOUNTER.loss":  "{character} dihajar sampai mati oleh [gold]Si Regent[/gold] dan para [gold]budaknya[/gold].",
+    "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.loss":  "{character} adalah babak terakhir dari [gold]Grand Final[/gold] [gold]Si Silent[/gold].",
+    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "[gold]Si Defect[/gold] membakar {character} dengan [gold]Meriam Sampah[/gold]nya, beserta seluruh kartu status."
 }

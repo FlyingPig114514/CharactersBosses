@@ -32,7 +32,7 @@
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "Defekt",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character} został unicestwiony „Hiperpromieniem” [gold]Defekta[/gold].",
   "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "Tęcza",
-  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "{character} został unicestwiony przez [gold]Defekta[/gold] i Tęczę.",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "[gold]Defekt[/gold] roztopił {character} w swojej [gold]Tęczy[/gold].",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "Nekromantka",
   "NECROBINDER_BOSS_ENCOUNTER.loss": "Duszę {character} zagarnęła [gold]Nekromantka[/gold].",
@@ -65,7 +65,7 @@
   "REGENT_KING_BOSS_ENCOUNTER.loss": "{character} został zmiażdżony władzą [gold]Monarchy[/gold].",
 
   "IRONCLAD_BLOOD_BOSS_ENCOUNTER.title": "Pancernik",
-  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "{character} został zmiażdżony rosnącą Siłą [gold]Pancernika[/gold].",
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "Każda kropla krwi {character} wlała się w ciało [gold]Pancernika[/gold].",
 
     "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.title": "Pancernik",
   "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss": "[gold]Pancernik[/gold] żonglował {character}, aż w końcu zasypały go własne kopie.",
@@ -97,15 +97,22 @@
   "TELEMETRY_PROMPT_YES": "Włącz",
   "TELEMETRY_PROMPT_NO": "Zostaw wyłączone",
     "NECROBINDER_OSTY_BOSS_ENCOUNTER.title":  "The Necrobinder",
-    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character} was dragged into the grave by the [gold]Necrobinder[/gold]\u0027s Osty.",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character} został roztrzaskany przez [gold]Kostka[/gold], sługę [gold]Nekromantki[/gold].",
     "SILENT_SNECKO_BOSS_ENCOUNTER.title":  "The Silent",
     "SILENT_SNECKO_BOSS_ENCOUNTER.loss":  "{character} was sent to the grave by the [gold]Silent[/gold]\u0027s dice.",
   "DEFECT_EVENT_BOSS_ENCOUNTER.loss": "[gold]Defekt[/gold] wyciągnął {character} ze stosu kart odrzuconych.",
   "DEFECT_EVENT_BOSS_ENCOUNTER.title": "Defekt",
     "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.title":  "Necrobinder",
-    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "{character} watches every card turn Ethereal at the hands of [gold]the Necrobinder[/gold].",
-    "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "{character} is torn apart by [gold]the Necrobinder[/gold]'s sleight of flesh.",
+    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "[gold]Nekromantka[/gold] wciągnęła {character} w czeluście pustki.",
+    "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "Każdy cal ciała {character} został wpleciony przez [gold]Nekromantkę[/gold] w jej [gold]Maltretowanie[/gold].",
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.title":  "Necrobinder",
     "REGENT_CHOICE_BOSS_ENCOUNTER.title":  "The Regent",
-    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions."
+    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions.",
+    "DEFECT_THUNDER_BOSS_ENCOUNTER.loss":  "{character} spłonął na popiół w [gold]Burzy[/gold] zesłanej przez [gold]Defekta[/gold].",
+    "REGENT_BOMBARD_BOSS_ENCOUNTER.loss":  "{character} został zmieciony w spaloną ziemię przez [gold]Bombardowanie[/gold] [gold]Monarchy[/gold].",
+    "IRONCLAD_STRIKE_BOSS_ENCOUNTER.loss":  "[gold]Pancernik[/gold] posłał {character} do piekła [gold]Perfekcyjnym uderzeniem[/gold].",
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.loss":  "[gold]Zjawa[/gold] utopiła {character} w swoim [gold]Pluciu jadem[/gold].",
+    "REGENT_MINION_BOSS_ENCOUNTER.loss":  "{character} został zatłuczony przez [gold]Monarchę[/gold] i jego [gold]sługi[/gold].",
+    "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.loss":  "{character} był ostatnim aktem [gold]Wielkiego finału[/gold] [gold]Zjawy[/gold].",
+    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "[gold]Defekt[/gold] spalił {character} swoim [gold]Działem przeciwlotniczym[/gold], wraz z kartami statusu."
 }

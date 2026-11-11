@@ -32,7 +32,7 @@
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "ディフェクト",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character}は[gold]ディフェクト[/gold]の[gold]ハイパービーム[/gold]に消し飛ばされた。",
   "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "虹",
-  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "{character}は[gold]ディフェクト[/gold]の虹に消し去られた。",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "[gold]ディフェクト[/gold]は{character}を[gold]レインボー[/gold]に溶かし込んだ。",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "ネクロバインダー",
   "NECROBINDER_BOSS_ENCOUNTER.loss": "{character}の魂は[gold]ネクロバインダー[/gold]に奪われた。",
@@ -65,7 +65,7 @@
   "REGENT_KING_BOSS_ENCOUNTER.loss": "{character}は[gold]リージェント[/gold]の王権に踏み潰された。",
 
   "IRONCLAD_BLOOD_BOSS_ENCOUNTER.title": "アイアンクラッド",
-  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "{character}は戦うほど強くなる[gold]アイアンクラッド[/gold]の[gold]筋力[/gold]に潰された。",
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "{character}の血の一滴残らずが[gold]アイアンクラッド[/gold]の身体に注ぎ込まれた。",
 
     "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.title": "アイアンクラッド",
   "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss": "{character}は[gold]アイアンクラッド[/gold]に弄ばれ、最後は自分のコピーに埋め尽くされた。",
@@ -97,15 +97,22 @@
   "TELEMETRY_PROMPT_YES": "有効にする",
   "TELEMETRY_PROMPT_NO": "オフのまま",
     "NECROBINDER_OSTY_BOSS_ENCOUNTER.title":  "The Necrobinder",
-    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character} was dragged into the grave by the [gold]Necrobinder[/gold]\u0027s Osty.",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character}は[gold]ネクロバインダー[/gold]の[gold]オスティ[/gold]に粉々に砕かれた。",
     "SILENT_SNECKO_BOSS_ENCOUNTER.title":  "The Silent",
     "SILENT_SNECKO_BOSS_ENCOUNTER.loss":  "{character} was sent to the grave by the [gold]Silent[/gold]\u0027s dice.",
   "DEFECT_EVENT_BOSS_ENCOUNTER.loss": "{character}は[gold]ディフェクト[/gold]に捨て札から引き戻された。",
   "DEFECT_EVENT_BOSS_ENCOUNTER.title": "ディフェクト",
     "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.title":  "Necrobinder",
-    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "{character} watches every card turn Ethereal at the hands of [gold]the Necrobinder[/gold].",
-    "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "{character} is torn apart by [gold]the Necrobinder[/gold]'s sleight of flesh.",
+    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "{character}は[gold]ネクロバインダー[/gold]に虚空の底へ引きずり込まれた。",
+    "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "{character}の血肉の一片一片が[gold]ネクロバインダー[/gold]の[gold]呪肉の奇術[/gold]に編み込まれた。",
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.title":  "Necrobinder",
     "REGENT_CHOICE_BOSS_ENCOUNTER.title":  "The Regent",
-    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions."
+    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions.",
+    "DEFECT_THUNDER_BOSS_ENCOUNTER.loss":  "{character}は[gold]ディフェクト[/gold]の[gold]ストーム[/gold]で黒焦げにされた。",
+    "REGENT_BOMBARD_BOSS_ENCOUNTER.loss":  "{character}は[gold]リージェント[/gold]の[gold]爆撃[/gold]で焦土と化した。",
+    "IRONCLAD_STRIKE_BOSS_ENCOUNTER.loss":  "[gold]アイアンクラッド[/gold]の[gold]パーフェクトストライク[/gold]で{character}は地獄へ叩き込まれた。",
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.loss":  "{character}は[gold]サイレント[/gold]の[gold]蛇の噛みつき[/gold]に呑み込まれた。",
+    "REGENT_MINION_BOSS_ENCOUNTER.loss":  "{character}は[gold]リージェント[/gold]とその[gold]僕たち[/gold]に袋叩きにされた。",
+    "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.loss":  "{character}は[gold]サイレント[/gold]の[gold]グランドフィナーレ[/gold]の最後の一幕となった。",
+    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "[gold]ディフェクト[/gold]の[gold]フラックキャノン[/gold]で{character}は状態カードごと焼き尽くされた。"
 }

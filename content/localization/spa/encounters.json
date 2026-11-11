@@ -32,7 +32,7 @@
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "El Defectuoso",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character} fue aniquilado por el [gold]Hiperrayo[/gold] de [gold]El Defectuoso[/gold].",
   "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "Arcoíris",
-  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "{character} fue aniquilado por el [gold]Defecto[/gold] con un Arcoíris.",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "[gold]El Defectuoso[/gold] fundió a {character} en su [gold]Arcoíris[/gold].",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "La Vinculahuesos",
   "NECROBINDER_BOSS_ENCOUNTER.loss": "[gold]La Vinculahuesos[/gold] se llevó el alma de {character}.",
@@ -65,7 +65,7 @@
   "REGENT_KING_BOSS_ENCOUNTER.loss": "{character} fue aplastado bajo la corona de [gold]El Regente[/gold].",
 
   "IRONCLAD_BLOOD_BOSS_ENCOUNTER.title": "El Blindado",
-  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "{character} fue aplastado por la [gold]Fuerza[/gold] creciente de [gold]El Blindado[/gold].",
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "Cada gota de la sangre de {character} se vertió en el cuerpo de [gold]El Blindado[/gold].",
 
     "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.title": "El Blindado",
   "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss": "[gold]El Blindado[/gold] tuvo a {character} dando vueltas hasta ahogarlo bajo sus propias copias.",
@@ -97,15 +97,22 @@
   "TELEMETRY_PROMPT_YES": "Activar",
   "TELEMETRY_PROMPT_NO": "Mantenerlo desactivado",
     "NECROBINDER_OSTY_BOSS_ENCOUNTER.title":  "The Necrobinder",
-    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character} was dragged into the grave by the [gold]Necrobinder[/gold]\u0027s Osty.",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character} fue hecho pedazos por [gold]Nudillos[/gold], el sirviente de [gold]La Vinculahuesos[/gold].",
     "SILENT_SNECKO_BOSS_ENCOUNTER.title":  "The Silent",
     "SILENT_SNECKO_BOSS_ENCOUNTER.loss":  "{character} was sent to the grave by the [gold]Silent[/gold]\u0027s dice.",
   "DEFECT_EVENT_BOSS_ENCOUNTER.loss": "[gold]El Defectuoso[/gold] volvió a sacar a {character} de la Pila de descarte.",
   "DEFECT_EVENT_BOSS_ENCOUNTER.title": "El Defectuoso",
     "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.title":  "Necrobinder",
-    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "{character} watches every card turn Ethereal at the hands of [gold]the Necrobinder[/gold].",
-    "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "{character} is torn apart by [gold]the Necrobinder[/gold]'s sleight of flesh.",
+    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "[gold]La Vinculahuesos[/gold] arrastró a {character} a lo más profundo del vacío.",
+    "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "Cada centímetro de la carne de {character} fue tejido por [gold]La Vinculahuesos[/gold] en su [gold]Perturbación corporal[/gold].",
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.title":  "Necrobinder",
     "REGENT_CHOICE_BOSS_ENCOUNTER.title":  "The Regent",
-    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions."
+    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions.",
+    "DEFECT_THUNDER_BOSS_ENCOUNTER.loss":  "{character} quedó reducido a cenizas en la [gold]Tormenta[/gold] de [gold]El Defectuoso[/gold].",
+    "REGENT_BOMBARD_BOSS_ENCOUNTER.loss":  "{character} fue arrasado hasta convertirse en tierra quemada por el [gold]Bombardeo[/gold] de [gold]El Regente[/gold].",
+    "IRONCLAD_STRIKE_BOSS_ENCOUNTER.loss":  "[gold]El Blindado[/gold] mandó a {character} al infierno con su [gold]Golpe perfeccionado[/gold].",
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.loss":  "[gold]La Silenciosa[/gold] ahogó a {character} con su [gold]Mordisco de serpiente[/gold].",
+    "REGENT_MINION_BOSS_ENCOUNTER.loss":  "{character} fue linchado por [gold]El Regente[/gold] y sus [gold]esbirros[/gold].",
+    "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.loss":  "{character} fue el último acto del [gold]Gran final[/gold] de [gold]La Silenciosa[/gold].",
+    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "[gold]El Defectuoso[/gold] calcinó a {character} con su [gold]Artillería antiaérea[/gold], cartas de estado incluidas."
 }

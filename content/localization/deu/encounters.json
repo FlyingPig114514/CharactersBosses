@@ -32,7 +32,7 @@
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "Das Defekte",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character} wurde vom [gold]Hyperstrahl[/gold] des [gold]Defekten[/gold] ausgelöscht.",
   "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "Regenbogen",
-  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "{character} wurde vom [gold]Defekt[/gold] mit einem Regenbogen ausgelöscht.",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "Der [gold]Defekte[/gold] hat {character} in seinen [gold]Regenbogen[/gold] eingeschmolzen.",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "Die Totenbinderin",
   "NECROBINDER_BOSS_ENCOUNTER.loss": "Die Seele von {character} wurde von der [gold]Totenbinderin[/gold] eingefordert.",
@@ -65,7 +65,7 @@
   "REGENT_KING_BOSS_ENCOUNTER.loss": "{character} wurde unter der Krone des [gold]Regenten[/gold] zermalmt.",
 
   "IRONCLAD_BLOOD_BOSS_ENCOUNTER.title": "Der Eiserne",
-  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "{character} wurde von der wachsenden [gold]Stärke[/gold] des [gold]Eisernen[/gold] zermalmt.",
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "Jeder letzte Tropfen von {character}s Blut floss in den Körper des [gold]Eisernen[/gold].",
 
     "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.title": "Der Eiserne",
   "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss": "{character} wurde vom [gold]Eisernen[/gold] herumgewirbelt und schließlich von seinen eigenen Kopien begraben.",
@@ -97,15 +97,22 @@
   "TELEMETRY_PROMPT_YES": "Aktivieren",
   "TELEMETRY_PROMPT_NO": "Ausgeschaltet lassen",
     "NECROBINDER_OSTY_BOSS_ENCOUNTER.title":  "The Necrobinder",
-    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character} was dragged into the grave by the [gold]Necrobinder[/gold]\u0027s Osty.",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character} wurde von [gold]Osty[/gold], dem Begleiter der [gold]Totenbinderin[/gold], zu Brei geschlagen.",
     "SILENT_SNECKO_BOSS_ENCOUNTER.title":  "The Silent",
     "SILENT_SNECKO_BOSS_ENCOUNTER.loss":  "{character} was sent to the grave by the [gold]Silent[/gold]\u0027s dice.",
   "DEFECT_EVENT_BOSS_ENCOUNTER.loss": "{character} wurde vom [gold]Defekten[/gold] aus dem Abwurfstapel zurückgeholt.",
   "DEFECT_EVENT_BOSS_ENCOUNTER.title": "Das Defekte",
     "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.title":  "Necrobinder",
-    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "{character} watches every card turn Ethereal at the hands of [gold]the Necrobinder[/gold].",
-    "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "{character} is torn apart by [gold]the Necrobinder[/gold]'s sleight of flesh.",
+    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "{character} wurde von der [gold]Totenbinderin[/gold] in die Tiefen der Leere gezogen.",
+    "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "Jeder Zoll von {character}s Fleisch wurde von der [gold]Totenbinderin[/gold] zu einem Teil ihres [gold]Leibeszerfalls[/gold] gewoben.",
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.title":  "Necrobinder",
     "REGENT_CHOICE_BOSS_ENCOUNTER.title":  "The Regent",
-    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions."
+    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions.",
+    "DEFECT_THUNDER_BOSS_ENCOUNTER.loss":  "{character} wurde im [gold]Sturm[/gold] des [gold]Defekten[/gold] zu Asche verbrannt.",
+    "REGENT_BOMBARD_BOSS_ENCOUNTER.loss":  "{character} wurde von der [gold]Bombardierung[/gold] des [gold]Regenten[/gold] zu verbranntem Boden gemacht.",
+    "IRONCLAD_STRIKE_BOSS_ENCOUNTER.loss":  "{character} wurde vom [gold]Eisernen[/gold] mit einem [gold]Perfekten Schlag[/gold] in die Hölle geschleudert.",
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.loss":  "{character} wurde vom [gold]Schlangenbiss[/gold] der [gold]Stillen[/gold] verschlungen.",
+    "REGENT_MINION_BOSS_ENCOUNTER.loss":  "{character} wurde vom [gold]Regenten[/gold] und seinen [gold]Dienern[/gold] zu Tode geprügelt.",
+    "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.loss":  "{character} war der letzte Akt im [gold]Großen Finale[/gold] der [gold]Stillen[/gold].",
+    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "{character} wurde von der [gold]Flak-Kanone[/gold] des [gold]Defekten[/gold] samt aller Statuskarten niedergebrannt."
 }

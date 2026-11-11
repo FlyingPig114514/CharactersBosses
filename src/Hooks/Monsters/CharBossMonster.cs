@@ -445,6 +445,15 @@ public abstract partial class CharBossMonster : MonsterModel
         CombatStartFired = false;   // 新的一场战斗
         TurnNumber = 0;
         NextTurnEnergyBonus = 0;
+        // ★ v0.2.573：「能量汲取」的升级进度也必须每场清零。
+        //   怪物 Model 在同一次运行里会被复用（上面那行 `CombatStartFired = false` 就是为此），
+        //   而 `_persistentlyUpgraded` 会让 BuildHand 把「上一场升过的牌」继续按升级版造出来，
+        //   `DrainUpgradeStep` 残留则让下一场第 1 次能量汲取直接跳到第 2 组。
+        //   用户 2026-11-11 实测（mod_log 钉住）：20:58 那场第 4 回合 能量汲取升级了 FEAR、POKE，
+        //   紧接着 21:00 那场**第 1 回合**手牌就是 [POKE+,FEAR+,FRIENDSHIP+]，而当时的卡组是
+        //   `deck(12): POKE,FEAR,FRIENDSHIP+,…` —— 卡组没升级，是这份残留状态补上去的。
+        _persistentlyUpgraded.Clear();
+        DrainUpgradeStep = 0;
         FixActHp();                 // 按真实幕数校正血量（创建生物时拿不到幕数，只能在这里补）
         try
         {

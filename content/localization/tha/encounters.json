@@ -32,7 +32,7 @@
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "นักเวทแปรพักตร์",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character} ถูก[gold]ลำแสงพิฆาต[/gold]ของ[gold]นักเวทแปรพักตร์[/gold]สลายจนสิ้นซาก",
   "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "รุ้ง",
-  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "{character} ถูก [gold]เดอะดีเฟกต์[/gold] ทำลายด้วยรุ้ง",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "[gold]นักเวทแปรพักตร์[/gold]หลอม{character}ลงใน[gold]สายรุ้ง[/gold]",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "นักปลุกผีผูกจิต",
   "NECROBINDER_BOSS_ENCOUNTER.loss": "วิญญาณของ {character} ถูก[gold]นักปลุกผีผูกจิต[/gold]เก็บไป",
@@ -65,7 +65,7 @@
   "REGENT_KING_BOSS_ENCOUNTER.loss": "{character} ถูกบดขยี้ใต้บัลลังก์ของ[gold]Regent[/gold]",
 
   "IRONCLAD_BLOOD_BOSS_ENCOUNTER.title": "นักรบเกราะเหล็ก",
-  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "{character} ถูก[gold]ความแข็งแรง[/gold]ที่เพิ่มขึ้นเรื่อยๆ ของ[gold]นักรบเกราะเหล็ก[/gold]บดขยี้",
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "เลือดทุกหยดของ{character} ไหลเข้าสู่ร่างของ[gold]นักรบเกราะเหล็ก[/gold]",
 
   "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.title": "นักรบเกราะเหล็ก",
   "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss": "{character} ถูก[gold]นักรบเกราะเหล็ก[/gold]เล่นเหมือนโยนรับส่ง ก่อนจมอยู่ใต้สำเนาของตัวเอง",
@@ -97,15 +97,22 @@
   "TELEMETRY_PROMPT_YES": "เปิดใช้งาน",
   "TELEMETRY_PROMPT_NO": "ปิดไว้ก่อน",
     "NECROBINDER_OSTY_BOSS_ENCOUNTER.title":  "The Necrobinder",
-    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character} was dragged into the grave by the [gold]Necrobinder[/gold]\u0027s Osty.",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character} ถูก[gold]น้าผี[/gold]ของ[gold]นักปลุกผีผูกจิต[/gold]ทุบจนแหลก",
     "SILENT_SNECKO_BOSS_ENCOUNTER.title":  "The Silent",
     "SILENT_SNECKO_BOSS_ENCOUNTER.loss":  "{character} was sent to the grave by the [gold]Silent[/gold]\u0027s dice.",
   "DEFECT_EVENT_BOSS_ENCOUNTER.loss": "[gold]นักเวทแปรพักตร์[/gold]ดึง {character} กลับมาจากกองทิ้ง",
   "DEFECT_EVENT_BOSS_ENCOUNTER.title": "นักเวทแปรพักตร์",
     "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.title":  "Necrobinder",
-    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "{character} watches every card turn Ethereal at the hands of [gold]the Necrobinder[/gold].",
-    "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "{character} is torn apart by [gold]the Necrobinder[/gold]'s sleight of flesh.",
+    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "[gold]นักปลุกผีผูกจิต[/gold]ลาก{character}ลงสู่ห้วงแห่งความว่างเปล่า",
+    "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "ทุกตารางนิ้วของเลือดเนื้อ{character} ถูก[gold]นักปลุกผีผูกจิต[/gold]ถักทอเป็น[gold]Sleight of Flesh[/gold]",
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.title":  "Necrobinder",
     "REGENT_CHOICE_BOSS_ENCOUNTER.title":  "The Regent",
-    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions."
+    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions.",
+    "DEFECT_THUNDER_BOSS_ENCOUNTER.loss":  "{character} ถูกเผาเป็นถ่านใน[gold]มรสุม[/gold]ของ[gold]นักเวทแปรพักตร์[/gold]",
+    "REGENT_BOMBARD_BOSS_ENCOUNTER.loss":  "{character} ถูกถล่มจนเป็นดินเผาไหม้ด้วย[gold]ระเบิดทำลายล้าง[/gold]ของ[gold]The Regent[/gold]",
+    "IRONCLAD_STRIKE_BOSS_ENCOUNTER.loss":  "[gold]นักรบเกราะเหล็ก[/gold]ส่ง{character}ลงนรกด้วย[gold]จู่โจมสมบูรณ์แบบ[/gold]",
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.loss":  "{character} จมอยู่ใต้[gold]Snakebite[/gold]ของ[gold]นักฆ่าแห่งความเงียบ[/gold]",
+    "REGENT_MINION_BOSS_ENCOUNTER.loss":  "{character} ถูก[gold]The Regent[/gold]และ[gold]ลูกน้อง[/gold]ของเขารุมทำร้ายจนตาย",
+    "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.loss":  "{character} กลายเป็นฉากสุดท้ายใน[gold]อวสานอลังการ[/gold]ของ[gold]นักฆ่าแห่งความเงียบ[/gold]",
+    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "{character} ถูก[gold]Flak Cannon[/gold]ของ[gold]นักเวทแปรพักตร์[/gold]เผาไหม้ไปพร้อมการ์ดสถานะทั้งมือ"
 }

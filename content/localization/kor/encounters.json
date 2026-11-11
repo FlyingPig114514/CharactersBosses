@@ -32,7 +32,7 @@
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "디펙트",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character}는 [gold]디펙트[/gold]의 파괴광선에 소멸했습니다.",
   "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "무지개",
-  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "{character}이(가) [gold]디펙트[/gold]의 무지개에 소멸했습니다.",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "[gold]디펙트[/gold]는 {character}를 [gold]무지개[/gold]에 녹여버렸습니다.",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "네크로바인더",
   "NECROBINDER_BOSS_ENCOUNTER.loss": "{character}의 영혼은 [gold]네크로바인더[/gold]에게 거두어졌습니다.",
@@ -65,7 +65,7 @@
   "REGENT_KING_BOSS_ENCOUNTER.loss": "{character}는 [gold]리젠트[/gold]의 왕권에 짓눌려 부서졌습니다.",
 
   "IRONCLAD_BLOOD_BOSS_ENCOUNTER.title": "아이언클래드",
-  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "{character}는 싸울수록 강해지는 [gold]아이언클래드[/gold]의 힘에 짓눌려 부서졌습니다.",
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "{character}의 피 한 방울까지 [gold]아이언클래드[/gold]의 몸속으로 흘러들었습니다.",
 
     "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.title": "아이언클래드",
   "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss": "{character}는 [gold]아이언클래드[/gold]에게 농락당하다가 마지막에는 자신의 복사본에 파묻혔습니다.",
@@ -97,15 +97,22 @@
   "TELEMETRY_PROMPT_YES": "활성화",
   "TELEMETRY_PROMPT_NO": "끈 상태 유지",
     "NECROBINDER_OSTY_BOSS_ENCOUNTER.title":  "The Necrobinder",
-    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character} was dragged into the grave by the [gold]Necrobinder[/gold]\u0027s Osty.",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character}는 [gold]네크로바인더[/gold]의 [gold]골골이[/gold]에게 박살났습니다.",
     "SILENT_SNECKO_BOSS_ENCOUNTER.title":  "The Silent",
     "SILENT_SNECKO_BOSS_ENCOUNTER.loss":  "{character} was sent to the grave by the [gold]Silent[/gold]\u0027s dice.",
   "DEFECT_EVENT_BOSS_ENCOUNTER.loss": "{character}는 [gold]디펙트[/gold]에게 버린 카드 더미에서 다시 끌려 나왔습니다.",
   "DEFECT_EVENT_BOSS_ENCOUNTER.title": "디펙트",
     "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.title":  "Necrobinder",
-    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "{character} watches every card turn Ethereal at the hands of [gold]the Necrobinder[/gold].",
-    "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "{character} is torn apart by [gold]the Necrobinder[/gold]'s sleight of flesh.",
+    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "{character}는 [gold]네크로바인더[/gold]에게 공허의 심연으로 끌려갔습니다.",
+    "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "{character}의 살점 한 조각 한 조각이 [gold]네크로바인더[/gold]의 [gold]살점 재주[/gold]로 엮여 들어갔습니다.",
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.title":  "Necrobinder",
     "REGENT_CHOICE_BOSS_ENCOUNTER.title":  "The Regent",
-    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions."
+    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions.",
+    "DEFECT_THUNDER_BOSS_ENCOUNTER.loss":  "{character}는 [gold]디펙트[/gold]의 [gold]폭풍[/gold] 속에서 숯덩이가 되었습니다.",
+    "REGENT_BOMBARD_BOSS_ENCOUNTER.loss":  "{character}는 [gold]리젠트[/gold]의 [gold]포격[/gold]에 초토화되었습니다.",
+    "IRONCLAD_STRIKE_BOSS_ENCOUNTER.loss":  "[gold]아이언클래드[/gold]의 [gold]완벽한 타격[/gold]에 {character}는 지옥으로 처박혔습니다.",
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.loss":  "{character}는 [gold]사일런트[/gold]의 [gold]뱀 물기[/gold]에 삼켜졌습니다.",
+    "REGENT_MINION_BOSS_ENCOUNTER.loss":  "{character}는 [gold]리젠트[/gold]와 그의 [gold]하수인들[/gold]에게 둘러싸여 맞아 죽었습니다.",
+    "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.loss":  "{character}는 [gold]사일런트[/gold]의 [gold]대단원의 막[/gold]의 마지막 장면이 되었습니다.",
+    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "[gold]디펙트[/gold]의 [gold]대공포[/gold]에 {character}는 상태 카드째로 불타 사라졌습니다."
 }

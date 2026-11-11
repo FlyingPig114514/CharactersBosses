@@ -32,7 +32,7 @@
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "O Defeituoso",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character} foi aniquilado pelo [gold]Hiper Raio[/gold] de [gold]O Defeituoso[/gold].",
   "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "Arco-íris",
-  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "{character} foi aniquilado pelo [gold]Defeito[/gold] com um Arco-íris.",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "[gold]O Defeituoso[/gold] derreteu {character} em seu [gold]Arco-íris[/gold].",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "A Necroartífice",
   "NECROBINDER_BOSS_ENCOUNTER.loss": "[gold]A Necroartífice[/gold] tomou a alma de {character}.",
@@ -65,7 +65,7 @@
   "REGENT_KING_BOSS_ENCOUNTER.loss": "{character} foi esmagado sob a coroa de [gold]O Regente[/gold].",
 
   "IRONCLAD_BLOOD_BOSS_ENCOUNTER.title": "O Rígido",
-  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "{character} foi esmagado pela [gold]Força[/gold] crescente de [gold]O Rígido[/gold].",
+  "IRONCLAD_BLOOD_BOSS_ENCOUNTER.loss": "Cada gota do sangue de {character} foi derramada no corpo de [gold]O Rígido[/gold].",
 
     "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.title": "O Rígido",
   "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss": "[gold]O Rígido[/gold] fez {character} de bola até afogá-lo nas próprias cópias.",
@@ -97,15 +97,22 @@
   "TELEMETRY_PROMPT_YES": "Ativar",
   "TELEMETRY_PROMPT_NO": "Manter desativado",
     "NECROBINDER_OSTY_BOSS_ENCOUNTER.title":  "The Necrobinder",
-    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character} was dragged into the grave by the [gold]Necrobinder[/gold]\u0027s Osty.",
+    "NECROBINDER_OSTY_BOSS_ENCOUNTER.loss":  "{character} foi reduzido a pedaços por [gold]Ostheo[/gold], o companheiro de [gold]A Necroartífice[/gold].",
     "SILENT_SNECKO_BOSS_ENCOUNTER.title":  "The Silent",
     "SILENT_SNECKO_BOSS_ENCOUNTER.loss":  "{character} was sent to the grave by the [gold]Silent[/gold]\u0027s dice.",
   "DEFECT_EVENT_BOSS_ENCOUNTER.loss": "[gold]O Defeituoso[/gold] tirou {character} de volta da Pilha de Descarte.",
   "DEFECT_EVENT_BOSS_ENCOUNTER.title": "O Defeituoso",
     "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.title":  "Necrobinder",
-    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "{character} watches every card turn Ethereal at the hands of [gold]the Necrobinder[/gold].",
-    "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "{character} is torn apart by [gold]the Necrobinder[/gold]'s sleight of flesh.",
+    "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "[gold]A Necroartífice[/gold] arrastou {character} para as profundezas do vazio.",
+    "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "Cada centímetro da carne de {character} foi tecido por [gold]A Necroartífice[/gold] em sua [gold]Manipulação Corpórea[/gold].",
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.title":  "Necrobinder",
     "REGENT_CHOICE_BOSS_ENCOUNTER.title":  "The Regent",
-    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions."
+    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions.",
+    "DEFECT_THUNDER_BOSS_ENCOUNTER.loss":  "{character} foi reduzido a cinzas na [gold]Tormenta[/gold] de [gold]O Defeituoso[/gold].",
+    "REGENT_BOMBARD_BOSS_ENCOUNTER.loss":  "{character} foi arrasado até virar terra queimada pelo [gold]Bombardeio[/gold] de [gold]O Regente[/gold].",
+    "IRONCLAD_STRIKE_BOSS_ENCOUNTER.loss":  "[gold]O Rígido[/gold] mandou {character} para o inferno com um [gold]Golpe Aperfeiçoado[/gold].",
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.loss":  "[gold]A Sorrateira[/gold] afogou {character} com sua [gold]Mordida de Serpente[/gold].",
+    "REGENT_MINION_BOSS_ENCOUNTER.loss":  "{character} foi espancado até a morte por [gold]O Regente[/gold] e seus [gold]lacaios[/gold].",
+    "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.loss":  "{character} foi o último ato do [gold]Grande Desfecho[/gold] de [gold]A Sorrateira[/gold].",
+    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "[gold]O Defeituoso[/gold] incinerou {character} com sua [gold]Artilharia Antiaérea[/gold], cartas de status inclusas."
 }
