@@ -5175,3 +5175,6 @@ Chronological action log.
 | 2026-11-11 18:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/DownfallCollectibleCompat.cs` | ok | 0 |
 | 2026-11-11 18:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/DownfallCollectibleCompat.cs` | ok | 0 |
 | 2026-11-11 18:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-11 19:12 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/SceneTreeDumper.cs` | ok | 0 |
+| 2026-11-11 19:12 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Patches/BossFrameTickPatch.cs` | ok | 0 |
+| 2026-11-11 19:12 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/SceneTreeDumper.cs` | ok | 0 |

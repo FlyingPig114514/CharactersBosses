@@ -147,6 +147,8 @@ public static class BossFrameTick
         var swTick = System.Diagnostics.Stopwatch.StartNew();
         // 进新战斗房（斗蛐蛐连打第二场）时，把上一场留下的面板/层/翻侧计数全拆掉。
         CharacterBosses.UI.BossUiSession.EnsureFresh();
+        // 场景树导出器（按 F9 导出，幂等挂载；用户 2026-11-11 要「能看各种节点」）
+        try { Core.SceneTreeDumper.Ensure(); } catch { /* 忽略 */ }
         try { TickInner(source); }
         finally
         {
