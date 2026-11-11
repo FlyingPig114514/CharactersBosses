@@ -760,7 +760,13 @@ public static class BossScriptPlanner
         return list;
     }
 
-    /// <summary>本回合剧本里那张「只有在玩家选了某张之后才打得出」的牌（= 天际钻头）；没有就 null。</summary>
+    /// <summary>
+    /// 本回合剧本里那张「天际钻头」（X 费牌）；没有就 null。
+    ///
+    /// 认法有两条，够用即可：
+    ///   · 剧本点名「只有玩家选了某张才打得出」的那张（第 1 回合）；
+    ///   · **X 费牌**（第 5 回合的钻头是常驻的、没有 `OnlyIfChosenCard`，但它是 `HasEnergyCostX`）。
+    /// </summary>
     private static CardModel? FindChoiceDrill(Monsters.CharBossMonster? boss, int turnNumber)
     {
         try
@@ -770,19 +776,36 @@ public static class BossScriptPlanner
             if (scriptTurn?.Cards == null || pcs == null) return null;
             foreach (var entry in scriptTurn.Cards)
             {
-                if (entry?.OnlyIfChosenCard == null) continue;
-                foreach (var card in pcs.Hand.Cards)
+                if (entry?.Card == null) continue;
+                var card = FirstHandCardOf(pcs, entry);
+                if (card == null) continue;
+                bool xCost = false;
+                try { xCost = card.EnergyCost.CostsX; } catch { xCost = false; }
+                if (entry.OnlyIfChosenCard != null || xCost) return card;
+            }
+        }
+        catch { /* 忽略 */ }
+        return null;
+    }
+
+    /// <summary>她手里「是这条剧本牌」的第一张实例（按类型 / 模型 id 比，升级版也算）。</summary>
+    private static CardModel? FirstHandCardOf(MegaCrit.Sts2.Core.Entities.Players.PlayerCombatState pcs, ScriptCard entry)
+    {
+        try
+        {
+            string? wanted = null;
+            try { wanted = ModelDb.GetId(entry.Card)?.Entry; } catch { wanted = null; }
+            foreach (var card in pcs.Hand.Cards)
+            {
+                if (card == null) continue;
+                try
                 {
-                    if (card == null) continue;
-                    try
-                    {
-                        if (card.GetType() == entry.Card) return card;
-                        string? a = ModelDb.GetId(card.GetType())?.Entry;
-                        string? b = ModelDb.GetId(entry.Card)?.Entry;
-                        if (a != null && b != null && string.Equals(a, b, StringComparison.Ordinal)) return card;
-                    }
-                    catch { /* 单张读不到就跳过 */ }
+                    if (card.GetType() == entry.Card) return card;
+                    if (wanted == null) continue;
+                    string? actual = ModelDb.GetId(card.GetType())?.Entry;
+                    if (string.Equals(actual, wanted, StringComparison.Ordinal)) return card;
                 }
+                catch { /* 单张读不到就跳过 */ }
             }
         }
         catch { /* 忽略 */ }

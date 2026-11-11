@@ -144,11 +144,14 @@ T2 大爆炸/辉光/收集光辉 各 +1 ⇒ 3 … T5 累积到 7，付 6 ⇒ 1
      现在按这个标记区分（`BossHandPanel.IsAutoPlayed` / `BuildCell` / `Cell.Bright` 三处一起改）。
    - 星位序列：`ScriptCard.ShowsDrillGain` → 规划期算出「选它之后天际钻头会**多打**几段」
      （= 变更后段数 − 原本段数；星位序列 3 次 × +2 费 ⇒ X 多 6，X≥4 时照原版翻倍），
-     画成 `BossHandCard.AddDrillGainLabel` 那条小标签（如 **8×12**）。
-     **它故意不是意图** ⇒ 不进 `PlannedPlay.Intents`、也不进原版 `MoveState.Intents`，
-     薄荷尖塔那种「按意图统计本回合伤害」的 mod 不会把它算进去（用户明确要求）。
+     用**原版意图节点**画出来（`MultiAttackIntent(8, 12)` → `NIntent`，如 **8×12**）。
+     用户口径：「**你用原版的，别自己瞎搞。只改一下不让薄荷尖塔记录就行了**」。所以：
+     · 用的是 `BossHandCard.AddDrillGainIntent`（走同一个 `AddIntent`），不是自造 Label；
+     · 它**不放进 `PlannedPlay.Intents`** ⇒ 不会被 `PublishVanillaIntents` 写进原版 `MoveState.Intents`，
+       而薄荷尖塔只读那里（见 `Core/MintySpireDamagePreviewCompat` 顶部注释）⇒ 不会重复统计。
      实测口径（当前实现）：第 1 回合 8×12（余费 0 ⇒ 原本 0 段，选后 X=6 ⇒ 12 段）；
-     第 5 回合 8×15（余费 3 ⇒ 原本 3 段，选后 X=9 ⇒ 18 段）。
+     第 5 回合 8×15（余费 3 ⇒ 原本 3 段，选后 X=9 ⇒ 18 段）。第 5 回合的钻头是常驻的、
+     没有 `OnlyIfChosenCard`，`BossScriptPlanner.FindChoiceDrill` 按「X 费牌」也认得出它。
 3. **震荡波附魔「灵魂之力」**：用户「震荡波具有消耗，给它附魔灵魂之力」
    —— 反编译确认 `Shockwave.CanonicalKeywords` 就是 `Exhaust` ⇒ 附魔合法（`SoulsPower` 去掉消耗）。
    候选那张与第 12 回合那张都加了。

@@ -144,10 +144,13 @@ public static partial class BossHandCard
         // ★ 彩虹机（用户 2026-11-07）：「会触发节拍器的那张牌」下面再标一条**30 无来源群伤**。
         //   游戏里这 30 点确实会打出来（节拍器第 5 颗球），以前意图上完全看不见。
         try { AddExtraAoeLabel(boss, planned, row); } catch (Exception e) { Logger.Log("[CharBoss] 额外群伤标记失败: " + e.Message); }
-        // ★ 2026-11-10（三层「抉择储」）：「星位序列」下面标出「选它之后天际钻头会多打多少」，
-        //   例如第一回合 8×12。这条**故意不是意图** ⇒ 不进原版 `MoveState.Intents`，
-        //   薄荷尖塔那种「按意图统计本回合总伤害」的 mod 不会把它算进去（用户明确要求）。
-        try { AddDrillGainLabel(planned, row); } catch (Exception e) { Logger.Log("[CharBoss] 天际钻头预告标记失败: " + e.Message); }
+        // ★ 2026-11-10（三层「抉择储」）：「星位序列」下面画出「选它之后天际钻头会多打多少」，
+        //   例如第一回合 **8×12** —— 用的是**原版的意图节点**（`MultiAttackIntent` → `NIntent`），
+        //   不是自造的 Label（用户 2026-11-10：「你用原版的，别自己瞎搞」）。
+        //   ⚠ 但它**不进** `planned.Intents` ⇒ 也就不会进原版 `MoveState.Intents`，
+        //   薄荷尖塔（读 `NextMove.Intents` 统计本回合总伤害）不会把它算进去（用户要求只改这一点）。
+        try { AddDrillGainIntent(boss, planned, targets, row); }
+        catch (Exception e) { Logger.Log("[CharBoss] 天际钻头预告意图失败: " + e.Message); }
         try { ApplyIntentShift(boss, row); } catch { /* 忽略 */ }
 
         // 激发球的意图（攻势 / `伤害×次数` / 守势）已经在计划阶段由 BossOrbSim 算好并塞进 Intents，
@@ -189,33 +192,26 @@ public static partial class BossHandCard
     }
 
     /// <summary>
-    /// 三层「抉择储」：「**星位序列**」这一格下面标出「选它之后天际钻头会**多打**多少」，
-    /// 形如 <c>8×12</c>（用户 2026-11-10：「例如第一回合星位序列下面就显示 8*12」）。
+    /// 三层「抉择储」：「**星位序列**」这一格下面画出「选它之后天际钻头会**多打**多少」，形如 <c>8×12</c>
+    /// （用户 2026-11-10：「例如第一回合星位序列下面就显示 8*12」）。
     ///
-    /// 它**故意不是意图**：不进 `PlannedPlay.Intents`、也就不会进原版 `MoveState.Intents` ⇒
-    /// 薄荷尖塔那种「按意图统计本回合将受到多少伤害」的 mod **不会**把它算进去（用户明确要求）。
+    /// 用户 2026-11-10 第二轮口径：「**你用原版的，别自己瞎搞。只改一下不让薄荷尖塔记录就行了**」
+    /// ⇒ 这里直接用原版 <c>MultiAttackIntent</c> 走同一个 <see cref="AddIntent"/>
+    /// （和别的意图一模一样的节点/图标/字体），**不用自造的 Label**。
+    ///
+    /// 唯一「不让薄荷尖塔记录」的做法：它**不放进 `PlannedPlay.Intents`**
+    /// ⇒ 也就不会被 <c>CharBossMonster.PublishVanillaIntents</c> 写进原版 `MoveState.Intents`，
+    /// 而薄荷尖塔只读那里（见 <c>Core/MintySpireDamagePreviewCompat</c> 顶部注释）⇒ 不会重复统计。
     /// </summary>
-    private static void AddDrillGainLabel(PlannedPlay? planned, Control row)
+    private static void AddDrillGainIntent(CharBossMonster boss, PlannedPlay? planned,
+                                           List<Creature> targets, Control row)
     {
         if (planned == null || planned.DrillPerHit <= 0) return;
         int hits = Math.Max(0, planned.DrillGainHits);
         if (hits <= 0) return;
 
-        var label = new Label
-        {
-            Text = planned.DrillPerHit + "×" + hits,
-            MouseFilter = Control.MouseFilterEnum.Stop,
-            TooltipText = "选了星位序列 ⇒ 天际钻头会多打 " + hits + " 段（每段 " + planned.DrillPerHit + " 点）\n"
-                        + "天际钻头原本 " + planned.DrillPerHit + "×" + planned.DrillBaseHits
-                        + " ⇒ 之后 " + planned.DrillPerHit + "×" + planned.DrillTotalHits + "\n"
-                        + "（这条只是预告，不算在薄荷尖塔的伤害统计里）",
-            VerticalAlignment = VerticalAlignment.Center,
-            HorizontalAlignment = HorizontalAlignment.Center,
-            CustomMinimumSize = new Vector2(58f, 0f),        // 不给最小宽度会被压成 0 宽 ⇒ 看不见
-        };
-        label.AddThemeColorOverride("font_color", new Color(1f, 0.72f, 0.28f));
-        label.AddThemeFontSizeOverride("font_size", 22);
-        row.AddChild(label);
+        AddIntent(boss, new MegaCrit.Sts2.Core.MonsterMoves.Intents.MultiAttackIntent(
+                            planned.DrillPerHit, hits), targets, row);
     }
 
     /// <summary>
