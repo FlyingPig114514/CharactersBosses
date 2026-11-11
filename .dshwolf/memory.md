@@ -5120,3 +5120,7 @@ Chronological action log.
 | 2026-11-11 14:06 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/CharacterBosses.json` | ok | 0 |
 | 2026-11-11 14:06 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BuildInfo.cs` | ok | 0 |
 | 2026-11-11 14:07 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/boss-regent-choice.md` | ok | 0 |
+| 2026-11-11 14:12 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/ChoiceRegentScript.cs` | ok | 0 |
+| 2026-11-11 14:13 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/CharacterBosses.json` | ok | 0 |
+| 2026-11-11 14:13 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-11 14:13 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/boss-regent-choice.md` | ok | 0 |
