@@ -92,7 +92,8 @@ public static class BossIntentBuilder
                                                   int smokePerHit = 0, int smokeHits = 0,
                                                   int letterOpenerHit = 0, int pendingStatusCards = 0,
                                                   bool aoeFromCaller = false, bool minionSummon = false,
-                                                  int shivOverride = 0, int etherealBefore = 0)
+                                                  int shivOverride = 0, int etherealBefore = 0,
+                                                  int starHits = -1)
     {
         var intents = new List<AbstractIntent>();
 
@@ -212,6 +213,41 @@ public static class BossIntentBuilder
         }
 
         int hits = BossDamagePredictor.Hits(card, target);
+
+        // ★ 2026-11-10（用户：「星尘和辐射没有正确显示段数。记得计算他在本回合会获得的辉星」）：
+        //   · 星尘 `Stardust`：`WithHitCount(ResolveStarXValue())` —— 把身上**所有辉星花光**，一星一段；
+        //   · 辐射 `Radiate`：段数 = **本回合获得过的辉星数**（历史里的正数 `StarsModifiedEntry`）。
+        //   这两条在意图里靠战斗历史算，而规划期历史是空的 ⇒ 由调用方（`BossScriptPlanner`）
+        //   按剧本顺序把数递进来（`starHits`，-1 = 不覆盖）。
+        if (starHits >= 0)
+        {
+            if (hits != starHits)
+            {
+                Logger.Log($"[CharBoss] {SafeEntry(card)}：本回合辉星口径 {starHits} 段（牌面/历史算出 {hits}）⇒ 意图段数按 {starHits}");
+            }
+            hits = starHits;
+            // 一段都没有（辐射这回合还没拿到星 / 星尘身上没星）⇒ 这张牌打不出伤害，
+            // 别画一条「0 点」攻击意图出来。
+            if (starHits <= 0
+                && (entry == "RADIATE" || entry == "STARDUST"))
+            {
+                damage = 0;
+            }
+        }
+
+        // 「天际钻头」`HeavenlyDrill`：造成 8 点伤害 **X 次**，而 X ≥ 4 时照原版**再翻倍**。
+        // 调用方给的 `xHits` 是「X − 1」，这里还原成 X 再套翻倍规则。
+        if (entry == "HEAVENLY_DRILL" && xHits >= 0)
+        {
+            int xValue = Math.Max(0, xHits + 1);
+            int realHits = xValue <= 0 ? 0 : (xValue >= 4 ? xValue * 2 : xValue);
+            if (realHits != hits)
+            {
+                Logger.Log($"[CharBoss] 天际钻头：X={xValue}{(xValue >= 4 ? "（X≥4 翻倍）" : string.Empty)}" +
+                           $" ⇒ 意图段数 {hits} → {realHits}");
+            }
+            hits = realHits;
+        }
 
         // ★ 2026-11-05（用户设计：三层「状态机」）：「散射炮」（`FLAK_CANNON`）的段数 =
         //   **她自己**牌堆里「状态牌」的数量（不含消耗牌堆）—— 反编译：
@@ -446,7 +482,8 @@ public static class BossIntentBuilder
                 // `StrengthPower` 层数根本不变），意图纹丝不动（用户 2026-10-23 实测：减了 11 点还显示 10×4）。
                 // 现在改成 <see cref="LiveMultiAttackIntent"/>：**每次渲染都重算**，
                 // 并且走原版伤害管道 <c>Hook.ModifyDamage</c> ⇒ 任何 mod 的任何增/减伤害都算进来。
-                int times = Math.Max(1, 1 + xHits) * plays;   // 复制药水/爆发 ⇒ 整张牌打两遍，X 也随之翻倍
+                // ★ 2026-11-10：天际钻头（X≥4 翻倍的段数已经算进 `hits`）直接用 `hits`，别再用 `1+xHits`。
+                int times = Math.Max(1, entry == "HEAVENLY_DRILL" ? hits : 1 + xHits) * plays;   // 复制药水/爆发 ⇒ 整张牌打两遍，X 也随之翻倍
                 int planBase = baseForHooks;
                 if (times <= 1)
                 {

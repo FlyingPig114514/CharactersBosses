@@ -167,9 +167,26 @@ T2 大爆炸/辉光/收集光辉 各 +1 ⇒ 3 … T5 累积到 7，付 6 ⇒ 1
    - `BossFrameTickPatch.WatchPlayQueue` 不再对它报「⚠ 出牌队列滞留」（和数据收集里
      「玩家自己在选牌」那条豁免同一性质），所以等再久也不会被当成 bug。
 
-## 6. 仍然待确认
+## 6. 第三轮订正（用户 2026-11-10，v0.2.563）
+
+1. **星尘 / 辐射的段数**：「记得计算他在本回合会获得的辉星」。
+   - 反编译：星尘 `Stardust` 有 `HasStarCostX => true`，`WithHitCount(ResolveStarXValue())`
+     ⇒ **把身上所有辉星花光、一星一段**；
+     辐射 `Radiate` 的 `CalculatedHits` 数的是历史里**本回合的正数 `StarsModifiedEntry`** ⇒ 段数 = 本回合获得过的辉星数。
+   - 两条在规划期都算不出来（历史空 / 星还没花）⇒ 新增 `IntentsFor(starHits:)`，由
+     `BossScriptPlanner` 按剧本顺序把数递进去（`starsGainedThisTurn` + X 星费的星数）。
+     0 段时连伤害也清零，不再画一条 0 点攻击意图。
+2. **汇流 / 淬炼刀刃的「下回合 +1 能量」不再当成立刻到手**（`DeferredEnergyCard` 加 `CONVERGENCE`、`REFINE_BLADE`）
+   ⇒ 第 9 回合（2 费：汇流+ 1、隐秘藏品 1）与第 10 回合（3 费：铸墙 2、淬炼刀刃 1）最后那张隐秘藏品正确压暗。
+   顺带 `DeferredStarCard`：汇流的「下回合 +星」也不再算进本回合星预算。
+3. **天际钻头把费花光**改由剧本 `ScriptCard.SpendsAllEnergy` 明说（不依赖 `EnergyCost.CostsX` 在规划期猜对）
+   ⇒ 第 5 回合的「君王之剑」不会再被画成能打。
+4. **`XHitBonus` 改成「规划期算出的 cost 优先」**（以前优先读已捕获的 `ResolveEnergyXValue()`，
+   可能残留上一张牌的值 ⇒ 第 13 回合只剩 1 费却画 2 段），并给天际钻头补上「X≥4 时段数翻倍」。
+
+## 7. 仍然待确认
 
 1. **天际钻头预告的口径**：现在显示的是「多出来的段数」（用户原话「减去天际钻头原本的 8×2」）。
-   若想改成显示「选它之后的总段数」，把 `AddDrillGainLabel` 里的 `DrillGainHits` 换成 `DrillTotalHits` 即可。
+   若想改成显示「选它之后的总段数」，把 `AddDrillGainIntent` 里的 `DrillGainHits` 换成 `DrillTotalHits` 即可。
 2. **能力面板**：`BossInfoTable["REGENT_CHOICE"]` 仍是占位数据，等用户给正式那几行。
 

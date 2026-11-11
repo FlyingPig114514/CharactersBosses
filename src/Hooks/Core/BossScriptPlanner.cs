@@ -54,6 +54,8 @@ public static class BossScriptPlanner
         // ⇒ 规划期的星预算必须把这笔算进来，否则第 8 回合的「七星（7 星）」会被判成星不够而不打
         //（用户 2026-10-28 实测：第 8 回合意图里直接没了七星）。
         int stars = pcs.Stars;
+        // ★ 2026-11-10（三层「抉择储」）：**本回合她获得过多少辉星**（辐射的段数靠它）。
+        int starsGainedThisTurn = 0;
         try { stars += Math.Max(0, boss.Creature?.GetPowerAmount<MegaCrit.Sts2.Core.Models.Powers.StarNextTurnPower>() ?? 0); }
         catch { /* 读不到就不补 */ }
         var hand = pcs.Hand.Cards.ToList();
@@ -409,8 +411,11 @@ public static class BossScriptPlanner
             // `CapturedXValue = pcs.Energy`）。所以这里必须按**本地剩余 energy** 记账，
             // 否则排在它前面的牌一扣费，它就被判成「费不够 3>1」而永远打不出来。
             // 用户 2026-10-23 的用例：第 1 回合 拖延+(2) + 自动化+(0) ⇒ 挽歌**以 1 费打出**（X=1）。
-            if (IsXCost(card)) cost = Math.Max(0, energy);
-            int starCost = BossPlanner.StarCostOf(card);
+            if (IsXCost(card) || entry.SpendsAllEnergy) cost = Math.Max(0, energy);
+            // **X 星费牌**（星尘 `Stardust`：`HasStarCostX`，把身上**所有**辉星花光，段数 = 花掉的星数）
+            // ⇒ 规划期把星费按「当前剩余星」记账并清零，否则后面吃星的牌会被误判成还够。
+            bool starX = IsStarXCost(card);
+            int starCost = starX ? Math.Max(0, stars) : BossPlanner.StarCostOf(card);
             if (cost > energy || starCost > stars)
             {
                 // ⚠ 这条消息**也覆盖星费不足**（原来只写 `cost>energy`，看不出到底是费还是星不够 ——
@@ -442,6 +447,14 @@ public static class BossScriptPlanner
 
             // X 费牌（根除）：真的打出去时 X = 花光本回合剩余能量，打 X 次（也就是伤害段数）。
             int xHits = XHitBonus(card, cost);
+            // ★ 2026-11-10（用户：「星尘和辐射没有正确显示段数。记得计算他在本回合会获得的辉星」）：
+            //   · 星尘 `Stardust`：`WithHitCount(ResolveStarXValue())` = **把身上所有辉星花光、一段一星**；
+            //   · 辐射 `Radiate`：段数 = **本回合获得过的辉星数**（战斗历史里的正数 `StarsModifiedEntry`）。
+            //   两者的段数在规划期都算不出来（历史空 / 还没花星）⇒ 由这里按剧本顺序把数递进去。
+            string entryNow = SafeEntry(card);
+            int starHits = -1;
+            if (starX) starHits = Math.Max(0, starCost);
+            else if (entryNow == "RADIATE") starHits = Math.Max(0, starsGainedThisTurn);
             var intents = BossIntentBuilder.IntentsFor(card, target, pendingDrop, pendingRise,
                 // ⚠ v0.2.362：**她自己的力量**单独走 `strengthBonus`（奥斯提的牌不吃）
                 extraDamage: (IsBlade(card) ? pendingBladeDamage : 0)
@@ -484,6 +497,8 @@ public static class BossScriptPlanner
                 discardsThisTurn: discardsThisTurn,
                 // 钢铁风暴：每丢一张生成一把小刀 ⇒ 段数 = 本回合剧本里被丢弃的张数
                 shivOverride: SafeEntry(card) == "STORM_OF_STEEL" ? stormDiscards : 0,
+                // ★ 2026-11-10：星尘（花光所有星）/ 辐射（本回合获得的星）的段数（-1 = 不覆盖）
+                starHits: starHits,
                 // 仆从储：这一张是不是「召唤」（按本回合前面已计划的仆从数量算）
                 minionSummon: IsMinionSummonHere(card, boss, ref plannedMinions),
                 // ★ 2026-11-10：亡魂牵引的段数 = 本场打出的虚无牌数，而本回合排它前面的那几张
@@ -646,15 +661,24 @@ public static class BossScriptPlanner
 
             // 剧本里的牌自己会给资源（崇拜 = +2 辉星、某些牌 + 能量）→ 必须记账，
             // 否则后面的牌（例如陨星要 2 辉星）会被误判成不够费/不够星（用户实测：第 3、8 回合不出陨星）。
-            stars += Math.Max(0, (int)Math.Round(ReadVar(card, "Stars")));
-            stars += Math.Max(0, (int)Math.Round(ReadVar(card, "Star")));
+            // ★ 2026-11-10：**本回合获得的辉星**单独记一份 —— 辐射（`Radiate`）的段数就是它
+            //   （用户：「记得计算他在本回合会获得的辉星」）。汇流那种「下回合 +星」不算。
+            int gainedStars = Math.Max(0, (int)Math.Round(ReadVar(card, "Stars")))
+                              + Math.Max(0, (int)Math.Round(ReadVar(card, "Star")));
+            if (DeferredStarCard(card)) gainedStars = 0;
+            stars += gainedStars;
+            starsGainedThisTurn += gainedStars;
             // ⚠ 有些牌的 `Energy` 变量**不是**「现在回能量」：
             //   · 拖延 Delay → 下回合 +N（由 PendingNextTurnEnergyCredit 在下一回合到账）；
-            //   · 自动化 Automation → 每抽 10 张才 +N。
+            //   · 自动化 Automation → 每抽 10 张才 +N；
+            //   · 汇流 Convergence / 淬炼刀刃 RefineBlade → **下回合** +N。
             // 规划期把它们当成立刻回能 ⇒ 多算 1～2 点 ⇒ 后面的牌被误判成打得起，
-            // 而 `CardCmd.AutoPlay` 既不检查也不扣费 ⇒ 就出现「没费也出」（用户 2026-10-23 实测）。
+            // 用户实测就表现为「第 9 / 10 回合那张本该没费的隐秘藏品被画成还能打」。
             if (!DeferredEnergyCard(card))
                 energy += Math.Max(0, (int)Math.Round(ReadVar(card, "Energy")));
+            // X 费牌（天际钻头）把这一回合剩下的能量**全部花光**：剧本点名的最可靠，
+            // 不依赖 `EnergyCost.CostsX` 在规划期猜对（猜错就会把「君王之剑」画成还能打）。
+            if (entry.SpendsAllEnergy) energy = 0;
 
             // 这张牌打出后会让她额外抽几张（「灵魂」）→ 也给「自动化」记账：抽满 10 张就 +能量，
             // 而这份能量在出牌阶段是真会到账的（被拦掉的抽牌照样记自动化计数）
@@ -945,7 +969,26 @@ public static class BossScriptPlanner
     {
         string entry = SafeEntry(card);
         return entry == "DELAY" || entry == "CHARGE_BATTERY" || entry == "AUTOMATION"
-               || entry == "FRIENDSHIP";
+               || entry == "FRIENDSHIP"
+               // ★ 2026-11-10（三层「抉择储」，用户实测第 9 / 10 回合）：
+               //   · 汇流 `Convergence`：本回合保留手牌，**下个回合**获得 1 能量；
+               //   · 淬炼刀刃 `RefineBlade`：铸造之后**下个回合**获得 1 能量。
+               //   不排除的话规划期会当成立刻回 1 费 ⇒ 该回合最后那张「隐秘藏品」被画成还能打。
+               || entry == "CONVERGENCE" || entry == "REFINE_BLADE";
+    }
+
+    /// <summary>这张牌的 `Stars` 变量是「**下回合**获得」而不是现在就到手（汇流）。</summary>
+    internal static bool DeferredStarCard(CardModel card)
+    {
+        try { return SafeEntry(card) == "CONVERGENCE"; }
+        catch { return false; }
+    }
+
+    /// <summary>这张牌是 **X 星费牌**（把身上所有辉星花光，段数 = 花掉的星数；星尘 `Stardust`）。</summary>
+    internal static bool IsStarXCost(CardModel card)
+    {
+        try { return card.HasStarCostX; }
+        catch { return false; }
     }
 
     private static bool HasPower<TPower>(CharBossMonster boss) where TPower : PowerModel
@@ -1077,11 +1120,18 @@ public static class BossScriptPlanner
         {
             // 判定只能问 EnergyCost.CostsX ——卡牌上的 HasEnergyCostX 是 protected，mod 里访问不到。
             if (!card.EnergyCost.CostsX) return 0;
-            // ResolveEnergyXValue 与结算用的同一个函数（根除 = WithHitCount(ResolveEnergyXValue())），
-            // 但它在**打出前**CapturedXValue 还是 0 → 那时用规划出的 cost 兜底。
-            int x = 0;
-            try { x = card.ResolveEnergyXValue(); } catch { x = 0; }
-            if (x <= 0) x = cost;
+            // ⚠ 2026-11-10（用户：「第 13 回合只有两费，崇拜花了一费，天际钻头应该只有一段伤害」）：
+            //   以前**优先**用 `ResolveEnergyXValue()`（它读的是「已经捕获的 X」）——
+            //   写在意图重算那一刻，这个值可能是上一张牌 / 上一次捕获留下的
+            //   ⇒ 明明这一回合只剩 1 费，画面却是 2 段。现在反过来：**规划期算出来的 `cost`
+            //   优先**（它才是「出手那一刻的剩余能量」），只有 `cost <= 0`（重算路径没给）才退回
+            //   `ResolveEnergyXValue()`，而且要求它自己也 > 0。
+            int x = Math.Max(0, cost);
+            if (x <= 0)
+            {
+                try { x = card.ResolveEnergyXValue(); } catch { x = 0; }
+            }
+            // 天际钻头「X≥4 时 X 翻倍」由 `IntentsFor` 自己按 `xHits` 还原 X 再处理段数。
             return Math.Max(0, x - 1);
         }
         catch { return 0; }

@@ -263,6 +263,16 @@ public sealed class ScriptCard
     /// </summary>
     public Type? OnlyIfChosenCard { get; init; }
 
+    /// <summary>
+    /// 这张牌是 **X 费牌：把这一回合**剩下的能量**全部花光**（用户 2026-11-10 的三层「抉择储」第 5 回合）。
+    ///
+    /// 为什么要显式声明：规划期靠 `EnergyCost.CostsX` 猜「这是 X 费牌」有时会落空
+    /// （猜不到就按卡面 0 费算 ⇒ 后面的牌被误判成「还打得出来」，用户实测第 5 回合的「君王之剑」
+    /// 就是这样被画成能打的）。剧本直接点名「这张把费花光」最可靠：
+    /// 规划期算完它就把预算清零，执行期它的 X 天然等于出手时的剩余能量。
+    /// </summary>
+    public bool SpendsAllEnergy { get; init; }
+
     /// <summary>这张牌造出来时**附魔「播种」**（`Sown`）：打出时获得 1 费（用户设计：根除骨第 3 回合的钙化）。</summary>
     public bool EnchantSown { get; init; }
 

@@ -44,7 +44,7 @@ public static class ChoiceRegentScript
                 Display<Alignment>(drillGain: true),
                 Display<Resonance>(BossIntentTag.Debuff | BossIntentTag.Buff),
                 Display<Shockwave>(BossIntentTag.Debuff, souls: true),
-                new ScriptCard { Card = typeof(HeavenlyDrill), OnlyIfChosenCard = typeof(Alignment) },
+                new ScriptCard { Card = typeof(HeavenlyDrill), OnlyIfChosenCard = typeof(Alignment), SpendsAllEnergy = true },
                 C<SovereignBlade>()),
 
             // ── 2 ────────────────────────────────────────────────────────────────
@@ -80,7 +80,8 @@ public static class ChoiceRegentScript
                     Display<Alignment>(drillGain: true),
                     Display<Resonance>(BossIntentTag.Debuff | BossIntentTag.Buff),
                     Display<Shockwave>(BossIntentTag.Debuff, souls: true),
-                    C<HeavenlyDrill>(),
+                    // 天际钻头：把这一回合剩下的能量全部花光 ⇒ 后面的君王之剑 / 防御一定没费
+                    new ScriptCard { Card = typeof(HeavenlyDrill), SpendsAllEnergy = true },
                     C<SovereignBlade>(), C<DefendRegent>(),
                 },
             },
@@ -133,7 +134,9 @@ public static class ChoiceRegentScript
 
             // ── 13 ───────────────────────────────────────────────────────────────
             T(2, "13. 崇拜、星尘、天际钻头、防御（没费）",
-                C<Venerate>(true), C<Stardust>(), C<HeavenlyDrill>(), C<DefendRegent>()),
+                C<Venerate>(true), C<Stardust>(),
+                new ScriptCard { Card = typeof(HeavenlyDrill), SpendsAllEnergy = true },
+                C<DefendRegent>()),
         };
 
         return new BossScript
