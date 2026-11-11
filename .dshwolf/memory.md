@@ -5165,3 +5165,13 @@ Chronological action log.
 | 2026-11-11 18:16 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/.tmp/fix_anger_loc.py` | ok | 0 |
 | 2026-11-11 18:17 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/.tmp/patch_boulder_cell.py` | ok | 0 |
 | 2026-11-11 18:18 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-11 18:32 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/.tmp/patch_cell_boulder.py` | ok | 0 |
+| 2026-11-11 18:32 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/.tmp/patch_cell_boulder.py` | ok | 0 |
+| 2026-11-11 18:36 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/.tmp/list_collectibles.py` | ok | 0 |
+| 2026-11-11 18:36 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/.tmp/map_collectibles.py` | ok | 0 |
+| 2026-11-11 18:38 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/.tmp/collectible_full.py` | ok | 0 |
+| 2026-11-11 18:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/DownfallCollectibleCompat.cs` | ok | 0 |
+| 2026-11-11 18:39 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/.tmp/collectible_full2.py` | ok | 0 |
+| 2026-11-11 18:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/DownfallCollectibleCompat.cs` | ok | 0 |
+| 2026-11-11 18:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/DownfallCollectibleCompat.cs` | ok | 0 |
+| 2026-11-11 18:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BuildInfo.cs` | ok | 0 |

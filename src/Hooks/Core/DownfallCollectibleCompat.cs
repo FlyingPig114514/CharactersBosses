@@ -832,6 +832,17 @@ public static class DownfallCollectibleCompat
             //   就会掉回按 (角色, 幕) 查的静态表，而这三只和它们的兄弟设计**落在同一格** ⇒ 掉错牌。
             switch (boss.SpawnVariantKey)
             {
+                case "SILENT_SNAKEBITE":     // 一层 蛇咬猎（用户 2026-11-11：藏品 = 群蛇形态）
+                    // 她和同层「奇巧猎」落在同一格（掉落表按「角色 + 幕」索引 ⇒ 会掉余像）⇒ 必须点名。
+                    cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.SerpentForm);   // 群蛇形态
+                    upgraded = false;
+                    Logger.Log("[CharBoss] 收藏家藏品：蛇咬猎 → 群蛇形态");
+                    return true;
+                case "SILENT_BREWER":        // 三层 炼药猎（用户 2026-10-26：藏品 = 炼制药水；否则会掉刀猎的墨之刃）
+                    cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.Alchemize);    // 炼制药水
+                    upgraded = false;
+                    Logger.Log("[CharBoss] 收藏家藏品：炼药猎 → 炼制药水");
+                    return true;
                 case "SILENT_SNECKO":        // 二层 蛇眼猎
                     cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.BulletTime);   // 子弹时间
                     upgraded = false;
