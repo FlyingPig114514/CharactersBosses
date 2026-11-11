@@ -556,6 +556,8 @@ public static class BossScriptPlanner
                 SmokeHits = Core.StatusBossMath.StatusCardsGenerated(card),
                 LetterOpenerHit = Core.StatusBossMath.IsSkillForLetterOpener(card, skillsThisTurn) ? loDamage : 0,
                 PendingStatusCards = statusesThisTurn,
+                // ★ 2026-11-10：星尘/辐射的段数（辉星口径）在这里定死，重算路径原样再用
+                StarHits = starHits,
             });
             // ★ v0.2.300：「踩踏」的减费看的是「本回合已经打完的攻击牌数」⇒ 每计划一张攻击牌就 +1
             //   （必须在扣费之后记，位置无所谓；放在这里与 energy 记账相邻，方便以后核对）。

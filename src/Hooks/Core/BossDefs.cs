@@ -946,14 +946,14 @@ public static class BossDefs
                     //   ⇒ 真抽 5 张进来，那次「挑一张技能牌」的候选就变成 10 张（用户要的是**5 张**）。
                     //   燃烧木棍走的是它自己的「消耗 → 印牌」钩子，不是抽牌 ⇒ 不受这条影响。
                     BlocksVanillaDraw = true,
-                    // 进阶（用户 2026-11-10）：8 = 升级群星之子、收集光辉；9 = 升级淬炼刀刃、共鸣、震荡波。
+                    // 进阶（用户 2026-11-10）：8 = 升级群星之子、收集光辉；9 = 升级淬炼刀刃、震荡波。
+                    // （用户第二轮订正：「进阶9不再升级共鸣」⇒ 共鸣已从这张表里移除。）
                     // 「崇拜」全难度都是升级版 ⇒ 写在剧本里（`Upgraded = true`），不进这张表。
                     AscensionUpgrades = new List<(int MinAscension, Type Card)>
                     {
                         (8, typeof(ChildOfTheStars)),
                         (8, typeof(GatherLight)),
                         (9, typeof(RefineBlade)),
-                        (9, typeof(Resonance)),
                         (9, typeof(Shockwave)),
                     },
                 },

@@ -176,6 +176,12 @@ T2 大爆炸/辉光/收集光辉 各 +1 ⇒ 3 … T5 累积到 7，付 6 ⇒ 1
    - 两条在规划期都算不出来（历史空 / 星还没花）⇒ 新增 `IntentsFor(starHits:)`，由
      `BossScriptPlanner` 按剧本顺序把数递进去（`starsGainedThisTurn` + X 星费的星数）。
      0 段时连伤害也清零，不再画一条 0 点攻击意图。
+   - ⚠ **只传规划期是没用的**（用户第二轮：「辐射仍没有提前计算…星尘仍然没有正确显示段数」）：
+     `PrepareTurn` 规划完**紧接着**就调 `BladesGrowth.RecomputeAll` 重算、出牌期每张牌前还会再重算
+     ⇒ 全被「历史口径」覆盖回 1 段。现在把它**定死存进 `PlannedPlay.StarHits`**，
+     两条重算路径（`BladesGrowth.RecomputeAll` / `CharBossMonster.RefreshPlannedIntents`）都原样再用。
+5. **进阶 9 不再升级共鸣**（用户 2026-11-10 订正）：`BossDefs` 的进阶表与第 11 回合剧本那张都改回未升级。
+   进阶 9 现在只有：淬炼刀刃、震荡波。
 2. **汇流 / 淬炼刀刃的「下回合 +1 能量」不再当成立刻到手**（`DeferredEnergyCard` 加 `CONVERGENCE`、`REFINE_BLADE`）
    ⇒ 第 9 回合（2 费：汇流+ 1、隐秘藏品 1）与第 10 回合（3 费：铸墙 2、淬炼刀刃 1）最后那张隐秘藏品正确压暗。
    顺带 `DeferredStarCard`：汇流的「下回合 +星」也不再算进本回合星预算。

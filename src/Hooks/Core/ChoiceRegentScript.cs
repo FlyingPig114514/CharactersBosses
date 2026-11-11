@@ -121,8 +121,9 @@ public static class ChoiceRegentScript
                 C<HiddenCache>()),
 
             // ── 11 ───────────────────────────────────────────────────────────────
+            // 共鸣**不进进阶 9 的升级表**（用户 2026-11-10 订正：「进阶9不再升级共鸣」）
             T(3, "11. 共鸣、君王之剑、防御（没费）",
-                new ScriptCard { Card = typeof(Resonance), UpgradeMinAscension = 9 },
+                C<Resonance>(),
                 C<SovereignBlade>(), C<DefendRegent>()),
 
             // ── 12 ───────────────────────────────────────────────────────────────

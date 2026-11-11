@@ -418,6 +418,9 @@ public static class BladesGrowth
                         // 于是「何人僭越」那三次重算把 ×N 抹回 ×1，玩家看到的意图就偏低了）
                         extraHits: (SafeEntry(card) == "SOVEREIGN_BLADE" ? bladePendingHits : 0),
                         xHits: xHits,
+                        // ★ 2026-11-10：星尘（花光所有星）/ 辐射（本回合获得的星）的段数 ——
+                        //   规划期定死在计划里，这里原样再用（否则会被「历史口径」覆盖回 1 段）。
+                        starHits: play.StarHits,
                         // 幻影之刃：这张牌印出来的**第一把小刀** +9（其余刀不加）
                         shivBonus: phantomHere,
                         shivBonusBakedIn: phantomOnHer,

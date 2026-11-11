@@ -89,6 +89,19 @@ public sealed class PlannedPlay
 
     /// <summary>同上（悬停说明用）：选了星位序列之后天际钻头的总段数。</summary>
     public int DrillTotalHits { get; init; }
+
+    /// <summary>
+    /// 这张牌的段数按**辉星口径**算（-1 = 不管）：
+    ///   · 星尘 `Stardust`（X 星费）= 出手那一刻她**身上所有星**（一星一段）；
+    ///   · 辐射 `Radiate` = **本回合获得过的辉星数**。
+    ///
+    /// ★ 2026-11-10（用户「辐射仍没有提前计算本回合会获得的辉星数。星尘仍然没有正确显示段数」）：
+    ///   这两个数只有在**规划期**按剧本顺序走得出来（战斗历史那时是空的）。
+    ///   可 `PrepareTurn` 规划完**紧接着**就会调 `BladesGrowth.RecomputeAll` 重算一次、
+    ///   出牌期每张牌前还会再重算 ⇒ 不把这个数存进计划里，就会被重算路径用「历史口径」覆盖回 1 段。
+    ///   所以规划期把它定死存在这里，重算原样再用（和 `SmokePerHit` / `LetterOpenerHit` 同一套做法）。
+    /// </summary>
+    public int StarHits { get; init; } = -1;
 }
 
 /// <summary>

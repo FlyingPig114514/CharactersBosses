@@ -416,6 +416,8 @@ public abstract partial class CharBossMonster
                     // ★ v0.2.527：钢铁风暴的段数（= 本回合丢掉的张数）牌面上没有变量，
                     //   规划期由剧本算好存进 `GeneratedShivs`；这条重算路以前没传 ⇒ 面板只剩「强化」。
                     shivOverride: entry == "STORM_OF_STEEL" ? Math.Max(0, play.GeneratedShivs) : 0,
+                    // ★ 2026-11-10：星尘/辐射的段数（辉星口径）在规划期定死，这里原样再用
+                    starHits: play.StarHits,
                     aoeFromCaller: true);
                 // ★ 2026-11-10（用户：「暴风雨激发电球的 8×2 意图被吃掉了（回合开始时闪了一下）」）：
                 //   `BossOrbSim.Predict(card, xEnergy)` 的 **X 是参数**，默认 0 —— 规划期
