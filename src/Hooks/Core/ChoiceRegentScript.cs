@@ -62,8 +62,10 @@ public static class ChoiceRegentScript
 
             // ── 4 ────────────────────────────────────────────────────────────────
             // 用户 2026-11-10 第三轮订正：「4.君王之剑、隐秘藏品、防御（没费）、抉择抉择+（不出）」，3 费。
-            T(3, "4. 君王之剑、隐秘藏品、防御（没费）；抉择抉择+ 不出",
-                C<SovereignBlade>(), C<HiddenCache>(), C<DefendRegent>(),
+            // 2026-11-10 第四轮：「把 4、5、11 这三个回合中那张不出的**防御换成打击**，保持它不出」
+            // （打击不是技能牌 ⇒ 不会多出一张「抉择，抉择」的候选）。
+            T(3, "4. 君王之剑、隐秘藏品、打击（没费）；抉择抉择+ 不出",
+                C<SovereignBlade>(), C<HiddenCache>(), C<StrikeRegent>(),
                 Choice(hold: true)),
 
             // ── 5 ────────────────────────────────────────────────────────────────
@@ -72,7 +74,7 @@ public static class ChoiceRegentScript
             new BossTurn
             {
                 Note = "5. 洗牌。抉择抉择+（王室认证）：让玩家挑一张打 3 次 ⇒ 天际钻头（一定打出）、" +
-                       "君王之剑（没费）、防御（没费）",
+                       "君王之剑（没费）、打击（没费）",
                 Energy = 2,
                 ShuffleDrawPile = true,
                 Cards = new List<ScriptCard>
@@ -83,9 +85,9 @@ public static class ChoiceRegentScript
                     Display<Alignment>(drillGain: true),
                     Display<Resonance>(BossIntentTag.Debuff | BossIntentTag.Buff),
                     Display<Shockwave>(BossIntentTag.Debuff, souls: true),
-                    // 天际钻头：把这一回合剩下的能量全部花光 ⇒ 后面的君王之剑 / 防御一定没费
+                    // 天际钻头：把这一回合剩下的能量全部花光 ⇒ 后面的君王之剑 / 打击一定没费
                     new ScriptCard { Card = typeof(HeavenlyDrill), SpendsAllEnergy = true },
-                    C<SovereignBlade>(), C<DefendRegent>(),
+                    C<SovereignBlade>(), C<StrikeRegent>(),
                 },
             },
 
@@ -125,9 +127,10 @@ public static class ChoiceRegentScript
 
             // ── 11 ───────────────────────────────────────────────────────────────
             // 共鸣**不进进阶 9 的升级表**（用户 2026-11-10 订正：「进阶9不再升级共鸣」）
-            T(3, "11. 共鸣、君王之剑、防御（没费）",
+            // 2026-11-10 第四轮：这一回合那张不出的**防御换成打击**（保持不出）
+            T(3, "11. 共鸣、君王之剑、打击（没费）",
                 C<Resonance>(),
-                C<SovereignBlade>(), C<DefendRegent>()),
+                C<SovereignBlade>(), C<StrikeRegent>()),
 
             // ── 12 ───────────────────────────────────────────────────────────────
             T(4, "12. 星位序列（2 星）、辉光、震荡波、收集光辉",
@@ -158,6 +161,8 @@ public static class ChoiceRegentScript
         typeof(HiddenCache), typeof(Bulwark), typeof(Alignment), typeof(Resonance), typeof(Shockwave),
         typeof(HeavenlyDrill), typeof(BigBang), typeof(Glow), typeof(GatherLight), typeof(Radiate),
         typeof(RefineBlade), typeof(Parry), typeof(Stardust), typeof(Convergence), typeof(DefendRegent),
+        // 2026-11-10 第四轮：第 4 / 5 / 11 回合那张「不出」的牌换成了打击 ⇒ 卡组里也放两张
+        typeof(StrikeRegent), typeof(StrikeRegent),
     };
 
     /// <summary>
