@@ -182,6 +182,12 @@ T2 大爆炸/辉光/收集光辉 各 +1 ⇒ 3 … T5 累积到 7，付 6 ⇒ 1
      两条重算路径（`BladesGrowth.RecomputeAll` / `CharBossMonster.RefreshPlannedIntents`）都原样再用。
 5. **进阶 9 不再升级共鸣**（用户 2026-11-10 订正）：`BossDefs` 的进阶表与第 11 回合剧本那张都改回未升级。
    进阶 9 现在只有：淬炼刀刃、震荡波。
+6. **回合开始到账的「下回合 +N 辉星」也算进「本回合获得的星」**（用户：
+   「第一回合选隐秘藏品的情况下，第二回合的辐射没有计算隐秘藏品在回合开始时给的星」）：
+   `StarNextTurnPower` 是**她回合开始时**由 `PlayerCmd.GainStars` 到账的（影子玩家那条由
+   `CharBossMonster.SettleStarNextTurnPower` 手动结算）⇒ 对本回合而言它就是「本回合获得的辉星」。
+   规划期现在把它**同时**加进 `stars`（预算）与 `starsGainedThisTurn`（辐射的段数口径），
+   星尘的星数口径也包含它。
 2. **汇流 / 淬炼刀刃的「下回合 +1 能量」不再当成立刻到手**（`DeferredEnergyCard` 加 `CONVERGENCE`、`REFINE_BLADE`）
    ⇒ 第 9 回合（2 费：汇流+ 1、隐秘藏品 1）与第 10 回合（3 费：铸墙 2、淬炼刀刃 1）最后那张隐秘藏品正确压暗。
    顺带 `DeferredStarCard`：汇流的「下回合 +星」也不再算进本回合星预算。

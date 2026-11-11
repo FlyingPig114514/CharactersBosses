@@ -53,11 +53,17 @@ public static class BossScriptPlanner
         // ⚠ 规划发生在**玩家回合**，而「下回合辉星」（StarNextTurnPower）要到他回合开始才到账
         // ⇒ 规划期的星预算必须把这笔算进来，否则第 8 回合的「七星（7 星）」会被判成星不够而不打
         //（用户 2026-10-28 实测：第 8 回合意图里直接没了七星）。
-        int stars = pcs.Stars;
+        //
+        // ★ 2026-11-10（用户：「第一回合选隐秘藏品的情况下，第二回合的辐射没有计算隐秘藏品在
+        //   回合开始时给的星」）：这笔「下回合 +N 星」是**她回合开始时到账**的 ⇒ 对本回合而言它就是
+        //   「本回合获得过的辉星」，辐射（`Radiate`）的段数必须把它算上。
+        //   所以它同时进 `stars`（预算）与 `starsGainedThisTurn`（辐射的段数口径）。
+        int starNextTurn = 0;
+        try { starNextTurn = Math.Max(0, boss.Creature?.GetPowerAmount<MegaCrit.Sts2.Core.Models.Powers.StarNextTurnPower>() ?? 0); }
+        catch { starNextTurn = 0; }
+        int stars = pcs.Stars + starNextTurn;
         // ★ 2026-11-10（三层「抉择储」）：**本回合她获得过多少辉星**（辐射的段数靠它）。
-        int starsGainedThisTurn = 0;
-        try { stars += Math.Max(0, boss.Creature?.GetPowerAmount<MegaCrit.Sts2.Core.Models.Powers.StarNextTurnPower>() ?? 0); }
-        catch { /* 读不到就不补 */ }
+        int starsGainedThisTurn = starNextTurn;
         var hand = pcs.Hand.Cards.ToList();
         var used = new HashSet<CardModel>();
         var skipped = new List<string>();
