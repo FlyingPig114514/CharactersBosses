@@ -40,7 +40,7 @@
     "LOCK_ON_POWER.title":  "跟踪锁定",
     "LOCK_ON_POWER.description":  "{Boss}盯上了你：{Pronoun}的单体攻击、随机攻击和充能球只会攻击你。\n这只 Boss 倒下后锁定才会解除。{Extra}",
     "BOSS_PRIMAL_FORCE_POWER.title":  "原始力量",
-    "BOSS_PRIMAL_FORCE_POWER.description":  "铁甲战士使用「巨石」时，获得 1 点力量和 3 点覆甲。\n若「巨石」对你造成了未被格挡的伤害，你抽 1 张牌。",
+    "BOSS_PRIMAL_FORCE_POWER.description":  "铁甲战士使用「巨石」时，会获得 1 点力量和 3 点覆甲。\n若「巨石」对你造成了未被格挡的伤害，你获得 1 层虚弱。",
     "BOSS_STELLAR_GATHERING_POWER.title":  "群星荟萃",
     "BOSS_STELLAR_GATHERING_POWER.description":  "每当储君获得「保留手牌」时，所有玩家获得「保留手牌」与「下回合能量」。\n警告：黑洞属于无来源伤害，带有「为你而死」的召唤物不会替你承受该伤害。",
     "BOSS_BURNING_PACT_POWER.title":  "燃烧契约",

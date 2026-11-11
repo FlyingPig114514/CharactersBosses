@@ -40,7 +40,7 @@
     "LOCK_ON_POWER.title":  "추적 고정",
     "LOCK_ON_POWER.description":  "{Boss}이(가) 당신을 노립니다: {Pronoun}의 단일 대상 공격, 무작위 공격, 구체는 당신만을 향합니다.\n이 보스가 쓰러져야만 고정이 해제됩니다.{Extra}",
        "BOSS_PRIMAL_FORCE_POWER.title":  "원초의 힘",
-       "BOSS_PRIMAL_FORCE_POWER.description":  "아이언클래드가 '거대한 바위'를 사용하면 힘을 1, 판금을 3 얻습니다.\n'거대한 바위'가 당신에게 막히지 않은 피해를 입히면 당신은 카드를 1장 뽑습니다.",
+       "BOSS_PRIMAL_FORCE_POWER.description":  "아이언클래드가 '거대한 바위'를 사용하면 힘을 1, 판금을 3 얻습니다.\n'거대한 바위'가 당신에게 막히지 않은 피해를 입히면 당신은 약화를 1 얻습니다.",
        "BOSS_STELLAR_GATHERING_POWER.title":  "별들의 집회",
   "BOSS_STELLAR_GATHERING_POWER.description":  "리젠트가 '보존'을 얻을 때마다 모든 플레이어가 '보존'과 다음 턴 에너지를 얻습니다.\n경고: 블랙홀은 근원이 없는 피해이므로, '살신성인'을 지닌 소환물이 대신 받아 주지 않습니다.",
     "BOSS_BURNING_PACT_POWER.title":  "불타는 계약",

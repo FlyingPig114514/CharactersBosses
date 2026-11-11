@@ -40,7 +40,7 @@
     "LOCK_ON_POWER.title":  "Namierzenie",
     "LOCK_ON_POWER.description":  "{Boss} cię namierzył: ataki na pojedynczy cel, ataki losowe i Sfery {Pronoun} trafiają tylko w ciebie.\nNamierzenie kończy się dopiero, gdy ten boss padnie.{Extra}",
        "BOSS_PRIMAL_FORCE_POWER.title":  "Pierwotna siła",
-       "BOSS_PRIMAL_FORCE_POWER.description":  "Kiedy Pancernik zagra „Dużą skałę”, zyskuje 1 pkt. Siły i 3 pkt. Opancerzenia.\nJeśli „Duża skała” zada ci niezablokowane obrażenia, dobierasz 1 kartę.",
+       "BOSS_PRIMAL_FORCE_POWER.description":  "Kiedy Pancernik zagra „Dużą skałę”, zyskuje 1 pkt. Siły i 3 pkt. Opancerzenia.\nJeśli „Duża skała” zada ci niezablokowane obrażenia, zyskujesz 1 pkt. Słabości.",
        "BOSS_STELLAR_GATHERING_POWER.title":  "Gwiezdne zgromadzenie",
   "BOSS_STELLAR_GATHERING_POWER.description":  "Kiedykolwiek Monarcha otrzyma „Zachowanie”, wszyscy gracze otrzymują „Zachowanie” i energię w następnej turze.\nOSTRZEŻENIE: „Czarna dziura” zadaje obrażenia bez źródła — przywołane stworzenie z „Umrę za Ciebie” nie pochłonie ich za ciebie.",
     "BOSS_BURNING_PACT_POWER.title":  "Płonący pakt",

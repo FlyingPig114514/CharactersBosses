@@ -40,7 +40,7 @@
     "LOCK_ON_POWER.title":  "Verrouillage de cible",
     "LOCK_ON_POWER.description":  "{Boss} vous a pris pour cible : {Pronoun} attaques mono-cible, attaques aléatoires et Orbes ne touchent que vous.\nLe verrou ne se brisera qu'à la chute de ce boss.{Extra}",
        "BOSS_PRIMAL_FORCE_POWER.title":  "Force primitive",
-       "BOSS_PRIMAL_FORCE_POWER.description":  "Chaque fois que Le Soldat de Fer joue [gold]Rocher gigantesque[/gold], il gagne 1 [gold]Force[/gold] et 3 [gold]Blindage[/gold].\nSi [gold]Rocher gigantesque[/gold] vous inflige des dégâts non bloqués, vous piochez 1 carte.",
+       "BOSS_PRIMAL_FORCE_POWER.description":  "Chaque fois que Le Soldat de Fer joue [gold]Rocher gigantesque[/gold], il gagne 1 [gold]Force[/gold] et 3 [gold]Blindage[/gold].\nSi [gold]Rocher gigantesque[/gold] vous inflige des dégâts non bloqués, vous gagnez 1 [gold]Affaibli[/gold].",
        "BOSS_STELLAR_GATHERING_POWER.title":  "Convergence stellaire",
   "BOSS_STELLAR_GATHERING_POWER.description":  "Chaque fois que Le Régent gagne [gold]Retenue[/gold], tous les joueurs gagnent [gold]Retenue[/gold] et de l'[gold]Énergie au prochain tour[/gold].\nAVERTISSEMENT : le [gold]Trou noir[/gold] inflige des dégâts sans source – une invocation avec « [gold]Ma vie pour toi[/gold] » ne les encaissera pas à votre place.",
     "BOSS_BURNING_PACT_POWER.title":  "Pacte brûlant",

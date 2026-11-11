@@ -40,7 +40,7 @@
     "LOCK_ON_POWER.title":  "Aggancio",
     "LOCK_ON_POWER.description":  "{Boss} ti ha preso di mira: {Pronoun} attacchi a bersaglio singolo, attacchi casuali e Globi colpiscono solo te.\nL'aggancio si scioglie solo quando questo boss cade.{Extra}",
        "BOSS_PRIMAL_FORCE_POWER.title":  "Forza Primordiale",
-       "BOSS_PRIMAL_FORCE_POWER.description":  "Ogni volta che l'Ironclad gioca [gold]Macigno[/gold], ottiene 1 di [gold]Forza[/gold] e 3 di [gold]Placcatura[/gold].\nSe [gold]Macigno[/gold] ti infligge danno non bloccato, peschi 1 carta.",
+       "BOSS_PRIMAL_FORCE_POWER.description":  "Ogni volta che l'Ironclad gioca [gold]Macigno[/gold], ottiene 1 di [gold]Forza[/gold] e 3 di [gold]Placcatura[/gold].\nSe [gold]Macigno[/gold] ti infligge danno non bloccato, ottieni 1 di [gold]Debolezza[/gold].",
        "BOSS_STELLAR_GATHERING_POWER.title":  "Adunanza Stellare",
   "BOSS_STELLAR_GATHERING_POWER.description":  "Ogni volta che il Regent ottiene [gold]Conservazione[/gold], tutti i giocatori ottengono [gold]Conservazione[/gold] e [gold]Energia nel prossimo turno[/gold].\nAVVERTENZA: il [gold]Buco Nero[/gold] infligge danno senza fonte: un'invocazione con \"[gold]Morirò per te[/gold]\" non lo assorbe al posto tuo.",
     "BOSS_BURNING_PACT_POWER.title":  "Patto di Fuoco",

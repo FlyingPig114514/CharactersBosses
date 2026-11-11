@@ -40,7 +40,7 @@
     "LOCK_ON_POWER.title": "İzleme Kilidi",
     "LOCK_ON_POWER.description": "{Boss} seni hedef aldı: {Pronoun} tek hedef saldırıları, rastgele saldırıları ve küreleri yalnızca sana vurur.\nBu boss öldüğünde kilit kalkar.{Extra}",
     "BOSS_PRIMAL_FORCE_POWER.title": "İlkel Güç",
-    "BOSS_PRIMAL_FORCE_POWER.description": "Demirkaplı [gold]Devasa Kaya[/gold] kullandığında 1 [gold]Kuvvet[/gold] ve 3 [gold]Zırh[/gold] elde eder.\n[gold]Devasa Kaya[/gold] sana bloklanmamış hasar verdiyse, 1 kart çekersin.",
+    "BOSS_PRIMAL_FORCE_POWER.description": "Demirkaplı [gold]Devasa Kaya[/gold] kullandığında 1 [gold]Kuvvet[/gold] ve 3 [gold]Zırh[/gold] elde eder.\n[gold]Devasa Kaya[/gold] sana bloklanmamış hasar verdiyse, 1 [gold]Zayıf[/gold] elde edersin.",
     "BOSS_STELLAR_GATHERING_POWER.title": "Yıldız Buluşması",
     "BOSS_STELLAR_GATHERING_POWER.description": "Naip [gold]Sakla[/gold] elde ettiğinde, tüm oyuncular [gold]Sakla[/gold] ve bir sonraki tur için [gold]Enerji[/gold] elde eder.\nUYARI: [gold]Kara Delik[/gold] kaynaksız hasar verir - “Senin İçin Ölürüm” özellikli çağırılan yaratıklar bu hasarı senin yerine üstlenmez.",
     "BOSS_BURNING_PACT_POWER.title": "Yakan Anlaşma",

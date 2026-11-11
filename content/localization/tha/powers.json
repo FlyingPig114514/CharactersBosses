@@ -40,7 +40,7 @@
     "LOCK_ON_POWER.title": "ล็อกติดตาม",
     "LOCK_ON_POWER.description": "{Boss} ล็อกเป้ามาที่คุณ: การโจมตีเป้าเดียว การโจมตีแบบสุ่ม และลูกแก้วของ{Pronoun}จะโจมตีแค่คุณเท่านั้น\nล็อกจะคลายเมื่อบอสตัวนี้ล้มลง{Extra}",
     "BOSS_PRIMAL_FORCE_POWER.title": "พลังดึกดำบรรพ์",
-    "BOSS_PRIMAL_FORCE_POWER.description": "เมื่อนักรบเกราะเหล็กใช้[gold]หินยักษ์[/gold] เขาจะได้รับ[gold]ความแข็งแรง[/gold] 1 และ[gold]เกราะโลหะ[/gold] 3\nหาก[gold]หินยักษ์[/gold]สร้างความเสียหายที่ไม่ถูกบล็อกใส่คุณ คุณจะจั่วการ์ด 1 ใบ",
+    "BOSS_PRIMAL_FORCE_POWER.description": "เมื่อนักรบเกราะเหล็กใช้[gold]หินยักษ์[/gold] เขาจะได้รับ[gold]ความแข็งแรง[/gold] 1 และ[gold]เกราะโลหะ[/gold] 3\nหาก[gold]หินยักษ์[/gold]สร้างความเสียหายที่ไม่ถูกบล็อกใส่คุณ คุณจะได้รับ[gold]ความอ่อนแอ[/gold] 1",
     "BOSS_STELLAR_GATHERING_POWER.title": "รวมดวงดาว",
     "BOSS_STELLAR_GATHERING_POWER.description": "ทุกครั้งที่ Regent ได้รับ[gold]คงสภาพ[/gold] ผู้เล่นทุกคนจะได้รับ[gold]คงสภาพ[/gold]และ[gold]พลังงาน[/gold]เทิร์นถัดไป\nคำเตือน: [gold]หลุมดำ[/gold]สร้างความเสียหายที่ไม่มีแหล่งที่มา สิ่งอัญเชิญที่มี “Die for You” จะไม่รับความเสียหายนั้นแทนคุณ",
     "BOSS_BURNING_PACT_POWER.title": "สัญญาเพลิง",

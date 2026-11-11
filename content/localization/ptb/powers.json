@@ -40,7 +40,7 @@
     "LOCK_ON_POWER.title": "Bloqueio de Rastreio",
     "LOCK_ON_POWER.description": "{Boss} travou você como alvo: {Pronoun2} ataques de alvo único, ataques aleatórios e Orbes só atingem você.\nO bloqueio acaba quando esse chefe morre.{Extra}",
     "BOSS_PRIMAL_FORCE_POWER.title": "Força Primordial",
-    "BOSS_PRIMAL_FORCE_POWER.description": "Sempre que O Rígido usar [gold]Rocha Gigantesca[/gold], ele recebe 1 de [gold]Força[/gold] e 3 de [gold]Blindagem[/gold].\nSe [gold]Rocha Gigantesca[/gold] causar dano não bloqueado a você, você compra 1 carta.",
+    "BOSS_PRIMAL_FORCE_POWER.description": "Sempre que O Rígido usar [gold]Rocha Gigantesca[/gold], ele recebe 1 de [gold]Força[/gold] e 3 de [gold]Blindagem[/gold].\nSe [gold]Rocha Gigantesca[/gold] causar dano não bloqueado a você, você recebe 1 de [gold]Fraqueza[/gold].",
     "BOSS_STELLAR_GATHERING_POWER.title": "Convergência Estelar",
     "BOSS_STELLAR_GATHERING_POWER.description": "Sempre que O Regente receber [gold]Manter[/gold], todos os jogadores recebem [gold]Manter[/gold] e [gold]Energia Iminente[/gold].\nAVISO: o [gold]Buraco Negro[/gold] causa dano sem fonte; uma criatura vinculada com «[gold]Morrer por Você[/gold]» não absorverá esse dano por você.",
     "BOSS_BURNING_PACT_POWER.title": "Pacto Ardente",

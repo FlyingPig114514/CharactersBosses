@@ -40,7 +40,7 @@
     "LOCK_ON_POWER.title":  "Tracking Lock",
     "LOCK_ON_POWER.description":  "{Boss} has locked onto you: {Pronoun2} single-target attacks, random attacks and orbs only hit you.\nThe lock ends when that boss dies.{Extra}",
     "BOSS_PRIMAL_FORCE_POWER.title":  "Primal Force",
-    "BOSS_PRIMAL_FORCE_POWER.description":  "Whenever the Ironclad plays Giant Rock, he gains 1 Strength and 3 Plated Armor.\nIf Giant Rock deals unblocked damage to you, you draw 1 card.",
+    "BOSS_PRIMAL_FORCE_POWER.description":  "Whenever the Ironclad plays Giant Rock, he gains 1 Strength and 3 Plated Armor.\nIf Giant Rock deals unblocked damage to you, you gain 1 Weak.",
     "BOSS_STELLAR_GATHERING_POWER.title":  "Stellar Gathering",
     "BOSS_STELLAR_GATHERING_POWER.description":  "Whenever the Regent gains Retain, all players gain Retain and Energy next turn.\nWarning: Black Hole deals un-sourced damage; summons with \"Die For You\" will not absorb it.",
     "BOSS_BURNING_PACT_POWER.title":  "Burning Pact",

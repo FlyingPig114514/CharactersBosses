@@ -40,7 +40,7 @@
     "LOCK_ON_POWER.title":  "跟蹤鎖定",
     "LOCK_ON_POWER.description":  "{Boss}盯上了你：{Pronoun}的單體攻擊、隨機攻擊和充能球只會攻擊你。\n這只 Boss 倒下后鎖定才會解除。{Extra}",
     "BOSS_PRIMAL_FORCE_POWER.title":  "原始力量",
-    "BOSS_PRIMAL_FORCE_POWER.description":  "鐵甲戰士使用「巨石」時，獲得 1 點力量和 3 點覆甲。\n若「巨石」對你造成了未被格擋的傷害，你抽 1 張牌。",
+    "BOSS_PRIMAL_FORCE_POWER.description":  "鐵甲戰士使用「巨石」時，會獲得 1 點力量和 3 點覆甲。\n若「巨石」對你造成了未被格擋的傷害，你獲得 1 層虛弱。",
     "BOSS_STELLAR_GATHERING_POWER.title":  "群星薈萃",
     "BOSS_STELLAR_GATHERING_POWER.description":  "每當儲君獲得「保留手牌」時，所有玩家獲得「保留手牌」與「下回合能量」。\n警告：黑洞屬於無來源傷害，帶有「為你而死」的召喚物不會替你承受該傷害。",
     "BOSS_BURNING_PACT_POWER.title":  "燃燒契約",

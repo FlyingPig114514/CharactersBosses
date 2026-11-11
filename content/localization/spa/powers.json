@@ -40,7 +40,7 @@
     "LOCK_ON_POWER.title": "Bloqueo de rastreo",
     "LOCK_ON_POWER.description": "{Boss} te ha fijado como objetivo: {Pronoun2} ataques de un solo objetivo, ataques aleatorios y Orbes solo te alcanzarán a ti.\nEl bloqueo termina cuando ese jefe muere.{Extra}",
     "BOSS_PRIMAL_FORCE_POWER.title": "Fuerza primigenia",
-    "BOSS_PRIMAL_FORCE_POWER.description": "Cada vez que El Blindado use [gold]Roca gigantesca[/gold], gana 1 de [gold]Fuerza[/gold] y 3 de [gold]Blindaje[/gold].\nSi [gold]Roca gigantesca[/gold] te inflige daño sin bloquear, robas 1 carta.",
+    "BOSS_PRIMAL_FORCE_POWER.description": "Cada vez que El Blindado use [gold]Roca gigantesca[/gold], gana 1 de [gold]Fuerza[/gold] y 3 de [gold]Blindaje[/gold].\nSi [gold]Roca gigantesca[/gold] te inflige daño sin bloquear, ganas 1 de [gold]Debilidad[/gold].",
     "BOSS_STELLAR_GATHERING_POWER.title": "Concurrencia estelar",
     "BOSS_STELLAR_GATHERING_POWER.description": "Cada vez que El Regente obtenga [gold]Retención[/gold], todos los jugadores obtienen [gold]Retención[/gold] y [gold]Energía inminente[/gold].\nADVERTENCIA: el [gold]Agujero negro[/gold] inflige daño sin fuente; una criatura vinculada con «[gold]Morirá por ti[/gold]» no absorberá ese daño por ti.",
     "BOSS_BURNING_PACT_POWER.title": "Pacto Ardiente",

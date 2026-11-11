@@ -40,7 +40,7 @@
     "LOCK_ON_POWER.title":  "Zielerfassung",
     "LOCK_ON_POWER.description":  "{Boss} hat dich ins Visier genommen: {Pronoun} Einzelzielangriffe, Zufallsangriffe und Orbs treffen nur dich.\nDiese Zielerfassung endet erst, wenn dieser Boss fällt.{Extra}",
        "BOSS_PRIMAL_FORCE_POWER.title":  "Urtümliche Kraft",
-       "BOSS_PRIMAL_FORCE_POWER.description":  "Jedes Mal, wenn Der Eiserne [gold]Riesiger Fels[/gold] spielt, erhält er 1 [gold]Stärke[/gold] und 3 [gold]Panzerung[/gold].\nWenn [gold]Riesiger Fels[/gold] dir ungeblockten Schaden zufügt, ziehst du 1 Karte.",
+       "BOSS_PRIMAL_FORCE_POWER.description":  "Jedes Mal, wenn Der Eiserne [gold]Riesiger Fels[/gold] spielt, erhält er 1 [gold]Stärke[/gold] und 3 [gold]Panzerung[/gold].\nWenn [gold]Riesiger Fels[/gold] dir ungeblockten Schaden zufügt, erhältst du 1 [gold]Schwach[/gold].",
        "BOSS_STELLAR_GATHERING_POWER.title":  "Sternensammlung",
   "BOSS_STELLAR_GATHERING_POWER.description":  "Jedes Mal, wenn Der Regent [gold]Behalten[/gold] erhält, erhalten alle Spieler [gold]Behalten[/gold] und [gold]Energie im nächsten Zug[/gold].\nWARNUNG: [gold]Schwarzes Loch[/gold] verursacht Schaden ohne Quelle – eine Beschwörung mit „[gold]Für dich sterben[/gold]“ fängt diesen Schaden nicht für dich ab.",
     "BOSS_BURNING_PACT_POWER.title":  "Feuerpakt",

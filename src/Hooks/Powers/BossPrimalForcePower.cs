@@ -35,7 +35,8 @@ public sealed class BossPrimalForcePower : PowerModel
 
     private const int StrengthPerRock = 1;
     private const int PlatingPerRock = 3;
-    private const int DrawOnUnblocked = 1;
+    /// <summary>「巨石」造成未被格挡伤害时，该玩家获得的**虚弱**层数（用户 2026-11-11：改回破防上虚弱）。</summary>
+    private const int WeakOnUnblocked = 1;
 
     private int _logs;
 
@@ -90,15 +91,15 @@ public sealed class BossPrimalForcePower : PowerModel
             if (player == null) return;
 
             var ctx = choiceContext ?? new BlockingPlayerChoiceContext();
-            // 抽牌：CardCmd 没有单独的 Draw，画牌走 DiscardAndDraw（弃 0 张、抽 N 张）
-            // ★ v0.2.382（用户 2026-11-04）：原来走 `CardCmd.DiscardAndDraw(ctx, 空列表, N)` ——
-            //   「弃 0 张再抽 N 张」这条在弃牌列表为空时**不会真的抽牌**（日志已经证明走到了这里，
-            //   但玩家手上没多牌）。改成原版真正的抽牌入口 `CardPileCmd.Draw`（灵魂「抽 3」也是走它）。
-            await MegaCrit.Sts2.Core.Commands.CardPileCmd.Draw(ctx, DrawOnUnblocked, player);
+            // ★ 2026-11-11（用户）：「改回巨石破防上虚弱，每次巨石 +1 力量、+3 覆甲，代码和描述统一修改」
+            //   以前这里是该玩家**抽 1 张牌**（v0.2.382 的写法）；现在改成给该玩家 **1 层虚弱**，
+            //   与「原始力量」的本地化文案一致（`BOSS_PRIMAL_FORCE_POWER.description` /
+            //   `IRONCLAD_BOSS.boulder`）。
+            await PowerCmd.Apply<WeakPower>(ctx, target, WeakOnUnblocked, self, cardSource);
 
             if (_logs++ < 20)
             {
-                Logger.Log($"[CharBoss] 原始力量：巨石对 {target.Name} 造成 {unblocked} 点未被格挡伤害 → 抽 {DrawOnUnblocked} 张牌");
+                Logger.Log($"[CharBoss] 原始力量：巨石对 {target.Name} 造成 {unblocked} 点未被格挡伤害 → 获得 {WeakOnUnblocked} 层虚弱");
             }
         }
         catch (Exception e)

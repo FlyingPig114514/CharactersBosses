@@ -40,7 +40,7 @@
     "LOCK_ON_POWER.title": "Kunci Pelacakan",
     "LOCK_ON_POWER.description": "{Boss} mengunci sasarannya padamu: serangan satu target, serangan acak, dan bola dari {Pronoun} hanya mengenai kamu.\nKunci baru lepas setelah boss ini tumbang.{Extra}",
     "BOSS_PRIMAL_FORCE_POWER.title": "Kekuatan Purba",
-    "BOSS_PRIMAL_FORCE_POWER.description": "Saat Si Ironclad menggunakan [gold]Batu Raksasa[/gold], dia mendapatkan 1 [gold]Kekuatan[/gold] dan 3 [gold]Lapisan[/gold].\nJika [gold]Batu Raksasa[/gold] memberikan kerusakan yang tidak tertahan padamu, kamu mengambil 1 kartu.",
+    "BOSS_PRIMAL_FORCE_POWER.description": "Saat Si Ironclad menggunakan [gold]Batu Raksasa[/gold], dia mendapatkan 1 [gold]Kekuatan[/gold] dan 3 [gold]Lapisan[/gold].\nJika [gold]Batu Raksasa[/gold] memberikan kerusakan yang tidak tertahan padamu, kamu mendapatkan 1 [gold]Lemah[/gold].",
     "BOSS_STELLAR_GATHERING_POWER.title": "Himpunan Bintang",
     "BOSS_STELLAR_GATHERING_POWER.description": "Setiap kali Si Regent mendapatkan [gold]Pertahankan[/gold], semua pemain mendapatkan [gold]Pertahankan[/gold] dan [gold]Energi[/gold] giliran berikutnya.\nPERINGATAN: [gold]Lubang Hitam[/gold] memberikan kerusakan tanpa sumber - makhluk panggilan dengan “Mati Buatmu” tidak akan menahan kerusakan itu untukmu.",
     "BOSS_BURNING_PACT_POWER.title": "Perjanjian Membara",

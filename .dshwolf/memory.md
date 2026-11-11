@@ -5159,3 +5159,9 @@ Chronological action log.
 | 2026-11-11 17:46 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/IroncladStrikeScript.cs` | ok | 0 |
 | 2026-11-11 17:47 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BuildInfo.cs` | ok | 0 |
 | 2026-11-11 17:48 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/boss-table-check-2026-11-11.md` | ok | 0 |
+| 2026-11-11 18:16 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Powers/BossPrimalForcePower.cs` | ok | 0 |
+| 2026-11-11 18:16 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Powers/BossPrimalForcePower.cs` | ok | 0 |
+| 2026-11-11 18:16 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/.tmp/fix_primal_loc.py` | ok | 0 |
+| 2026-11-11 18:16 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/.tmp/fix_anger_loc.py` | ok | 0 |
+| 2026-11-11 18:17 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/.tmp/patch_boulder_cell.py` | ok | 0 |
+| 2026-11-11 18:18 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BuildInfo.cs` | ok | 0 |
