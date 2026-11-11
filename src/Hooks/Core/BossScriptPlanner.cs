@@ -256,10 +256,39 @@ public static class BossScriptPlanner
                 used.Add(card);
                 // 标了 AutoPlayed 的展示牌**本回合会被打出去** → ①画亮 ②把它下方那排意图也画出来
                 //（用户实测：所向无敌下面缺「守势」）。没标的（剑圣：费不够）保持压暗、无意图。
-                if (entry.AutoPlayed)
+                //
+                // ★ 2026-11-10（用户，三层「抉择储」）：那 5 张候选技能牌要**压暗但画意图**
+                //   （铸墙 = 守势+强化、隐秘藏品 = 强化、共鸣 = 策略+强化、震荡波 = 策略、
+                //     星位序列 = 标出天际钻头会多出多少段）。由剧本点名 → 这里按标签造意图，
+                //   并把这一条登记成 `DimWhenShown`（手牌栏据此压暗）。
+                bool autoPlayed = entry.AutoPlayed;
+                bool forcedHere = entry.ForceIntents != BossIntentTag.None || entry.ShowsDrillGain;
+                if (autoPlayed || forcedHere)
                 {
                     var displayTarget = BossPlanner.ChooseTarget(boss, card) ?? boss.Creature;
-                    var displayIntents = PreviewIntents(card, displayTarget, pendingDrop, pendingRise, inTurnStrength);
+                    var displayIntents = autoPlayed
+                        ? PreviewIntents(card, displayTarget, pendingDrop, pendingRise, inTurnStrength)
+                        : ForcedIntents(entry.ForceIntents);
+
+                    int drillPerHit = 0, drillGain = 0, drillBase = 0, drillTotal = 0;
+                    if (entry.ShowsDrillGain)
+                    {
+                        try
+                        {
+                            var drill = FindChoiceDrill(boss, turnNumber);
+                            if (drill != null)
+                            {
+                                drillPerHit = Math.Max(0, (int)Math.Round(ReadVar(drill, "Damage")));
+                                (drillBase, drillTotal) = DrillHitsPreview(hand, card, energy);
+                                drillGain = Math.Max(0, drillTotal - drillBase);
+                                Logger.Log($"[CharBoss] 抉择：星位序列预告 —— 天际钻头 {drillPerHit}×{drillBase}" +
+                                           $" ⇒ 选它之后 {drillPerHit}×{drillTotal}（多 {drillPerHit}×{drillGain}）" +
+                                           $"（当前余费 {energy}）");
+                            }
+                        }
+                        catch (Exception e) { Logger.Log("[CharBoss] 抉择：星位序列预告失败: " + e.Message); }
+                    }
+
                     boss.DisplayPlays.Add(new PlannedPlay
                     {
                         Card = card,
@@ -267,9 +296,15 @@ public static class BossScriptPlanner
                         Cost = 0,
                         StarCost = 0,
                         Intents = displayIntents,
+                        DimWhenShown = !autoPlayed,
+                        DrillPerHit = drillPerHit,
+                        DrillGainHits = drillGain,
+                        DrillBaseHits = drillBase,
+                        DrillTotalHits = drillTotal,
                     });
                 }
-                skipped.Add(card.Id.Entry + (entry.AutoPlayed ? "(仅显示意图/回合结束自动打出)" : "(仅显示意图)"));
+                skipped.Add(card.Id.Entry + (entry.AutoPlayed ? "(仅显示意图/回合结束自动打出)"
+                                     : forcedHere ? "(仅显示意图，压暗)" : "(仅显示意图)"));
                 continue;
             }
 
@@ -705,9 +740,95 @@ public static class BossScriptPlanner
         return Math.Max(0, energySpentSoFar - 1);
     }
 
-    /// <summary>这张手牌是不是剧本点名的那张（**多人换牌后的类型**也算命中）。</summary>
-    private static bool Matches(CardModel card, ScriptCard entry, Monsters.CharBossMonster? boss = null)
+    // ───────── 三层「抉择储」：展示牌的意图与「天际钻头预告」 ─────────
+
+    /// <summary>
+    /// 按剧本点名的标签造意图（<see cref="ScriptCard.ForceIntents"/>）。
+    /// 顺序固定 **守势 → 策略 → 强化** —— 用户给的口径正是这个顺序
+    /// （铸墙 = 守势+强化、共鸣 = 策略+强化、震荡波 = 策略、隐秘藏品 = 强化）。
+    /// </summary>
+    private static List<MegaCrit.Sts2.Core.MonsterMoves.Intents.AbstractIntent> ForcedIntents(BossIntentTag tags)
     {
+        var list = new List<MegaCrit.Sts2.Core.MonsterMoves.Intents.AbstractIntent>();
+        if (tags == BossIntentTag.None) return list;
+        if ((tags & BossIntentTag.Defend) != 0)
+            list.Add(new MegaCrit.Sts2.Core.MonsterMoves.Intents.DefendIntent());
+        if ((tags & BossIntentTag.Debuff) != 0)
+            list.Add(new MegaCrit.Sts2.Core.MonsterMoves.Intents.DebuffIntent(false));
+        if ((tags & BossIntentTag.Buff) != 0)
+            list.Add(new MegaCrit.Sts2.Core.MonsterMoves.Intents.BuffIntent());
+        return list;
+    }
+
+    /// <summary>本回合剧本里那张「只有在玩家选了某张之后才打得出」的牌（= 天际钻头）；没有就 null。</summary>
+    private static CardModel? FindChoiceDrill(Monsters.CharBossMonster? boss, int turnNumber)
+    {
+        try
+        {
+            var scriptTurn = boss?.Def?.ScriptForAct(boss.ActIndex)?.TurnAt(turnNumber);
+            var pcs = boss?.Shadow?.PlayerCombatState;
+            if (scriptTurn?.Cards == null || pcs == null) return null;
+            foreach (var entry in scriptTurn.Cards)
+            {
+                if (entry?.OnlyIfChosenCard == null) continue;
+                foreach (var card in pcs.Hand.Cards)
+                {
+                    if (card == null) continue;
+                    try
+                    {
+                        if (card.GetType() == entry.Card) return card;
+                        string? a = ModelDb.GetId(card.GetType())?.Entry;
+                        string? b = ModelDb.GetId(entry.Card)?.Entry;
+                        if (a != null && b != null && string.Equals(a, b, StringComparison.Ordinal)) return card;
+                    }
+                    catch { /* 单张读不到就跳过 */ }
+                }
+            }
+        }
+        catch { /* 忽略 */ }
+        return null;
+    }
+
+    /// <summary>
+    /// 天际钻头「原本」与「选了星位序列之后」各打几段（用户 2026-11-10 的口径：
+    /// 星位序列被「抉择，抉择」打出 3 次、每次 +2 费 ⇒ 钻头的 X 多 6 点，而 X≥4 时 X 会翻倍）。
+    /// 返回 (原本段数, 选它之后段数)；「多出来的」由调用方相减。
+    /// </summary>
+    private static (int Base, int Total) DrillHitsPreview(List<CardModel> hand, CardModel alignmentCard, int energyLeft)
+    {
+        // 星位序列每次给多少费（未升级 2、升级 3）
+        int perPlay = 2;
+        try { perPlay = Math.Max(0, (int)Math.Round(ReadVar(alignmentCard, "Energy"))); }
+        catch { perPlay = 2; }
+
+        // 「抉择，抉择」的 Repeat（未升级 3、升级 5 ⇒ 升级后是抽牌数变 5 而不是重复次数）
+        int repeat = 3;
+        try
+        {
+            foreach (var card in hand)
+            {
+                if (card == null) continue;
+                if (SafeEntry(card) != "DECISIONS_DECISIONS") continue;
+                repeat = Math.Max(1, (int)Math.Round(ReadVar(card, "Repeat")));
+                break;
+            }
+        }
+        catch { repeat = 3; }
+
+        int baseX = Math.Max(0, energyLeft);
+        int totalX = baseX + Math.Max(0, perPlay) * Math.Max(1, repeat);
+        return (DrillHitsForX(baseX), DrillHitsForX(totalX));
+    }
+
+    /// <summary>天际钻头的段数 = X（X≥4 时照原版翻倍；X≤0 一段都打不出）。</summary>
+    private static int DrillHitsForX(int x)
+    {
+        if (x <= 0) return 0;
+        return x >= 4 ? x * 2 : x;
+    }
+
+    /// <summary>这张手牌是不是剧本点名的那张（**多人换牌后的类型**也算命中）。</summary>
+    private static bool Matches(CardModel card, ScriptCard entry, Monsters.CharBossMonster? boss = null)    {
         try
         {
             var actual = card.GetType();

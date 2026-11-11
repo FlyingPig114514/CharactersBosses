@@ -185,7 +185,7 @@ public partial class BossHandPanel : Control
                     var planned = stunned ? null : (boss.Plan.FirstOrDefault(p => ReferenceEquals(p.Card, cell.Card))
                                                    ?? boss.DisplayPlays.FirstOrDefault(p => ReferenceEquals(p.Card, cell.Card)));
                     BossHandCard.RefreshIntents(cell.Node, boss, planned);
-                    cell.Bright = planned != null;
+                    cell.Bright = planned != null && !planned.DimWhenShown;
                 }
             }
             else
@@ -455,12 +455,14 @@ public partial class BossHandPanel : Control
         var display = boss.DisplayPlays.FirstOrDefault(p => ReferenceEquals(p.Card, card));
         // 被击晕：既压暗也不挂意图行（`BuildCell` 的 planned 为 null ⇒ 不建意图行；bright=false ⇒ 压暗）
         var showAs = boss.Stunned ? null : (planned ?? display);
+        // ★ 2026-11-10：`DimWhenShown` 的展示牌要**画意图但压暗**（抉择储那 5 张候选技能牌）
+        bool brightHere = showAs != null && !showAs.DimWhenShown;
         return new Cell
         {
-            Node = BossHandCard.BuildCell(this, boss, card, showAs, showAs != null),
+            Node = BossHandCard.BuildCell(this, boss, card, showAs, brightHere),
             Card = card,
             Planned = planned != null,
-            Bright = showAs != null,
+            Bright = brightHere,
         };
     }
 
@@ -472,6 +474,9 @@ public partial class BossHandPanel : Control
     {
         foreach (var p in boss.DisplayPlays)
         {
+            // ★ 2026-11-10（三层「抉择储」）：标了 `DimWhenShown` 的展示牌**不出牌**，
+            //   只是要在自己下面画意图（那 5 张候选技能牌）⇒ 不算「会打出去」，保持压暗。
+            if (p.DimWhenShown) continue;
             if (ReferenceEquals(p.Card, card)) return true;
         }
         return false;

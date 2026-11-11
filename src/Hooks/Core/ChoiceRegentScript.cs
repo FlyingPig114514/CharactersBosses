@@ -39,8 +39,11 @@ public static class ChoiceRegentScript
                 C<Venerate>(true),
                 C<Royalties>(),
                 Choice(),
-                Display<HiddenCache>(), Display<Bulwark>(), Display<Alignment>(),
-                Display<Resonance>(), Display<Shockwave>(),
+                Display<HiddenCache>(BossIntentTag.Buff),
+                Display<Bulwark>(BossIntentTag.Defend | BossIntentTag.Buff),
+                Display<Alignment>(drillGain: true),
+                Display<Resonance>(BossIntentTag.Debuff | BossIntentTag.Buff),
+                Display<Shockwave>(BossIntentTag.Debuff, souls: true),
                 new ScriptCard { Card = typeof(HeavenlyDrill), OnlyIfChosenCard = typeof(Alignment) },
                 C<SovereignBlade>()),
 
@@ -72,18 +75,22 @@ public static class ChoiceRegentScript
                 Cards = new List<ScriptCard>
                 {
                     Choice(),
-                    Display<HiddenCache>(), Display<Bulwark>(), Display<Alignment>(),
-                    Display<Resonance>(), Display<Shockwave>(),
+                    Display<HiddenCache>(BossIntentTag.Buff),
+                    Display<Bulwark>(BossIntentTag.Defend | BossIntentTag.Buff),
+                    Display<Alignment>(drillGain: true),
+                    Display<Resonance>(BossIntentTag.Debuff | BossIntentTag.Buff),
+                    Display<Shockwave>(BossIntentTag.Debuff, souls: true),
                     C<HeavenlyDrill>(),
                     C<SovereignBlade>(), C<DefendRegent>(),
                 },
             },
 
             // ── 6 ────────────────────────────────────────────────────────────────
-            T(2, "6. 辉光、收集光辉、辐射、淬炼刀刃",
-                C<Glow>(),
-                new ScriptCard { Card = typeof(GatherLight), UpgradeMinAscension = 8 },
-                C<Radiate>(), new ScriptCard { Card = typeof(RefineBlade), UpgradeMinAscension = 9 }),
+            // 用户 2026-11-10 订正：「第六回合确实应该是 2 费，改成 辉光、辐射、淬炼刀刃、收集光辉（没费）」。
+            T(2, "6. 辉光、辐射、淬炼刀刃、收集光辉（没费）",
+                C<Glow>(), C<Radiate>(),
+                new ScriptCard { Card = typeof(RefineBlade), UpgradeMinAscension = 9 },
+                new ScriptCard { Card = typeof(GatherLight), UpgradeMinAscension = 8 }),
 
             // ── 7 ────────────────────────────────────────────────────────────────
             T(3, "7. 君王之剑、汇流+、崇拜（没费）",
@@ -120,7 +127,8 @@ public static class ChoiceRegentScript
             // ── 12 ───────────────────────────────────────────────────────────────
             T(4, "12. 星位序列（2 星）、辉光、震荡波、收集光辉",
                 C<Alignment>(), C<Glow>(),
-                new ScriptCard { Card = typeof(Shockwave), UpgradeMinAscension = 9 },
+                // 震荡波带「消耗」⇒ 附魔「灵魂之力」去掉它（用户 2026-11-10 指定）
+                new ScriptCard { Card = typeof(Shockwave), UpgradeMinAscension = 9, EnchantSouls = true },
                 new ScriptCard { Card = typeof(GatherLight), UpgradeMinAscension = 8 }),
 
             // ── 13 ───────────────────────────────────────────────────────────────
@@ -168,11 +176,31 @@ public static class ChoiceRegentScript
         where T : MegaCrit.Sts2.Core.Models.CardModel
         => new() { Card = typeof(T), Upgraded = upgraded, From = "deck" };
 
-    /// <summary>「抉择，抉择+」挑候选时**只显示、不出**的那几张（用户：「都摆出来，但是被选的那五张牌暗着」）。</summary>
-    private static ScriptCard Display<T>()
+    /// <summary>
+    /// 「抉择，抉择+」挑候选时**只显示、不出**的那几张（用户：「都摆出来，但是被选的那五张牌暗着」）。
+    ///
+    /// ★ 2026-11-10 第二轮订正：暗着**但要画意图** ——
+    /// 铸墙 = 守势+强化、隐秘藏品 = 强化、共鸣 = 策略+强化、震荡波 = 策略、
+    /// 星位序列 = 标出「选它之后天际钻头会多打多少」。
+    /// </summary>
+    private static ScriptCard Display<T>(BossIntentTag intents = BossIntentTag.None, bool drillGain = false,
+                                         bool souls = false)
         where T : MegaCrit.Sts2.Core.Models.CardModel
-        => new() { Card = typeof(T), From = "display", DisplayOnly = true };
+        => new()
+        {
+            Card = typeof(T),
+            From = "display",
+            DisplayOnly = true,
+            ForceIntents = intents,
+            ShowsDrillGain = drillGain,
+            EnchantSouls = souls,
+        };
 
+    /// <summary>
+    /// 那 5 张候选技能牌（用户设计：内容固定，顺序 = 铸墙、隐秘藏品、星位序列、共鸣、震荡波…
+    /// 这里按用户原话的次序：隐秘藏品、铸墙、星位序列、共鸣、震荡波）。
+    /// 「灵魂之力」附在**震荡波**上（用户 2026-11-10：它本身带「消耗」）。
+    /// </summary>
     /// <summary>「抉择，抉择+」（附魔王室认证 = 固有 + 保留）。<paramref name="hold"/> = 本回合留着不出。</summary>
     private static ScriptCard Choice(bool hold = false)
         => new()

@@ -91,7 +91,9 @@ public static partial class BossHandCard
     /// </summary>
     internal static void BuildIntentRow(Control cell, CharBossMonster boss, PlannedPlay? planned)
     {
-        if (planned == null || planned.Intents.Count == 0) return;
+        if (planned == null) return;
+        // 意图一条都没有、但有「天际钻头预告」的牌（星位序列）也要建这一行 —— 否则标签没地方挂
+        if (planned.Intents.Count == 0 && planned.DrillPerHit <= 0) return;
 
         var row = new HBoxContainer
         {
@@ -110,14 +112,29 @@ public static partial class BossHandCard
         // 格挡图标只有一个箭头、几乎不带数字信息，压住它损失最小 ⇒ 把所有 `DefendIntent`
         // 挪到这一行的末尾（其余意图保持原顺序：先牌本身的、再激发球的）。
         var ordered = new List<AbstractIntent>(planned.Intents.Count);
+        // ★ 2026-11-10：只有**这一行里有攻击意图**时才需要把守势挪到最后（原意是不让格挡挡住伤害数字）。
+        //   三层「抉择储」的候选牌是「守势+强化」这种纯功能行，用户要的就是守势在前 ⇒ 保持原顺序。
+        bool hasAttack = false;
         foreach (var intent in planned.Intents)
         {
-            if (intent is DefendIntent) continue;
-            ordered.Add(intent);
+            if (intent is MegaCrit.Sts2.Core.MonsterMoves.Intents.AttackIntent
+                || intent is MegaCrit.Sts2.Core.MonsterMoves.Intents.MultiAttackIntent) { hasAttack = true; break; }
         }
-        foreach (var intent in planned.Intents)
+        if (!hasAttack)
         {
-            if (intent is DefendIntent) ordered.Add(intent);
+            ordered.AddRange(planned.Intents);
+        }
+        else
+        {
+            foreach (var intent in planned.Intents)
+            {
+                if (intent is DefendIntent) continue;
+                ordered.Add(intent);
+            }
+            foreach (var intent in planned.Intents)
+            {
+                if (intent is DefendIntent) ordered.Add(intent);
+            }
         }
 
         foreach (var intent in ordered)
@@ -127,6 +144,10 @@ public static partial class BossHandCard
         // ★ 彩虹机（用户 2026-11-07）：「会触发节拍器的那张牌」下面再标一条**30 无来源群伤**。
         //   游戏里这 30 点确实会打出来（节拍器第 5 颗球），以前意图上完全看不见。
         try { AddExtraAoeLabel(boss, planned, row); } catch (Exception e) { Logger.Log("[CharBoss] 额外群伤标记失败: " + e.Message); }
+        // ★ 2026-11-10（三层「抉择储」）：「星位序列」下面标出「选它之后天际钻头会多打多少」，
+        //   例如第一回合 8×12。这条**故意不是意图** ⇒ 不进原版 `MoveState.Intents`，
+        //   薄荷尖塔那种「按意图统计本回合总伤害」的 mod 不会把它算进去（用户明确要求）。
+        try { AddDrillGainLabel(planned, row); } catch (Exception e) { Logger.Log("[CharBoss] 天际钻头预告标记失败: " + e.Message); }
         try { ApplyIntentShift(boss, row); } catch { /* 忽略 */ }
 
         // 激发球的意图（攻势 / `伤害×次数` / 守势）已经在计划阶段由 BossOrbSim 算好并塞进 Intents，
@@ -164,6 +185,36 @@ public static partial class BossHandCard
         };
         label.AddThemeColorOverride("font_color", new Color(1f, 0.32f, 0.32f));
         label.AddThemeFontSizeOverride("font_size", 22);      // 默认字号太小，和意图图标不搭
+        row.AddChild(label);
+    }
+
+    /// <summary>
+    /// 三层「抉择储」：「**星位序列**」这一格下面标出「选它之后天际钻头会**多打**多少」，
+    /// 形如 <c>8×12</c>（用户 2026-11-10：「例如第一回合星位序列下面就显示 8*12」）。
+    ///
+    /// 它**故意不是意图**：不进 `PlannedPlay.Intents`、也就不会进原版 `MoveState.Intents` ⇒
+    /// 薄荷尖塔那种「按意图统计本回合将受到多少伤害」的 mod **不会**把它算进去（用户明确要求）。
+    /// </summary>
+    private static void AddDrillGainLabel(PlannedPlay? planned, Control row)
+    {
+        if (planned == null || planned.DrillPerHit <= 0) return;
+        int hits = Math.Max(0, planned.DrillGainHits);
+        if (hits <= 0) return;
+
+        var label = new Label
+        {
+            Text = planned.DrillPerHit + "×" + hits,
+            MouseFilter = Control.MouseFilterEnum.Stop,
+            TooltipText = "选了星位序列 ⇒ 天际钻头会多打 " + hits + " 段（每段 " + planned.DrillPerHit + " 点）\n"
+                        + "天际钻头原本 " + planned.DrillPerHit + "×" + planned.DrillBaseHits
+                        + " ⇒ 之后 " + planned.DrillPerHit + "×" + planned.DrillTotalHits + "\n"
+                        + "（这条只是预告，不算在薄荷尖塔的伤害统计里）",
+            VerticalAlignment = VerticalAlignment.Center,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            CustomMinimumSize = new Vector2(58f, 0f),        // 不给最小宽度会被压成 0 宽 ⇒ 看不见
+        };
+        label.AddThemeColorOverride("font_color", new Color(1f, 0.72f, 0.28f));
+        label.AddThemeFontSizeOverride("font_size", 22);
         row.AddChild(label);
     }
 

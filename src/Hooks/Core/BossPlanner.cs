@@ -66,6 +66,29 @@ public sealed class PlannedPlay
 
     /// <summary>本回合排在它前面、会生成的状态牌张数 —— 散射炮的段数要加这一笔。</summary>
     public int PendingStatusCards { get; init; }
+
+    // ───────── ★ 2026-11-10：三层「抉择储」的展示牌（那 5 张候选技能牌） ─────────
+
+    /// <summary>
+    /// 这张展示牌**要压暗**（它本回合不会被她打出去，但玩家要看到它的意图）。
+    ///
+    /// 手牌栏原来用「在不在 `Plan` / `DisplayPlays` 里」决定亮暗 ⇒ 进了 `DisplayPlays` 就一定画亮。
+    /// 三层「抉择储」的 5 张候选牌正相反：**暗着**，但要把「选它会怎样」的意图画出来
+    /// （用户 2026-11-10 原话：「可以选的那 5 张牌是暗的，但是显示意图」）。
+    /// </summary>
+    public bool DimWhenShown { get; init; }
+
+    /// <summary>「星位序列」那条：天际钻头每段多少伤害（0 = 这张牌不显示天际钻头的预告）。</summary>
+    public int DrillPerHit { get; init; }
+
+    /// <summary>同上：**多出来**的段数（= 选了星位序列之后的段数 − 天际钻头原本的段数）。</summary>
+    public int DrillGainHits { get; init; }
+
+    /// <summary>同上（悬停说明用）：天际钻头原本的段数。</summary>
+    public int DrillBaseHits { get; init; }
+
+    /// <summary>同上（悬停说明用）：选了星位序列之后天际钻头的总段数。</summary>
+    public int DrillTotalHits { get; init; }
 }
 
 /// <summary>

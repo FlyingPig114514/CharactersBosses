@@ -184,6 +184,33 @@ public sealed class ScriptCard
     public bool DisplayOnly { get; init; }
 
     /// <summary>
+    /// 配合 <see cref="DisplayOnly"/>：这张展示牌**要画哪些意图**（用户 2026-11-10 的三层「抉择储」）。
+    ///
+    /// 背景：那 5 张候选技能牌由玩家挑一张、再被「抉择，抉择」重复打出 3 次 ——
+    /// 它们**不出牌**（手牌栏压暗），但玩家必须能提前看到「选它会怎样」，所以要点名画意图：
+    /// 铸墙 = 守势+强化、隐秘藏品 = 强化、共鸣 = 策略+强化、震荡波 = 策略。
+    ///
+    /// 画的顺序固定为 **守势 → 策略 → 强化**（用户给的口径正是这个顺序）。
+    /// 与 <see cref="AutoPlayed"/> 的区别：那个是「本回合真的会打出去 ⇒ 画亮 + 用它自己的意图」，
+    /// 这里只画意图、牌仍然压暗。
+    /// </summary>
+    public BossIntentTag ForceIntents { get; init; }
+
+    /// <summary>
+    /// 配合 <see cref="DisplayOnly"/>：这张展示牌下面标出「**天际钻头会因此多出多少伤害/段数**」
+    /// （用户 2026-11-10：星位序列那一栏要显示，例如第一回合 8×12）。
+    ///
+    /// 实现见 <see cref="BossScriptPlanner"/>：按「若选了星位序列 ⇒ 能量 +6（3 次 × +2）⇒
+    /// 天际钻头的 X 变大 ⇒ X≥4 翻倍」算出**多出来的段数**（= 变更后的段数 − 天际钻头原本的段数），
+    /// 画成 <c>UI/BossHandCard</c> 里那条小标签。
+    ///
+    /// ⚠ 这条**不是意图**（不进 `Intents`、也不进原版 `MoveState.Intents`）⇒
+    /// 薄荷尖塔那类「按原版意图统计本回合总伤害」的 mod **不会**把它算进去（用户明确要求）。
+    /// </summary>
+    public bool ShowsDrillGain { get; init; }
+
+
+    /// <summary>
     /// 这张牌打出去时**还会额外造成多少「无来源群体伤害」**（0 = 没有）。
     ///
     /// 唯一用途（用户 2026-11-07 的彩虹机）：第 8 回合那张「彩虹+」会踩到遗物「节拍器」的第 5 颗球，
@@ -288,6 +315,24 @@ public sealed class ScriptCard
     /// 也就是药水夹在牌中间，不能统一挪到回合开头。
     /// </summary>
     public Type? DrinkBefore { get; init; }
+}
+
+/// <summary>
+/// 「展示牌要画哪些意图」（<see cref="ScriptCard.ForceIntents"/>）。
+///
+/// 用标签而不是直接塞 <c>AbstractIntent</c> 实例：意图对象要能按当前力量/易伤实时重算，
+/// 所以剧本只声明「画哪几种」，真正的节点由规划期按同一把尺子造出来。
+/// </summary>
+[Flags]
+public enum BossIntentTag
+{
+    None = 0,
+    /// <summary>守势（格挡）。</summary>
+    Defend = 1,
+    /// <summary>强化（蓝上箭头）。</summary>
+    Buff = 2,
+    /// <summary>策略（红下箭头：给玩家上负面）。</summary>
+    Debuff = 4,
 }
 
 /// <summary>剧本里「喝一瓶药水」：哪一瓶 + 备注（只用于日志）。</summary>
