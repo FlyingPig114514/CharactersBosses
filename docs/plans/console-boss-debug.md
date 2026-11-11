@@ -66,6 +66,7 @@ id = 类名按 `StringHelper.Slugify`（驼峰断词 → 全大写）算出来�
 | `fight NECROBINDER_ERADICATE_BOSS_ENCOUNTER` | 根除骨 | 三层 | `Core/NecrobinderAct3Script.cs` |
 | `fight REGENT_COLORLESS_BOSS_ENCOUNTER` | 无色储君 | 三层 | `RegentScript.BuildAct3` |
 | `fight REGENT_STAR_BOSS_ENCOUNTER` | 辉星储 | 三层 | `Core/RegentStarScript.cs` |
+| `fight REGENT_CHOICE_BOSS_ENCOUNTER` | **抉择储**（用户 2026-11-10；特殊效果「指导」= 玩家替他挑「抉择，抉择」要重复打出的牌） | 三层 | `Core/ChoiceRegentScript.cs` |
 | `fight REGENT_KING_BOSS_ENCOUNTER` | **王储**（用户 2026-11-02；原名「征服者储君」） | 二层 | `Core/KingRegentScript.cs` |
 | `fight IRONCLAD_BLOOD_BOSS_ENCOUNTER` | 放血战 | 二层 | `Core/BleedIroncladScript.cs` |
 | `fight IRONCLAD_JUGGLER_BOSS_ENCOUNTER` | 杂耍战 | 二层 | `Core/JugglerIroncladScript.cs` |

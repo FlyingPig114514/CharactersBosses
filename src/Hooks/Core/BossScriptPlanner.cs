@@ -224,6 +224,16 @@ public static class BossScriptPlanner
 
             if (!IsPlayable(card)) { skipped.Add(card.Id.Entry + "(不可打出)"); continue; }
 
+            // 「抉择储」：这张牌只有在玩家「抉择，抉择」里挑了指定那张时才打得出
+            //（第 1 回合的天际钻头 —— 3 点能量被前三张花光，只有玩家选星位序列才有费）。
+            // 规划期选择还不知道 ⇒ 跳过（手牌里压暗、没有意图）；选择落地后由
+            // `CharBossMonster.RunChoiceFollowUpsAsync` 按剧本补打。
+            if (!ChoiceRegent.EntryAllowed(boss, turnNumber, entry))
+            {
+                skipped.Add(entry.Card.Name + "(等抉择结果)");
+                continue;
+            }
+
             // 「惊逃」那张（二层杂耍战）：**不花她的能量**，但**照样按普通出牌规划**
             //（走下面同一条路 ⇒ 意图、每打一张牌后的重算、力量到账后把预补撤回去 全都一致）。
             // 用户 2026-11-02：「你就不能让惊逃的伤害预览计算逻辑和直接打牌一样吗？…

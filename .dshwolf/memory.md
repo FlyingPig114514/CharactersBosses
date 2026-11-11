@@ -5013,3 +5013,33 @@ Chronological action log.
 | 2026-11-10 23:03 | edit | `src/Hooks/Patches/TopBarBossIconFallbackPatch.cs` | ok | 0 |
 | 2026-11-10 23:03 | write | `src/Hooks/Patches/TopBarBossIconFallbackPatch.cs` | ok | 0 |
 | 2026-11-10 23:10 | edit | `tools/upload-workshop.ps1` | ok | 0 |
+| 2026-11-11 12:58 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/ChoiceRegentScript.cs` | ok | 0 |
+| 2026-11-11 12:58 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossScript.cs` | ok | 0 |
+| 2026-11-11 12:58 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Powers/BossGuidePower.cs` | ok | 0 |
+| 2026-11-11 12:58 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/ChoiceRegent.cs` | ok | 0 |
+| 2026-11-11 12:58 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Patches/ChoiceRegentPickPatch.cs` | ok | 0 |
+| 2026-11-11 12:59 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Monsters/CharBossMonster.Choice.cs` | ok | 0 |
+| 2026-11-11 12:59 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Monsters/CharBossMonster.cs` | ok | 0 |
+| 2026-11-11 12:59 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossScriptPlanner.cs` | ok | 0 |
+| 2026-11-11 12:59 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Encounters/TierBossEncounters.cs` | ok | 0 |
+| 2026-11-11 12:59 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Encounters/CharBossEncounters.cs` | ok | 0 |
+| 2026-11-11 12:59 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossKeys.cs` | ok | 0 |
+| 2026-11-11 12:59 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossKeys.cs` | ok | 0 |
+| 2026-11-11 12:59 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossKeys.cs` | ok | 0 |
+| 2026-11-11 12:59 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossKeys.cs` | ok | 0 |
+| 2026-11-11 12:59 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossKeys.cs` | ok | 0 |
+| 2026-11-11 12:59 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossLineups.cs` | ok | 0 |
+| 2026-11-11 12:59 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossLineups.cs` | ok | 0 |
+| 2026-11-11 12:59 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossDefs.cs` | ok | 0 |
+| 2026-11-11 12:59 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Monsters/TierBossMonsters.Act3.cs` | ok | 0 |
+| 2026-11-11 12:59 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossInfoTable.cs` | ok | 0 |
+| 2026-11-11 13:00 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/DownfallCollectibleCompat.cs` | ok | 0 |
+| 2026-11-11 13:00 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Monsters/CharBossMonster.Choice.cs` | ok | 0 |
+| 2026-11-11 13:01 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Patches/ChoiceRegentPickPatch.cs` | ok | 0 |
+| 2026-11-11 13:01 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/CharacterBosses.json` | error | 0 |
+| 2026-11-11 13:01 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BuildInfo.cs` | error | 0 |
+| 2026-11-11 13:01 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/CharacterBosses.json` | ok | 0 |
+| 2026-11-11 13:01 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-11 13:02 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/boss-regent-choice.md` | ok | 0 |
+| 2026-11-11 13:02 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/console-boss-debug.md` | ok | 0 |
+| 2026-11-11 13:08 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossDefs.cs` | ok | 0 |

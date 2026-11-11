@@ -1049,6 +1049,8 @@ internal static class BossLineups
             {
                 if (entry == "REGENT_STAR_BOSS_ENCOUNTER") return (true, true);
                 if (entry == "REGENT_COLORLESS_BOSS_ENCOUNTER") return (false, true);
+                // ★ 2026-11-10：三层储君现在有**第三套**「抉择储」⇒ 点名它时必须让路
+                if (entry == "REGENT_CHOICE_BOSS_ENCOUNTER") return (false, true);
             }
         }
         catch { /* 继续往下判断 */ }
@@ -1063,6 +1065,7 @@ internal static class BossLineups
                 {
                     if (k == "REGENT_STAR") return (true, true);
                     if (k == "REGENT_COLORLESS") return (false, true);
+                    if (k == "REGENT_CHOICE") return (false, true);   // 第三套在场 ⇒ 不是辉星储
                 }
             }
         }
@@ -1070,6 +1073,49 @@ internal static class BossLineups
 
         // ③ 最后才按种子算 —— 这是**不可靠**的答案（此时遭遇/阵容都还读不到），所以不锁定
         return (RegentStarAt3(), false);
+    }
+
+    /// <summary>
+    /// **这一场战斗实际用哪套三层储君设计里的第三套「抉择储」**（用户 2026-11-10）。
+    /// 判据同 <see cref="StarRegentActive"/>：① 房间遭遇；② 存档里的主 Boss 遭遇反查阵容；
+    /// ③ 拿不到再按种子。只有**点名遭遇 / 阵容里真有它**时才会是 true，绝不随机抢走另外两套的位置。
+    /// </summary>
+    internal static bool ChoiceActive() => Latched("REGENT_CHOICE", ComputeChoice);
+
+    private static (bool Value, bool Decisive) ComputeChoice()
+    {
+        try
+        {
+            string? entry = CurrentEncounterEntry();
+            if (!string.IsNullOrEmpty(entry))
+            {
+                if (entry == "REGENT_CHOICE_BOSS_ENCOUNTER") return (true, true);
+                if (entry == "REGENT_COLORLESS_BOSS_ENCOUNTER") return (false, true);
+                if (entry == "REGENT_STAR_BOSS_ENCOUNTER") return (false, true);
+            }
+        }
+        catch { /* 继续往下判断 */ }
+
+        // ② 从**存档里的主 Boss 遭遇**反查这一场阵容（同步数据）
+        try
+        {
+            var lineup = CurrentFightLineup();
+            if (lineup != null)
+            {
+                bool hasChoice = false, hasOther = false;
+                foreach (var k in lineup)
+                {
+                    if (k == "REGENT_CHOICE") hasChoice = true;
+                    else if (k == "REGENT_COLORLESS" || k == "REGENT_STAR") hasOther = true;
+                }
+                if (hasChoice) return (true, true);
+                if (hasOther) return (false, true);
+            }
+        }
+        catch { /* 继续兜底 */ }
+
+        // ③ 拿不到遭遇/阵容 ⇒ 不认（这三套是**平权**的，随机挑会把另两套挤掉）
+        return (false, false);
     }
 
     /// <summary>

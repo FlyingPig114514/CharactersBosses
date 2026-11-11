@@ -225,6 +225,17 @@ public sealed class ScriptCard
     /// </summary>
     public bool HoldInstead { get; init; }
 
+    /// <summary>
+    /// 这张牌**只有在「抉择，抉择」那一手玩家挑了指定的那张**时才打得出（null = 不受选择影响）。
+    ///
+    /// 唯一用途（用户 2026-11-10 的三层「抉择储」第 1 回合）：
+    /// 「天际钻头」是 X 费牌，而第 1 回合打完 群星之子/崇拜/王国资产 正好把 3 点能量花光
+    /// ⇒ 只有玩家挑了「星位序列」（它每次给 2 费，被重复打出 3 次 ⇒ +6）才有费打钻头。
+    /// 规划期玩家的选择还不知道 ⇒ 这种牌**不规划**（手牌里压暗、没有意图）；
+    /// 等选择落地后由 <see cref="ChoiceRegent.RunAfterPickAsync"/> 重新按剧本补打。
+    /// </summary>
+    public Type? OnlyIfChosenCard { get; init; }
+
     /// <summary>这张牌造出来时**附魔「播种」**（`Sown`）：打出时获得 1 费（用户设计：根除骨第 3 回合的钙化）。</summary>
     public bool EnchantSown { get; init; }
 

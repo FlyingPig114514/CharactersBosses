@@ -888,6 +888,10 @@ case "REGENT_STAR_BOSS_ENCOUNTER":         // 三层 辉星储
                     cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.VoidForm);        // 虚空形态
                     upgraded = false;
                     return true;
+                case "REGENT_CHOICE_BOSS_ENCOUNTER":       // 三层 抉择储（用户 2026-11-10 指定：藏品 = 天际钻头）
+                    cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.HeavenlyDrill);
+                    upgraded = false;
+                    return true;
                 case "SILENT_GRAND_FINALE_BOSS_ENCOUNTER":   // 三层 华丽猎
                     cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.WellLaidPlans);   // 计划妥当
                     upgraded = false;

@@ -925,6 +925,39 @@ public static class BossDefs
                     },
                 },
             },
+            // ★ 2026-11-10（用户）三层储君的**第三套设计「抉择储」**（Key `REGENT_CHOICE`）。
+            //   特殊效果「指导」：她打「抉择，抉择」时由**玩家**替他挑那张要被重复打出 3 次的牌
+            //   （知识恶魔那套选牌界面；多人时由被他锁定的那位选，选完他才继续打后面的牌）。
+            //   剧本 Core/ChoiceRegentScript.cs（13 回合、9～13 循环），
+            //   选择接管见 Patches/ChoiceRegentPickPatch.cs + Core/ChoiceRegent.cs。
+            [2] = new List<BossVariant>
+            {
+                new BossVariant
+                {
+                    Key = "REGENT_CHOICE",
+                    Enabled = Core.BossLineups.ChoiceActive,
+                    Deck = Core.ChoiceRegentScript.Deck(),
+                    Relics = Core.ChoiceRegentScript.Relics(),
+                    Script = Core.ChoiceRegentScript.Build(),
+                    SpecialLoc = "REGENT_BOSS.guide",
+                    SpecialPower = typeof(Powers.BossGuidePower),
+                    // ★ 2026-11-10（用户）：「拦掉原版的抽牌，但不拦燃烧木棍的印牌」。
+                    //   必须拦：她的「抉择，抉择+」自己会 `CardPileCmd.Draw(5)`，而她的手牌恒等于剧本
+                    //   ⇒ 真抽 5 张进来，那次「挑一张技能牌」的候选就变成 10 张（用户要的是**5 张**）。
+                    //   燃烧木棍走的是它自己的「消耗 → 印牌」钩子，不是抽牌 ⇒ 不受这条影响。
+                    BlocksVanillaDraw = true,
+                    // 进阶（用户 2026-11-10）：8 = 升级群星之子、收集光辉；9 = 升级淬炼刀刃、共鸣、震荡波。
+                    // 「崇拜」全难度都是升级版 ⇒ 写在剧本里（`Upgraded = true`），不进这张表。
+                    AscensionUpgrades = new List<(int MinAscension, Type Card)>
+                    {
+                        (8, typeof(ChildOfTheStars)),
+                        (8, typeof(GatherLight)),
+                        (9, typeof(RefineBlade)),
+                        (9, typeof(Resonance)),
+                        (9, typeof(Shockwave)),
+                    },
+                },
+            },
         },
     };
 

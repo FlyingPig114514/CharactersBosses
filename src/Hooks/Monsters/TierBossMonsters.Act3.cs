@@ -88,6 +88,15 @@ public sealed class RegentStarBoss : RegentBoss
     public override string? PinnedVariantKey => "REGENT_STAR";
 }
 
+/// <summary>抉择储君（第 3 层）—— 设计 Key <c>REGENT_CHOICE</c>。</summary>
+public sealed class RegentChoiceBoss : RegentBoss
+{
+    public RegentChoiceBoss() { SpawnVariantKey = "REGENT_CHOICE"; }
+
+    public override int? TierAct => 2;
+    public override string? PinnedVariantKey => "REGENT_CHOICE";
+}
+
 /// <summary>易伤战（第 3 层）—— 设计 Key <c>IRONCLAD_VULN</c>。</summary>
 public sealed class IroncladVulnBoss : IroncladBoss
 {

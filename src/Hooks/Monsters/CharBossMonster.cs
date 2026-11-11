@@ -957,6 +957,10 @@ public abstract partial class CharBossMonster : MonsterModel
 
                 await PlayOne(ctx, pcs, play);
                 try { Core.RainbowMimic.OnCardPlayed(this, play.Card); } catch { /* 忽略 */ }
+                // 「抉择储」：玩家在「抉择，抉择」里选完之后，把「只有挑了那张才打得出」的牌接着打出去
+                //（第 1 回合的天际钻头；见 CharBossMonster.Choice.cs）。其它 Boss / 其它回合是空操作。
+                try { await RunChoiceFollowUpsAsync(ctx, pcs, play.Card); }
+                catch (Exception e) { Logger.Log("[CharBoss] 抉择补打失败: " + e.Message); }
                 lastMs = swAll.ElapsedMilliseconds;      // ← 之前一直没赋值（日志里「最后一张牌后」永远等于总时长）
 
                 // 小刀流：**生成刀的那张牌打出之后**，刀才进手牌 → 这时把它们摆到最前面

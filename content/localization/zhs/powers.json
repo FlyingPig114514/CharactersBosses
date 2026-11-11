@@ -73,5 +73,7 @@
     "BOSS_VOID_CALL_POWER.description":  "虚空之唤\n亡灵契约师首次打出[gold]女妖之嚎[/gold]时，所有玩家的所有卡牌获得[gold]虚无[/gold]，直到亡灵契约师死亡。",
     "BOSS_VOID_CALL_POWER.hexText":  "亡灵契约师存活时，你的所有卡牌都拥有[gold]虚无[/gold]。",
     "BOSS_DEVOUR_LIFE_POWER.description":  "每当亡灵契约师给予负面效果时，她获得[gold]4[/gold]点格挡。",
-    "BOSS_DEVOUR_LIFE_POWER.title":  "吞噬生命"
+    "BOSS_DEVOUR_LIFE_POWER.title":  "吞噬生命",
+    "BOSS_GUIDE_POWER.title":  "指导",
+    "BOSS_GUIDE_POWER.description":  "每当储君打出[gold]抉择，抉择[/gold]时，由你替他选择要被重复打出的那张牌。"
 }

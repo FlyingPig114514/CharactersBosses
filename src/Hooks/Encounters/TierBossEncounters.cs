@@ -270,6 +270,21 @@ public sealed class RegentStarBossEncounter : RegentBossEncounter
 }
 
 /// <summary>
+/// 第三幕储君的**第三套设计「抉择储」**（用户 2026-11-10；另两套是「无色储君」/「辉星储」）。
+///
+/// 特殊效果「指导」：她打「抉择，抉择」时由**玩家**（多人时是被他锁定的那位）替他挑一张要被重复
+/// 打出 3 次的牌 —— 用知识恶魔那套选牌界面，选完他才继续打后面的牌
+/// （见 <c>Patches/ChoiceRegentPickPatch.cs</c> 与 <c>Core/ChoiceRegent.cs</c>）。
+/// 剧本 <c>Core/ChoiceRegentScript.cs</c>，特殊效果 Power = <c>Powers/BossGuidePower.cs</c>。
+///
+/// 控制台直接打：<c>fight REGENT_CHOICE_BOSS_ENCOUNTER</c>。
+/// </summary>
+public sealed class RegentChoiceBossEncounter : RegentBossEncounter
+{
+    public override int? TierAct => 2;
+}
+
+/// <summary>
 /// 第三幕「**炼药猎**」的固定档位版（群友投稿、用户 2026-10-25 实验；剧本 <c>Core/SilentBrewerScript.cs</c>）。
 ///
 /// ⚠ 它**不是**纯控制台遭遇：三层静默猎手出场时按种子 **50/50** 在「刀猎 / 炼药猎」里挑一个

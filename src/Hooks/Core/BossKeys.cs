@@ -78,6 +78,7 @@ internal static class BossKeys
         new("NECROBINDER_OSTY",     3, 2, 2, typeof(NecrobinderBoss)),     // 亡灵 2 号：养手骨
         new("REGENT_COLORLESS",     4, 2, 1, typeof(RegentBoss)),          // 储君 1 号：无色储君
         new("REGENT_STAR",          4, 2, 2, typeof(RegentBoss)),          // 储君 2 号：辉星储
+        new("REGENT_CHOICE",        4, 2, 3, typeof(RegentBoss)),          // 储君 3 号：抉择储（用户 2026-11-10）
         new("IRONCLAD_VULN",        0, 2, 1, typeof(IroncladBoss)),        // 铁甲 1 号：易伤战
         new("IRONCLAD_BOULDER",     0, 2, 2, typeof(IroncladBoss)),        // 铁甲 2 号：巨石战
     };
@@ -116,6 +117,7 @@ internal static class BossKeys
                 "NECROBINDER_OSTY",     // 3 层 7 号
                 "REGENT_COLORLESS",     // 3 层 8 号
                 "REGENT_STAR",          // 3 层 9 号
+                "REGENT_CHOICE",        // 3 层 10 号（储君 3 号：抉择储，用户 2026-11-10）
                 "IRONCLAD_VULN",        // 3 层 10 号
                 "IRONCLAD_BOULDER",     // 3 层 11 号
             };
@@ -223,6 +225,7 @@ internal static class BossKeys
         ["NECROBINDER_FLESH"] = "血肉骨",
         ["REGENT_COLORLESS"] = "无色储",
         ["REGENT_STAR"] = "辉星储",
+        ["REGENT_CHOICE"] = "抉择储",
         ["IRONCLAD_VULN"] = "易伤战",
         ["IRONCLAD_BOULDER"] = "巨石战",
     };
@@ -278,7 +281,8 @@ internal static class BossKeys
             case "IRONCLAD_VULN": return "IRONCLAD_BOULDER";
             case "IRONCLAD_BOULDER": return "IRONCLAD_VULN";
             case "REGENT_COLORLESS": return "REGENT_STAR";
-            case "REGENT_STAR": return "REGENT_COLORLESS";
+            case "REGENT_STAR": return "REGENT_CHOICE";      // 三层储君三套设计的链式互补
+            case "REGENT_CHOICE": return "REGENT_COLORLESS";
             // 二层铁甲战士的一对变体（放血战 / 杂耍战）
             // 二层静默猎手的一对变体（涂毒猎 / 蛇眼猎）
             case "SILENT_ENVENOM": return "SILENT_SNECKO";
@@ -349,6 +353,7 @@ internal static class BossKeys
             case "REGENT_KING": return ModelDb.Encounter<RegentKingBossEncounter>();
             case "REGENT_COLORLESS": return ModelDb.Encounter<RegentColorlessBossEncounter>();
             case "REGENT_STAR": return ModelDb.Encounter<RegentStarBossEncounter>();
+            case "REGENT_CHOICE": return ModelDb.Encounter<RegentChoiceBossEncounter>();
             case "REGENT_BOMBARD": return ModelDb.Encounter<RegentBombardBossEncounter>();
             case "NECROBINDER_OSTY": return ModelDb.Encounter<NecrobinderOstyBossEncounter>();
             case "SILENT_SNECKO": return ModelDb.Encounter<SilentSneckoBossEncounter>();

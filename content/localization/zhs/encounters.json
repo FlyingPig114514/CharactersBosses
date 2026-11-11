@@ -84,5 +84,7 @@
     "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.title":  "亡灵契约师",
     "NECROBINDER_ETHEREAL_BOSS_ENCOUNTER.loss":  "{character} 的每一张牌都化作了[gold]亡灵契约师[/gold]的虚无。",
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "{character}被[gold]亡灵契约师[/gold]的血肉戏法撕碎了。",
-    "NECROBINDER_FLESH_BOSS_ENCOUNTER.title":  "亡灵契约师"
+    "NECROBINDER_FLESH_BOSS_ENCOUNTER.title":  "亡灵契约师",
+    "REGENT_CHOICE_BOSS_ENCOUNTER.title":  "储君",
+    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}被[gold]储君[/gold]的抉择玩弄至死。"
 }

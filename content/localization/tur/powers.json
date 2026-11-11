@@ -69,5 +69,7 @@
     "BOSS_VOID_CALL_POWER.description":  "Call of the Void\nWhen the Necrobinder plays [gold]Banshee\u0027s Cry[/gold] for the first time, all of your cards gain [gold]Ethereal[/gold] until the Necrobinder dies.",
     "BOSS_VOID_CALL_POWER.hexText":  "While the Necrobinder lives, all of your cards have [gold]Ethereal[/gold].",
     "BOSS_DEVOUR_LIFE_POWER.description":  "Whenever the Necrobinder applies a debuff, she gains [gold]4[/gold] Block.",
-    "BOSS_DEVOUR_LIFE_POWER.title":  "Devour Life"
+    "BOSS_DEVOUR_LIFE_POWER.title":  "Devour Life",
+    "BOSS_GUIDE_POWER.title":  "Guidance",
+    "BOSS_GUIDE_POWER.description":  "Whenever the Regent plays [gold]Decisions, Decisions[/gold], *you* choose which card it repeats."
 }

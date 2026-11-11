@@ -429,6 +429,8 @@ public static class CharBossEncounters
         ModelDb.Encounter<SilentBrewerBossEncounter>(),
         // 三层储君的第二套设计（无色储君 / 辉星储 50/50，用户 2026-10-28）
         ModelDb.Encounter<RegentStarBossEncounter>(),
+        // 三层储君的第三套设计「抉择储」（用户 2026-11-10）
+        ModelDb.Encounter<RegentChoiceBossEncounter>(),
         // 一层储君的第二套设计（碎屑储君 / **轰击储**，用户 2026-11-04）
         ModelDb.Encounter<RegentBombardBossEncounter>(),
     });

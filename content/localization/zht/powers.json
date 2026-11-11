@@ -73,5 +73,7 @@
     "BOSS_VOID_CALL_POWER.description":  "虛空之喚\n亡靈契約師首次打出[gold]女妖之嚎[/gold]時，所有玩家的所有卡牌獲得[gold]虛無[/gold]，直到亡靈契約師死亡。",
     "BOSS_VOID_CALL_POWER.hexText":  "亡靈契約師存活時，你的所有卡牌都擁有[gold]虛無[/gold]。",
     "BOSS_DEVOUR_LIFE_POWER.description":  "每當亡靈契約師給予負面效果時，她獲得[gold]4[/gold]點格擋。",
-    "BOSS_DEVOUR_LIFE_POWER.title":  "吞噬生命"
+    "BOSS_DEVOUR_LIFE_POWER.title":  "吞噬生命",
+    "BOSS_GUIDE_POWER.title":  "指導",
+    "BOSS_GUIDE_POWER.description":  "每當儲君打出[gold]決擇，決擇[/gold]時，由你替他選擇要被重複打出的那張牌。"
 }
