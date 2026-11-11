@@ -118,6 +118,10 @@ public static class IroncladStrikeScript
     {
         Card = card.Card, Upgraded = card.Upgraded, From = card.From,
         HellraiserFree = true, CostThisTurn = 0,
+        // ★ 2026-11-11（用户：「打击战的完美打击**确实都**附魔王室认证」）：
+        //   以前只复制 Card / Upgraded / From，把 `EnchantRoyallyApproved` 丢了 ⇒
+        //   第 6~9 回合被「地狱狂徒」免费打出的那张完美打击没有附魔、卡面也不显示。
+        EnchantRoyallyApproved = card.EnchantRoyallyApproved,
     };
 
     private static BossTurn Turn(string note, int turnIndex, params ScriptCard[] cards)

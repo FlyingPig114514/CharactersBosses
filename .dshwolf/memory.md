@@ -5153,3 +5153,9 @@ Chronological action log.
 | 2026-11-11 17:06 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/.tmp/fill_sheet.py` | ok | 0 |
 | 2026-11-11 17:06 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/.tmp/fill_data.json` | ok | 0 |
 | 2026-11-11 17:07 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/boss-table-check-2026-11-11.md` | ok | 0 |
+| 2026-11-11 17:46 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/IroncladStrikeScript.cs` | error | 0 |
+| 2026-11-11 17:46 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/DefectRainbowScript.cs` | error | 0 |
+| 2026-11-11 17:46 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/DefectRainbowScript.cs` | ok | 0 |
+| 2026-11-11 17:46 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/IroncladStrikeScript.cs` | ok | 0 |
+| 2026-11-11 17:47 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-11 17:48 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/boss-table-check-2026-11-11.md` | ok | 0 |

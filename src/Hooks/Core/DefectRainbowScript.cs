@@ -89,17 +89,15 @@ public static class DefectRainbowScript
             },
 
             // 8：彩虹+(2) + 聚变(1) + 玻璃工艺(1) = 4 费（正好花完）
-            //   ★ 这一张「彩虹+」会踩到「节拍器」的第 5 颗球 ⇒ 额外 30 点**无来源**群伤
-            //   （`Metronome`：`AfterOrbChanneled` 里计数到 `OrbCount` 就
-            //    `CreatureCmd.Damage(..., ValueProp.Unpowered, ...)` 打全体）。
-            //   ⏳ 意图上那条 30 还没画（待办：需要改手牌栏的逐张意图渲染）。
+            // ★ 2026-11-11（用户：「彩虹机第八回合不应该再有 30 点群伤」）：
+            //   节拍器（`Metronome`）早已从她的遗物里移除 ⇒ 这里的 `ExtraAoe = 30` 一并去掉，
+            //   手牌栏不再在那张彩虹下面标「30 无来源群伤」。
             new BossTurn
             {
-                Note = "8. 彩虹+、聚变、玻璃工艺（这张彩虹会触发节拍器：额外 30 无来源群伤）",
+                Note = "8. 彩虹+、聚变、玻璃工艺",
                 Cards = new List<ScriptCard>
                 {
-                    // ExtraAoe = 30 ⇒ 手牌栏会在这张牌下面标一条「30 无来源群伤」（用户 2026-11-07）
-                    new() { Card = typeof(Rainbow), Upgraded = true, From = "deck", ExtraAoe = 30 },
+                    new() { Card = typeof(Rainbow), Upgraded = true, From = "deck" },
                     C<Fusion>(true), C<Glasswork>(),
                 },
                 Energy = TurnEnergy,
