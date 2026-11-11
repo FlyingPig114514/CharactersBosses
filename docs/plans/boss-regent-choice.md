@@ -155,6 +155,17 @@ T2 大爆炸/辉光/收集光辉 各 +1 ⇒ 3 … T5 累积到 7，付 6 ⇒ 1
 3. **震荡波附魔「灵魂之力」**：用户「震荡波具有消耗，给它附魔灵魂之力」
    —— 反编译确认 `Shockwave.CanonicalKeywords` 就是 `Exhaust` ⇒ 附魔合法（`SoulsPower` 去掉消耗）。
    候选那张与第 12 回合那张都加了。
+4. **选牌不许被打断**（用户：「如果我选的太慢，他的这个回合会结束并使我的下个回合开始。应该让储君的这张牌
+   不会被提前打断，玩家选完之前所有其他进程都应该停着。也不要因为这张牌卡了很久就把它当bug（只让抉择抉择受到这些豁免）」）。
+   三个地方一起改，**只豁免 `DECISIONS_DECISIONS` 这一张**：
+   - `CharBossMonster.PlayOne` 的 5 秒 `Task.WhenAny(playTask, Task.Delay(5000))` 兜底（本来是防球动画不返回
+     把整回合挂死的）对它**不计时** ⇒ 一直 await 到玩家选完，期间她整个回合停在这一句，其它 Boss 与玩家回合
+     自然都排在后面；
+   - `StrayBossCardQueuePatch.Reap()` 在等待期间**暂停**（新增 `HoldReap`）—— 慢车道 4Hz 会调它，
+     而它把 `DECISIONS_DECISIONS` 当成「怪物打出的残留卡面」用 `RemoveCardFromQueueForCancellation` 摘掉，
+     等于提前打断她这一手（这就是「选慢一点她回合就结束了」的另一半原因）；
+   - `BossFrameTickPatch.WatchPlayQueue` 不再对它报「⚠ 出牌队列滞留」（和数据收集里
+     「玩家自己在选牌」那条豁免同一性质），所以等再久也不会被当成 bug。
 
 ## 6. 仍然待确认
 

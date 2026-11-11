@@ -385,6 +385,14 @@ public static class BossFrameTick
             string entry = "?", owner = "?", ages = $"{(age / 1_000_000.0):0.0}s";
             try { entry = card.Model?.Id.Entry ?? "?"; } catch { }
             try { owner = card.Model?.Owner?.Creature?.Name ?? "?"; } catch { }
+            // ★ 2026-11-10（用户）：「也不要因为这张牌卡了很久就把它当 bug」——
+            //   「抉择，抉择」是在等**真人玩家**选牌（玩家可能想很久），和上面那条「玩家自己在选牌」
+            //   同一性质 ⇒ **不报**（否则日志里每 3 秒一条 ⚠，还会被数据收集当成线索）。
+            if (string.Equals(entry, "DECISIONS_DECISIONS", StringComparison.Ordinal))
+            {
+                _queueSeen[card] = nowUsec;
+                continue;
+            }
             Logger.Log($"[CharBoss] ⚠ 出牌队列滞留：{entry}（拥有者 {owner}）已在队列里 {ages}" +
                        $"，队列内我们 Boss 的卡面 {alive.Count} 个 —— 若随后卡死，这一行就是线索");
             _queueSeen[card] = nowUsec;                                      // 每 3 秒最多报一次，别刷屏

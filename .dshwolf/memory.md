@@ -5081,3 +5081,11 @@ Chronological action log.
 | 2026-11-11 13:33 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/CharacterBosses.json` | ok | 0 |
 | 2026-11-11 13:33 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BuildInfo.cs` | ok | 0 |
 | 2026-11-11 13:33 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/boss-regent-choice.md` | ok | 0 |
+| 2026-11-11 13:38 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Monsters/CharBossMonster.cs` | ok | 0 |
+| 2026-11-11 13:38 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Patches/BossFrameTickPatch.cs` | ok | 0 |
+| 2026-11-11 13:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Patches/StrayBossCardQueuePatch.cs` | ok | 0 |
+| 2026-11-11 13:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Patches/StrayBossCardQueuePatch.cs` | ok | 0 |
+| 2026-11-11 13:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Monsters/CharBossMonster.cs` | ok | 0 |
+| 2026-11-11 13:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/CharacterBosses.json` | ok | 0 |
+| 2026-11-11 13:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-11 13:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/boss-regent-choice.md` | ok | 0 |

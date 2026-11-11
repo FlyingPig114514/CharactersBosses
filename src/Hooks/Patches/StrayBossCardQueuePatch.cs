@@ -44,6 +44,12 @@ internal static class StrayBossCardQueuePatch
     private static int _removed;
 
     /// <summary>
+    /// 暂停 <see cref="Reap"/>（「抉择，抉择」在等玩家选牌期间由 <c>CharBossMonster.PlayOne</c> 置上）。
+    /// 只影响这一个时间窗，其它时候照旧收她的卡面。
+    /// </summary>
+    internal static bool HoldReap;
+
+    /// <summary>
     /// 把「属于我们 Boss 的、挂在出牌队列里的卡面」**真的移出队列**（幂等，随便调）。
     ///
     /// ⚠ 2026-10-29 第二版（用户实测：多人「前两回合还好，第三回合明显变长」，
@@ -60,6 +66,11 @@ internal static class StrayBossCardQueuePatch
     /// </summary>
     internal static void Reap()
     {
+        // ★ 2026-11-10（用户）：「抉择，抉择」正在**等真人玩家选牌**时，这张牌合法地挂在出牌队列上
+        //   （和玩家自己打「生存者」等选择完全同一性质）。这段时间里一律**不动队列** ——
+        //   慢车道 4Hz 会调到这里，而 `RemoveCardFromQueueForCancellation` 会把正在执行的卡面
+        //   从队列里摘掉，等于把她这一手提前打断 ⇒ 表现为「我选慢一点，她的回合就结束了」。
+        if (HoldReap) return;
         try
         {
             var queue = NCardPlayQueue.Instance;

@@ -1723,10 +1723,38 @@ public abstract partial class CharBossMonster : MonsterModel
                            Patches.HittableEnemiesSidePatch.SideFlipState());
             }
             catch { /* 忽略 */ }
-            var finished = await Task.WhenAny(playTask, Task.Delay(5000));
-            if (!ReferenceEquals(finished, playTask))
+            // ★ 2026-11-10（用户）：**「抉择，抉择」享有豁免** ——
+            //   「如果我选的太慢，他的这个回合会结束并使我的下个回合开始。应该让储君的这张牌不会被提前打断，
+            //     玩家选完之前所有其他进程都应该停着。也不要因为这张牌卡了很久就把它当bug。」
+            //   原因就在下面那个 5 秒兜底：它本来是防「球的动画/音效不返回把整回合挂死」的，
+            //   而这张牌是**在等真人玩家选牌**（可能选很久）⇒ 一超时就把她这一手跳过、于是她回合结束、
+            //   玩家的下个回合直接开始。这里对它**不再计时**：一直 await 到玩家选完为止
+            //   （期间她整个回合都停在这一句，其它 Boss / 玩家回合自然都排在后面）。
+            bool waitsForPlayerChoice = false;
+            try
             {
-                Logger.Log($"[CharBoss] PLAY {play.Card.Id.Entry} 超时(5s)，跳过继续");
+                waitsForPlayerChoice = SafeEntryOf(play.Card) == "DECISIONS_DECISIONS"
+                                       && Core.ChoiceRegent.IsChoiceBoss(this);
+            }
+            catch { waitsForPlayerChoice = false; }
+
+            if (waitsForPlayerChoice)
+            {
+                Logger.Log("[CharBoss] 抉择：这张牌要等玩家选完 ⇒ **不计超时**（玩家没选完之前她这一手不会往下走）");
+                // 同时**暂停「出牌队列收卡面」**（慢车道 4Hz 也会调它，而它会把正在执行的卡面从队列里摘掉
+                // ⇒ 等于把她这一手提前打断，用户实测「选慢一点她回合就结束了」）。
+                Patches.StrayBossCardQueuePatch.HoldReap = true;
+                try { await playTask; }
+                finally { Patches.StrayBossCardQueuePatch.HoldReap = false; }
+                Logger.Log("[CharBoss] 抉择：玩家选完了 ⇒ 继续结算这张牌");
+            }
+            else
+            {
+                var finished = await Task.WhenAny(playTask, Task.Delay(5000));
+                if (!ReferenceEquals(finished, playTask))
+                {
+                    Logger.Log($"[CharBoss] PLAY {play.Card.Id.Entry} 超时(5s)，跳过继续");
+                }
             }
 
             try { await Patches.SneakyOnBossAttack.EnsureGrantedAsync(this, play.Card, sneakyBefore, sneakyAmount); }
