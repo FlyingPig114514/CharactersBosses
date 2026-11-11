@@ -1760,6 +1760,42 @@ public abstract partial class CharBossMonster : MonsterModel
             try { await Patches.SneakyOnBossAttack.EnsureGrantedAsync(this, play.Card, sneakyBefore, sneakyAmount); }
             catch { /* 忽略：绝不影响出牌 */ }
 
+            // ★ 2026-11-10（用户：「怎么感觉铸造有问题？」）：把**每一次铸造**和**铸完之后的剑伤**记一行。
+            //   君王之剑的伤害 = 10（卡面基础）+ 本场所有铸造之和，用户能直接拿日志对账：
+            //   例如 A9 的「淬炼刀刃」升级后铸 12（不是 8）、「大爆炸」铸 5、「击剑指南」战斗开始铸 10。
+            try
+            {
+                int forgedNow = 0;
+                try
+                {
+                    if (play.Card.DynamicVars.TryGetValue("Forge", out var forgeVar) && forgeVar != null)
+                        forgedNow = Math.Max(0, (int)Math.Round((double)forgeVar.BaseValue));
+                }
+                catch { forgedNow = 0; }
+                if (forgedNow > 0)
+                {
+                    string bladeNow = "?";
+                    try
+                    {
+                        foreach (var pile in pcs.AllPiles)
+                        {
+                            if (pile == null) continue;
+                            foreach (var c in pile.Cards)
+                            {
+                                if (c is not MegaCrit.Sts2.Core.Models.Cards.SovereignBlade) continue;
+                                if (c.DynamicVars.TryGetValue("Damage", out var dv) && dv != null)
+                                    bladeNow = dv.BaseValue.ToString("0");
+                                break;
+                            }
+                        }
+                    }
+                    catch { bladeNow = "?"; }
+                    Logger.Log($"[CharBoss] 铸造：{play.Card.Id.Entry}（升级={play.Card.IsUpgraded}）铸了 {forgedNow}" +
+                               $" ⇒ 君王之剑当前伤害 {bladeNow}（= 卡面 10 + 本场铸造之和）");
+                }
+            }
+            catch { /* 纯诊断 */ }
+
             // 原版出牌队列会把「怪物打出的牌」当成远程玩家出牌挂一张卡面在屏幕中上方，且没人收走
             // ⇒ 打完之后立刻扫一遍把它藏掉（慢车道 4Hz 只是兜底，见 StrayBossCardQueuePatch）。
             try { Patches.StrayBossCardQueuePatch.Reap(); } catch { /* 忽略 */ }
