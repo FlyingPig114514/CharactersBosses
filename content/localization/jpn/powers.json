@@ -71,5 +71,9 @@
     "BOSS_DEVOUR_LIFE_POWER.description":  "Whenever the Necrobinder applies a debuff, she gains [gold]4[/gold] Block.",
     "BOSS_DEVOUR_LIFE_POWER.title":  "Devour Life",
     "BOSS_GUIDE_POWER.title":  "Guidance",
-    "BOSS_GUIDE_POWER.description":  "Whenever the Regent plays [gold]Decisions, Decisions[/gold], *you* choose which card it repeats."
+    "BOSS_GUIDE_POWER.description":  "Whenever the Regent plays [gold]Decisions, Decisions[/gold], *you* choose which card it repeats.",
+    "BOSS_BASH_POWER.title":  "強打",
+    "BOSS_BASH_POWER.description":  "名前のストライクを含むカードも、アイアンクラッドの[gold]パーフェクトストライク[/gold]のダメージを増やす。名前のストライクを含むカードをプレイするたびに、アイアンクラッドの[gold]パーフェクトストライク[/gold]はそうしたカード1枚分のボーナスを失う。",
+    "BOSS_SNAKE_FORM_POWER.title":  "蛇体形態",
+    "BOSS_SNAKE_FORM_POWER.description":  "[gold]サイレント[/gold]の手札の枚数に上限はない。\nあなたか[gold]サイレント[/gold]が山札を切るたび、その人物の山札に[gold]蛇の噛みつき[/gold]1枚を切り混ぜる。"
 }

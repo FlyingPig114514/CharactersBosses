@@ -71,5 +71,9 @@
     "BOSS_DEVOUR_LIFE_POWER.description":  "Whenever the Necrobinder applies a debuff, she gains [gold]4[/gold] Block.",
     "BOSS_DEVOUR_LIFE_POWER.title":  "Devour Life",
     "BOSS_GUIDE_POWER.title":  "Guidance",
-    "BOSS_GUIDE_POWER.description":  "Whenever the Regent plays [gold]Decisions, Decisions[/gold], *you* choose which card it repeats."
+    "BOSS_GUIDE_POWER.description":  "Whenever the Regent plays [gold]Decisions, Decisions[/gold], *you* choose which card it repeats.",
+    "BOSS_BASH_POWER.title":  "Grzmotnięcie",
+    "BOSS_BASH_POWER.description":  "Karty w twojej talii, których nazwa zawiera «Uderzenie», również zwiększają obrażenia [gold]Perfekcyjnego uderzenia[/gold] Pancernika. Za każdym razem, gdy zagrasz kartę, której nazwa zawiera «Uderzenie», [gold]Perfekcyjne uderzenie[/gold] traci bonus jednej takiej karty.",
+    "BOSS_SNAKE_FORM_POWER.title":  "Wężowa postać",
+    "BOSS_SNAKE_FORM_POWER.description":  "Liczba kart na ręce [gold]Zjawy[/gold] nie ma limitu.\nZa każdym razem, gdy ty lub [gold]Zjawa[/gold] tasujecie, ta osoba wtasowuje [gold]Plucie jadem[/gold] do swojej talii do dobierania."
 }

@@ -71,5 +71,9 @@
     "BOSS_DEVOUR_LIFE_POWER.description":  "Whenever the Necrobinder applies a debuff, she gains [gold]4[/gold] Block.",
     "BOSS_DEVOUR_LIFE_POWER.title":  "Devour Life",
     "BOSS_GUIDE_POWER.title":  "Guidance",
-    "BOSS_GUIDE_POWER.description":  "Whenever the Regent plays [gold]Decisions, Decisions[/gold], *you* choose which card it repeats."
+    "BOSS_GUIDE_POWER.description":  "Whenever the Regent plays [gold]Decisions, Decisions[/gold], *you* choose which card it repeats.",
+    "BOSS_BASH_POWER.title":  "ทุบตี",
+    "BOSS_BASH_POWER.description":  "การ์ดในกองของคุณที่มีชื่อมีคำว่า «จู่โจม» จะเพิ่มความเสียหายของ [gold]จู่โจมสมบูรณ์แบบ[/gold] ของ[gold]นักรบเกราะเหล็ก[/gold] ด้วย ทุกครั้งที่คุณเล่นการ์ดที่มีชื่อมีคำว่า «จู่โจม» [gold]จู่โจมสมบูรณ์แบบ[/gold] จะเสียโบนัสจากการ์ดนั้นหนึ่งใบ",
+    "BOSS_SNAKE_FORM_POWER.title":  "ร่างงู",
+    "BOSS_SNAKE_FORM_POWER.description":  "จำนวนการ์ดบนมือของ[gold]นักฆ่าแห่งความเงียบ[/gold] ไม่มีขีดจำกัด\nทุกครั้งที่คุณหรือ[gold]นักฆ่าแห่งความเงียบ[/gold]สับกองการ์ด ผู้นั้นจะสับ [gold]Snakebite[/gold] หนึ่งใบเข้าสู่กองจั่วของตนเอง"
 }

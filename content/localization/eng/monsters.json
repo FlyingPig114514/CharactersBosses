@@ -48,7 +48,7 @@
     "MINION_DIVE_BOMB_MONSTER.title":  "Dive Bomb Minion",
     "MINION_DIVE_BOMB_MONSTER.name":  "Dive Bomb Minion",
     "MINION_STRIKE_MONSTER.name":  "Strike Minion",
-    "IRONCLAD_BOSS.bash":  "Bash\\nCards in your deck whose name contains \"Strike\" also increase the Ironclad\u0027s Perfected Strike damage. Each time you play a card whose name contains \"Strike\", the Ironclad\u0027s Perfected Strike loses the bonus of one such card.",
+    "IRONCLAD_BOSS.bash":  "Bash\nCards in your deck whose name contains «Strike» also increase the Ironclad's [gold]Perfected Strike[/gold] damage. Each time you play a card whose name contains «Strike», the Ironclad's [gold]Perfected Strike[/gold] loses the bonus of one such card.",
     "SILENT_SLY_BOSS.name":  "Sly Hunter",
     "SILENT_SLY_BOSS.title":  "Sly Hunter",
     "SILENT_SLY_BOSS.moves.CHARBOSS_PLAY.title":  "Play",
@@ -145,5 +145,15 @@
     "SILENT_BOSS.suppression":  "Suppression\nWhenever the Silent plays [gold]Grand Finale[/gold], put a [gold]Void[/gold] on top of every player's draw pile.",
     "NECROBINDER_BOSS.void_call":  "Call of the Void\nWhen the Necrobinder plays [gold]Banshee\u0027s Cry[/gold] for the first time, all of your cards gain [gold]Ethereal[/gold] until the Necrobinder dies.",
     "NECROBINDER_BOSS.devour_life":  "Devour Life\nWhenever the Necrobinder applies a debuff, she gains [gold]4[/gold] Block.\n[red]Warning: [/red][gold]Sleight of Flesh[/gold] deals unpowered damage: summons with [gold]Die for You[/gold] will not absorb it for you.",
-    "REGENT_BOSS.guide":  "Guidance\nWhenever the Regent plays [gold]Decisions, Decisions[/gold], *you* choose which card it repeats.\nIn multiplayer the locked-on player chooses, and he only plays the rest of his cards afterwards."
+    "REGENT_BOSS.guide":  "Guidance\nWhenever the Regent plays [gold]Decisions, Decisions[/gold], *you* choose which card it repeats.\nIn multiplayer the locked-on player chooses, and he only plays the rest of his cards afterwards.",
+    "NECROBINDER_FLESH_BOSS.name":  "Flesh Necrobinder",
+    "NECROBINDER_FLESH_BOSS.title":  "Flesh Necrobinder",
+    "NECROBINDER_FLESH_BOSS.moves.CHARBOSS_PLAY.title":  "Play",
+    "NECROBINDER_ETHEREAL_BOSS.name":  "Ethereal Necrobinder",
+    "NECROBINDER_ETHEREAL_BOSS.title":  "Ethereal Necrobinder",
+    "NECROBINDER_ETHEREAL_BOSS.moves.CHARBOSS_PLAY.title":  "Play",
+    "REGENT_CHOICE_BOSS.name":  "Choice Regent",
+    "REGENT_CHOICE_BOSS.title":  "Choice Regent",
+    "REGENT_CHOICE_BOSS.moves.CHARBOSS_PLAY.title":  "Play",
+    "SILENT_BOSS.snake_form":  "Serpent Form\nThere is no limit to the Silent's hand size.\nWhenever you or the Silent shuffle, that player shuffles a [gold]Snakebite[/gold] into their draw pile."
 }

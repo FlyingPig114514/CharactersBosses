@@ -71,5 +71,9 @@
     "BOSS_DEVOUR_LIFE_POWER.description":  "Whenever the Necrobinder applies a debuff, she gains [gold]4[/gold] Block.",
     "BOSS_DEVOUR_LIFE_POWER.title":  "Devour Life",
     "BOSS_GUIDE_POWER.title":  "Guidance",
-    "BOSS_GUIDE_POWER.description":  "Whenever the Regent plays [gold]Decisions, Decisions[/gold], *you* choose which card it repeats."
+    "BOSS_GUIDE_POWER.description":  "Whenever the Regent plays [gold]Decisions, Decisions[/gold], *you* choose which card it repeats.",
+    "BOSS_BASH_POWER.title":  "Esmagar",
+    "BOSS_BASH_POWER.description":  "Cartas do seu baralho cujo nome contenha «Golpe» também aumentam o dano do [gold]Golpe Aperfeiçoado[/gold] de O Rígido. Sempre que você jogar uma carta cujo nome contenha «Golpe», o [gold]Golpe Aperfeiçoado[/gold] perde o bônus de uma dessas cartas.",
+    "BOSS_SNAKE_FORM_POWER.title":  "Forma Serpentina",
+    "BOSS_SNAKE_FORM_POWER.description":  "Não há limite para o tamanho da mão de [gold]A Sorrateira[/gold].\nSempre que você ou [gold]A Sorrateira[/gold] embaralhar, essa pessoa embaralha uma [gold]Mordida de Serpente[/gold] no próprio monte de compra."
 }

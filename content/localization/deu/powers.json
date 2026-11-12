@@ -71,5 +71,9 @@
     "BOSS_DEVOUR_LIFE_POWER.description":  "Whenever the Necrobinder applies a debuff, she gains [gold]4[/gold] Block.",
     "BOSS_DEVOUR_LIFE_POWER.title":  "Devour Life",
     "BOSS_GUIDE_POWER.title":  "Guidance",
-    "BOSS_GUIDE_POWER.description":  "Whenever the Regent plays [gold]Decisions, Decisions[/gold], *you* choose which card it repeats."
+    "BOSS_GUIDE_POWER.description":  "Whenever the Regent plays [gold]Decisions, Decisions[/gold], *you* choose which card it repeats.",
+    "BOSS_BASH_POWER.title":  "Schmettern",
+    "BOSS_BASH_POWER.description":  "Karten in deinem Deck, deren Name «Schlag» enthält, erhöhen auch den Schaden von [gold]Perfekter Schlag[/gold] des Eisernen. Jedes Mal, wenn du eine Karte spielst, deren Name «Schlag» enthält, verliert der [gold]Perfekte Schlag[/gold] des Eisernen den Bonus einer solchen Karte.",
+    "BOSS_SNAKE_FORM_POWER.title":  "Schlangenform",
+    "BOSS_SNAKE_FORM_POWER.description":  "Für die Handgröße der [gold]Stillen[/gold] gibt es kein Limit.\nImmer wenn du oder die [gold]Stille[/gold] mischt, mischt diese Person einen [gold]Schlangenbiss[/gold] in ihren Nachziehstapel."
 }

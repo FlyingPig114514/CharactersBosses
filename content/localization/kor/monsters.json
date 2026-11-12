@@ -41,7 +41,7 @@
     "REGENT_BOSS.orbital":  "Orbital Bombardment\nAt the start of combat, you gain 1 stack of [gold]Spectrum Shift[/gold].\nThe Regent is Stunned on turn 1, plays 1 [gold]Bombardment[/gold] on turn 2, and is Stunned again after that.\nAfter 5 turns in which you played a colorless card, the Regent wakes up — and [gold]Bombardment[/gold] turns around and starts hitting the Regent himself.",
     "REGENT_BOSS.minion":  "Call to Arms\nWhenever the Regent plays a Minion card, if he has fewer than 2 Minions, summon the matching Minion instead.\nWhenever the Regent gains Strength from a card, his other allies gain the same amount.",
     "DEFECT_BOSS.thunder":  "Lightning Rod\nEvery time you play 3 cards in a turn, the Defect loses 1 Focus this turn (1 per 3 cards, restored at end of turn).",
-    "DEFECT_BOSS.rainbow":  "디펙트가 구체를 5개 집중시킬 때마다 집중을 1 얻습니다. 그 암흑 구체는 수동 효과를 발동하지 않습니다.\n경고: 유리 구체는 출처 없는 피해를 줍니다. «너를 위해 죽는다» 소환물이 대신 받지 못합니다.",
+    "DEFECT_BOSS.rainbow":  "무지개\n디펙트가 구체를 5개 집중시킬 때마다 집중을 1 얻습니다. 그 암흑 구체는 수동 효과를 발동하지 않습니다.\n경고: 유리 구체는 출처 없는 피해를 줍니다. «너를 위해 죽는다» 소환물이 대신 받지 못합니다.",
     "MINION_STRIKE_MONSTER.title":  "Strike Minion",
     "MINION_SACRIFICE_MONSTER.title":  "Sacrifice Minion",
     "MINION_SACRIFICE_MONSTER.name":  "Sacrifice Minion",
@@ -144,5 +144,16 @@
     "SILENT_BOSS.suppression":  "Suppression\nWhenever the Silent plays [gold]Grand Finale[/gold], put a [gold]Void[/gold] on top of every player's draw pile.",
     "NECROBINDER_BOSS.void_call":  "Call of the Void\nWhen the Necrobinder plays [gold]Banshee\u0027s Cry[/gold] for the first time, all of your cards gain [gold]Ethereal[/gold] until the Necrobinder dies.",
     "NECROBINDER_BOSS.devour_life":  "Devour Life\nWhenever the Necrobinder applies a debuff, she gains [gold]4[/gold] Block.\n[red]Warning: [/red][gold]Sleight of Flesh[/gold] deals unpowered damage: summons with [gold]Die for You[/gold] will not absorb it for you.",
-    "REGENT_BOSS.guide":  "Guidance\nWhenever the Regent plays [gold]Decisions, Decisions[/gold], *you* choose which card it repeats.\nIn multiplayer the locked-on player chooses, and he only plays the rest of his cards afterwards."
+    "REGENT_BOSS.guide":  "Guidance\nWhenever the Regent plays [gold]Decisions, Decisions[/gold], *you* choose which card it repeats.\nIn multiplayer the locked-on player chooses, and he only plays the rest of his cards afterwards.",
+    "IRONCLAD_BOSS.bash":  "강타\n이름에 «타격»이 포함된 카드도 아이언클래드의 [gold]완벽한 타격[/gold] 피해량을 늘립니다. 이름에 «타격»이 포함된 카드를 낼 때마다 아이언클래드의 [gold]완벽한 타격[/gold]은 그 카드 한 장만큼의 보너스를 잃습니다.",
+    "NECROBINDER_FLESH_BOSS.name":  "Flesh Necrobinder",
+    "NECROBINDER_FLESH_BOSS.title":  "Flesh Necrobinder",
+    "NECROBINDER_FLESH_BOSS.moves.CHARBOSS_PLAY.title":  "Play",
+    "NECROBINDER_ETHEREAL_BOSS.name":  "Ethereal Necrobinder",
+    "NECROBINDER_ETHEREAL_BOSS.title":  "Ethereal Necrobinder",
+    "NECROBINDER_ETHEREAL_BOSS.moves.CHARBOSS_PLAY.title":  "Play",
+    "REGENT_CHOICE_BOSS.name":  "Choice Regent",
+    "REGENT_CHOICE_BOSS.title":  "Choice Regent",
+    "REGENT_CHOICE_BOSS.moves.CHARBOSS_PLAY.title":  "Play",
+    "SILENT_BOSS.snake_form":  "뱀의 형상\n[gold]사일런트[/gold]의 패 수에는 제한이 없습니다.\n당신이나 [gold]사일런트[/gold]가 카드 더미를 섞을 때마다, 그 사람의 뽑을 카드 더미에 [gold]뱀 물기[/gold] 한 장을 섞어 넣습니다."
 }

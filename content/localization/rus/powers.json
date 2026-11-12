@@ -71,5 +71,9 @@
     "BOSS_DEVOUR_LIFE_POWER.description":  "Whenever the Necrobinder applies a debuff, she gains [gold]4[/gold] Block.",
     "BOSS_DEVOUR_LIFE_POWER.title":  "Devour Life",
     "BOSS_GUIDE_POWER.title":  "Guidance",
-    "BOSS_GUIDE_POWER.description":  "Whenever the Regent plays [gold]Decisions, Decisions[/gold], *you* choose which card it repeats."
+    "BOSS_GUIDE_POWER.description":  "Whenever the Regent plays [gold]Decisions, Decisions[/gold], *you* choose which card it repeats.",
+    "BOSS_BASH_POWER.title":  "Вмятина",
+    "BOSS_BASH_POWER.description":  "Карты в вашей колоде, в названии которых есть «Удар», также увеличивают урон [gold]Отточенного удара[/gold] Латоносца. Каждый раз, когда вы разыгрываете карту с «Ударом» в названии, [gold]Отточенный удар[/gold] теряет бонус одной такой карты.",
+    "BOSS_SNAKE_FORM_POWER.title":  "Змеиная форма",
+    "BOSS_SNAKE_FORM_POWER.description":  "Ограничения на размер руки у [gold]Безмолвной[/gold] нет.\nКаждый раз, когда вы или [gold]Безмолвная[/gold] тасуете колоду, этот игрок замешивает [gold]Змеиный укус[/gold] в свою колоду добора."
 }

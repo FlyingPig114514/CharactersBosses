@@ -71,5 +71,9 @@
     "BOSS_DEVOUR_LIFE_POWER.description":  "Whenever the Necrobinder applies a debuff, she gains [gold]4[/gold] Block.",
     "BOSS_DEVOUR_LIFE_POWER.title":  "Devour Life",
     "BOSS_GUIDE_POWER.title":  "Guidance",
-    "BOSS_GUIDE_POWER.description":  "Whenever the Regent plays [gold]Decisions, Decisions[/gold], *you* choose which card it repeats."
+    "BOSS_GUIDE_POWER.description":  "Whenever the Regent plays [gold]Decisions, Decisions[/gold], *you* choose which card it repeats.",
+    "BOSS_BASH_POWER.title":  "Remuk",
+    "BOSS_BASH_POWER.description":  "Kartu di dekmu yang namanya mengandung «Tebas» juga menambah kerusakan [gold]Tebasan Sempurna[/gold] Si Ironclad. Setiap kali kamu memainkan kartu yang namanya mengandung «Tebas», [gold]Tebasan Sempurna[/gold] kehilangan bonus dari satu kartu tersebut.",
+    "BOSS_SNAKE_FORM_POWER.title":  "Bentuk Ular",
+    "BOSS_SNAKE_FORM_POWER.description":  "Tidak ada batas jumlah kartu di tangan [gold]Si Silent[/gold].\nSetiap kali kamu atau [gold]Si Silent[/gold] mengocok, orang itu mengocok satu [gold]Gigitan Ular[/gold] ke tumpukan tarikannya."
 }

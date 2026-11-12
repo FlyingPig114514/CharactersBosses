@@ -71,5 +71,9 @@
     "BOSS_DEVOUR_LIFE_POWER.description":  "Whenever the Necrobinder applies a debuff, she gains [gold]4[/gold] Block.",
     "BOSS_DEVOUR_LIFE_POWER.title":  "Devour Life",
     "BOSS_GUIDE_POWER.title":  "Guidance",
-    "BOSS_GUIDE_POWER.description":  "Whenever the Regent plays [gold]Decisions, Decisions[/gold], *you* choose which card it repeats."
+    "BOSS_GUIDE_POWER.description":  "Whenever the Regent plays [gold]Decisions, Decisions[/gold], *you* choose which card it repeats.",
+    "BOSS_BASH_POWER.title":  "Mazzata",
+    "BOSS_BASH_POWER.description":  "Le carte nel tuo mazzo il cui nome contiene «Colpo» aumentano anche i danni del [gold]Colpo Perfetto[/gold] dell'Ironclad. Ogni volta che giochi una carta il cui nome contiene «Colpo», il [gold]Colpo Perfetto[/gold] perde il bonus di una di quelle carte.",
+    "BOSS_SNAKE_FORM_POWER.title":  "Forma Serpentina",
+    "BOSS_SNAKE_FORM_POWER.description":  "Non c'è limite alla dimensione della mano del [gold]Silent[/gold].\nOgni volta che tu o il [gold]Silent[/gold] rimescolate, quella persona rimescola un [gold]Morso Viperino[/gold] nel proprio mazzo di pesca."
 }

@@ -5213,3 +5213,14 @@ Chronological action log.
 | 2026-11-11 22:33 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/workshop/changenote.txt` | ok | 0 |
 | 2026-11-12 08:34 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/.tmp/fix_encounter_titles.ps1` | ok | 0 |
 | 2026-11-12 08:47 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Patches/RunHistoryBossVariantPatch.cs` | ok | 0 |
+| 2026-11-12 08:51 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/rules.md` | ok | 0 |
+| 2026-11-12 08:52 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/workshop/changenote.txt` | ok | 0 |
+| 2026-11-12 10:55 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Encounters/CharBossEncounters.cs` | ok | 0 |
+| 2026-11-12 11:01 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/.tmp/audit_boss_registries.ps1` | ok | 0 |
+| 2026-11-12 11:01 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/.tmp/audit_boss2.ps1` | ok | 0 |
+| 2026-11-12 11:02 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/.tmp/audit_boss3.ps1` | ok | 0 |
+| 2026-11-12 11:02 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/.tmp/audit_boss4.ps1` | ok | 0 |
+| 2026-11-12 11:06 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/.tmp/boss_loc_fill.json` | ok | 0 |
+| 2026-11-12 11:06 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/.tmp/apply_boss_loc_fill.ps1` | ok | 0 |
+| 2026-11-12 11:07 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/.tmp/boss_loc_fill2.json` | ok | 0 |
+| 2026-11-12 11:10 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/workshop/changenote.txt` | ok | 0 |

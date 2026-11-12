@@ -433,6 +433,16 @@ public static class CharBossEncounters
         ModelDb.Encounter<RegentChoiceBossEncounter>(),
         // 一层储君的第二套设计（碎屑储君 / **轰击储**，用户 2026-11-04）
         ModelDb.Encounter<RegentBombardBossEncounter>(),
+        // ★ v0.2.582（用户 2026-11-11：「第二个 boss 有可能显示原版的 boss 图标…这个 boss 是华丽猎，
+        //   是不是还有新 boss 也是这样？」）：下面这三个遭遇**类早就存在**、`BossKeys.EncounterOf`
+        //   也认得它们，但一直**漏登记在这张表里**。后果不是「打不出来」，而是**图标**：
+        //   `OurEncounterIconPaths.IsOurEncounter()` 就是遍历这张表建白名单的 ⇒ 这三只被判成
+        //   「不是我们的遭遇」⇒ `Patches/BossMapPointCharacterIconPatch` 直接 return（地图徽章保持
+        //   原版 TheKinBoss 占位图，看着就是「原版的 boss 图标」），`EncounterIconPathPatch.Fix`
+        //   也不接管（顶栏/结算/历史那几处同理）。
+        ModelDb.Encounter<SilentGrandFinaleBossEncounter>(),   // 三层猎人 3 号：华丽猎（用户 2026-11-09）
+        ModelDb.Encounter<NecrobinderFleshBossEncounter>(),    // 一层亡灵 2 号：血肉骨（用户 2026-11-10）
+        ModelDb.Encounter<NecrobinderEtherealBossEncounter>(), // 二层亡灵 2 号：虚无骨（用户 2026-11-09）
     });
 
     /// <summary>

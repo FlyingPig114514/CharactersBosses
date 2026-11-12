@@ -71,5 +71,9 @@
     "BOSS_DEVOUR_LIFE_POWER.description":  "Whenever the Necrobinder applies a debuff, she gains [gold]4[/gold] Block.",
     "BOSS_DEVOUR_LIFE_POWER.title":  "Devour Life",
     "BOSS_GUIDE_POWER.title":  "Guidance",
-    "BOSS_GUIDE_POWER.description":  "Whenever the Regent plays [gold]Decisions, Decisions[/gold], *you* choose which card it repeats."
+    "BOSS_GUIDE_POWER.description":  "Whenever the Regent plays [gold]Decisions, Decisions[/gold], *you* choose which card it repeats.",
+    "BOSS_BASH_POWER.title":  "Göçertme",
+    "BOSS_BASH_POWER.description":  "Adında «Saldırı» geçen destendeki kartlar da [gold]Demirkaplı[/gold]'nın [gold]Kusursuz Saldırı[/gold] hasarını artırır. Adında «Saldırı» geçen bir kart oynadığında [gold]Kusursuz Saldırı[/gold] o kartlardan birinin bonusunu kaybeder.",
+    "BOSS_SNAKE_FORM_POWER.title":  "Yılan Formu",
+    "BOSS_SNAKE_FORM_POWER.description":  "[gold]Sessiz[/gold]'in elindeki kart sayısının bir sınırı yok.\nSen ya da [gold]Sessiz[/gold] desteyi her karıştırdığında, o kişi kendi çekme destesine bir [gold]Yılan Isırığı[/gold] karıştırır."
 }

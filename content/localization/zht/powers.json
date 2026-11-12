@@ -66,7 +66,7 @@
     "BOSS_BASH_POWER.title":  "痛擊",
     "BOSS_BASH_POWER.description":  "你的名字中包含打擊的牌也會增加鐵甲戰士的完美打擊的傷害。每當你打出名字中包含打擊的牌時，鐵甲戰士的完美打擊的傷害就少受一張名字中包含打擊的牌的加成。",
     "BOSS_SNAKE_FORM_POWER.title":  "群蛇形態",
-    "BOSS_SNAKE_FORM_POWER.description":  "靜默獵手的手牌數沒有上限。每當你或靜默獵手洗牌時，將一張蛇咬洗入自己的抽牌堆。",
+    "BOSS_SNAKE_FORM_POWER.description":  "靜默獵手的手牌數沒有上限。\n每當你或靜默獵手洗牌時，將一張[gold]蛇咬[/gold]洗入自己的抽牌堆。",
     "BOSS_SUPPRESSION_POWER.title":  "壓制",
     "BOSS_SUPPRESSION_POWER.description":  "每當靜默獵手打出[gold]華麗收場[/gold]時，將一張[gold]虛空[/gold]放入所有玩家的抽牌堆頂部。",
     "BOSS_VOID_CALL_POWER.title":  "虛空之喚",

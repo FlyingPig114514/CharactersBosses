@@ -71,5 +71,9 @@
     "BOSS_DEVOUR_LIFE_POWER.description":  "Whenever the Necrobinder applies a debuff, she gains [gold]4[/gold] Block.",
     "BOSS_DEVOUR_LIFE_POWER.title":  "Devour Life",
     "BOSS_GUIDE_POWER.title":  "Guidance",
-    "BOSS_GUIDE_POWER.description":  "Whenever the Regent plays [gold]Decisions, Decisions[/gold], *you* choose which card it repeats."
+    "BOSS_GUIDE_POWER.description":  "Whenever the Regent plays [gold]Decisions, Decisions[/gold], *you* choose which card it repeats.",
+    "BOSS_BASH_POWER.title":  "강타",
+    "BOSS_BASH_POWER.description":  "이름에 «타격»이 포함된 카드도 아이언클래드의 [gold]완벽한 타격[/gold] 피해량을 늘립니다. 이름에 «타격»이 포함된 카드를 낼 때마다 아이언클래드의 [gold]완벽한 타격[/gold]은 그 카드 한 장만큼의 보너스를 잃습니다.",
+    "BOSS_SNAKE_FORM_POWER.title":  "뱀의 형상",
+    "BOSS_SNAKE_FORM_POWER.description":  "[gold]사일런트[/gold]의 패 수에는 제한이 없습니다.\n당신이나 [gold]사일런트[/gold]가 카드 더미를 섞을 때마다, 그 사람의 뽑을 카드 더미에 [gold]뱀 물기[/gold] 한 장을 섞어 넣습니다."
 }

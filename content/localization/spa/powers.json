@@ -71,5 +71,9 @@
     "BOSS_DEVOUR_LIFE_POWER.description":  "Whenever the Necrobinder applies a debuff, she gains [gold]4[/gold] Block.",
     "BOSS_DEVOUR_LIFE_POWER.title":  "Devour Life",
     "BOSS_GUIDE_POWER.title":  "Guidance",
-    "BOSS_GUIDE_POWER.description":  "Whenever the Regent plays [gold]Decisions, Decisions[/gold], *you* choose which card it repeats."
+    "BOSS_GUIDE_POWER.description":  "Whenever the Regent plays [gold]Decisions, Decisions[/gold], *you* choose which card it repeats.",
+    "BOSS_BASH_POWER.title":  "Porrazo",
+    "BOSS_BASH_POWER.description":  "Las cartas de tu mazo cuyo nombre contenga «Golpe» también aumentan el daño del [gold]Golpe perfeccionado[/gold] de El Blindado. Cada vez que juegues una carta cuyo nombre contenga «Golpe», el [gold]Golpe perfeccionado[/gold] pierde el bono de una de esas cartas.",
+    "BOSS_SNAKE_FORM_POWER.title":  "Forma serpentina",
+    "BOSS_SNAKE_FORM_POWER.description":  "No hay límite para el tamaño de la mano de [gold]La Silenciosa[/gold].\nCada vez que tú o [gold]La Silenciosa[/gold] barajéis, esa persona baraja un [gold]Mordisco de serpiente[/gold] en su pila de robo."
 }

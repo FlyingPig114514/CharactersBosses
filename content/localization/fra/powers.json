@@ -71,5 +71,9 @@
     "BOSS_DEVOUR_LIFE_POWER.description":  "Whenever the Necrobinder applies a debuff, she gains [gold]4[/gold] Block.",
     "BOSS_DEVOUR_LIFE_POWER.title":  "Devour Life",
     "BOSS_GUIDE_POWER.title":  "Guidance",
-    "BOSS_GUIDE_POWER.description":  "Whenever the Regent plays [gold]Decisions, Decisions[/gold], *you* choose which card it repeats."
+    "BOSS_GUIDE_POWER.description":  "Whenever the Regent plays [gold]Decisions, Decisions[/gold], *you* choose which card it repeats.",
+    "BOSS_BASH_POWER.title":  "Heurt",
+    "BOSS_BASH_POWER.description":  "Les cartes de votre deck dont le nom contient « Frappe » augmentent aussi les dégâts de [gold]Frappe perfectionnée[/gold] du Soldat de Fer. Chaque fois que vous jouez une carte dont le nom contient « Frappe », la [gold]Frappe perfectionnée[/gold] perd le bonus d'une de ces cartes.",
+    "BOSS_SNAKE_FORM_POWER.title":  "Forme serpentine",
+    "BOSS_SNAKE_FORM_POWER.description":  "La taille de la main de [gold]La Silencieuse[/gold] n'a aucune limite.\nChaque fois que vous ou [gold]La Silencieuse[/gold] mélangez votre pioche, cette personne mélange une [gold]Morsure de serpent[/gold] dans sa pioche."
 }

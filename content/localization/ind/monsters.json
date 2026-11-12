@@ -41,7 +41,7 @@
     "REGENT_BOSS.orbital":  "Orbital Bombardment\nAt the start of combat, you gain 1 stack of [gold]Spectrum Shift[/gold].\nThe Regent is Stunned on turn 1, plays 1 [gold]Bombardment[/gold] on turn 2, and is Stunned again after that.\nAfter 5 turns in which you played a colorless card, the Regent wakes up — and [gold]Bombardment[/gold] turns around and starts hitting the Regent himself.",
     "REGENT_BOSS.minion":  "Call to Arms\nWhenever the Regent plays a Minion card, if he has fewer than 2 Minions, summon the matching Minion instead.\nWhenever the Regent gains Strength from a card, his other allies gain the same amount.",
     "DEFECT_BOSS.thunder":  "Lightning Rod\nEvery time you play 3 cards in a turn, the Defect loses 1 Focus this turn (1 per 3 cards, restored at end of turn).",
-    "DEFECT_BOSS.rainbow":  "Setiap kali Defect menyalurkan 5 orb, ia memperoleh 1 Fokus. Orb Gelap-nya tidak pernah memicu efek pasifnya.\nPERINGATAN: orb Kaca memberikan kerusakan tanpa sumber — panggilan dengan «Mati untukmu» tidak akan menyerapnya.",
+    "DEFECT_BOSS.rainbow":  "Pelangi\nSetiap kali Defect menyalurkan 5 orb, ia memperoleh 1 Fokus. Orb Gelap-nya tidak pernah memicu efek pasifnya.\nPERINGATAN: orb Kaca memberikan kerusakan tanpa sumber — panggilan dengan «Mati untukmu» tidak akan menyerapnya.",
     "MINION_STRIKE_MONSTER.title":  "Strike Minion",
     "MINION_SACRIFICE_MONSTER.title":  "Sacrifice Minion",
     "MINION_SACRIFICE_MONSTER.name":  "Sacrifice Minion",
@@ -144,5 +144,16 @@
     "SILENT_BOSS.suppression":  "Suppression\nWhenever the Silent plays [gold]Grand Finale[/gold], put a [gold]Void[/gold] on top of every player's draw pile.",
     "NECROBINDER_BOSS.void_call":  "Call of the Void\nWhen the Necrobinder plays [gold]Banshee\u0027s Cry[/gold] for the first time, all of your cards gain [gold]Ethereal[/gold] until the Necrobinder dies.",
     "NECROBINDER_BOSS.devour_life":  "Devour Life\nWhenever the Necrobinder applies a debuff, she gains [gold]4[/gold] Block.\n[red]Warning: [/red][gold]Sleight of Flesh[/gold] deals unpowered damage: summons with [gold]Die for You[/gold] will not absorb it for you.",
-    "REGENT_BOSS.guide":  "Guidance\nWhenever the Regent plays [gold]Decisions, Decisions[/gold], *you* choose which card it repeats.\nIn multiplayer the locked-on player chooses, and he only plays the rest of his cards afterwards."
+    "REGENT_BOSS.guide":  "Guidance\nWhenever the Regent plays [gold]Decisions, Decisions[/gold], *you* choose which card it repeats.\nIn multiplayer the locked-on player chooses, and he only plays the rest of his cards afterwards.",
+    "IRONCLAD_BOSS.bash":  "Remuk\nKartu di dekmu yang namanya mengandung «Tebas» juga menambah kerusakan [gold]Tebasan Sempurna[/gold] Si Ironclad. Setiap kali kamu memainkan kartu yang namanya mengandung «Tebas», [gold]Tebasan Sempurna[/gold] kehilangan bonus dari satu kartu tersebut.",
+    "NECROBINDER_FLESH_BOSS.name":  "Flesh Necrobinder",
+    "NECROBINDER_FLESH_BOSS.title":  "Flesh Necrobinder",
+    "NECROBINDER_FLESH_BOSS.moves.CHARBOSS_PLAY.title":  "Play",
+    "NECROBINDER_ETHEREAL_BOSS.name":  "Ethereal Necrobinder",
+    "NECROBINDER_ETHEREAL_BOSS.title":  "Ethereal Necrobinder",
+    "NECROBINDER_ETHEREAL_BOSS.moves.CHARBOSS_PLAY.title":  "Play",
+    "REGENT_CHOICE_BOSS.name":  "Choice Regent",
+    "REGENT_CHOICE_BOSS.title":  "Choice Regent",
+    "REGENT_CHOICE_BOSS.moves.CHARBOSS_PLAY.title":  "Play",
+    "SILENT_BOSS.snake_form":  "Bentuk Ular\nTidak ada batas jumlah kartu di tangan [gold]Si Silent[/gold].\nSetiap kali kamu atau [gold]Si Silent[/gold] mengocok, orang itu mengocok satu [gold]Gigitan Ular[/gold] ke tumpukan tarikannya."
 }
