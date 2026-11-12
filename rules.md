@@ -66,6 +66,17 @@ public static void Postfix()
 }
 ```
 
+### 8. 发布（创意工坊 / GitHub）必须等到明确指令
+- **只做被要求的发布**：用户可以只让你「改代码」「装机」「打包」，这三件都**不包含**上传。
+  上传创意工坊（`tools/upload-workshop.ps1`）和 `git push` 到 GitHub 都必须先拿到**当次的明确指令**，
+  不能从「上次让我传过」或含糊的句子（如「我不说不要上传」）里推断授权。
+- **上传前必须更新 `workshop/changenote.txt`**：那是工坊页面上显示的更新日志，
+  每次上传都要按最新版本重写（首行 `v<版本> — <一句话主题>`，正文按【新内容】/【修正】分段，
+  面向玩家、不写内部实现细节）。没写更新日志就不许上传。
+- 版本号、`BuildInfo.Tag`、`changenote.txt` 三者的版本必须一致；上传前 `pack-dist.ps1` 会自动校验
+  两份实现 DLL 的版本串。
+- 同理：`git push` 前确认要推的提交都在本机、工作区干净；推送后回读 `origin/main` 与 `HEAD` 是否一致。
+
 ## 禁止事项
 
 - 禁止修改 `ModEntry.cs` 的 `Initialize()` 方法和 `Logger` 类
