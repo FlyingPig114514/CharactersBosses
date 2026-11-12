@@ -7,7 +7,7 @@
 #   powershell -ExecutionPolicy Bypass -File tools\feishu-stats.ps1
 #   ... -ExplodeMulti                   # 多人局：每场记到它场上的每只 Boss 名下（默认只记阵容第 0 位）
 #   ... -By boss                        # 只按角色（5 个，会把奇巧猎/炼药猎/刀猎混在一起）
-#   ... -By variant+players             # 18 只 Boss 各自再按人数拆
+#   ... -By variant+players             # 34 只 Boss 各自再按人数拆
 #   ... -CleanSolo                      # 只算「单人 + 玩家用原版角色」的对局（= -SoloOnly -VanillaChars）
 #   ... -SoloOnly                       # 只算单人局
 #   ... -Players 2,3,4                  # 只算指定人数的对局（多人胜率用这个；单人写 -Players 1）
@@ -279,7 +279,7 @@ while ($true) {
 
         # ★ 变体（用户 2026-10-31：「你这是把所有的战士、猎人等不同 boss 混在一起了吗？我们目前有 18 个」）：
         #   `boss` 列只有**角色**（DEFECT_BOSS / SILENT_BOSS…，5 个），
-        #   真正的 18 只 Boss 是**变体键**：`lineup` 里逗号分隔的那串（第 0 位 = 主 Boss），
+        #   真正的 34 只 Boss 是**变体键**：`lineup` 里逗号分隔的那串（第 0 位 = 主 Boss），
         #   多人局用 `bossList`（4 只全在）。⚠ 我们自己的“阵营”写死在这两个字段里，别再指望 `boss` 列。
         $lineupKeys = @($lineup.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne '' })
         $listKeys = @(((AsText (Fld $f 'bossList')).Trim()).Split(',') |
