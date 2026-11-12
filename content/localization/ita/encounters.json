@@ -31,7 +31,7 @@
 
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "Defect",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "L'[gold]Iper-Raggio[/gold] del [gold]Defect[/gold] ha annientato {character}.",
-  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "Arcobaleno",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "Defect",
   "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "Il [gold]Defect[/gold] ha sciolto {character} nel suo [gold]Arcobaleno[/gold].",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "Necrobinder",
@@ -114,5 +114,12 @@
     "SILENT_SNAKEBITE_BOSS_ENCOUNTER.loss":  "Il [gold]Silent[/gold] ha sommerso {character} con il suo [gold]Morso Viperino[/gold].",
     "REGENT_MINION_BOSS_ENCOUNTER.loss":  "{character} è stato linciato dal [gold]Regent[/gold] e dai suoi [gold]seguaci[/gold].",
     "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.loss":  "{character} è stato l'ultimo atto del [gold]Gran Finale[/gold] del [gold]Silent[/gold].",
-    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "Il [gold]Defect[/gold] ha incenerito {character} con il suo [gold]Cannone Antiaereo[/gold], carte stato comprese."
+    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "Il [gold]Defect[/gold] ha incenerito {character} con il suo [gold]Cannone Antiaereo[/gold], carte stato comprese.",
+    "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.title":  "Silent",
+    "DEFECT_THUNDER_BOSS_ENCOUNTER.title":  "Defect",
+    "DEFECT_STATUS_BOSS_ENCOUNTER.title":  "Defect",
+    "REGENT_BOMBARD_BOSS_ENCOUNTER.title":  "Regent",
+    "REGENT_MINION_BOSS_ENCOUNTER.title":  "Regent",
+    "IRONCLAD_STRIKE_BOSS_ENCOUNTER.title":  "Ironclad",
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "Silent"
 }

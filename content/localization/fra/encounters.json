@@ -31,7 +31,7 @@
 
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "Le Défectueux",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "L'[gold]Ultralaser[/gold] du [gold]Défectueux[/gold] a anéanti {character}.",
-  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "Arc-en-ciel",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "Le Défectueux",
   "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "Le [gold]Défectueux[/gold] a fait fondre {character} dans son [gold]Arc-en-ciel[/gold].",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "La Tisse-Mort",
@@ -114,5 +114,12 @@
     "SILENT_SNAKEBITE_BOSS_ENCOUNTER.loss":  "La [gold]Silencieuse[/gold] a noyé {character} sous sa [gold]Morsure de serpent[/gold].",
     "REGENT_MINION_BOSS_ENCOUNTER.loss":  "{character} a été lynché par le [gold]Régent[/gold] et ses [gold]sbires[/gold].",
     "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.loss":  "{character} fut le dernier acte du [gold]Clou du spectacle[/gold] de la [gold]Silencieuse[/gold].",
-    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "Le [gold]Défectueux[/gold] a carbonisé {character} avec son [gold]Canon anti-aérien[/gold], cartes de statut comprises."
+    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "Le [gold]Défectueux[/gold] a carbonisé {character} avec son [gold]Canon anti-aérien[/gold], cartes de statut comprises.",
+    "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.title":  "La Silencieuse",
+    "DEFECT_THUNDER_BOSS_ENCOUNTER.title":  "Le Défectueux",
+    "DEFECT_STATUS_BOSS_ENCOUNTER.title":  "Le Défectueux",
+    "REGENT_BOMBARD_BOSS_ENCOUNTER.title":  "Le Régent",
+    "REGENT_MINION_BOSS_ENCOUNTER.title":  "Le Régent",
+    "IRONCLAD_STRIKE_BOSS_ENCOUNTER.title":  "Le Soldat de Fer",
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "La Silencieuse"
 }

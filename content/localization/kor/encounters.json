@@ -31,7 +31,7 @@
 
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "디펙트",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character}는 [gold]디펙트[/gold]의 파괴광선에 소멸했습니다.",
-  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "무지개",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "디펙트",
   "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "[gold]디펙트[/gold]는 {character}를 [gold]무지개[/gold]에 녹여버렸습니다.",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "네크로바인더",
@@ -114,5 +114,12 @@
     "SILENT_SNAKEBITE_BOSS_ENCOUNTER.loss":  "{character}는 [gold]사일런트[/gold]의 [gold]뱀 물기[/gold]에 삼켜졌습니다.",
     "REGENT_MINION_BOSS_ENCOUNTER.loss":  "{character}는 [gold]리젠트[/gold]와 그의 [gold]하수인들[/gold]에게 둘러싸여 맞아 죽었습니다.",
     "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.loss":  "{character}는 [gold]사일런트[/gold]의 [gold]대단원의 막[/gold]의 마지막 장면이 되었습니다.",
-    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "[gold]디펙트[/gold]의 [gold]대공포[/gold]에 {character}는 상태 카드째로 불타 사라졌습니다."
+    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "[gold]디펙트[/gold]의 [gold]대공포[/gold]에 {character}는 상태 카드째로 불타 사라졌습니다.",
+    "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.title":  "사일런트",
+    "DEFECT_THUNDER_BOSS_ENCOUNTER.title":  "디펙트",
+    "DEFECT_STATUS_BOSS_ENCOUNTER.title":  "디펙트",
+    "REGENT_BOMBARD_BOSS_ENCOUNTER.title":  "리젠트",
+    "REGENT_MINION_BOSS_ENCOUNTER.title":  "리젠트",
+    "IRONCLAD_STRIKE_BOSS_ENCOUNTER.title":  "아이언클래드",
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "사일런트"
 }

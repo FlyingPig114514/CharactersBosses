@@ -31,7 +31,7 @@
 
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "Arıza",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character}, [gold]Arıza[/gold]'nın [gold]Hiper Işın[/gold]'ıyla yok edildi.",
-  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "Gökkuşağı",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "Arıza",
   "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "[gold]Arıza[/gold], {character}'ı [gold]Gökkuşağı[/gold]nda eritti.",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "Ölübağlayan",
@@ -114,5 +114,12 @@
     "SILENT_SNAKEBITE_BOSS_ENCOUNTER.loss":  "[gold]Sessiz[/gold], {character}'ı [gold]Yılan Isırığı[/gold]yla boğdu.",
     "REGENT_MINION_BOSS_ENCOUNTER.loss":  "{character}, [gold]Naip[/gold] ve [gold]uşakları[/gold] tarafından dövülerek öldürüldü.",
     "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.loss":  "{character}, [gold]Sessiz[/gold]'in [gold]Büyük Final[/gold]inin son perdesi oldu.",
-    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "[gold]Arıza[/gold], [gold]Uçaksavar[/gold]ıyla {character}'ı durum kartlarıyla birlikte yakıp kül etti."
+    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "[gold]Arıza[/gold], [gold]Uçaksavar[/gold]ıyla {character}'ı durum kartlarıyla birlikte yakıp kül etti.",
+    "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.title":  "Sessiz",
+    "DEFECT_THUNDER_BOSS_ENCOUNTER.title":  "Arıza",
+    "DEFECT_STATUS_BOSS_ENCOUNTER.title":  "Arıza",
+    "REGENT_BOMBARD_BOSS_ENCOUNTER.title":  "Naip",
+    "REGENT_MINION_BOSS_ENCOUNTER.title":  "Naip",
+    "IRONCLAD_STRIKE_BOSS_ENCOUNTER.title":  "Demirkaplı",
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "Sessiz"
 }

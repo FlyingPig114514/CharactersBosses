@@ -31,7 +31,7 @@
 
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "O Defeituoso",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character} foi aniquilado pelo [gold]Hiper Raio[/gold] de [gold]O Defeituoso[/gold].",
-  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "Arco-íris",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "O Defeituoso",
   "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "[gold]O Defeituoso[/gold] derreteu {character} em seu [gold]Arco-íris[/gold].",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "A Necroartífice",
@@ -114,5 +114,12 @@
     "SILENT_SNAKEBITE_BOSS_ENCOUNTER.loss":  "[gold]A Sorrateira[/gold] afogou {character} com sua [gold]Mordida de Serpente[/gold].",
     "REGENT_MINION_BOSS_ENCOUNTER.loss":  "{character} foi espancado até a morte por [gold]O Regente[/gold] e seus [gold]lacaios[/gold].",
     "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.loss":  "{character} foi o último ato do [gold]Grande Desfecho[/gold] de [gold]A Sorrateira[/gold].",
-    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "[gold]O Defeituoso[/gold] incinerou {character} com sua [gold]Artilharia Antiaérea[/gold], cartas de status inclusas."
+    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "[gold]O Defeituoso[/gold] incinerou {character} com sua [gold]Artilharia Antiaérea[/gold], cartas de status inclusas.",
+    "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.title":  "A Sorrateira",
+    "DEFECT_THUNDER_BOSS_ENCOUNTER.title":  "O Defeituoso",
+    "DEFECT_STATUS_BOSS_ENCOUNTER.title":  "O Defeituoso",
+    "REGENT_BOMBARD_BOSS_ENCOUNTER.title":  "O Regente",
+    "REGENT_MINION_BOSS_ENCOUNTER.title":  "O Regente",
+    "IRONCLAD_STRIKE_BOSS_ENCOUNTER.title":  "O Rígido",
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "A Sorrateira"
 }

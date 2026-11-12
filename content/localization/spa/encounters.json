@@ -31,7 +31,7 @@
 
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "El Defectuoso",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character} fue aniquilado por el [gold]Hiperrayo[/gold] de [gold]El Defectuoso[/gold].",
-  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "Arcoíris",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "El Defectuoso",
   "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "[gold]El Defectuoso[/gold] fundió a {character} en su [gold]Arcoíris[/gold].",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "La Vinculahuesos",
@@ -114,5 +114,12 @@
     "SILENT_SNAKEBITE_BOSS_ENCOUNTER.loss":  "[gold]La Silenciosa[/gold] ahogó a {character} con su [gold]Mordisco de serpiente[/gold].",
     "REGENT_MINION_BOSS_ENCOUNTER.loss":  "{character} fue linchado por [gold]El Regente[/gold] y sus [gold]esbirros[/gold].",
     "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.loss":  "{character} fue el último acto del [gold]Gran final[/gold] de [gold]La Silenciosa[/gold].",
-    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "[gold]El Defectuoso[/gold] calcinó a {character} con su [gold]Artillería antiaérea[/gold], cartas de estado incluidas."
+    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "[gold]El Defectuoso[/gold] calcinó a {character} con su [gold]Artillería antiaérea[/gold], cartas de estado incluidas.",
+    "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.title":  "La Silenciosa",
+    "DEFECT_THUNDER_BOSS_ENCOUNTER.title":  "El Defectuoso",
+    "DEFECT_STATUS_BOSS_ENCOUNTER.title":  "El Defectuoso",
+    "REGENT_BOMBARD_BOSS_ENCOUNTER.title":  "El Regente",
+    "REGENT_MINION_BOSS_ENCOUNTER.title":  "El Regente",
+    "IRONCLAD_STRIKE_BOSS_ENCOUNTER.title":  "El Blindado",
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "La Silenciosa"
 }

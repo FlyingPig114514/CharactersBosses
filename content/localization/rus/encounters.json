@@ -31,7 +31,7 @@
 
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "Дефект",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character} был испепелен «Гиперлучом» [gold]Дефекта[/gold].",
-  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "Радуга",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "Дефект",
   "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "[gold]Дефект[/gold] растворил {character} в своей [gold]Радуге[/gold].",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "Призывающая",
@@ -114,5 +114,12 @@
     "SILENT_SNAKEBITE_BOSS_ENCOUNTER.loss":  "[gold]Безмолвная[/gold] утопила {character} в своём [gold]Змеином укусе[/gold].",
     "REGENT_MINION_BOSS_ENCOUNTER.loss":  "{character} был забит насмерть [gold]Наследником[/gold] и его [gold]слугами[/gold].",
     "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.loss":  "{character} стал последним актом [gold]Кульминации[/gold] [gold]Безмолвной[/gold].",
-    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "[gold]Дефект[/gold] сжёг {character} своей [gold]Зенитной пушкой[/gold] вместе с картами статуса."
+    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "[gold]Дефект[/gold] сжёг {character} своей [gold]Зенитной пушкой[/gold] вместе с картами статуса.",
+    "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.title":  "Безмолвная",
+    "DEFECT_THUNDER_BOSS_ENCOUNTER.title":  "Дефект",
+    "DEFECT_STATUS_BOSS_ENCOUNTER.title":  "Дефект",
+    "REGENT_BOMBARD_BOSS_ENCOUNTER.title":  "Наследник",
+    "REGENT_MINION_BOSS_ENCOUNTER.title":  "Наследник",
+    "IRONCLAD_STRIKE_BOSS_ENCOUNTER.title":  "Латоносец",
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "Безмолвная"
 }

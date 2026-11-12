@@ -90,5 +90,11 @@
     "REGENT_BOMBARD_BOSS_ENCOUNTER.loss":  "{character} 被[gold]儲君[/gold]的[gold]轟擊[/gold]碾成了焦土。",
     "REGENT_MINION_BOSS_ENCOUNTER.loss":  "{character} 被[gold]儲君[/gold]和他的[gold]僕從們[/gold]圍毆致死。",
     "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.loss":  "{character} 在[gold]靜默獵手[/gold]的[gold]華麗收場[/gold]裡謝了幕。",
-    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "{character} 被[gold]故障機器人[/gold]的[gold]散射炮[/gold]連同滿手狀態牌一起燒盡了。"
+    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "{character} 被[gold]故障機器人[/gold]的[gold]散射炮[/gold]連同滿手狀態牌一起燒盡了。",
+    "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.title":  "靜默獵手",
+    "DEFECT_THUNDER_BOSS_ENCOUNTER.title":  "故障機器人",
+    "DEFECT_STATUS_BOSS_ENCOUNTER.title":  "故障機器人",
+    "REGENT_BOMBARD_BOSS_ENCOUNTER.title":  "儲君",
+    "REGENT_MINION_BOSS_ENCOUNTER.title":  "儲君",
+    "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "故障機器人"
 }

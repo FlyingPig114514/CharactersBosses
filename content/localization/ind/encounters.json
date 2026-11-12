@@ -31,7 +31,7 @@
 
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "Si Defect",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character} dilenyapkan oleh [gold]Sinar Hyper[/gold] milik [gold]Si Defect[/gold].",
-  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "Pelangi",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "Si Defect",
   "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "[gold]Si Defect[/gold] meleburkan {character} ke dalam [gold]Pelangi[/gold]nya.",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "Si Necrobinder",
@@ -114,5 +114,12 @@
     "SILENT_SNAKEBITE_BOSS_ENCOUNTER.loss":  "[gold]Si Silent[/gold] menenggelamkan {character} dengan [gold]Gigitan Ular[/gold]nya.",
     "REGENT_MINION_BOSS_ENCOUNTER.loss":  "{character} dihajar sampai mati oleh [gold]Si Regent[/gold] dan para [gold]budaknya[/gold].",
     "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.loss":  "{character} adalah babak terakhir dari [gold]Grand Final[/gold] [gold]Si Silent[/gold].",
-    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "[gold]Si Defect[/gold] membakar {character} dengan [gold]Meriam Sampah[/gold]nya, beserta seluruh kartu status."
+    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "[gold]Si Defect[/gold] membakar {character} dengan [gold]Meriam Sampah[/gold]nya, beserta seluruh kartu status.",
+    "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.title":  "Si Silent",
+    "DEFECT_THUNDER_BOSS_ENCOUNTER.title":  "Si Defect",
+    "DEFECT_STATUS_BOSS_ENCOUNTER.title":  "Si Defect",
+    "REGENT_BOMBARD_BOSS_ENCOUNTER.title":  "Si Regent",
+    "REGENT_MINION_BOSS_ENCOUNTER.title":  "Si Regent",
+    "IRONCLAD_STRIKE_BOSS_ENCOUNTER.title":  "Si Ironclad",
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "Si Silent"
 }

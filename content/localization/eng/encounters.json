@@ -91,5 +91,10 @@
     "REGENT_BOMBARD_BOSS_ENCOUNTER.loss":  "{character} was flattened into scorched earth by the [gold]Regent[/gold]'s [gold]bombardment[/gold].",
     "REGENT_MINION_BOSS_ENCOUNTER.loss":  "{character} was beaten to death by the [gold]Regent[/gold] and his [gold]minions[/gold].",
     "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.loss":  "{character} was the final act of the [gold]Silent[/gold]'s [gold]grand finale[/gold].",
-    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "{character} was burned away by the [gold]Defect[/gold]'s [gold]flak cannon[/gold], status cards and all."
+    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "{character} was burned away by the [gold]Defect[/gold]'s [gold]flak cannon[/gold], status cards and all.",
+    "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.title":  "The Silent (Shiv)",
+    "DEFECT_THUNDER_BOSS_ENCOUNTER.title":  "The Defect",
+    "DEFECT_STATUS_BOSS_ENCOUNTER.title":  "The Defect",
+    "REGENT_BOMBARD_BOSS_ENCOUNTER.title":  "The Regent",
+    "REGENT_MINION_BOSS_ENCOUNTER.title":  "The Regent"
 }

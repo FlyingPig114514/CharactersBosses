@@ -31,7 +31,7 @@
 
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "ディフェクト",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character}は[gold]ディフェクト[/gold]の[gold]ハイパービーム[/gold]に消し飛ばされた。",
-  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "虹",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "ディフェクト",
   "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "[gold]ディフェクト[/gold]は{character}を[gold]レインボー[/gold]に溶かし込んだ。",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "ネクロバインダー",
@@ -114,5 +114,12 @@
     "SILENT_SNAKEBITE_BOSS_ENCOUNTER.loss":  "{character}は[gold]サイレント[/gold]の[gold]蛇の噛みつき[/gold]に呑み込まれた。",
     "REGENT_MINION_BOSS_ENCOUNTER.loss":  "{character}は[gold]リージェント[/gold]とその[gold]僕たち[/gold]に袋叩きにされた。",
     "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.loss":  "{character}は[gold]サイレント[/gold]の[gold]グランドフィナーレ[/gold]の最後の一幕となった。",
-    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "[gold]ディフェクト[/gold]の[gold]フラックキャノン[/gold]で{character}は状態カードごと焼き尽くされた。"
+    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "[gold]ディフェクト[/gold]の[gold]フラックキャノン[/gold]で{character}は状態カードごと焼き尽くされた。",
+    "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.title":  "サイレント",
+    "DEFECT_THUNDER_BOSS_ENCOUNTER.title":  "ディフェクト",
+    "DEFECT_STATUS_BOSS_ENCOUNTER.title":  "ディフェクト",
+    "REGENT_BOMBARD_BOSS_ENCOUNTER.title":  "リージェント",
+    "REGENT_MINION_BOSS_ENCOUNTER.title":  "リージェント",
+    "IRONCLAD_STRIKE_BOSS_ENCOUNTER.title":  "アイアンクラッド",
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "サイレント"
 }

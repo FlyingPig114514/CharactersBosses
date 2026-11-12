@@ -31,7 +31,7 @@
 
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "Das Defekte",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character} wurde vom [gold]Hyperstrahl[/gold] des [gold]Defekten[/gold] ausgelöscht.",
-  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "Regenbogen",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "Das Defekte",
   "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "Der [gold]Defekte[/gold] hat {character} in seinen [gold]Regenbogen[/gold] eingeschmolzen.",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "Die Totenbinderin",
@@ -114,5 +114,12 @@
     "SILENT_SNAKEBITE_BOSS_ENCOUNTER.loss":  "{character} wurde vom [gold]Schlangenbiss[/gold] der [gold]Stillen[/gold] verschlungen.",
     "REGENT_MINION_BOSS_ENCOUNTER.loss":  "{character} wurde vom [gold]Regenten[/gold] und seinen [gold]Dienern[/gold] zu Tode geprügelt.",
     "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.loss":  "{character} war der letzte Akt im [gold]Großen Finale[/gold] der [gold]Stillen[/gold].",
-    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "{character} wurde von der [gold]Flak-Kanone[/gold] des [gold]Defekten[/gold] samt aller Statuskarten niedergebrannt."
+    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "{character} wurde von der [gold]Flak-Kanone[/gold] des [gold]Defekten[/gold] samt aller Statuskarten niedergebrannt.",
+    "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.title":  "Die Stille",
+    "DEFECT_THUNDER_BOSS_ENCOUNTER.title":  "Das Defekte",
+    "DEFECT_STATUS_BOSS_ENCOUNTER.title":  "Das Defekte",
+    "REGENT_BOMBARD_BOSS_ENCOUNTER.title":  "Der Regent",
+    "REGENT_MINION_BOSS_ENCOUNTER.title":  "Der Regent",
+    "IRONCLAD_STRIKE_BOSS_ENCOUNTER.title":  "Der Eiserne",
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "Die Stille"
 }

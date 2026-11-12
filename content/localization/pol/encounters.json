@@ -31,7 +31,7 @@
 
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "Defekt",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character} został unicestwiony „Hiperpromieniem” [gold]Defekta[/gold].",
-  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "Tęcza",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "Defekt",
   "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "[gold]Defekt[/gold] roztopił {character} w swojej [gold]Tęczy[/gold].",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "Nekromantka",
@@ -114,5 +114,12 @@
     "SILENT_SNAKEBITE_BOSS_ENCOUNTER.loss":  "[gold]Zjawa[/gold] utopiła {character} w swoim [gold]Pluciu jadem[/gold].",
     "REGENT_MINION_BOSS_ENCOUNTER.loss":  "{character} został zatłuczony przez [gold]Monarchę[/gold] i jego [gold]sługi[/gold].",
     "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.loss":  "{character} był ostatnim aktem [gold]Wielkiego finału[/gold] [gold]Zjawy[/gold].",
-    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "[gold]Defekt[/gold] spalił {character} swoim [gold]Działem przeciwlotniczym[/gold], wraz z kartami statusu."
+    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "[gold]Defekt[/gold] spalił {character} swoim [gold]Działem przeciwlotniczym[/gold], wraz z kartami statusu.",
+    "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.title":  "Zjawa",
+    "DEFECT_THUNDER_BOSS_ENCOUNTER.title":  "Defekt",
+    "DEFECT_STATUS_BOSS_ENCOUNTER.title":  "Defekt",
+    "REGENT_BOMBARD_BOSS_ENCOUNTER.title":  "Monarcha",
+    "REGENT_MINION_BOSS_ENCOUNTER.title":  "Monarcha",
+    "IRONCLAD_STRIKE_BOSS_ENCOUNTER.title":  "Pancernik",
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "Zjawa"
 }

@@ -31,7 +31,7 @@
 
   "DEFECT_CLAW_BOSS_ENCOUNTER.title": "นักเวทแปรพักตร์",
   "DEFECT_CLAW_BOSS_ENCOUNTER.loss": "{character} ถูก[gold]ลำแสงพิฆาต[/gold]ของ[gold]นักเวทแปรพักตร์[/gold]สลายจนสิ้นซาก",
-  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "รุ้ง",
+  "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "นักเวทแปรพักตร์",
   "DEFECT_RAINBOW_BOSS_ENCOUNTER.loss":  "[gold]นักเวทแปรพักตร์[/gold]หลอม{character}ลงใน[gold]สายรุ้ง[/gold]",
 
   "NECROBINDER_BOSS_ENCOUNTER.title": "นักปลุกผีผูกจิต",
@@ -114,5 +114,12 @@
     "SILENT_SNAKEBITE_BOSS_ENCOUNTER.loss":  "{character} จมอยู่ใต้[gold]Snakebite[/gold]ของ[gold]นักฆ่าแห่งความเงียบ[/gold]",
     "REGENT_MINION_BOSS_ENCOUNTER.loss":  "{character} ถูก[gold]The Regent[/gold]และ[gold]ลูกน้อง[/gold]ของเขารุมทำร้ายจนตาย",
     "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.loss":  "{character} กลายเป็นฉากสุดท้ายใน[gold]อวสานอลังการ[/gold]ของ[gold]นักฆ่าแห่งความเงียบ[/gold]",
-    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "{character} ถูก[gold]Flak Cannon[/gold]ของ[gold]นักเวทแปรพักตร์[/gold]เผาไหม้ไปพร้อมการ์ดสถานะทั้งมือ"
+    "DEFECT_STATUS_BOSS_ENCOUNTER.loss":  "{character} ถูก[gold]Flak Cannon[/gold]ของ[gold]นักเวทแปรพักตร์[/gold]เผาไหม้ไปพร้อมการ์ดสถานะทั้งมือ",
+    "SILENT_GRAND_FINALE_BOSS_ENCOUNTER.title":  "นักฆ่าแห่งความเงียบ",
+    "DEFECT_THUNDER_BOSS_ENCOUNTER.title":  "นักเวทแปรพักตร์",
+    "DEFECT_STATUS_BOSS_ENCOUNTER.title":  "นักเวทแปรพักตร์",
+    "REGENT_BOMBARD_BOSS_ENCOUNTER.title":  "Regent",
+    "REGENT_MINION_BOSS_ENCOUNTER.title":  "Regent",
+    "IRONCLAD_STRIKE_BOSS_ENCOUNTER.title":  "นักรบเกราะเหล็ก",
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "นักฆ่าแห่งความเงียบ"
 }
