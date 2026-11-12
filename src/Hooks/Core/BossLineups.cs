@@ -265,13 +265,24 @@ internal static class BossLineups
     }
 
     /// <summary>
-    /// 这一场同时上几只 Boss = **玩家数（1～4）**。
+    /// **一场战斗里最多上几只 Boss**（= 最多几个人玩）。
+    ///
+    /// 原版联机上限是 4，但社区有模组能放宽到 5（用户 2026-11-11：「适配一下 5 人联机…5 个 boss 的站位是 w 型」）。
+    /// 我们这一套本来就是「Boss 数 = 玩家数、每个角色最多一只」⇒ 5 人时正好是**5 个角色各一只**。
+    /// ⚠ 这个常量必须和 <see cref="Core.MultiBossPlan.PartnersForWithKeys"/> 里用的上限**是同一个**，
+    ///   否则会出现「阵容按 5 只算、实际只造了 4 只」的半截状态。
+    /// </summary>
+    internal const int MaxPlayersPerFight = 5;
+
+    /// <summary>
+    /// 这一场同时上几只 Boss = **玩家数（1～<see cref="MaxPlayersPerFight"/>）**。
     ///
     /// ⚠ 这里以前夹到 3（"4 人暂不支持"），于是四人联机只出 **3 只 Boss**（用户 2026-10-29 实测：
     /// "只看到 3 个 boss"）。改成 4 之后：一层/二层候补各 5 只、三层 8 只，凑 4 只不成问题；
+    /// v0.2.585 又抬到 5（5 人联机）—— 各幕每个角色至少 2 只候补，进阶 10 的两场各 5 只也凑得齐。
     /// 至于「同角色不复用」「两场不重复」这些约束，下面的 ⑥/② 遍会自动让步（极端情况才降级）。
     /// </summary>
-    internal static int PlayersPerFight() => Math.Clamp(PlayerCount(), 1, 4);
+    internal static int PlayersPerFight() => Math.Clamp(PlayerCount(), 1, MaxPlayersPerFight);
 
     /// <summary>
     /// 生成某一幕某一场的阵容（Boss 标识数组，`[0]` = 站位/行动里的第 1 只，也就是**主 Boss**）。
@@ -436,6 +447,33 @@ internal static class BossLineups
         }
 
         if (picked.Count == 0) return Fallback(act);
+
+        // ★ v0.2.585（5 人联机）：`need >= 5` 时补一条**构成自检** ——
+        //   用户口径是「5 个 boss 分别是那 5 个原版角色，不重复也不少」。
+        //   规则上 ⑥ 那遍「每个角色最多一只、逐角色各取一只」本来就是这个结果，
+        //   但换阵容 / 进阶 10 第二场 / 某个角色候补被 `usedInThisAct` 清空时会降级 ⇒ 这里喊出来，
+        //   免得又出现「场上两只猎人、没有故障机器人」这种只有实机才看得见的问题。
+        if (need >= 5)
+        {
+            var chars = new List<int>(picked.Count);
+            foreach (var key in picked)
+            {
+                int ch = BossKeys.CharacterOf(key);
+                if (ch >= 0) chars.Add(ch);
+            }
+            int distinct = chars.Distinct().Count();
+            string detail = string.Join(", ", picked);
+            if (picked.Count < need || distinct != picked.Count)
+            {
+                Logger.Log($"[CharBoss] ⚠ 5 人局阵容不完整：想要 {need} 只、实得 {picked.Count} 只，" +
+                           $"角色去重后 {distinct} 个 ⇒ [{detail}]" +
+                           "（正常应是 5 个角色各一只 ⇒ 检查各幕候补 / usedInThisAct 是否把某角色清空了）");
+            }
+            else
+            {
+                Logger.Log($"[CharBoss] {need} 人局阵容构成自检通过：{picked.Count} 只、{distinct} 个角色各一只 ⇒ [{detail}]");
+            }
+        }
         return picked.ToArray();
     }
 

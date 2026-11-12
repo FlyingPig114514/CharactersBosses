@@ -46,20 +46,11 @@ internal static class BossConfigBaseLibBootstrap
         }
     }
 
-    private static bool BaseLibLoaded()
-    {
-        try
-        {
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                if (assembly == null) continue;
-                if (string.Equals(assembly.GetName().Name, "BaseLib", StringComparison.OrdinalIgnoreCase))
-                    return true;
-            }
-        }
-        catch { /* 按「没装」处理 */ }
-        return false;
-    }
+    /// <summary>
+    /// 本机有没有 BaseLib —— ★ v0.2.587 起统一问 <see cref="Core.BaseLibPresence"/>
+    /// （以前这里自己扫一遍，和别处的判断可能不一致；调试开关 `charbosses_force_no_baselib.txt` 也只有那边认）。
+    /// </summary>
+    private static bool BaseLibLoaded() => Core.BaseLibPresence.Available;
 
     /// <summary>真正碰 BaseLib 的那一段（没有 BaseLib 时绝不进入）。</summary>
     [MethodImpl(MethodImplOptions.NoInlining)]

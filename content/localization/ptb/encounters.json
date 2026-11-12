@@ -121,5 +121,9 @@
     "REGENT_BOMBARD_BOSS_ENCOUNTER.title":  "O Regente",
     "REGENT_MINION_BOSS_ENCOUNTER.title":  "O Regente",
     "IRONCLAD_STRIKE_BOSS_ENCOUNTER.title":  "O Rígido",
-    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "A Sorrateira"
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "A Sorrateira",
+    "BASELIB_MISSING_HEADER":  "Mod obrigatório ausente: BaseLib",
+    "BASELIB_MISSING_BODY":  "Esta máquina não tem o mod BaseLib instalado (id da Steam Workshop 3737335127).\n\nIndisponível:\n· a tela de configuração de mods no jogo\n· a sincronização das configurações do anfitrião no multijogador\n\nTodo o resto funciona (substituição de chefes, baralhos/relíquias/roteiros, formações multijogador). Inscreva-se no BaseLib e reinicie o jogo.",
+    "BASELIB_MISSING_OK":  "Entendi",
+    "BASELIB_MISSING_CLOSE":  "Fechar"
 }

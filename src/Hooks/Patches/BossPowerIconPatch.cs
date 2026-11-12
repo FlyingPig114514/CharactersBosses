@@ -75,8 +75,17 @@ public static class BossPowerSmallIconPatch
 
             string? entry = BossPowerIcons.VanillaEntryOf(__instance);
             if (entry == null) return;
-            __result = ImageHelper.GetImagePath(
+
+            // ★ v0.2.588（CVC-跨版本兼容补丁的兼容）：`PowerModel.get_PackedIconPath` 这个 getter
+            //   **三个模组同时在打**（CVC 报告原文：`[postfix] get_PackedIconPath — BaseLib; CharacterBosses;
+            //   RitsuLib.framework-content-assets`）。postfix 谁最后跑谁说了算 ⇒ 我们只在「该改」时改：
+            //   ① 只处理**本 mod 的 Power**（上面 VanillaEntryOf 已经保证）；
+            //   ② 若当前的 __result 已经是一个**真实存在的资源**（别的模组已经解析好了），就不覆盖它，
+            //      避免把别人的图标抢成我们的。
+            string candidate = ImageHelper.GetImagePath(
                 "atlases/power_atlas.sprites/" + entry.ToLowerInvariant() + ".tres");
+            if (!string.IsNullOrEmpty(__result) && Godot.ResourceLoader.Exists(__result)) return;
+            __result = candidate;
         }
         catch { /* 取不到就保持原样（会显示空图标，但不影响战斗） */ }
     }
@@ -96,7 +105,25 @@ public static class BossPowerBigIconPatch
 
             string? entry = BossPowerIcons.VanillaEntryOf(__instance);
             if (entry == null) return;
-            __result = ImageHelper.GetImagePath("powers/" + entry.ToLowerInvariant() + ".png");
+
+            // ★ v0.2.588：`get_ResolvedBigIconPath` 同样是**三个模组共用**的补丁点
+            //   （CVC 报告：`CharacterBosses; RitsuLib.framework-content-assets; SteamRandomMatchMod`）⇒
+            //   别人已经解析出真实资源时不动它。
+            //
+            //   ⚠ 但原版这个 getter **自带兜底**：反编译 `PowerModel.ResolvedBigIconPath` 是
+            //   `powers/<id>.png` → `powers/beta/<id>.png` → `powers/missing_power.png`，
+            //   而 `missing_power.png` 是**真实存在的资源** ⇒ 光看「Exists 就放过」会把我们自己的
+            //   Power 一律留在「缺失图标」上（回归）。所以判定要排除原版那两条兜底路径。
+            string lower = entry.ToLowerInvariant();
+            string candidate = ImageHelper.GetImagePath("powers/" + lower + ".png");
+            string vanillaDefault = ImageHelper.GetImagePath("powers/" + __instance.Id.Entry.ToLowerInvariant() + ".png");
+            string missing = ImageHelper.GetImagePath("powers/missing_power.png");
+            bool foreignResolved = !string.IsNullOrEmpty(__result)
+                                   && Godot.ResourceLoader.Exists(__result)
+                                   && !string.Equals(__result, missing, StringComparison.Ordinal)
+                                   && !string.Equals(__result, vanillaDefault, StringComparison.Ordinal);
+            if (foreignResolved) return;
+            __result = candidate;
         }
         catch { /* 同上 */ }
     }

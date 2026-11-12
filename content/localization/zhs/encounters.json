@@ -96,5 +96,9 @@
     "DEFECT_THUNDER_BOSS_ENCOUNTER.title":  "故障机器人",
     "DEFECT_STATUS_BOSS_ENCOUNTER.title":  "故障机器人",
     "REGENT_BOMBARD_BOSS_ENCOUNTER.title":  "储君",
-    "REGENT_MINION_BOSS_ENCOUNTER.title":  "储君"
+    "REGENT_MINION_BOSS_ENCOUNTER.title":  "储君",
+    "BASELIB_MISSING_HEADER":  "缺少前置模组 BaseLib",
+    "BASELIB_MISSING_BODY":  "本机没有安装前置模组 BaseLib（Steam 创意工坊 id 3737335127）。\n\n以下功能不可用：\n· 游戏内「模组配置」界面\n· 多人联机时「以房主为准」的勾选与玩法设置同步\n\n其余功能全部正常（Boss 替换、卡组/遗物/剧本、联机阵容）。订阅 BaseLib 后重启游戏即可恢复。",
+    "BASELIB_MISSING_OK":  "知道了",
+    "BASELIB_MISSING_CLOSE":  "关闭"
 }

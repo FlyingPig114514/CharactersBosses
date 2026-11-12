@@ -121,5 +121,9 @@
     "REGENT_BOMBARD_BOSS_ENCOUNTER.title":  "Monarcha",
     "REGENT_MINION_BOSS_ENCOUNTER.title":  "Monarcha",
     "IRONCLAD_STRIKE_BOSS_ENCOUNTER.title":  "Pancernik",
-    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "Zjawa"
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "Zjawa",
+    "BASELIB_MISSING_HEADER":  "Brak wymaganego moda: BaseLib",
+    "BASELIB_MISSING_BODY":  "Na tej maszynie nie zainstalowano moda BaseLib (id Steam Workshop 3737335127).\n\nNiedostępne:\n· ekran konfiguracji modów w grze\n· synchronizacja ustawień hosta w trybie wieloosobowym\n\nWszystko inne działa (zamiana bossów, talie/relikwie/skrypty, składy wieloosobowe). Subskrybuj BaseLib i uruchom grę ponownie.",
+    "BASELIB_MISSING_OK":  "Rozumiem",
+    "BASELIB_MISSING_CLOSE":  "Zamknij"
 }

@@ -96,5 +96,9 @@
     "DEFECT_STATUS_BOSS_ENCOUNTER.title":  "故障機器人",
     "REGENT_BOMBARD_BOSS_ENCOUNTER.title":  "儲君",
     "REGENT_MINION_BOSS_ENCOUNTER.title":  "儲君",
-    "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "故障機器人"
+    "DEFECT_RAINBOW_BOSS_ENCOUNTER.title":  "故障機器人",
+    "BASELIB_MISSING_HEADER":  "缺少前置模組 BaseLib",
+    "BASELIB_MISSING_BODY":  "本機沒有安裝前置模組 BaseLib（Steam 創意工坊 id 3737335127）。\n\n以下功能無法使用：\n· 遊戲內「模組設定」介面\n· 多人連線時「以房主為準」的勾選與玩法設定同步\n\n其餘功能全部正常（Boss 替換、牌組/遺物/劇本、連線陣容）。訂閱 BaseLib 後重新啟動遊戲即可恢復。",
+    "BASELIB_MISSING_OK":  "知道了",
+    "BASELIB_MISSING_CLOSE":  "關閉"
 }

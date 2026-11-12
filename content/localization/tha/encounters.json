@@ -121,5 +121,9 @@
     "REGENT_BOMBARD_BOSS_ENCOUNTER.title":  "Regent",
     "REGENT_MINION_BOSS_ENCOUNTER.title":  "Regent",
     "IRONCLAD_STRIKE_BOSS_ENCOUNTER.title":  "นักรบเกราะเหล็ก",
-    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "นักฆ่าแห่งความเงียบ"
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "นักฆ่าแห่งความเงียบ",
+    "BASELIB_MISSING_HEADER":  "ไม่พบมอดที่จำเป็น: BaseLib",
+    "BASELIB_MISSING_BODY":  "เครื่องนี้ยังไม่ได้ติดตั้งมอด BaseLib (Steam Workshop id 3737335127)\n\nใช้งานไม่ได้:\n· หน้าตั้งค่ามอดในเกม\n· การซิงก์การตั้งค่าของเจ้าของห้องในการเล่นหลายคน\n\nฟังก์ชันอื่นทำงานปกติทั้งหมด (เปลี่ยนบอส, เด็ค/เครื่องราง/สคริปต์, จัดทีมหลายคน) สมัคร BaseLib แล้วรีสตาร์ตเกม",
+    "BASELIB_MISSING_OK":  "เข้าใจแล้ว",
+    "BASELIB_MISSING_CLOSE":  "ปิด"
 }

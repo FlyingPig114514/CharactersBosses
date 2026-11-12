@@ -75,7 +75,7 @@
 - 代码规范与目录约定：`AGENTS.md`、`rules.md`、`rules_en.md`
 - 各 Boss 设计稿与排查记录：`docs/plans/`
 - 双版本实现：`src/CharacterBosses.csproj` 有 `Sts2Target=107|111` 两个目标，产物是
-  `CharacterBosses.Impl107.dll` / `CharacterBosses.Impl111.dll`，由 `loader/` 的外壳在运行时挑一个加载。
+  `CharacterBosses.Impl107.dll.bin` / `CharacterBosses.Impl111.dll.bin`，由 `loader/` 的外壳在运行时挑一个加载（`.bin` 扩展名是为了不让 CVC 等扫描器把这些实现当成独立模组）。
 
 ## 许可证
 

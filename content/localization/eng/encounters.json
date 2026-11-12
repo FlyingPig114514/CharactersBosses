@@ -96,5 +96,9 @@
     "DEFECT_THUNDER_BOSS_ENCOUNTER.title":  "The Defect",
     "DEFECT_STATUS_BOSS_ENCOUNTER.title":  "The Defect",
     "REGENT_BOMBARD_BOSS_ENCOUNTER.title":  "The Regent",
-    "REGENT_MINION_BOSS_ENCOUNTER.title":  "The Regent"
+    "REGENT_MINION_BOSS_ENCOUNTER.title":  "The Regent",
+    "BASELIB_MISSING_HEADER":  "Missing required mod: BaseLib",
+    "BASELIB_MISSING_BODY":  "This machine does not have the BaseLib mod installed (Steam Workshop id 3737335127).\n\nUnavailable:\n· the in-game mod config screen\n· host-driven boss picks & gameplay setting sync in multiplayer\n\nEverything else works (boss replacement, decks/relics/scripts, multiplayer lineups). Subscribe to BaseLib and restart the game to restore these.",
+    "BASELIB_MISSING_OK":  "Got it",
+    "BASELIB_MISSING_CLOSE":  "Close"
 }

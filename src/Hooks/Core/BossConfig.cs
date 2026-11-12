@@ -88,6 +88,9 @@ public static class BossConfig
         /// </summary>
         [JsonPropertyName("sharePool")] public bool SharePool { get; set; }
 
+        /// <summary>★ v0.2.587：已经提醒过玩家「没装 BaseLib」了吗（只提醒一次）。</summary>
+        [JsonPropertyName("baseLibWarned")] public bool BaseLibWarned { get; set; }
+
         /// <summary>
         /// A4 的子项（用户 2026-10-29 追加）：**进阶 10 第三幕固定「一场原本 Boss + 一场角色 Boss」**。
         /// 需要 <see cref="SharePool"/> 开启才生效；开启后进阶 10 第三幕的两场 Boss 战不再各抽各的，
@@ -678,7 +681,49 @@ public static class BossConfig
     /// 就会一台替换一台不替换，轮次 1 立刻分叉。
     /// </summary>
     internal static bool IsMapEnabledForGameplay(ActModel? act)
-        => IsMapEnabledCore(act, allowLocal: GameplaySettingsFollowHost);
+    {
+        // ★ v0.2.586：客人端优先用**房主广播来的**那套地图开关（玩家反馈「开混合匹配联机不同步」的连带问题：
+        //   房主关掉某张原版图的替换时，客人按默认规则照样替换）。房主没显式设过 / 还没收到 ⇒ 走原默认。
+        if (!GameplaySettingsFollowHost)
+        {
+            try
+            {
+                var hostValue = BossPicksSync.HostMapEnabled(EntryOf(act));
+                if (hostValue.HasValue) return hostValue.Value;
+            }
+            catch { /* 忽略 */ }
+        }
+        return IsMapEnabledCore(act, allowLocal: GameplaySettingsFollowHost);
+    }
+
+    /// <summary>★ v0.2.587：已经提醒过「没装 BaseLib」吗（只提醒一次，写盘记住）。</summary>
+    internal static bool BaseLibWarned
+    {
+        get { try { return Current.BaseLibWarned; } catch { return false; } }
+    }
+
+    internal static void SetBaseLibWarned(bool warned)
+    {
+        try
+        {
+            if (Current.BaseLibWarned == warned) return;
+            Current.BaseLibWarned = warned;
+            _dirty = true;
+            Save();
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 配置：写 baseLibWarned 失败: " + e.Message); }
+    }
+    /// <summary>所有**显式设过**的地图开关（房主广播用；没设过的地图不出现 = 按原版默认）。</summary>
+    internal static List<KeyValuePair<string, bool>> AllMapSwitches()
+    {
+        try
+        {
+            var list = new List<KeyValuePair<string, bool>>();
+            foreach (var kv in Current.Maps) list.Add(kv);
+            return list;
+        }
+        catch { return new List<KeyValuePair<string, bool>>(); }
+    }
 
     private static bool IsMapEnabledCore(ActModel? act, bool allowLocal)
     {
@@ -702,11 +747,56 @@ public static class BossConfig
         catch { return false; }
     }
 
-    /// <summary>玩法用的「共用匹配池」：★ v0.2.468 起**客人端恒 false**（以房主的同步槽位为准）。</summary>
-    internal static bool SharePoolForGameplay => GameplaySettingsFollowHost && SharePool;
+    /// <summary>
+    /// 玩法用的「共用匹配池」：★ v0.2.468 起**客人端不读本机配置**；
+    /// ★ v0.2.586 起客人端改用**房主广播来的值**（那条消息和勾选一起发，见 `BossPicksSync`）。
+    ///
+    /// 为什么原来那样会不同步（玩家反馈「联机时开和原版 boss 混合匹配会不同步」）：
+    ///   客人恒 false ⇒ `ForVanillaBoss` 里那段「按种子抽这一场要不要保留原版 Boss」**整段被跳过**
+    ///   ⇒ 房主抽到「保留原版」时，客人却照样替换成角色 Boss ⇒ 进 Boss 房立刻分叉。
+    ///   现在客人用房主的值，种子又来自同步的 RunState ⇒ 两端抽到同一个结果。
+    ///   万一消息还没到（刚进图），按「开」处理并打一行日志 —— 房主真的关着时，
+    ///   同步槽位会是**我们的遭遇**，客人早在 `ForVanillaBoss` 开头的跟随分支就返回了，走不到这里。
+    /// </summary>
+    internal static bool SharePoolForGameplay
+    {
+        get
+        {
+            if (GameplaySettingsFollowHost) return SharePool;
+            try
+            {
+                var host = BossPicksSync.HostSharePool;
+                if (host.HasValue) return host.Value;
+                if (_guestSharePoolPendingLogged) { /* 只喊一次 */ }
+                else
+                {
+                    _guestSharePoolPendingLogged = true;
+                    Logger.Log("[CharBoss] 客人端：还没收到房主的玩法设置 ⇒ 共用匹配池先按「开」算" +
+                               "（房主真的关着时同步槽位会是我们的遭遇，走不到这一步）");
+                }
+            }
+            catch { /* 忽略 */ }
+            return true;
+        }
+    }
 
-    /// <summary>玩法用的「进阶 10 第三幕一场原本一场角色」：客人端恒 false（同上）。</summary>
-    internal static bool Asc10Act3OneEachForGameplay => GameplaySettingsFollowHost && Asc10Act3OneEach;
+    private static bool _guestSharePoolPendingLogged;
+
+    /// <summary>玩法用的「进阶 10 第三幕一场原本一场角色」：客人端用房主广播来的值（同上）。</summary>
+    internal static bool Asc10Act3OneEachForGameplay
+    {
+        get
+        {
+            if (GameplaySettingsFollowHost) return SharePool && Asc10Act3OneEach;
+            try
+            {
+                var host = BossPicksSync.HostAsc10Act3OneEach;
+                if (host.HasValue) return host.Value;
+            }
+            catch { /* 忽略 */ }
+            return false;
+        }
+    }
 
     /// <summary>按地图 id 设置开关（配置界面用）。</summary>
     public static void SetMapEnabled(string? mapEntry, bool enabled)
@@ -718,6 +808,8 @@ public static class BossConfig
             _dirty = true;
             Save();
             Logger.Log($"[CharBoss] 配置：地图 {mapEntry} → {(enabled ? "替换" : "不替换（保持原版）")}");
+            // v0.2.586：房主改了玩法设置 ⇒ 立刻重播一次给客人（否则要等下次算阵容才带过去）
+            try { BossPicksSync.BroadcastIfHost(); } catch { /* 单人/非房主无所谓 */ }
         }
         catch (Exception e) { Logger.Log("[CharBoss] 配置：写地图开关失败: " + e.Message); }
     }
@@ -1020,6 +1112,7 @@ public static class BossConfig
         {
             if (Current.SharePool == enabled) return;
             Current.SharePool = enabled;
+        try { Core.BossPicksSync.BroadcastIfHost(); } catch { /* 单人/非房主无所谓 */ }
             _dirty = true;
             Save();
             Logger.Log($"[CharBoss] 配置：与原本 Boss 共用匹配池 → {(enabled ? "开" : "关")}" +
@@ -1169,6 +1262,7 @@ public static class BossConfig
                 // ⚠ 2026-10-30 补：以前这里**漏了** A4 和新增的 A5 ⇒ 「共用匹配池 / 进阶 10 固定一场原本」
                 //   每次重启都被悄悄写回默认值（用户勾了也白勾）。现在全部原样写回。
                 SharePool = data.SharePool,
+                BaseLibWarned = data.BaseLibWarned,
                 Asc10Act3OneEach = data.Asc10Act3OneEach,
                 Telemetry = data.Telemetry,
                 ConsentAsked = data.ConsentAsked,

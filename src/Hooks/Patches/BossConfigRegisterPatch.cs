@@ -41,6 +41,11 @@ public static class BossConfigRegisterMainMenuPatch
         //（用户 2026-10-30；默认关，问过一次就记下来，以后不再打扰。见 UI/TelemetryConsentPrompt.cs）
         try { CharacterBosses.UI.TelemetryConsentPrompt.MaybeAsk(); }
         catch (Exception e) { Logger.Log("[CharBoss] 数据记录询问（补丁）失败（忽略）: " + e.Message); }
+
+        // ★ v0.2.587：没装前置 BaseLib 时，用同一个原版弹窗**提醒一次**哪些功能不可用
+        //（用户：「改成软依赖，但要在玩家没装 baselib 时警告玩家有的功能不可用」）
+        try { CharacterBosses.UI.BaseLibMissingNotice.MaybeWarn(); }
+        catch (Exception e) { Logger.Log("[CharBoss] BaseLib 缺失提醒（补丁）失败（忽略）: " + e.Message); }
     }
 }
 

@@ -124,8 +124,10 @@ public static class MultiBossPlan
         try
         {
             if (!WantsSecondBoss(out int playerCount)) return result;      // 单人：一只都不加
-            // 「只数 = 玩家数」⇒ 我之外还要几只（v0.2.526 起也用这个数当上限/下限）
-            int wantPartners = Math.Max(0, Math.Min(playerCount, 4) - 1);
+            // 「只数 = 玩家数」⇒ 我之外还要几只。
+            // ★ v0.2.585：上限从 4 抬到 5（5 人联机），并且**必须**读 BossLineups 的同一个常量 ——
+            //   两边各写一个数时会出现「阵容按 5 只算、这里只造 4 只」的半截状态。
+            int wantPartners = Math.Max(0, Math.Min(playerCount, BossLineups.MaxPlayersPerFight) - 1);
 
             int act = 0;
             try { act = CurrentRunState()?.CurrentActIndex ?? 0; } catch { act = 0; }

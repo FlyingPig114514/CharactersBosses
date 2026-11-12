@@ -121,5 +121,9 @@
     "REGENT_BOMBARD_BOSS_ENCOUNTER.title":  "Le Régent",
     "REGENT_MINION_BOSS_ENCOUNTER.title":  "Le Régent",
     "IRONCLAD_STRIKE_BOSS_ENCOUNTER.title":  "Le Soldat de Fer",
-    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "La Silencieuse"
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "La Silencieuse",
+    "BASELIB_MISSING_HEADER":  "Mod requis manquant : BaseLib",
+    "BASELIB_MISSING_BODY":  "Cette machine n'a pas le mod BaseLib installé (id Steam Workshop 3737335127).\n\nIndisponible :\n· l'écran de configuration des mods en jeu\n· la synchronisation des réglages de l'hôte en multijoueur\n\nTout le reste fonctionne (remplacement des boss, decks/reliques/scripts, compositions multijoueur). Abonnez-vous à BaseLib puis relancez le jeu.",
+    "BASELIB_MISSING_OK":  "Compris",
+    "BASELIB_MISSING_CLOSE":  "Fermer"
 }

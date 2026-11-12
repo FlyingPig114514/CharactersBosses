@@ -1,24 +1,50 @@
-CharacterBosses 安装说明（v0.2.558）
+CharacterBosses 安装说明（v0.2.588）
 ========================================
 
 【本地安装（创意工坊连不上 / 网不好时用这个包）】
-  1. 先确认装了前置模组 **BaseLib**（创意工坊物品 id 3737335127）。本模组**硬依赖**它，
-     没装会在模组列表里报错并加载失败（日志里是 Could not load file or assembly 'BaseLib'）：
+  1. 建议装前置模组 **BaseLib**（创意工坊物品 id 3737335127）—— 从 v0.2.587 起它是**可选**的：
+     不装也能正常玩（Boss 替换 / 卡组 / 遗物 / 剧本 / 联机阵容全都在），只是少了
+     「游戏内『模组配置』界面」和「多人时以房主为准的勾选同步」两项，
+     并且进主菜单时会弹一次提示告诉你少了什么。想装就按下面两种方式：
        · 能上工坊：直接订阅 BaseLib；
        · 完全上不了工坊：让朋友把 <游戏目录>\mods\BaseLib\ 整个文件夹打包发给你，放回同一位置即可。
   2. 把本压缩包里的 CharacterBosses 文件夹整个解压到：
        <Steam>\steamapps\common\Slay the Spire 2\mods\
-     解压完应当是这三个文件（缺一个都会加载失败）：
+     解压完应当是这 5 个文件（缺一个都会加载失败）：
        mods\CharacterBosses\CharacterBosses.dll
+       mods\CharacterBosses\CharacterBosses.Impl107.dll.bin
+       mods\CharacterBosses\CharacterBosses.Impl111.dll.bin
        mods\CharacterBosses\CharacterBosses.json
        mods\CharacterBosses\CharacterBosses.pck
+     那两份 .dll.bin 是模组自己的实现文件，**故意改扩展名**不让 CVC 之类的扫描器
+     误识别；别改回 .dll，也别删 —— 少任何一份，对应版本的玩家就加载不起来。
   3. 启动游戏 → 主菜单「模组」里勾上「玩家角色Boss (Characters Bosses)」→ 重启游戏生效。
      首次装新模组时游戏可能弹一次「模组警告」，确认后才加载。
-  4. 想联机：**所有机器必须是同一版本 + 同一套模组**（模组列表里能看到版本号，本包是 v0.2.558）。
+  4. 想联机：**所有机器必须是同一版本 + 同一套模组**（模组列表里能看到版本号，本包是 v0.2.588）。
   5. 卸载：删掉 mods\CharacterBosses\ 整个文件夹（配置和本机日志在
      %APPDATA%\SlayTheSpire2\ 下，想清干净一起删）。
 
 
+【v0.2.588 汇总】★ 与「CVC-跨版本兼容补丁」兼容
+
+  ── 以前为什么会冲突 ──────────────────────────────
+  · CVC 是加载前先把所有模组 DLL 过一遍 IL 的补丁器，它会扫描 mod 目录里
+    **每一个 .dll** 来判断「这个模组是按哪个游戏版本编的」。
+  · 我们为了同时支持正式版和 beta，包里一直有两份实现（Impl107 / Impl111），
+    游戏只会加载其中一份。CVC 把**没被加载的那份 107** 也扫了进去，
+    于是把整个模组判成「目标 0.107」，还可能去改写一份根本用不上的文件。
+
+  ── 现在怎么改的 ────────────────────────────────
+  · 两份实现改名为 CharacterBosses.Impl107.dll.bin / .Impl111.dll.bin
+    —— 扫描器看不见，模组自己照样能加载（扩展名对它无意义）。
+    **请不要手动改回 .dll**，也不要删掉任何一份。
+  · 顺带把两处与 BaseLib / RitsuLib 共用的图标改写改成「不抢」：
+    只有在别人给出的图标为空、或那个文件不存在时，才填我们自己的图。
+  · 清单加了 min_game_version（0.107.1），版本过低的游戏会直接不加载而不是崩。
+
+  ── 怎么看结果 ──────────────────────────────────
+  · CVC 的报告在 %APPDATA%\SlayTheSpire2\cross_version_compat_report.txt，
+    CharacterBosses 那一行应当是 [clean]、findings 0。
 【v0.2.558 汇总（自 v0.2.535 起）★ 联机请所有机器一起更新】
 
   ── 新 Boss：一层亡灵契约师 2 号「血肉骨」 ───────────────
@@ -186,7 +212,8 @@ CharacterBosses 安装说明（v0.2.558）
 
   ── 一个包同时支持正式版与 beta（沿用 v0.2.40. 的外壳）────────
   · 游戏只加载 11KB 的 CharacterBosses.dll，它探测版本后载入对应实现：
-    正式版（v0.107.x）→ CharacterBosses.Impl107.dll；beta（v0.111.x）→ CharacterBosses.Impl111.dll
+    正式版（v0.107.x）→ CharacterBosses.Impl107.dll.bin；beta（v0.111.x）→ CharacterBosses.Impl111.dll.bin
+    （v0.2.588 起扩展名是 .dll.bin，理由见上面 v0.2.588 那一段）
   · 你不需要管版本，订阅即用；日志会写「双版本外壳：… ⇒ 加载实现 …」。
 
   ── Boss 分类改成「只按层数 + 同角色内部编号」────────────────
@@ -726,8 +753,8 @@ CharacterBosses 安装说明（v0.2.558）
   以下为 v0.2.133 的历史条目（保留备查）：
 
 【v0.2.133 重要变更】
-  1. 本模组现在**依赖 BaseLib**（游戏内「模组配置」里的设置界面要用它）。
-     没装 BaseLib 会加载失败 —— 请先在 Steam 创意工坊订阅 / 装好 BaseLib。
+  1. 本模组从 v0.2.587 起把 BaseLib 改成**可选依赖**：装了就多出「游戏内模组配置」界面（主菜单 →「模组配置」→ CharacterBosses）与「多人以房主为准的勾选同步」；
+     没装也不影响开玩（Boss 替换 / 卡组 / 剧本 / 联机阵容全都在），只是那两项不可用 —— 进主菜单会弹一次提示说明。
      装好之后改设置：主菜单 →「模组配置」→ CharacterBosses。
   2. 设置文件改名：charbosses_config.json → **charbosses_config.cfg**（内容仍是 JSON）。
      旧文件会在下次启动时自动迁移并删除（留着它游戏会把它当模组清单反序列化并报错）。

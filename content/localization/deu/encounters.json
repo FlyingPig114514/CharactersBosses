@@ -121,5 +121,9 @@
     "REGENT_BOMBARD_BOSS_ENCOUNTER.title":  "Der Regent",
     "REGENT_MINION_BOSS_ENCOUNTER.title":  "Der Regent",
     "IRONCLAD_STRIKE_BOSS_ENCOUNTER.title":  "Der Eiserne",
-    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "Die Stille"
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "Die Stille",
+    "BASELIB_MISSING_HEADER":  "Erforderliche Mod fehlt: BaseLib",
+    "BASELIB_MISSING_BODY":  "Auf diesem Rechner fehlt die Mod BaseLib (Steam Workshop id 3737335127).\n\nNicht verfügbar:\n· der Mod-Konfigurationsbildschirm im Spiel\n· die Synchronisierung der Host-Einstellungen im Mehrspieler\n\nAlles andere funktioniert (Boss-Ersetzung, Decks/Relikte/Skripte, Mehrspieler-Aufstellungen). BaseLib abonnieren und das Spiel neu starten.",
+    "BASELIB_MISSING_OK":  "Verstanden",
+    "BASELIB_MISSING_CLOSE":  "Schließen"
 }

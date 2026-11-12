@@ -150,6 +150,8 @@ public static class BossEnemySpreadPatch
     /// <summary>每个站位的中文名（日志与文档共用同一套说法）。</summary>
     private static string[] PlacementNames(int count) => count switch
     {
+        // 5 只（5 人联机）：用户 2026-11-11「5 个 boss 的站位是 w 型」= 上下上下上（两个谷、三个峰）
+        >= 5 => new[] { "左上", "左下", "中上", "右下", "右上" },
         >= 4 => new[] { "左上", "下偏左", "上偏右", "右下" },
         3 => new[] { "左上", "中下", "右上" },
         _ => new[] { "左上", "右下" },
@@ -167,6 +169,30 @@ public static class BossEnemySpreadPatch
     /// </summary>
     private static float[] SlotX(int count, float minX, float maxX, float centerX, float viewW)
     {
+        if (count >= 5)
+        {
+            // ★ v0.2.585（5 人联机）：5 只在可用宽度里**等距**摆开（相邻 ≈ 1.2×SpreadX ≈ 240），
+            //   右侧仍贴右缘、左侧仍不压玩家区 —— 和 4 只那套同一套边界规则，只是多一个点。
+            //   4 只时横向占 ~900px，这里 5 个点占 ~960px，量级相同 ⇒ 战场缩放不用动（仍是 0.80）。
+            float right = viewW > 600f ? viewW - SpreadX * 0.75f : maxX + SpreadX * 0.75f;
+            float lo = viewW > 600f ? viewW * 0.17f : minX - SpreadX * 0.75f;
+            float need5 = SpreadX * 1.2f * 4f;          // 4 个间隔
+            float left = right - need5;
+            if (left < lo)
+            {
+                left = lo;                              // 让位给玩家区，剩下宽度均分（W 形状不变）
+                if (right - left < need5 * 0.5f) right = left + need5;   // 极端窄屏兜底
+            }
+            float span5 = right - left;
+            return new[]
+            {
+                left,
+                left + span5 * 0.25f,
+                left + span5 * 0.5f,
+                left + span5 * 0.75f,
+                right,
+            };
+        }
         if (count >= 4)
         {
             // 用户 2026-10-29 第三次反馈：「右边还有那么大空间呢，再往右错一些」。
@@ -221,6 +247,8 @@ public static class BossEnemySpreadPatch
     /// </summary>
     private static float[] SlotY(int count, float upY, float downY)
     {
+        // 5 只（5 人联机）：上 / 下 / 上 / 下 / 上 —— 字母 W 的五个折点（两个谷、三个峰）
+        if (count >= 5) return new[] { upY, downY, upY, downY, upY };
         if (count >= 4) return new[] { upY, downY, upY, downY };
         if (count == 3) return new[] { upY, downY, upY };
         return new[] { upY, downY };

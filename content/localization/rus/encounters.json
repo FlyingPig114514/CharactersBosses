@@ -121,5 +121,9 @@
     "REGENT_BOMBARD_BOSS_ENCOUNTER.title":  "Наследник",
     "REGENT_MINION_BOSS_ENCOUNTER.title":  "Наследник",
     "IRONCLAD_STRIKE_BOSS_ENCOUNTER.title":  "Латоносец",
-    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "Безмолвная"
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "Безмолвная",
+    "BASELIB_MISSING_HEADER":  "Не хватает обязательного мода: BaseLib",
+    "BASELIB_MISSING_BODY":  "На этой машине не установлен мод BaseLib (id в Steam Workshop 3737335127).\n\nНедоступно:\n· экран настройки модов в игре\n· синхронизация настроек хоста в многопользовательской игре\n\nВсё остальное работает (замена боссов, колоды/реликвии/скрипты, составы в мультиплеере). Подпишитесь на BaseLib и перезапустите игру.",
+    "BASELIB_MISSING_OK":  "Понятно",
+    "BASELIB_MISSING_CLOSE":  "Закрыть"
 }

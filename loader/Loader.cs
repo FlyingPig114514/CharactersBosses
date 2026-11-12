@@ -9,13 +9,13 @@ namespace CharacterBosses;
 
 /// <summary>
 /// **双版本外壳（loader）** —— 游戏只会加载这一个 dll（文件名 = 清单里的模组 id），
-/// 真正的实现放在同目录的 `CharacterBosses.Impl107.dll` / `CharacterBosses.Impl111.dll`：
+/// 真正的实现放在同目录的 `CharacterBosses.Impl107.dll.bin` / `CharacterBosses.Impl111.dll.bin`：
 ///
 /// <code>
 /// mods/CharacterBosses/
 ///   CharacterBosses.dll            ← 本文件（外壳：版本判断 + 转发）
-///   CharacterBosses.Impl107.dll    ← 正式版 v0.107 的实现
-///   CharacterBosses.Impl111.dll    ← beta v0.111 的实现
+///   CharacterBosses.Impl107.dll.bin ← 正式版 v0.107 的实现
+///   CharacterBosses.Impl111.dll.bin ← beta v0.111 的实现
 ///   CharacterBosses.pck / .json
 /// </code>
 ///
@@ -42,14 +42,19 @@ public static class LoaderEntry
 
             string want = isBeta ? ImplBeta : ImplRelease;
             string other = isBeta ? ImplRelease : ImplBeta;
-            string path = Path.Combine(dir, want);
 
-            if (!File.Exists(path))
+            // ★ v0.2.588：实现文件现在以 **`.dll.bin`** 的名义随包发布（见 install-mod.bat / pack-dist.ps1）。
+            //   原因：`CVC-跨版本兼容补丁`（以及其它扫描器）会把 mod 目录里**每一个 `.dll`** 当成一个模组实现去
+            //   指纹识别；我们同时带 107/111 两份，于是它扫到休眠的那份 `Impl107.dll`，把整个模组判定成
+            //   「目标 0.107（older→newer）」—— 那是 CVC 报告里对我们唯一不利的推断，还会让它去 rewrite
+            //   一份根本不会被加载的 DLL。改成 `.dll.bin` 后扫描器看不见它，我们自己照样能按路径加载。
+            string path = FindImpl(dir, want);
+            if (path == null)
             {
-                Log($"双版本外壳：找不到 {want}，尝试退回另一份");
-                string fallback = Path.Combine(dir, other);
-                if (!File.Exists(fallback)) { Log($"双版本外壳：{want} 与 {other} 都不在 {dir} ⇒ 放弃"); return; }
-                path = fallback; want = other;
+                Log($"双版本外壳：找不到 {want}（.dll / .dll.bin 都没有），尝试退回另一份");
+                path = FindImpl(dir, other);
+                if (path == null) { Log($"双版本外壳：{want} 与 {other} 都不在 {dir} ⇒ 放弃"); return; }
+                want = other;
             }
 
             Log($"双版本外壳：游戏={VersionText()}（探测 beta={isBeta}）⇒ 加载实现 {want}");
@@ -75,7 +80,7 @@ public static class LoaderEntry
                 // 再兜一层：按「名字就叫 ModEntry、命名空间是 CharacterBosses」扫一遍
                 try
                 {
-                    foreach (var t in asm.GetTypes())
+                    foreach (var t in GetLoadableTypes(asm))
                     {
                         if (t.Name != "ModEntry") continue;
                         entry = t;
@@ -108,6 +113,22 @@ public static class LoaderEntry
     }
 
     /// <summary>
+    /// 按「.dll → .dll.bin」的顺序找实现文件（v0.2.588 起默认是后者）。
+    /// `LoadFromAssemblyPath` 不看扩展名，所以 `.bin` 照样能加载。
+    /// </summary>
+    private static string? FindImpl(string dir, string fileName)
+    {
+        try
+        {
+            string direct = Path.Combine(dir, fileName);
+            if (File.Exists(direct)) return direct;
+            string hidden = direct + ".bin";
+            if (File.Exists(hidden)) return hidden;
+            return null;
+        }
+        catch { return null; }
+    }
+    /// <summary>
     /// 把实现程序集里的**所有具体 `AbstractModel` 子类**登记进 `ModelDb`
     /// （游戏只自动扫描清单声明的那个程序集，第二个程序集得我们自己来）。
     /// 不登记的症状：设 Boss 槽时报 `ENCOUNTER.XXX not present in the dictionary`、
@@ -119,7 +140,7 @@ public static class LoaderEntry
         {
             var modelBase = typeof(MegaCrit.Sts2.Core.Models.AbstractModel);
             int injected = 0, total = 0;
-            foreach (var t in asm.GetTypes())
+            foreach (var t in GetLoadableTypes(asm))
             {
                 try
                 {
@@ -189,11 +210,40 @@ public static class LoaderEntry
         return null;
     }
 
+    /// <summary>
+    /// **能拿到多少算多少**的类型枚举（★ v0.2.587）。
+    ///
+    /// 为什么要它：实现程序集里有几个类型直接实现了 BaseLib 的接口（`ICustomMessage` 等）。
+    /// 玩家**没装 BaseLib** 时，`Assembly.GetTypes()` 会整体抛 `ReflectionTypeLoadException`，
+    /// 于是我们一个模型都登记不上 ⇒ 整局没有角色 Boss（表现为「模组装了但什么都没变」）。
+    /// 这里改用异常里带回来的**部分结果**：坏掉的类型跳过，其余照常登记。
+    /// </summary>
+    private static Type[] GetLoadableTypes(Assembly asm)
+    {
+        try { return asm.GetTypes(); }
+        catch (ReflectionTypeLoadException e)
+        {
+            var ok = new List<Type>();
+            int failed = 0;
+            foreach (var t in e.Types)
+            {
+                if (t != null) ok.Add(t);
+                else failed++;
+            }
+            Log($"双版本外壳：有 {failed} 个类型加载不了（多半是没装 BaseLib）⇒ 其余 {ok.Count} 个照常处理");
+            return ok.ToArray();
+        }
+        catch (Exception e)
+        {
+            Log("双版本外壳：枚举类型失败: " + e.GetType().Name + ": " + e.Message);
+            return Array.Empty<Type>();
+        }
+    }
     private static void DumpLoadDiagnostics(Assembly asm)
     {
         try
         {
-            var types = asm.GetTypes();
+            var types = GetLoadableTypes(asm);
             Log($"双版本外壳：该实现里共 {types.Length} 个类型，其中名字含 ModEntry 的：");
             foreach (var t in types)
             {

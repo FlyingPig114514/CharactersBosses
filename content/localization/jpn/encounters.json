@@ -121,5 +121,9 @@
     "REGENT_BOMBARD_BOSS_ENCOUNTER.title":  "リージェント",
     "REGENT_MINION_BOSS_ENCOUNTER.title":  "リージェント",
     "IRONCLAD_STRIKE_BOSS_ENCOUNTER.title":  "アイアンクラッド",
-    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "サイレント"
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "サイレント",
+    "BASELIB_MISSING_HEADER":  "前提 MOD BaseLib が見つかりません",
+    "BASELIB_MISSING_BODY":  "この環境には前提 MOD の BaseLib が入っていません（Steam ワークショップ id 3737335127）。\n\n使えない機能：\n· ゲーム内の「MOD 設定」画面\n· マルチプレイ時のホスト設定（ボス候補・共用プール）同期\n\nそれ以外はすべて動作します（ボス置換・デッキ/レリック/スクリプト・マルチ編成）。BaseLib を購読してゲームを再起動してください。",
+    "BASELIB_MISSING_OK":  "了解",
+    "BASELIB_MISSING_CLOSE":  "閉じる"
 }

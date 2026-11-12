@@ -140,18 +140,28 @@ echo [3/4] Copying files and generating manifests...
 rem 外壳（文件名必须是模组 id）+ 两份实现
 if exist "!TOOLS_DIR!loader\bin\CharacterBosses.dll" (
     copy /Y "!TOOLS_DIR!loader\bin\CharacterBosses.dll" "!MOD_SUBFOLDER!\CharacterBosses.dll" >nul
-    echo   - Loader copied (CharacterBosses.dll)
+    echo   - Loader copied: CharacterBosses.dll
 ) else (
     copy /Y "!MOD_SRC_DIR!\bin\Release-!STS2_TARGET!\!MOD_NAME!.dll" "!MOD_SUBFOLDER!\" >nul
-    echo   - DLL copied (Release-!STS2_TARGET!，无外壳)
+    echo   - DLL copied: Release-!STS2_TARGET! [no shell]
 )
+rem ★ v0.2.588: both implementations ship as ".dll.bin" instead of ".dll".
+rem   Reason: CVC (cross-version compat) and similar scanners treat EVERY ".dll" in a mod
+rem   folder as a separate mod implementation and fingerprint its target game version.
+rem   Our dormant Impl107 copy made the whole mod look like a 0.107-target mod.
+rem   The loader uses AssemblyLoadContext.LoadFromAssemblyPath, which ignores extensions.
+rem   Also delete leftover ".dll" copies from older versions so both cannot coexist.
+if exist "!MOD_SUBFOLDER!\!MOD_NAME!.Impl107.dll.bin" del /q "!MOD_SUBFOLDER!\!MOD_NAME!.Impl107.dll.bin" >nul 2>nul
+if exist "!MOD_SUBFOLDER!\!MOD_NAME!.Impl111.dll.bin" del /q "!MOD_SUBFOLDER!\!MOD_NAME!.Impl111.dll.bin" >nul 2>nul
+if exist "!MOD_SUBFOLDER!\!MOD_NAME!.Impl107.dll" del /q "!MOD_SUBFOLDER!\!MOD_NAME!.Impl107.dll" >nul 2>nul
+if exist "!MOD_SUBFOLDER!\!MOD_NAME!.Impl111.dll" del /q "!MOD_SUBFOLDER!\!MOD_NAME!.Impl111.dll" >nul 2>nul
 if exist "!MOD_SRC_DIR!\bin\Release-107\!MOD_NAME!.Impl107.dll" (
-    copy /Y "!MOD_SRC_DIR!\bin\Release-107\!MOD_NAME!.Impl107.dll" "!MOD_SUBFOLDER!\" >nul
-    echo   - Impl copied (107)
+    copy /Y "!MOD_SRC_DIR!\bin\Release-107\!MOD_NAME!.Impl107.dll" "!MOD_SUBFOLDER!\!MOD_NAME!.Impl107.dll.bin" >nul
+    echo   - Impl copied: 107 as .dll.bin
 )
 if exist "!MOD_SRC_DIR!\bin\Release-111\!MOD_NAME!.Impl111.dll" (
-    copy /Y "!MOD_SRC_DIR!\bin\Release-111\!MOD_NAME!.Impl111.dll" "!MOD_SUBFOLDER!\" >nul
-    echo   - Impl copied (111)
+    copy /Y "!MOD_SRC_DIR!\bin\Release-111\!MOD_NAME!.Impl111.dll" "!MOD_SUBFOLDER!\!MOD_NAME!.Impl111.dll.bin" >nul
+    echo   - Impl copied: 111 as .dll.bin
 )
 
 rem 虚影精灵表以**独立文件**随 mod 一起安装，不再 base64 内嵌进 DLL。
@@ -177,7 +187,7 @@ if defined MANIFEST_SRC (
     rem   `[ERROR] Mod manifest ... is missing the 'id' field! ... The mod will not be loaded.`
     rem   <Mod>.json 本身已经是一份完整清单（build_pck.gd 也明确不把清单打进 pck），所以删掉这份多余的。
     if exist "!MOD_SUBFOLDER!\mod_manifest.json" del /q "!MOD_SUBFOLDER!\mod_manifest.json"
-    echo   - mod_manifest.json removed (只保留 !MOD_NAME!.json)
+    echo   - mod_manifest.json removed; keep only !MOD_NAME!.json
 ) else (
     echo   - WARNING: No manifest found in !MOD_SRC_DIR!
 )

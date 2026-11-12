@@ -4,7 +4,7 @@
       游戏按 `<Mod>.json` 里的 id 找这个 dll）。
 
     它只做两件事：判断当前游戏版本 → 加载同目录下的
-    `CharacterBosses.Impl107.dll` / `CharacterBosses.Impl111.dll` 并转发 Initialize()。
+    `CharacterBosses.Impl107.dll.bin` / `CharacterBosses.Impl111.dll.bin` 并转发 Initialize()。
 
     ⚠ 外壳必须只引用**两版都有**的游戏 API（这里只用到 `[ModInitializer]` 特性），
       所以固定引用正式版（v0.107，最低版本）的程序集。

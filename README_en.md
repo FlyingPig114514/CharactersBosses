@@ -79,7 +79,7 @@ contributed content, tested and reported bugs!
 - Conventions: `AGENTS.md`, `rules.md`, `rules_en.md`
 - Design notes and investigations: `docs/plans/`
 - Dual-target build: `src/CharacterBosses.csproj` builds `Sts2Target=107|111` into
-  `CharacterBosses.Impl107.dll` / `CharacterBosses.Impl111.dll`; the shell in `loader/` loads one at runtime.
+  `CharacterBosses.Impl107.dll.bin` / `CharacterBosses.Impl111.dll.bin`; the shell in `loader/` loads one at runtime (the `.bin` suffix keeps scanner mods such as CVC from mistaking them for separate mods).
 
 ## License
 

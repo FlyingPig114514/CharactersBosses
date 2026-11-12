@@ -121,5 +121,9 @@
     "REGENT_BOMBARD_BOSS_ENCOUNTER.title":  "리젠트",
     "REGENT_MINION_BOSS_ENCOUNTER.title":  "리젠트",
     "IRONCLAD_STRIKE_BOSS_ENCOUNTER.title":  "아이언클래드",
-    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "사일런트"
+    "SILENT_SNAKEBITE_BOSS_ENCOUNTER.title":  "사일런트",
+    "BASELIB_MISSING_HEADER":  "필수 모드 BaseLib이(가) 없습니다",
+    "BASELIB_MISSING_BODY":  "이 환경에는 선행 모드 BaseLib이(가) 설치되어 있지 않습니다 (Steam 창작마당 id 3737335127).\n\n사용할 수 없는 기능:\n· 게임 내 '모드 설정' 화면\n· 멀티플레이에서 호스트 설정(보스 후보·공용 풀) 동기화\n\n나머지는 모두 정상 동작합니다(보스 교체, 덱/유물/스크립트, 멀티 편성). BaseLib을 구독한 뒤 게임을 다시 시작하세요.",
+    "BASELIB_MISSING_OK":  "확인",
+    "BASELIB_MISSING_CLOSE":  "닫기"
 }

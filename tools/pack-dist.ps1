@@ -107,26 +107,46 @@ function Test-BytesContain([byte[]]$hay, [string]$text) {
     return $false
 }
 
+# ★ v0.2.588：两份实现改以 **`<名字>.dll.bin`** 发布（不再用 `.dll`）。
+#   原因：CVC-跨版本兼容补丁 以及其它扫描器会把 mod 目录里**每个 .dll** 当成一个模组实现做
+#   版本指纹；我们同时带 107/111 两份，休眠的那份会让扫描器把整个模组判成「目标 0.107
+#   (older→newer)」，还会去改写一份根本不会被加载的 DLL。外壳 loader 用
+#   `LoadFromAssemblyPath` 按路径载入、不看扩展名，所以 `.bin` 完全等价。
+#   这里两种扩展名都接受（老目录可能还是 .dll），搬过去时统一改名成 `.bin`。
+function Resolve-ImplFile([string]$dir, [string]$base) {
+    $hidden = Join-Path $dir ($base + '.bin')
+    if (Test-Path $hidden) { return $hidden }
+    $plain = Join-Path $dir $base
+    if (Test-Path $plain) { return $plain }
+    return $null
+}
+
+$implBases = @('CharacterBosses.Impl107.dll', 'CharacterBosses.Impl111.dll')
+$implNames = @()
 $badVersion = @()
-foreach ($n in @('CharacterBosses.Impl107.dll', 'CharacterBosses.Impl111.dll')) {
-    $p = Join-Path $Source $n
-    if (-not (Test-Path $p)) { continue }
+foreach ($n in $implBases) {
+    $p = Resolve-ImplFile $Source $n
+    if (-not $p) { continue }
+    $implNames += (Split-Path -Leaf $p)
     $v = Get-ImplVersion $p
-    Write-Host ('[dist] ' + $n + ' 版本串: ' + ($(if ($v) { 'v' + $v } else { '<读不到>' })))
-    if ($v -ne $version) { $badVersion += ($n + '=' + $(if ($v) { 'v' + $v } else { '<读不到>' })) }
+    Write-Host ('[dist] ' + (Split-Path -Leaf $p) + ' 版本串: ' + ($(if ($v) { 'v' + $v } else { '<读不到>' })))
+    if ($v -ne $version) { $badVersion += ((Split-Path -Leaf $p) + '=' + $(if ($v) { 'v' + $v } else { '<读不到>' })) }
 }
 if ($badVersion.Count -gt 0) {
     Write-Host ('[dist] ✗ 拒绝打包：源目录的实现版本与清单版本 v' + $version + ' 不一致 ⇒ ' + ($badVersion -join ', ')) -ForegroundColor Red
-    Write-Host '[dist]   最常见原因：游戏正开着，install-mod.bat 复制 Impl*.dll 时文件被占用（copy 失败被 >nul 吞掉）。' -ForegroundColor Yellow
+    Write-Host '[dist]   最常见原因：游戏正开着，install-mod.bat 复制 Impl*.dll(.bin) 时文件被占用（copy 失败被 >nul 吞掉）。' -ForegroundColor Yellow
     Write-Host '[dist]   ⇒ 先完全退出游戏，再重跑 install-mod.bat（两个目标各编一次），然后再打包。' -ForegroundColor Yellow
     exit 1
 }
 
+if ($implNames.Count -lt 2) {
+    Write-Host ('[dist] ✗ 拒绝打包：两份实现缺了一份（找到: ' + $(if ($implNames.Count) { $implNames -join ', ' } else { '一个都没有' }) + '）') -ForegroundColor Red
+    Write-Host '[dist]   双版本外壳要求 Impl107 与 Impl111 同时在场，否则另一个游戏分支的玩家会载入失败。' -ForegroundColor Yellow
+    exit 1
+}
+
 # 只搬这几个文件（游戏 mods 目录里还有 frames\ 等非工坊内容）
-$names = @(
-    'CharacterBosses.dll',
-    'CharacterBosses.Impl107.dll',
-    'CharacterBosses.Impl111.dll',
+$names = @('CharacterBosses.dll') + $implNames + @(
     'CharacterBosses.json',
     'CharacterBosses.pck',
     '安装说明.txt'
