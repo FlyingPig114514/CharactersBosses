@@ -10,13 +10,14 @@
 #   ... -By variant+players             # 18 只 Boss 各自再按人数拆
 #   ... -CleanSolo                      # 只算「单人 + 玩家用原版角色」的对局（= -SoloOnly -VanillaChars）
 #   ... -SoloOnly                       # 只算单人局
+#   ... -Players 2,3,4                  # 只算指定人数的对局（多人胜率用这个；单人写 -Players 1）
 #   ... -VanillaChars                   # 只算玩家用原版角色的对局（pCharMod 全是 vanilla）
 #   ... -Asc10                          # 只算**进阶 10** 的对局（用户 2026-11-01 要求）
 #   ... -Ascension 9,10                 # 进阶筛选的通用写法（单个也行：-Ascension 10）
 #   ... -By charmod                     # 按「玩家角色所属模组」分组（看模组角色有没有把数据拉偏）
 #
 # 默认 -By variant：分组键取自 lineup（第 0 位 = 主 Boss）/ bossList（多人局全部），
-# 也就是**18 只 Boss 的变体键**（SILENT_SLY / SILENT_BREWER / IRONCLAD_ANGER / DEFECT_DARK…）。
+# 也就是**当前 34 只 Boss 的变体键**（SILENT_SLY / SILENT_BREWER / IRONCLAD_ANGER / DEFECT_DARK…）。
 # 注意 `boss` 列只有**角色**（SILENT_BOSS / DEFECT_BOSS…，5 个），别用它数 Boss 数量。
 #   ... -MinVersion 0.2.276             # 只算这个版本及以后的数据
 #   ... -Csv "$env:USERPROFILE\Desktop\charbosses-stats.csv"
@@ -38,7 +39,7 @@ param(
     [string]$TableId = '',
     [string]$ConfigPath = '',
 
-    # variant = 18 只 Boss（`lineup`/`bossList` 里的变体键，如 SILENT_SLY / IRONCLAD_ANGER）；
+    # variant = 34 只 Boss（`lineup`/`bossList` 里的变体键，如 SILENT_SLY / IRONCLAD_ANGER）；
     # boss    = 只按角色（5 个：SILENT_BOSS…），会把奇巧猎/炼药猎/刀猎混在一起
     [ValidateSet('variant', 'variant+players', 'variant+charmod',
                  'boss', 'players', 'charmod', 'boss+players', 'boss+charmod')]
@@ -58,6 +59,11 @@ param(
     [switch]$Asc10,
     # 进阶筛选的通用写法：单个（9）或多个（9,10）都行；行里读不到进阶的会被排除
     [string]$Ascension = '',
+
+    # 只要**指定人数**的对局（用户 2026-11-11：「计算多人胜率，分 2/3/4 人」）：
+    #   写 `-Players 2,3,4` / `-Players 2` / `-Players 2 3 4` 都行；
+    #   读不到 players 的旧行会被排除（和 -SoloOnly 同一套口径）。
+    [string]$Players = '',
 
     [string]$MinVersion = '',
     [string]$Csv = '',
@@ -124,6 +130,20 @@ if ($Ascension) {
 if ($Asc10 -and -not ($ascWanted -contains 10)) { $ascWanted += 10 }
 $ascWanted = @($ascWanted | Select-Object -Unique)
 $useAscFilter = $ascWanted.Count -gt 0
+
+# -Players 2,3,4 —— 只要这些人数（含单人时也可以写 1）
+$playersWanted = @()
+if ($Players) {
+    foreach ($part in ($Players -split '[,;\s]+')) {
+        $p = $part.Trim()
+        if (-not $p) { continue }
+        $n = 0
+        if ([int]::TryParse($p, [ref]$n) -and $n -gt 0) { $playersWanted += $n }
+        else { Write-Host ("-Players 里的「{0}」不是正整数，已忽略" -f $p) -ForegroundColor Yellow }
+    }
+}
+$playersWanted = @($playersWanted | Select-Object -Unique)
+$usePlayersFilter = $playersWanted.Count -gt 0
 
 # ── HTTP（和其它 feishu-*.ps1 一样走 curl，避免 PS 的 TLS 老问题）───────────
 $base = 'https://open.feishu.cn/open-apis'
@@ -292,12 +312,16 @@ while ($true) {
 
 }
 
-# ── 过滤：只要单人 / 只要原版角色 / 只要某个进阶（对「联网拉到的」和「自检假数据」都生效）──
-if ($SoloOnly -or $VanillaChars -or $useAscFilter) {
+# ── 过滤：只要单人 / 只要指定人数 / 只要原版角色 / 只要某个进阶（对「联网拉到的」和「自检假数据」都生效）──
+if ($SoloOnly -or $usePlayersFilter -or $VanillaChars -or $useAscFilter) {
     $kept = New-Object System.Collections.ArrayList
     foreach ($r in $rows) {
         if ($SoloOnly) {
             if ($null -eq $r.players -or [int]$r.players -ne 1) { $skipped.multi++; continue }
+        }
+        if ($usePlayersFilter) {
+            if ($null -eq $r.players) { $skipped.multi++; continue }              # 老版本没记人数
+            if (-not ($playersWanted -contains [int]$r.players)) { $skipped.multi++; continue }
         }
         if ($VanillaChars) {
             $mods = @(([string]$r.charMod).Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne '' })
@@ -317,9 +341,10 @@ if ($SoloOnly -or $VanillaChars -or $useAscFilter) {
 
 $filterNote = @()
 if ($SoloOnly) { $filterNote += '只要单人' }
+if ($usePlayersFilter) { $filterNote += ('只要 ' + (($playersWanted | Sort-Object) -join '/') + ' 人局') }
 if ($VanillaChars) { $filterNote += '只要原版角色' }
 if ($useAscFilter) { $filterNote += ('只要进阶 ' + (($ascWanted | Sort-Object) -join '/')) }
-Write-Host ("      跳过：非对局 {0}、未打完 {1}、控制台 {2}、无结果 {3}、旧版本 {4}、多人 {5}、模组角色 {6}、读不到角色模组 {7}、进阶不符 {8}" -f `
+Write-Host ("      跳过：非对局 {0}、未打完 {1}、控制台 {2}、无结果 {3}、旧版本 {4}、人数不符 {5}、模组角色 {6}、读不到角色模组 {7}、进阶不符 {8}" -f `
     $skipped.diag, $skipped.aborted, $skipped.console, $skipped.noresult, $skipped.old,
     $skipped.multi, $skipped.modchar, $skipped.nocharmod, $skipped.noasc) -ForegroundColor DarkGray
 if ($filterNote.Count -gt 0) {
@@ -483,7 +508,7 @@ Write-Host ('      分档基准：原版 Boss 的玩家胜率约 75%～88%（击
 Write-Host ('      红色 = 低于 {0:0}%（比原版最难的还难）；黄色 = 高于 {1:0}%（比原版最温和的还简单）；其余落在原版区间内。' -f `
     ($HardBelow * 100), ($EasyAbove * 100)) -ForegroundColor DarkGray
 Write-Host '      样本 <5 场的分组仅供参看。' -ForegroundColor DarkGray
-Write-Host ('      分组键 = Boss 变体（18 只）；多人局默认只记阵容第 0 位那只，加 -ExplodeMulti 可让场上每只各记一次。') -ForegroundColor DarkGray
+Write-Host ('      分组键 = Boss 变体（当前 34 只）；多人局默认只记阵容第 0 位那只，加 -ExplodeMulti 可让场上每只各记一次。') -ForegroundColor DarkGray
 
 # ── CSV ─────────────────────────────────────────────────────────────────
 if (-not $NoCsv) {
