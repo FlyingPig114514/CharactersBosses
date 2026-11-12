@@ -11,6 +11,7 @@ Learned preferences, project conventions, and corrections.
 - 打包（Compress-Archive 出 .dist\CharacterBosses-vX.zip）必须等用户明确要求，默认不打包；只构建 + 装进游戏。
 ## Conventions
 
+- 创意工坊页面显示的更新日志来自 workshop\workshop.json 的 changeNote 字段（上传器 SubmitItemUpdate 只读它）；workshop\changenote.txt 只是人读副本，改它不会上线。上传前两处都要同步。
 - 【本模组排查口诀】「规划日志说对了、面板上却是错的」⇒ 一定是 `BladesGrowth.RecomputeAll`（无球 Boss）或 `CharBossMonster.RefreshPlannedIntents`（有球 Boss）这条**每帧重算**的路少传了参数，把规划期的 `PlannedPlay.Intents` 盖掉了。新增任何「牌面上没有对应变量、只能由剧本算出来」的意图数值（shivOverride / extraHits / discardsThisTurn / simBlock…）时，**三条路都要传**：BossScriptPlanner 规划、BladesGrowth、有球分支；核对办法是先看日志里的 `剧本第 N 回合: 打 [...]` 与 `意图 X: [...]` 是否与面板一致。
 - Boss 名与特殊效果名相互独立：「状态机」是 Boss 名，「同步」是它的特殊效果名；特殊效果名一般与某张卡牌同名（例外：死亡收割，是 1 代卡），但效果可与该卡无关。不要用一方推断另一方，等用户明确告知。
 - 【皮肤 mod 兼容】皮肤 mod 有三类做法：①改 `CharacterModel.VisualsPath`（或 pck 覆盖同路径资源）；②改 `CharacterModel.CreateVisuals()`；③**在 `NCreature._Ready` 后置补丁里判 `entity.Player?.Character.Id.Entry` 再塞自己的场景**（工坊「空洞骑士」皮肤就是这样）。我们这只 Boss 的影子 Player 是在 `AfterAddedToRoom` 才绑的 ⇒ `_Ready` 那一刻 `Entity.Player == null` ⇒ 第③类一律失效。解决办法：绑好之后用 `Harmony.GetPatchInfo`（反射，这版是 internal）拿到 `Patches.Postfixes`，把别家挂在 `_Ready` 上的、签名是 `static void X(NCreature)` 的后置补丁对我们这只 Boss 的节点**补跑一次**（每只只补一次，那些补丁不幂等）。
