@@ -163,7 +163,8 @@ public sealed class NecrobinderDoomBossEncounter : NecrobinderBossEncounter
     ///
     /// ⚠ 2026-10-30 用户澄清：曾经在这里写「亡灵契约师统一用群魂 / 骷髅」并把 `soul_bone` 套给
     /// 灾厄骨与根除骨，但**用户否认说过这句话**（那张图是 2026-10-26 只给「灵魂骨」的）。
-    /// 现在按用户口径：**只有灵魂骨**用 `soul_bone`，其余亡灵档位一律角色徽记。
+    /// 2026-11-14 更新：根除骨与养手骨各自有了专属图（`eradicate_bone` / `osty_bone`），
+    /// 但**灾厄骨仍然用角色徽记**（用户只点名了那两个）。
     /// </summary>
 }
 
@@ -212,22 +213,34 @@ public sealed class NecrobinderFleshBossEncounter : NecrobinderBossEncounter
 /// 第三幕「**养手骨**」的固定档位版（用户 2026-11-03；三层亡灵契约师的**第二套设计**，第一套是「根除骨」）。
 /// 剧本 <c>Core/OstyKeeperScript.cs</c>，特殊效果「不死」= <c>Powers/BossOstyUndyingPower.cs</c>。
 /// 与「刀猎/炼药猎」「易伤战/巨石战」「无色储君/辉星储」同一套机制：以**房间遭遇**为准，种子 50/50。
+///
+/// 地图图标（用户 2026-11-14 指定）：用「骨手」那张专属图 ——
+/// 资源 <c>res://CharacterBosses/images/map/osty_bone</c>（+.png / _outline.png，随 PCK 打包，
+/// 见 tools\art\pck_extras.txt；由 tools\art\make-soul-bone-icon.ps1 从素材图生成）。
 /// </summary>
 public sealed class NecrobinderOstyBossEncounter : NecrobinderBossEncounter
 {
     public override int? TierAct => 2;
+
+    public override string BossNodePath => "res://CharacterBosses/images/map/osty_bone";
 }
-/// <summary>第三幕「根除骨」的固定档位版（剧本 <c>Core/NecrobinderAct3Script.cs</c>）。</summary>
+/// <summary>
+/// 第三幕「根除骨」的固定档位版（剧本 <c>Core/NecrobinderAct3Script.cs</c>）。
+///
+/// 地图图标（用户 2026-11-14 指定）：用「镰刀骨」那张专属图 ——
+/// 资源 <c>res://CharacterBosses/images/map/eradicate_bone</c>（+.png / _outline.png，随 PCK 打包，
+/// 见 tools\art\pck_extras.txt；由 tools\art\make-soul-bone-icon.ps1 从素材图生成）。
+///
+/// ⚠ 2026-10-30 时用户说过「只有灵魂骨才用专属图」，**2026-11-14 已更新**：
+///   现在亡灵契约师的三个档位各自有自己的图（灵魂骨 soul_bone / 根除骨 eradicate_bone /
+///   养手骨 osty_bone），所以三层两颗徽章不会再撞成同一张。
+///   同层的**虚无骨**（第二套设计）与**血肉骨**仍然不覆写 ⇒ 走亡灵契约师的角色徽记。
+/// </summary>
 public sealed class NecrobinderEradicateBossEncounter : NecrobinderBossEncounter
 {
     public override int? TierAct => 2;
 
-    /// <summary>
-    /// 地图徽章：**根除骨没有专属美术**（用户 2026-10-30 明确指出：只有「灵魂骨」才用 `soul_bone` 那张）。
-    /// 所以这里**不覆写** `BossNodePath` ⇒ 走基类的 TheKinBoss 占位 ⇒ 由
-    /// <c>Patches/BossMapPointCharacterIconPatch</c> 换成**亡灵契约师的角色徽记**
-    /// （这样三层两颗徽章也不会撞成同一张图）。
-    /// </summary>
+    public override string BossNodePath => "res://CharacterBosses/images/map/eradicate_bone";
 }
 
 /// <summary>第一幕「碎屑储君」的固定档位版（剧本 <c>Core/DebrisRegentScript.cs</c>）。</summary>

@@ -45,6 +45,7 @@ Learned preferences, project conventions, and corrections.
 - 本 mod 里 Boss 的影子 Player 也满足 Creature.IsPlayer（Creature.Player != null）⇒ 会出现在 CombatState.Players 里；凡「玩家」判定必须用 BossLockOn.RealPlayers（Creature.Monster == null 过滤），判断是否多人要用 MultiBossPlan.WantsSecondBoss（读 RunState.Players）。
 ## Do-Not-Repeat
 
+- 工坊上传失败先看 Steam 日志（C:\Program Files (x86)\Steam\logs\workshop_log.txt 与 console_log.txt）：`LogonFailure Rate Limit Exceeded` = 短时间内重复调用 SteamAPI 登录被限流，继续重试只会更糟，必须等几分钟以上；`No Connection` 是客户端掉线，不是上传器的问题。另外 git push 用 wincred 时必须在 danger-full-access 下跑，否则 credential helper 子进程起不来（couldn't create signal pipe）。
 - tools\*.ps1 必须保留 UTF-8 BOM（edit 工具会把它写掉，导致 powershell -File 按 ANSI 解码、CJK 报解析错误）；改完用 [System.IO.File]::WriteAllText + New-Object System.Text.UTF8Encoding($true) 重写。同理 .cs/.json 里写 Windows 路径时反斜杠要写成 `/` 或 `\\`，否则 CS1009。
 - .bat 的 if/else 块里，echo 文本中出现的 `)` 会被 cmd 当成块结束符，导致 else 分支被无条件执行；if 块内的 echo 一律不要写括号。
 - 发布授权：上传创意工坊（tools/upload-workshop.ps1）和 git push 都必须拿到当次明确指令；「改代码/装机/打包」不包含上传，不能从上次授权或含糊措辞推断。上传前必须先按最新版本重写 workshop/changenote.txt（首行 `v<版本> — 主题`），没更新日志就不许上传。
