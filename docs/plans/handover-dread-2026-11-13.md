@@ -99,3 +99,30 @@
 - [ ] `install-mod.bat` → `[verify] 两份实现的版本串都是 vX.Y.Z  OK`。
 - [ ] `docs\plans\dread-mode.md` 有对应「进度」小节。
 - [ ] 28 只 Boss 都有 `<key>_dread` 文案 + 接线（可用脚本扫 `SpecialLocDread` / `SpecialLocDreadByAct` 覆盖度自检）。
+---
+
+## 发布记录：v0.2.650（2026-11-14）
+
+- 打包：`tools\pack-dist.ps1` → `workshop\content\CharacterBosses\` + `.dist\CharacterBosses\` + `.dist\CharacterBosses-v0.2.650.zip`（13.75 MB，双端版本串均 v0.2.650）
+- 工坊：条目 **3830639796** 已更新（`tools\upload-workshop.ps1`），Steam 日志 `Upload finished for workshop item 3830639796 : OK`
+- GitHub：`1b056f8 release: v0.2.650 恐惧模式完整适配 + 选牌/抉择/支配/特效朝向修复` 已推到 `main`
+- 更新日志：`workshop\changenote.txt`（`tools\mk-workshop-json.ps1` 同步进 `workshop.json`）
+
+### ⚠ 工坊上传踩到的坑（下次别再踩）
+
+连着重试上传会把 Steam 账号打进 `LogonFailure Rate Limit Exceeded`，而 Steam 客户端被踢下线后
+**自己不会重连**（`connection_log.txt` 里会留 `not auto reconnecting due to Rate Limit Exceeded`
+和 `Sending SteamServerConnectFailure_t … Do not reconnect`），此后每次上传都秒失败：
+
+```
+Upload workshop item 3830639796 failed (Failed to initialize build on server (No Connection))
+```
+
+判断方法（都是纯读日志，不用瞎试）：
+- `C:\Program Files (x86)\Steam\logs\connection_log.txt` —— 有没有新的 `[Logged On`；
+- `C:\Program Files (x86)\Steam\logs\workshop_log.txt` —— 失败原因是 `Rate Limit` 还是 `No Connection`；
+- `connection_log.txt` 的 LastWriteTime 停在被踢的那一刻 = 客户端仍是离线。
+
+解法：**`Steam.exe -shutdown` 之后重新启动**（带 JWT persistence，不用重输密码），
+等 `connection_log.txt` 出现 `[Logged On` 再上传，一次就过。
+另外：能打开工坊网页 ≠ 客户端在线（浏览器走的是 steamcommunity.com 的 HTTPS，与 CM 会话无关）。
