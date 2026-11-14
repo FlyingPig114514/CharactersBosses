@@ -1,4 +1,8 @@
 {
   "SACRIFICE.title": "สละชีพ",
-  "SACRIFICE.description": "ศัตรูตัวนี้จะยอมแลกบางสิ่งเพื่อให้ได้ผลอันทรงพลัง"
+  "SACRIFICE.description": "ศัตรูตัวนี้จะยอมแลกบางสิ่งเพื่อให้ได้ผลอันทรงพลัง",
+    "TEMPTATION.title":  "การล่อลวง",
+    "TEMPTATION.description":  "This enemy will give you a positive effect in exchange for a powerful effect.",
+    "JUDGEMENT.title":  "การพิพากษา",
+    "JUDGEMENT.description":  "This enemy will kill you immediately."
 }

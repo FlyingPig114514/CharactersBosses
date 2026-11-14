@@ -49,7 +49,8 @@ public static class RegentStarScript
                 Note = "1. 黑洞、辉光+、汇流+、星界脉冲",
                 Energy = 3,
                 Cards = Cards(
-                    C<BlackHole>(), C<Glow>(true), C<Convergence>(true), C<AstralPulse>()),
+                    // ★ 2026-11-13（用户）：「升级黑洞」
+                C<BlackHole>(true), C<Glow>(true), C<Convergence>(true), C<AstralPulse>()),
             },
             // 2（3 费：太阳打击+ 1 + 防御 1 + 花样百出+ 0 + 万向斩 0 + 王者之拳 1；
             //    花样百出会印出「万向斩」「究极防御」，究极防御这回合没费、打不出）
@@ -112,7 +113,43 @@ public static class RegentStarScript
             Turns = turns,
             LoopFrom = 4,      // 用户：之后 5～8 循环（0 起 ⇒ 第 5 回合）
             LoopLength = 4,
+            // ★ 2026-11-13（恐惧模式，用户当轮口径）：
+            //   「辉星储本来第四回合就是星不够，一定不能打出七星的。**交换防御和隐秘藏品+的位置**之后，
+            //     由于隐秘藏品+的下回合辉星结算辉星就够了」
+            //   ⇒ 恐惧模式下第 3 / 4 回合换成：3 = 群星斗篷、剑雨、**隐秘藏品+**；
+            //     4 = **防御**、凡庸、七星 ⇒ 隐秘藏品+ 的「下回合 +星」在第 4 回合到账，
+            //     七星（7 星）这回合真的打得出去。
+            //
+            //   ⚠ 为什么用 `Resolve` 而不是在 `Build()` 里直接 `DreadMode.IsActive` 分支：
+            //     `BossDefs` 是**静态初始化**，那时 `DreadMode.IsActive` 恒为 false
+            //     （同一个坑在「蛇眼猎·谋杀」那里踩过）。`Resolve` 是**每次取回合表时**才求值。
+            Resolve = DreadTurnOverride,
         };
+    }
+
+    /// <summary>恐惧模式的回合覆盖（只改第 3 / 4 回合；其余返回 null 交回静态回合表）。</summary>
+    private static BossTurn? DreadTurnOverride(int turn)
+    {
+        if (!Core.DreadMode.IsActive) return null;
+        if (turn == 3)
+        {
+            return new BossTurn
+            {
+                Note = "3.（恐惧）群星斗篷、剑雨、隐秘藏品+（提前一回合收藏，好让下回合的星到账）",
+                Energy = TurnEnergy,
+                Cards = Cards(C<CloakOfStars>(), C<Salvo>(), C<HiddenCache>(true)),
+            };
+        }
+        if (turn == 4)
+        {
+            return new BossTurn
+            {
+                Note = "4.（恐惧）防御、凡庸、七星（隐秘藏品+ 的星已到账 ⇒ 7 星够了）",
+                Energy = TurnEnergy,
+                Cards = Cards(C<DefendRegent>(), C<Normality>(), C<SevenStars>()),
+            };
+        }
+        return null;
     }
 
     /// <summary>卡组（剧本里出现过的牌按最大张数收集；剧本手牌本来也是从这里造的）。</summary>

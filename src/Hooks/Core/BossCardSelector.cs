@@ -433,7 +433,10 @@ public sealed class BossCardSelector : ICardSelector
         return null;
     }
 
-    public static IDisposable Push() => CardSelectCmd.PushSelector(Instance);
+    // ⚠ 0.113 起选牌器栈改成「按玩家」挂在 `RunManager.Instance.CardSelectorStack` 上
+    //   ⇒ 这里必须知道挂在谁身上（= 她的影子玩家）。见 Core/SelectionCompat.cs。
+    public static IDisposable Push(MegaCrit.Sts2.Core.Entities.Players.Player? player)
+        => SelectionCompat.Push(player, Instance);
 
     /// <summary>
     /// 剧本「**选择队列**」的游标：每个 (Boss, 回合号) 一份，按顺序消费

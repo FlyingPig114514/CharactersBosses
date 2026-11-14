@@ -30,8 +30,17 @@ public sealed class SleeveTrickPower : PowerModel
     /// <summary>触发的耗能门槛（用户设计：耗能不低于 2）。</summary>
     private const int MinCost = 2;
 
-    /// <summary>每次塞几张小刀。</summary>
+    /// <summary>每次塞几张小刀（正常 3 张）。</summary>
     private const int ShivCount = 3;
+
+    /// <summary>
+    /// ★ 2026-11-13（恐惧模式「袖里乾坤」）：**每次 4 张**小刀。
+    /// （用户设计表原文：「每回合首次打出 ≥2 费牌 ⇒ **4 张小刀**加入她手牌」。）
+    /// </summary>
+    private const int ShivCountDread = 4;
+
+    /// <summary>这一次实际塞几张（按当前模式取）。</summary>
+    private static int ShivCountNow => Core.DreadMode.IsActive ? ShivCountDread : ShivCount;
 
     public override PowerType Type => PowerType.Buff;
 
@@ -86,9 +95,9 @@ public sealed class SleeveTrickPower : PowerModel
             if (combat == null) return;
 
             _usedThisTurn = true;
-            await CharacterBosses.Core.GameCompatExtra.CreateShivInHand(shadow, ShivCount, combat);
+            await CharacterBosses.Core.GameCompatExtra.CreateShivInHand(shadow, ShivCountNow, combat);
             Logger.Log($"[CharBoss] 袖里乾坤：玩家打出 {card.Id.Entry}（耗能 ≥ {MinCost}）→ " +
-                       $"给静默猎手塞 {ShivCount} 张小刀");
+                       $"给静默猎手塞 {ShivCountNow} 张小刀");
 
             // 用户要求：这几把刀要**放在手牌最前面、最先打出、亮着、每把刀下有攻势意图**，
             // 并且终结技的段数跟着变 → 插进计划头部并重算意图，再刷新手牌栏。

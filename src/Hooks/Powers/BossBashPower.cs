@@ -36,7 +36,13 @@ public sealed class BossBashPower : PowerModel
     /// <summary>每张牌给多少伤害（进阶 9～10 = 3，其余 = 2）。</summary>
     internal static int PerCard()
     {
-        try { return Core.BossLineups.Ascension() >= 9 ? 3 : 2; }
+        try
+        {
+            int per = Core.BossLineups.Ascension() >= 9 ? 3 : 2;
+            // 2026-11-13（恐惧模式「痛击」）：每张「打击」牌的加成 **+1**（2⇒3，进阶 9～10 的 3⇒4）
+            if (Core.DreadMode.IsActive) per += 1;
+            return per;
+        }
         catch { return 2; }
     }
 
@@ -128,5 +134,25 @@ public sealed class BossBashPower : PowerModel
     {
         int cards = Math.Max(0, CountNow(boss) - Math.Max(0, PlayedStrikes));
         return 6 + PerCard() * cards;
+    }
+
+    /// <summary>
+    /// ★ 2026-11-13（恐惧模式「痛击」，用户当轮口径）：
+    ///   「你的名字中包含打击的牌也会增加铁甲战士的完美打击**和痛击**的伤害…
+    ///     **让痛击的伤害也和完美打击一样受到打击的加成**」
+    ///   ⇒ 恐惧模式下，「痛击」（BASH）这张牌自己也吃同一份额外加成。
+    ///
+    /// 返回要**加上去**的伤害（0 = 不加）。以卡面当前伤害为基数（升级版也正确），
+    /// 因为每回合的手牌都是新建实例 ⇒ 不会叠加两次。
+    /// </summary>
+    internal int BashBonusDamage(CharBossMonster? boss)
+    {
+        try
+        {
+            if (!Core.DreadMode.IsActive) return 0;
+            int cards = Math.Max(0, CountNow(boss) - Math.Max(0, PlayedStrikes));
+            return PerCard() * cards;
+        }
+        catch { return 0; }
     }
 }

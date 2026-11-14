@@ -56,6 +56,15 @@ internal static class BossLineups
     ///      · **其它情况（多人，或连人数都读不到）→ 用固定种子 1**：
     ///        宁可「这一局不随机」，也绝不能两端算出不同阵容。
     /// </summary>
+    /// <summary>
+    /// 本局种子（**给别的模块做「稳定随机」用**）—— 与阵容随机用的是同一个值。
+    ///
+    /// 用户 2026-11-13：「让耗能增加的牌不因 SL 变化」。
+    /// 任何「随机挑一张牌/一个目标」的效果都**不能**用 `Random.Shared`（SL 之后重跑会换一个、
+    /// 联机两端也会各算各的）⇒ 拿来当种子做确定性哈希。
+    /// </summary>
+    internal static ulong RunSeed => CurrentSeed();
+
     private static ulong CurrentSeed()
     {
         var state = MultiBossPlan.RunStateOrNull();

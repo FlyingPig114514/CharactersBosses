@@ -70,7 +70,7 @@ public static class MinionSummonPatch
             if (boss.Creature?.GetPower<BossCallToArmsPower>() == null) return true;   // 不是仆从储
 
             int alive = BossMinionMonster.CountAlive(boss);
-            if (alive >= BossCallToArmsPower.MinionCap) return true;                  // 已经够 2 只 ⇒ 走原版
+            if (alive >= BossCallToArmsPower.MinionCapNow) return true;                  // 已经够 2 只 ⇒ 走原版
 
             var combat = boss.CombatState;
             if (combat == null) return true;
@@ -78,7 +78,7 @@ public static class MinionSummonPatch
             if (_logs++ < 30)
             {
                 Logger.Log($"[CharBoss] 征召上前：储君打出 {SafeEntry(card)} 时仆从只有 {alive} 只" +
-                           $"（不足 {BossCallToArmsPower.MinionCap}）⇒ 改为召唤 {minionType.Name}");
+                           $"（不足 {BossCallToArmsPower.MinionCapNow}）⇒ 改为召唤 {minionType.Name}");
             }
             __result = SummonAsync(boss, minionType, choiceContext);
             return false;

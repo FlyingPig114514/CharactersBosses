@@ -402,7 +402,10 @@ private static int OrbPassiveDamageCore(CharBossMonster boss, bool quiet, ref in
                 try
                 {
                     if (string.Equals(play.Card.Id.Entry, "TEMPEST", StringComparison.Ordinal))
+                    {
                         x = Math.Max(1, play.Cost);
+                        try { if (play.Card.IsUpgraded) x++; } catch { }   // 2026-11-13 (dread): Tempest+ 多 1 颗
+                    }
                 }
                 catch { x = 0; }
                 cards.Add((play.Card, x));

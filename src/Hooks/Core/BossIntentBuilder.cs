@@ -367,6 +367,16 @@ public static class BossIntentBuilder
         //（`ReassignDeadLocks` / 开局分配晚于规划），而**出牌**在 v0.2.155 起是按实时锁定的 ⇒
         // 显示的判据必须跟着实时锁定走，否则会出现「显示 0、实际挨打」。
         bool aimedElsewhere = !IsAoE(card) && AimedAwayFromLocal(card, target);
+
+#if STS2_111
+        // ★ 2026-11-13（用户）：0.113.0 的「铭记死亡」改成「对**生命值最低的玩家**造成 19(23)」
+        //   ⇒ 它的意图不该按「锁定对象」清零，而要按「生命值最低的玩家」清零：
+        //   那只玩家看得到伤害，其他人看 0。其它牌仍按锁定关系判断（`AimedAwayFromLocal`）。
+        if (string.Equals(entry, "MEMENTO_MORI", StringComparison.Ordinal))
+        {
+            aimedElsewhere = MementoMoriAimedElsewhere(card);
+        }
+#endif
         // 「还没到账的加成」（熔炉铸造 / 剑圣重放）只对本来就有伤害的牌生效，
         // 否则技能牌会被算出一条幻影攻击（踩过）。
         // 这张牌「还没跑力量/虚弱/易伤」的牌面伤害 —— X 费那张（根除）要用它去走原版伤害管道。
@@ -575,6 +585,33 @@ public static class BossIntentBuilder
                             return ApplyPct(BossDamagePredictor.FinalDamage(card, lethalBase, victim), lethalPct);
                         }));
                     }
+                }
+                else if (MiserySleightPerHit(card) is int miseryPer && miseryPer > 0 && totalHits <= 1)
+                {
+                    // ★ 2026-11-12（用户）：苦难（MISERY）被血肉骨的「血肉戏法」放大时，
+                    //   要显示成**一个数**：`苦难基础伤害 + 被锁定玩家的负面种类数 × 9`。
+                    //   只有「没被她锁定的玩家」才加这一笔 —— 苦难是把被锁玩家的负面**复制给其他人**，
+                    //   被锁那位自己不会因此多挂负面 ⇒ 他只挨苦难的牌面伤害。
+                    //   种类数走 `LockedPlayerDebuffKinds(boss, card)`（含本回合前面那些牌即将上的负面）。
+                    int miseryBase = damage;
+                    int miseryExtra = miseryPer;
+                    intents.Add(new LiveDelegateSingleAttackIntent((liveTargets, liveOwner) =>
+                    {
+                        var viewer = FirstPlayerTarget(liveTargets) ?? liveOwner;
+                        int total = BossDamagePredictor.FinalDamage(card, miseryBase, viewer);
+                        try
+                        {
+                            var boss = card.Owner?.Creature?.Monster as Monsters.CharBossMonster;
+                            var lockedCreature = Core.BossLockOn.TargetFor(boss!)?.Creature;
+                            bool viewerIsLocked = lockedCreature != null && ReferenceEquals(viewer, lockedCreature);
+                            if (!viewerIsLocked)
+                                total += miseryExtra * Core.FleshBone.LockedPlayerDebuffKinds(boss, card);
+                        }
+                        catch { /* 算不出来就只显示牌面伤害 */ }
+                        return Math.Max(0, total);
+                    }));
+                    Logger.Log($"[CharBoss] 苦难意图：牌面 {miseryBase} + 被锁玩家负面种类 × {miseryExtra}" +
+                               "（只对没被锁定的玩家显示）");
                 }
                 else intents.Add(totalHits > 1
                     ? new LiveMultiAttackIntent((targets, owner) =>
@@ -909,12 +946,19 @@ public static class BossIntentBuilder
             }
         }
 
-        var (hasDebuff, hasBuff, hasSacrifice) = ClassifyPowers(card);
+        var (hasDebuff, hasBuff, hasSacrifice, hasTemptation) = ClassifyPowers(card);
         // 「疯狂科学」只要「守势 + 强化」两条：牺牲意图也去掉（它是三套模板的混合体，
         // 数据上会带上「失去力量」这类减益变量，画出来就是用户看到的那个多余的下箭头）。
         if (madScience) hasSacrifice = false;
         if (hasDebuff) intents.Add(new DebuffIntent(false));
         if (hasSacrifice) intents.Add(new SacrificeIntent());   // 付出代价换强力效果（蓝色向下箭头）
+        // ★ 2026-11-13（用户新增）：**诱惑** = 以给你正面效果为代价换强力效果（策略图标上下翻转）
+        if (hasTemptation) intents.Add(new TemptationIntent());
+#if STS2_111
+        // ★ 2026-11-13（用户新增）：**审判** = 立刻使你死亡（灾厄图标）。
+        //   只在**看意图的这位玩家**真的满足秒杀条件（血量 ≤ 判定的 30 / 40）时才出现。
+        if (JudgmentApplies(card, target)) intents.Add(new JudgmentIntent());
+#endif
 
         // ★ 2026-11-10（用户「血肉骨」需求）：「要在会给予负面效果的牌的意图中加上血肉戏法的 9 点伤害」。
         //   「血肉戏法」（`SleightOfFleshPower`）是她身上那层能力：她**每给目标上一个负面**就对那个目标
@@ -928,10 +972,50 @@ public static class BossIntentBuilder
             {
                 var sleightBoss = card.Owner?.Creature?.Monster as Monsters.CharBossMonster;
                 int sleight = Core.FleshBone.SleightPerHit(sleightBoss, card);
-                if (sleight > 0)
+
+                // ★ 2026-11-12（用户）：「血肉骨所有的血肉戏法伤害似乎都被错误的显示成群体伤害，
+                //   但实际上血肉戏法本身是单体的」—— 以前这里是无条件 `new RawAttackIntent(sleight)`，
+                //   于是**每个玩家的手牌栏都显示自己会挨这一笔**，看起来就像群攻。
+                //   真实语义（反编译 `SleightOfFleshPower.AfterPowerAmountChanged`）：
+                //   她**每给某个目标上一个负面**就只打**那个目标** ⇒ 单体，目标就是被这只 Boss 锁定的玩家。
+                //   ⇒ 现在按「看意图的人是不是被锁的那位」逐帧判断：
+                //     · 单体牌（大多数）：只有被锁定的玩家看得到；
+                //     · 群体减益牌（对全体上负面，如闪电霹雳）：每个玩家都会挨 ⇒ 都显示；
+                //     · 苦难（MISERY）**不在这里**处理 —— 它要把这一笔并进牌面伤害里（见上面那个分支）。
+                bool isMisery = string.Equals(entry, "MISERY", StringComparison.Ordinal);
+                if (sleight > 0 && !isMisery)
                 {
-                    intents.Add(new RawAttackIntent(sleight));
-                    Logger.Log($"[CharBoss] 血肉戏法意图：{entry} 会给负面 ⇒ 额外 +{sleight}（无来源）");
+                    int perDebuff = sleight;
+                    // ★ 2026-11-12（用户订正）：「命运同担是给敌人上一次给自己上一次，血肉戏法只在给**敌人**
+                    //   上 debuff 的时候触发，所以也应该只触发一次」。
+                    //   所以这里只数**上给敌人的**负面类型（`DebuffPowerTypes` 会跳过 `TargetType.Self` 的牌、
+                    //   并且按类型去重）；反编译核过 `SharedFate.CanonicalVars`：
+                    //   `EnemyStrengthLoss` / `PlayerStrengthLoss` 两个都是**普通 DynamicVar**（不是
+                    //   `PowerVar<>`）⇒ 本来就不会被数进来，只按「一次触发」算。
+                    //   我们卡组里施加减益的牌基本都只上 1 种类型 ⇒ 恒为 1 次；
+                    //   真有「一张牌给敌人上两种不同负面」的牌才会是 2 次（原版 `AfterPowerAmountChanged`
+                    //   确实是每施加一次算一次）。
+                    int kindsOfCard = Math.Max(1, Core.FleshBone.DebuffPowerTypes(card).Count);
+                    bool aoeCard = IsAoE(card);
+                    intents.Add(new LiveDelegateSingleAttackIntent((targets, _) =>
+                    {
+                        try
+                        {
+                            var viewer = FirstPlayerTarget(targets);
+                            if (viewer == null) return 0;
+
+                            if (!aoeCard)
+                            {
+                                var lockedCreature = Core.BossLockOn.TargetFor(sleightBoss!)?.Creature;
+                                bool viewerIsLocked = lockedCreature != null && ReferenceEquals(viewer, lockedCreature);
+                                if (!viewerIsLocked) return 0;      // 单体：别的玩家看不到这一笔
+                            }
+                            return perDebuff * kindsOfCard;
+                        }
+                        catch { return 0; }
+                    }));
+                    Logger.Log($"[CharBoss] 血肉戏法意图：{entry}（{(aoeCard ? "群攻" : "单体")}）" +
+                               $"⇒ 目标挨 {kindsOfCard} 种负面 × {perDebuff}（只对会被打到的人显示）");
                 }
             }
             catch { /* 算不出来就不加 */ }
@@ -947,43 +1031,10 @@ public static class BossIntentBuilder
                            || BuffVarCards.Contains(entry)));
         if (selfBenefit) intents.Add(new BuffIntent());
 
-        // ★ 2026-11-10（用户「血肉骨」需求）：「多人时，苦难会将被锁定玩家身上的 buff 传给其他玩家，
-        //   此时要在其他玩家的意图中提前显示会收到的血肉戏法的伤害（取决于被她锁定的玩家身上的负面
-        //   效果种类多少）」。
-        //   反编译 `Misery`：先按 `TypeForCurrentAmount == Debuff` 把**目标身上**的负面逐种克隆，
-        //   再对 `CombatState.HittableEnemies`（她视角 = 所有玩家，不含原目标）逐种 `PowerCmd.Apply`
-        //   ⇒ 每复制一种，她身上的血肉戏法就打那个玩家一次 ⇒ 其他玩家各挨 `Amount × 种类数`。
-        //   所以这里用「每帧现算」的委托意图：被锁定的那位本地玩家不显示（他只挨牌面的 7 点），
-        //   其他玩家各自显示 `血肉戏法 × 种类数`。
-        if (string.Equals(entry, "MISERY", StringComparison.Ordinal))
-        {
-            try
-            {
-                var miseryBoss = card.Owner?.Creature?.Monster as Monsters.CharBossMonster;
-                if (miseryBoss != null && Core.MultiplayerCardSwap.IsMultiplayer(miseryBoss))
-                {
-                    int per = Core.FleshBone.SleightPerHit(miseryBoss, card);
-                    if (per > 0)
-                    {
-                        intents.Add(new LiveDelegateSingleAttackIntent((targets, _) =>
-                        {
-                            try
-                            {
-                                var local = FirstPlayerTarget(targets);
-                                var locked = Core.BossLockOn.TargetFor(miseryBoss);
-                                if (local == null || locked?.Creature == null) return 0;
-                                if (ReferenceEquals(local, locked.Creature)) return 0;   // 被锁的那位只挨 7 点
-                                int kinds = Core.FleshBone.LockedPlayerDebuffKinds(miseryBoss);
-                                return per * Math.Max(0, kinds);
-                            }
-                            catch { return 0; }
-                        }));
-                        Logger.Log($"[CharBoss] 苦难（多人）：其他玩家按「被锁玩家负面种类数 × {per}」显示血肉戏法伤害");
-                    }
-                }
-            }
-            catch { /* 算不出来就不加 */ }
-        }
+        // ★ 苦难（MISERY）的那一笔血肉戏法**已经并进牌面伤害意图**了
+        //   （见上面 `MiserySleightPerHit(card) is int miseryPer` 那个分支）——
+        //   用户 2026-11-12 要求显示成「苦难基础伤害 + 被锁玩家负面种类数 × 9」这一个数，
+        //   所以这里不再额外挂一行。
 
         if (intents.Count == 0)
         {
@@ -1221,9 +1272,9 @@ public static class BossIntentBuilder
     };
 
     /// <summary>看这张牌施加的 power 是增益还是减益（数值为负的也算减益，如「下砸」减敌人力量）。</summary>
-    private static (bool hasDebuff, bool hasBuff, bool hasSacrifice) ClassifyPowers(CardModel card)
+    private static (bool hasDebuff, bool hasBuff, bool hasSacrifice, bool hasTemptation) ClassifyPowers(CardModel card)
     {
-        bool debuff = false, buff = false, sacrifice = false;
+        bool debuff = false, buff = false, sacrifice = false, temptation = false;
         bool selfTargeted = TargetsSelf(card);
 
         try
@@ -1232,6 +1283,27 @@ public static class BossIntentBuilder
             if (ForceBuffCards.Contains(card.Id.Entry)) buff = true;
             if (ForceDebuffCards.Contains(card.Id.Entry)) debuff = true;
             if (Var(card, "HpLoss", 0) > 0m) sacrifice = true;
+
+            // ★ 2026-11-13（「诱惑」意图）：**给玩家正面效果**的牌。
+            //   · 点名表（目前唯一一张）：与我一战 `FIGHT_ME`；
+            //   · 通用兜底：变量名里带 `Enemy`（= 作用在对方身上）、且不是 Loss/Down/Reduce 这类
+            //     **减少**语义、且数值 > 0 ⇒ 也是给对方的正面效果。
+            //     （「命运同担」的两个变量是 `PlayerStrengthLoss` / `EnemyStrengthLoss` ⇒ 含 Loss，
+            //       不会被误判成诱惑。）
+            if (TemptationCards.Contains(card.Id.Entry)) temptation = true;
+            try
+            {
+                foreach (var kv in card.DynamicVars)
+                {
+                    string name = kv.Key ?? string.Empty;
+                    var v = kv.Value;
+                    if (v == null) continue;
+                    if (name.IndexOf("Enemy", StringComparison.OrdinalIgnoreCase) < 0) continue;
+                    if (LooksLikeLoss(name)) continue;
+                    if (v.BaseValue > 0m) temptation = true;
+                }
+            }
+            catch { /* 变量名字段读不到就算了，点名表那条仍然有效 */ }
 
             foreach (var v in card.DynamicVars.Values)
             {
@@ -1258,8 +1330,60 @@ public static class BossIntentBuilder
         {
             Logger.Log($"[CharBoss] power 分类失败（{card.Id.Entry}）: {e.Message}");
         }
-        return (debuff, buff, sacrifice);
+        return (debuff, buff, sacrifice, temptation);
     }
+
+    /// <summary>
+    /// 「诱惑」点名表：会给**对方（玩家）正面效果**的牌。
+    /// 目前只有「与我一战」（`FightMe`：给目标 +1 力量，自己 +3 力量）。
+    /// </summary>
+    private static readonly HashSet<string> TemptationCards = new(StringComparer.Ordinal)
+    {
+        "FIGHT_ME",
+    };
+
+    /// <summary>变量名看起来是「减少 / 下降」（用来把 `EnemyStrengthLoss` 这类排除在「诱惑」之外）。</summary>
+    private static bool LooksLikeLoss(string name)
+    {
+        return name.IndexOf("Loss", StringComparison.OrdinalIgnoreCase) >= 0
+            || name.IndexOf("Down", StringComparison.OrdinalIgnoreCase) >= 0
+            || name.IndexOf("Reduce", StringComparison.OrdinalIgnoreCase) >= 0
+            || name.IndexOf("Minus", StringComparison.OrdinalIgnoreCase) >= 0;
+    }
+
+#if STS2_111
+    /// <summary>
+    /// ★ 2026-11-13（「审判」意图）：这张牌会不会**立刻秒杀**看意图的那位玩家。
+    ///
+    /// 目前唯一的秒杀牌是 0.113 的衍生牌「审判」（`Judgement`）：
+    /// 反编译 `OnPlay` = `if (Target.IsAlive &amp;&amp; Target.CurrentHp &lt;= Threshold)
+    /// CreatureCmd.SetCurrentHp(Target, 0)`，而 `Threshold` = `IntVar("Threshold", 30)`、
+    /// 升级 `+10 ⇒ 40`。
+    ///
+    /// 用户口径：「只在符合秒杀条件（被该卡牌使用者锁定的玩家血量不高于 30 或 40）的时候
+    /// **对该玩家**显示该意图，否则不显示该意图」。
+    /// 传进来的 `target` 就是这只 Boss 锁定/计划打的那位玩家 ⇒ 直接按他的血量判断。
+    /// （多人时该意图对所有玩家可见，但判断依据始终是**被锁定的那位**的血量。）
+    /// </summary>
+    private static bool JudgmentApplies(CardModel? card, Creature? target)
+    {
+        try
+        {
+            if (card == null || target == null) return false;
+            if (!target.IsAlive) return false;
+            if (target.Monster != null) return false;      // 只对真人玩家
+
+            string entry;
+            try { entry = card.Id.Entry; } catch { return false; }
+            if (!string.Equals(entry, "JUDGEMENT", StringComparison.Ordinal)) return false;
+
+            int threshold = (int)Var(card, "Threshold", 0m);
+            if (threshold <= 0) return false;
+            return target.CurrentHp <= threshold;
+        }
+        catch { return false; }
+    }
+#endif
 
     /// <summary>由奥斯提出手的牌：意图数字不吃 Boss 的力量/易伤。</summary>
     private static readonly HashSet<string> OstyAttackCards = new(StringComparer.Ordinal)
@@ -1519,6 +1643,49 @@ public static class BossIntentBuilder
     {
         try { return card.TargetType == TargetType.AllEnemies; }
         catch { return false; }
+    }
+
+    /// <summary>
+    /// 「铭记死亡」（0.113.0 重做版）对**本地观看者**来说是不是「打到别人身上」。
+    ///
+    /// 新规则：它打的是**生命值最低的玩家**（忽略召唤物），与「被她锁定」无关。
+    ///   · 本地玩家就是那只最低血的 ⇒ false（显示伤害意图）；
+    ///   · 否则 ⇒ true（显示 0）。
+    /// 判据与真正结算共用 <see cref="Core.BossLockOn.LowestHpRealPlayer"/>，所以「显示的」和「真打的」一致。
+    /// </summary>
+    private static bool MementoMoriAimedElsewhere(CardModel? card)
+    {
+        try
+        {
+            var boss = card?.Owner?.Creature?.Monster as Monsters.CharBossMonster;
+            var combat = boss?.CombatState;
+            if (combat == null) return false;
+
+            var lowest = Core.BossLockOn.LowestHpRealPlayer(combat)?.Creature;
+            var local = MegaCrit.Sts2.Core.Context.LocalContext.GetMe(combat)?.Creature;
+            if (lowest == null || local == null) return false;
+            return !ReferenceEquals(lowest, local);
+        }
+        catch { return false; }
+    }
+
+    /// <summary>
+    /// 这张牌是不是**苦难（MISERY）+ 她身上有血肉戏法**，返回血肉戏法每下几点（0 = 不适用）。
+    ///
+    /// 苦难是唯一需要把血肉戏法**并进牌面伤害**的牌：它会把被锁定玩家身上的负面逐种复制给其他玩家，
+    /// 每复制一种就触发一次血肉戏法 ⇒ 其他玩家实际挨的是「苦难牌面 + 种类数 × 9」。
+    /// </summary>
+    private static int MiserySleightPerHit(CardModel? card)
+    {
+        try
+        {
+            if (card == null) return 0;
+            if (!string.Equals(card.Id.Entry, "MISERY", StringComparison.Ordinal)) return 0;
+            var boss = card.Owner?.Creature?.Monster as Monsters.CharBossMonster;
+            if (boss == null) return 0;
+            return Core.FleshBone.SleightPerHit(boss, card);
+        }
+        catch { return 0; }
     }
 
     /// <summary>这位 Boss 打出的**小刀**现在是不是群攻（她身上有「刀扇」的 FanOfKnivesPower 时是）。</summary>

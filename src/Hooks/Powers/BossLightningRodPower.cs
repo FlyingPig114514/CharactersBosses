@@ -46,7 +46,8 @@ public sealed class BossLightningRodPower : PowerModel
     public override bool ShouldPlayVfx => false;
 
     /// <summary>每打几张牌扣 1 点集中。</summary>
-    private const int CardsPerFocus = 3;
+    // 2026-11-13 (dread): normal = 3 cards per -1 Focus, unlimited; dread = 5 cards, once per turn.
+    private static int CardsPerFocus => Core.DreadMode.IsActive ? 5 : 3;
 
     /// <summary>
     /// **仅 107 用**：本回合已经自己扣掉多少点集中（她回合结束时还回去）。
@@ -70,6 +71,9 @@ public sealed class BossLightningRodPower : PowerModel
     /// </summary>
     private int _playedThisTurn;
 
+    /// <summary>2026-11-13 (dread): 每回合只让引雷针触发 1 次。</summary>
+    private bool _dreadFired;
+
     /// <summary>日志限流用。</summary>
     private int _logs;
 
@@ -88,6 +92,7 @@ public sealed class BossLightningRodPower : PowerModel
     public override Task AfterApplied(Creature applier, MegaCrit.Sts2.Core.Models.CardModel cardSource)
     {
         _playedThisTurn = 0;
+        _dreadFired = false;
         SyncAmount();
         return Task.CompletedTask;
     }
@@ -111,6 +116,13 @@ public sealed class BossLightningRodPower : PowerModel
             SyncAmount();
 
             if (count % CardsPerFocus != 0) return;
+
+            // 2026-11-13 (dread): 每回合最多触发 1 次
+            if (Core.DreadMode.IsActive)
+            {
+                if (_dreadFired) return;
+                _dreadFired = true;
+            }
 
             // ★ 2026-11-10（用户：「让『引雷针』的减集中并返还通过超能光束 buff 和减集中实现」）：
             //   不再自己 `FocusPower -= 1` / 回合结束再 `+= 1`，而是给她 **1 层「超能光束」那层降集中**：
@@ -165,6 +177,8 @@ public sealed class BossLightningRodPower : PowerModel
             if (_playedThisTurn == 0) return Task.CompletedTask;
 
             _playedThisTurn = 0;
+
+            _dreadFired = false;
             SyncAmount();
             Logger.Log("[CharBoss] 引雷针：玩家回合开始 ⇒ 计数清零（图标回到 3）");
         }

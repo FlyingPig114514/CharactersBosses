@@ -105,7 +105,7 @@ public sealed class BossDevourLifePower : PowerModel
                               && amount > 0m);                                  // 只认「加层」，衰减（−1）不算
             if (!fromHer) return;
 
-            await CreatureCmd.GainBlock(owner, FleshBone.DevourBlock, ValueProp.Unpowered, null);
+            await CreatureCmd.GainBlock(owner, FleshBone.DevourBlockNow, ValueProp.Unpowered, null);
 
             // ★ 2026-11-10 第二轮（用户：「命运同担还是不对玩家造成伤害」）：
             //   以前「血肉戏法」那 9 点放在 `Patches/SleightOfFleshBossPatch` 里（接管**她身上那层
@@ -118,13 +118,16 @@ public sealed class BossDevourLifePower : PowerModel
             try { sleight = Math.Max(0, owner.GetPowerAmount<SleightOfFleshPower>()); }
             catch { sleight = 0; }
 
+            // 2026-11-13（恐惧模式「吞噬生命」）：她的「血肉戏法」按**升级版**算（9 → 13）
+            if (sleight > 0) sleight = FleshBone.SleightNow(sleight);
+
             if (sleight > 0)
             {
                 await CreatureCmd.Damage(choiceContext, target, sleight, ValueProp.Unpowered, owner);
             }
 
             Logger.Log($"[CharBoss] 吞噬生命：她给 {target.Name} 上了 {SafeEntry(power)}" +
-                       $"（{amount:0.#}）⇒ 获得 {FleshBone.DevourBlock} 点格挡" +
+                       $"（{amount:0.#}）⇒ 获得 {FleshBone.DevourBlockNow} 点格挡" +
                        (sleight > 0 ? $" + 血肉戏法 {sleight} 点无来源伤害" : ""));
         }
         catch (Exception e)

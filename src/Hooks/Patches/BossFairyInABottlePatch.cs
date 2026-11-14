@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Commands;
@@ -61,6 +62,24 @@ namespace CharacterBosses.Patches;
 [HarmonyPatch(typeof(Hook), nameof(Hook.ShouldDie))]
 public static class BossFairyInABottlePatch
 {
+    /// <summary>
+    /// (Boss → 那瓶药水)：**已经同步丢掉了药水、也已经同步回了血**，只欠「清负面」这一步。
+    ///
+    /// ★ 2026-11-13（v0.2.617，玩家反馈「『我的小钱钱』把炼药猎打死时，她的瓶中精灵没有复活」）：
+    ///   老实现把**整个**复活（丢药水 + 回 30%）都推给了 `Hook.AfterPreventingDeath` 前缀，
+    ///   而这一步有两个「可能整段不生效」的入口：
+    ///     ① 前缀里要**重新查一遍** `FairyOf(boss)` —— 两次查询之间药水但凡变了一下（多段伤害里
+    ///        第二次判死、栏位重排、别的模组动过药水），查不到就 `return true` ⇒ 原版兜底（`preventer`
+    ///        是 null ⇒ 什么也不做）⇒ **一滴血都不回**，而 `ShouldDie` 已经说过「不许死」了
+    ///        ⇒ 她停在 0 血、`IsDead` 为真 ⇒ 死亡流程**递归**再判一次 ⇒ 这一次没有药水了 ⇒ 真死。
+    ///     ② 只要中间任何一个 await/钩子抛异常，那段 Task 就整个不跑。
+    ///   现在改成：**判死那一刻同步把药水丢掉、同步把血回满**（`Creature.HealInternal`，
+    ///   与 `CreatureCmd.Heal` 同一份底层实现，只是不等动画），`AfterPreventingDeath` 那一段
+    ///   只负责「清负面」——它跑不跑都不影响复活本身。多段伤害里第二刀再判死时药水已不在
+    ///   ⇒ 走原版（与玩家自己的瓶中精灵完全一致）。
+    /// </summary>
+    private static readonly Dictionary<CharBossMonster, PotionModel> PendingDebuffClear = new();
+
     [HarmonyPrefix]
     public static bool Prefix(Creature creature, ref bool __result)
     {
@@ -76,13 +95,52 @@ public static class BossFairyInABottlePatch
                 return true;
             }
 
-            Logger.Log($"[CharBoss] 瓶中精灵：{boss.Def?.Key} 本该死亡（HP {creature.CurrentHp}）→ 用这瓶药水顶掉" +
-                       "（回血/清负面交给 Hook.AfterPreventingDeath 前缀，由死亡流程 await）");
+            int maxHp = creature.MaxHp;
+            int before = creature.CurrentHp;
+            decimal heal = Math.Max(maxHp * 0.3m, 1m);
+
+            Logger.Log($"[CharBoss] 瓶中精灵：{boss.Def?.Key} 本该死亡（HP {before}/{maxHp}）→ 用这瓶药水顶掉" +
+                       "（**判死这一刻同步丢药水 + 同步回血**，清负面交给 Hook.AfterPreventingDeath 前缀）");
 
             // BGM（用户 2026-10-28）：炼药猎触发瓶中精灵 ⇒ 切入女王**二阶段**音乐
             //（原版女王的二阶段触发点是「火炬头死后」，炼药猎这里对应「瓶中精灵救了她一命」）。
-            // 纯本地表现，和结算顺序无关，留在这里即可。
             try { BossBgm.OnBrewerFairySaved(); } catch (Exception me) { Logger.Log("[CharBoss] BGM 二阶段调用失败: " + me.Message); }
+
+            // ① 先把「欠清负面」记上（哪怕下面丢药水失败也照清）
+            try
+            {
+                if (PendingDebuffClear.Count > 16) PendingDebuffClear.Clear();   // 兜底：别无限增长
+                PendingDebuffClear[boss] = potion;
+            }
+            catch { /* 忽略 */ }
+
+            // ② 同步丢药水（只丢一次；多段伤害里第二刀再判死时这里已经查不到药水了）
+            bool consumed = false;
+            try
+            {
+                var shadow = boss.Shadow;
+                if (shadow != null)
+                {
+                    shadow.RemoveUsedPotionInternal(potion);
+                    consumed = true;
+                }
+            }
+            catch (Exception e) { Logger.Log("[CharBoss] 瓶中精灵：丢弃药水失败（继续回血）: " + e.Message); }
+
+            // ③ 同步回血 —— 复活在**这里**就已经完成，后面任何环节跑不跑都不影响
+            try { creature.HealInternal(heal); }
+            catch (Exception e) { Logger.Log("[CharBoss] 瓶中精灵：同步回血失败: " + e.Message); }
+
+            int after = creature.CurrentHp;
+            Logger.Log($"[CharBoss] 瓶中精灵：丢弃药水={consumed} → 回复 {heal:0} 点生命（现在 {after}/{maxHp}）");
+
+            if (after <= 0)
+            {
+                // 回血真没成 ⇒ 不要拦「不许死」，让原版按它自己的路子处理（宁可她死，也不要卡在 0 血）
+                Logger.Log("[CharBoss] ⚠ 瓶中精灵：同步回血没生效（HP 仍是 0）⇒ 放行原版判死");
+                try { PendingDebuffClear.Remove(boss); } catch { /* 忽略 */ }
+                return true;
+            }
 
             __result = false;                                       // 不死
             return false;                                           // 跳过原版
@@ -92,6 +150,21 @@ public static class BossFairyInABottlePatch
             Logger.Log("[CharBoss] 瓶中精灵兜底失败: " + e.Message);
             return true;
         }
+    }
+
+    /// <summary>取出（并清掉）这只 Boss 欠着的那次「清负面」。</summary>
+    internal static bool TryConsumePending(CharBossMonster boss, out PotionModel? potion)
+    {
+        potion = null;
+        try
+        {
+            if (boss == null) return false;
+            if (!PendingDebuffClear.TryGetValue(boss, out var found)) return false;
+            PendingDebuffClear.Remove(boss);
+            potion = found;
+            return true;
+        }
+        catch { return false; }
     }
 
     /// <summary>她栏位里那瓶「瓶中精灵」（没有就 null）。</summary>
@@ -106,8 +179,29 @@ public static class BossFairyInABottlePatch
     }
 
     /// <summary>
+    /// **只清负面**（v0.2.617 起的主力路径）：药水与回血已经在 `Hook.ShouldDie` 前缀里同步做完了，
+    /// 这一段只把「调制：瓶中精灵触发时清除她的所有负面效果」这件事接回死亡流程去 await
+    /// （联机两端在同一步结算完再继续，与 v0.2.329 的口径一致）。
+    /// </summary>
+    internal static async Task ClearDebuffsOnlyAsync(Creature me, PotionModel? potion)
+    {
+        try
+        {
+            Logger.Log($"[CharBoss] 瓶中精灵：复活已同步完成（{potion?.Id.Entry ?? "?"}）⇒ 现在清负面");
+            await ClearDebuffsAsync(me);
+            Logger.Log("[CharBoss] 瓶中精灵：复活流程结束（回血 + 清负面都在死亡流程的 await 之内）");
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 瓶中精灵清负面失败: " + e.Message);
+        }
+    }
+
+    /// <summary>
     /// 丢弃药水 + 回复 30% 最大生命（照抄原版 `AfterPreventingDeath` 的数值），然后清掉全部负面。
     /// 这个 Task 会被 `CreatureCmd.Kill` **await**（联机两端在同一步结算完再继续）。
+    ///
+    /// ⚠ v0.2.617 起它只是**兜底老路径**（判死时没走到同步那条、但药水还在）。
     /// </summary>
     internal static async Task SaveAsync(Player? shadow, PotionModel potion)
     {
@@ -233,11 +327,20 @@ public static class BossFairyAfterPreventingDeathPatch
         {
             if (creature?.Monster is not CharBossMonster boss) return true;
 
+            // ① 主力路径（v0.2.617）：判死那一刻已经同步丢了药水 + 回了血，这里只清负面。
+            if (BossFairyInABottlePatch.TryConsumePending(boss, out var pending))
+            {
+                __result = BossFairyInABottlePatch.ClearDebuffsOnlyAsync(creature, pending);
+                Logger.Log("[CharBoss] 瓶中精灵：把「清负面」挂成死亡流程要 await 的 Task（复活本身已同步完成）");
+                return false;
+            }
+
+            // ② 兜底老路径：药水还在、但没有同步记账（判死不是我们拦的）。
             var potion = BossFairyInABottlePatch.FairyOf(boss);
             if (potion == null) return true;          // 不是这条路径 ⇒ 交给原版
 
             __result = BossFairyInABottlePatch.SaveAsync(boss.Shadow, potion);
-            Logger.Log("[CharBoss] 瓶中精灵：把「回血 + 清负面」挂成死亡流程要 await 的 Task（联机同步修复）");
+            Logger.Log("[CharBoss] 瓶中精灵：把「回血 + 清负面」挂成死亡流程要 await 的 Task（兜底老路径）");
             return false;                              // 原版本体无需再跑
         }
         catch (Exception e)

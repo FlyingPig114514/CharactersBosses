@@ -76,8 +76,9 @@ public sealed class SharedFatePower : PowerModel
                 if (player?.Creature == null || !player.Creature.IsAlive) continue;
                 if (player.Creature.Monster != null) continue;       // 只给真人玩家，不给召唤物
                 if (!BossLockOn.SpecialEffectAppliesTo(boss, player)) continue;
+                int discardAmount = Core.DreadMode.IsActive ? 2 : 1;   // 2026-11-13 dread
                 await PowerCmd.Apply<SharedFateDiscardPower>(
-                    choiceContext, player.Creature, 1m, Owner, null);
+                    choiceContext, player.Creature, discardAmount, Owner, null);
                 count++;
             }
 

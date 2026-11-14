@@ -19,7 +19,7 @@ namespace CharacterBosses.Core;
 ///     int played = History.CardPlaysFinished.Count(e =&gt; e.HappenedThisTurn(CombatState)
 ///                     &amp;&amp; e.CardPlay.Card.Tags.Contains(Shiv) &amp;&amp; e.CardPlay.Player == Owner.Player);
 ///     if (played &gt; 0) return 0;                                                     // ← ②
-///     return Amount;                                                                // = 9（升级 12）
+///     return Amount;                                                                // 0.111/107 = 9（升级 12）
 /// }
 /// </code>
 /// 于是：
@@ -27,6 +27,12 @@ namespace CharacterBosses.Core;
 ///     ⇒ 原版**不会**替意图加这 9 点 —— 我们自己补不会重复；
 ///   · **②** 只有「本回合第一张小刀」吃 —— 所以补正只能落在每回合的**第一把刀**上；
 ///   · 牌面 <c>PowerVar&lt;PhantomBladesPower&gt;(9)</c>，升级 +3；层数是 Counter（重复打出会叠加）。
+///
+/// ★ 2026-11-13（0.113.0 削弱）：牌面从 **9 改成 8**（升级仍是 +3 ⇒ 11）。
+///   本条注释里所有「9（升级 12）」都是 0.111/107 的旧值，代码**没有**写死任何数字：
+///   · 已经挂在她身上时读 `GetPowerAmount&lt;PhantomBladesPower&gt;()`（<see cref="AmountOf"/>）；
+///   · 「本回合还没打出」时读牌面的 `DynamicVars["PhantomBladesPower"]`（<see cref="VarKey"/>）。
+///   ⇒ 0.113 上意图预览会自动少 1 点，不需要另改代码。
 /// </summary>
 public static class PhantomShivs
 {

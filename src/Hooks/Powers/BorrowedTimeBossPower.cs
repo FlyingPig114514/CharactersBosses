@@ -24,6 +24,16 @@ public sealed class BorrowedTimeBossPower : PowerModel
 {
     private const int Threshold = 10;
 
+    /// <summary>
+    /// ★ 2026-11-13（恐惧模式「预借时间」）：正常门槛 **10** 点能量，
+    /// **恐惧模式 6** 点（用户设计表原文：「你每花 6 能量 ⇒ 你本回合所有牌 +1 费，且她 +1 能量」）。
+    /// 「玩家本回合所有牌 +1 费 + 她 +1 能量」本来就已在正常模式实现了 ⇒ 恐惧版落在**门槛更低**上。
+    /// </summary>
+    private const int ThresholdDread = 6;
+
+    /// <summary>这一模式下的实际门槛。</summary>
+    private static int ThresholdNow => Core.DreadMode.IsActive ? ThresholdDread : Threshold;
+
     public override PowerType Type => PowerType.Buff;
 
     /// <summary>Counter：状态栏图标上会显示一个数字 —— 就是「还差多少能量她回费」。</summary>
@@ -38,7 +48,7 @@ public sealed class BorrowedTimeBossPower : PowerModel
     public override Task AfterApplied(MegaCrit.Sts2.Core.Entities.Creatures.Creature applier,
                                       MegaCrit.Sts2.Core.Models.CardModel cardSource)
     {
-        try { SetAmount(Threshold, true); } catch { /* 忽略 */ }
+        try { SetAmount(ThresholdNow, true); } catch { /* 忽略 */ }
         return Task.CompletedTask;
     }
 
@@ -61,10 +71,10 @@ public sealed class BorrowedTimeBossPower : PowerModel
     {
         try
         {
-            int best = Threshold;             // 默认显示满格（还没有人开始攒）
+            int best = ThresholdNow;          // 默认显示满格（还没有人开始攒）
             foreach (var kv in _spentByPlayer)
             {
-                int remain = Math.Clamp(Threshold - kv.Value, 1, Threshold);
+                int remain = Math.Clamp(ThresholdNow - kv.Value, 1, ThresholdNow);
                 if (remain < best) best = remain;
             }
             SetAmount(best, true);
@@ -115,9 +125,9 @@ public sealed class BorrowedTimeBossPower : PowerModel
 
             int times = 0;
             var ctx = new BlockingPlayerChoiceContext();
-            while (spent >= Threshold)
+            while (spent >= ThresholdNow)
             {
-                spent -= Threshold;
+                spent -= ThresholdNow;
                 times++;
 
                 // 给玩家 1 层原版「预借时间」：本回合所有牌耗能 +1（可叠加）
@@ -138,7 +148,7 @@ public sealed class BorrowedTimeBossPower : PowerModel
             if (times > 0)
             {
                 Flash();
-                Logger.Log($"[CharBoss] 预借时间：玩家花费满 {Threshold} 点能量 ×{times} → 玩家 +{times} 层预借时间，" +
+                Logger.Log($"[CharBoss] 预借时间：玩家花费满 {ThresholdNow} 点能量 ×{times} → 玩家 +{times} 层预借时间，" +
                            $"亡灵契约师 +{times} 能量（该玩家本轮已花 {spent}）");
             }
         }

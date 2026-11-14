@@ -59,6 +59,19 @@ internal static class ChoiceRegentPickPatch
             if (boss == null || !ChoiceRegent.IsChoiceBoss(boss)) return true;
 
             // ③ 候选牌 = 她手里通过原版过滤的那些（技能牌、非不可打出）
+            //    ⚠ 恐惧模式会**再打一次**「抉择，抉择」（见 CharBossMonster.RunChoiceFollowUpsAsync）：
+            //      那次它自己也在手牌里、而且它本身是技能牌 ⇒ 必须把它自己排除掉，
+            //      否则「从剩下的 4 张里选」会变成「4 张 + 抉择，抉择自己」；
+            //      已经挑过的那张也一并排除（用户口径是「**剩下**的 4 张里选 1」）。
+            var second = false;
+            List<Type> alreadyPicked = new();
+            try
+            {
+                alreadyPicked = ChoiceRegent.AllPicksFor(boss, boss.TurnNumber);
+                second = alreadyPicked.Count > 0;
+            }
+            catch { second = false; }
+
             var candidates = new List<CardModel>();
             try
             {
@@ -68,6 +81,8 @@ internal static class ChoiceRegentPickPatch
                     foreach (var card in hand)
                     {
                         if (card == null) continue;
+                        if (IsDecisionsDecisions(card)) continue;
+                        if (second && alreadyPicked.Contains(card.GetType())) continue;
                         bool ok;
                         try { ok = filter == null || filter(card); } catch { ok = false; }
                         if (ok) candidates.Add(card);
@@ -89,7 +104,7 @@ internal static class ChoiceRegentPickPatch
                 return true;
             }
 
-            __result = ChooseAsync(context, candidates, chooser, boss);
+            __result = ChooseAsync(context, candidates, chooser, boss, second);
             return false;
         }
         catch (Exception e)
@@ -103,24 +118,32 @@ internal static class ChoiceRegentPickPatch
     private static async Task<IEnumerable<CardModel>> ChooseAsync(PlayerChoiceContext context,
                                                                  List<CardModel> candidates,
                                                                  Player chooser,
-                                                                 Monsters.CharBossMonster boss)
+                                                                 Monsters.CharBossMonster boss,
+                                                                 bool second)
     {
         try
         {
             string listed = string.Join(",", candidates.Select(SafeEntry));
             Logger.Log($"[CharBoss] 指导：储君打出「抉择，抉择」⇒ 让 {SafeName(chooser)} 从 {candidates.Count} 张里挑一张" +
-                       $"（{listed}）");
+                       $"{(second ? "（恐惧模式·第二次）" : string.Empty)}（{listed}）");
         }
         catch { /* 日志失败不影响流程 */ }
 
         CardModel? picked = null;
         try
         {
-            // ⚠ 她出牌期间栈顶压着自动选择器（`BossCardSelector`）：原版 `FromChooseACardScreen` 开头就是
+            // ⚠ 她出牌期间栈顶压着自动选择器：原版每个选牌入口开头都是
             //   `if (Selector != null) ⇒ 用选择器`，不摘下来界面根本不会出现。摘完记得还回去。
-            using (CardSelectCmd.SuspendSelectorForTest())
+            //
+            // ★ v0.2.640 曾改成网格界面（`FromSimpleGrid`）；用户否掉：「肯定用知识恶魔的界面，
+            //   因为之前就没出过问题」⇒ 恢复知识恶魔界面（`NChooseACardSelectionScreen`），
+            //   只在「候选 > 3 张」时换成我们自己发的复刻版（那个入口对 >3 张会直接 throw，
+            //   而界面本身没有张数限制 —— 见 ChooseViaKnowledgeDemonAsync 的注释）。
+            using (Core.SelectionCompat.SuspendForUi(chooser))
             {
-                picked = await CardSelectCmd.FromChooseACardScreen(context, candidates, chooser, false);
+                picked = candidates.Count <= 3
+                    ? await CardSelectCmd.FromChooseACardScreen(context, candidates, chooser, false)
+                    : await ChooseViaKnowledgeDemonAsync(context, candidates, chooser);
             }
         }
         catch (Exception e)
@@ -134,10 +157,106 @@ internal static class ChoiceRegentPickPatch
             Logger.Log($"[CharBoss] 指导：玩家没给出选择 ⇒ 退回第一张 {SafeEntry(picked)}");
         }
 
-        try { ChoiceRegent.NotePick(boss, boss.TurnNumber, picked.GetType()); }
+        try { ChoiceRegent.NotePick(boss, boss.TurnNumber, picked.GetType(), second); }
         catch { /* 忽略 */ }
 
         return new List<CardModel> { picked };
+    }
+
+    /// <summary>
+    /// **知识恶魔那个选牌界面**（`NChooseACardSelectionScreen`）的「不限张数」复刻。
+    ///
+    /// 为什么不直接用 `CardSelectCmd.FromChooseACardScreen`：它的第一句就是
+    /// <code>
+    /// if (cards.Count > 3) throw new ArgumentException("Only works with less than 3 cards", "cards");
+    /// </code>
+    /// 只能喂 3 张以内的牌（原版 `发现` / `类星体` 那种三选一）。而用户的设计是「会有 5 张牌」，
+    /// 恐惧模式再挑第二张时还剩 4 张 ⇒ 两种都超限。
+    ///
+    /// 但**界面本身没有张数限制**（`ShowScreen(IReadOnlyList&lt;CardModel&gt;, bool)` 随便传），
+    /// 那道检查只在外层那个静态方法里。所以这里把它拆开、逐句照抄
+    /// `FromChooseACardScreen` 的「非选择器」分支，只去掉开头那个判断：
+    /// <list type="number">
+    ///   <item>`UndoEndTurnIfNecessary(player)` —— 玩家已经点了结束回合就撤回（她这一手要等玩家点完）；</item>
+    ///   <item>`ReserveChoiceId` → `SignalPlayerChoiceBegun`（多人：其它客户端进入等待）；</item>
+    ///   <item>自己是本机玩家 ⇒ `NPlayerHand.CancelAllCardPlay()` + `ShowScreen` + await `CardsSelected()`
+    ///         ⇒ `PlayerChoiceResult.FromIndex(下标)` + `SyncLocalChoice`（把结果广播给其它端）；</item>
+    ///   <item>不是本机 ⇒ `WaitForRemoteChoice` + `AsIndex()`（等房主那边选完）；</item>
+    ///   <item>`SignalPlayerChoiceEnded`。</item>
+    /// </list>
+    /// 视觉、交互、同步语义与原版完全一致，只是张数不再受限。
+    /// </summary>
+    private static async Task<CardModel?> ChooseViaKnowledgeDemonAsync(
+        PlayerChoiceContext context, List<CardModel> candidates, Player chooser)
+    {
+        // ① 撤回「已结束回合」（照抄 CardSelectCmd.UndoEndTurnIfNecessary）
+        try
+        {
+            var combat = MegaCrit.Sts2.Core.Combat.CombatManager.Instance;
+            var state = chooser.Creature?.CombatState;
+            if (combat != null && state != null
+                && state.CurrentSide == MegaCrit.Sts2.Core.Combat.CombatSide.Player
+                && combat.IsPlayerReadyToEndTurn(chooser))
+            {
+#if STS2_111
+                combat.TryUndoReadyToEndTurn(chooser);
+#else
+                combat.UndoReadyToEndTurn(chooser);
+#endif
+            }
+        }
+        catch { /* 拿不到就跳过，界面照样弹 */ }
+
+        var sync = MegaCrit.Sts2.Core.Runs.RunManager.Instance.PlayerChoiceSynchronizer;
+        uint choiceId = sync.ReserveChoiceId(chooser);
+#if STS2_111
+        await context.SignalPlayerChoiceBegun(
+            chooser, MegaCrit.Sts2.Core.Entities.Multiplayer.PlayerChoiceOptions.None);
+#else
+        await context.SignalPlayerChoiceBegun(
+            MegaCrit.Sts2.Core.Entities.Multiplayer.PlayerChoiceOptions.None);
+#endif
+        try
+        {
+            // ② 本机玩家：弹界面、等他点
+            if (MegaCrit.Sts2.Core.Context.LocalContext.IsMe(chooser))
+            {
+                try { MegaCrit.Sts2.Core.Nodes.Combat.NPlayerHand.Instance?.CancelAllCardPlay(); }
+                catch { /* 只是停掉出牌动画，失败无所谓 */ }
+
+                var screen = MegaCrit.Sts2.Core.Nodes.Screens.CardSelection.NChooseACardSelectionScreen
+                    .ShowScreen(candidates, false);
+                var chosen = await screen.CardsSelected();
+
+                CardModel? first = null;
+                if (chosen != null)
+                {
+                    foreach (var c in chosen) { first = c; break; }
+                }
+                int index = first == null ? -1 : candidates.IndexOf(first);
+                try
+                {
+                    sync.SyncLocalChoice(chooser, choiceId,
+                        MegaCrit.Sts2.Core.GameActions.PlayerChoiceResult
+                            .FromIndex(index < 0 ? (int?)null : index));
+                }
+                catch (Exception e)
+                {
+                    Logger.Log("[CharBoss] 指导：同步本地选择失败（本地结果不受影响）: " + e.Message);
+                }
+                return first;
+            }
+
+            // ③ 别的客户端：等那名玩家选完
+            var remote = await sync.WaitForRemoteChoice(chooser, choiceId);
+            int remoteIndex = remote.AsIndex();
+            return (remoteIndex < 0 || remoteIndex >= candidates.Count) ? null : candidates[remoteIndex];
+        }
+        finally
+        {
+            try { await context.SignalPlayerChoiceEnded(); }
+            catch { /* 忽略 */ }
+        }
     }
 
     /// <summary>被锁定的玩家；拿不到就用第一个真人玩家。</summary>

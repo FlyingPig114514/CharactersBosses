@@ -54,12 +54,18 @@ public sealed class BossPrimalForcePower : PowerModel
             if (entry != "GIANT_ROCK") return;
 
             var ctx = choiceContext ?? new BlockingPlayerChoiceContext();
-            await PowerCmd.Apply<StrengthPower>(ctx, self, StrengthPerRock, self, null);
-            await PowerCmd.Apply<PlatingPower>(ctx, self, PlatingPerRock, self, null);
+            // ★ 2026-11-13 订正（用户原文复述）：「铁甲战士使用『巨石』时，会获得 **1 点力量和 3 点覆甲**」
+            //   ⇒ 恐惧模式**不再翻倍**（v0.2.609 的 +2/+6 是我自己加的强化，已回退）。
+            //   巨石战的恐惧提升由另外三条承担：执迷 −1 费（等效「第 1/7 回合 +1 能量、多打一张巨石+」）
+            //   与「巨石造成未被格挡伤害 ⇒ 你 1 层虚弱」（见 BossDefs / BoulderIroncladScript）。
+            int rockStrength = StrengthPerRock;
+            await PowerCmd.Apply<StrengthPower>(ctx, self, rockStrength, self, null);
+            int rockPlating = PlatingPerRock;
+            await PowerCmd.Apply<PlatingPower>(ctx, self, rockPlating, self, null);
 
             if (_logs++ < 20)
             {
-                Logger.Log($"[CharBoss] 原始力量：他打出巨石 → +{StrengthPerRock} 力量、+{PlatingPerRock} 覆甲");
+                Logger.Log($"[CharBoss] 原始力量：他打出巨石 → +{rockStrength} 力量、+{rockPlating} 覆甲");
             }
         }
         catch (Exception e)

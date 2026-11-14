@@ -70,7 +70,7 @@ public static class SilentBrewerScript
                 Energy = TurnEnergy,
                 Potions = Potions<ShipInABottle, GhostInAJar>(),
                 Cards = Cards(
-                    C<SerpentForm>(),
+                    C<SerpentForm>(Core.DreadMode.IsActive),   // 2026-11-13（恐惧模式）：群蛇形态升级
                     Brew(true, typeof(BlockPotion)),
                     Brew(true, typeof(Duplicator)),
                     Brew(true, typeof(FyshOil)),

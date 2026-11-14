@@ -131,16 +131,22 @@ public sealed class KnowThyPlacePower : PowerModel
             _lostThisTurn += lost;
 
             int threshold = ThresholdFor();
-            while (_lostThisTurn >= threshold && _triggersThisTurn < MaxTriggersPerTurn)
+            // ★ 2026-11-13（恐惧模式「何人僭越」）：用户设计表原文
+            //   「一回合内失去 25 生命 ⇒ 所有玩家本回合 −1 力量（PS：**不再减少她铸造**；**每回合可多次**）」
+            //   ⇒ 恐惧模式：① 不扣她的铸造；② 去掉每回合 3 次的上限（掉血够就继续触发）。
+            bool dread = Core.DreadMode.IsActive;
+            int cap = dread ? int.MaxValue : MaxTriggersPerTurn;
+            while (_lostThisTurn >= threshold && _triggersThisTurn < cap)
             {
                 _lostThisTurn -= threshold;
                 _triggersThisTurn++;
 
-                await LoseForge(choiceContext);
+                if (!dread) await LoseForge(choiceContext);   // 恐惧模式不再减少她铸造
                 await WeakenPlayers(choiceContext);
 
                 Logger.Log($"[CharBoss] 何人僭越：本回合第 {_triggersThisTurn} 次触发" +
-                           $"（累计掉血达标 {threshold}）→ 铸造 −{ForgeLoss}，玩家 −1 力量");
+                           $"（累计掉血达标 {threshold}）→ " +
+                           (dread ? "恐惧模式：不减铸造，" : $"铸造 −{ForgeLoss}，") + "玩家 −1 力量");
             }
 
             // 图标上那个「还会扣几次铸造」的计数跟着掉血走（用户 2026-10-29 要求）

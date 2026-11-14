@@ -96,6 +96,8 @@ public static class BossDefs
                 Relics = Core.IroncladStrikeScript.Relics(),
                 Script = Core.IroncladStrikeScript.Build(),
                 SpecialLoc = "IRONCLAD_BOSS.bash",
+            // 2026-11-13（恐惧模式）：同名「痛击」，每张「打击」牌加成 +1
+            SpecialLocDread = "IRONCLAD_BOSS.bash_dread",
                 SpecialPower = typeof(Powers.BossBashPower),
                 // 用户 2026-11-07：进阶 8 = 升级岩石铠甲 + 获得护喉甲；进阶 9 = 升级完美打击、预备打击
                 AscensionUpgrades = new List<(int, Type)>
@@ -122,6 +124,8 @@ public static class BossDefs
                 Relics = Core.JugglerIroncladScript.Relics(),
                 Script = Core.JugglerIroncladScript.Build(),
                 SpecialLoc = "IRONCLAD_BOSS.pact",
+    // 2026-11-13（恐惧模式）：同名「燃烧契约」，恐慌版额外让玩家的打击牌加成他的完美打击
+    SpecialLocDread = "IRONCLAD_BOSS.pact_dread",
                 SpecialPower = typeof(Powers.BossBurningPactPower),
                 // 进阶（用户 2026-11-02，v0.2.321 削弱后重排）：8 = 升级无惧疼痛、**邪眼**；
                 // 9 = 升级**完美打击**、彼岸咆哮（原来的预备打击/踩踏已从剧本下线）。
@@ -140,7 +144,9 @@ public static class BossDefs
                 Deck = BoulderIroncladScript.Deck(),
                 Relics = BoulderIroncladScript.Relics(),
                 Script = BoulderIroncladScript.Build(),
-                SpecialLoc = "IRONCLAD_BOSS.boulder",          // 特殊效果「原始力量」
+                SpecialLoc = "IRONCLAD_BOSS.boulder",
+    // 2026-11-13（恐惧模式）：同名「原始力量」，巨石加成翻倍
+    SpecialLocDread = "IRONCLAD_BOSS.boulder_dread",          // 特殊效果「原始力量」
                 SpecialPower = typeof(Powers.BossPrimalForcePower),
                 // 进阶（用户 2026-10-27 / 2026-11-07）：8 = 升级「无惧疼痛」+ 获得遗物「奥利哈钢」；
                 //   9 = 获得遗物「金刚杵」＋升级「彼岸咆哮」（用户 2026-11-07 追加）。
@@ -162,6 +168,11 @@ public static class BossDefs
         SpecialPowerByAct = new Type?[]
         {
             typeof(Powers.IroncladRagePower), typeof(Powers.BossRendingPower), typeof(Powers.DominateWeakPower), null,
+        },
+        // 2026-11-13（恐惧模式）：第一幕「愤怒战」用同名文案，效果 = 额外带「奥利哈钢」
+        SpecialLocDreadByAct = new string?[]
+        {
+            "IRONCLAD_BOSS.anger_dread", "IRONCLAD_BOSS.rending_dread", "IRONCLAD_BOSS.dominate_dread", null,
         },
         // 让她的遗物真的收到战斗内钩子（卡戎之灰：消耗牌→3 伤；奥利哈钢：回合结束无格挡→+6 格挡）。
         // 影子 Player 的遗物默认收不到这些钩子，需要 Patches/BossRelicHookBridge 手动补跑。
@@ -249,6 +260,9 @@ public static class BossDefs
         //   · 第三幕「刀猎」= 袖里乾坤；
         //   · 第二幕「涂毒猎」= 带毒刺击（中毒改成玩家回合结束结算、可格挡，未格挡伤害转移 1 点中毒给她）。
         SpecialLocByAct = new string?[] { "SILENT_BOSS.sly", "SILENT_BOSS.special_act2", "SILENT_BOSS.special", null },
+        // 2026-11-13（恐惧模式）：第一幕「命运同担」恐惧版 = 下回合开始弃 2 张
+        // 2026-11-13（恐惧模式）：第三幕「刀猎·袖里乾坤」= 每次塞 4 张小刀（正常 3 张）
+        SpecialLocDreadByAct = new string?[] { "SILENT_BOSS.sly_dread", "SILENT_BOSS.special_act2_dread", "SILENT_BOSS.special_dread", null },
         SpecialPowerByAct = new Type?[]
         {
             typeof(Powers.SharedFatePower), typeof(Powers.PoisonStrikePower), typeof(Powers.SleeveTrickPower), null,
@@ -303,6 +317,8 @@ public static class BossDefs
                 Relics = Core.SnakeBiteSilentScript.Relics(),
                 Script = Core.SnakeBiteSilentScript.Build(),
                 SpecialLoc = "SILENT_BOSS.snake_form",
+        // 2026-11-13（恐惧模式）：同名「群蛇形态」，玩家洗牌塞 3 张蛇咬
+        SpecialLocDread = "SILENT_BOSS.snake_form_dread",
                 SpecialPower = typeof(Powers.BossSnakeFormPower),
                 // 用户 2026-11-08：进阶 8 = 升级残影、逃脱计划；进阶 9 = 升级背刺、飞镖
                 AscensionUpgrades = new List<(int, Type)>
@@ -324,6 +340,8 @@ public static class BossDefs
                 Relics = Core.SnakeEyesSilentScript.Relics(),
                 Script = Core.SnakeEyesSilentScript.Build(),
                 SpecialLoc = "SILENT_BOSS.well_laid",
+        // 2026-11-13（恐惧模式）：同名「计划妥当」，谋杀只要抽牌就加伤
+        SpecialLocDread = "SILENT_BOSS.well_laid_dread",
                 SpecialPower = typeof(Powers.BossWellLaidPlansPower),
                 // 进阶（用户 2026-11-04）：8 = 升级究极防御、闪躲翻滚；9 = 升级匕首雨、冲刺。
                 // （升级是**按类型**的 ⇒ 剧本里所有同名牌一起升级。）
@@ -345,6 +363,8 @@ public static class BossDefs
                 Relics = SilentBrewerScript.Relics(),
                 Script = SilentBrewerScript.Build(),
                 SpecialLoc = "SILENT_BOSS.brewer",   // 特殊效果「调制」
+        // 2026-11-13（恐惧模式）：同名「调制」，格挡抵消不消耗格挡
+        SpecialLocDread = "SILENT_BOSS.brewer_dread",
                 SpecialPower = typeof(Powers.BrewModPower),
                 Potions = SilentBrewerScript.InitialPotions(),
                 HealPerPotion = 0,      // 用户 2026-10-26：削弱，去掉「喝药回 5 血」
@@ -372,6 +392,8 @@ public static class BossDefs
                     Relics = Core.GrandFinaleSilentScript.Relics(),
                     Script = Core.GrandFinaleSilentScript.Build(),
                     SpecialLoc = "SILENT_BOSS.suppression",       // 特殊效果「压制」
+                    // 2026-11-13（恐惧模式）：同名「压制」+「她打出华丽收场时给所有玩家 1 层昏鸣」
+                    SpecialLocDread = "SILENT_BOSS.suppression_dread",
                     SpecialPower = typeof(Powers.BossSuppressionPower),
                     // 用户 2026-11-09：「拦掉原版的抽牌」—— 剧本手牌写死了，杂技/肾上腺素不再真抽
                     BlocksVanillaDraw = true,
@@ -433,6 +455,23 @@ public static class BossDefs
         {
             typeof(Powers.BossCoolantPower), typeof(Powers.SynthesisPower), typeof(Powers.DeviationPower), null,
         },
+    // ★ 2026-11-13（用户「恐惧模式的提升」）：恐惧版特殊效果（**名字与正常模式相同**、效果更强）。
+    //   已做：第二幕 物理机「人工合成」= 人工制品 3 → **5** 层；未填的槽位自动退回正常模式那一份
+    //   （见 BossDefinition.SpecialLocForAct / SpecialPowerForAct 里的 DreadMode.IsActive 分支）。
+    SpecialLocDreadByAct = new string?[]
+    {
+        "DEFECT_BOSS.dark_dread", "DEFECT_BOSS.synthesis_dread", "DEFECT_BOSS.special_dread", null,
+    },
+    SpecialPowerDreadByAct = new Type?[]
+    {
+        null, typeof(Powers.SynthesisDreadPower), null, null,
+    },
+    // ★ 2026-11-13（恐惧模式）：第一幕「黑球机」**升级眼部攻击**（用户原话
+    //   「黑球机：升级眼部攻击 …」）。走 DreadUpgradesByAct 通道 ⇒ 卡组与剧本手牌里同名的那张都升级。
+    DreadUpgradesByAct = new List<Type>?[]
+    {
+        new List<Type> { typeof(GoForTheEyes) }, null, null, null,
+    },
         // 进阶加成（用户设计）：
         //   · 第一幕（黑球机，用户 2026-10-26）：进阶 8 升级「飞跃」+ 获得遗物「不安油灯」；
         //     进阶 9 升级「趁势打击」（弹回已按用户 2026-10-27 取消）。
@@ -477,6 +516,8 @@ public static class BossDefs
                 Script = Core.DefectThunderScript.Build(),
                 SpecialLoc = "DEFECT_BOSS.thunder",
                 SpecialPower = typeof(Powers.BossLightningRodPower),
+        // 2026-11-13 (dread): 同名「引雷针」，5 张牌 -1 集中且每回合 1 次
+        SpecialLocDread = "DEFECT_BOSS.thunder_dread",
                 // 用户 2026-11-05：进阶 8 = 升级缓冲、充电；进阶 9 = 升级扫荡射线、集中打击。
                 AscensionUpgrades = new List<(int, Type)>
                 {
@@ -503,6 +544,8 @@ public static class BossDefs
                 Relics = Core.DefectRainbowScript.Relics(),
                 Script = Core.DefectRainbowScript.Build(),
                 SpecialLoc = "DEFECT_BOSS.rainbow",
+        // ★ 恐惧模式：同名「彩虹」，每 5 球 +2 集中（Power 内部按 DreadMode.IsActive 判定）
+        SpecialLocDread = "DEFECT_BOSS.rainbow_dread",
                 SpecialPower = typeof(Powers.BossRainbowPower),
                 // 用户 2026-11-07：进阶 8 = 升级启动流程、冷却剂；
                 // 用户 2026-11-08 改：进阶 9 = 升级**冰雹风暴、雷霆**（原来是「冰雹风暴、同步」）。
@@ -528,6 +571,8 @@ public static class BossDefs
                 Script = Core.EventMachineScript.Build(),
                 SpecialLoc = "DEFECT_BOSS.one_for_all",        // 特殊效果「一心化万」
                 SpecialPower = typeof(Powers.BossAllForOnePower),
+        // 2026-11-13 (dread): 同名「一心化万」，第 4、9 回合多打一张疯狂进食+'
+        SpecialLocDread = "DEFECT_BOSS.one_for_all_dread",
                 // 进阶（用户 2026-11-04）：8 = 升级所有防御；9 = 升级疯狂进食。
                 // （升级按类型 ⇒ 剧本里的防御全部变「防御+」。）
                 AscensionUpgrades = new List<(int, Type)>
@@ -561,6 +606,8 @@ public static class BossDefs
                     Relics = Core.StatusDefectScript.Relics(),
                     Script = Core.StatusDefectScript.Build(),
                     SpecialLoc = "DEFECT_BOSS.status",
+        // ★ 恐惧模式：同名「状态机」；用户给的恐惧版正文与现有实现一致 ⇒ 只备一份同文案
+        SpecialLocDread = "DEFECT_BOSS.status_dread",
                     SpecialPower = typeof(Powers.BossSyncPower),
                     // 用户 2026-11-05：进阶 8 = 升级「强撑」「高速脱离」；进阶 9 = 升级「污秽攻击」+ 获得「数据磁盘」
                     AscensionUpgrades = new List<(int, Type)>
@@ -620,6 +667,15 @@ public static class BossDefs
             typeof(Powers.NotYetPower), typeof(Powers.BossSoulBoundPower),
             typeof(Powers.BorrowedTimeBossPower), null,
         },
+        // ★ 2026-11-13（恐惧模式）：按幕的恐惧版特殊效果。
+        //   目前只有第三幕「根除骨·预借时间」有（门槛 10 → **6** 点能量；
+        //   「玩家本回合所有牌 +1 费 + 她 +1 能量」那一半正常模式就已经是现状）。
+        //   第一 / 二幕留空 ⇒ `SpecialLocForAct` 自动退回正常模式那一份。
+        SpecialLocDreadByAct = new string?[]
+        {
+            // 第一幕「灾厄骨」：恐惧版**去掉**「回合结束用格挡/召唤物紧急续命」那条保护
+            "NECROBINDER_BOSS.special_dread", "NECROBINDER_BOSS.soul_bound_dread", "NECROBINDER_BOSS.borrowed_time_dread", null,
+        },
         // 进阶加成（用户设计，2026-10-24 用户要求：**原来"所有幕都吃"的四条只对第一幕生效**）：
         //   · 第一幕灾厄骨：进阶 8 厄运之衣+；进阶 9 友谊+、无处可逃+、荒疫打击+
         //   · 进阶 8（第二幕）：升级「死亡之舞」「违逆」；进阶 9（第二幕）：升级「死亡行军」「切断」
@@ -676,6 +732,8 @@ public static class BossDefs
                 Relics = Core.FleshBoneScript.Relics(),
                 Script = Core.FleshBoneScript.Build(),
                 SpecialLoc = "NECROBINDER_BOSS.devour_life",   // 特殊效果「吞噬生命」
+                // 2026-11-13（恐惧模式）：同名「吞噬生命」+ 每次 6 格挡（正常 4）+ 血肉戏法按升级版算
+                SpecialLocDread = "NECROBINDER_BOSS.devour_life_dread",
                 SpecialPower = typeof(Powers.BossDevourLifePower),
                 // 进阶（用户 2026-11-10 第三轮改稿）：8 = 升级护卫、吸引仇恨；
                 //                                  9 = **只升级摧残**。
@@ -696,6 +754,8 @@ public static class BossDefs
                 Relics = Core.EtherealBoneScript.Relics(),
                 Script = Core.EtherealBoneScript.Build(),
                 SpecialLoc = "NECROBINDER_BOSS.void_call",       // 特殊效果「虚空之唤」
+                // 2026-11-13（恐惧模式）：同名「虚空之唤」+ 战斗开始就直接生效（不必等她打女妖之嚎）
+                SpecialLocDread = "NECROBINDER_BOSS.void_call_dread",
                 SpecialPower = typeof(Powers.BossVoidCallPower),
                 // 进阶（用户 2026-11-09）：8 = 升级灰烬之灵、违逆；9 = 升级友谊。
                 AscensionUpgrades = new List<(int, Type)>
@@ -767,6 +827,14 @@ public static class BossDefs
         {
             "REGENT_BOSS.comet", "REGENT_BOSS.special", "REGENT_BOSS.resonance", null,
         },
+        // ★ 2026-11-13（恐惧模式）：按幕的恐惧版特殊效果。
+        //   · 第一幕「碎屑储·彗星」：碎屑放到玩家**抽牌堆顶部**（正常是随机洗入）
+        //   · 第二幕「铸剑储·何人僭越」：不再扣她的铸造，且每回合可多次触发
+        //   · 第三幕「无色储·共鸣」：留空（还没做）⇒ 自动退回正常模式那一份
+        SpecialLocDreadByAct = new string?[]
+        {
+            "REGENT_BOSS.comet_dread", "REGENT_BOSS.special_dread", "REGENT_BOSS.resonance_dread", null,
+        },
         SpecialPowerByAct = new Type?[]
         {
             typeof(Powers.CometBossPower), typeof(Powers.KnowThyPlacePower), typeof(Powers.ResonancePower), null,
@@ -818,6 +886,8 @@ public static class BossDefs
                 Relics = Core.RegentBombardScript.Relics(),
                 Script = Core.RegentBombardScript.Build(),
                 SpecialLoc = "REGENT_BOSS.orbital",           // 特殊效果「环绕轨道」
+                // 2026-11-13（恐惧模式）：同名「环绕轨道」+ **第 1 回合**就打轰击（正常是第 2 回合）
+                SpecialLocDread = "REGENT_BOSS.orbital_dread",
                 SpecialPower = typeof(Powers.BossOrbitalBombardPower),
                 // 进阶（用户 2026-11-04）：8 = 升级群星斗篷、拳斗；9 = 升级星灭 + 获得遗物「金刚杵」。
                 AscensionUpgrades = new List<(int MinAscension, Type Card)>
@@ -844,6 +914,10 @@ public static class BossDefs
                 Relics = Core.KingRegentScript.Relics(),
                 Script = Core.KingRegentScript.Build(),
                 SpecialLoc = "REGENT_BOSS.conqueror",          // 特殊效果「征服者」
+                // 2026-11-13（恐惧模式）：同名「征服者」+ 额外「本回合 −1 力量（王之凝视）」
+                SpecialLocDread = "REGENT_BOSS.conqueror_dread",
+                // 恐惧模式还要**升级「王者之拳」**（走 DreadUpgrades 通道，运行期才判）
+                DreadUpgrades = new List<Type> { typeof(MonarchsGaze) },
                 SpecialPower = typeof(Powers.BossConquerorPower),
                 // 进阶（用户 2026-11-02）：8 = 升级宇宙冷漠 + 获得遗物「奥利哈钢」；
                 //   · v0.2.324 削弱：不再升级王者之拳（进阶 9 的名单里原本只有它，
@@ -872,6 +946,8 @@ public static class BossDefs
                 Relics = Core.RegentStarScript.Relics(),
                 Script = Core.RegentStarScript.Build(),
                 SpecialLoc = "REGENT_BOSS.stellar",            // 特殊效果「群星荟萃」
+                // 2026-11-13（恐惧模式）：同名「群星荟萃」+ 第3/4回合换牌让七星打得出去
+                SpecialLocDread = "REGENT_BOSS.stellar_dread",
                 SpecialPower = typeof(Powers.BossStellarGatheringPower),
                 // 进阶（用户 2026-10-28）：8 = 获得遗物「星际尘埃」；9 = 升级「剑雨」+「王者之拳」。
                 AscensionUpgrades = new List<(int MinAscension, Type Card)>
@@ -906,6 +982,8 @@ public static class BossDefs
                     Relics = Core.RegentMinionScript.Relics(),
                     Script = Core.RegentMinionScript.Build(),
                     SpecialLoc = "REGENT_BOSS.minion",
+                // 2026-11-13（恐惧模式）：同名「征召上前」+ 仆从数不足 **1** + 俯冲仆从伤害仍是 16
+                SpecialLocDread = "REGENT_BOSS.minion_dread",
                     SpecialPower = typeof(Powers.BossCallToArmsPower),
                     // 用户 2026-11-05：进阶 8 = 升级护驾！！！、群星之子；
                     //                 进阶 9 = 升级下去！、冲锋！！、类星体（连带它印出来的震荡波 / 究极打击）。
@@ -940,6 +1018,8 @@ public static class BossDefs
                     Relics = Core.ChoiceRegentScript.Relics(),
                     Script = Core.ChoiceRegentScript.Build(),
                     SpecialLoc = "REGENT_BOSS.guide",
+                    // 2026-11-13（恐惧模式）：同名「指导」+「由玩家替他挑 2 张（再打一次抉择，抉择、拦掉抽牌）」
+                    SpecialLocDread = "REGENT_BOSS.guide_dread",
                     SpecialPower = typeof(Powers.BossGuidePower),
                     // ★ 2026-11-10（用户）：「拦掉原版的抽牌，但不拦燃烧木棍的印牌」。
                     //   必须拦：她的「抉择，抉择+」自己会 `CardPileCmd.Draw(5)`，而她的手牌恒等于剧本

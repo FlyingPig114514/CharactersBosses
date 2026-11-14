@@ -49,6 +49,28 @@ public static class GrandFinaleSilentScript
                 Energy = 2,
             },
 
+#if STS2_111
+            // 2（0.113.0 重做版）：肾上腺素、夜魇+（复制杂技）、杂技（弃战术大师）、战术大师（奇巧）、
+            //    隐秘匕首（弃防御 **和铭记死亡**）、铭记死亡（奇巧：被丢掉时免费打出）、防御；
+            //    不出：防御（被隐秘匕首丢弃）、防御（保留，没费）、华丽收场（保留，抽牌堆非空）。
+            //    能量账：起手 2（3−涅奥 1）+ 肾上腺素 1 + 战术大师（奇巧弃牌）1 = 4
+            //           = 夜魇+ 2 + 杂技 1 + 防御 1（铭记死亡是奇巧自动打出，不花能量）。
+            new BossTurn
+            {
+                Note = "2. 肾上腺素、夜魇+（复制杂技）、杂技（弃战术大师）、战术大师（奇巧）、隐秘匕首（弃防御和铭记死亡）、铭记死亡（奇巧）、防御",
+                Cards = new List<ScriptCard>
+                {
+                    C<Adrenaline>(), C<Nightmare>(true), C<Acrobatics>(),
+                    SlyDiscard<Tactician>(),
+                    C<HiddenDaggers>(),
+                    Discard<DefendSilent>(), SlyDiscard<MementoMori>(),
+                    C<DefendSilent>(),
+                    Kept<DefendSilent>(), Kept<GrandFinale>(),
+                },
+                Energy = 2,
+                PickOrder = new List<Type> { typeof(Acrobatics) },   // 夜魇复制的就是「杂技」
+            },
+#else
             // 2：肾上腺素、夜魇+（夜魇杂技）、杂技（弃战术大师）、战术大师（奇巧）、隐秘匕首（弃 2 张防御）、
             //    铭记死亡、防御×2（被丢弃）、防御 / 华丽收场（保留不出）
             new BossTurn
@@ -69,6 +91,8 @@ public static class GrandFinaleSilentScript
                 Energy = 2,
                 PickOrder = new List<Type> { typeof(Acrobatics) },   // 夜魇复制的就是「杂技」
             },
+
+#endif
 
             // 3：中和、手上技法（为防御添加奇巧）、钢铁风暴（丢光剩下 5 张：防御(奇巧)、杂技×3、华丽收场）
             new BossTurn
@@ -159,6 +183,24 @@ public static class GrandFinaleSilentScript
                 Energy = 3,
             },
 
+#if STS2_111
+            // 9（0.113.0 重做版）：杂技（弃铭记死亡）、铭记死亡（奇巧）、中和、防御、防御、华丽收场；
+            //    不出：打击（被必备工具丢弃）、防御（保留，没费）、打击（保留，没费）。
+            //    能量账：杂技 1 + 防御 1 + 防御 1 = 3（中和 0、华丽收场 0、铭记死亡奇巧免费）。
+            new BossTurn
+            {
+                Note = "9. 杂技（弃铭记死亡）、铭记死亡（奇巧）、中和、防御、防御、华丽收场；打击（被必备工具丢弃）、防御 / 打击（保留不出）",
+                Cards = new List<ScriptCard>
+                {
+                    C<Acrobatics>(), SlyDiscard<MementoMori>(),
+                    C<Neutralize>(), C<DefendSilent>(), C<DefendSilent>(),
+                    C<GrandFinale>(emptyDrawPileFirst: true),
+                    ToolsDiscard(Discard<StrikeSilent>()),
+                    Kept<DefendSilent>(), Kept<StrikeSilent>(),
+                },
+                Energy = 3,
+            },
+#else
             // 9：杂技（弃防御）、铭记死亡、中和、防御、华丽收场、打击（被必备工具丢弃）、
             //    防御 / 打击（保留不出）
             new BossTurn
@@ -174,6 +216,8 @@ public static class GrandFinaleSilentScript
                 },
                 Energy = 3,
             },
+
+#endif
 
             // 10：洗牌。杂技（弃防御）、手上技法（为防御加奇巧）、钢铁风暴（丢光剩下 4 张）、
             //     防御（奇巧）、打击（被必备工具丢弃）
@@ -199,6 +243,38 @@ public static class GrandFinaleSilentScript
             Turns = turns,
             LoopFrom = 8,      // 用户：「之后 8～10 循环」
             LoopLength = 3,
+            // ★ 2026-11-13（恐惧模式，用户当轮口径）：「增强恐惧模式下的华丽猎，把第 6 回合的尖啸换成精准+」。
+            //   用 `Resolve`（**运行期**求值）而不是在 `Build()` 里判 `DreadMode.IsActive` ——
+            //   `BossDefs` 是静态初始化，那时 IsActive 恒为 false（同一个坑见蛇眼猎·谋杀 / 辉星储换牌）。
+            //   第 6 回合不在 8～10 的循环里，所以按回合号覆盖是安全的。
+            Resolve = DreadTurnOverride,
+        };
+    }
+
+    /// <summary>
+    /// 恐惧模式的回合覆盖：把第 6 回合的「尖啸」（`PiercingWail`，1 费）换成「**精准+**」
+    /// （`Accuracy` 升级版，「小刀额外造成 6 点伤害」，1 费 —— 比尖啸更贴「增强」的意思：
+    /// 第 7/10 回合的隐秘匕首、钢铁风暴都会掉小刀，精准+ 正好给小刀加伤）。
+    /// 本回合能量仍是 3：精准+ 1 + 打击 1 + 生存者 1 = 3，正好打完。
+    ///
+    /// ⚠ v0.2.638：第一版（0.2.636/637）这里误写成了 `PreciseCut`（**精确切击**，0 费，
+    ///   是「炼药猎」第 5 回合用的牌，华丽猎卡组里压根没有）—— 用户当场认出来「她都打精确切击了，
+    ///   华丽猎卡组里根本没有这张牌」。中文「精准」= `Accuracy`，别再和「精确切击」搞混。
+    /// </summary>
+    private static BossTurn? DreadTurnOverride(int turn)
+    {
+        if (!Core.DreadMode.IsActive) return null;
+        if (turn != 6) return null;
+
+        return new BossTurn
+        {
+            Note = "6.（恐惧）精准+、打击、生存者（手牌空、不弃牌）；防御（被必备工具丢弃）",
+            Cards = new List<ScriptCard>
+            {
+                ToolsDiscard(Discard<DefendSilent>()),
+                C<Accuracy>(true), C<StrikeSilent>(), C<Survivor>(),
+            },
+            Energy = 3,
         };
     }
 
@@ -252,6 +328,10 @@ public static class GrandFinaleSilentScript
         typeof(DefendSilent), typeof(DefendSilent), typeof(DefendSilent),
         typeof(DefendSilent), typeof(DefendSilent), typeof(DefendSilent),
         typeof(PiercingWail),
+        // 恐惧模式第 6 回合把「尖啸」换成「精准+」（`Accuracy`，**不是** `PreciseCut` 精确切击）
+        // ⇒ 卡组里也要有它（见 DreadTurnOverride）。普通模式这张牌不会出现在手牌里
+        // （本变体 `BlocksVanillaDraw = true`，抽牌被拦、手牌完全由剧本给）。
+        typeof(Accuracy),
     };
 
     /// <summary>遗物（用户给的 7 个，顺序照抄）。</summary>

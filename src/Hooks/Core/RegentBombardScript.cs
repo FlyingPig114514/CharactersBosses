@@ -70,12 +70,24 @@ public static class RegentBombardScript
                 wakeA,
             },
             // ★ 真正的回合选择走这里：被击晕的回合数由玩家决定 ⇒ 长度不固定。
+            //   2026-11-13（恐惧模式，用户当轮口径）：「轰击储**第一回合就打轰击**，而不是第二回合」
+            //   ⇒ 恐惧模式下打轰击的那一回合是第 1 回合，之后立刻进入被击晕状态。
+            //   （`DreadMode.IsActive` 在这里是**运行期**求值 —— `Resolve` 每次取回合表时才跑，
+            //     不像 `Build()` 那样在 `BossDefs` 静态初始化时就定死。）
             Resolve = turn =>
             {
-                if (turn <= 1)
-                    return new BossTurn { Note = "1. 被击晕（环绕轨道）", Cards = new List<ScriptCard>() };
-                if (turn == 2)
-                    return turnBombard;
+                bool dread = Core.DreadMode.IsActive;
+                int bombardTurn = dread ? 1 : 2;
+
+                if (turn < bombardTurn)
+                {
+                    return new BossTurn
+                    {
+                        Note = dread ? "1.（恐惧）先打轰击 —— 见下一回合" : "1. 被击晕（环绕轨道）",
+                        Cards = new List<ScriptCard>(),
+                    };
+                }
+                if (turn == bombardTurn) return turnBombard;
                 if (!Powers.BossOrbitalBombardPower.Awake)
                     return new BossTurn
                     {

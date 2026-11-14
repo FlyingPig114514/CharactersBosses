@@ -71,7 +71,11 @@ public static class SoulBoundDrawPatch
             // 回合开始抽牌：原版补手牌是 `fromHandDraw: true`；而**power 在回合开始施放的抽牌**
             // （小提琴 / 机器学习 / 崩坠「自弑之欲」）走的是 `false`。后者的共同特征是
             // 「玩家这一回合还一张牌都没打」⇒ 也按回合开始抽牌处理，不计入死亡行军。
-            if (fromHandDraw || PlayerCardPlayedTracker.PlaysThisTurn == 0)
+            //
+            // ★ 2026-11-13（恐惧模式「灵魂绑定」，用户当轮口径）：
+            //   原文 PS「每回合**开始时的抽牌也算**」⇒ 恐惧模式下**不再排除**这一类，
+            //   回合开始补的牌同样算「亡灵契约师抽了一张牌」（自动化计数 + 死亡行军伤害）。
+            if (!Core.DreadMode.IsActive && (fromHandDraw || PlayerCardPlayedTracker.PlaysThisTurn == 0))
             {
                 if (!fromHandDraw && _logged++ < 10)
                 {

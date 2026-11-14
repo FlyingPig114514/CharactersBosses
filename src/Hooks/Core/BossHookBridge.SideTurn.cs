@@ -356,11 +356,16 @@ public static partial class BossHookBridge
                 players++;
 
                 // 用户 2026-11-05：**2 张冷光，手牌 + 抽牌堆各 1 张**（回调成最初的写法）
-                foreach (var pile in new[]
-                         {
-                             MegaCrit.Sts2.Core.Entities.Cards.PileType.Hand,
-                             MegaCrit.Sts2.Core.Entities.Cards.PileType.Draw,
-                         })
+                // ★ 恐惧模式（用户 2026-11-13）：**只给手牌 1 张**——没有抽牌堆那张备用，
+                //   想保暗黑球就得一直把它攥在手里，换能量就这回合彻底失去保护。
+                var piles = Core.DreadMode.IsActive
+                    ? new[] { MegaCrit.Sts2.Core.Entities.Cards.PileType.Hand }
+                    : new[]
+                      {
+                          MegaCrit.Sts2.Core.Entities.Cards.PileType.Hand,
+                          MegaCrit.Sts2.Core.Entities.Cards.PileType.Draw,
+                      };
+                foreach (var pile in piles)
                 {
                     try
                     {

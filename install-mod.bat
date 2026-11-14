@@ -192,6 +192,16 @@ if defined MANIFEST_SRC (
     echo   - WARNING: No manifest found in !MOD_SRC_DIR!
 )
 
+rem ★ 装机自检（2026-11-13）：游戏开着的时候上面两条 copy 会因为文件被占用而**静默失败**
+rem   （`>nul` 把错误吞掉了），于是出现「Impl107 新版 + Impl111 旧版」的混版状态。
+rem   v0.2.502 的联机不同步、v0.2.591 这次都是这么来的 ⇒ 拷完立刻校验两份的版本串。
+powershell -ExecutionPolicy Bypass -NoProfile -File "%~dp0tools\verify-deploy.ps1" -ModDir "!MOD_SUBFOLDER!"
+if errorlevel 1 (
+    echo   - WARNING: deployed impl versions do NOT match the manifest
+    echo     Close the game completely and re-run install-mod.bat
+)
+
+
 echo [4/4] Creating .pck file...
 if exist "!GODOT_EXE!" (
     if exist "!PCK_SCRIPT!" (

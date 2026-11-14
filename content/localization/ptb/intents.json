@@ -1,4 +1,8 @@
 {
   "SACRIFICE.title": "Sacrifício",
-  "SACRIFICE.description": "Este inimigo pagará um preço para obter um efeito poderoso."
+  "SACRIFICE.description": "Este inimigo pagará um preço para obter um efeito poderoso.",
+    "TEMPTATION.title":  "Tentação",
+    "TEMPTATION.description":  "This enemy will give you a positive effect in exchange for a powerful effect.",
+    "JUDGEMENT.title":  "Julgamento",
+    "JUDGEMENT.description":  "This enemy will kill you immediately."
 }

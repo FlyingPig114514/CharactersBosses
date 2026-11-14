@@ -35,6 +35,43 @@ public sealed class BossSuppressionPower : PowerModel
 
     public override bool ShouldPlayVfx => false;
 
+    /// <summary>
+    /// 特殊效果说明。
+    ///
+    /// 用户 2026-11-13：「新版本在华丽猎的特殊效果中添加警告：警告：静默猎手的『铭记死亡』
+    /// 会攻击生命值最少的玩家（忽略召唤物），而不一定是被她锁定的玩家。」
+    ///
+    /// 为什么单开一个键而不是直接改原文：这段警告只在 0.113 之后成立
+    /// （旧版铭记死亡是 1 费单体、按锁定打），所以 `powers` 表里另存
+    /// `<ID>.description_v113`（原文 + 空行 + 警告，16 种语言齐备），
+    /// 只在 `STS2_111` 这套构建里读它；107 那份仍然读原来的 `description`。
+    ///
+    /// ★ 2026-11-13（恐惧模式「压制」）：恐惧模式下还要多一条「给她所有玩家 1 层昏鸣」，
+    ///   所以另存 `.description_dread`（107 用）/ `.description_v113_dread`（0.113 用）两套。
+    /// </summary>
+    public override MegaCrit.Sts2.Core.Localization.LocString Description
+    {
+        get
+        {
+            try
+            {
+                bool dread = Core.DreadMode.IsActive;
+#if STS2_111
+                return new MegaCrit.Sts2.Core.Localization.LocString(
+                    "powers", Id.Entry + (dread ? ".description_v113_dread" : ".description_v113"));
+#else
+                if (dread)
+                {
+                    return new MegaCrit.Sts2.Core.Localization.LocString(
+                        "powers", Id.Entry + ".description_dread");
+                }
+                return base.Description;
+#endif
+            }
+            catch { return base.Description; }
+        }
+    }
+
     /// <summary>华丽收场的 entry（`GrandFinale` → `GRAND_FINALE`）。</summary>
     private const string GrandFinaleEntry = "GRAND_FINALE";
 
@@ -99,10 +136,50 @@ public sealed class BossSuppressionPower : PowerModel
                 Logger.Log($"[CharBoss] 压制：她打出华丽收场 ⇒ 给 {given} 名玩家的抽牌堆顶各塞 1 张虚空" +
                            $"（第 {boss.TurnNumber} 回合）");
             }
+
+            // ★ 2026-11-13（恐惧模式「压制」，用户当轮原文）：
+            //   「每当她打出华丽收场时，给所有玩家 1 层『昏鸣』」（= 仪式兽给的那个 debuff：
+            //    下回合只能打出 1 张牌）。
+            //   原版 `RingingPower` 就是它：Debuff / Single，`AfterApplied` 给那位玩家**所有卡牌**
+            //   挂 `Afflictions.Ringing`，之后 `ShouldPlay` 只放行本回合的第一张带 Ringing 的牌
+            //   ⇒ 正是「下回合只能打出 1 张牌」。所以这里直接施加原版那层 power，不自己造机制。
+            if (Core.DreadMode.IsActive)
+            {
+                await ApplyRingingAsync(choiceContext, owner, card);
+            }
         }
         catch (Exception e)
         {
             Logger.Log("[CharBoss] 压制（华丽收场塞虚空）失败: " + e.Message);
         }
+    }
+
+    /// <summary>恐惧模式：给**所有真人玩家**各 1 层原版「昏鸣」（`RingingPower`）。</summary>
+    private static async Task ApplyRingingAsync(PlayerChoiceContext choiceContext,
+                                                Creature owner, CardModel? source)
+    {
+        var combat = owner.CombatState;
+        if (combat == null) return;
+        var players = Core.BossLockOn.RealPlayers(combat);
+        if (players == null) return;
+
+        int rung = 0;
+        foreach (var player in players)
+        {
+            var creature = player?.Creature;
+            if (creature == null || !creature.IsAlive) continue;
+            try
+            {
+                await PowerCmd.Apply<MegaCrit.Sts2.Core.Models.Powers.RingingPower>(
+                    choiceContext, creature, 1m, owner, source);
+                rung++;
+            }
+            catch (Exception e)
+            {
+                Logger.Log("[CharBoss] 压制（恐惧）：给玩家施加昏鸣失败: " + e.Message);
+            }
+        }
+        Logger.Log($"[CharBoss] 压制（恐惧）：她打出华丽收场 ⇒ 给 {rung} 名玩家各 1 层昏鸣" +
+                   "（下回合只能打出 1 张牌）");
     }
 }

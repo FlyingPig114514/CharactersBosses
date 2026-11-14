@@ -24,4 +24,25 @@ public sealed class BossGuidePower : PowerModel
     public override PowerStackType StackType => PowerStackType.Single;
 
     public override bool ShouldPlayVfx => false;
+
+    /// <summary>
+    /// 恐惧模式（2026-11-13 用户口径）：由玩家替他挑 **2 张**（再打一次「抉择，抉择」并拦掉抽牌）
+    /// ⇒ 图标说明另存 `powers` 表的 `<ID>.description_dread`（16 语言）。
+    /// </summary>
+    public override MegaCrit.Sts2.Core.Localization.LocString Description
+    {
+        get
+        {
+            try
+            {
+                if (Core.DreadMode.IsActive)
+                {
+                    return new MegaCrit.Sts2.Core.Localization.LocString(
+                        "powers", Id.Entry + ".description_dread");
+                }
+                return base.Description;
+            }
+            catch { return base.Description; }
+        }
+    }
 }

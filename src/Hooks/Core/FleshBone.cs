@@ -53,6 +53,29 @@ public static class FleshBone
     /// <summary>「吞噬生命」每次给她多少格挡（用户设计）。</summary>
     public const int DevourBlock = 4;
 
+    /// <summary>
+    /// ★ 2026-11-13（恐惧模式「吞噬生命」）：正常 4 点、**恐惧模式 6 点**。
+    /// （用户设计表原文：「血肉戏法升级；她给负面 ⇒ **6** 格挡」。）
+    /// </summary>
+    public const int DevourBlockDread = 6;
+
+    /// <summary>「吞噬生命」这一次实际给多少格挡（按当前模式取）。</summary>
+    public static int DevourBlockNow => Core.DreadMode.IsActive ? DevourBlockDread : DevourBlock;
+
+    /// <summary>恐惧模式：她的「血肉戏法」按**升级版**算（9 → 13，`SleightOfFlesh.OnUpgrade` +4）。</summary>
+    public const int SleightUpgradeBonus = 4;
+
+    /// <summary>她这层血肉戏法在这一模式下实际的「每次伤害」。</summary>
+    public static int SleightNow(int baseAmount)
+    {
+        try
+        {
+            if (!Core.DreadMode.IsActive) return baseAmount;
+            return baseAmount + SleightUpgradeBonus;
+        }
+        catch { return baseAmount; }
+    }
+
     /// <summary>这一只 Boss 是不是「血肉骨」。</summary>
     public static bool IsFlesh(CharBossMonster? boss)
     {
@@ -194,8 +217,8 @@ public static class FleshBone
                 int kinds = DebuffKinds(card);
                 if (kinds > 0)
                 {
-                    fromDevour += DevourBlock * kinds;
-                    block += DevourBlock * kinds;
+                    fromDevour += DevourBlockNow * kinds;
+                    block += DevourBlockNow * kinds;
                 }
             }
         }
@@ -230,27 +253,99 @@ public static class FleshBone
     /// 多人：**被这只 Boss 锁定的那位玩家**身上有几种负面（苦难会把它逐种传给其他玩家 ⇒
     /// 每个其他玩家会挨 `血肉戏法 × 种类数`）。
     /// </summary>
-    public static int LockedPlayerDebuffKinds(CharBossMonster? boss)
+    public static int LockedPlayerDebuffKinds(CharBossMonster? boss) => LockedPlayerDebuffKinds(boss, null);
+
+    /// <summary>
+    /// 同上，但把「她**本回合还没打出、且排在 <paramref name="upToCard"/> 之前**的牌会给被锁玩家上的负面」
+    /// 也算进去（用户 2026-11-12：「记得考虑在本回合刚施加的负面效果」）。
+    ///
+    /// 为什么要它：意图是在**玩家回合**里画的，那时她这一回合的牌一张都还没打，
+    /// `creature.Powers` 里当然只有上回合残留的负面。而苦难真正结算时，
+    /// 排在它前面的那几张（摧残 / 违逆 / 恐惧 …）上的负面**已经在她锁定的玩家身上了**，
+    /// 苦难会把它们逐种复制给别人 ⇒ 预览必须把它们算进「种类数」。
+    ///
+    /// 按**类型**去重（同一类型上多少层都只触发一次血肉戏法：原版触发点是
+    /// `AfterPowerAmountChanged`，一次施加 = 一次）。
+    /// </summary>
+    public static int LockedPlayerDebuffKinds(CharBossMonster? boss, CardModel? upToCard)
     {
         try
         {
+            var kinds = new HashSet<Type>();
+
             var locked = BossLockOn.TargetFor(boss!);
             var creature = locked?.Creature;
-            if (creature == null) return 0;
-
-            int kinds = 0;
-            foreach (var power in creature.Powers)
+            if (creature != null)
             {
-                if (power == null) continue;
+                foreach (var power in creature.Powers)
+                {
+                    if (power == null) continue;
+                    try
+                    {
+                        if (power.TypeForCurrentAmount == PowerType.Debuff) kinds.Add(power.GetType());
+                    }
+                    catch { /* 忽略这一层 */ }
+                }
+            }
+
+            // 本回合还没打出来、但排在它前面的那些牌会给玩家上的负面（按类型去重）
+            if (upToCard != null && boss?.Plan != null)
+            {
                 try
                 {
-                    if (power.TypeForCurrentAmount == PowerType.Debuff) kinds++;
+                    foreach (var play in boss.Plan)
+                    {
+                        var planned = play?.Card;
+                        if (planned == null) continue;
+                        if (ReferenceEquals(planned, upToCard)) break;      // 只算排在它前面的
+                        foreach (var t in DebuffPowerTypes(planned)) kinds.Add(t);
+                    }
                 }
-                catch { /* 忽略这一层 */ }
+                catch { /* 忽略 */ }
             }
-            return kinds;
+
+            return kinds.Count;
         }
         catch { return 0; }
+    }
+
+    /// <summary>
+    /// 这张牌会给**敌人**上哪几种负面（返回 Power 的**类型**，按类型去重）。
+    /// 与 <see cref="DebuffKinds"/> 同一套判据（`PowerVar&lt;T&gt;` + 有害），只是要类型而不是个数。
+    /// </summary>
+    internal static List<Type> DebuffPowerTypes(CardModel? card)
+    {
+        var types = new List<Type>();
+        if (card == null) return types;
+
+        bool selfTargeted = false;
+        try { selfTargeted = card.TargetType == TargetType.Self; }
+        catch { /* 读不到就当不是 */ }
+        if (selfTargeted) return types;
+
+        try
+        {
+            foreach (var v in card.DynamicVars.Values)
+            {
+                var type = v.GetType();
+                if (!type.IsGenericType) continue;
+                if (type.GetGenericTypeDefinition() != typeof(MegaCrit.Sts2.Core.Localization.DynamicVars.PowerVar<>)) continue;
+
+                var powerType = type.GetGenericArguments()[0];
+                try
+                {
+                    var power = ModelDb.GetById<PowerModel>(ModelDb.GetId(powerType));
+                    if (power == null) continue;
+                    var amount = v.BaseValue;
+                    var kind = power.GetTypeForAmount(amount);
+                    bool harmful = kind == PowerType.Debuff || amount < 0m;
+                    if (harmful && !types.Contains(powerType)) types.Add(powerType);
+                }
+                catch { /* 忽略这一项 */ }
+            }
+        }
+        catch { /* 读不到就当没有 */ }
+        return types;
     }
 
     /// <summary>她身上有没有某件遗物（按 entry 判）。</summary>

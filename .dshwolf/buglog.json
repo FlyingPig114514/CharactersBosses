@@ -1421,6 +1421,123 @@
       "fix": "①钢铁风暴段数牌面无变量、靠 shivOverride 从剧本传，BladesGrowth.RecomputeAll 与有球分支 RefreshPlannedIntents 两条重算路都没传 ⇒ 盖掉规划值，只剩 BuffIntent；两条路补 shivOverride: play.GeneratedShivs。②BladesGrowth.discardsSoFar 从 0 起算，漏了必备工具回合开始丢的 1 张 ⇒ 铭记死亡少 4；改成 HasToolsOfTrade ? 1 : 0。③TakeToolsDiscard 只按牌名挑第一张、不看 boss.Plan 保留了哪些实例 ⇒ 丢掉计划里要打的打击 ⇒ 出牌循环「不在手牌」静默跳过；改成优先挑不在 Plan 里的那张。",
       "file": "src/Hooks/Core/BladesGrowth.cs / src/Hooks/Monsters/CharBossMonster.Turn.cs / src/Hooks/Core/BossCardSelector.cs",
       "at": "2026-11-09T09:34:14.252Z"
+    },
+    {
+      "id": "bug-218-mweyzovl",
+      "error_message": "恐惧模式「亡灵契约师的支配」第一回合随机挑中的是诅咒牌（ASCENDERS_BANE 登顶者之灾），加费没有可感知效果 —— 用户报「似乎没有在第一回合增加随机手牌的耗能（或者它选到了不可打出的牌？）」。日志：`亡灵契约师的支配：Silent 的「ASCENDERS_BANE」本回合费用 +1`",
+      "fix": "NecrobinderDominionPower.AfterPlayerTurnStart 改成只从「打得出去」的手牌里随机挑：用 BossScriptPlanner.IsPlayable 过滤（排除 CardType.Status/Curse/Quest 与带 CardKeyword.Unplayable 的牌，但「执迷」ENTHRALLED 单独放行），候选为空时打一行「没有可打出的牌 ⇒ 本回合不涨价」。顺带把 BossScriptPlanner.IsPlayable 从 private 改成 internal 以便复用。触发时机本来是对的（AfterPlayerTurnStart 在回合开始补手牌之后），不用动。",
+      "at": "2026-11-13T12:45:43.473Z"
+    },
+    {
+      "id": "bug-219-mwezyp51",
+      "error_message": "恐惧模式「亡灵契约师的支配」每回合都没有任何手牌费用增加（从 v0.2.593 首版起从未生效）。根因不是选牌：CardEnergyCost.AddThisCombat(int amount, bool reduceOnly = false) 的第二个参数是 reduceOnly（只允许朝降低方向生效），而代码写的是 AddThisCombat(1, true) ⇒ 正数被整条吞掉。",
+      "fix": "改用 AddThisTurn(1)（过期时机 EndOfTurn，正好是「本回合 +1 费」）。注意本模组其它几处 AddThisCombat(-n, true) 是负数（减费），reduceOnly 恰好满足，那些是对的、不要动。日志改成打印 before→after 费用便于验证。",
+      "at": "2026-11-13T13:12:56.773Z"
+    },
+    {
+      "id": "bug-220-mwf04qsy",
+      "error_message": "恐惧模式「亡灵契约师的支配」挑中加费的牌在 SL（存读档）之后会变 —— 因为用的是 Random.Shared.Next（进程级随机数）：SL 后钩子重跑会挑另一张，联机两端也会各摇各的。",
+      "fix": "改成确定性哈希 StableIndex：种子只用「BossLineups.RunSeed（= RunState.Rng.Seed）+ 玩家 NetId + 当前可打出手牌的 id 序列（含是否升级）」，故意不掺回合数/帧号/时间 ⇒ SL 前后、联机两端都算出同一张。另外做成幂等+自愈：目标牌本回合已有本地费用修正（HasLocalModifiers）就跳过（重入/SL 不叠加成 +2），被 SL 丢掉时会自动补回。",
+      "at": "2026-11-13T13:17:38.866Z"
+    },
+    {
+      "id": "bug-221-mwf3jvau",
+      "error_message": "华丽猎第 2 回合：杂技、隐秘匕首的「弃 N 张牌」实际弃了 0 张（手牌只减少被牌自身那一张），导致带「奇巧」的 MEMENTO_MORI / TACTICIAN 从未被丢弃 ⇒ 奇巧自动打出永远不触发；同时隐秘匕首的卡面停在半空不落下。",
+      "fix": "待修。日志实证（v0.2.634，22:51:4x）：`剧本第 2 回合: 打 [ADRENALINE,NIGHTMARE,ACROBATICS,HIDDEN_DAGGERS,DEFEND_SILENT] 跳过 [TACTICIAN(被丢弃 → 奇巧自动打出),…,MEMENTO_MORI(被丢弃 → 奇巧自动打出),…]`，但随后手牌快照 9→8→7→6 只按「牌自己离开手牌」递减，TACTICIAN / MEMENTO_MORI 一直留在手牌里。反编译 `HiddenDaggers.OnPlay` = `CardSelectCmd.FromHandForDiscard(prefs: new CardSelectorPrefs(DiscardSelectionPrompt, DynamicVars.Cards.IntValue), …, filter: null, source: this)` → `Shiv.CreateInHand` → `CardCmd.Discard(cards)`。⇒ 结论：给影子玩家的 FromHandForDiscard 选择被 `BossCardSelector` 答成了「0 张」。修法方向：① `BossCardSelector` 对 DiscardSelectionPrompt 必须返回**恰好 prefs 张**（点名表 PickOrder 用尽后按「最不值钱的可打出牌」兜底，绝不允许返回空集）；② 更好的是优先按剧本 `ScriptCard.Discards` 指定的牌来答（这样 铭记死亡/战术大师 一定会被丢弃 ⇒ 奇巧触发、意图也对得上）；③ 卡面停在半空是同一根因的副作用：弃牌选择没结束 ⇒ 牌的 AutoPlay 流程没走完 ⇒ NCard 停在空中，修好选择器后应一起消失。",
+      "at": "2026-11-13T14:53:23.382Z"
+    },
+    {
+      "id": "bug-222-mwf3mqve",
+      "error_message": "影子玩家的 CardSelectCmd.FromHandForDiscard 返回空选择 ⇒ 杂技/隐秘匕首/早有准备/生存者的「弃 N 张」弃了 0 张 ⇒ 带「奇巧」的牌永远不自动打出，且那张牌的卡面停在空中不落下。日志实证：整场战斗 mod_log 里一条 `自动选择:` 都没有 ⇒ BossCardSelector 根本没被问到（走的是「真 UI」分支，影子玩家没有 UI ⇒ 空）。",
+      "fix": "新增 BossDiscardSelectionPatch：给 CardSelectCmd.FromHandForDiscard 挂前缀，只对我们的影子玩家（player.Creature.Monster is CharBossMonster），在调用点直接复用 BossCardSelector.GetSelectedCards(候选, want, want) 作答（内部按剧本 DiscardInstead 点名 → 奇巧优先 → 价值兜底）；want 取 prefs.MinSelect，取不到用 MaxSelect，都为 0 时按 1 张兜底，绝不允许返回空集。真人玩家/原版怪物一律 return true。不改 BossCardSelector.Push——它挂的 CardSelectorStack 在 111 上实测没被采纳。",
+      "at": "2026-11-13T14:55:37.610Z"
+    },
+    {
+      "id": "bug-223-mwf47ojd",
+      "error_message": "影子玩家（Boss）的「从手牌里挑一张」效果（夜魇 NIGHTMARE 复制、手上技法 HAND_TRICK 加奇巧）让那张牌永远卡在空中、后续剧本全停；日志里完全没有「自动选择」行",
+      "fix": "v0.2.637：`CardSelectCmd.FromHand`（5 参签名）也加前缀 BossHandSelectionPatch，只在 player.Creature.Monster is CharBossMonster 时于调用点作答（want = MinSelect→MaxSelect→1，夹到候选数，BossCardSelector.GetSelectedCards，绝不返回空集）；DECISIONS_DECISIONS 放行给 ChoiceRegentPickPatch。v0.2.635 的 FromHandForDiscard 版只治了弃牌那一半。",
+      "file": "src/Hooks/Patches/BossDiscardSelectionPatch.cs",
+      "at": "2026-11-13T15:11:54.361Z"
+    },
+    {
+      "id": "bug-224-mwf4cz0v",
+      "error_message": "恐惧模式·华丽猎第6回合打出「精确切击」(PreciseCut)，而华丽猎卡组里没有这张牌 —— 那是炼药猎第5回合的牌，用户误以为是变体串台",
+      "fix": "用户要的「精准+」是 Accuracy（1费，小刀+4/升级+6），不是 PreciseCut（精确切击，0费）。GrandFinaleSilentScript.DreadTurnOverride 改 C<Accuracy>(true)，Deck() 同步；能量 1+1+1=3 正好。教训：用户给的中文牌名必须先在 docs/plans/cards-*.md 查类名，别凭字面近似手写。",
+      "file": "src/Hooks/Core/GrandFinaleSilentScript.cs",
+      "at": "2026-11-13T15:16:01.231Z"
+    },
+    {
+      "id": "bug-225-mwfru1k5",
+      "error_message": "影子玩家的自动选牌器一次都没挂上过：mod_log 里 49 行「选牌器挂载失败: Couldn't get selector stack for player …」⇒ 所有要选牌的牌（洁净 FromCombatPile / 夜魇 FromHand / 手上技法 / 隐秘匕首 / 夜宴）的 OnPlay 永远 await，卡面停在半空、整条剧本连锁停摆",
+      "fix": "0.113 的 CardSelectorStack.GetSelectorStackForPlayer 用 _playerCollection.GetPlayerSlotIndex(player)，影子玩家不在 Players 里 ⇒ slot=-1 ⇒ PushSelector 和 GetSelector 都抛异常。以前只在 CardSelectCmd.FromHandForDiscard / FromHand 两个方法上打补丁（17 个入口里的 2 个，洁净走的 FromCombatPile 没堵上）。v0.2.639 改成只在 CardSelectorStack.GetSelector(Player) 挂前缀：影子玩家直接返回 BossCardSelector.Instance，一处覆盖全部入口；删除 BossDiscardSelectionPatch.cs（与 ChoiceRegentPickPatch 同为 FromHand 前缀、顺序不定）；SelectionCompat.Push 在 111 改空操作，SuspendForUi 对影子玩家改自管挂起标记（抉择储要真界面）。",
+      "file": "src/Hooks/Patches/BossSelectorStackPatch.cs",
+      "at": "2026-11-14T02:13:08.837Z"
+    },
+    {
+      "id": "bug-226-mwfs9spc",
+      "error_message": "抉择储的「指导」不弹选牌界面、她自己挑了第一张；日志「指导：选择界面出错，退回第一张: Only works with less than 3 cards (Parameter 'cards')」",
+      "fix": "CardSelectCmd.FromChooseACardScreen 第一句就是 if (cards.Count > 3) throw ArgumentException(\"Only works with less than 3 cards\")，只能给三选一用；指导的设计是 5 张（恐惧第二次 4 张）⇒ 必抛 ⇒ catch 后退回 candidates[0]。改用 CardSelectCmd.FromSimpleGrid（NSimpleCardSelectScreen 网格，不限张数）+ new CardSelectorPrefs(new LocString(\"monsters\",\"REGENT_BOSS.choice_prompt\"),1,1)，MinSelect < 候选数 保证一定弹 UI；新本地化键 16 语言已加。",
+      "file": "src/Hooks/Patches/ChoiceRegentPickPatch.cs",
+      "at": "2026-11-14T02:25:23.856Z"
+    },
+    {
+      "id": "bug-227-mwfsfsll",
+      "error_message": "抉择储的「指导」在 5 张候选时必抛 Only works with less than 3 cards；那道 to3 检查在 CardSelectCmd.FromChooseACardScreen 外层方法里，知识恶魔界面 NChooseACardSelectionScreen 本身不限张数",
+      "fix": "别换界面，把 FromChooseACardScreen 的非选择器分支逐句复刻（ChooseViaKnowledgeDemonAsync）：UndoEndTurnIfNecessary(107 UndoReadyToEndTurn / 111 TryUndoReadyToEndTurn) + ReserveChoiceId + SignalPlayerChoiceBegun(107 1参 / 111 2参) + NPlayerHand.CancelAllCardPlay + NChooseACardSelectionScreen.ShowScreen(cards,false) + CardsSelected + PlayerChoiceResult.FromIndex + SyncLocalChoice（远程走 WaitForRemoteChoice+AsIndex）+ SignalPlayerChoiceEnded。candidates<=3 仍走原版方法。",
+      "file": "src/Hooks/Patches/ChoiceRegentPickPatch.cs",
+      "at": "2026-11-14T02:30:03.658Z"
+    },
+    {
+      "id": "bug-228-mwfsks04",
+      "error_message": "恐惧模式抉择储第1回合，玩家第二次挑了星位序列（Alignment）但天际钻头（HeavenlyDrill）没有补打",
+      "fix": "RunChoiceFollowUpsAsync 里顺序反了：先 PlayChoiceGatedCardsAsync（此时 AllPicksFor 只有第一挑，picks.Contains(Alignment) 为假）再打第二张抉择。改成先 PlayDreadSecondDecisionsAsync 再 PlayChoiceGatedCardsAsync —— 与用户原设计「选1→打3次→剩4张选1→再打3次→继续后面的牌」一致。第二挑会排除已挑过的牌，所以不会两次都命中；天际钻头是攻击牌，不在抉择的技能牌候选里。",
+      "file": "src/Hooks/Monsters/CharBossMonster.Choice.cs",
+      "at": "2026-11-14T02:33:56.164Z"
+    },
+    {
+      "id": "bug-229-mwfsxnt1",
+      "error_message": "角色 Boss 的攻击特效方向反了（朝右、背对玩家）：匕首雨 flurry 写死 goingRight:true、震荡波 flying_slash 落在她自己身上、NBigSlashVfx 用 IsEnemy 判方向…",
+      "fix": "所有 VFX 都经过 GodotTreeExtensions.AddChildSafely(Node,Node)（VfxCmd.PlayVfx/PlayOnCreature* 以及攻击构建器的 WithAttackerFx/WithHitVfxNode 内部都是它）⇒ 只补这一个方法：在 PlayOne 包住 CardCmd.AutoPlay 的窗口内，把类名带 Vfx 的 Node2D 的 Scale.X 取负（只翻 X>0 的，幂等），其它节点不碰。用户例外：轰击储自伤那一手 Begin(..., targetsSelf: play.Target==自己) 整体不翻，保持原版。君王之剑看着对是因为它的特效落在被打的玩家身上。",
+      "file": "src/Hooks/Patches/BossAttackVfxFacingPatch.cs",
+      "at": "2026-11-14T02:43:57.253Z"
+    },
+    {
+      "id": "bug-230-mwft2plh",
+      "error_message": "攻击特效镜像对震荡波无效：日志里只有「打的是她自己 ⇒ 不镜像」、一条「已水平镜像」都没有",
+      "fix": "两个 bug：①targetsSelf 用 play.Target==Creature 判，而 play.Target = BossPlanner.ChooseTarget() ?? Creature，群攻牌(AllEnemies)没单一目标就兜底成她自己 ⇒ 每张牌都被判成自伤。改按牌的 TargetType 判（只认 Self/AnyAlly/AllAllies/Osty）。②类名含 \"Vfx\" 的过滤太窄：vfx_flying_slash 场景根节点运行时类型不叫 *Vfx ⇒ 被筛掉。改成「类名含 Vfx」OR「父节点往上能找到 NCreature」两条命中任一即翻，并显式排除 NDamageNumVfx（伤害数字是文字，镜像会反着写）。",
+      "file": "src/Hooks/Patches/BossAttackVfxFacingPatch.cs",
+      "at": "2026-11-14T02:47:52.853Z"
+    },
+    {
+      "id": "bug-231-mwfufil9",
+      "error_message": "攻击特效镜像补丁一次都没触发（日志只有「形态特效已水平镜像」，没有「攻击特效已水平镜像」）",
+      "fix": "GodotTreeExtensions.AddChildSafely 全文只有几行，JIT 会内联到调用点 ⇒ Harmony 补丁装上也不触发。改补它内部真正落地的 Godot.Node.AddChild(Node,bool,InternalMode)（有正常方法体、无 AggressiveInlining），再加第二道保险 VfxCmd.PlayVfx(Vector2,string,Control)（体量大不会内联，所有字符串路径特效都由它落地）。另外不再按「打自己」跳过——抉择抉择是 TargetType.Self，以前整手跳过导致它重放出来的震荡波也不翻；现在只跳过「BOMBARDMENT + BossOrbitalBombardPower.Awake」这一个用户点名的例外。",
+      "file": "src/Hooks/Patches/BossAttackVfxFacingPatch.cs",
+      "at": "2026-11-14T03:25:49.917Z"
+    },
+    {
+      "id": "bug-232-mwfuxh5f",
+      "error_message": "攻击特效镜像后方向对了但位置跑到生物右边（震荡波应在储君左边朝左，实际在她右边朝左）",
+      "fix": "VfxCmd.PlayVfx 把节点原点放在生物中心(GlobalPosition = creatureNode.VfxSpawnPosition)，美术在场景内部偏向一侧；直接翻节点 Scale.X 会把偏移一起镜像。改成对画在她自己身上的特效只翻子节点(MirrorArt)：逐个镜像子 Node2D，节点位置/原点不动；没有子 Node2D 才退回翻节点本身。玩家身上/非生物容器里的 *Vfx 仍翻节点。",
+      "at": "2026-11-14T03:39:47.859Z"
+    },
+    {
+      "id": "bug-233-mwfwig58",
+      "error_message": "震荡波镜像后仍在储君右边（朝左）——MirrorArt 的 `return any || Mirror(node)` 在子节点已翻过时会退回去翻节点本身，而 AddChild 与 PlayVfx 两个入口对同一节点各调一次 ⇒ 第二次把节点也翻了，美术偏移跟着镜像",
+      "fix": "①给节点打 Godot meta charboss_vfx_mirrored 防重复处理；②MirrorArt 优先用 Sprite2D/AnimatedSprite2D 的 FlipH（原地镜像，位置不动），没有贴图节点才翻子 Node2D；③不再退回翻节点本身。",
+      "at": "2026-11-14T04:24:05.948Z"
+    },
+    {
+      "id": "bug-234-mwfwnj3d",
+      "error_message": "震荡波（NVfxSpine 骨骼动画特效）镜像后方向对了但位置跑到 Boss 右侧；这类节点没有贴图子节点可 FlipH，翻 Scale.X 会把骨骼内部的美术偏移一起镜像",
+      "fix": "对 NVfxSpine / NVfxParticleSystem 这类画面型特效：翻完再 node.Position.X += -(她自己的 Hitbox.Size.X)（玩家在左 ⇒ 负值，拿不到尺寸用 130px），把斩击挪回她左边；尺度用命中框宽度所以不同大小的 Boss 自动适配。其它 *Vfx（飘字/卡牌拖尾/buff 图标/伤害数字）不平移。",
+      "at": "2026-11-14T04:28:03.049Z"
+    },
+    {
+      "id": "bug-235-mwfwvb4q",
+      "error_message": "boss 打小刀的动画被镜像翻反了（小刀投掷朝反方向飞）",
+      "fix": "镜像范围太宽：原先「她出牌期间所有 *Vfx」都翻。Shiv 用的是 NShivThrowVfx.Create(attacker, target, color)——生成时同时拿到攻击者与目标，方向自己算，翻了就反。现改为只翻「锚在她身上」的特效（父链能到她自己 NCreature；或 NVfxSpine/NVfxParticleSystem 且离她 1.6 身位内），并加排除名单 NShivThrowVfx/NBigSlashVfx/NBigSlashImpactVfx/NLargeMagicMissileVfx/NHitSparkVfx/NDamageNumVfx。落在玩家身上的特效一律不碰。",
+      "at": "2026-11-14T04:34:05.978Z"
     }
   ]
 }

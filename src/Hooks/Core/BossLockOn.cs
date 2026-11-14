@@ -64,6 +64,36 @@ public static class BossLockOn
     }
 
     /// <summary>
+    /// **当前生命值最低的真人玩家**（只数活着的真人玩家：影武者 / 其它 Boss 的影子 Player、
+    /// 奥斯提之类的召唤物一律不算）。
+    ///
+    /// 用途：0.113.0 把「铭记死亡」重做成
+    /// 「奇巧。对**生命值最低的敌人**造成 19(23) 点伤害」，原版实现是
+    /// <c>CombatState.HittableEnemies.MinBy(c =&gt; c.CurrentHp)</c> —— 那是从**卡牌拥有者**的视角数的，
+    /// 会把召唤物（奥斯提、为她而死的随从…）一起算进去。用户 2026-11-13 要求：
+    ///   · 实际打的目标：**只看玩家**，忽略召唤物；
+    ///   · 意图显示：对「生命值最少的玩家」显示伤害，而不一定是被她锁定的那位。
+    /// 两个需求共用这一个查询，保证「显示的」和「真打的」永远是同一只。
+    /// </summary>
+    public static Player? LowestHpRealPlayer(ICombatState? combat)
+    {
+        try
+        {
+            Player? best = null;
+            int bestHp = int.MaxValue;
+            foreach (var p in RealPlayers(combat))
+            {
+                var creature = p?.Creature;
+                if (creature == null || !creature.IsAlive) continue;
+                int hp = creature.CurrentHp;
+                if (hp < bestHp) { bestHp = hp; best = p; }
+            }
+            return best;
+        }
+        catch { return null; }
+    }
+
+    /// <summary>
     /// 「**对应型**特殊效果」该不该对这名玩家生效（设计见 multiplayer-lockon.md §1.4 / §阶段 2）。
     ///   · 单人（真人玩家 &lt; 2）→ 恒 <c>true</c>：原样生效，零回归；
     ///   · 多人 → 只有**锁定这只 Boss** 的那名玩家才是 true。

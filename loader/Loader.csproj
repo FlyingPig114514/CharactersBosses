@@ -10,12 +10,16 @@
       所以固定引用正式版（v0.107，最低版本）的程序集。
   -->
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <!-- 手机移植版（`com.megacrit.sts2re`，运行时 .NET 9.0.7）用同一份源码编 net9.0：
+         `-p:PhoneBuild=1` → bin-phone\CharacterBosses.dll -->
+    <TargetFramework Condition="'$(PhoneBuild)' != '1'">net10.0</TargetFramework>
+    <TargetFramework Condition="'$(PhoneBuild)' == '1'">net9.0</TargetFramework>
     <AssemblyName>CharacterBosses</AssemblyName>
     <RootNamespace>CharacterBosses</RootNamespace>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
-    <OutputPath>bin\</OutputPath>
+    <OutputPath Condition="'$(PhoneBuild)' != '1'">bin\</OutputPath>
+    <OutputPath Condition="'$(PhoneBuild)' == '1'">bin-phone\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <Sts2RefDir>$(MSBuildThisFileDirectory)..\.refs\</Sts2RefDir>

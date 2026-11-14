@@ -1,0 +1,7 @@
+{
+    "DREAD.IRONCLAD.description":  "铁甲战士的支配：每场战斗开始时，所有敌人获得 1 层恶魔形态。",
+    "DREAD.SILENT.description":  "静默猎手的支配：每场战斗开始时，你失去 1 点力量并获得 1 层虚弱。",
+    "DREAD.DEFECT.description":  "故障机器人的支配：在你的回合结束时，每有一名敌人，你就受到 3 点伤害。",
+    "DREAD.NECROBINDER.description":  "亡灵契约师的支配：在你的回合开始时，你随机1张手牌的费用在本回合增加 1。",
+    "DREAD.REGENT.description":  "储君的支配：每当敌人攻击你时，你在本回合失去 1 点力量。"
+}

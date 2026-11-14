@@ -44,8 +44,10 @@ public static class DefectThunderScript
             //   暴风雨（X 费）把这 3 点全吃掉 ⇒ 生成 **3 个闪电充能球**，两张打击没费
             new BossTurn
             {
-                Note = "3. 暴风雨（X 费，2 基础 + 充电 1 = 3 点能量 ⇒ 3 个闪电球）、打击×2（没费）",
-                Cards = new List<ScriptCard> { C<Tempest>(), C<StrikeDefect>(), C<StrikeDefect>() },
+                Note = Core.DreadMode.IsActive
+                    ? "3. 暴风雨+（X 费，2 基础 + 充电 1 = 3 点能量 ⇒ 4 个闪电球）、打击×2（没费）"
+                    : "3. 暴风雨（X 费，2 基础 + 充电 1 = 3 点能量 ⇒ 3 个闪电球）、打击×2（没费）",
+                Cards = new List<ScriptCard> { C<Tempest>(Core.DreadMode.IsActive), C<StrikeDefect>(), C<StrikeDefect>() },
                 Energy = 2,
             },
 
@@ -85,8 +87,10 @@ public static class DefectThunderScript
             // 10：同第 3 回合 —— **2 基础 + 第 9 回合「充电」的 +1 = 3 点**（这里只写 2）
             new BossTurn
             {
-                Note = "10. 暴风雨（X 费，2 基础 + 充电 1 = 3 点能量 ⇒ 3 个闪电球）、贪婪（诅咒，打不出）、打击（没费）",
-                Cards = new List<ScriptCard> { C<Tempest>(), C<Greed>(), C<StrikeDefect>() },
+                Note = Core.DreadMode.IsActive
+                    ? "10. 暴风雨+（X 费，2 基础 + 充电 1 = 3 点能量 ⇒ 4 个闪电球）、贪婪（诅咒，打不出）、打击（没费）"
+                    : "10. 暴风雨（X 费，2 基础 + 充电 1 = 3 点能量 ⇒ 3 个闪电球）、贪婪（诅咒，打不出）、打击（没费）",
+                Cards = new List<ScriptCard> { C<Tempest>(Core.DreadMode.IsActive), C<Greed>(), C<StrikeDefect>() },
                 Energy = 2,
             },
         };

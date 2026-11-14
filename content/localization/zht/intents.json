@@ -1,4 +1,8 @@
 {
   "SACRIFICE.title": "犧牲",
-  "SACRIFICE.description": "這個敵人會付出代價來換取強力效果。"
+  "SACRIFICE.description": "這個敵人會付出代價來換取強力效果。",
+    "TEMPTATION.title":  "誘惑",
+    "TEMPTATION.description":  "這名敵人將以給予你正面效果為代價換取強力效果。",
+    "JUDGEMENT.title":  "審判",
+    "JUDGEMENT.description":  "這名敵人將立刻使你死亡。"
 }

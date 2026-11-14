@@ -59,7 +59,13 @@ public sealed class NeowBlessing : RelicModel
     };
 
     // ── 出现条件：默认关闭 ──
+    // ⚠ 0.113.0 起 `RelicModel.IsAllowed` 改成非 virtual，扩展点变成 `protected virtual IsAllowedInternal`
+    //   （编译实测 CS0506）⇒ 两个版本各覆盖各的。
+#if STS2_107
     public override bool IsAllowed(IRunState runState) => NeowBlessingToggle.Enabled;
+#else
+    protected override bool IsAllowedInternal(IRunState runState) => NeowBlessingToggle.Enabled;
+#endif
 
     public override bool IsAllowedAtNeow(Player player) => NeowBlessingToggle.Enabled;
 

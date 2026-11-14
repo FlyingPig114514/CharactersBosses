@@ -44,6 +44,11 @@ public sealed class BossRendingPower : PowerModel
 
             int unblocked = 0;
             try { unblocked = result.UnblockedDamage; } catch { unblocked = 0; }
+            if (Core.DreadMode.IsActive)
+            {
+                // dread：被格挡掉的部分也算伤害总量
+                try { unblocked += result.BlockedDamage; } catch { }
+            }
             if (unblocked <= 0) return;
 
             var ctx = choiceContext ?? new BlockingPlayerChoiceContext();

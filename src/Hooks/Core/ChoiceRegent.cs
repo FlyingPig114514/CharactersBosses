@@ -36,32 +36,76 @@ internal static class ChoiceRegent
         catch { return false; }
     }
 
-    /// <summary>(Boss, 回合号) → 玩家在「抉择，抉择」里挑中的那张牌的类型。</summary>
-    private static readonly Dictionary<(Monsters.CharBossMonster Boss, int Turn), Type> Picks = new();
+    /// <summary>(Boss, 回合号) → 玩家在「抉择，抉择」里挑中的那张牌的类型（按挑选顺序）。</summary>
+    private static readonly Dictionary<(Monsters.CharBossMonster Boss, int Turn), List<Type>> Picks = new();
 
-    /// <summary>记住这一次选择（由选牌补丁调用）。</summary>
-    internal static void NotePick(Monsters.CharBossMonster? boss, int turn, Type? cardType)
+    /// <summary>
+    /// (Boss, 回合号) → 恐惧模式那次「再打一次抉择，抉择」有没有做过。
+    ///
+    /// 恐惧模式（2026-11-13 用户口径）：储君打出「抉择，抉择」时由玩家挑 **2 张** ——
+    /// 5 张里选 1 → 他打出 3 次 → 再打一次「抉择，抉择」（**拦掉它的抽牌**）→ 剩下 4 张里选 1 →
+    /// 他再打出 3 次 → 继续后面的牌。这张表就是那个「同一回合只补一次」的闸门。
+    /// </summary>
+    private static readonly HashSet<(Monsters.CharBossMonster Boss, int Turn)> DreadSecondPlayed = new();
+
+    /// <summary>记住这一次选择（由选牌补丁调用）。按顺序累积 ⇒ 恐惧模式一回合两条。</summary>
+    internal static void NotePick(Monsters.CharBossMonster? boss, int turn, Type? cardType, bool second = false)
     {
         try
         {
             if (boss == null || cardType == null) return;
-            if (Picks.Count > 256) Picks.Clear();
-            Picks[(boss, turn)] = cardType;
-            Logger.Log($"[CharBoss] 指导：玩家替她挑了 {SafeName(cardType)} ⇒ 这张会被「抉择，抉择」打出 3 次" +
-                       $"（第 {turn} 回合）");
+            if (Picks.Count > 256) { Picks.Clear(); DreadSecondPlayed.Clear(); }
+
+            var key = (boss, turn);
+            if (!Picks.TryGetValue(key, out var list) || list == null)
+            {
+                list = new List<Type>();
+                Picks[key] = list;
+            }
+            list.Add(cardType);
+            Logger.Log($"[CharBoss] 指导：玩家替她挑了 {SafeName(cardType)}" +
+                       $"（本回合第 {list.Count} 张{(second ? "、恐惧模式的第二挑" : string.Empty)}）" +
+                       $" ⇒ 这张会被「抉择，抉择」打出 3 次（第 {turn} 回合）");
         }
         catch { /* 忽略 */ }
     }
 
-    /// <summary>这一回合玩家挑的是哪张（没挑过 = null）。</summary>
+    /// <summary>这一回合玩家**第一次**挑的是哪张（没挑过 = null）。</summary>
     internal static Type? PickFor(Monsters.CharBossMonster? boss, int turn)
     {
         try
         {
             if (boss == null) return null;
-            return Picks.TryGetValue((boss, turn), out var t) ? t : null;
+            return Picks.TryGetValue((boss, turn), out var list) && list != null && list.Count > 0 ? list[0] : null;
         }
         catch { return null; }
+    }
+
+    /// <summary>这一回合玩家挑过的**全部**卡（恐惧模式一回合两张；没挑过 = 空表）。</summary>
+    internal static List<Type> AllPicksFor(Monsters.CharBossMonster? boss, int turn)
+    {
+        try
+        {
+            if (boss == null) return new List<Type>();
+            return Picks.TryGetValue((boss, turn), out var list) && list != null
+                ? new List<Type>(list)
+                : new List<Type>();
+        }
+        catch { return new List<Type>(); }
+    }
+
+    /// <summary>
+    /// 恐惧模式：这一回合的「再打一次抉择，抉择」现在能不能开始（同一回合只放行一次）。
+    /// </summary>
+    internal static bool TryBeginDreadSecondPlay(Monsters.CharBossMonster? boss, int turn)
+    {
+        try
+        {
+            if (boss == null) return false;
+            if (DreadSecondPlayed.Count > 256) DreadSecondPlayed.Clear();
+            return DreadSecondPlayed.Add((boss, turn));
+        }
+        catch { return false; }
     }
 
     /// <summary>清掉这一回合的记账（回合重排 / 重打时用）。</summary>
@@ -71,6 +115,7 @@ internal static class ChoiceRegent
         {
             if (boss == null) return;
             Picks.Remove((boss, turn));
+            DreadSecondPlayed.Remove((boss, turn));
         }
         catch { /* 忽略 */ }
     }
@@ -78,13 +123,18 @@ internal static class ChoiceRegent
     /// <summary>
     /// 剧本里这一条现在能不能打（<see cref="ScriptCard.OnlyIfChosenCard"/> 为空 = 永远能打）。
     /// 规划期玩家的选择还不知道 ⇒ 返回 false（那张牌压暗、没有意图，留在手里）。
+    /// 恐惧模式一回合会挑两张 ⇒ 命中**任意一张**都算（例如恐惧模式下第二挑选了星位序列）。
     /// </summary>
     internal static bool EntryAllowed(Monsters.CharBossMonster? boss, int turn, ScriptCard? entry)
     {
         try
         {
             if (entry?.OnlyIfChosenCard == null) return true;
-            return PickFor(boss, turn) == entry.OnlyIfChosenCard;
+            foreach (var pick in AllPicksFor(boss, turn))
+            {
+                if (pick == entry.OnlyIfChosenCard) return true;
+            }
+            return false;
         }
         catch { return true; }
     }

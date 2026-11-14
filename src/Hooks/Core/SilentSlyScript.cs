@@ -128,7 +128,8 @@ public static class SilentSlyScript
         typeof(StrikeSilent), typeof(StrikeSilent), typeof(StrikeSilent),
         typeof(Neutralize), typeof(Survivor), typeof(Untouchable), typeof(FlickFlack),
         typeof(Deflect), typeof(Acrobatics), typeof(Prepared), typeof(Prepared),
-        typeof(Backflip), typeof(MementoMori), typeof(Ricochet), typeof(Tactician),
+        // ★ 2026-11-13（用户）：「从奇巧猎的卡组中移除铭记死亡（本来现在也不在剧本中出现）」
+        typeof(Backflip), typeof(Ricochet), typeof(Tactician),
         typeof(Reflex), typeof(HiddenDaggers), typeof(PiercingWail),   // 用户 2026-10-26：暴露 → 尖啸
     };
 

@@ -64,6 +64,10 @@ internal static class LegacyRelicHookCompatPatch
     private static int _logs;
 
     // ───────── ② 烘焙手套（107 的 BeforeHandDraw） ─────────
+    // ⚠ 0.113.0 的 `ToastyMittens` 已经没有 `BeforeHandDraw` 这个方法了（实测日志：
+    //   `MittensBeforeHandDrawCompat 挂载失败 … Patching exception in method null`）
+    //   ⇒ 这一段只在 107 的构建里存在。
+#if STS2_107
     [HarmonyPatch(typeof(ToastyMittens), "BeforeHandDraw")]
     internal static class MittensBeforeHandDrawCompat
     {
@@ -91,4 +95,5 @@ internal static class LegacyRelicHookCompatPatch
 
         private static int _mittenLogs;
     }
+#endif
 }

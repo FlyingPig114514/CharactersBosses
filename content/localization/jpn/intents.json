@@ -1,4 +1,8 @@
 {
   "SACRIFICE.title": "犠牲",
-  "SACRIFICE.description": "この敵は代償を払って強力な効果を得る。"
+  "SACRIFICE.description": "この敵は代償を払って強力な効果を得る。",
+    "TEMPTATION.title":  "誘惑",
+    "TEMPTATION.description":  "This enemy will give you a positive effect in exchange for a powerful effect.",
+    "JUDGEMENT.title":  "審判",
+    "JUDGEMENT.description":  "This enemy will kill you immediately."
 }

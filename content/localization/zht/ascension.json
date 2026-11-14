@@ -1,0 +1,7 @@
+{
+    "DREAD.IRONCLAD.description":  "鐵甲戰士的支配：每場戰鬥開始時，所有敵人獲得 1 層惡魔形態。",
+    "DREAD.SILENT.description":  "靜默獵手的支配：每場戰鬥開始時，你失去 1 點力量並獲得 1 層虛弱。",
+    "DREAD.DEFECT.description":  "故障機器人的支配：在你的回合結束時，每有一名敵人，你就受到 3 點傷害。",
+    "DREAD.NECROBINDER.description":  "亡靈契約師的支配：在你的回合開始時，你隨機1張手牌的費用在這個回合增加 1。",
+    "DREAD.REGENT.description":  "儲君的支配：每當敵人攻擊你時，你在這個回合失去 1 點力量。"
+}

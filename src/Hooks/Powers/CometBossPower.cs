@@ -94,19 +94,54 @@ public sealed class CometBossPower : PowerModel
                 Logger.Log($"[CharBoss] 彗星：玩家打出碎屑 → 清掉 {cleared} 名玩家的虚弱/易伤");
             }
 
-            // ③ 所有敌方（所有 Boss）各失去 10 点生命：真正的"失去生命"，不吃格挡/力量/易伤。
+            // ③ 所有敌方（所有 Boss）各失去 10 点生命。
+            //
+            // ⚠ 用户 2026-11-12 实测报的 bug：「你是不是直接在代码层面把他们的血减少了 10？」
+            //   —— 是的，以前这里直接调 `Creature.LoseHpInternal(...)`。反编译那个方法只有三行：
+            //       `CurrentHp = Math.Max(CurrentHp - num, 0); return new DamageResult{...}`，
+            //   它**只改数字**：不播受击动画、不弹伤害数字、不跑 `WasTargetKilled` 那套死亡处理
+            //   ⇒ 表现就是「敌人没有受击动画」「所有奥斯提（含骸骨军团召唤的）血减到 0 还站着」。
+            //
+            //   原版的「失去生命」出口是 `CreatureCmd.Damage(...)` + `Unblockable | Unpowered`
+            //   （反编译 `PoisonPower.Trigger` 就是 `CreatureCmd.Damage(ctx, Owner, Amount,
+            //     ValueProp.Unblockable | ValueProp.Unpowered, null, null)`）——
+            //   它照样不吃格挡、不吃力量/易伤，但会走完整的受击/死亡流程。
+            //   ⇒ 现在改成一次性对**所有存活敌方**走原版 Damage（同一笔、群体结算）。
             try
             {
                 var enemies = combat?.Enemies;
                 if (enemies != null)
                 {
+                    var live = new List<MegaCrit.Sts2.Core.Entities.Creatures.Creature>();
                     foreach (var enemy in enemies)
                     {
                         if (enemy == null || !enemy.IsAlive) continue;
-                        enemy.LoseHpInternal(CometEnemyHpLoss, MegaCrit.Sts2.Core.ValueProps.ValueProp.Unblockable
-                                                          | MegaCrit.Sts2.Core.ValueProps.ValueProp.Unpowered);
-                        Logger.Log($"[CharBoss] 彗星：玩家打出碎屑 → {enemy.Name} 失去 {CometEnemyHpLoss} 点生命" +
-                                   $"（剩余 {enemy.CurrentHp}）");
+                        live.Add(enemy);
+                    }
+
+                    if (live.Count > 0)
+                    {
+                        var before = new List<string>(live.Count);
+                        foreach (var e in live)
+                        {
+                            try { before.Add($"{e.Name}({e.CurrentHp})"); } catch { /* 忽略 */ }
+                        }
+
+                        // ⚠ 用 5 参数重载（`ctx, targets, amount, props, dealer`）：107 的
+                        //   `CreatureCmd.Damage` 没有 7 参数那个版本（编译实测 CS1501）⇒ 保持双版本都能编。
+                        //   dealer 传 null = 无来源伤害。
+                        await CreatureCmd.Damage(choiceContext, live, CometEnemyHpLoss,
+                            MegaCrit.Sts2.Core.ValueProps.ValueProp.Unblockable
+                            | MegaCrit.Sts2.Core.ValueProps.ValueProp.Unpowered,
+                            (MegaCrit.Sts2.Core.Entities.Creatures.Creature?)null);
+
+                        var after = new List<string>(live.Count);
+                        foreach (var e in live)
+                        {
+                            try { after.Add($"{e.Name}({e.CurrentHp}{(e.IsAlive ? "" : ",已死")})"); } catch { /* 忽略 */ }
+                        }
+                        Logger.Log($"[CharBoss] 彗星：玩家打出碎屑 → {live.Count} 个敌方各失去 {CometEnemyHpLoss} 点生命" +
+                                   $"（{string.Join(", ", before.ToArray())} → {string.Join(", ", after.ToArray())}）");
                     }
                 }
             }

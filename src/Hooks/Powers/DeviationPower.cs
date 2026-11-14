@@ -67,7 +67,11 @@ public sealed partial class DeviationPower : PowerModel
             //   崩坠那批 `*.Cards.Token.*` 同理；再叠两条保险：
             //     · 模型命名空间里带 `.Token`（有些模组会漏填稀有度）；
             //     · 所在卡池是 `*Collectible*` 之类（收藏家藏品牌）。
-            if (IsDerivedCard(card))
+            //
+            // ★ 2026-11-13（恐惧模式「偏差认知」）：用户 PS 原文
+            //   「并且现在即使打出的是**衍生能力**，也会为它增加集中」
+            //   ⇒ 恐惧模式下**跳过**这道衍生牌闸门（正常模式仍然不算）。
+            if (IsDerivedCard(card) && !Core.DreadMode.IsActive)
             {
                 string entry = SafeEntry(card);
                 if (DerivedLogged.Add(entry))
@@ -98,15 +102,33 @@ public sealed partial class DeviationPower : PowerModel
         }
     }
 
+    /// <summary>2026-11-13（恐惧模式）：她**免疫「偏差认知」**——任何来源给她的那层都立刻移除。</summary>
+    private async Task StripBiasedCognitionDread(Creature owner)
+    {
+        try
+        {
+            if (!Core.DreadMode.IsActive || owner == null) return;
+            var biased = owner.GetPower<MegaCrit.Sts2.Core.Models.Powers.BiasedCognitionPower>();
+            if (biased == null) return;
+            Logger.Log("[CharBoss] 偏差认知（恐惧模式）：她免疫「偏差认知」⇒ 立刻移除那层");
+            await PowerCmd.Remove(biased);
+        }
+        catch (System.Exception e)
+        {
+            Logger.Log("[CharBoss] 免疫偏差认知失败: " + e.Message);
+        }
+    }
     public override async Task AfterSideTurnStart(CombatSide side, IReadOnlyList<Creature> participants,
                                                   ICombatState combatState)
     {
+        await StripBiasedCognitionDread(Owner);
         await ReconcileAsync(null);
     }
 
     public override async Task BeforeSideTurnEnd(PlayerChoiceContext choiceContext, CombatSide side,
                                                  IEnumerable<Creature> participants)
     {
+        await StripBiasedCognitionDread(Owner);
         await ReconcileAsync(choiceContext);
     }
 

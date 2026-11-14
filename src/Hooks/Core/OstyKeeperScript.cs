@@ -127,10 +127,11 @@ public static class OstyKeeperScript
             //   `(8, typeof(Afterlife))`，升级**按类型** ⇒ 两张来生会一起变「来生+」。
             new()
             {
-                Note = "5. 来生(1)、来生(1)、死亡之舞(1)",
+                // ★ 2026-11-13（用户）：「第五回合的第一张来生替换为钙化+」⇒ 回到「钙化+ + 来生 + 死亡之舞」（能量账仍是 3）
+                Note = "5. 钙化+(1)、来生(1)、死亡之舞(1)",
                 Energy = 3,
                 Cards = Cards(
-                    Play<Afterlife>(1), Play<Afterlife>(1), Play<DanseMacabre>(1)),
+                    Play<Calcify>(1, upgraded: true), Play<Afterlife>(1), Play<DanseMacabre>(1)),
             },
 
             // 6：洗牌。护卫+ 1 + 出击+ 1 = 2；吸引仇恨+（2 费）没费、保留

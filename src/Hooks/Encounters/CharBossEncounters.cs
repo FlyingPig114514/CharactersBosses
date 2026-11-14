@@ -178,6 +178,47 @@ public abstract class CharBossEncounterBase<TMonster> : EncounterModel, Core.IBo
     public override IEnumerable<MonsterModel> AllPossibleMonsters =>
         new[] { ModelDb.Monster<TMonster>() };
 
+    /// <summary>
+    /// **恐惧模式（Dread）的「支配」**（用户 2026-11-13）。
+    ///
+    /// 反编译 `DreadRunModel.ApplyCurrentDominion()`：它取 `Act.BossEncounter ?? SecondBossEncounter`
+    /// 的 <c>GetDominion()</c> 塞进 `RunState.Dominion`，而进 **Boss 房**时会被
+    /// `RemoveDominionIfRoomIsBoss` 清掉 ⇒ 支配只在**本幕的普通房间**生效。
+    /// 我们替换了每一幕的 Boss 遭遇 ⇒ 必须自己按「本幕 Boss 属于哪个原版角色」返回一个，
+    /// 否则恐惧模式里游戏会打 `... which doesn't have any dominion set!`（等于没有支配）。
+    /// 非恐惧模式下游戏根本不会问这个（`GetDominion()` 只被 DreadRunModel 调用）。
+    /// </summary>
+#if STS2_111
+    // ⚠ `EncounterModel.GetDominion()` 是 0.113.0 才加的虚方法（恐惧模式用的）⇒ 只在 111 构建里覆盖。
+    public override MegaCrit.Sts2.Core.Models.Dread.DominionModel? GetDominion()
+    {
+        try
+        {
+            string? key = null;
+            try { key = BossKeys.KeyOfEncounter(this); } catch { key = null; }
+            int ch = BossKeys.CharacterOf(key);
+            Type? dominion = ch switch
+            {
+                Core.DreadCharacters.Ironclad => typeof(Core.IroncladDominion),
+                Core.DreadCharacters.Silent => typeof(Core.SilentDominion),
+                Core.DreadCharacters.Defect => typeof(Core.DefectDominion),
+                Core.DreadCharacters.Necrobinder => typeof(Core.NecrobinderDominion),
+                Core.DreadCharacters.Regent => typeof(Core.RegentDominion),
+                _ => null,
+            };
+            if (dominion == null) return null;
+            var id = ModelDb.GetId(dominion);
+            if (id == null) return null;
+            return ModelDb.GetById<MegaCrit.Sts2.Core.Models.Dread.DominionModel>(id);
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 取恐惧模式支配失败: " + e.Message);
+            return null;
+        }
+    }
+#endif
+
     protected override IReadOnlyList<(MonsterModel, string?)> GenerateMonsters()
     {
         // ★ v0.2.418（用户实测：`fight DEFECT_EVENT_BOSS_ENCOUNTER` 依然打成能力机）：

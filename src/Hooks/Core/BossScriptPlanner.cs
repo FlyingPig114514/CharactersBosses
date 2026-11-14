@@ -914,7 +914,7 @@ public static class BossScriptPlanner
         }
         catch { return false; }
     }
-    private static bool IsPlayable(CardModel card)
+    internal static bool IsPlayable(CardModel card)
     {
         // 「执迷」（Enthralled）是**可以打出的诅咒**（2 费、带「永恒」：在手牌里就必须先打它），
         // 用户 2026-10-27 要求三层「巨石战」真的把它打出去 ⇒ 单独放行。
@@ -1283,7 +1283,7 @@ public static class BossScriptPlanner
             string entry = SafeEntry(card);
             if (entry != "MINION_STRIKE" && entry != "MINION_DIVE_BOMB" && entry != "MINION_SACRIFICE") return false;
             if (boss.Creature?.GetPower<Powers.BossCallToArmsPower>() == null) return false;
-            if (planned >= Powers.BossCallToArmsPower.MinionCap) return false;
+            if (planned >= Powers.BossCallToArmsPower.MinionCapNow) return false;
             planned++;
             return true;
         }

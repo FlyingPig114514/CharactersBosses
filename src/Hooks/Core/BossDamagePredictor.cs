@@ -940,6 +940,13 @@ public static class BossDamagePredictor
     /// <param name="discardsThisTurn">打出这张牌之前，她本回合已经（将会）丢弃的张数。</param>
     public static int MementoMoriDamage(CardModel card, int discardsThisTurn)
     {
+#if STS2_111
+        // ★ 2026-11-13（0.113.0 重做）：3 费、奇巧、固定 19(23) 点，「每弃一张 +4」整段删掉了
+        //   （反编译新 `MementoMori.CanonicalVars` 只有一个 `DamageVar(19m, ValueProp.Move)`）
+        //   ⇒ 直接读牌面伤害即可，`discardsThisTurn` 不再参与。
+        try { return Math.Max(0, FloorToInt(VarValue(card, "Damage", 19m))); }
+        catch { return 19; }
+#else
         try
         {
             decimal baseVar = VarValue(card, "CalculationBase", 9m);
@@ -948,6 +955,7 @@ public static class BossDamagePredictor
             return Math.Max(0, value);
         }
         catch { return Math.Max(0, FloorToInt(VarValue(card, "CalculatedDamage", 0m))); }
+#endif
     }
 
     /// <summary>

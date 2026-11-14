@@ -66,6 +66,16 @@ public sealed class DominateWeakPower : PowerModel
 
             // 用对方拿到的 choiceContext；拿不到就临时造一个（和「人工合成」同一套兜底）
             var ctx = choiceContext ?? new BlockingPlayerChoiceContext();
+            // 2026-11-13（恐惧模式「主宰」）：虚弱 1 → 2，**并且同时给 2 层脆弱**
+            if (Core.DreadMode.IsActive)
+            {
+                stacks += 1;
+                await PowerCmd.Apply<WeakPower>(ctx, target, stacks, owner, null);
+                await PowerCmd.Apply<MegaCrit.Sts2.Core.Models.Powers.FrailPower>(ctx, target, 2m, owner, null);
+                Logger.Log($"[CharBoss] 主宰（恐惧模式）：给 {target.Name} 上 {amount} 层易伤 → 附带 {stacks} 层虚弱 + 2 层脆弱");
+                return;
+            }
+
             await PowerCmd.Apply<WeakPower>(ctx, target, stacks, owner, null);
 
             Logger.Log($"[CharBoss] 主宰：给 {target.Name} 上 {amount} 层易伤 → 附带 {stacks} 层虚弱");

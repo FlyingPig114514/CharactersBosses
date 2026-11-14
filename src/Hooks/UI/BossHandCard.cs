@@ -251,7 +251,8 @@ public static partial class BossHandCard
                 // 必须先入树（_Ready 建好内部节点）再 UpdateIntent，否则空引用
                 row.AddChild(node);
                 node.UpdateIntent(intent, targets, boss.Creature);
-                if (intent is SacrificeIntent) FlipIconDown(node);
+                // 「牺牲」= 强化的蓝箭头翻转；「诱惑」= 策略的红箭头翻转（用户 2026-11-13）
+                if (intent is SacrificeIntent || intent is TemptationIntent) FlipIconDown(node);
                 return;
             }
         }

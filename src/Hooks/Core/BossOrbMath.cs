@@ -130,6 +130,7 @@ public static class BossOrbMath
         {
             orbType = typeof(LightningOrb);
             count = Math.Max(0, xEnergy);
+            try { if (card.IsUpgraded) count++; } catch { }   // 2026-11-13 dread: Tempest+ channels 1 more
             return count > 0;
         }
 

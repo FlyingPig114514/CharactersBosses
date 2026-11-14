@@ -1,4 +1,8 @@
 {
   "SACRIFICE.title": "Opferung",
-  "SACRIFICE.description": "Dieser Gegner zahlt einen Preis, um einen mächtigen Effekt zu erlangen."
+  "SACRIFICE.description": "Dieser Gegner zahlt einen Preis, um einen mächtigen Effekt zu erlangen.",
+    "TEMPTATION.title":  "Verlockung",
+    "TEMPTATION.description":  "Dieser Gegner gibt dir einen positiven Effekt, um einen starken Effekt zu erhalten.",
+    "JUDGEMENT.title":  "Urteil",
+    "JUDGEMENT.description":  "Dieser Gegner tötet dich sofort."
 }

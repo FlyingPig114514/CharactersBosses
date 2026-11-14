@@ -833,7 +833,7 @@ public abstract partial class CharBossMonster : MonsterModel
 
         // Boss 出牌期间顶上自动选择器：让「抽 3 弃 1」这类需要选择的牌自动结算，
         // 否则它会等一个永远不到来的玩家选择，把整回合挂死。using 保证一定弹出。
-        using var selectorScope = BossCardSelector.Push();
+        using var selectorScope = BossCardSelector.Push(Shadow);
 
         // 替影子 Player 补触发「玩家回合开始」的钩子：它的遗物/能力（召 Osty、给辉星、
         // 下回合加抽/加能量…）都挂在这上面，而它不在 CombatState.Players 里，原版不会替它触发。
@@ -1722,7 +1722,31 @@ public abstract partial class CharBossMonster : MonsterModel
             //   ② `Hook.AfterDamageGiven` 前缀在**她的伤害落地那一刻**才真正播。
             //   这样连「彼岸咆哮」那种回合结束从消耗堆自动打出的牌也能覆盖（它不走 PlayOne）。
 
-            playTask = CardCmd.AutoPlay(ctx, play.Card, target, AutoPlayType.Default);
+            // ★ v0.2.643（用户：「让他们的攻击牌的攻击特效朝左」）：这一手出牌期间把「攻击特效镜像」的窗口打开
+            //   （见 <see cref="Patches.BossAttackVfxFacing"/>）。
+            //
+            // ⚠ v0.2.644 修：`targetsSelf` **不能**用「`play.Target == 自己`」判 ——
+            //   `BossPlanner.ChooseTarget(...) ?? Creature` 对**群攻牌**（震荡波等 `AllEnemies`）
+            //   返回的是 null ⇒ 兜底成她自己 ⇒ 每一张牌都被判成「打自己」⇒ 一次都没镜像。
+            // ⚠ v0.2.645 再修：干脆**不再按目标判断**。原版「抉择，抉择」从手牌里挑出来的
+            //   **技能牌也会被重复打出**（用户实测：挑的是「震荡波」），而「抉择，抉择」自己是
+            //   `TargetType.Self` ⇒ 以前整手都跳过 ⇒ 连它重放出来的震荡波特效也没翻。
+            //   现在只有**用户点名的那一个例外**才跳过：轰击储【醒来后】的「轰击」打她自己
+            //   （`BossOrbitalBombardPower.Awake`），那一手保持原版方向。
+            bool vfxQuiet = false;
+            try
+            {
+                vfxQuiet = SafeEntryOf(play.Card) == "BOMBARDMENT"
+                           && Powers.BossOrbitalBombardPower.Awake;
+            }
+            catch { vfxQuiet = false; }
+            Patches.BossAttackVfxFacing.Begin(SafeEntryOf(play.Card), vfxQuiet);
+            try { playTask = CardCmd.AutoPlay(ctx, play.Card, target, AutoPlayType.Default); }
+            catch
+            {
+                Patches.BossAttackVfxFacing.End();   // 同步就抛了的话窗口没关（下面那段 finally 进不去）
+                throw;
+            }
             // ★ v0.2.450（联机不同步取证）：出牌前后各记一次「翻侧决策的全部输入」。
             //   这套记账（深度计数 + 真人出牌登记 + 15 秒过期）是纯本机的，一旦两端不同，
             //   同一张群攻牌就会一端打玩家、另一端打 Boss。两端 mod_log 逐字一比即可确认。
@@ -1747,23 +1771,31 @@ public abstract partial class CharBossMonster : MonsterModel
             }
             catch { waitsForPlayerChoice = false; }
 
-            if (waitsForPlayerChoice)
+            try
             {
-                Logger.Log("[CharBoss] 抉择：这张牌要等玩家选完 ⇒ **不计超时**（玩家没选完之前她这一手不会往下走）");
-                // 同时**暂停「出牌队列收卡面」**（慢车道 4Hz 也会调它，而它会把正在执行的卡面从队列里摘掉
-                // ⇒ 等于把她这一手提前打断，用户实测「选慢一点她回合就结束了」）。
-                Patches.StrayBossCardQueuePatch.HoldReap = true;
-                try { await playTask; }
-                finally { Patches.StrayBossCardQueuePatch.HoldReap = false; }
-                Logger.Log("[CharBoss] 抉择：玩家选完了 ⇒ 继续结算这张牌");
-            }
-            else
-            {
-                var finished = await Task.WhenAny(playTask, Task.Delay(5000));
-                if (!ReferenceEquals(finished, playTask))
+                if (waitsForPlayerChoice)
                 {
-                    Logger.Log($"[CharBoss] PLAY {play.Card.Id.Entry} 超时(5s)，跳过继续");
+                    Logger.Log("[CharBoss] 抉择：这张牌要等玩家选完 ⇒ **不计超时**（玩家没选完之前她这一手不会往下走）");
+                    // 同时**暂停「出牌队列收卡面」**（慢车道 4Hz 也会调它，而它会把正在执行的卡面从队列里摘掉
+                    // ⇒ 等于把她这一手提前打断，用户实测「选慢一点她回合就结束了」）。
+                    Patches.StrayBossCardQueuePatch.HoldReap = true;
+                    try { await playTask; }
+                    finally { Patches.StrayBossCardQueuePatch.HoldReap = false; }
+                    Logger.Log("[CharBoss] 抉择：玩家选完了 ⇒ 继续结算这张牌");
                 }
+                else
+                {
+                    var finished = await Task.WhenAny(playTask, Task.Delay(5000));
+                    if (!ReferenceEquals(finished, playTask))
+                    {
+                        Logger.Log($"[CharBoss] PLAY {play.Card.Id.Entry} 超时(5s)，跳过继续");
+                    }
+                }
+            }
+            finally
+            {
+                // 攻击特效镜像的窗口只包住「这一手」——异常路径也必须关掉，否则会漏到玩家回合
+                Patches.BossAttackVfxFacing.End();
             }
 
             try { await Patches.SneakyOnBossAttack.EnsureGrantedAsync(this, play.Card, sneakyBefore, sneakyAmount); }
@@ -2644,6 +2676,7 @@ public abstract partial class CharBossMonster : MonsterModel
             {
                 if (asc >= minAsc) result.Add(type);
             }
+            AppendDreadUpgrades(result);
             return result;
         }
         int act = ActIndex + 1;   // 按幕的条目用 1 起幕号
@@ -2653,7 +2686,26 @@ public abstract partial class CharBossMonster : MonsterModel
             if (byAct != 0 && byAct != act) continue;
             result.Add(type);
         }
+        AppendDreadUpgrades(result);
         return result;
+    }
+
+    /// <summary>
+    /// ★ 2026-11-13（恐惧模式）：把「恐惧模式专属升级」追加进去
+    /// （`BossDefinition.DreadUpgradesByAct` / `BossVariant.DreadUpgrades`）。
+    /// 目前用到它的：一层**黑球机**（升级「眼部攻击」）、二层**王储**（升级「王者之拳」）。
+    /// </summary>
+    private void AppendDreadUpgrades(List<Type> result)
+    {
+        try
+        {
+            if (!Core.DreadMode.IsActive) return;
+            foreach (var type in Def.DreadUpgradeTypesFor(ActIndex))
+            {
+                if (type != null) result.Add(type);
+            }
+        }
+        catch { /* 绝不影响卡组构建 */ }
     }
 
 

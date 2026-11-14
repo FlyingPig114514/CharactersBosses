@@ -80,7 +80,15 @@ public static class IroncladAngerScript
     };
 
     /// <summary>第一幕的遗物（涅奥的祝福由 <c>CarriesNeowBlessing</c> 自动带）。</summary>
-    public static List<Type> Relics() => new()
+    public static List<Type> Relics()
+    {
+        var relics = RelicsNormal();
+        // 2026-11-13（恐惧模式）：愤怒战的恐惧版额外带「奥利哈钢」（回合结束没有格挡 ⇒ +6 格挡）
+        if (Core.DreadMode.IsActive) relics.Add(typeof(Orichalcum));
+        return relics;
+    }
+
+    private static List<Type> RelicsNormal() => new()
     {
         typeof(BurningBlood),        // 燃烧之血
         typeof(Relics.NeowBlessing),   // 涅奥的祝福：所有 Boss 都是第 2 件（用户 2026-10-27 口径）

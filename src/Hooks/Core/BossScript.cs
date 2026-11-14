@@ -733,6 +733,19 @@ public static class BossScriptRunner
 
             int count = Math.Max(0, deckStrikes) + Math.Max(0, boss.StrikeCopiesMade);
 
+            // 2026-11-13（恐惧模式「燃烧契约」）：你名字含「打击」的牌也加成他的完美打击。
+            // 复用「痛击」的实时牌堆统计（只取玩家那部分 = 总数 − 她自己的 7 张）；
+            // 这里是快照式加成 ⇒ 不会因为你打出打击牌而下降（那一套只在打击战走）。
+            if (Core.DreadMode.IsActive)
+            {
+                try
+                {
+                    int mine = Powers.BossBashPower.CountNow(boss) - Powers.BossBashPower.OwnStrikeCards;
+                    if (mine > 0) count += mine;
+                }
+                catch { /* 忽略 */ }
+            }
+
             // 基础值 / 每张加成：读**卡面 BaseValue**（未升级 = 6 / 2；升级后才 3）。
             // ⚠ 不要用预览管线读 ExtraDamage —— 那会把升级值算进来（用户 2026-11-02：完美打击每张 +2，升级后才 +3，
             //   而 Boss 卡组里这张一直是未升级版）。
@@ -835,6 +848,23 @@ public static class BossScriptRunner
                             ApplyBashToPerfectStrike(card, cardBoss);
                         }
                     }
+                    // ★ 2026-11-13（恐惧模式）：**「痛击」自己也吃打击加成**（用户 PS：
+                    //   「让痛击的伤害也和完美打击一样受到打击的加成」）。
+                    //   加在这一张实例的 Damage 上 ⇒ 卡面数字、意图预览、真实伤害三者一致。
+                    else if (card.Id.Entry == "BASH" && cardBoss != null && Core.DreadMode.IsActive)
+                    {
+                        var bashPower = cardBoss.Creature?.GetPower<CharacterBosses.Powers.BossBashPower>();
+                        if (bashPower != null)
+                        {
+                            int bonus = bashPower.BashBonusDamage(cardBoss);
+                            if (bonus > 0)
+                            {
+                                card.DynamicVars.Damage.BaseValue += bonus;
+                                Logger.Log($"[CharBoss] 痛击（恐惧）：打击牌也加成痛击 ⇒ {card.Id.Entry} 伤害 +{bonus}" +
+                                           $"（现在 {card.DynamicVars.Damage.BaseValue}）");
+                            }
+                        }
+                    }
                 }
                 catch (Exception e) { Logger.Log("[CharBoss] 痛击加成计算失败: " + e.Message); }
                 if (entry.DamageOverride > 0)
@@ -849,6 +879,19 @@ public static class BossScriptRunner
                         Logger.Log($"[CharBoss] 剧本伤害覆盖失败（{card.Id.Entry}）: {e.Message}");
                     }
                 }
+                // ★ 2026-11-13（恐惧模式「征召上前」，用户当轮口径）：
+                //   「俯冲仆从的伤害仍保持在 **16**，仆从俯冲+ 的伤害仍为 16」
+                //   ⇒ 0.113 把「仆从俯冲」卡面削到 11（升级 13），恐惧模式要**还原成 16**（升级版也是 16）。
+                //   改的是**这一张实例**的 Damage 变量 ⇒ 卡面、意图预览、真实伤害三者一致。
+                try
+                {
+                    if (Core.DreadMode.IsActive && card.Id.Entry == "MINION_DIVE_BOMB")
+                    {
+                        card.DynamicVars.Damage.BaseValue = 16m;
+                        Logger.Log("[CharBoss] 征召上前（恐惧）：「仆从俯冲」卡面伤害还原成 16（不升级也 16）");
+                    }
+                }
+                catch (Exception e) { Logger.Log("[CharBoss] 恐惧版仆从俯冲伤害覆盖失败: " + e.Message); }
                 if (entry.FreeThisTurn) { try { card.SetToFreeThisTurn(); } catch { /* 忽略 */ } }
                 // 「保留」（计划妥当）：给这张牌加 CardKeyword.Retain ⇒ 回合结束不会被弃掉
                 if (entry.Retain)

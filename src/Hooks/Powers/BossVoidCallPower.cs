@@ -47,6 +47,48 @@ public sealed class BossVoidCallPower : PowerModel
 
     public override bool ShouldPlayVfx => false;
 
+    /// <summary>
+    /// ★ 2026-11-13（恐惧模式「虚空之唤」）：正常版要等她**首次打出「女妖之嚎」**才生效；
+    /// 恐惧版 **战斗开始就直接生效**（用户设计表原文：「战斗开始 ⇒ 所有玩家所有牌获得**虚无**，
+    /// 直到她死亡」）。
+    /// 「直到她死亡」那条本来就由 <c>CharBossMonster.BeforeRemovedFromRoom</c> 调
+    /// <see cref="ClearHexFromAllPlayers"/> 负责 ⇒ 这里只管把恶咒提前挂上。
+    /// </summary>
+    public override async Task AfterApplied(MegaCrit.Sts2.Core.Entities.Creatures.Creature? applier,
+                                            CardModel? cardSource)
+    {
+        try
+        {
+            if (!Core.DreadMode.IsActive) return;
+            var owner = Owner;
+            if (owner == null || !owner.IsAlive) return;
+            if (Applied) return;
+
+            var combat = owner.CombatState;
+            if (combat == null) return;
+
+            var targets = new List<Creature>();
+            foreach (var player in Core.BossLockOn.RealPlayers(combat))
+            {
+                var creature = player?.Creature;
+                if (creature == null || !creature.IsAlive) continue;
+                if (targets.Contains(creature)) continue;
+                targets.Add(creature);
+            }
+            if (targets.Count == 0) return;
+
+            Applied = true;
+            int amount = Math.Max(1, Amount);
+            await PowerCmd.Apply<HexPower>(new BlockingPlayerChoiceContext(), targets, amount, owner, null);
+            Logger.Log($"[CharBoss] 虚空之唤（恐惧）：战斗开始即生效 ⇒ 给 {targets.Count} 名玩家各挂 " +
+                       $"{amount} 层恶咒（所有卡牌获得虚无，直到她死亡）");
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 虚空之唤（恐惧）：战斗开始挂恶咒失败: " + e.Message);
+        }
+    }
+
     /// <summary>场上是否还有活着的「虚无骨」（给文案替换用）。</summary>
     internal static bool AnyAliveVoidBoss()
     {

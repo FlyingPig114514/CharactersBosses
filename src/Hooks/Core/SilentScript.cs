@@ -51,8 +51,11 @@ public static class SilentScript
             Turn("切割、打击、终结技（按本回合已打出的攻击次数结算）", 3,
                 C<Slice>(), C<StrikeSilent>(), C<Finisher>()),
 
-            Turn("幻影之刃（小刀获得保留、每回合第一张小刀 +9）、尖啸、隐秘匕首（0 费给 2 刀，当回合就打出去）", 4,
-                C<PhantomBlades>(), C<PiercingWail>(), C<HiddenDaggers>()),
+            // ★ 2026-11-13（用户）：「将第四回合的幻影之刃替换为精准+」
+            //   （幻影之刃在 0.113 被削到 8 点，用户索性把这回合改成精准切击+ —— 它 0 费、
+            //     伤害 = 13+? − 2 × 手里其它牌数，见 BossDamagePredictor.PreciseCutDamage）
+            Turn("精准+（0 费，按出手时手牌数结算）、尖啸、隐秘匕首（0 费给 2 刀，当回合就打出去）", 4,
+                C<PreciseCut>(true), C<PiercingWail>(), C<HiddenDaggers>()),
 
             Turn("刀扇（2 费能力：给 4 刀，且小刀改打全体）；铃铛的诅咒/防御没费", 5,
                 C<FanOfKnives>(), C<CurseOfTheBell>(), C<DefendSilent>()),

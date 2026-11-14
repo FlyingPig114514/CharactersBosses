@@ -78,7 +78,12 @@ public sealed class ResonancePower : PowerModel
             //（单人恒为 true；其它 Boss 影子 Player 生成的牌一律不算）
             if (!Core.BossLockOn.SpecialEffectAppliesTo(Owner.Monster as Monsters.CharBossMonster, creator)) return;
 
-            await FireGeneration("玩家生成卡牌", creditHistory: false, withdrawPending: false);
+            // ★ 2026-11-13（恐惧模式「共鸣」，用户当轮口径）：
+            //   原文「每当玩家在战斗内生成卡牌时，也会触发储君的『创世之柱』**并增加超质量体的伤害**」
+            //   ⇒ 恐惧模式把 `creditHistory` 打开：玩家印的牌也记进 `CardGeneratedEntry`
+            //     ⇒ 超质量体（Supermassive）的倍率跟着涨。
+            //   正常模式仍是 false（用户 2026-10-24 明确过「玩家印牌不该让超质量体涨」）。
+            await FireGeneration("玩家生成卡牌", creditHistory: Core.DreadMode.IsActive, withdrawPending: false);
         }
         catch (Exception e)
         {

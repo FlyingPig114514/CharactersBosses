@@ -79,6 +79,12 @@ public sealed class PoisonStrikePower : PowerModel
 
         var ctx = new ThrowingPlayerChoiceContext();   // 与原版 Trigger() 用的是同一个上下文
         int iterations = TriggerCountOf(poison);
+
+        // ★ 2026-11-13 订正（用户原文复述）：「中毒改为在你的回合结束时结算，且伤害**可以被格挡抵消**」
+        //   ⇒ 恐惧模式**保持可格挡**（v0.2.614 把它改成 Unblockable 是理解反了，已回退）。
+        //   恐惧版的强化改落在**结算次数**上：同一份中毒在这一步多结算一次（伤害仍可被格挡）。
+        if (Core.DreadMode.IsActive) iterations *= 2;
+
         for (int i = 0; i < iterations; i++)
         {
             int hit = poison.Amount;
@@ -94,6 +100,7 @@ public sealed class PoisonStrikePower : PowerModel
 
             if (damage > 0m)
             {
+                // 2026-11-13 订正：两个模式都**保持可格挡**（用户原文「伤害可以被格挡抵消」）。
                 await CreatureCmd.Damage(ctx, poison.Owner, damage, ValueProp.Unpowered, null, null);
             }
             if (poison.Owner.IsAlive)

@@ -57,8 +57,43 @@ public sealed class BossDefinition
     /// </summary>
     public string?[] SpecialLocByAct = new string?[4];
 
+    // ★ 2026-11-13（用户「恐惧模式的提升」）：恐惧模式下**同名但更强**的那一套特殊效果。
+    //   为空的槽位表示「这只 Boss 没有单独的恐惧版」⇒ 退回正常模式的那份。
+    //   文案另存 `<KEY>_BOSS.<special>_dread`（16 语言），由 SpecialLocForAct 按 DreadMode.IsActive 切换。
+    public string?[] SpecialLocDreadByAct = new string?[4];
+
     /// <summary>按幕的特殊效果 Power，与 <see cref="SpecialLocByAct"/> 一一对应。</summary>
     public Type?[] SpecialPowerByAct = new Type?[4];
+
+    /// <summary>恐惧模式专用的特殊效果 Power（与 <see cref="SpecialLocDreadByAct"/> 一一对应）。</summary>
+    public Type?[] SpecialPowerDreadByAct = new Type?[4];
+
+    /// <summary>
+    /// ★ 2026-11-13（恐惧模式）：**恐惧模式专属的「升级某张牌」**（按幕）。
+    ///
+    /// 为什么需要单独一条通道：`AscensionUpgrades` 是**静态**表（按进阶等级），而恐惧模式是
+    /// **运行时**才知道的（`DreadMode.IsActive`）—— 像「黑球机：**升级眼部攻击**」这种要求，
+    /// 只能等到造手牌 / 组卡组的那一刻才判断。
+    ///
+    /// 用途：`CharBossMonster.AscensionUpgradeTypes()` 会在 `DreadMode.IsActive` 时把这里
+    /// （以及变体的 <see cref="BossVariant.DreadUpgrades"/>）一并加进去 ⇒ 卡组与剧本手牌里
+    /// 同名的那张牌都变成升级版。
+    /// </summary>
+    public List<Type>?[] DreadUpgradesByAct = new List<Type>?[4];
+
+    /// <summary>这一幕恐惧模式要额外升级哪些牌（变体优先；没填就是空）。</summary>
+    public List<Type> DreadUpgradeTypesFor(int act)
+    {
+        try
+        {
+            var variantList = ActiveVariant(act)?.DreadUpgrades;
+            if (variantList != null) return variantList;
+            var byAct = DreadUpgradesByAct[Clamp(act, DreadUpgradesByAct.Length)];
+            if (byAct != null) return byAct;
+        }
+        catch { /* 忽略 */ }
+        return new List<Type>();
+    }
 
     /// <summary>按幕的**初始药水**（炼药猎：8 瓶；其它 Boss 留空）。</summary>
     public List<Type>?[] PotionsByAct = new List<Type>?[4];
@@ -304,6 +339,11 @@ public sealed class BossDefinition
         var v = ActiveVariant(act);
         // 变体**优先**：变体的 SpecialLoc 为空就是「这套设计没有特殊效果说明」，
         // 不能 `??` 掉回主设计（否则炼药猎会显示刀猎的「袖里乾坤」，用户 2026-10-26 实测）。
+        if (Core.DreadMode.IsActive)
+        {
+            var dread = v != null ? v.SpecialLocDread : SpecialLocDreadByAct[Clamp(act, SpecialLocDreadByAct.Length)];
+            if (!string.IsNullOrWhiteSpace(dread)) return dread;
+        }
         return v != null ? v.SpecialLoc : SpecialLocByAct[Clamp(act, SpecialLocByAct.Length)];
     }
 
@@ -311,6 +351,11 @@ public sealed class BossDefinition
     public Type? SpecialPowerForAct(int act)
     {
         var v = ActiveVariant(act);
+        if (Core.DreadMode.IsActive)
+        {
+            var dread = v != null ? v.SpecialPowerDread : SpecialPowerDreadByAct[Clamp(act, SpecialPowerDreadByAct.Length)];
+            if (dread != null) return dread;
+        }
         return v != null ? v.SpecialPower : SpecialPowerByAct[Clamp(act, SpecialPowerByAct.Length)];
     }
 
@@ -344,7 +389,12 @@ public sealed class BossDefinition
     /// <summary>这一幕**实际生效**的「谋杀按本场拿到过的牌数起步」开关（变体优先）。</summary>
     public bool MurderCountsDrawnCardsFor(int act)
     {
-        try { return ActiveVariant(act)?.MurderCountsDrawnCards == true; }
+        try
+        {
+            // 2026-11-13（恐惧模式「计划妥当」）：蛇眼猎的「谋杀」**只要她抽牌就加伤**，不再要求保留在手牌里
+            if (Core.DreadMode.IsActive && ActiveVariant(act)?.Key == "SILENT_SNECKO") return true;
+            return ActiveVariant(act)?.MurderCountsDrawnCards == true;
+        }
         catch { return false; }
     }
 
@@ -421,7 +471,13 @@ public sealed class BossVariant
     public List<Type>? Relics { get; init; }
     public BossScript? Script { get; init; }
     public string? SpecialLoc { get; init; }
+
+    /// <summary>恐惧模式用的特殊效果文案（为空 = 与正常模式相同）。</summary>
+    public string? SpecialLocDread { get; init; }
     public Type? SpecialPower { get; init; }
+
+    /// <summary>恐惧模式用的特殊效果 Power（null = 与正常模式相同）。</summary>
+    public Type? SpecialPowerDread { get; init; }
     /// <summary>
     /// 这套设计要不要**拦掉原版的抽牌**（ShadowBossNoDrawPatch）。默认 false = 跟主定义走。
     /// 用户 2026-11-09 的「华丽猎」：剧本把手牌写死了，杂技/肾上腺素那些「抽 N 张」不该再从牌堆里
@@ -458,6 +514,12 @@ public sealed class BossVariant
 
     /// <summary>这套设计**自己的进阶遗物表**（同上，取代主定义在那一幕的 `AscensionRelicsByAct` 行）。</summary>
     public List<(int MinAscension, Type Relic)>? AscensionRelics { get; init; }
+
+    /// <summary>
+    /// ★ 2026-11-13（恐惧模式）：这套设计在**恐惧模式**下额外升级哪些牌（空 = 不额外升级）。
+    /// 例：二层「王储」= 升级「王者之拳」。
+    /// </summary>
+    public List<Type>? DreadUpgrades { get; init; }
 
     /// <summary>
     /// 这套设计额外的**最大生命加成**（用户 2026-11-03 的三层「事件机」：+20）。

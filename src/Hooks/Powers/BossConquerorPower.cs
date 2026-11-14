@@ -99,6 +99,25 @@ public sealed class BossConquerorPower : PowerModel
             if (Owner != null && ReferenceEquals(creature, Owner)) continue;
 
             await PowerCmd.Apply<ParalysisPower>(ctx, creature, PerTrigger, Owner, null, false);
+
+            // ★ 2026-11-13（恐惧模式「征服者」）：除了「麻痹」，再给**本回合 −1 力量**
+            //   —— 用户设计表原文：「她把牌放回抽牌堆顶 ⇒ 所有玩家下一张攻击牌伤害 **−50%**
+            //   且本回合 −1 力量（PS：用王之凝视）」。
+            //   直接复用原版「王之凝视」那层 `MonarchsGazeStrengthDownPower : TemporaryStrengthPower`
+            //   （IsPositive = false，本回合 −1 力量、回合结束自动还），与 `KnowThyPlacePower` 同一写法。
+            if (Core.DreadMode.IsActive)
+            {
+                try
+                {
+                    await PowerCmd.Apply<MegaCrit.Sts2.Core.Models.Powers.MonarchsGazeStrengthDownPower>(
+                        ctx, creature, 1m, Owner, null, false);
+                }
+                catch (Exception e)
+                {
+                    Logger.Log("[CharBoss] 征服者（恐惧）：王之凝视施加失败: " + e.Message);
+                }
+            }
+
             hit++;
         }
         return hit;

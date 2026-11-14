@@ -67,10 +67,13 @@ public sealed class BossRainbowPower : PowerModel
             var creature = Owner;
             if (creature == null) return;
 
-            await PowerCmd.Apply<FocusPower>(choiceContext, creature, 1m, null, null);
+            // ★ 2026-11-13（用户「恐惧模式的提升」）：同名「彩虹」，恐惧模式下每 5 球给 **2** 点集中
+            //   （正常模式 1 点）。用户规则：恐惧版特殊效果**沿用普通模式的名字**。
+            decimal focusGain = CharacterBosses.Core.DreadMode.IsActive ? 2m : 1m;
+            await PowerCmd.Apply<FocusPower>(choiceContext, creature, focusGain, null, null);
             if (_logs++ < 20)
             {
-                Logger.Log($"[CharBoss] 彩虹：累计生成第 {_orbs} 颗充能球 ⇒ 故障机器人 +1 集中" +
+                Logger.Log($"[CharBoss] 彩虹：累计生成第 {_orbs} 颗充能球 ⇒ 故障机器人 +{focusGain} 集中" +
                            $"（现在 {SafeFocus(creature)}）");
             }
             try { InvokeDisplayAmountChanged(); } catch { /* 忽略 */ }

@@ -26,7 +26,15 @@ namespace CharacterBosses.Patches;
 /// 做法：给她这条入口套一个**计数**（`HittableEnemiesSidePatch.ForceRelativeHold`），
 /// 整条任务跑完（`ContinueWith`）再减回去；计数而不是 bool，避免嵌套/并发把它提前清掉。
 /// </summary>
-[HarmonyPatch(typeof(CardPileCmd), nameof(CardPileCmd.AutoPlayFromDrawPile))]
+[HarmonyPatch(typeof(CardPileCmd), nameof(CardPileCmd.AutoPlayFromDrawPile),
+              new[]
+              {
+                  typeof(MegaCrit.Sts2.Core.GameActions.Multiplayer.PlayerChoiceContext),
+                  typeof(MegaCrit.Sts2.Core.Entities.Players.Player),
+                  typeof(int),
+                  typeof(MegaCrit.Sts2.Core.Entities.Cards.CardPilePosition),
+                  typeof(bool),
+              })]
 internal static class AutoPlayFromDrawPileSideHoldPatch
 {
     [HarmonyPrefix]

@@ -108,7 +108,24 @@ public static class BossSlotAssignmentPatch
 }
 
 /// <summary>切点②：生成这一幕的房间时会随机滚出两个 Boss。</summary>
-[HarmonyPatch(typeof(ActModel), nameof(ActModel.GenerateRooms))]
+#if STS2_107
+    [HarmonyPatch(typeof(ActModel), nameof(ActModel.GenerateRooms),
+                  new[]
+                  {
+                      typeof(MegaCrit.Sts2.Core.Random.Rng),
+                      typeof(MegaCrit.Sts2.Core.Unlocks.UnlockState),
+                      typeof(bool),
+                  })]
+#else
+    [HarmonyPatch(typeof(ActModel), nameof(ActModel.GenerateRooms),
+                  new[]
+                  {
+                      typeof(MegaCrit.Sts2.Core.Random.Rng),
+                      typeof(MegaCrit.Sts2.Core.Unlocks.UnlockState),
+                      typeof(bool),
+                      typeof(bool),
+                  })]
+#endif
 public static class BossSlotGenerateRoomsPatch
 {
     [HarmonyPostfix]

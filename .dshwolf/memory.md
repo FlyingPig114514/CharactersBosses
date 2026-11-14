@@ -5256,3 +5256,171 @@ Chronological action log.
 | 2026-11-12 14:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Patches/BossPowerIconPatch.cs` | ok | 0 |
 | 2026-11-12 14:40 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/close_sts2.ps1` | ok | 0 |
 | 2026-11-12 14:43 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/cvc-compat.md` | ok | 0 |
+| 2026-11-12 20:58 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/CharacterBosses.csproj` | ok | 0 |
+| 2026-11-12 20:58 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/CharacterBosses.csproj` | ok | 0 |
+| 2026-11-12 20:58 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/loader/Loader.csproj` | ok | 0 |
+| 2026-11-12 22:33 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Powers/CometBossPower.cs` | ok | 0 |
+| 2026-11-12 22:34 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/FleshBone.cs` | ok | 0 |
+| 2026-11-12 22:34 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-12 22:34 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-12 22:34 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-12 22:34 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-12 22:35 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Powers/CometBossPower.cs` | ok | 0 |
+| 2026-11-12 22:38 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/lose-hp-and-sleight-2026-11-12.md` | ok | 0 |
+| 2026-11-12 22:40 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-12 22:41 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/lose-hp-and-sleight-2026-11-12.md` | ok | 0 |
+| 2026-11-13 10:39 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/SelectionCompat.cs` | ok | 0 |
+| 2026-11-13 10:41 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossLockOn.cs` | error | 0 |
+| 2026-11-13 10:41 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossLockOn.cs` | ok | 0 |
+| 2026-11-13 10:41 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Patches/MementoMoriLowestHpPatch.cs` | ok | 0 |
+| 2026-11-13 10:52 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/memento-mori-0113-2026-11-13.md` | ok | 0 |
+| 2026-11-13 12:04 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/verify-deploy.ps1` | ok | 0 |
+| 2026-11-13 12:07 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/memento-mori-0113-2026-11-13.md` | ok | 0 |
+| 2026-11-13 12:16 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/memento-mori-0113-2026-11-13.md` | ok | 0 |
+| 2026-11-13 13:21 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/CharDominions.cs` | ok | 0 |
+| 2026-11-13 13:25 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/dread-mode.md` | ok | 0 |
+| 2026-11-13 13:30 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/dread-mode.md` | ok | 0 |
+| 2026-11-13 13:31 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/dread-mode.md` | ok | 0 |
+| 2026-11-13 13:32 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/dread-mode.md` | ok | 0 |
+| 2026-11-13 13:34 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/dread-mode.md` | ok | 0 |
+| 2026-11-13 13:41 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossHookBridge.SideTurn.cs` | ok | 0 |
+| 2026-11-13 14:42 | write | `.tmp/loc.ps1` | ok | 0 |
+| 2026-11-13 14:43 | edit | `src/Hooks/Powers/BossSuppressionPower.cs` | ok | 0 |
+| 2026-11-13 14:43 | edit | `src/Hooks/Powers/BossSuppressionPower.cs` | ok | 0 |
+| 2026-11-13 14:43 | edit | `src/Hooks/Core/BossDefs.cs` | ok | 0 |
+| 2026-11-13 14:43 | edit | `src/Hooks/Core/ChoiceRegent.cs` | ok | 0 |
+| 2026-11-13 14:43 | edit | `src/Hooks/Patches/ChoiceRegentPickPatch.cs` | ok | 0 |
+| 2026-11-13 14:43 | edit | `src/Hooks/Patches/ChoiceRegentPickPatch.cs` | ok | 0 |
+| 2026-11-13 14:43 | write | `src/Hooks/Monsters/CharBossMonster.Choice.cs` | ok | 0 |
+| 2026-11-13 14:43 | edit | `src/Hooks/Monsters/CharBossMonster.Choice.cs` | ok | 0 |
+| 2026-11-13 14:43 | edit | `src/Hooks/Monsters/CharBossMonster.Choice.cs` | ok | 0 |
+| 2026-11-13 14:43 | edit | `src/Hooks/Core/BossDefs.cs` | ok | 0 |
+| 2026-11-13 14:43 | edit | `src/Hooks/Patches/ChoiceRegentPickPatch.cs` | ok | 0 |
+| 2026-11-13 14:43 | edit | `src/Hooks/Patches/ChoiceRegentPickPatch.cs` | ok | 0 |
+| 2026-11-13 14:43 | edit | `src/Hooks/Powers/BossGuidePower.cs` | ok | 0 |
+| 2026-11-13 14:44 | write | `.tmp/loc-round19.ps1` | ok | 0 |
+| 2026-11-13 14:44 | write | `.tmp/loc-round19.json` | ok | 0 |
+| 2026-11-13 14:44 | write | `.tmp/apply-loc.ps1` | ok | 0 |
+| 2026-11-13 14:44 | write | `.tmp/loc-round19.json` | ok | 0 |
+| 2026-11-13 14:44 | write | `.tmp/loc.ps1` | ok | 0 |
+| 2026-11-13 14:44 | edit | `.tmp/apply-loc.ps1` | ok | 0 |
+| 2026-11-13 14:51 | edit | `src/Hooks/Patches/BossFairyInABottlePatch.cs` | ok | 0 |
+| 2026-11-13 14:51 | edit | `src/Hooks/Patches/BossFairyInABottlePatch.cs` | ok | 0 |
+| 2026-11-13 14:51 | edit | `src/Hooks/Patches/BossFairyInABottlePatch.cs` | ok | 0 |
+| 2026-11-13 14:51 | edit | `src/Hooks/Patches/BossFairyInABottlePatch.cs` | ok | 0 |
+| 2026-11-13 14:51 | edit | `src/Hooks/Patches/BossFairyInABottlePatch.cs` | ok | 0 |
+| 2026-11-13 14:55 | edit | `src/Hooks/Core/FleshBone.cs` | error | 0 |
+| 2026-11-13 14:55 | edit | `src/Hooks/Core/FleshBone.cs` | ok | 0 |
+| 2026-11-13 14:55 | edit | `src/Hooks/Powers/BossDevourLifePower.cs` | error | 0 |
+| 2026-11-13 14:55 | edit | `src/Hooks/Powers/BossDevourLifePower.cs` | ok | 0 |
+| 2026-11-13 14:55 | edit | `src/Hooks/Powers/BossVoidCallPower.cs` | ok | 0 |
+| 2026-11-13 14:55 | edit | `src/Hooks/Powers/BossConquerorPower.cs` | ok | 0 |
+| 2026-11-13 14:56 | write | `.tmp/loc-round25.json` | ok | 0 |
+| 2026-11-13 14:58 | edit | `src/Hooks/Core/BossDefs.cs` | ok | 0 |
+| 2026-11-13 14:58 | edit | `.tmp/apply-loc.ps1` | ok | 0 |
+| 2026-11-13 14:58 | write | `.tmp/loc-round26.json` | ok | 0 |
+| 2026-11-13 14:58 | write | `.tmp/apply-loc.ps1` | ok | 0 |
+| 2026-11-13 14:58 | edit | `.tmp/apply-loc.ps1` | ok | 0 |
+| 2026-11-13 14:59 | edit | `src/Hooks/Powers/KnowThyPlacePower.cs` | ok | 0 |
+| 2026-11-13 14:59 | edit | `src/Hooks/Patches/CometDebrisPatch.cs` | ok | 0 |
+| 2026-11-13 14:59 | edit | `src/Hooks/Core/BossDefs.cs` | ok | 0 |
+| 2026-11-13 14:59 | write | `.tmp/loc-round27.json` | ok | 0 |
+| 2026-11-13 15:03 | edit | `src/Hooks/Powers/DeviationPower.cs` | ok | 0 |
+| 2026-11-13 15:05 | edit | `src/Hooks/Powers/PoisonStrikePower.cs` | ok | 0 |
+| 2026-11-13 15:05 | edit | `src/Hooks/Powers/PoisonStrikePower.cs` | ok | 0 |
+| 2026-11-13 15:05 | edit | `src/Hooks/Powers/BossPrimalForcePower.cs` | ok | 0 |
+| 2026-11-13 15:05 | write | `.tmp/loc-fix-boulder.json` | ok | 0 |
+| 2026-11-13 15:06 | edit | `src/Hooks/Core/BossDefinition.cs` | ok | 0 |
+| 2026-11-13 15:06 | edit | `src/Hooks/Core/BossDefinition.cs` | ok | 0 |
+| 2026-11-13 15:06 | edit | `src/Hooks/Monsters/CharBossMonster.cs` | ok | 0 |
+| 2026-11-13 15:06 | edit | `src/Hooks/Core/BossDefs.cs` | ok | 0 |
+| 2026-11-13 15:14 | edit | `src/Hooks/Patches/CometDebrisPatch.cs` | ok | 0 |
+| 2026-11-13 15:14 | edit | `src/Hooks/Core/RegentStarScript.cs` | ok | 0 |
+| 2026-11-13 15:14 | edit | `src/Hooks/Powers/NotYetPower.cs` | ok | 0 |
+| 2026-11-13 15:14 | edit | `src/Hooks/Core/RegentBombardScript.cs` | ok | 0 |
+| 2026-11-13 15:15 | edit | `src/Hooks/Core/BossScript.cs` | ok | 0 |
+| 2026-11-13 15:16 | edit | `src/Hooks/Patches/SoulBoundDrawPatch.cs` | ok | 0 |
+| 2026-11-13 15:16 | edit | `src/Hooks/Powers/ResonancePower.cs` | ok | 0 |
+| 2026-11-13 15:16 | edit | `src/Hooks/Powers/BossBashPower.cs` | ok | 0 |
+| 2026-11-13 15:16 | edit | `src/Hooks/Core/BossScript.cs` | ok | 0 |
+| 2026-11-13 18:10 | write | `src/Hooks/Core/TemptationIntent.cs` | ok | 0 |
+| 2026-11-13 18:10 | edit | `src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-13 18:10 | edit | `src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-13 18:10 | edit | `src/Hooks/UI/BossHandCard.cs` | ok | 0 |
+| 2026-11-13 18:12 | write | `docs/plans/intent-types.md` | ok | 0 |
+| 2026-11-13 19:45 | write | `src/Hooks/Powers/DominionPowers.cs` | ok | 0 |
+| 2026-11-13 19:46 | edit | `src/Hooks/Core/CharDominions.cs` | ok | 0 |
+| 2026-11-13 19:47 | edit | `src/Hooks/Powers/DominionPowers.cs` | ok | 0 |
+| 2026-11-13 20:01 | edit | `src/Hooks/Patches/BossSpecialPowerIconPatch.cs` | ok | 0 |
+| 2026-11-13 20:01 | edit | `src/Hooks/Patches/BossSpecialPowerIconPatch.cs` | ok | 0 |
+| 2026-11-13 20:01 | edit | `src/Hooks/Patches/BossSpecialPowerIconPatch.cs` | error | 0 |
+| 2026-11-13 20:01 | edit | `src/Hooks/Patches/BossSpecialPowerIconPatch.cs` | ok | 0 |
+| 2026-11-13 20:02 | edit | `src/Hooks/Patches/BossSpecialPowerIconPatch.cs` | ok | 0 |
+| 2026-11-13 20:03 | edit | `src/Hooks/Patches/BossSpecialPowerIconPatch.cs` | ok | 0 |
+| 2026-11-13 20:12 | write | `src/Hooks/Patches/DreadSpecialDescriptionPatch.cs` | ok | 0 |
+| 2026-11-13 20:32 | write | `docs/plans/pronouns.md` | ok | 0 |
+| 2026-11-13 20:45 | edit | `src/Hooks/Powers/DominionPowers.cs` | error | 0 |
+| 2026-11-13 20:45 | edit | `src/Hooks/Powers/DominionPowers.cs` | ok | 0 |
+| 2026-11-13 21:12 | edit | `src/Hooks/Powers/DominionPowers.cs` | ok | 0 |
+| 2026-11-13 21:16 | edit | `src/Hooks/Core/BossLineups.cs` | ok | 0 |
+| 2026-11-13 21:16 | edit | `src/Hooks/Powers/DominionPowers.cs` | ok | 0 |
+| 2026-11-13 21:17 | edit | `src/Hooks/Powers/DominionPowers.cs` | ok | 0 |
+| 2026-11-13 21:17 | edit | `src/Hooks/Powers/DominionPowers.cs` | ok | 0 |
+| 2026-11-13 22:55 | write | `src/Hooks/Patches/BossDiscardSelectionPatch.cs` | ok | 0 |
+| 2026-11-13 22:58 | edit | `src/Hooks/Core/GrandFinaleSilentScript.cs` | ok | 0 |
+| 2026-11-13 22:58 | edit | `src/Hooks/Core/GrandFinaleSilentScript.cs` | ok | 0 |
+| 2026-11-13 23:05 | edit | `src/Hooks/Patches/BossDiscardSelectionPatch.cs` | ok | 0 |
+| 2026-11-13 23:07 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-13 23:07 | edit | `src/CharacterBosses.json` | ok | 0 |
+| 2026-11-13 23:11 | edit | `docs/plans/dread-mode.md` | error | 0 |
+| 2026-11-13 23:12 | edit | `docs/plans/dread-mode.md` | ok | 0 |
+| 2026-11-13 23:14 | edit | `src/Hooks/Core/GrandFinaleSilentScript.cs` | ok | 0 |
+| 2026-11-13 23:14 | edit | `src/Hooks/Core/GrandFinaleSilentScript.cs` | ok | 0 |
+| 2026-11-13 23:15 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-13 23:15 | edit | `src/CharacterBosses.json` | ok | 0 |
+| 2026-11-13 23:15 | edit | `docs/plans/dread-mode.md` | ok | 0 |
+| 2026-11-13 23:15 | edit | `docs/plans/dread-mode.md` | ok | 0 |
+| 2026-11-14 10:11 | write | `src/Hooks/Core/SelectionCompat.cs` | ok | 0 |
+| 2026-11-14 10:11 | write | `src/Hooks/Patches/BossSelectorStackPatch.cs` | ok | 0 |
+| 2026-11-14 10:12 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-14 10:12 | edit | `src/CharacterBosses.json` | ok | 0 |
+| 2026-11-14 10:17 | write | `.tmp/loc-choice-prompt.json` | ok | 0 |
+| 2026-11-14 10:17 | write | `.tmp/loc-choice-prompt.json` | ok | 0 |
+| 2026-11-14 10:17 | write | `.tmp/apply-loc-perlang.ps1` | ok | 0 |
+| 2026-11-14 10:17 | edit | `src/Hooks/Patches/ChoiceRegentPickPatch.cs` | ok | 0 |
+| 2026-11-14 10:17 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-14 10:17 | edit | `src/CharacterBosses.json` | ok | 0 |
+| 2026-11-14 10:29 | edit | `src/Hooks/Patches/ChoiceRegentPickPatch.cs` | ok | 0 |
+| 2026-11-14 10:29 | edit | `src/Hooks/Patches/ChoiceRegentPickPatch.cs` | ok | 0 |
+| 2026-11-14 10:29 | edit | `src/Hooks/Patches/ChoiceRegentPickPatch.cs` | ok | 0 |
+| 2026-11-14 10:29 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-14 10:29 | edit | `src/CharacterBosses.json` | ok | 0 |
+| 2026-11-14 10:32 | edit | `src/Hooks/Monsters/CharBossMonster.Choice.cs` | ok | 0 |
+| 2026-11-14 10:33 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-14 10:33 | edit | `src/CharacterBosses.json` | ok | 0 |
+| 2026-11-14 10:41 | write | `src/Hooks/Patches/BossAttackVfxFacingPatch.cs` | ok | 0 |
+| 2026-11-14 10:42 | edit | `src/Hooks/Monsters/CharBossMonster.cs` | ok | 0 |
+| 2026-11-14 10:42 | edit | `src/Hooks/Monsters/CharBossMonster.cs` | ok | 0 |
+| 2026-11-14 10:42 | edit | `src/Hooks/Monsters/CharBossMonster.cs` | ok | 0 |
+| 2026-11-14 10:46 | edit | `src/Hooks/Monsters/CharBossMonster.cs` | ok | 0 |
+| 2026-11-14 10:46 | edit | `src/Hooks/Patches/BossAttackVfxFacingPatch.cs` | ok | 0 |
+| 2026-11-14 10:46 | edit | `src/Hooks/Patches/BossAttackVfxFacingPatch.cs` | ok | 0 |
+| 2026-11-14 10:46 | edit | `src/Hooks/Patches/BossAttackVfxFacingPatch.cs` | ok | 0 |
+| 2026-11-14 10:47 | edit | `src/Hooks/Patches/BossAttackVfxFacingPatch.cs` | ok | 0 |
+| 2026-11-14 10:55 | write | `src/Hooks/Patches/BossAttackVfxFacingPatch.cs` | ok | 0 |
+| 2026-11-14 10:55 | edit | `src/Hooks/Monsters/CharBossMonster.cs` | ok | 0 |
+| 2026-11-14 10:56 | edit | `src/Hooks/Patches/BossAttackVfxFacingPatch.cs` | ok | 0 |
+| 2026-11-14 10:56 | edit | `src/Hooks/Patches/BossAttackVfxFacingPatch.cs` | ok | 0 |
+| 2026-11-14 11:34 | edit | `src/Hooks/Patches/BossAttackVfxFacingPatch.cs` | ok | 0 |
+| 2026-11-14 12:23 | edit | `src/Hooks/Patches/BossAttackVfxFacingPatch.cs` | ok | 0 |
+| 2026-11-14 12:23 | edit | `src/Hooks/Patches/BossAttackVfxFacingPatch.cs` | ok | 0 |
+| 2026-11-14 12:27 | edit | `src/Hooks/Patches/BossAttackVfxFacingPatch.cs` | ok | 0 |
+| 2026-11-14 12:27 | edit | `src/Hooks/Patches/BossAttackVfxFacingPatch.cs` | ok | 0 |
+| 2026-11-14 12:27 | edit | `src/Hooks/Patches/BossAttackVfxFacingPatch.cs` | ok | 0 |
+| 2026-11-14 12:27 | edit | `src/Hooks/Patches/BossAttackVfxFacingPatch.cs` | ok | 0 |
+| 2026-11-14 12:27 | edit | `src/Hooks/Patches/BossAttackVfxFacingPatch.cs` | ok | 0 |
+| 2026-11-14 12:33 | write | `src/Hooks/Patches/BossAttackVfxFacingPatch.cs` | ok | 0 |
+| 2026-11-14 12:35 | edit | `src/Hooks/Patches/BossAttackVfxFacingPatch.cs` | ok | 0 |
+| 2026-11-14 12:35 | edit | `src/Hooks/Patches/BossAttackVfxFacingPatch.cs` | ok | 0 |
+| 2026-11-14 12:52 | write | `workshop/changenote.txt` | error | 0 |
+| 2026-11-14 12:52 | write | `workshop/changenote.txt` | ok | 0 |

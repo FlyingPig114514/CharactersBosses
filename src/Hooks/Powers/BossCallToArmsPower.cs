@@ -41,6 +41,14 @@ public sealed class BossCallToArmsPower : PowerModel
     /// <summary>仆从数量上限（不足这个数就改为召唤）。</summary>
     internal const int MinionCap = 2;
 
+    /// <summary>
+    /// ★ 2026-11-13（恐惧模式「征召上前」，用户当轮口径）：正常是「仆从数不足 **2** 就改为召唤」，
+    /// 恐惧版是「不足 **1**」（= 场上**一只仆从都没有**时才改成召唤）。
+    /// 补丁 `MinionSummonPatch` 与规划器 `BossScriptPlanner` 都读同一个 <see cref="MinionCapNow"/>，
+    /// 所以「预告会召唤的回合」与「真的召唤」永远一致。
+    /// </summary>
+    internal static int MinionCapNow => Core.DreadMode.IsActive ? 1 : MinionCap;
+
     private int _logs;
 
     /// <summary>她出牌前记录的力量值（用来判断「这张牌有没有给她加力量」）。</summary>

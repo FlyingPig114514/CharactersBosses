@@ -83,3 +83,9 @@ mod_log*.txt
 
 # 杀戮尖塔 1「崩坠」mod 素材提取产物（只本地浏览，不进仓库）
 /.assets-sts1-downfall/
+
+# 本地 adb / 安卓工具（24MB+，不进仓库）
+/.tools/
+
+# loader 的安卓试编产物
+/loader/bin-phone/

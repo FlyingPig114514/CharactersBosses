@@ -18,7 +18,7 @@
     "DEFECT_BOSS_ENCOUNTER.title":  "故障機器人",
     "DEFECT_BOSS_ENCOUNTER.loss":  "{character} 被[gold]故障機器人[/gold]分析并刪除了。",
     "DEFECT_AI_BOSS_ENCOUNTER.title":  "故障機器人",
-    "DEFECT_AI_BOSS_ENCOUNTER.loss":  "{character} 的每一張牌都被[gold]故障機器人[/gold]算進了模型。",
+    "DEFECT_AI_BOSS_ENCOUNTER.loss":  "{character} 的每1張牌都被[gold]故障機器人[/gold]算進了模型。",
     "DEFECT_CLAW_BOSS_ENCOUNTER.title":  "故障機器人",
     "DEFECT_CLAW_BOSS_ENCOUNTER.loss":  "{character}被[gold]故障機器人[/gold]的超能光束湮滅了。",
     "NECROBINDER_BOSS_ENCOUNTER.title":  "亡靈契約師",

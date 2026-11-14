@@ -81,12 +81,20 @@ public static class EventMachineScript
             // 4：全是 0 费；万物一心返手 2 张 ⇒ 所有单位 +2 力量
             new()
             {
-                Note = "4. 疯狂进食(0)、热修复+(0)、万物一心(0，返手超能光束+冰之长枪 ⇒ 所有单位 +2 力量)、冰之长枪(0)、超能光束(0)",
+                Note = Core.DreadMode.IsActive
+                    ? "4. 疯狂进食(0)、热修复+(0)、万物一心(0，返手超能光束+冰之长枪 ⇒ 所有单位 +2 力量)、疯狂进食+(0)、冰之长枪(0)、超能光束(0)"
+                    : "4. 疯狂进食(0)、热修复+(0)、万物一心(0，返手超能光束+冰之长枪 ⇒ 所有单位 +2 力量)、冰之长枪(0)、超能光束(0)",
                 Energy = 3,
-                Cards = Cards(
-                    Free<FeedingFrenzy>(0), Free<Hotfix>(0, upgraded: true),
-                    Returns<AllForOne>(0, typeof(IceLance), typeof(Hyperbeam)),
-                    Free<IceLance>(0), Free<Hyperbeam>(0)),
+                Cards = Core.DreadMode.IsActive
+                    ? Cards(
+                        Free<FeedingFrenzy>(0), Free<Hotfix>(0, upgraded: true),
+                        Returns<AllForOne>(0, typeof(IceLance), typeof(Hyperbeam)),
+                        Free<FeedingFrenzy>(0, upgraded: true),   // 2026-11-13 (dread): 万物一心后再补一张疯狂进食+
+                        Free<IceLance>(0), Free<Hyperbeam>(0))
+                    : Cards(
+                        Free<FeedingFrenzy>(0), Free<Hotfix>(0, upgraded: true),
+                        Returns<AllForOne>(0, typeof(IceLance), typeof(Hyperbeam)),
+                        Free<IceLance>(0), Free<Hyperbeam>(0)),
             },
 
             // 5：防御（附魔漩涡）1 + 打击 1 = 2（贪婪是诅咒）
@@ -129,12 +137,20 @@ public static class EventMachineScript
             // 9：只有防御要 1 费；万物一心返 2 张 ⇒ 所有单位 +2 力量
             new()
             {
-                Note = "9. 疯狂进食(0)、万物一心(0，返手超能光束+冰之长枪 ⇒ 所有单位 +2 力量)、冰之长枪(0)、超能光束(0)、防御(1，附魔「漩涡」打出两次)",
+                Note = Core.DreadMode.IsActive
+                    ? "9. 疯狂进食(0)、万物一心(0，返手超能光束+冰之长枪 ⇒ 所有单位 +2 力量)、疯狂进食+(0)、冰之长枪(0)、超能光束(0)、防御(1，附魔「漩涡」打出两次)"
+                    : "9. 疯狂进食(0)、万物一心(0，返手超能光束+冰之长枪 ⇒ 所有单位 +2 力量)、冰之长枪(0)、超能光束(0)、防御(1，附魔「漩涡」打出两次)",
                 Energy = 3,
-                Cards = Cards(
-                    Free<FeedingFrenzy>(0),
-                    Returns<AllForOne>(0, typeof(IceLance), typeof(Hyperbeam)),
-                    Free<IceLance>(0), Free<Hyperbeam>(0), Spiral<DefendDefect>(1)),
+                Cards = Core.DreadMode.IsActive
+                    ? Cards(
+                        Free<FeedingFrenzy>(0),
+                        Returns<AllForOne>(0, typeof(IceLance), typeof(Hyperbeam)),
+                        Free<FeedingFrenzy>(0, upgraded: true),   // 2026-11-13 (dread)
+                        Free<IceLance>(0), Free<Hyperbeam>(0), Spiral<DefendDefect>(1))
+                    : Cards(
+                        Free<FeedingFrenzy>(0),
+                        Returns<AllForOne>(0, typeof(IceLance), typeof(Hyperbeam)),
+                        Free<IceLance>(0), Free<Hyperbeam>(0), Spiral<DefendDefect>(1)),
             },
         };
 

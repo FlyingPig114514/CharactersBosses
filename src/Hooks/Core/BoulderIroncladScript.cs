@@ -30,10 +30,11 @@ public static class BoulderIroncladScript
         {
             new()
             {
-                Note = "1. 执迷、祭品+（王室认证）、腐化+（此后技能牌 0 费且消耗）、武装+、原始力量+（变化成打击×2/痛击）、巨石+×3（打 1 张，另两张没费不出；祭品+ 的 +2 能量已计入）",
+                // 2026-11-13（恐惧模式）第 1 回合：执迷 -1 费 ⇒ 多 1 点能量，能多打 1 张巨石+
+                Note = Core.DreadMode.IsActive ? "1. 执迷（恐惧模式 -1 费）、祭品+（王室认证）、腐化+、武装+、原始力量+（变化成打击×2/痛击）、巨石+×3（执迷省出的 1 点 ⇒ 打 2 张，剩 1 张没费）" : "1. 执迷、祭品+（王室认证）、腐化+（此后技能牌 0 费且消耗）、武装+、原始力量+（变化成打击×2/痛击）、巨石+×3（打 1 张，另两张没费不出；祭品+ 的 +2 能量已计入）",
                 // ⚠ 这一回合的能量写死 4：加祭品 +2 = 6 点可支配；
                 //   账：执迷 2 + 腐化 2（升级后）+ 武装 1 + 原始力量 0 + 祭品 0 = 5 ⇒ 只剩 1 点，正好打 1 张巨石（1 费）。
-                Energy = 4,
+                Energy = Core.DreadMode.IsActive ? 5 : 4,   // 2026-11-13 dread: 执迷 -1 费省出 1 点 ⇒ 多打 1 张巨石+
                 Cards = Cards(
                     C<Enthralled>(), C<Offering>(true), C<Corruption>(true), C<Armaments>(true),
                     C<PrimalForce>(true), C<GiantRock>(true), C<GiantRock>(true), C<GiantRock>(true)),
@@ -81,8 +82,10 @@ public static class BoulderIroncladScript
             },
             new()
             {
-                Note = "7. 执迷、巨石+、巨石+（第二张没费）",
-                Energy = Energy,
+                Note = Core.DreadMode.IsActive
+                    ? "7. 执迷（恐惧模式 -1 费）、巨石+、巨石+（两张都打得出去）"
+                    : "7. 执迷、巨石+、巨石+（第二张没费）",
+                Energy = Core.DreadMode.IsActive ? Energy + 1 : Energy,   // 2026-11-13 dread
                 Cards = Cards(C<Enthralled>(), C<GiantRock>(true), C<GiantRock>(true)),
             },
             new()

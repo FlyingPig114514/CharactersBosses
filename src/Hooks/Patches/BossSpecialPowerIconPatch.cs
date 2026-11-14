@@ -1,3 +1,4 @@
+using System;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Powers;
@@ -28,6 +29,16 @@ public static class BossSpecialPowerIconPatch
     [HarmonyPrefix]
     public static bool Prefix(PowerModel __instance, ref string __result)
     {
+        // ★ 2026-11-13（用户）：「这 3 个 buff 的图标改成对应角色的头像。这三个 buff 不属于 boss 的
+        //   特殊效果（和那些不是一类东西），所以不用好奇图标。其它特殊效果还是用好奇图标」
+        //   ⇒ 恐惧模式的三个「支配」power 用**角色头像**（`CharacterModel.IconTexturePath`）。
+        var dominionIcon = DominionIconOf(__instance);
+        if (!string.IsNullOrEmpty(dominionIcon))
+        {
+            __result = dominionIcon!;
+            return false;
+        }
+
         // 「麻痹」（二层「王储」施加给玩家的减益）：mod 自带的黄色闪电
         // （`tools/art/import_proj/.../images/powers/paralysis.png`，随 PCK 打包，见 pck_extras.txt）。
         if (__instance is Powers.ParalysisPower)
@@ -62,6 +73,91 @@ public static class BossSpecialPowerIconPatch
             // 拿不到就交给原版
         }
         return true;
+    }
+
+    /// <summary>
+    /// 恐惧模式的「支配」power 图标 = **对应角色的头像**（`CharacterModel.IconTexturePath`）。
+    ///
+    /// 用户 2026-11-13：「这 3 个 buff 的图标改成对应角色的头像。这三个 buff 不属于 boss 的特殊效果
+    /// （和那些不是一类东西），所以不用好奇图标。其它特殊效果还是用好奇图标」
+    ///
+    /// 目前用到它的三个（都在 `Powers/DominionPowers.cs`）：
+    ///   · `DefectDominionPower`（故障机器人的支配）→ 故障机器人头像；
+    ///   · `NecrobinderDominionPower`（亡灵契约师的支配）→ 亡灵契约师头像；
+    ///   · `FoolDominionPower`（愚者的支配）→ 愚者头像（`Models.Characters.Fool`，仅 0.113 有）。
+    ///
+    /// 取不到（角色没注册 / 路径为空）时返回 null ⇒ 继续走下面的逻辑（最终落到好奇灯泡），
+    /// 绝不会出现「图标空白」。
+    /// </summary>
+    private static string? DominionIconOf(PowerModel? power)
+    {
+        try
+        {
+            if (power == null) return null;
+            if (power is Powers.DefectDominionPower)
+                return ExistingOrNull(CharacterIconPath(typeof(MegaCrit.Sts2.Core.Models.Characters.Defect)));
+            if (power is Powers.NecrobinderDominionPower)
+                return ExistingOrNull(CharacterIconPath(typeof(MegaCrit.Sts2.Core.Models.Characters.Necrobinder)));
+#if STS2_111
+            if (power is Powers.FoolDominionPower)
+                return ExistingOrNull(CharacterIconPath(typeof(MegaCrit.Sts2.Core.Models.Characters.Fool)));
+#endif
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 支配图标：取角色头像失败（退回好奇）: " + e.Message);
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// 某个原版角色的**头像贴图路径**（取不到返回 null）。
+    ///
+    /// ⚠ `CharacterModel.IconTexturePath` 是 **private**，所以这里按原版同一套拼法自己拼：
+    /// <code>
+    /// // 反编译 CharacterModel：
+    /// private string IconTexturePath =&gt; ImageHelper.GetImagePath(
+    ///     "ui/top_panel/character_icon_" + base.Id.Entry.ToLowerInvariant() + ".png");
+    /// public  Texture2D IconTexture  =&gt; PreloadManager.Cache.GetTexture2D(IconTexturePath);
+    /// </code>
+    /// 也就是**顶栏那颗角色头像**用的那张图（`ui/top_panel/character_icon_defect.png` 之类），
+    /// 与原版自己显示的完全是同一个文件。
+    /// </summary>
+    private static string? CharacterIconPath(Type characterType)
+    {
+        try
+        {
+            var id = ModelDb.GetId(characterType);
+            string entry = id?.Entry ?? string.Empty;
+            if (string.IsNullOrEmpty(entry)) return null;
+
+            return MegaCrit.Sts2.Core.Helpers.ImageHelper.GetImagePath(
+                "ui/top_panel/character_icon_" + entry.ToLowerInvariant() + ".png");
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 支配图标：拼角色头像路径失败: " + e.Message);
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// 这个 res:// 资源**真的存在**吗（防止「角色没注册 / 该角色没有顶栏头像图」时画出空白图标）。
+    /// 查不到资源就返回 null ⇒ 退回好奇灯泡。
+    /// </summary>
+    private static string? ExistingOrNull(string? path)
+    {
+        if (string.IsNullOrEmpty(path)) return null;
+        try
+        {
+            if (Godot.ResourceLoader.Exists(path)) return path;
+            Logger.Log($"[CharBoss] 支配图标：{path} 不存在 ⇒ 退回好奇灯泡");
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 支配图标：检查资源存在性失败（退回好奇）: " + e.Message);
+        }
+        return null;
     }
 
     /// <summary>

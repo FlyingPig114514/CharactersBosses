@@ -86,16 +86,21 @@ public sealed class BossSnakeFormPower : PowerModel
             var combat = Owner?.CombatState;
             if (canonical == null || combat == null) return;
 
-            var card = combat.CreateCard(canonical, player);
-            if (card == null) return;
+            // 2026-11-13（恐惧模式「群蛇形态」）：玩家洗牌 ⇒ 塞 **3 张**蛇咬（正常 1 张）
+            int copies = Core.DreadMode.IsActive ? 3 : 1;
+            for (int i = 0; i < copies; i++)
+            {
+                var card = combat.CreateCard(canonical, player);
+                if (card == null) break;
 
-            var added = await MegaCrit.Sts2.Core.Commands.CardPileCmd.AddGeneratedCardToCombat(
-                card, PileType.Draw, player);
-            try { MegaCrit.Sts2.Core.Commands.CardCmd.PreviewCardPileAdd(added); }
-            catch { /* 忽略：动画失败不影响塞牌 */ }
+                var added = await MegaCrit.Sts2.Core.Commands.CardPileCmd.AddGeneratedCardToCombat(
+                    card, PileType.Draw, player);
+                try { MegaCrit.Sts2.Core.Commands.CardCmd.PreviewCardPileAdd(added); }
+                catch { /* 忽略：动画失败不影响塞牌 */ }
+            }
 
             if (_logs++ < 40)
-                Logger.Log($"[CharBoss] 群蛇形态：被锁定的玩家洗牌 ⇒ 往他的抽牌堆塞 1 张蛇咬（{player.NetId}）");
+                Logger.Log($"[CharBoss] 群蛇形态：被锁定的玩家洗牌 ⇒ 往他的抽牌堆塞 {copies} 张蛇咬（{player.NetId}）");
         }
         catch (Exception e) { Logger.Log("[CharBoss] 群蛇形态：给玩家塞蛇咬失败: " + e.Message); }
     }

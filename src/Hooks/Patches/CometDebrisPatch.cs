@@ -70,6 +70,11 @@ public static class CometDebrisRedirect
                         // 「creator == 我」才给格挡 —— 这是**储君生成、塞给玩家**的牌，
                         // 和原版怪物塞状态牌一样不该触发玩家的创世之柱（用户 2026-10-24）。
                         // 牌归谁看 `copy.Owner`（= victim），与 creator 无关。
+                        //
+                        // ★ 2026-11-13（用户订正）：**碎屑就塞进抽牌堆（Random）**。
+                        //   v0.2.620 我擅自把恐惧版改成「抽牌堆顶部」，用户原文只是「加入你的抽牌堆」
+                        //   ⇒ 已回退。恐惧模式的强化在于「碎屑本身对玩家没有正面效果」，
+                        //   不需要再动放置位置。
                         await MegaCrit.Sts2.Core.Commands.CardPileCmd.AddGeneratedCardToCombat(
                             copy, PileType.Draw, null, CardPilePosition.Random);
 

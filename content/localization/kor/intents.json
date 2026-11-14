@@ -1,4 +1,8 @@
 {
   "SACRIFICE.title": "희생",
-  "SACRIFICE.description": "이 적은 대가를 치르고 강력한 효과를 얻습니다."
+  "SACRIFICE.description": "이 적은 대가를 치르고 강력한 효과를 얻습니다.",
+    "TEMPTATION.title":  "유혹",
+    "TEMPTATION.description":  "This enemy will give you a positive effect in exchange for a powerful effect.",
+    "JUDGEMENT.title":  "심판",
+    "JUDGEMENT.description":  "This enemy will kill you immediately."
 }

@@ -84,11 +84,22 @@ public sealed class NotYetPower : PowerModel
         }
     }
 
-    /// <summary>② 玩家回合将要结束：会因灾厄死亡时，用格挡续命。</summary>
+    /// <summary>
+    /// ② 玩家回合将要结束：会因灾厄死亡时，用格挡续命。
+    ///
+    /// ★ 2026-11-13（恐惧模式「时候未到」，用户当轮口径）：
+    ///   > 灾厄骨是**去掉**「当你的回合将要结束时，若你将要因灾厄死亡，立刻用格挡和召唤物血量抵消灾厄，
+    ///   > 直到灾厄不再会使你死亡。」，让玩家的容错更强。
+    ///   ⇒ 恐惧模式下**整条②关掉**：只剩①（回合开始用格挡抵消灾厄），玩家必须自己算准灾厄。
+    ///   ①照常生效。
+    /// </summary>
     public override async Task BeforeSideTurnEnd(PlayerChoiceContext choiceContext, CombatSide side,
                                                  IEnumerable<Creature> participants)
     {
         if (side != CombatSide.Player) return;
+
+        // 恐惧模式：这一整条「续命」不再存在（用户要的就是容错更低）
+        if (Core.DreadMode.IsActive) return;
 
         foreach (var player in participants)
         {

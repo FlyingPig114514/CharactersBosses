@@ -1,3 +1,10 @@
+// ⚠ 0.113.0 起这个模型从 `Models.Singleton.MultiplayerScalingModel` 挪到了
+//   `Models.MultiplayerScalingModel`（编译实测 CS0234）⇒ 两个版本各指一次。
+#if STS2_107
+using BossScalingModel = MegaCrit.Sts2.Core.Models.Singleton.MultiplayerScalingModel;
+#else
+using BossScalingModel = MegaCrit.Sts2.Core.Models.MultiplayerScalingModel;
+#endif
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Models;
@@ -53,8 +60,8 @@ public static class BossNoMultiplayerHpScalePatch
 ///
 /// 单人局：原版本来就返回 1 ⇒ 这条不改变任何东西；原版怪物不受影响。
 /// </summary>
-[HarmonyPatch(typeof(MegaCrit.Sts2.Core.Models.Singleton.MultiplayerScalingModel),
-              nameof(MegaCrit.Sts2.Core.Models.Singleton.MultiplayerScalingModel.ModifyBlockMultiplicative))]
+
+[HarmonyPatch(typeof(BossScalingModel), nameof(BossScalingModel.ModifyBlockMultiplicative))]
 public static class BossNoMultiplayerBlockScalePatch
 {
     private static int _logged;

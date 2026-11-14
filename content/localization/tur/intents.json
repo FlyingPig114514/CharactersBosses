@@ -1,4 +1,8 @@
 {
   "SACRIFICE.title": "Kurban",
-  "SACRIFICE.description": "Bu düşman, güçlü bir etki kazanmak için bir bedel ödeyecektir."
+  "SACRIFICE.description": "Bu düşman, güçlü bir etki kazanmak için bir bedel ödeyecektir.",
+    "TEMPTATION.title":  "Baştan Çıkarma",
+    "TEMPTATION.description":  "This enemy will give you a positive effect in exchange for a powerful effect.",
+    "JUDGEMENT.title":  "Hüküm",
+    "JUDGEMENT.description":  "This enemy will kill you immediately."
 }
