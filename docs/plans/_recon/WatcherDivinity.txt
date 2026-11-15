@@ -1,0 +1,303 @@
+﻿// ===== WatcherMod.Divinity =====
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using Godot;
+using MegaCrit.Sts2.Core.Combat;
+using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Powers;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.ValueProps;
+
+namespace WatcherMod;
+
+public sealed class Divinity : PowerModel
+{
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <AfterApplied>d__8 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public Divinity <>4__this;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			Divinity divinity = <>4__this;
+			try
+			{
+				TaskAwaiter val;
+				if (num == 0)
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_00ce;
+				}
+				WatcherAttackVfxHelper.PlayDivinityStanceChange(((PowerModel)divinity).Owner);
+				divinity._vfx = StanceVfxHelper.SpawnOnCreature(((PowerModel)divinity).Owner, StanceVfxHelper.CreateDivinityVfx());
+				WatcherAttackVfxHelper.StartDivinityEye(((PowerModel)divinity).Owner);
+				divinity._borderVfx = StanceVfxHelper.SpawnDivinityBorder(((PowerModel)divinity).Owner);
+				WatcherAudioHelper.PlayOneShot("res://audio/watcher/divinity.ogg");
+				if (((PowerModel)divinity).Owner.Player != null)
+				{
+					val = PlayerCmd.GainEnergy(3m, ((PowerModel)divinity).Owner.Player).GetAwaiter();
+					if (!((TaskAwaiter)(ref val)).IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <AfterApplied>d__8>(ref val, ref this);
+						return;
+					}
+					goto IL_00ce;
+				}
+				goto end_IL_000e;
+				IL_00ce:
+				((TaskAwaiter)(ref val)).GetResult();
+				end_IL_000e:;
+			}
+			catch (global::System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <AfterRemoved>d__9 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public Divinity <>4__this;
+
+		public Creature oldOwner;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			Divinity divinity = <>4__this;
+			try
+			{
+				TaskAwaiter val;
+				if (num != 0)
+				{
+					StanceVfxHelper.Remove(ref divinity._vfx);
+					WatcherAttackVfxHelper.StopDivinityEye(oldOwner);
+					StanceVfxHelper.RemoveBorder(ref divinity._borderVfx);
+					val = global::System.Threading.Tasks.Task.CompletedTask.GetAwaiter();
+					if (!((TaskAwaiter)(ref val)).IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <AfterRemoved>d__9>(ref val, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+				}
+				((TaskAwaiter)(ref val)).GetResult();
+			}
+			catch (global::System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <AfterSideTurnEnd>d__11 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public CombatSide side;
+
+		public Divinity <>4__this;
+
+		private TaskAwaiter <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			Divinity divinity = <>4__this;
+			try
+			{
+				TaskAwaiter val;
+				if (num == 0)
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter);
+					num = (<>1__state = -1);
+					goto IL_008c;
+				}
+				if (side == ((PowerModel)divinity).Owner.Side && ((PowerModel)divinity).Owner.Player != null)
+				{
+					val = WatcherCombatHelper.ExitStance(((PowerModel)divinity).Owner.Player).GetAwaiter();
+					if (!((TaskAwaiter)(ref val)).IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <AfterSideTurnEnd>d__11>(ref val, ref this);
+						return;
+					}
+					goto IL_008c;
+				}
+				goto end_IL_000e;
+				IL_008c:
+				((TaskAwaiter)(ref val)).GetResult();
+				end_IL_000e:;
+			}
+			catch (global::System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	private Node2D? _vfx;
+
+	private Node? _borderVfx;
+
+	public override PowerType Type => (PowerType)1;
+
+	public override PowerStackType StackType => (PowerStackType)2;
+
+	protected override bool IsVisibleInternal => false;
+
+	[AsyncStateMachine(typeof(<AfterApplied>d__8))]
+	public override global::System.Threading.Tasks.Task AfterApplied(Creature? applier, CardModel? cardSource)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<AfterApplied>d__8 <AfterApplied>d__9 = default(<AfterApplied>d__8);
+		<AfterApplied>d__9.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<AfterApplied>d__9.<>4__this = this;
+		<AfterApplied>d__9.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <AfterApplied>d__9.<>t__builder)).Start<<AfterApplied>d__8>(ref <AfterApplied>d__9);
+		return ((AsyncTaskMethodBuilder)(ref <AfterApplied>d__9.<>t__builder)).Task;
+	}
+
+	[AsyncStateMachine(typeof(<AfterRemoved>d__9))]
+	public override global::System.Threading.Tasks.Task AfterRemoved(Creature oldOwner)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<AfterRemoved>d__9 <AfterRemoved>d__10 = default(<AfterRemoved>d__9);
+		<AfterRemoved>d__10.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<AfterRemoved>d__10.<>4__this = this;
+		<AfterRemoved>d__10.oldOwner = oldOwner;
+		<AfterRemoved>d__10.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <AfterRemoved>d__10.<>t__builder)).Start<<AfterRemoved>d__9>(ref <AfterRemoved>d__10);
+		return ((AsyncTaskMethodBuilder)(ref <AfterRemoved>d__10.<>t__builder)).Task;
+	}
+
+	public override decimal ModifyDamageMultiplicative(Creature? target, decimal amount, ValueProp props, Creature? dealer, CardModel? cardSource, CardPlay? cardPlay)
+	{
+		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+		bool flag = ((global::System.Enum)props).HasFlag((global::System.Enum)(object)(ValueProp)8) && !((global::System.Enum)props).HasFlag((global::System.Enum)(object)(ValueProp)4);
+		if (dealer == ((PowerModel)this).Owner && flag)
+		{
+			return 3m;
+		}
+		return 1m;
+	}
+
+	[AsyncStateMachine(typeof(<AfterSideTurnEnd>d__11))]
+	public override global::System.Threading.Tasks.Task AfterSideTurnEnd(PlayerChoiceContext choiceContext, CombatSide side, global::System.Collections.Generic.IEnumerable<Creature> participants)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+		<AfterSideTurnEnd>d__11 <AfterSideTurnEnd>d__12 = default(<AfterSideTurnEnd>d__11);
+		<AfterSideTurnEnd>d__12.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<AfterSideTurnEnd>d__12.<>4__this = this;
+		<AfterSideTurnEnd>d__12.side = side;
+		<AfterSideTurnEnd>d__12.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <AfterSideTurnEnd>d__12.<>t__builder)).Start<<AfterSideTurnEnd>d__11>(ref <AfterSideTurnEnd>d__12);
+		return ((AsyncTaskMethodBuilder)(ref <AfterSideTurnEnd>d__12.<>t__builder)).Task;
+	}
+}
+
+// ===== WatcherMod.Divinity.<AfterApplied>d__8 =====
+// ERROR: Could not find type definition WatcherMod.Divinity.<AfterApplied>d__8 in type system.
+// ===== WatcherMod.Divinity.<AfterRemoved>d__9 =====
+// ERROR: Could not find type definition WatcherMod.Divinity.<AfterRemoved>d__9 in type system.
+// ===== WatcherMod.Divinity.<AfterSideTurnEnd>d__11 =====
+// ERROR: Could not find type definition WatcherMod.Divinity.<AfterSideTurnEnd>d__11 in type system.

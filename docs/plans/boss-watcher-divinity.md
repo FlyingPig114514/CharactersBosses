@@ -231,3 +231,42 @@ SpecialPowerDreadByAct   = { null, null, typeof(Powers.BossDevotionPower), null 
   三个能量图标用的就是用户点名的**观者能量图标**（watcher_energy_icon.png，本体 pck 自带，已核对存在）；文本里图标用 [img]res://…[/img] 这种写法（观者模组自己的卡面也是这么写的，见 WATCHER_FOLLOW_UP.description）。
 
 - 16 语言逐个翻译（esp 与 spa 同西语、ptb 葡语）。
+
+## 第 5 轮（2026-11-15）—— 「进了神格就不再退」+ 许愿选项的结论
+
+### ① 「她不再会在回合开始时退出神格」已解决
+
+反编译观者模组 WatcherMod.Divinity（303 行）：退出神格的钩子不在回合开始，而在
+**AfterSideTurnEnd（回合结束）** 的 async 状态机 <AfterSideTurnEnd>d__11 里，逻辑只有两句：
+
+```csharp
+if (side == Owner.Side && Owner.Player != null)
+    await WatcherCombatHelper.ExitStance(Owner.Player);   // ← 到点自动退
+```
+
+新增 src/Hooks/Patches/WatcherDivinityKeepPatch.cs（111 独占）：补**本体**的
+PowerModel.AfterSideTurnEnd（不引用观者的类型，铁律不变），三个条件同时成立才短路：
+__instance.GetType().Name == "Divinity" + owner 是「我们某只 Boss 的影子玩家」+ 她身上挂着 BossDevotionPower。
+⇒ 只有神格观免退，观者原版玩家、其它 Boss、其它模组一律原样。
+（注：用户口径说的是「回合开始时退出」，实现里其实是回合结束 —— 效果等价，都是「她进了神格就一直挂着」。）
+
+### ② 许愿的「永生不死」选项 —— 机制已摸清，实现方式待定
+
+反编译 WatcherMod.WatcherWish_P.OnPlay：
+
+```csharp
+optStrength = CombatState.CreateCard<WatcherWishAlmighty>(Owner);
+optArmor    = CombatState.CreateCard<WatcherWishLiveForever>(Owner);    // ← 永生不死
+optGold     = CombatState.CreateCard<WatcherWishFameAndFortune>(Owner);
+var chosen  = await WatcherCombatHelper.ChooseOne(choiceContext, Owner, options,
+                            new LocString("cards", "WATCHER_WISH_P.selectionScreenPrompt"));
+// 选中哪个就 Apply 对应的 Power（永生不死 = WishPlatedArmorPower）
+```
+
+⇒ 要固定选「永生不死」，最干净的做法是**运行期给 WatcherCombatHelper.ChooseOne 挂 Harmony**
+（我们自己没法编译期 [HarmonyPatch] 别人的类型），prefix 里判「owner 是我们的影子玩家 + 候选项里有 WatcherWishLiveForever」
+就直接给出那一个。仓库里已有运行期挂补丁的先例（Core/MintySpireDamagePreviewCompat）。
+代价：ChooseOne 返回 Task<CardModel?>，prefix 要构造 Task.FromResult，且要确认它没有别的调用方被误伤（观者自己的卡大量用它）。
+**下一轮做这个（先只对「牌是 WATCHER_WISH_P」时生效，收得比 owner 更紧）。**
+
+107 / 111 均 0 错误。

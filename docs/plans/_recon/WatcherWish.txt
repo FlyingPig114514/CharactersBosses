@@ -1,0 +1,280 @@
+﻿// ===== WatcherMod.WatcherWish_P =====
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Localization;
+using MegaCrit.Sts2.Core.Localization.DynamicVars;
+using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Powers;
+
+namespace WatcherMod;
+
+public class WatcherWish_P : WatcherCard
+{
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <OnPlay>d__10 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public WatcherWish_P <>4__this;
+
+		public PlayerChoiceContext choiceContext;
+
+		private CardModel <optStrength>5__2;
+
+		private CardModel <optArmor>5__3;
+
+		private CardModel <optGold>5__4;
+
+		private bool <boosted>5__5;
+
+		private TaskAwaiter<bool> <>u__1;
+
+		private TaskAwaiter<CardModel?> <>u__2;
+
+		private TaskAwaiter<StrengthPower?> <>u__3;
+
+		private TaskAwaiter<WishPlatedArmorPower?> <>u__4;
+
+		private TaskAwaiter <>u__5;
+
+		private void MoveNext()
+		{
+			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0223: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_033c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0341: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0349: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0145: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0150: Expected O, but got Unknown
+			//IL_0150: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0155: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0286: Unknown result type (might be due to invalid IL or missing references)
+			//IL_028b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0203: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0205: Unknown result type (might be due to invalid IL or missing references)
+			//IL_030a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_030f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0324: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0326: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			WatcherWish_P watcherWish_P = <>4__this;
+			try
+			{
+				TaskAwaiter<bool> val5;
+				TaskAwaiter<CardModel> val4;
+				TaskAwaiter<StrengthPower> val3;
+				TaskAwaiter<WishPlatedArmorPower> val2;
+				TaskAwaiter val;
+				bool result;
+				List<CardModel> obj;
+				List<CardModel> options;
+				CardModel result2;
+				switch (num)
+				{
+				default:
+					val5 = watcherWish_P.TryConsumeKnowFateBoost().GetAwaiter();
+					if (!val5.IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val5;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter<bool>, <OnPlay>d__10>(ref val5, ref this);
+						return;
+					}
+					goto IL_007f;
+				case 0:
+					val5 = <>u__1;
+					<>u__1 = default(TaskAwaiter<bool>);
+					num = (<>1__state = -1);
+					goto IL_007f;
+				case 1:
+					val4 = <>u__2;
+					<>u__2 = default(TaskAwaiter<CardModel>);
+					num = (<>1__state = -1);
+					goto IL_01a1;
+				case 2:
+					val3 = <>u__3;
+					<>u__3 = default(TaskAwaiter<StrengthPower>);
+					num = (<>1__state = -1);
+					goto IL_023a;
+				case 3:
+					val2 = <>u__4;
+					<>u__4 = default(TaskAwaiter<WishPlatedArmorPower>);
+					num = (<>1__state = -1);
+					goto IL_02d7;
+				case 4:
+					{
+						val = <>u__5;
+						<>u__5 = default(TaskAwaiter);
+						num = (<>1__state = -1);
+						break;
+					}
+					IL_023a:
+					val3.GetResult();
+					goto end_IL_000e;
+					IL_007f:
+					result = val5.GetResult();
+					<optStrength>5__2 = (CardModel)(object)watcherWish_P.CombatState.CreateCard<WatcherWishAlmighty>(((CardModel)watcherWish_P).Owner);
+					<optArmor>5__3 = (CardModel)(object)watcherWish_P.CombatState.CreateCard<WatcherWishLiveForever>(((CardModel)watcherWish_P).Owner);
+					<optGold>5__4 = (CardModel)(object)watcherWish_P.CombatState.CreateCard<WatcherWishFameAndFortune>(((CardModel)watcherWish_P).Owner);
+					<boosted>5__5 = ((CardModel)watcherWish_P).IsUpgraded || result;
+					if (<boosted>5__5)
+					{
+						<optStrength>5__2.UpgradeInternal();
+						<optArmor>5__3.UpgradeInternal();
+						<optGold>5__4.UpgradeInternal();
+					}
+					obj = new List<CardModel>(3);
+					obj.Add(<optStrength>5__2);
+					obj.Add(<optArmor>5__3);
+					obj.Add(<optGold>5__4);
+					options = obj;
+					val4 = WatcherCombatHelper.ChooseOne(choiceContext, ((CardModel)watcherWish_P).Owner, (global::System.Collections.Generic.IReadOnlyList<CardModel>)options, new LocString("cards", "WATCHER_WISH_P.selectionScreenPrompt")).GetAwaiter();
+					if (!val4.IsCompleted)
+					{
+						num = (<>1__state = 1);
+						<>u__2 = val4;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter<CardModel>, <OnPlay>d__10>(ref val4, ref this);
+						return;
+					}
+					goto IL_01a1;
+					IL_02d7:
+					val2.GetResult();
+					goto end_IL_000e;
+					IL_01a1:
+					result2 = val4.GetResult();
+					if (result2 == <optStrength>5__2)
+					{
+						int num2 = (<boosted>5__5 ? 4 : 3);
+						val3 = WatcherPowerCmdCompat.Apply<StrengthPower>(((CardModel)watcherWish_P).Owner.Creature, decimal.op_Implicit(num2), ((CardModel)watcherWish_P).Owner.Creature, (CardModel?)(object)watcherWish_P, false).GetAwaiter();
+						if (!val3.IsCompleted)
+						{
+							num = (<>1__state = 2);
+							<>u__3 = val3;
+							((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter<StrengthPower>, <OnPlay>d__10>(ref val3, ref this);
+							return;
+						}
+						goto IL_023a;
+					}
+					if (result2 == <optArmor>5__3)
+					{
+						int num3 = (<boosted>5__5 ? 8 : 6);
+						val2 = WatcherPowerCmdCompat.Apply<WishPlatedArmorPower>(((CardModel)watcherWish_P).Owner.Creature, decimal.op_Implicit(num3), ((CardModel)watcherWish_P).Owner.Creature, (CardModel?)(object)watcherWish_P).GetAwaiter();
+						if (!val2.IsCompleted)
+						{
+							num = (<>1__state = 3);
+							<>u__4 = val2;
+							((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter<WishPlatedArmorPower>, <OnPlay>d__10>(ref val2, ref this);
+							return;
+						}
+						goto IL_02d7;
+					}
+					if (result2 == <optGold>5__4)
+					{
+						val = PlayerCmd.GainGold(decimal.op_Implicit(<boosted>5__5 ? 30 : 25), ((CardModel)watcherWish_P).Owner, false).GetAwaiter();
+						if (!((TaskAwaiter)(ref val)).IsCompleted)
+						{
+							num = (<>1__state = 4);
+							<>u__5 = val;
+							((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <OnPlay>d__10>(ref val, ref this);
+							return;
+						}
+						break;
+					}
+					goto end_IL_000e;
+				}
+				((TaskAwaiter)(ref val)).GetResult();
+				end_IL_000e:;
+			}
+			catch (global::System.Exception exception)
+			{
+				<>1__state = -2;
+				<optStrength>5__2 = null;
+				<optArmor>5__3 = null;
+				<optGold>5__4 = null;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<optStrength>5__2 = null;
+			<optArmor>5__3 = null;
+			<optGold>5__4 = null;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	public override string PortraitPath => "res://images/packed/card_portraits/watcher/wish.png";
+
+	public override bool CanBeGeneratedInCombat => false;
+
+	public override global::System.Collections.Generic.IEnumerable<CardKeyword> CanonicalKeywords => new <>z__ReadOnlySingleElementList<CardKeyword>((CardKeyword)1);
+
+	protected override global::System.Collections.Generic.IEnumerable<DynamicVar> CanonicalVars => new <>z__ReadOnlySingleElementList<DynamicVar>(new DynamicVar("MagicNumber", 25m));
+
+	public WatcherWish_P()
+		: base(3, (CardType)2, (CardRarity)4, (TargetType)0)
+	{
+	}
+
+	protected virtual global::System.Threading.Tasks.Task<bool> TryConsumeKnowFateBoost()
+	{
+		return global::System.Threading.Tasks.Task.FromResult<bool>(false);
+	}
+
+	[AsyncStateMachine(typeof(<OnPlay>d__10))]
+	protected override global::System.Threading.Tasks.Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<OnPlay>d__10 <OnPlay>d__11 = default(<OnPlay>d__10);
+		<OnPlay>d__11.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<OnPlay>d__11.<>4__this = this;
+		<OnPlay>d__11.choiceContext = choiceContext;
+		<OnPlay>d__11.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <OnPlay>d__11.<>t__builder)).Start<<OnPlay>d__10>(ref <OnPlay>d__11);
+		return ((AsyncTaskMethodBuilder)(ref <OnPlay>d__11.<>t__builder)).Task;
+	}
+
+	protected override void OnUpgrade()
+	{
+		((CardModel)this).DynamicVars["MagicNumber"].UpgradeValueBy(5m);
+	}
+}
+
+// ===== WatcherMod.WatcherWish_P.<OnPlay>d__10 =====
+// ERROR: Could not find type definition WatcherMod.WatcherWish_P.<OnPlay>d__10 in type system.
