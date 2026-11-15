@@ -210,3 +210,24 @@ SpecialPowerDreadByAct   = { null, null, typeof(Powers.BossDevotionPower), null 
 ### 下一轮
 
 本地化 16 语言（WATCHER_BOSS.name / title / moves.CHARBOSS_PLAY.title / devotion / devotion_dread、BOSS_DEVOTION_POWER.title/description/description_dread、WATCHER_BOSS_ENCOUNTER.title/loss），以及特殊效果说明下方那段「神格」。
+
+## 第 4 轮（2026-11-15）—— 16 语言本地化
+
+新增 9 个键 × 16 语言（check-localization.ps1 全绿）：
+
+| 表 | 键 |
+|---|---|
+| monsters.json | WATCHER_BOSS.name / .title / .moves.CHARBOSS_PLAY.title / .devotion / .devotion_dread |
+| powers.json | BOSS_DEVOTION_POWER.title / .description / .description_dread |
+| encounters.json | WATCHER_BOSS_ENCOUNTER.title / .loss |
+
+- 设计名：zhs/zht **神格观**，eng **Divinity Watcher**，jpn 神格観，kor 신격관，rus Божественный Наблюдатель，deu Göttlicher Beobachter，fra Observateur Divin，ita/esp/spa/ptb Observador Divino，pol Boski Obserwator，tur Kutsal Gözcü，ind Pengamat Ilahi，tha ผู้เฝ้ามองสวรรค์。
+- 特殊效果正文已按用户要求分两版（普通 −5 真言 / +3 力量；恐惧 −3 / +4 力量），并在**末尾空一行**加「神格」那一段：
+
+```
+[gold]神格[/gold]：进入这一姿态时，获得[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]×3 能量。处于这一姿态时，你的攻击造成三倍伤害。
+```
+
+  三个能量图标用的就是用户点名的**观者能量图标**（watcher_energy_icon.png，本体 pck 自带，已核对存在）；文本里图标用 [img]res://…[/img] 这种写法（观者模组自己的卡面也是这么写的，见 WATCHER_FOLLOW_UP.description）。
+
+- 16 语言逐个翻译（esp 与 spa 同西语、ptb 葡语）。

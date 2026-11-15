@@ -1,4 +1,4 @@
-{
+﻿{
     "BOSS_SYNC_POWER.title":  "同步",
     "BOSS_SYNC_POWER.description":  "每当故障机器人生成状态牌时，也会将其复制品加入你的弃牌堆。\n每回合你首次抽到状态牌时，将其消耗、抽 1 张牌并获得 1 能量。",
     "DEVIATION_POWER.title":  "偏差认知",
@@ -132,5 +132,8 @@
     "TAROT_ETERNAL_POWER.description":  "本回合抽到的前4张可打出的牌耗能减少{Amount}点（打出前有效）。",
     "BOSS_FOOL_POWER.title":  "愚者",
     "BOSS_FOOL_POWER.description":  "愚者的卡组中只有 3 张[gold]神话形态[/gold]，杝主要靠塔罗牌战斗。\n每当你获得[gold]灾厄[/gold]时，若你有[gold]格挡[/gold]，[gold]格挡[/gold]会先抵消等量[gold]灾厄[/gold]（你已经拥有的[gold]灾厄[/gold]不受影响）。\n[red]警告：[/red]请在第12回合前击杀愚者，否则后果自负。",
-    "BOSS_FOOL_POWER.description_dread":  "愚者的卡组中只有 3 张[gold]神话形态[/gold]，杝主要靠塔罗牌战斗。\n每当你获得[gold]灾厄[/gold]时，若你有[gold]格挡[/gold]，[gold]格挡[/gold]会先抵消等量[gold]灾厄[/gold]（你已经拥有的[gold]灾厄[/gold]不受影响）。\n恐惧模式：杝打出的所有非无色牌都已升级，[gold]魔术师[/gold]改为生成 2 个闪电充能球和 1 个玻璃充能球，[gold]新生之喜[/gold]与[gold]教皇[/gold]会多印 1 张[gold]非凡技艺[/gold]。\n[red]警告：[/red]请在第12回合前击杀愚者，否则后果自负。"
+    "BOSS_FOOL_POWER.description_dread":  "愚者的卡组中只有 3 张[gold]神话形态[/gold]，杝主要靠塔罗牌战斗。\n每当你获得[gold]灾厄[/gold]时，若你有[gold]格挡[/gold]，[gold]格挡[/gold]会先抵消等量[gold]灾厄[/gold]（你已经拥有的[gold]灾厄[/gold]不受影响）。\n恐惧模式：杝打出的所有非无色牌都已升级，[gold]魔术师[/gold]改为生成 2 个闪电充能球和 1 个玻璃充能球，[gold]新生之喜[/gold]与[gold]教皇[/gold]会多印 1 张[gold]非凡技艺[/gold]。\n[red]警告：[/red]请在第12回合前击杀愚者，否则后果自负。",
+    "BOSS_DEVOTION_POWER.title":  "虔信",
+    "BOSS_DEVOTION_POWER.description":  "虔信\n你每打出一张牌，观者获得 1 层[gold]真言[/gold]。\n在观者的回合开始时，她失去 5 层[gold]真言[/gold]（最多失去全部）。\n每当她获得 10 层[gold]真言[/gold]时，她会先退出当前姿态、获得 3 点[gold]力量[/gold]，然后进入[gold]神格[/gold]，而且她不再会在回合开始时退出[gold]神格[/gold]。\n\n[gold]神格[/gold]：进入这一姿态时，获得[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img][img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img][img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]能量。处于这一姿态时，你的攻击造成三倍伤害。",
+    "BOSS_DEVOTION_POWER.description_dread":  "虔信\n你每打出一张牌，观者获得 1 层[gold]真言[/gold]。\n在观者的回合开始时，她失去 3 层[gold]真言[/gold]（最多失去全部）。\n每当她获得 10 层[gold]真言[/gold]时，她会先退出当前姿态、获得 4 点[gold]力量[/gold]，然后进入[gold]神格[/gold]，而且她不再会在回合开始时退出[gold]神格[/gold]。\n\n[gold]神格[/gold]：进入这一姿态时，获得[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img][img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img][img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]能量。处于这一姿态时，你的攻击造成三倍伤害。"
 }
