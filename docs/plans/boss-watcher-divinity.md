@@ -533,3 +533,12 @@ WatcherCombatHelper.ChooseOne(PlayerChoiceContext, Player, IReadOnlyList<CardMod
 - **两个都装时优先 3747526116**（`Probe()` 里先认 A 的招牌类型 `WatcherMod.WatcherCombatHelper`），日志会打 `观者引用层：使用 3747526116（Boninall）（两个观者模组都在 ⇒ 优先 3747526116）`。
 
 107 / 111 均 0 错误 · `[verify] v0.2.677 OK` · 已安装。
+
+## 第 21 轮（2026-11-15）
+
+1. **至纯之水两版都不拦**（用户：A 拦不住、B 拦住了，干脆统一放开）⇒ 删掉 `InstallPureWaterBlock` 整个方法（含调用），改为**第 1 回合剧本放一张「奇迹（不出）」**（`holdInstead: true`）。
+2. **lamali 版的许愿也固定选「永生不死」**：反编译 `Watcher.Code.Cards.Rare.WishWatcher` —— 它走**本体**的 `CardSelectCmd.FromChooseACardScreen(ctx, options, owner, false)`，候选项是 `BecomeAlmighty` / `LiveForever`（永生不死）/ `FameAndFortune`。新增编译期补丁 `Patches/WatcherWishLowLevelChoicePatch`：候选项里出现 `LiveForever`（或 Boninall 的 `WatcherWishLiveForever`）且 owner 是我们的影子玩家 ⇒ 直接返回它；其它牌不动。
+3. **削弱**：进神格给的力量 **3 → 2**，恐惧 **4 → 3**（`BossDevotionPower.StrengthOnDivinity()`），16 语言的 4 个键同步改数字。
+   ⚠ 改文案时踩了个坑：日/韩/泰三种语言的数字在 `[gold]力量[/gold]` **标记之后**，第一次按「标记前 24 字符找数字」的批量替换把「真言 10 层」误改成了 2/3 —— 已逐语言修回（真言仍是 10，力量 2/3），并复查其余 13 种语言无误。
+
+107 / 111 均 0 错误 · 16 语言通过 · `[verify] v0.2.678 OK` · 已安装。

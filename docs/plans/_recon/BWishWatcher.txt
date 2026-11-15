@@ -1,0 +1,187 @@
+﻿// ===== Watcher.Code.Cards.Rare.WishWatcher =====
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using BaseLib.Abstracts;
+using BaseLib.Extensions;
+using BaseLib.Utils;
+using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Localization.DynamicVars;
+using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Powers;
+using MegaCrit.Sts2.Core.Nodes.CommonUi;
+using Watcher.Code.Abstract;
+using Watcher.Code.Cards.Token;
+using Watcher.Code.Character;
+using Watcher.Code.Powers;
+
+namespace Watcher.Code.Cards.Rare;
+
+[Pool(typeof(WatcherCardPool))]
+public sealed class WishWatcher : WatcherCardModel
+{
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <OnPlay>d__3 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public WishWatcher <>4__this;
+
+		public PlayerChoiceContext choiceContext;
+
+		public CardPlay cardPlay;
+
+		private TaskAwaiter<CardModel?> <>u__1;
+
+		private TaskAwaiter <>u__2;
+
+		private void MoveNext()
+		{
+			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0168: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0136: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0150: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			WishWatcher wishWatcher = <>4__this;
+			try
+			{
+				TaskAwaiter val;
+				TaskAwaiter<CardModel> val3;
+				if (num != 0)
+				{
+					if (num == 1)
+					{
+						val = <>u__2;
+						<>u__2 = default(TaskAwaiter);
+						num = (<>1__state = -1);
+						goto IL_0184;
+					}
+					List<CardModel> val2 = Enumerable.ToList<CardModel>(Enumerable.Select<CardModel, CardModel>((System.Collections.Generic.IEnumerable<CardModel>)(object)new CardModel[3]
+					{
+						(CardModel)ModelDb.Card<BecomeAlmighty>(),
+						(CardModel)ModelDb.Card<FameAndFortune>(),
+						(CardModel)ModelDb.Card<LiveForever>()
+					}, (Func<CardModel, CardModel>)((CardModel e) => (CardModel)((AbstractModel)e).MutableClone())));
+					Enumerator<CardModel> enumerator = val2.GetEnumerator();
+					try
+					{
+						while (enumerator.MoveNext())
+						{
+							CardModel current = enumerator.Current;
+							current.Owner = ((CardModel)wishWatcher).Owner;
+							if (((CardModel)wishWatcher).IsUpgraded)
+							{
+								CardCmd.Upgrade(current, (CardPreviewStyle)1);
+							}
+						}
+					}
+					finally
+					{
+						if (num < 0)
+						{
+							((System.IDisposable)enumerator/*cast due to .constrained prefix*/).Dispose();
+						}
+					}
+					val3 = CardSelectCmd.FromChooseACardScreen(choiceContext, (System.Collections.Generic.IReadOnlyList<CardModel>)val2, ((CardModel)wishWatcher).Owner, false).GetAwaiter();
+					if (!val3.IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val3;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter<CardModel>, <OnPlay>d__3>(ref val3, ref this);
+						return;
+					}
+				}
+				else
+				{
+					val3 = <>u__1;
+					<>u__1 = default(TaskAwaiter<CardModel>);
+					num = (<>1__state = -1);
+				}
+				if (val3.GetResult() is WishableWatcherCard wishableWatcherCard)
+				{
+					val = wishableWatcherCard.OnWish(choiceContext, cardPlay).GetAwaiter();
+					if (!((TaskAwaiter)(ref val)).IsCompleted)
+					{
+						num = (<>1__state = 1);
+						<>u__2 = val;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter, <OnPlay>d__3>(ref val, ref this);
+						return;
+					}
+					goto IL_0184;
+				}
+				goto end_IL_000e;
+				IL_0184:
+				((TaskAwaiter)(ref val)).GetResult();
+				end_IL_000e:;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	public override bool CanBeGeneratedInCombat => false;
+
+	public WishWatcher()
+		: base(3, (CardType)2, (CardRarity)4, (TargetType)0)
+	{
+		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0026: Expected O, but got Unknown
+		((ConstructedCardModel)this).WithVars((DynamicVar[])(object)new DynamicVar[1] { (DynamicVar)DynamicVarExtensions.WithUpgrade<GoldVar>(new GoldVar(25), 5m) });
+		((ConstructedCardModel)this).WithPower<StrengthPower>(3, 1);
+		((ConstructedCardModel)this).WithPower<PlatedArmorPower>(6, 2);
+		((ConstructedCardModel)this).WithKeywords((CardKeyword[])(object)new CardKeyword[1] { (CardKeyword)1 });
+	}
+
+	[AsyncStateMachine(typeof(<OnPlay>d__3))]
+	protected override System.Threading.Tasks.Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<OnPlay>d__3 <OnPlay>d__4 = default(<OnPlay>d__3);
+		<OnPlay>d__4.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<OnPlay>d__4.<>4__this = this;
+		<OnPlay>d__4.choiceContext = choiceContext;
+		<OnPlay>d__4.cardPlay = cardPlay;
+		<OnPlay>d__4.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <OnPlay>d__4.<>t__builder)).Start<<OnPlay>d__3>(ref <OnPlay>d__4);
+		return ((AsyncTaskMethodBuilder)(ref <OnPlay>d__4.<>t__builder)).Task;
+	}
+}
+
+// ===== Watcher.Code.Cards.Rare.WishWatcher.<>c =====
+// ERROR: Could not find type definition Watcher.Code.Cards.Rare.WishWatcher.<>c in type system.
+// ===== Watcher.Code.Cards.Rare.WishWatcher.<OnPlay>d__3 =====
+// ERROR: Could not find type definition Watcher.Code.Cards.Rare.WishWatcher.<OnPlay>d__3 in type system.

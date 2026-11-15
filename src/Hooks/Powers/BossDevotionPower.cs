@@ -57,7 +57,7 @@ public sealed class BossDevotionPower : PowerModel
     /// <summary>满 10 层时给多少力量：普通 3 / 恐惧 4。</summary>
     internal static int StrengthOnDivinity()
     {
-        try { return DreadMode.IsActive ? 4 : 3; }
+        try { return DreadMode.IsActive ? 3 : 2; }
         catch { return 3; }
     }
 

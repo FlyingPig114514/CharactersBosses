@@ -1,4 +1,4 @@
-﻿{
+{
     "DEFECT_BOSS.status":  "State Machine\nWhenever the Defect generates a Status card, a copy of it is also added to your discard pile.\nThe first time you draw a Status card each turn, Exhaust it, draw 1 card and gain 1 Energy.",
     "DEFECT_BOSS.status_dread":  "State Machine\nWhenever the Defect generates a Status card, a copy of it is also added to your discard pile.\nThe first time you draw a Status card each turn, Exhaust it, draw 1 card and gain 1 Energy.",
     "IRONCLAD_BOSS.name":  "アイアンクラッド",
@@ -198,6 +198,6 @@
     "WATCHER_BOSS.name":  "神格観",
     "WATCHER_BOSS.title":  "神格観",
     "WATCHER_BOSS.moves.CHARBOSS_PLAY.title":  "カードプレイ",
-    "WATCHER_BOSS.devotion":  "あなたがカードをプレイするたび、観者は[gold]真言[/gold]を1獲得する。\n観者のターン開始時、彼女は[gold]真言[/gold]を5失う（最大で全て）。\n彼女が[gold]真言[/gold]を10獲得するたび、彼女は現在のスタンスを終了し、[gold]力[/gold]を3獲得してから[gold]神格[/gold]に入り、以降ターン開始時に[gold]神格[/gold]を終了しなくなる。\n\n[gold]神格[/gold]：このスタンスに入ると[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img][img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img][img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]。このスタンス中、あなたの攻撃は3倍のダメージを与える。",
-    "WATCHER_BOSS.devotion_dread":  "あなたがカードをプレイするたび、観者は[gold]真言[/gold]を1獲得する。\n観者のターン開始時、彼女は[gold]真言[/gold]を3失う（最大で全て）。\n彼女が[gold]真言[/gold]を10獲得するたび、彼女は現在のスタンスを終了し、[gold]力[/gold]を4獲得してから[gold]神格[/gold]に入り、以降ターン開始時に[gold]神格[/gold]を終了しなくなる。\n\n[gold]神格[/gold]：このスタンスに入ると[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img][img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img][img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]。このスタンス中、あなたの攻撃は3倍のダメージを与える。"
+    "WATCHER_BOSS.devotion":  "あなたがカードをプレイするたび、観者は[gold]真言[/gold]を1獲得する。\n観者のターン開始時、彼女は[gold]真言[/gold]を5失う（最大で全て）。\n彼女が[gold]真言[/gold]を10獲得するたび、彼女は現在のスタンスを終了し、[gold]力[/gold]を2獲得してから[gold]神格[/gold]に入り、以降ターン開始時に[gold]神格[/gold]を終了しなくなる。\n\n[gold]神格[/gold]：このスタンスに入ると[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img][img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img][img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]。このスタンス中、あなたの攻撃は3倍のダメージを与える。",
+    "WATCHER_BOSS.devotion_dread":  "あなたがカードをプレイするたび、観者は[gold]真言[/gold]を1獲得する。\n観者のターン開始時、彼女は[gold]真言[/gold]を3失う（最大で全て）。\n彼女が[gold]真言[/gold]を10獲得するたび、彼女は現在のスタンスを終了し、[gold]力[/gold]を3獲得してから[gold]神格[/gold]に入り、以降ターン開始時に[gold]神格[/gold]を終了しなくなる。\n\n[gold]神格[/gold]：このスタンスに入ると[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img][img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img][img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]。このスタンス中、あなたの攻撃は3倍のダメージを与える。"
 }
