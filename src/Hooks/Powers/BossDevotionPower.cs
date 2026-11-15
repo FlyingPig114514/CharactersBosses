@@ -148,6 +148,19 @@ public sealed class BossDevotionPower : PowerModel
 
                 _pendingEnergy.TryGetValue(key, out int pend);
                 _pendingEnergy[key] = pend + 3;
+
+                // ★ 2026-11-15（用户第 3 条：进神格后「有费就打」的牌没亮也没打）：
+                //   她的回合预算在 `PrepareTurn` 里**已经算好并写进 `pcs.Energy`** 了，
+                //   而她是在**玩家回合**里进的这个神格 ⇒ 计划还是按旧预算排的。
+                //   所以这里**立刻**把那 3 点加到当前的 `pcs.Energy` 上，再重排计划；
+                //   `_pendingEnergy` 留给「她的回合还没开始」的情况（`PrepareTurn` 会覆盖成新预算再补这一笔）。
+                try
+                {
+                    var pcs = shadow?.PlayerCombatState;
+                    if (pcs != null) pcs.Energy += 3;
+                }
+                catch (Exception e) { Logger.Log("[CharBoss] 虔信：立刻加 3 点能量失败: " + e.Message); }
+
                 Logger.Log($"[CharBoss] 虔信：她进入神格 ⇒ +{str} 力量，本回合 +3 能量");
 
                 try { boss.RefreshPlannedIntents(); } catch { /* 下一帧会刷新 */ }

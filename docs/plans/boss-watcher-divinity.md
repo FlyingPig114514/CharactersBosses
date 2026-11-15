@@ -473,3 +473,9 @@ WatcherCombatHelper.ChooseOne(PlayerChoiceContext, Player, IReadOnlyList<CardMod
 新增 `src/Hooks/Monsters/CharBossMonster.Watcher.cs`（partial）：`IsConjureBlade` / `GeneratedExpungers` / `SurpriseWatcherConjureShown` / `WatcherGeneratedCards`。
 
 107 / 111 均 0 错误 · `[verify] v0.2.672 OK` · 已安装。
+## 第 16 轮（2026-11-15）
+
+1. **进神格后「有费就打」的牌没亮也没打**：她的回合预算在 `PrepareTurn` 里就写进 `pcs.Energy` 了，而神格是**玩家回合**里进的 ⇒ 计划按旧预算排。现在 `WatchDivinity` 立刻把那 3 点加到当前 `pcs.Energy` 再 `RefreshPlannedIntents`（`_pendingEnergy` 仍留给「她回合还没开始」的情况）。
+2. **说明框文案**：去掉特殊效果正文的首行白色「虔信」（上方黄色 buff 名已表达）；神格说明里三个能量图标后面的「能量」删掉。16 语言 ×（monsters 2 键 + powers 2 键）共 64 条一起改，`check-localization` 全绿。
+
+107 / 111 均 0 错误 · `[verify] v0.2.673 OK` · 已安装。
