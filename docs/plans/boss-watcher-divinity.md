@@ -440,3 +440,21 @@ WatcherCombatHelper.ChooseOne(PlayerChoiceContext, Player, IReadOnlyList<CardMod
    和塔罗愚同一条通路），这次确认在位上。
 
 107 / 111 均 0 错误 · `[verify] v0.2.670 OK` · 已安装。
+## 第 14 轮（2026-11-15）—— 至纯之水印牌 / 说明框上移 / 布质果实血量
+
+用户三条（截图实测反馈）：
+
+1. **拦掉「至纯之水」开局印的那张奇迹**（剧本里已经有奇迹了）
+   ⇒ `WatcherRuntimePatches` 加第三处运行期补丁：`WatcherMod.PureWater.BeforeCombatStart` 的 prefix，
+   只在 `BossRelicHookBridge.IsOurBossRelicPublic(relic)` 成立（= 她身上那件）时短路并返回 `Task.CompletedTask`。
+   观者原版玩家、其它 Boss 的至纯之水照旧印牌。
+2. **说明框太长了，往上移**（只动神格观）
+   ⇒ `BossSpecialTip.UsesLongSpecialText` 里加 `boss.Def.Key == "WATCHER_DIVINITY"` ⇒
+   复用炼药猎那条偏移 `BossUiTuning.BrewSpecialY`（默认 **−120**，`charbosses_ui.txt` 里 `brewSpecialY` 可热调）。
+   **其它 Boss 的说明框位置一个像素都没动。**
+3. **最大生命值没算布质果实**
+   ⇒ 反编译 `LoomingFruit`：`CanonicalVars = MaxHpVar(31)`，靠 `AfterObtained` → `CreatureCmd.GainMaxHp`。
+   影子玩家身上那件收不到这个钩子 ⇒ 照「根除骨 (66 → 97 = 66 + 31)」的先例**直接写进血量**：
+   `Hp = { 103, 103, 103, 103 }`（72 + 31）。
+
+107 / 111 均 0 错误 · `[verify] v0.2.671 OK` · 已安装。

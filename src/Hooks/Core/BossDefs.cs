@@ -1110,7 +1110,9 @@ public static class BossDefs
         Key = "WATCHER_DIVINITY",
         VisualScene = "watcher",
         CharacterType = typeof(MegaCrit.Sts2.Core.Models.Characters.Fool),   // 占位，运行期会被替换
-        Hp = new[] { 72, 72, 72, 72 },
+        // ⚠ 72 = 观者模组初始生命；再 +31 = **布质果实**（`LoomingFruit`，反编译 `CanonicalVars` = MaxHpVar(31)，
+        //   原版靠 `AfterObtained` 给，影子玩家身上那件收不到该钩子 ⇒ 照「根除骨」的先例直接写进血量）。
+        Hp = new[] { 103, 103, 103, 103 },
         // ★ 2026-11-15（用户口径）：「第 3 回合打出奇迹给自己 1 费，再加上**回合开始时的 2 费**，
         //   最少是 3 费」⇒ 每回合基础能量就是 **2**（多出来的来自奇迹 / 进神格的 3 点）。
         Energy = new[] { 2, 2, 2, 2 },

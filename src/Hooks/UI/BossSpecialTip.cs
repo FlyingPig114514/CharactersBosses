@@ -257,7 +257,15 @@ internal static class BossSpecialTip
     /// <summary>这只 Boss 的特殊效果说明是不是「炼药猎」那条长文本（目前只有调制）。</summary>
     private static bool UsesLongSpecialText(CharBossMonster boss)
     {
-        try { return boss.Def.SpecialPowerForAct(boss.ActIndex) == typeof(Powers.BrewModPower); }
+        try
+        {
+            // ★ 2026-11-15（用户：「由于这个特殊效果太长了，往上移动一些，其它boss说明框的位置不改变」）：
+            //   神格观（塔罗牌之后第二长的说明：虔信 4 行 + 空行 + 神格 2 行）和炼药猎的「调制」一样，
+            //   套用同一个偏移（`BossUiTuning.BrewSpecialY`，默认 −120，`charbosses_ui.txt` 可热调）。
+            //   **只加这一只，其它 Boss 的说明框位置一个像素都不动。**
+            if (boss.Def.Key == "WATCHER_DIVINITY") return true;
+            return boss.Def.SpecialPowerForAct(boss.ActIndex) == typeof(Powers.BrewModPower);
+        }
         catch { return false; }
     }
 

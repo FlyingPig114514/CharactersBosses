@@ -172,6 +172,53 @@ internal static class WatcherRuntimePatches
         catch { return true; }
     }
 
+    // ── ③ 压掉「至纯之水」开局印的奇迹 ──────────────────────────────────────
+    // 用户 2026-11-15：「拦掉至纯之水的印牌（那张奇迹，我已经在剧本里放了）」。
+    // 反编译 `WatcherMod.PureWater.BeforeCombatStart`：战斗开始时往手里塞 N 张 `WatcherMiracle`。
+    // 只对**我们这只 Boss 的**至纯之水生效（`BossRelicHookBridge.IsOurBossRelicPublic`）。
+    private static bool InstallPureWaterBlock()
+    {
+        try
+        {
+            var type = WatcherCards.T("PureWater");
+            if (type == null) return false;
+            MethodInfo? method = null;
+            foreach (var name in new[] { "BeforeCombatStart", "BeforeCombatStartInternal" })
+            {
+                method = type.GetMethod(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                if (method != null) break;
+            }
+            if (method == null)
+            {
+                Logger.Log("[CharBoss] 至纯之水：没找到 BeforeCombatStart（版本不同）⇒ 跳过印牌压制");
+                return true;
+            }
+
+            var prefix = new HarmonyMethod(typeof(WatcherRuntimePatches)
+                .GetMethod(nameof(PureWaterBlockPrefix), BindingFlags.Static | BindingFlags.NonPublic)!);
+            new Harmony("CharacterBosses.watcher.purewater").Patch(method, prefix: prefix);
+            Logger.Log($"[CharBoss] 至纯之水：已压掉原版开局的奇迹印牌（{type.Name}.{method.Name}）");
+            return true;
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 至纯之水印牌压制失败: " + e.Message);
+            return true;
+        }
+    }
+
+    private static bool PureWaterBlockPrefix(object __instance, ref Task __result)
+    {
+        try
+        {
+            if (__instance is not RelicModel relic) return true;
+            if (!Patches.BossRelicHookBridge.IsOurBossRelicPublic(relic)) return true;
+            __result = Task.CompletedTask;
+            if (_logs++ < 6) Logger.Log("[CharBoss] 至纯之水：她的那件不印奇迹（剧本里已有）");
+            return false;
+        }
+        catch { return true; }
+    }
     // ── 共用判定 ──────────────────────────────────────────────────────────
     private static Monsters.CharBossMonster? OurBossOwning(Creature owner)
     {
