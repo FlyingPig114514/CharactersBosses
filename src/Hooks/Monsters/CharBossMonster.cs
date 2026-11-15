@@ -1110,6 +1110,10 @@ public abstract partial class CharBossMonster : MonsterModel
                                $"[{string.Join(",", extra.ConvertAll(x => x.Card.Id.Entry))}]" +
                                $"（当前能量 {pcs.Energy} − 本回合已花 {ScriptEnergySpent} = " +
                                $"{Math.Max(0, pcs.Energy - ScriptEnergySpent)}）");
+                    // ★ 2026-11-15（用户：「观者进入神格后意图预览仍然没有重算」）：补打的这几张必须**并进 Plan**，
+                    //   否则 `RefreshPlannedIntents` 只是拿旧 Plan 重算一遍，意图里还是原来那几张。
+                    try { foreach (var planned in extra) if (!Plan.Contains(planned)) Plan.Add(planned); }
+                    catch { /* 纯显示 */ }
                     foreach (var extraPlay in extra)
                     {
                         if (Creature.IsDead) break;

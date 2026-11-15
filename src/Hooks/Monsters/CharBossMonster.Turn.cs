@@ -170,8 +170,8 @@ public abstract partial class CharBossMonster
                 if (Creature?.GetPower<Powers.BossDevotionPower>() != null)
                 {
                     // 灯笼只在**第一次**算一次（`TurnNumber` 是 0 起，用 <= 1 会在第 2 回合再算一遍 ⇒ 用户实测第 2 回合 4 费）
-                    int lantern = (!_watcherLanternGiven && HasRelic("LANTERN")) ? 1 : 0;
-                    if (lantern > 0) _watcherLanternGiven = true;
+                    int lantern = 0;   // 灯笼那 1 点由原版遗物钩子自己到账（以前这里再补一次 ⇒ 重复计算）
+                    _watcherLanternGiven = true;
                     int divinity = Powers.BossDevotionPower.TakePendingDivinityEnergy(this);
                     if (lantern + divinity > 0)
                     {

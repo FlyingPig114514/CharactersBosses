@@ -23,7 +23,8 @@ public abstract partial class CharBossMonster
         try
         {
             if (card == null) return false;
-            return string.Equals(card.Id.Entry, "WATCHER_CONJURE_BLADE", StringComparison.Ordinal);
+            string e = card.Id.Entry ?? string.Empty;
+            return e == "WATCHER_CONJURE_BLADE" || e == "WATCHER-CONJURE_BLADE";   // A / B 两套 id
         }
         catch { return false; }
     }
@@ -40,7 +41,8 @@ public abstract partial class CharBossMonster
             foreach (var c in hand.Cards)
             {
                 if (c == null) continue;
-                if (string.Equals(c.Id.Entry, "WATCHER_EXPUNGER", StringComparison.Ordinal)) list.Add(c);
+                string e = c.Id.Entry ?? string.Empty;
+                if (e == "WATCHER_EXPUNGER" || e == "WATCHER-EXPUNGER") list.Add(c);   // A / B 两套 id
             }
         }
         catch { /* 纯展示 */ }

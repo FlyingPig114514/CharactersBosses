@@ -518,12 +518,12 @@ public static class BossScriptPlanner
             // `IntentsFor` 对非 X 牌也认 `xHits`（按 `1 + xHits` 还原段数），所以这里直接把 X−1 递进去。
             try
             {
-                if (string.Equals(entryNow, "WATCHER_CONJURE_BLADE", StringComparison.Ordinal))
+                if (entryNow == "WATCHER_CONJURE_BLADE" || entryNow == "WATCHER-CONJURE_BLADE")
                 {
                     conjuredX = Math.Max(0, cost);
                     if (conjuredX > 0) Logger.Log($"[CharBoss] 聚能成刃：本回合 X={conjuredX} ⇒ 之后的灭除之刃 {conjuredX} 段");
                 }
-                else if (string.Equals(entryNow, "WATCHER_EXPUNGER", StringComparison.Ordinal) && conjuredX > 0)
+                else if ((entryNow == "WATCHER_EXPUNGER" || entryNow == "WATCHER-EXPUNGER") && conjuredX > 0)
                 {
                     xHits = Math.Max(0, conjuredX - 1);
                 }

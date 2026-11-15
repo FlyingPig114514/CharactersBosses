@@ -1115,7 +1115,9 @@ public static class BossDefs
         Hp = new[] { 103, 103, 103, 103 },
         // ★ 2026-11-15（用户口径）：「第 3 回合打出奇迹给自己 1 费，再加上**回合开始时的 2 费**，
         //   最少是 3 费」⇒ 每回合基础能量就是 **2**（多出来的来自奇迹 / 进神格的 3 点）。
-        Energy = new[] { 2, 2, 2, 2 },
+        // ★ 2026-11-15（用户：「后面回合的能量都搞成 1 了」）：涅奥的祝福每回合 **−1 能量**，
+        //   所以定义值要给 **3** ⇒ 实际每回合 2；第 1 回合再被灯笼 +1 ⇒ 3。
+        Energy = new[] { 3, 3, 3, 3 },
         HandSize = new[] { 5, 5, 6, 6 },
         DeckByAct = new List<Type>?[] { null, null, WatcherScript.Deck(), null },
         RelicsByAct = new List<Type>?[] { null, null, WatcherScript.Relics(), null },
