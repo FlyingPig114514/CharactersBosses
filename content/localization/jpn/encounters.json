@@ -1,4 +1,4 @@
-﻿{
+{
     "IRONCLAD_BOSS_ENCOUNTER.title":  "アイアンクラッド",
     "IRONCLAD_BOSS_ENCOUNTER.loss":  "{character}は[gold]アイアンクラッド[/gold]に打ち砕かれた。",
     "IRONCLAD_ANGER_BOSS_ENCOUNTER.title":  "アイアンクラッド",
@@ -107,6 +107,6 @@
     "FOOL_TAROT_BOSS_ENCOUNTER.loss":  "{character}は[gold]フール[/gold]のタロットカードに敗れた。",
     "FOOL_BOSS_ENCOUNTER.loss_tarot":  "{character}は[gold]フール[/gold]のデッキの新たな[gold]{Card}[/gold]となった。",
     "FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot":  "{character}は[gold]フール[/gold]のデッキの新たな[gold]{Card}[/gold]となった。",
-    "WATCHER_BOSS_ENCOUNTER.title":  "神格観",
-    "WATCHER_BOSS_ENCOUNTER.loss":  "{character}は[gold]神格観[/gold]の神格の力に押し潰された。"
+    "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "神格観",
+    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character}は[gold]神格観[/gold]の神格の力に押し潰された。"
 }

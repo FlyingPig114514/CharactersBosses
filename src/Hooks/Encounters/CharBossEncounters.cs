@@ -106,10 +106,18 @@ public sealed class FoolTarotBossNormalEncounter : FoolTarotBossEncounter
 #endif
 
 #if STS2_111
+/// <summary>观者 Boss 的**调试用普通战斗**版（`charbosses_debug.txt` 写 `watcher` 时用）。</summary>
+public sealed class WatcherDivinityBossNormalEncounter : WatcherDivinityBossEncounter
+{
+    public override RoomType RoomType => RoomType.Monster;
+}
 /// <summary>**观者 Boss 占位**遭遇（用户 2026-11-15；只有装了观者 mod 才会被排进候选表）。</summary>
-public class WatcherBossEncounter : CharBossEncounterBase<WatcherBoss>
+public class WatcherDivinityBossEncounter : CharBossEncounterBase<WatcherBoss>
 {
     public override int? TierAct => 2;
+
+    /// <summary>地图节点图标（`.png` + `_outline.png`，资源在 `res://CharacterBosses/images/map/`）。</summary>
+    public override string BossNodePath => "res://CharacterBosses/images/map/watcher_divinity";
 }
 #endif
 // ── 调试专用的「普通战斗」版本 ──
@@ -520,7 +528,7 @@ public static class CharBossEncounters
         ModelDb.Encounter<NecrobinderEtherealBossEncounter>(), // 二层亡灵 2 号：虚无骨（用户 2026-11-09）
 #if STS2_111
         ModelDb.Encounter<FoolTarotBossEncounter>(),           // 三层 12 号：塔罗愚（愚者，用户 2026-11-14）
-        ModelDb.Encounter<WatcherBossEncounter>(),             // 三层：观者占位（只有装了观者 mod 才会进候选表）
+        ModelDb.Encounter<WatcherDivinityBossEncounter>(),             // 三层：观者占位（只有装了观者 mod 才会进候选表）
 #endif
     });
 

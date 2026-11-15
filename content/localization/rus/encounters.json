@@ -1,4 +1,4 @@
-﻿{
+{
     "IRONCLAD_BOSS_ENCOUNTER.title":  "Латоносец",
     "IRONCLAD_BOSS_ENCOUNTER.loss":  "{character} был сломлен [gold]Латоносцем[/gold].",
     "IRONCLAD_ANGER_BOSS_ENCOUNTER.title":  "Латоносец",
@@ -107,6 +107,6 @@
     "FOOL_TAROT_BOSS_ENCOUNTER.loss":  "{character} проиграл колоде таро [gold]Шута[/gold].",
     "FOOL_BOSS_ENCOUNTER.loss_tarot":  "{character} стал новой картой [gold]{Card}[/gold] в колоде [gold]Шута[/gold].",
     "FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot":  "{character} стал новой картой [gold]{Card}[/gold] в колоде [gold]Шута[/gold].",
-    "WATCHER_BOSS_ENCOUNTER.title":  "Божественный Наблюдатель",
-    "WATCHER_BOSS_ENCOUNTER.loss":  "{character} был раздавлен божественной мощью [gold]Божественного Наблюдателя[/gold]."
+    "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "Божественный Наблюдатель",
+    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} был раздавлен божественной мощью [gold]Божественного Наблюдателя[/gold]."
 }

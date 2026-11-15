@@ -1,4 +1,4 @@
-﻿{
+{
     "IRONCLAD_BOSS_ENCOUNTER.title":  "นักรบเกราะเหล็ก",
     "IRONCLAD_BOSS_ENCOUNTER.loss":  "{character} ถูก[gold]นักรบเกราะเหล็ก[/gold]บดขยี้จนพ่ายแพ้",
     "IRONCLAD_ANGER_BOSS_ENCOUNTER.title":  "นักรบเกราะเหล็ก",
@@ -107,6 +107,6 @@
     "FOOL_TAROT_BOSS_ENCOUNTER.loss":  "{character} พ่ายแพ้ต่อไพ่ทาโรต์ของ [gold]The Fool[/gold]",
     "FOOL_BOSS_ENCOUNTER.loss_tarot":  "{character} กลายเป็น [gold]{Card}[/gold] ใบใหม่ในสำรับของ [gold]The Fool[/gold]",
     "FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot":  "{character} กลายเป็น [gold]{Card}[/gold] ใบใหม่ในสำรับของ [gold]The Fool[/gold]",
-    "WATCHER_BOSS_ENCOUNTER.title":  "ผู้เฝ้ามองสวรรค์",
-    "WATCHER_BOSS_ENCOUNTER.loss":  "{character} ถูกพลังสวรรค์ของ[gold]ผู้เฝ้ามองสวรรค์[/gold]บดขยี้"
+    "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "ผู้เฝ้ามองสวรรค์",
+    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} ถูกพลังสวรรค์ของ[gold]ผู้เฝ้ามองสวรรค์[/gold]บดขยี้"
 }

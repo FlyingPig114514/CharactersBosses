@@ -1,4 +1,4 @@
-﻿{
+{
     "IRONCLAD_BOSS_ENCOUNTER.title":  "Le Soldat de Fer",
     "IRONCLAD_BOSS_ENCOUNTER.loss":  "Le [gold]Soldat de Fer[/gold] a brisé {character}.",
     "IRONCLAD_ANGER_BOSS_ENCOUNTER.title":  "Le Soldat de Fer",
@@ -107,6 +107,6 @@
     "FOOL_TAROT_BOSS_ENCOUNTER.loss":  "{character} a perdu la partie face aux tarots de [gold]l\u0027Insensé[/gold].",
     "FOOL_BOSS_ENCOUNTER.loss_tarot":  "{character} est devenu la nouvelle carte [gold]{Card}[/gold] du deck de [gold]l\u0027Insensé[/gold].",
     "FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot":  "{character} est devenu la nouvelle carte [gold]{Card}[/gold] du deck de [gold]l\u0027Insensé[/gold].",
-    "WATCHER_BOSS_ENCOUNTER.title":  "Observateur Divin",
-    "WATCHER_BOSS_ENCOUNTER.loss":  "{character} a été écrasé par la puissance divine de l\u0027[gold]Observateur Divin[/gold]."
+    "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "Observateur Divin",
+    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} a été écrasé par la puissance divine de l\u0027[gold]Observateur Divin[/gold]."
 }

@@ -395,3 +395,35 @@ WatcherCombatHelper.ChooseOne(PlayerChoiceContext, Player, IReadOnlyList<CardMod
 ### 仍等用户确认
 
 「怪物获得 10 层真言也进神格」里的「怪物」指她自己还是别的怪物。
+
+## 第 12 轮（2026-11-15）—— 内部 id 改名 + 地图图标
+
+### 内部 id：WATCHER_BOSS → WATCHER_DIVINITY
+
+用户：「你这怎么直接 WATCHER_BOSS，把神格的英文加进去，类似其它 boss 的内部 id，又不是只会有这一个观者 boss。」
+
+按别的 Boss 的命名规律（<角色>_<设计名>）改成：
+
+| 项 | 旧 | 新 |
+|---|---|---|
+| BossKeys key | WATCHER_BOSS | **WATCHER_DIVINITY** |
+| 遭遇类 | WatcherBossEncounter | WatcherDivinityBossEncounter |
+| 调试用普通战斗遭遇 | WatcherBossNormalEncounter | WatcherDivinityBossNormalEncounter |
+| 控制台 id | WATCHER_BOSS_ENCOUNTER | **WATCHER_DIVINITY_BOSS_ENCOUNTER** |
+| 遭遇本地化键（16 语言） | WATCHER_BOSS_ENCOUNTER.* | WATCHER_DIVINITY_BOSS_ENCOUNTER.* |
+
+怪物模型类仍是 WatcherBoss（⇒ 怪物本地化键仍是 WATCHER_BOSS.name / .title / .devotion / .devotion_dread）——
+和愚者那边一样的处理（愚者的 roster key 是 FOOL_TAROT、怪物键是 FOOL_BOSS.*）。
+
+控制台：ight WATCHER_DIVINITY_BOSS_ENCOUNTER
+
+### 地图图标：换成一**代崩坠三层神格观**那张
+
+- 源文件（工作区自带）：`.assets-sts1-downfall\09-界面与地图 UI-Map\downfall-通用\ui\map\icon\watcher_divinity.png`
+  + 描边 `.assets-sts1-downfall\05-遗物图 Relics\downfall-通用\ui\map\outline\watcher_divinity_outline.png`
+- 拷到 `tools\art\import_proj\CharacterBosses\images\map\watcher_divinity{,_outline}.png` → Godot 导入 → 6 行追加进 `pck_extras.txt`
+- 遭遇上新增 `public override string BossNodePath => "res://CharacterBosses/images/map/watcher_divinity";`
+
+验证：PCK 里已含 `res://CharacterBosses/images/map/watcher_divinity.png` / `..._outline.png`（打包 extra 106 个文件）。
+
+107 / 111 均 0 错误 · 16 语言检查通过 · `[verify] v0.2.669 OK` · 已安装。

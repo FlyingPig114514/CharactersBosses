@@ -1,4 +1,4 @@
-﻿{
+{
     "IRONCLAD_BOSS_ENCOUNTER.title":  "Si Ironclad",
     "IRONCLAD_BOSS_ENCOUNTER.loss":  "{character} dihancurkan oleh [gold]Si Ironclad[/gold].",
     "IRONCLAD_ANGER_BOSS_ENCOUNTER.title":  "Si Ironclad",
@@ -107,6 +107,6 @@
     "FOOL_TAROT_BOSS_ENCOUNTER.loss":  "{character} dihabisi oleh kartu tarot [gold]Fool[/gold].",
     "FOOL_BOSS_ENCOUNTER.loss_tarot":  "{character} menjadi kartu baru [gold]{Card}[/gold] di dek [gold]Fool[/gold].",
     "FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot":  "{character} menjadi kartu baru [gold]{Card}[/gold] di dek [gold]Fool[/gold].",
-    "WATCHER_BOSS_ENCOUNTER.title":  "Pengamat Ilahi",
-    "WATCHER_BOSS_ENCOUNTER.loss":  "{character} dihancurkan oleh kekuatan ilahi [gold]Pengamat Ilahi[/gold]."
+    "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "Pengamat Ilahi",
+    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} dihancurkan oleh kekuatan ilahi [gold]Pengamat Ilahi[/gold]."
 }

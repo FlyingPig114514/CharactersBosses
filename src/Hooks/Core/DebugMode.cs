@@ -23,7 +23,7 @@ public static class DebugMode
     /// <summary>按角色下标排列的关键字，供内容解析用。</summary>
     public static readonly string[] CharacterKeys =
     {
-        "ironclad", "silent", "defect", "necrobinder", "regent", "fool",
+        "ironclad", "silent", "defect", "necrobinder", "regent", "fool", "watcher",
     };
 
     private static bool _loaded;

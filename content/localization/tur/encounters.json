@@ -1,4 +1,4 @@
-﻿{
+{
     "IRONCLAD_BOSS_ENCOUNTER.title":  "Demirkaplı",
     "IRONCLAD_BOSS_ENCOUNTER.loss":  "{character}, [gold]Demirkaplı[/gold] tarafından paramparça edildi.",
     "IRONCLAD_ANGER_BOSS_ENCOUNTER.title":  "Demirkaplı",
@@ -107,6 +107,6 @@
     "FOOL_TAROT_BOSS_ENCOUNTER.loss":  "{character}, [gold]Soytarı[/gold]\u0027nın tarot destesine yenildi.",
     "FOOL_BOSS_ENCOUNTER.loss_tarot":  "{character}, [gold]Soytarı[/gold]\u0027nın destesinde yeni [gold]{Card}[/gold] oldu.",
     "FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot":  "{character}, [gold]Soytarı[/gold]\u0027nın destesinde yeni [gold]{Card}[/gold] oldu.",
-    "WATCHER_BOSS_ENCOUNTER.title":  "Kutsal Gözcü",
-    "WATCHER_BOSS_ENCOUNTER.loss":  "{character}, [gold]Kutsal Gözcü[/gold]\u0027nün ilahi gücüyle ezildi."
+    "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "Kutsal Gözcü",
+    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character}, [gold]Kutsal Gözcü[/gold]\u0027nün ilahi gücüyle ezildi."
 }

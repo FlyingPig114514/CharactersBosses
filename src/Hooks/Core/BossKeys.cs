@@ -86,7 +86,7 @@ internal static class BossKeys
 #endif
 #if STS2_111
         // 观者 Boss 占位（用户 2026-11-15）：只有装了观者 mod 才会进候选表（见 RosterFor）
-        new("WATCHER_BOSS",         6, 2, 1, typeof(WatcherBoss)),
+        new("WATCHER_DIVINITY",         6, 2, 1, typeof(WatcherBoss)),
 #endif
     };
 
@@ -215,7 +215,7 @@ internal static class BossKeys
 #if STS2_111
         ["FOOL_TAROT"] = "塔罗愚",   // 三层 1 号（愚者）
 #if STS2_111
-    ["WATCHER_BOSS"] = "神格观",  // 三层 1 号（观者 mod）
+    ["WATCHER_DIVINITY"] = "神格观",  // 三层 1 号（观者 mod）
 #endif
 #endif
         ["REGENT_BOMBARD"] = "轰击储",
@@ -380,7 +380,7 @@ internal static class BossKeys
 #if STS2_111
             case "FOOL_TAROT": return ModelDb.Encounter<FoolTarotBossEncounter>();
 #if STS2_111
-            case "WATCHER_BOSS": return ModelDb.Encounter<WatcherBossEncounter>();
+            case "WATCHER_DIVINITY": return ModelDb.Encounter<WatcherDivinityBossEncounter>();
 #endif
 #endif
             default: return null;
@@ -431,7 +431,7 @@ internal static class BossKeys
 
     /// <summary>
     /// 候选表里「按运行期条件才加入」的那几只（目前只有观者占位）。
-    /// 装了观者 mod 才返回 `["WATCHER_BOSS"]`，否则空数组 —— 没装时行为和以前一模一样。
+    /// 装了观者 mod 才返回 `["WATCHER_DIVINITY"]`，否则空数组 —— 没装时行为和以前一模一样。
     /// </summary>
     /// <summary>
     /// **观者 Boss 的「缺模组就换人」兜底**（用户 2026-11-15）：
@@ -446,7 +446,7 @@ internal static class BossKeys
     {
         try
         {
-            if (!string.Equals(key, "WATCHER_BOSS", StringComparison.Ordinal)) return key ?? string.Empty;
+            if (!string.Equals(key, "WATCHER_DIVINITY", StringComparison.Ordinal)) return key ?? string.Empty;
 #if STS2_111
             if (Core.WatcherModPresence.Installed) return key!;
 #else
@@ -465,7 +465,7 @@ internal static class BossKeys
 #if STS2_111
         try
         {
-            if (Core.WatcherModPresence.Installed) return new[] { "WATCHER_BOSS" };
+            if (Core.WatcherModPresence.Installed) return new[] { "WATCHER_DIVINITY" };
         }
         catch { /* 探测失败就当没装 */ }
 #endif

@@ -1107,7 +1107,7 @@ public static class BossDefs
     /// </summary>
     public static readonly BossDefinition Watcher = new()
     {
-        Key = "WATCHER_BOSS",
+        Key = "WATCHER_DIVINITY",
         VisualScene = "watcher",
         CharacterType = typeof(MegaCrit.Sts2.Core.Models.Characters.Fool),   // 占位，运行期会被替换
         Hp = new[] { 72, 72, 72, 72 },

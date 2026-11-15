@@ -1,4 +1,4 @@
-﻿{
+{
     "IRONCLAD_BOSS_ENCOUNTER.title":  "The Ironclad",
     "IRONCLAD_BOSS_ENCOUNTER.loss":  "{character} was broken by the [gold]Ironclad[/gold].",
     "IRONCLAD_ANGER_BOSS_ENCOUNTER.title":  "The Ironclad",
@@ -107,6 +107,6 @@
     "FOOL_TAROT_BOSS_ENCOUNTER.loss":  "{character} was dealt the wrong card by the [gold]Fool[/gold].",
     "FOOL_BOSS_ENCOUNTER.loss_tarot":  "{character} became the new [gold]{Card}[/gold] in the [gold]Fool[/gold]\u0027s deck.",
     "FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot":  "{character} became the new [gold]{Card}[/gold] in the [gold]Fool[/gold]\u0027s deck.",
-    "WATCHER_BOSS_ENCOUNTER.title":  "Divinity Watcher",
-    "WATCHER_BOSS_ENCOUNTER.loss":  "{character} was crushed by the divine might of [gold]Divinity Watcher[/gold]."
+    "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "Divinity Watcher",
+    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} was crushed by the divine might of [gold]Divinity Watcher[/gold]."
 }
