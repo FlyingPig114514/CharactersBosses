@@ -58,10 +58,13 @@ internal static class WatcherRuntimePatches
     {
         try
         {
-            var type = WatcherCards.T("Divinity");
+            // 两条路：A 的 `Divinity.AfterSideTurnEnd`（回合结束退）、B 的 `DivinityStance.BeforeSideTurnStart`（回合开始退）
+            var type = WatcherCards.T("Divinity") ?? WatcherCards.T("DivinityStance");
             if (type == null) return false;
             var method = type.GetMethod("AfterSideTurnEnd",
-                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                         ?? type.GetMethod("BeforeSideTurnStart",
+                            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             if (method == null)
             {
                 Logger.Log("[CharBoss] 神格不退：Divinity 上没有 AfterSideTurnEnd（版本不同）⇒ 跳过");
@@ -116,7 +119,12 @@ internal static class WatcherRuntimePatches
         try
         {
             var helper = WatcherCards.T("WatcherCombatHelper");
-            if (helper == null) return false;
+            if (helper == null)
+            {
+                if (WatcherCards.Current != WatcherCards.Provider.None)
+                    Logger.Log("[CharBoss] 许愿固定选项：当前观者实现没有 `WatcherCombatHelper.ChooseOne`（lamali 版）⇒ 沿用该模组自己的选法");
+                return true;      // 不再重试
+            }
             var method = helper.GetMethod("ChooseOne",
                 BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static,
                 null,
@@ -183,7 +191,7 @@ internal static class WatcherRuntimePatches
             var type = WatcherCards.T("PureWater");
             if (type == null) return false;
             MethodInfo? method = null;
-            foreach (var name in new[] { "BeforeCombatStart", "BeforeCombatStartInternal" })
+            foreach (var name in new[] { "BeforeCombatStart", "BeforeCombatStartInternal", "BeforeHandDraw" })
             {
                 method = type.GetMethod(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                 if (method != null) break;

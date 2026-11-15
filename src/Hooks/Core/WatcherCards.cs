@@ -1,49 +1,69 @@
 #if STS2_111   // 观者 Boss 只在 0.113 构建里（107 不加）
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 
 namespace CharacterBosses.Core;
 
 /// <summary>
-/// **观者模组的牌 / 姿态 API 引用层**（用户 2026-11-15：三层 1 号「神格观」）。
+/// **同时兼容两个观者模组**的引用层（用户 2026-11-15）。
 ///
-/// 铁律：**绝不编译期引用别的模组**（见 `WatcherModPresence` / `WatcherVfx` 的注释）——
-/// 观者模组没装时我们的 DLL 也必须能加载。所以这里全部走**运行期反射**：
-///   · 牌：按 `Type` 名去观者程序集里取（`WatcherMod.WatcherStrike_P` …），取不到返回 null；
-///   · 姿态 / 真言：观者把机制放在 `WatcherMod.WatcherCombatHelper`（反编译 0.113 的 Watcher.dll）：
-///       `Task EnterDivinity(Player, CardModel?)`
-///       `Task ExitStance(Player)`
-///       `Task GainMantra(Player, int, CardModel?)`
-///       `int  GetTotalMantraGained(Player)`
-///       `bool IsInStance<T>(Creature)`
-///     它们的参数都是 `Player` —— 我们这边传 **Boss 的影子玩家**（`boss.Shadow`），
-///     也就是「观者的状态挂在影子玩家身上」。
+/// 工坊里有两份互不相干的「观者」实现，玩家装哪个都可能来打我们的「神格观」：
 ///
-/// 牌的内部 id 与中文名的对照（从观者模组 `res://Watcher/localization/zhs/cards.json` 反查）：
-///   许愿 WATCHER_WISH_P / 打击 WATCHER_STRIKE_P / 警惕 WATCHER_VIGILANCE / 光辉 WATCHER_BRILLIANCE
-///   防御 WATCHER_DEFEND_P / 敬拜 WATCHER_WORSHIP / 奇迹 WATCHER_MIRACLE / 聚能成刃 WATCHER_CONJURE_BLADE
-///   供奉 WATCHER_CONSECRATE / 化拳为空 WATCHER_EMPTY_FIST / 摆手 WATCHER_WAVE_OF_THE_HAND
-///   欺瞒现实 WATCHER_DECEIVE_REALITY / 平安 WATCHER_SAFETY / 灭除之刃 WATCHER_EXPUNGER
-///   虔信 WATCHER_DEVOTION / 旋身 WATCHER_SWIVEL / 圣洁 WATCHER_SANCTITY / 结末 WATCHER_CONCLUDE
-///   （贪婪 GREED 是**本体**的牌，直接 typeof；「洗牌」在观者与本体两份本地化里都查不到 ⇒ 待用户确认）
+/// | | 3747526116（Boninall，**优先**） | 3747492505（lamali） |
+/// |---|---|---|
+/// | 卡牌 | `WatcherMod.WatcherStrike_P` … | `Watcher.Code.Cards.Basic.StrikeWatcher` … |
+/// | 模型 id | `WATCHER_STRIKE_P`（下划线） | `WATCHER-STRIKE_WATCHER`（连字符） |
+/// | 姿态 API | `WatcherMod.WatcherCombatHelper.{EnterDivinity,ExitStance}`（只收 `Player`） | `Watcher.Code.Commands.StanceCmd.{EnterDivinity,ExitStance}`（收 `ctx, Player, card`） |
+/// | 真言 | power 类型名 `Mantra` | `MantraPower` |
+/// | 神格 | `Divinity`，回合**结束**自动退 | `DivinityStance`，回合**开始**自动退 |
+/// | 至纯之水印牌钩子 | `BeforeCombatStart` | `BeforeHandDraw` |
+///
+/// 用户确认：「这两个模组除了多人牌和先古牌以外大部分牌都是相同的（都是从 1 代搬过来的）」，
+/// 少量差异（许愿「永生不死」给覆甲/多重护甲、停顿升级后的额外格挡量）无伤大雅
+/// ⇒ 我们**只用两边都有的牌**（剧本里那 20 张全部重叠）。
+/// **两个都装时优先 3747526116**（现有实现，动画也与它一致）。
+///
+/// 铁律照旧：全部运行期反射，绝不编译期引用别人的程序集。
 /// </summary>
 internal static class WatcherCards
 {
-    private static Assembly? _asm;
+    internal enum Provider { None, Boninall, Lamali }
+
     private static bool _probed;
-    private static Type? _helper;
-    private static bool _helperProbed;
+    private static Assembly? _preferred;      // Boninall（优先）
+    private static Assembly? _secondary;      // lamali
+    private static Provider _provider = Provider.None;
 
     private static readonly Dictionary<string, Type?> _types = new(StringComparer.Ordinal);
 
-    /// <summary>观者模组的程序集（按名字含 "Watcher" 且不是我们自己的程序集找）。</summary>
+    internal static Provider Current
+    {
+        get { _ = ModAssembly(); return _provider; }
+    }
+
+    internal static string ProviderName => _provider switch
+    {
+        Provider.Boninall => "3747526116（Boninall）",
+        Provider.Lamali => "3747492505（lamali）",
+        _ => "未装",
+    };
+
+    /// <summary>优先那一份（有 Boninall 就用它）。</summary>
     internal static Assembly? ModAssembly()
     {
-        if (_probed) return _asm;
+        Probe();
+        return _preferred ?? _secondary;
+    }
+
+    private static void Probe()
+    {
+        if (_probed) return;
         _probed = true;
         try
         {
@@ -54,29 +74,49 @@ internal static class WatcherCards
                 if (string.IsNullOrEmpty(name)) continue;
                 if (name.StartsWith("CharacterBosses", StringComparison.OrdinalIgnoreCase)) continue;
                 if (name.IndexOf("Watcher", StringComparison.OrdinalIgnoreCase) < 0) continue;
-                _asm = asm;
-                Logger.Log("[CharBoss] 观者引用层：找到程序集 " + name);
-                break;
+
+                bool isBoninall = asm.GetType("WatcherMod.WatcherCombatHelper", false) != null
+                                  || asm.GetType("WatcherMod.WatcherCardPool", false) != null;
+                bool isLamali = asm.GetType("Watcher.Code.Commands.StanceCmd", false) != null;
+
+                if (isBoninall) _preferred = asm;
+                else if (isLamali && _secondary == null) _secondary = asm;
             }
+
+            _provider = _preferred != null ? Provider.Boninall
+                        : _secondary != null ? Provider.Lamali
+                        : Provider.None;
+
+            Logger.Log($"[CharBoss] 观者引用层：使用 {ProviderName}" +
+                       (_preferred != null && _secondary != null
+                           ? "（两个观者模组都在 ⇒ **优先 3747526116**）"
+                           : string.Empty));
         }
-        catch { _asm = null; }
-        if (_asm == null) Logger.Log("[CharBoss] 观者引用层：没找到观者模组的程序集（相关功能全部跳过）");
-        return _asm;
+        catch { _provider = Provider.None; }
     }
 
-    /// <summary>按短名取观者程序集里的类型（`WatcherStrike_P` → `WatcherMod.WatcherStrike_P`）。</summary>
+    /// <summary>按短类名取类型：先优先那一份，再另一份，最后在各自程序集里按类名全扫。</summary>
     internal static Type? T(string shortName)
     {
         if (string.IsNullOrEmpty(shortName)) return null;
         if (_types.TryGetValue(shortName, out var cached)) return cached;
 
+        Probe();
         Type? found = null;
-        try
+        foreach (var asm in new[] { _preferred, _secondary })
         {
-            var asm = ModAssembly();
-            if (asm != null)
+            if (asm == null) continue;
+            try
             {
                 found = asm.GetType("WatcherMod." + shortName, false)
+                        ?? asm.GetType("Watcher.Code.Cards.Basic." + shortName, false)
+                        ?? asm.GetType("Watcher.Code.Cards.Common." + shortName, false)
+                        ?? asm.GetType("Watcher.Code.Cards.Uncommon." + shortName, false)
+                        ?? asm.GetType("Watcher.Code.Cards.Rare." + shortName, false)
+                        ?? asm.GetType("Watcher.Code.Cards.Token." + shortName, false)
+                        ?? asm.GetType("Watcher.Code.Relics." + shortName, false)
+                        ?? asm.GetType("Watcher.Code.Powers." + shortName, false)
+                        ?? asm.GetType("Watcher.Code.Stances." + shortName, false)
                         ?? asm.GetType(shortName, false);
                 if (found == null)
                 {
@@ -86,108 +126,144 @@ internal static class WatcherCards
                     }
                 }
             }
+            catch { found = null; }
+            if (found != null) break;
         }
-        catch { found = null; }
 
         _types[shortName] = found;
         return found;
     }
 
-    // ── 剧本用到的牌（一次取好，取不到就是 null ⇒ 剧本那一格会被跳过） ──────────────
-    internal static Type? Wish => T("WatcherWish_P");                 // 许愿（选「永生不死」）
-    internal static Type? Strike => T("WatcherStrike_P");             // 打击
-    internal static Type? Defend => T("WatcherDefend_P");             // 防御
-    internal static Type? Vigilance => T("WatcherVigilance");         // 警惕
-    internal static Type? Brilliance => T("WatcherBrilliance");       // 光辉
-    internal static Type? Worship => T("WatcherWorship");             // 敬拜
-    internal static Type? Miracle => T("WatcherMiracle");             // 奇迹
-    internal static Type? ConjureBlade => T("WatcherConjureBlade");   // 聚能成刃（X 费）
-    internal static Type? Consecrate => T("WatcherConsecrate");       // 供奉
-    internal static Type? EmptyFist => T("WatcherEmptyFist");         // 化拳为空
-    internal static Type? WaveOfTheHand => T("WatcherWaveOfTheHand"); // 摆手
-    internal static Type? DeceiveReality => T("WatcherDeceiveReality"); // 欺瞒现实
-    internal static Type? Safety => T("WatcherSafety");               // 平安
-    internal static Type? Expunger => T("WatcherExpunger");           // 灭除之刃
-    internal static Type? Devotion => T("WatcherDevotion");           // 虔信
-    internal static Type? Swivel => T("WatcherSwivel");               // 旋身
-    internal static Type? Sanctity => T("WatcherSanctity");           // 圣洁
-    internal static Type? Conclude => T("WatcherConclude");           // 结末
+    /// <summary>先按类名找（不依赖 ModelDb），再按模型 id 兜底（两份实现的 id 前缀不同）。</summary>
+    private static Type? Card(string boninallName, string lamaliName, string boninallId, string lamaliId)
+    {
+        var byName = T(boninallName) ?? (string.IsNullOrEmpty(lamaliName) ? null : T(lamaliName));
+        if (byName != null) return byName;
+
+        foreach (var id in new[] { boninallId, lamaliId })
+        {
+            if (string.IsNullOrEmpty(id)) continue;
+            try
+            {
+                foreach (var c in ModelDb.AllCards)
+                {
+                    string? entry = null;
+                    try { entry = c.Id.Entry; } catch { continue; }
+                    if (string.Equals(entry, id, StringComparison.OrdinalIgnoreCase)) return c.GetType();
+                }
+            }
+            catch { /* ModelDb 还没就绪就算没找到 */ }
+        }
+        return null;
+    }
+
+    // ── 剧本用到的牌（两份实现都有的那批）──────────────────────────────────
+    internal static Type? Wish => Card("WatcherWish_P", "WishWatcher", "WATCHER_WISH_P", "WATCHER-WISH_WATCHER");
+    internal static Type? Strike => Card("WatcherStrike_P", "StrikeWatcher", "WATCHER_STRIKE_P", "WATCHER-STRIKE_WATCHER");
+    internal static Type? Defend => Card("WatcherDefend_P", "DefendWatcher", "WATCHER_DEFEND_P", "WATCHER-DEFEND_WATCHER");
+    internal static Type? Vigilance => Card("WatcherVigilance", "Vigilance", "WATCHER_VIGILANCE", "WATCHER-VIGILANCE");
+    internal static Type? Brilliance => Card("WatcherBrilliance", "Brilliance", "WATCHER_BRILLIANCE", "WATCHER-BRILLIANCE");
+    internal static Type? Worship => Card("WatcherWorship", "Worship", "WATCHER_WORSHIP", "WATCHER-WORSHIP");
+    internal static Type? Miracle => Card("WatcherMiracle", "Miracle", "WATCHER_MIRACLE", "WATCHER-MIRACLE");
+    internal static Type? ConjureBlade => Card("WatcherConjureBlade", "ConjureBlade", "WATCHER_CONJURE_BLADE", "WATCHER-CONJURE_BLADE");
+    internal static Type? Consecrate => Card("WatcherConsecrate", "Consecrate", "WATCHER_CONSECRATE", "WATCHER-CONSECRATE");
+    internal static Type? EmptyFist => Card("WatcherEmptyFist", "EmptyFist", "WATCHER_EMPTY_FIST", "WATCHER-EMPTY_FIST");
+    internal static Type? WaveOfTheHand => Card("WatcherWaveOfTheHand", "WaveOfTheHand", "WATCHER_WAVE_OF_THE_HAND", "WATCHER-WAVE_OF_THE_HAND");
+    internal static Type? DeceiveReality => Card("WatcherDeceiveReality", "DeceiveReality", "WATCHER_DECEIVE_REALITY", "WATCHER-DECEIVE_REALITY");
+    internal static Type? Safety => Card("WatcherSafety", "Safety", "WATCHER_SAFETY", "WATCHER-SAFETY");
+    internal static Type? Expunger => Card("WatcherExpunger", "Expunger", "WATCHER_EXPUNGER", "WATCHER-EXPUNGER");
+    internal static Type? Devotion => Card("WatcherDevotion", "Devotion", "WATCHER_DEVOTION", "WATCHER-DEVOTION");
+    internal static Type? Swivel => Card("WatcherSwivel", "Swivel", "WATCHER_SWIVEL", "WATCHER-SWIVEL");
+    internal static Type? Sanctity => Card("WatcherSanctity", "Sanctity", "WATCHER_SANCTITY", "WATCHER-SANCTITY");
+    internal static Type? Conclude => Card("WatcherConclude", "Conclude", "WATCHER_CONCLUDE", "WATCHER-CONCLUDE");
     internal static Type? Greed => typeof(MegaCrit.Sts2.Core.Models.Cards.Greed);   // 贪婪（本体牌）
 
-    // ── 姿态 / 真言（`WatcherMod.WatcherCombatHelper`）─────────────────────────
-    private static Type? Helper()
-    {
-        if (_helperProbed) return _helper;
-        _helperProbed = true;
-        _helper = T("WatcherCombatHelper");
-        if (_helper == null) Logger.Log("[CharBoss] 观者引用层：找不到 WatcherCombatHelper（姿态/真言功能会跳过）");
-        return _helper;
-    }
+    /// <summary>至纯之水（观者初始遗物）：A = `WatcherMod.PureWater`，B = `Watcher.Code.Relics.PureWater`。</summary>
+    internal static Type? PureWater => T("PureWater");
 
-    private static MethodInfo? M(string name, params Type[] args)
-    {
-        try
-        {
-            var t = Helper();
-            if (t == null) return null;
-            return t.GetMethod(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static,
-                               null, args, null);
-        }
-        catch { return null; }
-    }
+    /// <summary>手摇鼓（进阶 9 遗物）。</summary>
+    internal static Type? Damaru => T("Damaru");
 
-    /// <summary>进入神格（观者自己的实现：给 3 点能量 + 攻击三倍）。</summary>
+    // ── 姿态 / 真言（两份实现的接口不同，这里抹平）─────────────────────────
+    /// <summary>进神格（观者自己的实现：+3 能量、攻击三倍）。</summary>
     internal static Task EnterDivinityAsync(Player? owner, CardModel? source)
     {
         try
         {
-            var m = M("EnterDivinity", typeof(Player), typeof(CardModel));
-            return m?.Invoke(null, new object?[] { owner, source }) as Task ?? Task.CompletedTask;
+            Probe();
+            if (_provider == Provider.Boninall)
+            {
+                var m = Method("WatcherMod.WatcherCombatHelper", "EnterDivinity");
+                return m?.Invoke(null, new object?[] { owner, source }) as Task ?? Task.CompletedTask;
+            }
+            if (_provider == Provider.Lamali)
+            {
+                var m = Method("Watcher.Code.Commands.StanceCmd", "EnterDivinity");
+                return m?.Invoke(null, new object?[] { new ThrowingPlayerChoiceContext(), owner, source }) as Task
+                       ?? Task.CompletedTask;
+            }
         }
-        catch (Exception e) { Logger.Log("[CharBoss] 进神格失败: " + e.Message); return Task.CompletedTask; }
+        catch (Exception e) { Logger.Log("[CharBoss] 进神格失败: " + e.Message); }
+        return Task.CompletedTask;
     }
 
-    /// <summary>退出当前姿态（平静/愤怒/神格都会退）。**进神格前必须先退**，否则拿不到入姿态的 3 点能量。</summary>
+    /// <summary>退出当前姿态。**进神格前必须先退**，否则拿不到入姿态的 3 点能量。</summary>
     internal static Task ExitStanceAsync(Player? owner)
     {
         try
         {
-            var m = M("ExitStance", typeof(Player));
-            return m?.Invoke(null, new object?[] { owner }) as Task ?? Task.CompletedTask;
+            Probe();
+            if (_provider == Provider.Boninall)
+            {
+                var m = Method("WatcherMod.WatcherCombatHelper", "ExitStance");
+                return m?.Invoke(null, new object?[] { owner }) as Task ?? Task.CompletedTask;
+            }
+            if (_provider == Provider.Lamali)
+            {
+                var m = Method("Watcher.Code.Commands.StanceCmd", "ExitStance");
+                return m?.Invoke(null, new object?[] { new ThrowingPlayerChoiceContext(), owner, null }) as Task
+                       ?? Task.CompletedTask;
+            }
         }
-        catch (Exception e) { Logger.Log("[CharBoss] 退出姿态失败: " + e.Message); return Task.CompletedTask; }
+        catch (Exception e) { Logger.Log("[CharBoss] 退出姿态失败: " + e.Message); }
+        return Task.CompletedTask;
     }
 
-    /// <summary>获得真言（观者的实现里满 10 层会自己结算神格；我们只在需要时自己再补一层逻辑）。</summary>
+    /// <summary>获得真言。A 走 `WatcherCombatHelper.GainMantra`；B 直接给 `MantraPower` 加层（它自己结算神格）。</summary>
     internal static Task GainMantraAsync(Player? owner, int amount, CardModel? source)
     {
         try
         {
-            if (amount <= 0) return Task.CompletedTask;
-            var m = M("GainMantra", typeof(Player), typeof(int), typeof(CardModel));
-            return m?.Invoke(null, new object?[] { owner, amount, source }) as Task ?? Task.CompletedTask;
-        }
-        catch (Exception e) { Logger.Log("[CharBoss] 获得真言失败: " + e.Message); return Task.CompletedTask; }
-    }
-
-    /// <summary>她身上**现在的**真言层数（观者 `WatcherMod.Mantra` 这个 power 的 Amount）。</summary>
-    internal static int MantraOf(Player? owner)
-    {
-        try
-        {
-            var powers = owner?.Creature?.Powers;
-            if (powers == null) return 0;
-            for (int i = 0; i < powers.Count; i++)
+            if (amount <= 0 || owner?.Creature == null) return Task.CompletedTask;
+            Probe();
+            if (_provider == Provider.Boninall)
             {
-                var p = powers[i];
-                if (p == null) continue;
-                if (!string.Equals(p.GetType().Name, "Mantra", StringComparison.Ordinal)) continue;
-                return (int)Math.Round((double)p.Amount);
+                var m = Method("WatcherMod.WatcherCombatHelper", "GainMantra");
+                return m?.Invoke(null, new object?[] { owner, amount, source }) as Task ?? Task.CompletedTask;
+            }
+            if (_provider == Provider.Lamali)
+            {
+                var mantra = T("MantraPower");
+                if (mantra == null) return Task.CompletedTask;
+                var apply = typeof(MegaCrit.Sts2.Core.Commands.PowerCmd)
+                    .GetMethods(BindingFlags.Public | BindingFlags.Static)
+                    .FirstOrDefault(x => x.Name == "Apply" && x.IsGenericMethodDefinition
+                                         && x.GetParameters().Length == 6);
+                if (apply == null) return Task.CompletedTask;
+                return apply.MakeGenericMethod(mantra)
+                    .Invoke(null, new object?[]
+                    {
+                        new ThrowingPlayerChoiceContext(), owner.Creature, (decimal)amount,
+                        owner.Creature, source, false,
+                    }) as Task ?? Task.CompletedTask;
             }
         }
-        catch { /* 忽略 */ }
-        return 0;
+        catch (Exception e) { Logger.Log("[CharBoss] 获得真言失败: " + e.Message); }
+        return Task.CompletedTask;
     }
+
+    /// <summary>她身上**现在的**真言层数（A: `Mantra` / B: `MantraPower`）。</summary>
+    internal static int MantraOf(Player? owner) => PowerAmount(owner, "Mantra", "MantraPower");
 
     /// <summary>把真言直接改到指定层数（不转负由调用方保证）。</summary>
     internal static void SetMantra(Player? owner, int value)
@@ -200,7 +276,9 @@ internal static class WatcherCards
             {
                 var p = powers[i];
                 if (p == null) continue;
-                if (!string.Equals(p.GetType().Name, "Mantra", StringComparison.Ordinal)) continue;
+                string name;
+                try { name = p.GetType().Name; } catch { continue; }
+                if (name != "Mantra" && name != "MantraPower") continue;
                 p.SetAmount(Math.Max(0, value), true);
                 return;
             }
@@ -208,8 +286,30 @@ internal static class WatcherCards
         catch { /* 忽略 */ }
     }
 
-    /// <summary>她现在是不是在神格里（观者 `WatcherMod.Divinity` 这个 power 在不在）。</summary>
-    internal static bool InDivinity(Player? owner)
+    /// <summary>她现在是不是在神格里（A: `Divinity` / B: `DivinityStance`）。</summary>
+    internal static bool InDivinity(Player? owner) => HasPowerNamed(owner, "Divinity", "DivinityStance");
+
+    private static int PowerAmount(Player? owner, params string[] names)
+    {
+        try
+        {
+            var powers = owner?.Creature?.Powers;
+            if (powers == null) return 0;
+            for (int i = 0; i < powers.Count; i++)
+            {
+                var p = powers[i];
+                if (p == null) continue;
+                string name;
+                try { name = p.GetType().Name; } catch { continue; }
+                foreach (var n in names)
+                    if (string.Equals(name, n, StringComparison.Ordinal)) return (int)Math.Round((double)p.Amount);
+            }
+        }
+        catch { /* 忽略 */ }
+        return 0;
+    }
+
+    private static bool HasPowerNamed(Player? owner, params string[] names)
     {
         try
         {
@@ -218,22 +318,32 @@ internal static class WatcherCards
             for (int i = 0; i < powers.Count; i++)
             {
                 var p = powers[i];
-                if (p != null && string.Equals(p.GetType().Name, "Divinity", StringComparison.Ordinal)) return true;
+                if (p == null) continue;
+                string name;
+                try { name = p.GetType().Name; } catch { continue; }
+                foreach (var n in names)
+                    if (string.Equals(name, n, StringComparison.Ordinal)) return true;
             }
         }
         catch { /* 忽略 */ }
         return false;
     }
-    /// <summary>本场战斗累计获得过多少真言（观者自己的账本）。</summary>
-    internal static int TotalMantraGained(Player? owner)
+
+    private static MethodInfo? Method(string typeFullName, string methodName)
     {
         try
         {
-            var m = M("GetTotalMantraGained", typeof(Player));
-            if (m == null || owner == null) return 0;
-            return m.Invoke(null, new object?[] { owner }) is int n ? n : 0;
+            foreach (var asm in new[] { _preferred, _secondary })
+            {
+                if (asm == null) continue;
+                var t = asm.GetType(typeFullName, false);
+                if (t == null) continue;
+                var m = t.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+                if (m != null) return m;
+            }
         }
-        catch { return 0; }
+        catch { /* 忽略 */ }
+        return null;
     }
 }
 #endif

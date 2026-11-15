@@ -508,3 +508,28 @@ WatcherCombatHelper.ChooseOne(PlayerChoiceContext, Player, IReadOnlyList<CardMod
    新增 `Core/BaseLibMessageRegistration.cs`（纯反射、不引 BaseLib）：发消息前清掉 `_customMessages` 并重跑公开的 `Initialize()`；BaseLib 的 id 分配是「按 FullName 排序 + 哈希避让」**确定性**的 ⇒ 同一个模组集合的两端重算结果一致，不会分叉。接在 `BossPicksSync.BroadcastIfHost` 的 Send 之前。
 
 107 / 111 均 0 错误 · 16 语言通过 · `[verify] v0.2.676 OK` · 已安装（需两端同版本再测）。
+
+## 第 20 轮（2026-11-15）—— 同时兼容两个观者模组
+
+用户确认：两份观者模组「除了多人牌和先古牌以外大部分牌都是相同的（都从 1 代搬过来）」⇒ 只用**重叠**的牌就能同时适配。
+
+`WatcherCards` 重构成 provider 结构：
+
+| | A = 3747526116（Boninall，**优先**） | B = 3747492505（lamali） |
+|---|---|---|
+| 卡牌 | `WatcherMod.WatcherStrike_P` | `Watcher.Code.Cards.Basic.StrikeWatcher` |
+| 模型 id | `WATCHER_STRIKE_P` | `WATCHER-STRIKE_WATCHER` |
+| 姿态 | `WatcherCombatHelper.{EnterDivinity,ExitStance}`（只收 Player） | `StanceCmd.{EnterDivinity,ExitStance}`（多一个 ctx） |
+| 真言 | `Mantra` | `MantraPower` |
+| 神格 | `Divinity`（回合结束退） | `DivinityStance`（回合开始退） |
+| 至纯之水 | `BeforeCombatStart` | `BeforeHandDraw` |
+
+- 卡牌解析三级：**A 类名 → B 类名 → 模型 id**（`ModelDb.AllCards` 按 `Id.Entry` 查），任一命中即可；
+- 剧本那 20 张牌**全部在两版里都有**（用户核对过），少量数值差异（许愿「永生不死」给覆甲/多重护甲、停顿升级的额外格挡）按用户说法无伤大雅；
+- 姿态/真言/神格 全部按类型名双认（`Mantra`|`MantraPower`、`Divinity`|`DivinityStance`）；
+- 「进了神格不再退出」同时压 A 的 `Divinity.AfterSideTurnEnd` 与 B 的 `DivinityStance.BeforeSideTurnStart`；
+- 「至纯之水不印奇迹」同时压 `BeforeCombatStart` 与 `BeforeHandDraw`；
+- 许愿三选一的固定只对 A 生效（B 没有 `ChooseOne` 入口）⇒ 会打一行日志说明，沿用 B 自己的选法；
+- **两个都装时优先 3747526116**（`Probe()` 里先认 A 的招牌类型 `WatcherMod.WatcherCombatHelper`），日志会打 `观者引用层：使用 3747526116（Boninall）（两个观者模组都在 ⇒ 优先 3747526116）`。
+
+107 / 111 均 0 错误 · `[verify] v0.2.677 OK` · 已安装。
