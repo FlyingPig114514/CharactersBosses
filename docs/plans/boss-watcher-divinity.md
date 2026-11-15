@@ -181,3 +181,32 @@ BossKeys.DesignNames["WATCHER_BOSS"] 由「观者」改为「**神格观**」。
 
 - 第 7 回合的「**洗牌**」查不到（观者 + 本体两份 cards.json 都没有）。
 - 第 1 回合「许愿（**选择永生不死**）」需要指定选项 —— 观者的 WatcherWish_P 里有 WatcherWishLiveForever / Almighty / FameAndFortune 三个子选项，要确认走哪个 API 指定。
+
+## 第 3 轮（2026-11-15）—— 特殊效果「虔信」落地
+
+### 新增 src/Hooks/Powers/BossDevotionPower.cs（111 独占）
+
+- PowerType.Buff / StackType.Counter（层数就是**真言**层数，显示成图标上的数字）。
+- AfterCardPlayed：任意**真人玩家**打出的牌 ⇒ 真言 +1（她自己的影子玩家打的牌不算）。
+- AfterSideTurnStart(side == Enemy)：她的回合开始 ⇒ 真言 −5（**恐惧 −3**），Math.Min(当前, 损失) 保证不转负。
+- 每次加层后 while (当前 >= 10) 结算：**① 先 ExitStance → ② +3 力量（恐惧 +4）→ ③ EnterDivinity**，然后刷新意图（RefreshPlannedIntents + BossHandUi.RefreshForce）—— 进神格给的 3 点能量可能让「有费就打」的牌打得出去，所以必须重算。
+- 顺序是先退姿态：用户明确说过「保证她进神格时能拿到能量」，本来就在神格里时再满 10 层不算「进入神格」、拿不到能量。
+
+### 为什么真言不用观者模组的 Mantra power
+
+反编译 WatcherCombatHelper.GainMantra：它只是「记两个计数器 + Apply<Mantra>」，而**满 10 层的结算在 Mantra power 自己身上** —— 时机与顺序都不归我们管。用户要求「先退姿态」，所以真言层数改由**我们自己记**（本 Power 的 Amount），但姿态切换仍走观者的 ExitStance / EnterDivinity（神格的「+3 能量、攻击三倍」还是模组实现的）。
+
+### BossDefs.Watcher 接线
+
+`csharp
+SpecialLocByAct          = { null, null, "WATCHER_BOSS.devotion", null }
+SpecialLocDreadByAct     = { null, null, "WATCHER_BOSS.devotion_dread", null }
+SpecialPowerByAct        = { null, null, typeof(Powers.BossDevotionPower), null }
+SpecialPowerDreadByAct   = { null, null, typeof(Powers.BossDevotionPower), null }
+`
+
+107 / 111 均 0 错误。
+
+### 下一轮
+
+本地化 16 语言（WATCHER_BOSS.name / title / moves.CHARBOSS_PLAY.title / devotion / devotion_dread、BOSS_DEVOTION_POWER.title/description/description_dread、WATCHER_BOSS_ENCOUNTER.title/loss），以及特殊效果说明下方那段「神格」。

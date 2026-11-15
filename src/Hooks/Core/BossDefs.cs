@@ -1120,7 +1120,11 @@ public static class BossDefs
         ScriptByAct = new BossScript?[] { null, null, WatcherScript.Build(), null },
         // 手牌完全由剧本生成 ⇒ 拦掉原版抽牌（同塔罗愚）
         BlocksVanillaDraw = true,
-        // 特殊效果「虔信」下一轮接（`BossDevotionPower`）
+        // 特殊效果「虔信」：玩家每打一张牌 +1 真言 / 她回合开始 −5（恐惧 −3）/ 满 10 层退姿态 +力量进神格
+        SpecialLocByAct = new string?[] { null, null, "WATCHER_BOSS.devotion", null },
+        SpecialLocDreadByAct = new string?[] { null, null, "WATCHER_BOSS.devotion_dread", null },
+        SpecialPowerByAct = new Type?[] { null, null, typeof(Powers.BossDevotionPower), null },
+        SpecialPowerDreadByAct = new Type?[] { null, null, typeof(Powers.BossDevotionPower), null }
     };
 
     /// <summary>运行期把观者的真实 `CharacterModel` 类型写回占位定义（找不到就保持愚者占位）。</summary>
