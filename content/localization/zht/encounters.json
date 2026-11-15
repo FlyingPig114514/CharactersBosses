@@ -100,5 +100,11 @@
     "BASELIB_MISSING_HEADER":  "缺少前置模組 BaseLib",
     "BASELIB_MISSING_BODY":  "本機沒有安裝前置模組 BaseLib（Steam 創意工坊 id 3737335127）。\n\n以下功能無法使用：\n· 遊戲內「模組設定」介面\n· 多人連線時「以房主為準」的勾選與玩法設定同步\n\n其餘功能全部正常（Boss 替換、牌組/遺物/劇本、連線陣容）。訂閱 BaseLib 後重新啟動遊戲即可恢復。",
     "BASELIB_MISSING_OK":  "知道了",
-    "BASELIB_MISSING_CLOSE":  "關閉"
+    "BASELIB_MISSING_CLOSE":  "關閉",
+    "FOOL_BOSS_ENCOUNTER.title":  "愚者",
+    "FOOL_BOSS_ENCOUNTER.loss":  "{character}被[gold]愚者[/gold]的塔羅牌玩弄至死。",
+    "FOOL_TAROT_BOSS_ENCOUNTER.title":  "愚者",
+    "FOOL_TAROT_BOSS_ENCOUNTER.loss":  "{character}被[gold]愚者[/gold]的塔羅牌玩弄至死。",
+    "FOOL_BOSS_ENCOUNTER.loss_tarot":  "{character}成為了[gold]愚者[/gold]牌組中新的[gold]{Card}[/gold]。",
+    "FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot":  "{character}成為了[gold]愚者[/gold]牌組中新的[gold]{Card}[/gold]。"
 }

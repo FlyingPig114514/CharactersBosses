@@ -229,4 +229,10 @@ internal static class BossSpecialUi
         try { BossSpecialRichUi.HideAll(); } catch { /* 忽略 */ }
         try { BossSpecialTip.Hide(); } catch { /* 忽略 */ }
     }
+
+    /// <summary>是不是「塔罗愚」（他的说明框走自绘面板，见上面的注释）。</summary>
+    private static bool IsFoolBoss(CharBossMonster? boss)
+    {
+        try { return boss?.Def?.Key == "FOOL_BOSS"; } catch { return false; }
+    }
 }

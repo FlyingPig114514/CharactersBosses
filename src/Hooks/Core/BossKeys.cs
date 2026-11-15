@@ -81,6 +81,13 @@ internal static class BossKeys
         new("REGENT_CHOICE",        4, 2, 3, typeof(RegentBoss)),          // 储君 3 号：抉择储（用户 2026-11-10）
         new("IRONCLAD_VULN",        0, 2, 1, typeof(IroncladBoss)),        // 铁甲 1 号：易伤战
         new("IRONCLAD_BOULDER",     0, 2, 2, typeof(IroncladBoss)),        // 铁甲 2 号：巨石战
+#if STS2_111
+        new("FOOL_TAROT",           5, 2, 1, typeof(FoolTarotBoss)),      // 愚者 1 号：塔罗愚（用户 2026-11-14）
+#endif
+#if STS2_111
+        // 观者 Boss 占位（用户 2026-11-15）：只有装了观者 mod 才会进候选表（见 RosterFor）
+        new("WATCHER_BOSS",         6, 2, 1, typeof(WatcherBoss)),
+#endif
     };
 
     /// <summary>每一幕的候补（顺序 = 站位偏好）。</summary>
@@ -120,7 +127,12 @@ internal static class BossKeys
                 "REGENT_CHOICE",        // 3 层 10 号（储君 3 号：抉择储，用户 2026-11-10）
                 "IRONCLAD_VULN",        // 3 层 10 号
                 "IRONCLAD_BOULDER",     // 3 层 11 号
-            };
+#if STS2_111
+                "FOOL_TAROT",           // 3 层 12 号：塔罗愚（愚者，用户 2026-11-14）
+#endif
+                // 观者 Boss 占位（用户 2026-11-15）：**只有装了观者 mod 才会进候选表**。
+                // ⚠ 不能用 `#if`（编译期不知道别人装没装）⇒ 在 return 之前按运行期探测结果拼。
+            }.Concat(WatcherRoster()).ToArray();
         }
         if (act == 1)   // 第二幕：10 个（猎 2 / 机 2 / 骨 1 / 储 3 / 战 2）
         {
@@ -200,6 +212,12 @@ internal static class BossKeys
         ["IRONCLAD_STRIKE"] = "打击战",
         ["SILENT_SNAKEBITE"] = "蛇咬猎",
         ["REGENT_DEBRIS"] = "碎屑储",
+#if STS2_111
+        ["FOOL_TAROT"] = "塔罗愚",   // 三层 1 号（愚者）
+#if STS2_111
+    ["WATCHER_BOSS"] = "观者",  // 三层占位（观者 mod）
+#endif
+#endif
         ["REGENT_BOMBARD"] = "轰击储",
         // 二层
         ["SILENT_ENVENOM"] = "涂毒猎",
@@ -358,6 +376,12 @@ internal static class BossKeys
             case "NECROBINDER_OSTY": return ModelDb.Encounter<NecrobinderOstyBossEncounter>();
             case "SILENT_SNECKO": return ModelDb.Encounter<SilentSneckoBossEncounter>();
             case "DEFECT_EVENT": return ModelDb.Encounter<DefectEventBossEncounter>();
+#if STS2_111
+            case "FOOL_TAROT": return ModelDb.Encounter<FoolTarotBossEncounter>();
+#if STS2_111
+            case "WATCHER_BOSS": return ModelDb.Encounter<WatcherBossEncounter>();
+#endif
+#endif
             default: return null;
         }
     }
@@ -402,5 +426,21 @@ internal static class BossKeys
             return ByKey.ContainsKey(key) ? key : null;
         }
         catch { return null; }
+    }
+
+    /// <summary>
+    /// 候选表里「按运行期条件才加入」的那几只（目前只有观者占位）。
+    /// 装了观者 mod 才返回 `["WATCHER_BOSS"]`，否则空数组 —— 没装时行为和以前一模一样。
+    /// </summary>
+    private static string[] WatcherRoster()
+    {
+        // ★ 2026-11-15（用户）：「让玩家在对局中暂时遇不到观者（因为还没做，别放半成品上去）」
+        //   ⇒ 占位的定义 / 怪物 / 遭遇 / 探测全部保留（下一轮做设计时直接接上），
+        //     但**暂时不进候选表**：等真正的设计做完，把下面这三行恢复即可
+        //     （`if (Core.WatcherModPresence.Installed) return new[] { "WATCHER_BOSS" };`）。
+#if STS2_111
+        // 未完成，先不上场。
+#endif
+        return Array.Empty<string>();
     }
 }

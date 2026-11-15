@@ -125,5 +125,11 @@
     "BASELIB_MISSING_HEADER":  "Gerekli mod eksik: BaseLib",
     "BASELIB_MISSING_BODY":  "Bu makinede BaseLib modu kurulu değil (Steam Atölye id 3737335127).\n\nKullanılamayanlar:\n· oyun içi mod ayarları ekranı\n· çok oyunculuda ev sahibi ayarlarının eşitlenmesi\n\nDiğer her şey çalışır (boss değişimi, desteler/eserler/senaryolar, çok oyunculu dizilişler). BaseLib'e abone olup oyunu yeniden başlatın.",
     "BASELIB_MISSING_OK":  "Anladım",
-    "BASELIB_MISSING_CLOSE":  "Kapat"
+    "BASELIB_MISSING_CLOSE":  "Kapat",
+    "FOOL_BOSS_ENCOUNTER.title":  "Soytarı",
+    "FOOL_BOSS_ENCOUNTER.loss":  "{character}, [gold]Soytarı[/gold]'nın tarot destesine yenildi.",
+    "FOOL_TAROT_BOSS_ENCOUNTER.title":  "Soytarı",
+    "FOOL_TAROT_BOSS_ENCOUNTER.loss":  "{character}, [gold]Soytarı[/gold]'nın tarot destesine yenildi.",
+    "FOOL_BOSS_ENCOUNTER.loss_tarot":  "{character}, [gold]Soytarı[/gold]'nın destesinde yeni [gold]{Card}[/gold] oldu.",
+    "FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot":  "{character}, [gold]Soytarı[/gold]'nın destesinde yeni [gold]{Card}[/gold] oldu."
 }

@@ -389,7 +389,12 @@ private static int OrbPassiveDamageCore(CharBossMonster boss, bool quiet, ref in
         {
             var pcs = boss.Shadow?.PlayerCombatState;
             var queue = pcs?.OrbQueue;
-            if (queue == null || queue.Capacity <= 0) return 0;
+            // ⚠ 不能再用「球位容量 <= 0 就返回 0」：塔罗愚（用户 2026-11-14）
+            //   「第一次使用魔术师的当回合还是没有将要生成的球的意图」——
+            //   他**本来没有球位**，第 4 回合打出「魔术师」才 +3 个球位并生成 3 颗球，
+            //   而回合结束这三颗球各打一次被动。判断交给 `OrbsAfter`（它按计划把球位一起推进），
+            //   真的没有球时它本来就返回空列表。
+            if (queue == null) return 0;
 
             // ★ 2026-11-05：把「每张牌出手时的剩余能量」一起传下去 ——
             //   「暴风雨」是 X 费牌，生成几个闪电球要看那个数（用户要求提前计算），

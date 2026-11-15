@@ -256,11 +256,13 @@ public static class BossDefs
         // 抽完再把新进手牌放回抽牌堆顶（手牌仍等于剧本）。见 BossDefinition.KeepsScriptedHandByAct。
         KeepsScriptedHandByAct = new[] { true, false, false, false },
         // 特殊效果按幕区分：
-        //   · 第一幕「奇巧猎」= 命运同担（她每回合第一次弃牌 → 玩家下回合开始弃 1 张）；
+        //   · 第一幕「奇巧猎」= 命运同担（她每回合第 1 次弃牌 → 让**被你锁定的玩家**获得「命运同担」层数；
+        //     可叠加，层数 = 该玩家下回合开始时按层数弃牌；普通 1 层 / 恐惧 2 层）；
         //   · 第三幕「刀猎」= 袖里乾坤；
         //   · 第二幕「涂毒猎」= 带毒刺击（中毒改成玩家回合结束结算、可格挡，未格挡伤害转移 1 点中毒给她）。
         SpecialLocByAct = new string?[] { "SILENT_BOSS.sly", "SILENT_BOSS.special_act2", "SILENT_BOSS.special", null },
-        // 2026-11-13（恐惧模式）：第一幕「命运同担」恐惧版 = 下回合开始弃 2 张
+        // 2026-11-14（用户改口径）：第一幕「命运同担」改成**可叠加** —— 普通模式每次给 1 层、
+        //   恐惧模式每次给 2 层（层数 = 你下回合开始时按层数弃牌），图标借用「抑制」那个。
         // 2026-11-13（恐惧模式）：第三幕「刀猎·袖里乾坤」= 每次塞 4 张小刀（正常 3 张）
         SpecialLocDreadByAct = new string?[] { "SILENT_BOSS.sly_dread", "SILENT_BOSS.special_act2_dread", "SILENT_BOSS.special_dread", null },
         SpecialPowerByAct = new Type?[]
@@ -1041,10 +1043,106 @@ public static class BossDefs
         },
     };
 
+#if STS2_111
+    // ⚠ 0.113.0 才有「愚者（Fool）」这个角色与整套塔罗牌 ⇒ 这一个 Boss 只在 111 构建里存在。
+    /// <summary>
+    /// 三层 1 号「**塔罗愚**」（用户 2026-11-14；完整口径见 docs/plans/boss-fool-tarot.md）。
+    ///   · 特殊效果「愚者」= <see cref="Powers.BossFoolPower"/>：被施加灾厄时先用格挡抵消等量灾厄；
+    ///   · 卡组只有 3 张神话形态（其余全是印出来的塔罗牌）⇒ 拦掉原版抽牌/印牌/捞牌；
+    ///   · 恐惧模式：**非无色牌全部升级**（走 DreadUpgradesByAct 这条运行期通道）。
+    /// </summary>
+    public static readonly BossDefinition Fool = new()
+    {
+        Key = "FOOL_BOSS",
+        VisualScene = "fool",
+        CharacterType = typeof(MegaCrit.Sts2.Core.Models.Characters.Fool),
+        // 愚者基础血量 77；涅奥的祝福再按幕加（拾起 +120 / 每进一幕 +180）
+        Hp = new[] { 77, 77, 77, 77 },
+        // ⚠ 能量**就是愚者本人的 3 点**，不要为了「剧本里的牌全打得出去」把它调大：
+        //   他多出来的能量来自塔罗牌自己 —— 皇帝 = 获得 7 点能量、星星 = 下回合 3 点、太阳 = 2 点。
+        //   用户 2026-11-14 口径（第一回合写「神话形态、神话形态（没费）、神话形态（没费）」）
+        //   就是按「3 费只够打 1 张神话形态」设计的。
+        Energy = new[] { 3, 3, 3, 3 },
+        HandSize = new[] { 5, 5, 6, 6 },
+        DeckByAct = new List<Type>?[] { null, null, TarotFoolScript.Deck(), null },
+        RelicsByAct = new List<Type>?[] { null, null, TarotFoolScript.Relics(), null },
+        ScriptByAct = new BossScript?[] { null, null, TarotFoolScript.Build(), null },
+        // 用户口径：「拦掉所有原版抽牌、印牌、捞牌」
+        BlocksVanillaDraw = true,
+        // ★ 2026-11-14（用户）：「第九回合的费用应该够打虚空形态吧，有 2 张皇帝，上回合有 2 张星星，
+        //   还有被遗忘的仪式和鬼火」——
+        //   `星星`（TheStar）给的是**下回合** 3 点能量（`EnergyNextTurnPower`），而原版只在
+        //   `CombatState.Players` 里的人身上兑现，影子玩家不在里面 ⇒ 这 6 点从来没到账。
+        //   `HonorsNextTurnEnergyActs` 就是给这种「下回合能量」手动兑现的开关（本来是灵魂骨第二幕在用），
+        //   塔罗愚是第三幕 ⇒ 这里声明第三幕。
+        //   算一下第九回合：3（基础）+ 6（2 张星星）+ 7 + 7（2 张皇帝）+ 1（鬼火）= 24，
+        //   而 16 张牌合计正好 24 费（被遗忘的仪式的 +3 要「本回合消耗过牌」才给，不计）⇒ 正好打完。
+        HonorsNextTurnEnergyActs = new[] { 2 },
+        KeepsNextTurnEnergyPower = true,   // 别删「星星」给的下回合能量，交给回合能量结算兑现
+        SpecialLocByAct = new string?[] { null, null, "FOOL_BOSS.fool", null },
+        SpecialLocDreadByAct = new string?[] { null, null, "FOOL_BOSS.fool_dread", null },
+        SpecialPowerByAct = new Type?[] { null, null, typeof(Powers.BossFoolPower), null },
+        SpecialPowerDreadByAct = new Type?[] { null, null, typeof(Powers.BossFoolPower), null },
+        DreadUpgradesByAct = new List<Type>?[] { null, null, TarotFoolScript.DreadUpgradeTypes(), null },
+        // 进阶 8：意外光滑的石头 + 奥利哈钢；进阶 9：**金刚杵**（用户 2026-11-14 订正，原为玉之剑；
+        //   仍插在涅奥的祝福与闪亮口红之间）
+        AscensionRelicsByAct = new List<(int MinAscension, int Act, Type Relic, Type? InsertBefore)>
+        {
+            (8, 3, typeof(MegaCrit.Sts2.Core.Models.Relics.OddlySmoothStone), null),
+            (8, 3, typeof(MegaCrit.Sts2.Core.Models.Relics.Orichalcum), null),
+            (9, 3, typeof(MegaCrit.Sts2.Core.Models.Relics.Vajra),
+                   typeof(MegaCrit.Sts2.Core.Models.Relics.Anchor)),
+        },
+    };
+#endif
+
+#if STS2_111
+    /// <summary>
+    /// **观者 Boss 占位**（用户 2026-11-15）：「联动观者 mod，装了以后 boss 有可能为观者（暂时还没有设计），
+    /// 但和愚者一样先设置好」。
+    ///
+    /// ⚠ 观者是**别的 mod 的角色**，我们编译期没有它的类型 ⇒ `CharacterType` 先填愚者占位，
+    /// 真正的类型由 `Core.WatcherModPresence` 在运行期解析后写回（见 `RefreshWatcherCharacterType`）。
+    /// 没装观者 mod 时这只 Boss 根本不会进候选表（`BossKeys.RosterFor` 里按 `WatcherModPresence.Installed` 过滤）。
+    /// </summary>
+    public static readonly BossDefinition Watcher = new()
+    {
+        Key = "WATCHER_BOSS",
+        VisualScene = "watcher",
+        CharacterType = typeof(MegaCrit.Sts2.Core.Models.Characters.Fool),   // 占位，运行期会被替换
+        Hp = new[] { 72, 72, 72, 72 },
+        Energy = new[] { 3, 3, 3, 3 },
+        HandSize = new[] { 5, 5, 6, 6 },
+        // 卡组/剧本先空着（占位）⇒ `BossLoadout` 会按角色卡池自动配一套占位卡组
+        DeckByAct = new List<Type>?[] { null, null, null, null },
+        RelicsByAct = new List<Type>?[] { null, null, null, null },
+        ScriptByAct = new BossScript?[] { null, null, null, null },
+        // 特殊效果暂时不写（还没有设计）⇒ 不挂 Panel、不施加 Power
+    };
+
+    /// <summary>运行期把观者的真实 `CharacterModel` 类型写回占位定义（找不到就保持愚者占位）。</summary>
+    internal static void RefreshWatcherCharacterType()
+    {
+        try
+        {
+            var type = WatcherModPresence.CharacterType();
+            if (type != null && Watcher.CharacterType != type)
+            {
+                Watcher.CharacterType = type;
+                Logger.Log($"[CharBoss] 观者 Boss：角色类型已换成 {type.FullName}");
+            }
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 观者 Boss 角色类型解析失败: " + e.Message); }
+    }
+#endif
     /// <summary>按角色逐个列出，索引与 <c>CharBossEncounters</c> 的映射表一致。</summary>
     public static readonly BossDefinition[] ByCharacter =
     {
         Ironclad, Silent, Defect, Necrobinder, Regent,
+#if STS2_111
+        Fool,
+        Watcher,
+#endif
     };
 
     /// <summary>按 Key 索引（日志/调试用）。</summary>
@@ -1056,5 +1154,9 @@ public static class BossDefs
             [Defect.Key] = Defect,
             [Necrobinder.Key] = Necrobinder,
             [Regent.Key] = Regent,
+#if STS2_111
+            [Fool.Key] = Fool,
+            [Watcher.Key] = Watcher,
+#endif
         };
 }

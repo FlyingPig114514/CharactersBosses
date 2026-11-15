@@ -1,0 +1,10 @@
+{
+    "TAROT_FASTING.title":  "Post",
+    "TAROT_FASTING.description":  "Zyskaj {MagicNumber} [gold]Siły[/gold].\nZyskaj {MagicNumber} [gold]Zręczności[/gold].\nNa początku każdej tury zyskujesz o 1 [gold]Energii[/gold] mniej.",
+    "TAROT_DEVA_FORM.title":  "Postać Dewy",
+    "TAROT_DEVA_FORM.description":  "Na początku swojej tury zyskujesz [gold]Energię[/gold]; jej ilość rośnie o {MagicNumber} co turę.",
+    "TAROT_BRAWL.title":  "Bijatyka",
+    "TAROT_BRAWL.description":  "Na początku swojej tury nałóż {BrawlPower} [gold]Stłuczenia[/gold] na WSZYSTKICH wrogów.",
+    "TAROT_ETERNAL_FORM.title":  "Wieczna postać",
+    "TAROT_ETERNAL_FORM.description":  "Pierwsze 4 zagrywalne karty dobrane w każdej turze kosztują w tej turze o {EternalPower} mniej."
+}

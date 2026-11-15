@@ -125,5 +125,11 @@
     "BASELIB_MISSING_HEADER":  "Falta el mod obligatorio: BaseLib",
     "BASELIB_MISSING_BODY":  "Este equipo no tiene el mod BaseLib instalado (id de Steam Workshop 3737335127).\n\nNo disponible:\n· la pantalla de configuración de mods del juego\n· la sincronización de ajustes del anfitrión en multijugador\n\nTodo lo demás funciona (sustitución de jefes, mazos/reliquias/guiones, alineaciones multijugador). Suscríbete a BaseLib y reinicia el juego.",
     "BASELIB_MISSING_OK":  "Entendido",
-    "BASELIB_MISSING_CLOSE":  "Cerrar"
+    "BASELIB_MISSING_CLOSE":  "Cerrar",
+    "FOOL_BOSS_ENCOUNTER.title":  "El Juglar",
+    "FOOL_BOSS_ENCOUNTER.loss":  "{character} fue despachado por el tarot del [gold]Juglar[/gold].",
+    "FOOL_TAROT_BOSS_ENCOUNTER.title":  "El Juglar",
+    "FOOL_TAROT_BOSS_ENCOUNTER.loss":  "{character} fue despachado por el tarot del [gold]Juglar[/gold].",
+    "FOOL_BOSS_ENCOUNTER.loss_tarot":  "{character} se convirtió en la nueva carta [gold]{Card}[/gold] del mazo del [gold]Juglar[/gold].",
+    "FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot":  "{character} se convirtió en la nueva carta [gold]{Card}[/gold] del mazo del [gold]Juglar[/gold]."
 }

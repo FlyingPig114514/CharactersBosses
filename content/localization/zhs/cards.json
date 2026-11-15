@@ -1,0 +1,10 @@
+{
+    "TAROT_FASTING.title":  "斋戒",
+    "TAROT_FASTING.description":  "获得{MagicNumber}点[gold]力量[/gold]。\n获得{MagicNumber}点[gold]敏捷[/gold]。\n每回合开始时少获得1点[gold]能量[/gold]。",
+    "TAROT_DEVA_FORM.title":  "天人形态",
+    "TAROT_DEVA_FORM.description":  "在你的回合开始时获得[gold]能量[/gold]，每回合增加{MagicNumber}点。",
+    "TAROT_BRAWL.title":  "斗殴",
+    "TAROT_BRAWL.description":  "在你的回合开始时，给予所有敌人{BrawlPower}层[gold]瘀伤[/gold]。",
+    "TAROT_ETERNAL_FORM.title":  "永恒形态",
+    "TAROT_ETERNAL_FORM.description":  "每回合抽到的前4张可打出的牌，一回合内耗能减少{EternalPower}点。"
+}

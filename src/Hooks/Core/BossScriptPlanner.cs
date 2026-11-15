@@ -49,7 +49,53 @@ public static class BossScriptPlanner
         //   修法：补打时把「本回合已经花掉的能量」从预算里扣掉（`spentThisTurn`，由
         //   `CharBossMonster.ScriptEnergySpent` 逐张累加）。真正中途到账的能量照样算得进来。
         int energy = Math.Max(0, pcs.Energy - Math.Max(0, spentThisTurn));
-        int energyAtStart = energy;      // 螺旋钻击的段数 = 本回合已花费的能量之和（见下面的 HELIX_DRILL）
+        // ★ 2026-11-14（用户「塔罗愚」）：「第九回合的费用应该够打虚空形态吧，有 2 张皇帝，
+        //   上回合有 2 张星星，还有被遗忘的仪式和鬼火」——
+        //   `星星`（TheStar）的 3 点能量是 `<c>EnergyNextTurnPower</c>`，**他的回合开始**才兑现
+        //   （由 `CharBossMonster.PendingNextTurnEnergyCredit()` 补），而计划是在**玩家回合**就算好的
+        //   ⇒ 6 点能量在这里完全看不到，第 9 回合的「虚空形态」被判成没费。
+        //   和上面「下回合辉星」同一套处理：规划期先把这笔算进预算。
+        //   ⚠ 只对 `KeepsNextTurnEnergyPower` 打开的 Boss 生效（别人的剧本把这笔能量写死在逐回合预算里，
+        //     再算一次就会多给）。
+        try
+        {
+            if (boss.Def.KeepsNextTurnEnergyPower)
+            {
+                var pendingEnergy = boss.Creature?.GetPower<MegaCrit.Sts2.Core.Models.Powers.EnergyNextTurnPower>();
+                if (pendingEnergy != null)
+                {
+                    int gain = Math.Max(0, (int)Math.Round((double)pendingEnergy.Amount));
+                    if (gain > 0)
+                    {
+                        energy += gain;
+                        Logger.Log($"[CharBoss] 规划期补算「下回合 +{gain} 能量」（星星这类牌给的，" +
+                                   $"他回合开始才真到账）⇒ 本回合预算 {energy}");
+                    }
+                }
+            }
+        }
+        catch { /* 读不到就当 0 */ }
+        // ★ 用户 2026-11-14：「记得考虑天人形态的加费」——他每回合开始会拿到**递增**的能量，
+        //   而计划是玩家回合就算好的 ⇒ 这里先把这一笔算进预算（`TarotDevaPower.Amount` 就是本回合那个数）。
+        try
+        {
+            var deva = boss.Creature?.GetPower<Powers.TarotDevaPower>();
+            if (deva != null)
+            {
+                int gain = Math.Max(1, (int)Math.Round((double)deva.Amount));
+                energy += gain;
+                Logger.Log($"[CharBoss] 规划期补算天人形态 +{gain} 能量 ⇒ 本回合预算 {energy}");
+            }
+        }
+        catch { /* 读不到就当 0 */ }
+        // ★ 2026-11-14（用户）：「回响形态被打出两次的牌下方因为群蛇形态造成的伤害并没有标成 4×2
+        //   （恐惧则为 6×2）」「力量作为一回合的第一张牌因为回响被复制时，后面攻击牌的伤害预览
+        //   只考虑了 1 次力量的增幅」—— 也就是**回响形态的重打**在意图里完全没算。
+        //   反编译 `EchoFormPower`：`ModifyCardPlayCount` 对本回合**前 `Amount` 张**牌 +1，
+        //   计数在 `AfterCardPlayed` 里推进。规划期从「还剩几张额度」起算，逐张扣。
+        int echoCardsLeft = EchoFormCardsLeft(boss);
+        // 瘀伤：他回合开始才给敌人上，而意图在玩家回合就算好了 ⇒ 每段攻击预览先补上这一笔
+        int pendingBruise = BossIntentBuilder.PendingBruise(boss.Creature);        int energyAtStart = energy;      // 螺旋钻击的段数 = 本回合已花费的能量之和（见下面的 HELIX_DRILL）
         // ⚠ 规划发生在**玩家回合**，而「下回合辉星」（StarNextTurnPower）要到他回合开始才到账
         // ⇒ 规划期的星预算必须把这笔算进来，否则第 8 回合的「七星（7 星）」会被判成星不够而不打
         //（用户 2026-10-28 实测：第 8 回合意图里直接没了七星）。
@@ -148,6 +194,14 @@ public static class BossScriptPlanner
         int plannedDevour = BossDamagePredictor.DevourAmountOf(boss);
 
         // 球位模拟器：按剧本出牌顺序推进队列，判断哪几张牌会（因为球位已满）激发球
+        // ★ 2026-11-14（用户「塔罗愚」口径）：「获得群蛇形态之后，他每张牌下面都要加上
+        //   『因此牌会造成的群蛇伤害』（参考炼药猎那套做法）」。
+        //   炼药猎那条是 `BladesGrowth.RecomputeAll` 顺手算的，可它**有球位就直接 return**
+        //   （塔罗愚第 4 回合「魔术师」之后就永久有球位）⇒ 必须在规划期按剧本顺序自己算，
+        //   并存进 `PlannedPlay.SerpentDamage` 供两条重算路径原样再用。
+        int serpentNow = SerpentStacksOf(boss.Creature);   // 身上已有的层数（之前的回合拿到的）
+        int serpentSoFar = 0;                              // 本回合剧本里、排在当前牌**之前**会拿到的层数
+
         var orbSim = new BossOrbSim(boss.Creature, pcs.OrbQueue);
         // 到 Boss 出手前还会掉的力量/集中（偏差认知），意图要先扣掉它
         int pendingDrop = BossIntentBuilder.PendingDrop(boss.Creature);
@@ -275,7 +329,7 @@ public static class BossScriptPlanner
                 {
                     var displayTarget = BossPlanner.ChooseTarget(boss, card) ?? boss.Creature;
                     var displayIntents = autoPlayed
-                        ? PreviewIntents(card, displayTarget, pendingDrop, pendingRise, inTurnStrength)
+                        ? PreviewIntents(card, displayTarget, pendingDrop, pendingRise, inTurnStrength + pendingBruise)
                         : ForcedIntents(entry.ForceIntents);
 
                     int drillPerHit = 0, drillGain = 0, drillBase = 0, drillTotal = 0;
@@ -338,7 +392,7 @@ public static class BossScriptPlanner
                 if (sly)
                 {
                     var slyTarget = BossPlanner.ChooseTarget(boss, card) ?? boss.Creature;
-                    var slyIntents = PreviewIntents(card, slyTarget, pendingDrop, pendingRise, inTurnStrength);
+                    var slyIntents = PreviewIntents(card, slyTarget, pendingDrop, pendingRise, inTurnStrength + pendingBruise);
                     boss.DisplayPlays.Add(new PlannedPlay
                     {
                         Card = card,
@@ -382,7 +436,7 @@ public static class BossScriptPlanner
                 if (IsAutoPlayFromExhaust(boss, turnNumber, card))
                 {
                     var burnTarget = BossPlanner.ChooseTarget(boss, card) ?? boss.Creature;
-                    var burnIntents = PreviewIntents(card, burnTarget, pendingDrop, pendingRise, inTurnStrength);
+                    var burnIntents = PreviewIntents(card, burnTarget, pendingDrop, pendingRise, inTurnStrength + pendingBruise);
                     boss.DisplayPlays.Add(new PlannedPlay
                     {
                         Card = card,
@@ -459,6 +513,28 @@ public static class BossScriptPlanner
             //   两者的段数在规划期都算不出来（历史空 / 还没花星）⇒ 由这里按剧本顺序把数递进去。
             string entryNow = SafeEntry(card);
             int starHits = -1;
+            // 回响形态：这一张会不会被打两次（额度用完就回到 1 次）
+            // ★ 用户 2026-11-14：「月亮要把小刀打出时会触发的群蛇形态伤害列出来（4×10 或恐惧 6×10，
+            //   不受力量等影响）」——月亮印出 10 把小刀、这 10 把真的会被打出去，等于群蛇形态触发 10 次。
+            //   做法：把「这一张的段数」按 10 算（`playCount`），群蛇那一条就会画成 `4×10`。
+            //   月亮自己没有攻击伤害，所以放大 `playCount` 不会影响别的数字。
+            int moonShivs = 0;
+            try { if (string.Equals(card.Id.Entry, "THE_MOON", StringComparison.Ordinal)) moonShivs = BossIntentBuilder.ShivsFrom(card); }
+            catch { moonShivs = 0; }            int echoPlayCount = echoCardsLeft > 0 ? 2 : 1;
+            // 月亮：印出来的 10 把小刀都会被真的打出去 ⇒ 群蛇形态那条按 10 段画
+            // 用户 2026-11-14：月亮**本身也算一张牌** ⇒ 10 把小刀 + 月亮自己 = 11 段（4×11 / 恐惧 6×11）
+            if (moonShivs > 0) echoPlayCount = Math.Max(echoPlayCount, 1) * (moonShivs + 1);
+            // 月亮自己那一条群蛇伤害：他**打出**月亮时身上已经有群蛇形态（第 9 回合拿到的）
+            int serpentForMoon = moonShivs > 0 ? (serpentNow + serpentSoFar) : -1;
+            // 群蛇形态：这一张牌**自己**会不会给出层数（群蛇形态那张牌自己不标，之后的牌才吃到）
+            int serpentHere = 0;
+            try
+            {
+                int serpentGain = SerpentGainOf(card);
+                if (serpentGain > 0) serpentSoFar += serpentGain;
+                else serpentHere = serpentNow + serpentSoFar;
+            }
+            catch { serpentHere = 0; }
             if (starX) starHits = Math.Max(0, starCost);
             else if (entryNow == "RADIATE") starHits = Math.Max(0, starsGainedThisTurn);
             var intents = BossIntentBuilder.IntentsFor(card, target, pendingDrop, pendingRise,
@@ -487,7 +563,7 @@ public static class BossScriptPlanner
                 // 全身撞击：用「出手时会有多少格挡」覆盖牌面（见上面 simBlock 注释）
                 bodySlamBlock: SafeEntry(card) == "BODY_SLAM" ? simBlock : -1,
                 // 她自己的力量（奥斯提的牌不吃，见 IntentsFor 里的说明）
-                strengthBonus: inTurnStrength,
+                strengthBonus: inTurnStrength + pendingBruise,   // 后者 = 瘀伤（每段固定加值）
                 // ★ 2026-11-05：烟囱 / 开信刀的伤害挂在**触发它的这张牌**底下（不再进左侧独立列）；
                 //   烟囱按「本牌生成几张状态牌」打几段（强撑 = 2 张伤口 ⇒ 5×2），开信刀永远是单段。
                 //   散射炮把「本回合排在它前面、会生成状态牌的牌」也算进段数。
@@ -505,6 +581,8 @@ public static class BossScriptPlanner
                 shivOverride: SafeEntry(card) == "STORM_OF_STEEL" ? stormDiscards : 0,
                 // ★ 2026-11-10：星尘（花光所有星）/ 辐射（本回合获得的星）的段数（-1 = 不覆盖）
                 starHits: starHits,
+                serpentDamage: serpentForMoon >= 0 ? serpentForMoon : serpentHere,   // 群蛇形态（月亮：4×10）
+                playCount: echoPlayCount,     // 回响形态：群蛇那一条要画成 4×2 / 6×2
                 // 仆从储：这一张是不是「召唤」（按本回合前面已计划的仆从数量算）
                 minionSummon: IsMinionSummonHere(card, boss, ref plannedMinions),
                 // ★ 2026-11-10：亡魂牵引的段数 = 本场打出的虚无牌数，而本回合排它前面的那几张
@@ -564,7 +642,11 @@ public static class BossScriptPlanner
                 PendingStatusCards = statusesThisTurn,
                 // ★ 2026-11-10：星尘/辐射的段数（辉星口径）在这里定死，重算路径原样再用
                 StarHits = starHits,
+                SerpentDamage = serpentHere,   // 群蛇形态（重算路径原样再用）
+                PlayCount = echoPlayCount,     // 回响形态（重算路径原样再用）
             });
+            // 这张牌真的会打出去 ⇒ 用掉一次「回响形态」的重打额度
+            if (echoCardsLeft > 0) echoCardsLeft--;
             // ★ v0.2.300：「踩踏」的减费看的是「本回合已经打完的攻击牌数」⇒ 每计划一张攻击牌就 +1
             //   （必须在扣费之后记，位置无所谓；放在这里与 energy 记账相邻，方便以后核对）。
             try
@@ -596,7 +678,8 @@ public static class BossScriptPlanner
                     int add = Math.Max(0, BossDamagePredictor.StrengthGainOf(card));
                     if (add > 0)
                     {
-                        inTurnStrength += add;
+                        // 回响形态重打一次 ⇒ 这张牌的力量要算两遍（用户 2026-11-14）
+                        inTurnStrength += add * echoPlayCount;
                         Logger.Log($"[CharBoss] 意图预补：{SafeEntry(card)} 给她 {add} 点力量 ⇒ " +
                                    $"本回合后续攻击意图 +{inTurnStrength}");
                     }
@@ -1288,5 +1371,44 @@ public static class BossScriptPlanner
             return true;
         }
         catch { return false; }
+    }
+
+    /// <summary>他身上「群蛇形态」的层数（= 每打出一张牌对随机敌人造成多少伤害）；没有就是 0。</summary>
+    private static int SerpentStacksOf(MegaCrit.Sts2.Core.Entities.Creatures.Creature? boss)
+    {
+        if (boss == null) return 0;
+        try { return Math.Max(0, boss.GetPowerAmount<MegaCrit.Sts2.Core.Models.Powers.SerpentFormPower>()); }
+        catch { return 0; }
+    }
+
+    /// <summary>
+    /// 「群蛇形态」这张牌自己会给多少层（= 之后每张牌打多少）。牌面上是 `PowerVar&lt;SerpentFormPower&gt;`，
+    /// key 可能是 `SerpentForm` 或 `SerpentFormPower` ⇒ 两个都试，读不到就当 0（非这张牌）。
+    /// </summary>
+    private static int SerpentGainOf(MegaCrit.Sts2.Core.Models.CardModel? card)
+    {
+        if (card == null) return 0;
+        try
+        {
+            int byKey = (int)Math.Round(ReadVar(card, "SerpentForm"));
+            if (byKey <= 0) byKey = (int)Math.Round(ReadVar(card, "SerpentFormPower"));
+            return Math.Max(0, byKey);
+        }
+        catch { return 0; }
+    }
+
+    /// <summary>
+    /// 本回合还剩几张「回响形态」的重打额度（`EchoFormPower.Amount` = 每回合前几张牌会被打出两次）。
+    /// 没有这层 power 就是 0。
+    /// </summary>
+    private static int EchoFormCardsLeft(CharBossMonster boss)
+    {
+        try
+        {
+            var echo = boss?.Creature?.GetPower<MegaCrit.Sts2.Core.Models.Powers.EchoFormPower>();
+            if (echo == null) return 0;
+            return Math.Max(0, (int)Math.Round((double)echo.Amount));
+        }
+        catch { return 0; }
     }
 }

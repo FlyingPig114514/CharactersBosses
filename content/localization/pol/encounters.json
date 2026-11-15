@@ -125,5 +125,11 @@
     "BASELIB_MISSING_HEADER":  "Brak wymaganego moda: BaseLib",
     "BASELIB_MISSING_BODY":  "Na tej maszynie nie zainstalowano moda BaseLib (id Steam Workshop 3737335127).\n\nNiedostępne:\n· ekran konfiguracji modów w grze\n· synchronizacja ustawień hosta w trybie wieloosobowym\n\nWszystko inne działa (zamiana bossów, talie/relikwie/skrypty, składy wieloosobowe). Subskrybuj BaseLib i uruchom grę ponownie.",
     "BASELIB_MISSING_OK":  "Rozumiem",
-    "BASELIB_MISSING_CLOSE":  "Zamknij"
+    "BASELIB_MISSING_CLOSE":  "Zamknij",
+    "FOOL_BOSS_ENCOUNTER.title":  "Błazen",
+    "FOOL_BOSS_ENCOUNTER.loss":  "{character} przegrał z talią tarota [gold]Błazna[/gold].",
+    "FOOL_TAROT_BOSS_ENCOUNTER.title":  "Błazen",
+    "FOOL_TAROT_BOSS_ENCOUNTER.loss":  "{character} przegrał z talią tarota [gold]Błazna[/gold].",
+    "FOOL_BOSS_ENCOUNTER.loss_tarot":  "{character} stał się nową kartą [gold]{Card}[/gold] w talii [gold]Błazna[/gold].",
+    "FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot":  "{character} stał się nową kartą [gold]{Card}[/gold] w talii [gold]Błazna[/gold]."
 }

@@ -1,0 +1,743 @@
+﻿// ===== MegaCrit.Sts2.Core.Nodes.Vfx.NRollingBoulderVfx =====
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using Godot;
+using Godot.Bridge;
+using Godot.NativeInterop;
+using MegaCrit.Sts2.Core.Assets;
+using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Helpers;
+using MegaCrit.Sts2.Core.Logging;
+using MegaCrit.Sts2.Core.Nodes.Combat;
+using MegaCrit.Sts2.Core.Nodes.GodotExtensions;
+using MegaCrit.Sts2.Core.Nodes.Rooms;
+using MegaCrit.Sts2.Core.TestSupport;
+
+namespace MegaCrit.Sts2.Core.Nodes.Vfx;
+
+[ScriptPath("res://src/Core/Nodes/Vfx/NRollingBoulderVfx.cs")]
+public class NRollingBoulderVfx : Node2D
+{
+	[Signal]
+	public delegate void HitCreatureEventHandler(NCreature creature);
+
+	[Signal]
+	public delegate void FinishedEventHandler();
+
+	public class MethodName : MethodName
+	{
+		public static readonly StringName _Ready = StringName.op_Implicit("_Ready");
+
+		public static readonly StringName CleanUpBeforeEarlyExit = StringName.op_Implicit("CleanUpBeforeEarlyExit");
+	}
+
+	public class PropertyName : PropertyName
+	{
+		public static readonly StringName _boulder = StringName.op_Implicit("_boulder");
+
+		public static readonly StringName _shadow = StringName.op_Implicit("_shadow");
+
+		public static readonly StringName _slamBehind = StringName.op_Implicit("_slamBehind");
+
+		public static readonly StringName _slamFront = StringName.op_Implicit("_slamFront");
+	}
+
+	public class SignalName : SignalName
+	{
+		public static readonly StringName HitCreature = StringName.op_Implicit("HitCreature");
+
+		public static readonly StringName Finished = StringName.op_Implicit("Finished");
+	}
+
+	[StructLayout((LayoutKind)3)]
+	[CompilerGenerated]
+	private struct <PlayAnim>d__22 : IAsyncStateMachine
+	{
+		public int <>1__state;
+
+		public AsyncTaskMethodBuilder <>t__builder;
+
+		public NRollingBoulderVfx <>4__this;
+
+		public float xOffset;
+
+		public float timeToImpact;
+
+		public float rotationSpeed;
+
+		private Vector2 <initialBoulderPosition>5__2;
+
+		private Vector2 <initialShadowOffset>5__3;
+
+		private Vector2 <initialShadowScale>5__4;
+
+		private List<Creature> <creaturesHit>5__5;
+
+		private Vector2 <impactPoint>5__6;
+
+		private float <yAccel>5__7;
+
+		private Vector2 <velocity>5__8;
+
+		private float <timer>5__9;
+
+		private bool <firstImpact>5__10;
+
+		private TaskAwaiter<float> <>u__1;
+
+		private void MoveNext()
+		{
+			//IL_024a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0257: Unknown result type (might be due to invalid IL or missing references)
+			//IL_028d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0293: Unknown result type (might be due to invalid IL or missing references)
+			//IL_029a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_029f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0306: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0317: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0332: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0338: Unknown result type (might be due to invalid IL or missing references)
+			//IL_033d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0342: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0352: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0357: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_039e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0433: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0208: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0215: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0522: Unknown result type (might be due to invalid IL or missing references)
+			//IL_045c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_046d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0158: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0186: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0231: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0500: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0124: Unknown result type (might be due to invalid IL or missing references)
+			int num = <>1__state;
+			NRollingBoulderVfx nRollingBoulderVfx = <>4__this;
+			try
+			{
+				TaskAwaiter<float> val;
+				if (num == 0)
+				{
+					val = <>u__1;
+					<>u__1 = default(TaskAwaiter<float>);
+					num = (<>1__state = -1);
+					goto IL_0266;
+				}
+				Vector2 val2;
+				if (NCombatRoom.Instance == null || nRollingBoulderVfx._creatures.Count == 0)
+				{
+					nRollingBoulderVfx.CleanUpBeforeEarlyExit();
+				}
+				else
+				{
+					<initialBoulderPosition>5__2 = ((Node2D)nRollingBoulderVfx).GlobalPosition;
+					<initialShadowOffset>5__3 = ((Node2D)nRollingBoulderVfx._shadow).Position;
+					<initialShadowScale>5__4 = ((Node2D)nRollingBoulderVfx._shadow).Scale;
+					val2 = Vector2.Zero;
+					<creaturesHit>5__5 = new List<Creature>();
+					int num2 = 0;
+					Enumerator<Creature> enumerator = nRollingBoulderVfx._creatures.GetEnumerator();
+					try
+					{
+						while (enumerator.MoveNext())
+						{
+							Creature current = enumerator.Current;
+							NCreature creatureNode = NCombatRoom.Instance.GetCreatureNode(current);
+							if (creatureNode != null)
+							{
+								val2 += ((Node2D)creatureNode.Visuals).GlobalPosition;
+								num2++;
+							}
+						}
+					}
+					finally
+					{
+						if (num < 0)
+						{
+							((System.IDisposable)enumerator/*cast due to .constrained prefix*/).Dispose();
+						}
+					}
+					if (num2 == 0)
+					{
+						nRollingBoulderVfx.CleanUpBeforeEarlyExit();
+					}
+					else
+					{
+						val2 /= (float)num2;
+						((Node)nRollingBoulderVfx._shadow).Reparent((Node)(object)NCombatRoom.Instance.BackCombatVfxContainer, true);
+						if (!(val2 == Vector2.Zero))
+						{
+							goto IL_0132;
+						}
+						if (nRollingBoulderVfx._debugFinalPosition.HasValue)
+						{
+							val2 = nRollingBoulderVfx._debugFinalPosition.Value;
+							goto IL_0132;
+						}
+						nRollingBoulderVfx.CleanUpBeforeEarlyExit();
+					}
+				}
+				goto end_IL_000e;
+				IL_0266:
+				float result = val.GetResult();
+				float num3 = result;
+				<velocity>5__8.Y += <yAccel>5__7 * num3;
+				((Node2D)nRollingBoulderVfx).GlobalPosition = ((Node2D)nRollingBoulderVfx).GlobalPosition + <velocity>5__8 * num3;
+				Sprite2D boulder = nRollingBoulderVfx._boulder;
+				((Node2D)boulder).Rotation = ((Node2D)boulder).Rotation + Mathf.DegToRad(rotationSpeed) * num3;
+				((Node2D)nRollingBoulderVfx._shadow).Scale = <initialShadowScale>5__4 * ((Node2D)nRollingBoulderVfx).Scale * Mathf.InverseLerp(<initialBoulderPosition>5__2.Y, <impactPoint>5__6.Y, ((Node2D)nRollingBoulderVfx).GlobalPosition.Y);
+				((Node2D)nRollingBoulderVfx._shadow).GlobalPosition = new Vector2(((Node2D)nRollingBoulderVfx).GlobalPosition.X, <impactPoint>5__6.Y) + <initialShadowOffset>5__3 * ((Node2D)nRollingBoulderVfx).Scale;
+				Enumerator<Creature> enumerator2 = nRollingBoulderVfx._creatures.GetEnumerator();
+				try
+				{
+					while (enumerator2.MoveNext())
+					{
+						Creature current2 = enumerator2.Current;
+						if (<creaturesHit>5__5.Contains(current2))
+						{
+							continue;
+						}
+						NCreature creatureNode2 = NCombatRoom.Instance.GetCreatureNode(current2);
+						if (creatureNode2 == null)
+						{
+							<creaturesHit>5__5.Add(current2);
+							continue;
+						}
+						float num4 = ((Node2D)creatureNode2.Visuals).GlobalPosition.X - creatureNode2.Visuals.Bounds.Size.X * 0.5f;
+						if (((Node2D)nRollingBoulderVfx).GlobalPosition.X >= num4)
+						{
+							nRollingBoulderVfx.EmitSignalHitCreature(creatureNode2);
+							<creaturesHit>5__5.Add(current2);
+						}
+					}
+				}
+				finally
+				{
+					if (num < 0)
+					{
+						((System.IDisposable)enumerator2/*cast due to .constrained prefix*/).Dispose();
+					}
+				}
+				if (nRollingBoulderVfx._creatures.Count == <creaturesHit>5__5.Count)
+				{
+					<timer>5__9 += num3;
+				}
+				if (((Node2D)nRollingBoulderVfx).GlobalPosition.Y >= <impactPoint>5__6.Y)
+				{
+					if (!<firstImpact>5__10)
+					{
+						((Node2D)nRollingBoulderVfx._slamBehind).GlobalPosition = <impactPoint>5__6;
+						((Node2D)nRollingBoulderVfx._slamFront).GlobalPosition = <impactPoint>5__6;
+						nRollingBoulderVfx._slamBehind.Emitting = true;
+						nRollingBoulderVfx._slamFront.Emitting = true;
+						<firstImpact>5__10 = true;
+					}
+					<velocity>5__8.Y = (0f - <velocity>5__8.Y) * 0.33f;
+					if (Mathf.Abs(<velocity>5__8.Y) < 1f)
+					{
+						<velocity>5__8.Y = 0f;
+						<yAccel>5__7 = 0f;
+					}
+					Vector2 globalPosition = ((Node2D)nRollingBoulderVfx).GlobalPosition;
+					globalPosition.Y = <impactPoint>5__6.Y;
+					((Node2D)nRollingBoulderVfx).GlobalPosition = globalPosition;
+				}
+				goto IL_0507;
+				IL_0507:
+				if (<timer>5__9 <= 1f)
+				{
+					val = ((Node)(object)nRollingBoulderVfx).AwaitProcessFrame().GetAwaiter();
+					if (!val.IsCompleted)
+					{
+						num = (<>1__state = 0);
+						<>u__1 = val;
+						((AsyncTaskMethodBuilder)(ref <>t__builder)).AwaitUnsafeOnCompleted<TaskAwaiter<float>, <PlayAnim>d__22>(ref val, ref this);
+						return;
+					}
+					goto IL_0266;
+				}
+				((GodotObject)nRollingBoulderVfx).EmitSignal(SignalName.Finished, System.Array.Empty<Variant>());
+				((Node)(object)nRollingBoulderVfx._shadow).QueueFreeSafely();
+				((Node)(object)nRollingBoulderVfx).QueueFreeSafely();
+				goto end_IL_000e;
+				IL_0132:
+				Rect2 viewportRect = ((CanvasItem)nRollingBoulderVfx).GetViewportRect();
+				<impactPoint>5__6 = new Vector2(((Rect2)(ref viewportRect)).Size.X * 0.5f, val2.Y);
+				Vector2 val3 = default(Vector2);
+				((Vector2)(ref val3))..ctor(<impactPoint>5__6.X - xOffset, -150f);
+				float num5 = (<impactPoint>5__6.X - val3.X) / timeToImpact;
+				<yAccel>5__7 = 2f * (<impactPoint>5__6.Y - val3.Y) / (timeToImpact * timeToImpact);
+				((Node2D)nRollingBoulderVfx._shadow).Scale = Vector2.Zero;
+				((Node2D)nRollingBoulderVfx).GlobalPosition = val3;
+				<velocity>5__8 = new Vector2(num5, 0f);
+				<timer>5__9 = 0f;
+				<firstImpact>5__10 = false;
+				goto IL_0507;
+				end_IL_000e:;
+			}
+			catch (System.Exception exception)
+			{
+				<>1__state = -2;
+				<creaturesHit>5__5 = null;
+				((AsyncTaskMethodBuilder)(ref <>t__builder)).SetException(exception);
+				return;
+			}
+			<>1__state = -2;
+			<creaturesHit>5__5 = null;
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetResult();
+		}
+
+		[DebuggerHidden]
+		private void SetStateMachine(IAsyncStateMachine stateMachine)
+		{
+			((AsyncTaskMethodBuilder)(ref <>t__builder)).SetStateMachine(stateMachine);
+		}
+	}
+
+	private static readonly string _scenePath = SceneHelper.GetScenePath("vfx/vfx_rolling_boulder");
+
+	private const float _maxScale = 1.5f;
+
+	private const decimal _halfScaleDamage = 40m;
+
+	private const float _maxTimeToImpact = 0.5f;
+
+	private const float _minTimeToImpact = 0.25f;
+
+	private const float _minRotationSpeed = 600f;
+
+	private const float _maxRotationSpeed = 1000f;
+
+	private const float _minXOffset = 600f;
+
+	private const float _maxXOffset = 1000f;
+
+	private Sprite2D _boulder;
+
+	private Sprite2D _shadow;
+
+	private GpuParticles2D _slamBehind;
+
+	private GpuParticles2D _slamFront;
+
+	private List<Creature> _creatures;
+
+	private Vector2? _debugFinalPosition;
+
+	private decimal _damage;
+
+	private HitCreatureEventHandler backing_HitCreature;
+
+	private FinishedEventHandler backing_Finished;
+
+	public static string[] AssetPaths => new string[1] { _scenePath };
+
+	public event HitCreatureEventHandler HitCreature
+	{
+		add
+		{
+			backing_HitCreature = (HitCreatureEventHandler)System.Delegate.Combine((System.Delegate)backing_HitCreature, (System.Delegate)value);
+		}
+		remove
+		{
+			backing_HitCreature = (HitCreatureEventHandler)System.Delegate.Remove((System.Delegate)backing_HitCreature, (System.Delegate)value);
+		}
+	}
+
+	public event FinishedEventHandler Finished
+	{
+		add
+		{
+			backing_Finished = (FinishedEventHandler)System.Delegate.Combine((System.Delegate)backing_Finished, (System.Delegate)value);
+		}
+		remove
+		{
+			backing_Finished = (FinishedEventHandler)System.Delegate.Remove((System.Delegate)backing_Finished, (System.Delegate)value);
+		}
+	}
+
+	public static NRollingBoulderVfx? Create(System.Collections.Generic.IEnumerable<Creature> creatures, decimal damage, Vector2? debugFinalPosition = null)
+	{
+		if (TestMode.IsOn)
+		{
+			return null;
+		}
+		NRollingBoulderVfx nRollingBoulderVfx = PreloadManager.Cache.GetScene(_scenePath).Instantiate<NRollingBoulderVfx>((GenEditState)0);
+		nRollingBoulderVfx._creatures = Enumerable.ToList<Creature>(creatures);
+		nRollingBoulderVfx._damage = damage;
+		nRollingBoulderVfx._debugFinalPosition = debugFinalPosition;
+		return nRollingBoulderVfx;
+	}
+
+	public override void _Ready()
+	{
+		//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0104: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010a: Unknown result type (might be due to invalid IL or missing references)
+		_boulder = ((Node)this).GetNode<Sprite2D>(NodePath.op_Implicit("Boulder"));
+		_shadow = ((Node)this).GetNode<Sprite2D>(NodePath.op_Implicit("Shadow"));
+		_slamBehind = ((Node)this).GetNode<GpuParticles2D>(NodePath.op_Implicit("SlamBehind"));
+		_slamFront = ((Node)this).GetNode<GpuParticles2D>(NodePath.op_Implicit("SlamFront"));
+		float num = (float)(_damage / (_damage + 40m));
+		float num2 = num * 1.5f;
+		float timeToImpact = Mathf.Lerp(0.5f, 0.25f, num);
+		float rotationSpeed = Mathf.Lerp(600f, 1000f, num);
+		float xOffset = Mathf.Lerp(600f, 1000f, num);
+		((Node2D)this).Scale = Vector2.One * num2;
+		System.Collections.Generic.IEnumerator<GpuParticles2D> enumerator = Enumerable.OfType<GpuParticles2D>((System.Collections.IEnumerable)((Node)this).GetChildren(false)).GetEnumerator();
+		try
+		{
+			while (((System.Collections.IEnumerator)enumerator).MoveNext())
+			{
+				GpuParticles2D current = enumerator.Current;
+				if (!current.LocalCoords)
+				{
+					Material processMaterial = current.ProcessMaterial;
+					ParticleProcessMaterial val = (ParticleProcessMaterial)(object)((processMaterial is ParticleProcessMaterial) ? processMaterial : null);
+					if (val != null)
+					{
+						val.Scale = Vector2.One * num2;
+					}
+				}
+			}
+		}
+		finally
+		{
+			((System.IDisposable)enumerator)?.Dispose();
+		}
+		TaskHelper.RunSafely(PlayAnim(timeToImpact, xOffset, rotationSpeed));
+	}
+
+	[AsyncStateMachine(typeof(<PlayAnim>d__22))]
+	private System.Threading.Tasks.Task PlayAnim(float timeToImpact, float xOffset, float rotationSpeed)
+	{
+		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+		<PlayAnim>d__22 <PlayAnim>d__23 = default(<PlayAnim>d__22);
+		<PlayAnim>d__23.<>t__builder = AsyncTaskMethodBuilder.Create();
+		<PlayAnim>d__23.<>4__this = this;
+		<PlayAnim>d__23.timeToImpact = timeToImpact;
+		<PlayAnim>d__23.xOffset = xOffset;
+		<PlayAnim>d__23.rotationSpeed = rotationSpeed;
+		<PlayAnim>d__23.<>1__state = -1;
+		((AsyncTaskMethodBuilder)(ref <PlayAnim>d__23.<>t__builder)).Start<<PlayAnim>d__22>(ref <PlayAnim>d__23);
+		return ((AsyncTaskMethodBuilder)(ref <PlayAnim>d__23.<>t__builder)).Task;
+	}
+
+	private void CleanUpBeforeEarlyExit()
+	{
+		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+		Log.Warn("Rolling boulder VFX spawned with no targets, disabling");
+		((GodotObject)this).EmitSignal(SignalName.Finished, System.Array.Empty<Variant>());
+		((Node)(object)_shadow).QueueFreeSafely();
+		((Node)(object)this).QueueFreeSafely();
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	internal static List<MethodInfo> GetGodotMethodList()
+	{
+		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+		List<MethodInfo> val = new List<MethodInfo>(2);
+		val.Add(new MethodInfo(MethodName._Ready, new PropertyInfo((Type)0, StringName.op_Implicit(""), (PropertyHint)0, "", (PropertyUsageFlags)6, false), (MethodFlags)1, (List<PropertyInfo>)null, (List<Variant>)null));
+		val.Add(new MethodInfo(MethodName.CleanUpBeforeEarlyExit, new PropertyInfo((Type)0, StringName.op_Implicit(""), (PropertyHint)0, "", (PropertyUsageFlags)6, false), (MethodFlags)1, (List<PropertyInfo>)null, (List<Variant>)null));
+		return val;
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool InvokeGodotClassMethod(in godot_string_name method, NativeVariantPtrArgs args, out godot_variant ret)
+	{
+		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+		if ((ref method) == MethodName._Ready && ((NativeVariantPtrArgs)(ref args)).Count == 0)
+		{
+			((Node)this)._Ready();
+			ret = default(godot_variant);
+			return true;
+		}
+		if ((ref method) == MethodName.CleanUpBeforeEarlyExit && ((NativeVariantPtrArgs)(ref args)).Count == 0)
+		{
+			CleanUpBeforeEarlyExit();
+			ret = default(godot_variant);
+			return true;
+		}
+		return ((Node2D)this).InvokeGodotClassMethod(ref method, args, ref ret);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool HasGodotClassMethod(in godot_string_name method)
+	{
+		if ((ref method) == MethodName._Ready)
+		{
+			return true;
+		}
+		if ((ref method) == MethodName.CleanUpBeforeEarlyExit)
+		{
+			return true;
+		}
+		return ((Node2D)this).HasGodotClassMethod(ref method);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool SetGodotClassPropertyValue(in godot_string_name name, in godot_variant value)
+	{
+		if ((ref name) == PropertyName._boulder)
+		{
+			_boulder = VariantUtils.ConvertTo<Sprite2D>(ref value);
+			return true;
+		}
+		if ((ref name) == PropertyName._shadow)
+		{
+			_shadow = VariantUtils.ConvertTo<Sprite2D>(ref value);
+			return true;
+		}
+		if ((ref name) == PropertyName._slamBehind)
+		{
+			_slamBehind = VariantUtils.ConvertTo<GpuParticles2D>(ref value);
+			return true;
+		}
+		if ((ref name) == PropertyName._slamFront)
+		{
+			_slamFront = VariantUtils.ConvertTo<GpuParticles2D>(ref value);
+			return true;
+		}
+		return ((GodotObject)this).SetGodotClassPropertyValue(ref name, ref value);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool GetGodotClassPropertyValue(in godot_string_name name, out godot_variant value)
+	{
+		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+		if ((ref name) == PropertyName._boulder)
+		{
+			value = VariantUtils.CreateFrom<Sprite2D>(ref _boulder);
+			return true;
+		}
+		if ((ref name) == PropertyName._shadow)
+		{
+			value = VariantUtils.CreateFrom<Sprite2D>(ref _shadow);
+			return true;
+		}
+		if ((ref name) == PropertyName._slamBehind)
+		{
+			value = VariantUtils.CreateFrom<GpuParticles2D>(ref _slamBehind);
+			return true;
+		}
+		if ((ref name) == PropertyName._slamFront)
+		{
+			value = VariantUtils.CreateFrom<GpuParticles2D>(ref _slamFront);
+			return true;
+		}
+		return ((GodotObject)this).GetGodotClassPropertyValue(ref name, ref value);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	internal static List<PropertyInfo> GetGodotPropertyList()
+	{
+		//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+		List<PropertyInfo> val = new List<PropertyInfo>();
+		val.Add(new PropertyInfo((Type)24, PropertyName._boulder, (PropertyHint)0, "", (PropertyUsageFlags)4096, false));
+		val.Add(new PropertyInfo((Type)24, PropertyName._shadow, (PropertyHint)0, "", (PropertyUsageFlags)4096, false));
+		val.Add(new PropertyInfo((Type)24, PropertyName._slamBehind, (PropertyHint)0, "", (PropertyUsageFlags)4096, false));
+		val.Add(new PropertyInfo((Type)24, PropertyName._slamFront, (PropertyHint)0, "", (PropertyUsageFlags)4096, false));
+		return val;
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override void SaveGodotObjectData(GodotSerializationInfo info)
+	{
+		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+		((GodotObject)this).SaveGodotObjectData(info);
+		info.AddProperty(PropertyName._boulder, Variant.From<Sprite2D>(ref _boulder));
+		info.AddProperty(PropertyName._shadow, Variant.From<Sprite2D>(ref _shadow));
+		info.AddProperty(PropertyName._slamBehind, Variant.From<GpuParticles2D>(ref _slamBehind));
+		info.AddProperty(PropertyName._slamFront, Variant.From<GpuParticles2D>(ref _slamFront));
+		info.AddSignalEventDelegate(SignalName.HitCreature, (System.Delegate)backing_HitCreature);
+		info.AddSignalEventDelegate(SignalName.Finished, (System.Delegate)backing_Finished);
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override void RestoreGodotObjectData(GodotSerializationInfo info)
+	{
+		((GodotObject)this).RestoreGodotObjectData(info);
+		Variant val = default(Variant);
+		if (info.TryGetProperty(PropertyName._boulder, ref val))
+		{
+			_boulder = ((Variant)(ref val)).As<Sprite2D>();
+		}
+		Variant val2 = default(Variant);
+		if (info.TryGetProperty(PropertyName._shadow, ref val2))
+		{
+			_shadow = ((Variant)(ref val2)).As<Sprite2D>();
+		}
+		Variant val3 = default(Variant);
+		if (info.TryGetProperty(PropertyName._slamBehind, ref val3))
+		{
+			_slamBehind = ((Variant)(ref val3)).As<GpuParticles2D>();
+		}
+		Variant val4 = default(Variant);
+		if (info.TryGetProperty(PropertyName._slamFront, ref val4))
+		{
+			_slamFront = ((Variant)(ref val4)).As<GpuParticles2D>();
+		}
+		HitCreatureEventHandler hitCreatureEventHandler = default(HitCreatureEventHandler);
+		if (info.TryGetSignalEventDelegate<HitCreatureEventHandler>(SignalName.HitCreature, ref hitCreatureEventHandler))
+		{
+			backing_HitCreature = hitCreatureEventHandler;
+		}
+		FinishedEventHandler finishedEventHandler = default(FinishedEventHandler);
+		if (info.TryGetSignalEventDelegate<FinishedEventHandler>(SignalName.Finished, ref finishedEventHandler))
+		{
+			backing_Finished = finishedEventHandler;
+		}
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	internal static List<MethodInfo> GetGodotSignalList()
+	{
+		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0056: Expected O, but got Unknown
+		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+		List<MethodInfo> val = new List<MethodInfo>(2);
+		StringName hitCreature = SignalName.HitCreature;
+		PropertyInfo val2 = new PropertyInfo((Type)0, StringName.op_Implicit(""), (PropertyHint)0, "", (PropertyUsageFlags)6, false);
+		long num = 1L;
+		List<PropertyInfo> obj = new List<PropertyInfo>();
+		obj.Add(new PropertyInfo((Type)24, StringName.op_Implicit("creature"), (PropertyHint)0, "", (PropertyUsageFlags)6, new StringName("Control"), false));
+		val.Add(new MethodInfo(hitCreature, val2, (MethodFlags)num, obj, (List<Variant>)null));
+		val.Add(new MethodInfo(SignalName.Finished, new PropertyInfo((Type)0, StringName.op_Implicit(""), (PropertyHint)0, "", (PropertyUsageFlags)6, false), (MethodFlags)1, (List<PropertyInfo>)null, (List<Variant>)null));
+		return val;
+	}
+
+	protected void EmitSignalHitCreature(NCreature creature)
+	{
+		//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+		((GodotObject)this).EmitSignal(SignalName.HitCreature, (Variant[])(object)new Variant[1] { Variant.op_Implicit((GodotObject)(object)creature) });
+	}
+
+	protected void EmitSignalFinished()
+	{
+		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+		((GodotObject)this).EmitSignal(SignalName.Finished, System.Array.Empty<Variant>());
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override void RaiseGodotClassSignalCallbacks(in godot_string_name signal, NativeVariantPtrArgs args)
+	{
+		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+		if ((ref signal) == SignalName.HitCreature && ((NativeVariantPtrArgs)(ref args)).Count == 1)
+		{
+			backing_HitCreature?.Invoke(VariantUtils.ConvertTo<NCreature>(ref ((NativeVariantPtrArgs)(ref args))[0]));
+		}
+		else if ((ref signal) == SignalName.Finished && ((NativeVariantPtrArgs)(ref args)).Count == 0)
+		{
+			backing_Finished?.Invoke();
+		}
+		else
+		{
+			((GodotObject)this).RaiseGodotClassSignalCallbacks(ref signal, args);
+		}
+	}
+
+	[EditorBrowsable(/*Could not decode attribute arguments.*/)]
+	protected override bool HasGodotClassSignal(in godot_string_name signal)
+	{
+		if ((ref signal) == SignalName.HitCreature)
+		{
+			return true;
+		}
+		if ((ref signal) == SignalName.Finished)
+		{
+			return true;
+		}
+		return ((Node2D)this).HasGodotClassSignal(ref signal);
+	}
+}
+
+// ===== MegaCrit.Sts2.Core.Nodes.Vfx.NRollingBoulderVfx.HitCreatureEventHandler =====
+// ERROR: Could not find type definition MegaCrit.Sts2.Core.Nodes.Vfx.NRollingBoulderVfx.HitCreatureEventHandler in type system.
+// ===== MegaCrit.Sts2.Core.Nodes.Vfx.NRollingBoulderVfx.FinishedEventHandler =====
+// ERROR: Could not find type definition MegaCrit.Sts2.Core.Nodes.Vfx.NRollingBoulderVfx.FinishedEventHandler in type system.
+// ===== MegaCrit.Sts2.Core.Nodes.Vfx.NRollingBoulderVfx.MethodName =====
+// ERROR: Could not find type definition MegaCrit.Sts2.Core.Nodes.Vfx.NRollingBoulderVfx.MethodName in type system.
+// ===== MegaCrit.Sts2.Core.Nodes.Vfx.NRollingBoulderVfx.PropertyName =====
+// ERROR: Could not find type definition MegaCrit.Sts2.Core.Nodes.Vfx.NRollingBoulderVfx.PropertyName in type system.
+// ===== MegaCrit.Sts2.Core.Nodes.Vfx.NRollingBoulderVfx.SignalName =====
+// ERROR: Could not find type definition MegaCrit.Sts2.Core.Nodes.Vfx.NRollingBoulderVfx.SignalName in type system.
+// ===== MegaCrit.Sts2.Core.Nodes.Vfx.NRollingBoulderVfx.<PlayAnim>d__22 =====
+// ERROR: Could not find type definition MegaCrit.Sts2.Core.Nodes.Vfx.NRollingBoulderVfx.<PlayAnim>d__22 in type system.

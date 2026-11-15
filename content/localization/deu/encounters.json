@@ -125,5 +125,11 @@
     "BASELIB_MISSING_HEADER":  "Erforderliche Mod fehlt: BaseLib",
     "BASELIB_MISSING_BODY":  "Auf diesem Rechner fehlt die Mod BaseLib (Steam Workshop id 3737335127).\n\nNicht verfügbar:\n· der Mod-Konfigurationsbildschirm im Spiel\n· die Synchronisierung der Host-Einstellungen im Mehrspieler\n\nAlles andere funktioniert (Boss-Ersetzung, Decks/Relikte/Skripte, Mehrspieler-Aufstellungen). BaseLib abonnieren und das Spiel neu starten.",
     "BASELIB_MISSING_OK":  "Verstanden",
-    "BASELIB_MISSING_CLOSE":  "Schließen"
+    "BASELIB_MISSING_CLOSE":  "Schließen",
+    "FOOL_BOSS_ENCOUNTER.title":  "Der Narr",
+    "FOOL_BOSS_ENCOUNTER.loss":  "{character} wurde vom [gold]Narren[/gold] mit der falschen Karte bedient.",
+    "FOOL_TAROT_BOSS_ENCOUNTER.title":  "Der Narr",
+    "FOOL_TAROT_BOSS_ENCOUNTER.loss":  "{character} wurde vom [gold]Narren[/gold] mit der falschen Karte bedient.",
+    "FOOL_BOSS_ENCOUNTER.loss_tarot":  "{character} wurde die neue Karte [gold]{Card}[/gold] im Deck des [gold]Narren[/gold].",
+    "FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot":  "{character} wurde die neue Karte [gold]{Card}[/gold] im Deck des [gold]Narren[/gold]."
 }

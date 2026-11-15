@@ -1,0 +1,10 @@
+{
+    "TAROT_FASTING.title":  "断食",
+    "TAROT_FASTING.description":  "[gold]筋力[/gold]を{MagicNumber}得る。\n[gold]敏捷[/gold]を{MagicNumber}得る。\nターン開始時に得る[gold]エネルギー[/gold]が1少なくなる。",
+    "TAROT_DEVA_FORM.title":  "天人形態",
+    "TAROT_DEVA_FORM.description":  "ターン開始時に[gold]エネルギー[/gold]を得る。得る量は毎ターン{MagicNumber}ずつ増える。",
+    "TAROT_BRAWL.title":  "乱闘",
+    "TAROT_BRAWL.description":  "ターン開始時にすべての敵に[gold]打ち身[/gold]を{BrawlPower}与える。",
+    "TAROT_ETERNAL_FORM.title":  "永遠の形態",
+    "TAROT_ETERNAL_FORM.description":  "毎ターン最初に引いたプレイ可能なカード4枚は、そのターンの間コストが{EternalPower}下がる。"
+}

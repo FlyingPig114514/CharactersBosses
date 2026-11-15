@@ -1,0 +1,10 @@
+{
+    "TAROT_FASTING.title":  "Ayuno",
+    "TAROT_FASTING.description":  "Obtienes {MagicNumber} de [gold]Fuerza[/gold].\nObtienes {MagicNumber} de [gold]Destreza[/gold].\nAl inicio de cada turno obtienes 1 [gold]Energía[/gold] menos.",
+    "TAROT_DEVA_FORM.title":  "Forma Deva",
+    "TAROT_DEVA_FORM.description":  "Al inicio de tu turno obtienes [gold]Energía[/gold]; la cantidad aumenta {MagicNumber} cada turno.",
+    "TAROT_BRAWL.title":  "Pelea",
+    "TAROT_BRAWL.description":  "Al inicio de tu turno, aplica {BrawlPower} de [gold]Magulladura[/gold] a TODOS los enemigos.",
+    "TAROT_ETERNAL_FORM.title":  "Forma eterna",
+    "TAROT_ETERNAL_FORM.description":  "Las primeras 4 cartas jugables que robes cada turno cuestan {EternalPower} menos ese turno."
+}

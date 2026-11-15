@@ -106,6 +106,22 @@ internal sealed class BossOrbSim
                 Channel(typeof(FrostOrb), 1, result);
                 Channel(typeof(DarkOrb), 1, result);
             }
+            // ★ 塔罗愚（用户 2026-11-14）：「魔术师」由我们改写成了**固定球序**
+            //   （`Patches.FoolMagicianOrbPatch`：1 电 1 冰 1 玻璃；恐惧模式=升级版多 1 颗电球 ⇒ 2 电 1 冰 1 玻璃）。
+            //   原版它是「随机 Repeat 个球」，一张牌一种球的那张表表示不了 ⇒ 与彩虹同样单独处理。
+            //   顺序必须和 patch 里一致（先加球位，再按 电 / 冰 / 玻璃 入队）。
+            else if (Entry(card) == "THE_MAGICIAN")
+            {
+                int repeat = 3;
+                try { repeat = Math.Max(0, card.DynamicVars.Repeat.IntValue); } catch { repeat = 3; }
+                if (repeat <= 0) repeat = 3;
+                // 原版先 `OrbCmd.AddSlots(owner, Repeat)` 再加球 —— 球位先涨，所以不会激发任何东西
+                _capacity += repeat;
+                Channel(typeof(LightningOrb), 1, result);
+                try { if (card.IsUpgraded) Channel(typeof(LightningOrb), 1, result); } catch { /* 读不到就按未升级 */ }
+                Channel(typeof(FrostOrb), 1, result);
+                Channel(typeof(GlassOrb), 1, result);
+            }
             else if (BossOrbMath.TryChannels(card, xEnergy, out var orbType, out int channelCount))
             {
                 Channel(orbType, channelCount, result);

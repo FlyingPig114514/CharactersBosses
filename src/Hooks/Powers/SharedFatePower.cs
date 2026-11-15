@@ -70,20 +70,22 @@ public sealed class SharedFatePower : PowerModel
             // `BossLockOn.SpecialEffectAppliesTo` 就是「对应型特殊效果」的统一判据：
             //   单人 → 恒 true；多人 → 只有 `TargetFor(boss)` 那位。
             var boss = Owner?.Monster as Monsters.CharBossMonster;
+            // ★ v0.2.654（用户 2026-11-14）：「普通模式就她每回合首次弃牌时给玩家上 1 层「命运同担」，
+            //   恐惧模式下就是上 2 层」⇒ 层数就是「下回合开始要弃几张」。
+            int stacks = Core.DreadMode.IsActive ? 2 : 1;
             int count = 0;
             foreach (var player in BossLockOn.RealPlayers(combat))
             {
                 if (player?.Creature == null || !player.Creature.IsAlive) continue;
                 if (player.Creature.Monster != null) continue;       // 只给真人玩家，不给召唤物
                 if (!BossLockOn.SpecialEffectAppliesTo(boss, player)) continue;
-                int discardAmount = Core.DreadMode.IsActive ? 2 : 1;   // 2026-11-13 dread
                 await PowerCmd.Apply<SharedFateDiscardPower>(
-                    choiceContext, player.Creature, discardAmount, Owner, null);
+                    choiceContext, player.Creature, stacks, Owner, null);
                 count++;
             }
 
             Logger.Log($"[CharBoss] 命运同担：她本回合第一次弃牌（{SafeEntry(card)}）→ " +
-                       $"{count} 名玩家下回合开始时各弃 1 张手牌" +
+                       $"{count} 名玩家各获得 {stacks} 层「命运同担」（下回合开始时按层数弃牌）" +
                        (count == 1 ? "（多人时只有被她锁定的那位）" : string.Empty));
         }
         catch (Exception e)

@@ -9,7 +9,8 @@ namespace CharacterBosses.Core;
 ///
 /// 文件内容决定换哪个角色（第一行，大小写不敏感）：
 ///   · 空文件 / 不认识的词 → 铁甲战士（交付的样板）
-///   · ironclad / silent / defect / necrobinder / regent → 指定角色
+///   · ironclad / silent / defect / necrobinder / regent / fool → 指定角色
+///     （`fool` = 0.113 才有的愚者；只在 111 构建里有效，107 会退回铁甲战士）
 ///   · cycle → 每次普通战斗依次轮换 5 个角色（一次会话就能把 5 个都看一遍）
 ///   · 角色名后面可以跟 <c>@幕数</c>（1 起）强制档位，例如 <c>silent@3</c> = 用第三幕的卡组/剧本/血量。
 ///     没有它就只能真打到第三幕才能验证第三幕的设计。
@@ -22,7 +23,7 @@ public static class DebugMode
     /// <summary>按角色下标排列的关键字，供内容解析用。</summary>
     public static readonly string[] CharacterKeys =
     {
-        "ironclad", "silent", "defect", "necrobinder", "regent",
+        "ironclad", "silent", "defect", "necrobinder", "regent", "fool",
     };
 
     private static bool _loaded;
@@ -118,6 +119,52 @@ public static class DebugMode
         {
             Logger.Log("[CharBoss] debug mode read failed: " + e.Message);
             return null;
+        }
+    }
+
+    /// <summary>
+    /// **测试用：把真人玩家的最大生命值调到这个数**（用户 2026-11-14）。
+    ///
+    /// 为什么需要：塔罗愚第 7/14 回合会打出「死亡」（给玩家上 8 层灾厄），而**灾厄是无视缓冲的直接秒杀机制**
+    ///（用户原话：「难绷，灾厄无视缓冲，把玩家秒了 —— 不是 bug，是机制」）⇒ 一次没挡住测试就直接结束。
+    /// 打开 `charbosses_debug.txt` 时把它调到 10000，正常玩一个字节都不改。
+    /// </summary>
+    public const int TestPlayerMaxHp = 10000;
+
+    /// <summary>调试开关打开时，把这一场所有真人玩家的最大生命值 / 当前生命值拉满到 <see cref="TestPlayerMaxHp"/>。</summary>
+    internal static void TestPlayerHp(MegaCrit.Sts2.Core.Combat.ICombatState? state)
+    {
+        if (!Enabled || state == null) return;
+        int n = 0;
+        try
+        {
+            foreach (var player in state.Players)
+            {
+                var creature = player?.Creature;
+                if (creature == null) continue;
+                if (creature.MaxHp >= TestPlayerMaxHp) continue;
+                try
+                {
+                    // ⚠ `Creature.MaxHp` / `CurrentHp` 对外是**只读属性**（编译实测 CS0200）
+                    //   ⇒ 走它们自己的 public 内部方法（与 `CreatureCmd.SetMaxHp` 同一套落地，会广播事件刷新血条）。
+                    creature.SetMaxHpInternal(TestPlayerMaxHp);
+                    creature.SetCurrentHpInternal(TestPlayerMaxHp);
+                    n++;
+                }
+                catch (Exception e)
+                {
+                    Logger.Log("[CharBoss] 测试模式：调玩家血量失败（跳过这名玩家）: " + e.Message);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 测试模式：调玩家血量失败: " + e.Message);
+        }
+        if (n > 0)
+        {
+            Logger.Log($"[CharBoss] 测试模式：把 {n} 名玩家的最大生命值调到 {TestPlayerMaxHp}" +
+                       "（灾厄会无视缓冲秒人，避免测试提前结束；去掉 charbosses_debug.txt 即恢复）");
         }
     }
 }

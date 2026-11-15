@@ -1,0 +1,10 @@
+{
+    "TAROT_FASTING.title":  "การอดอาหาร",
+    "TAROT_FASTING.description":  "ได้รับ [gold]พละกำลัง[/gold] {MagicNumber}\nได้รับ [gold]ความว่องไว[/gold] {MagicNumber}\nเมื่อเริ่มเทิร์นจะได้รับ [gold]พลังงาน[/gold] น้อยลง 1",
+    "TAROT_DEVA_FORM.title":  "ร่างเทวะ",
+    "TAROT_DEVA_FORM.description":  "เมื่อเริ่มเทิร์นได้รับ [gold]พลังงาน[/gold] โดยจำนวนจะเพิ่มขึ้น {MagicNumber} ทุกเทิร์น",
+    "TAROT_BRAWL.title":  "การต่อสู้",
+    "TAROT_BRAWL.description":  "เมื่อเริ่มเทิร์น จะสร้าง [gold]แผลฟกช้ำ[/gold] {BrawlPower} ชั้นให้ศัตรูทั้งหมด",
+    "TAROT_ETERNAL_FORM.title":  "ร่างนิรันดร์",
+    "TAROT_ETERNAL_FORM.description":  "การ์ดที่เล่นได้ 4 ใบแรกที่จั่วในแต่ละเทิร์นจะมีค่าพลังงานลดลง {EternalPower} ในเทิร์นนั้น"
+}

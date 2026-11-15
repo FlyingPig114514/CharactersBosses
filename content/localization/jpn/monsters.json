@@ -29,8 +29,8 @@
     "SILENT_BOSS.special":  "袖裏乾坤\n各ターン、あなたがコスト2以上のカードを初めてプレイした時、サイレントの手札に[gold]ナイフ[/gold]を3枚加える。",
     "SILENT_BOSS.brewer":  "調合\nサイレントのポーションスロットは最初のまま残り、戦闘中にポーションを使う。\n彼女がブロックを持った状態でHPを失う場合、代わりに同じ値のブロックを失う。\n[gold]瓶詰の妖精[/gold]が発動した時、彼女のデバフをすべて除去する。\n警告：爆発の小瓶と蛇体化は発生源のないダメージのため、「身代わり」を持つ召喚物はあなたの代わりに受けません。",
     "SILENT_BOSS.brewer_dread": "調合\nThe Silent keeps her starting potion slots and uses potions in combat.\nWhenever she would lose HP while she has Block, Block equal to that amount is consumed instead.\nTriggering Fairy in a Bottle removes all her debuffs.\nHer [gold]Serpent Form[/gold] is upgraded (it deals more damage per trigger).\nWarning: Explosive Potion and Serpent Form deal sourceless damage; summons with Die For You do not absorb it.",
-    "SILENT_BOSS.sly":  "運命を共に\n各ターン、サイレントが初めてカードを捨てた時、あなたは次のターン開始時に手札を1枚捨てる。",
-    "SILENT_BOSS.sly_dread": "運命を共に\nThe first time the Silent discards a card each turn, you choose and discard two cards at the start of your next turn.",
+    "SILENT_BOSS.sly":  "運命共有\n静寂の者が毎ターン最初にカードを捨てた時、あなたは「運命共有」を1スタック得る：次のターン開始時、スタック数と同じ枚数の手札を捨てる。",
+    "SILENT_BOSS.sly_dread":  "運命共有\n静寂の者が毎ターン最初にカードを捨てた時、あなたは「運命共有」を2スタック得る：次のターン開始時、スタック数と同じ枚数の手札を捨てる。",
     "SILENT_BOSS.special_act2":  "毒の刺撃\n毒はあなたのターン終了時に精算され、そのダメージはブロックで防げる。\n敵に未ブロックのダメージを与えるたび、自身の毒を1点、対象に移す。",
     "SILENT_BOSS.special_act2_dread":  "毒の刺撃\nPoison resolves at the end of your turn and its damage can be blocked.\nOn Dread the same Poison resolves one extra time at the end of your turn (that damage can be blocked too).\nWhenever you deal unblocked damage to an enemy, you transfer 1 of your own Poison to that target.",
     "NECROBINDER_BOSS.special":  "時は未だ来ず\nあなたのブロックがターン開始で消える時、代わりに同じ値の[gold]破滅[/gold]を相殺する。\nあなたのターンが終わろうとする時、[gold]破滅[/gold]であなたが死ぬ場合、ブロックと召喚物のHPで、[gold]破滅[/gold]で死ななくなるまで相殺する。",
@@ -189,5 +189,10 @@
     "REGENT_BOSS.minion_dread":  "Call to Arms\n[gold]Dive Bomb Minion[/gold] keeps its damage at [gold]16[/gold] (the upgraded copy is 16 too).\nWhenever the Regent plays a Minion card and has fewer than [gold]1[/gold] minions, he summons the matching minion instead.\nWhenever the Regent gains Strength from a card, his other allies gain the same amount.\nSo on some turns the Regent always plays a [gold]Minion Dive Bomb[/gold] that hits you directly.",
     "REGENT_BOSS.resonance_dread":  "共鳴\n戦闘中にプレイヤーがカードを生成するたび、リージェントの「創造の柱」も発動する。\n警告：[gold]爆弾[/gold]は発生源のないダメージのため、「身代わり」を持つ召喚物はあなたの代わりに受けません。\nOn Dread the cards you generate also increase his [gold]Supermassive[/gold] damage.",
     "NECROBINDER_BOSS.soul_bound_dread":  "魂の拘束\nターン中にあなたがカードを引く時、それはネクロバインダーが引いたものとして扱われる（「オートメーション」のカウントと「死の行進」のダメージが増える）。\nOn Dread the cards you draw at the start of every turn count too (they also raise the Automation counter and Death March damage).",
-    "REGENT_BOSS.choice_prompt":  "繰り返しプレイされるカードを1枚選択"
+    "REGENT_BOSS.choice_prompt":  "繰り返しプレイされるカードを1枚選択",
+    "FOOL_BOSS.name":  "フール",
+    "FOOL_BOSS.title":  "フール",
+    "FOOL_BOSS.moves.CHARBOSS_PLAY.title":  "プレイ",
+    "FOOL_BOSS.fool":  "フール\nフールのデッキには[gold]神話化[/gold]が3枚しかなく、ほとんどをタロットカードで戦う。\nあなたが[gold]破滅[/gold]を得る時、[gold]ブロック[/gold]があればその[gold]ブロック[/gold]を消費して同量の[gold]破滅[/gold]を先に相殺する（すでに持っている[gold]破滅[/gold]は影響を受けない）。\n[red]警告：[/red]第12ターンまでにフールを倒せ。さもなくば自業自得だ。",
+    "FOOL_BOSS.fool_dread":  "フール\nフールのデッキには[gold]神話化[/gold]が3枚しかなく、ほとんどをタロットカードで戦う。\nあなたが[gold]破滅[/gold]を得る時、[gold]ブロック[/gold]があればその[gold]ブロック[/gold]を消費して同量の[gold]破滅[/gold]を先に相殺する（すでに持っている[gold]破滅[/gold]は影響を受けない）。\n恐怖モード：杝が使う無色以外のカードはすべてアップグレードされ、[gold]魔術師[/gold]は代わりにライトニングオーブ2個とグラスオーブ1個を生成し、[gold]思いがけぬ贈り物[/gold]と[gold]教皇[/gold]は[gold]武勇[/gold]をさらに1枚刷る。\n[red]警告：[/red]第12ターンまでにフールを倒せ。さもなくば自業自得だ。"
 }

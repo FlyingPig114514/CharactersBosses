@@ -29,8 +29,8 @@
     "SILENT_BOSS.special":  "소매 속의 건곤\n매 턴 처음으로 비용이 2 이상인 카드를 사용할 때, 사일런트의 손에 단도 3장을 추가합니다.",
     "SILENT_BOSS.brewer":  "조제\n사일런트의 시작 포션 슬롯은 제거되지 않으며, 전투 중에 포션을 사용합니다.\n방어도를 지닌 상태에서 체력을 잃을 경우, 대신 같은 양의 방어도로 피해를 막습니다.\n'병 속의 요정'이 발동하면 그녀의 모든 디버프를 제거합니다.\n경고: 폭발성 앰플과 구렁이의 형상은 근원이 없는 피해이므로, '살신성인'을 지닌 소환물이 대신 받아 주지 않습니다.",
     "SILENT_BOSS.brewer_dread": "조제\nThe Silent keeps her starting potion slots and uses potions in combat.\nWhenever she would lose HP while she has Block, Block equal to that amount is consumed instead.\nTriggering Fairy in a Bottle removes all her debuffs.\nHer [gold]Serpent Form[/gold] is upgraded (it deals more damage per trigger).\nWarning: Explosive Potion and Serpent Form deal sourceless damage; summons with Die For You do not absorb it.",
-    "SILENT_BOSS.sly":  "운명 동행\n사일런트가 매 턴 처음으로 카드를 버릴 때, 당신은 다음 턴 시작 시 손에서 카드를 1장 선택해 버립니다.",
-    "SILENT_BOSS.sly_dread": "운명 동행\nThe first time the Silent discards a card each turn, you choose and discard two cards at the start of your next turn.",
+    "SILENT_BOSS.sly":  "운명 공유\n침묵의 사냥꾼이 매 턴 처음으로 카드를 버릴 때, 당신은 '운명 공유'를 1중첩 얻습니다: 다음 턴 시작 시 중첩 수만큼 손패를 버립니다.",
+    "SILENT_BOSS.sly_dread":  "운명 공유\n침묵의 사냥꾼이 매 턴 처음으로 카드를 버릴 때, 당신은 '운명 공유'를 2중첩 얻습니다: 다음 턴 시작 시 중첩 수만큼 손패를 버립니다.",
     "SILENT_BOSS.special_act2":  "독 묻은 찌르기\n중독은 내 턴이 끝날 때 정산되며, 그 피해는 방어도로 막을 수 있습니다.\n적에게 막히지 않은 피해를 줄 때마다 자신의 중독 1을 대상에게 옮깁니다.",
     "SILENT_BOSS.special_act2_dread":  "독 묻은 찌르기\nPoison resolves at the end of your turn and its damage can be blocked.\nOn Dread the same Poison resolves one extra time at the end of your turn (that damage can be blocked too).\nWhenever you deal unblocked damage to an enemy, you transfer 1 of your own Poison to that target.",
     "NECROBINDER_BOSS.special":  "아직 때가 아니다\n내 턴 시작 시 방어도가 사라지려 할 때, 대신 같은 양의 종말을 상쇄합니다.\n내 턴이 끝나려 할 때 종말 때문에 죽게 된다면, 종말로 더 이상 죽지 않게 될 때까지 방어도와 소환물의 체력으로 종말을 즉시 상쇄합니다.",
@@ -189,5 +189,10 @@
     "REGENT_BOSS.minion_dread":  "Call to Arms\n[gold]Dive Bomb Minion[/gold] keeps its damage at [gold]16[/gold] (the upgraded copy is 16 too).\nWhenever the Regent plays a Minion card and has fewer than [gold]1[/gold] minions, he summons the matching minion instead.\nWhenever the Regent gains Strength from a card, his other allies gain the same amount.\nSo on some turns the Regent always plays a [gold]Minion Dive Bomb[/gold] that hits you directly.",
     "REGENT_BOSS.resonance_dread":  "공명\n플레이어가 전투 중 카드를 생성할 때마다 리젠트의 '창조의 기둥'도 발동합니다.\n경고: 폭탄은 근원이 없는 피해이므로, '살신성인'을 지닌 소환물이 대신 받아 주지 않습니다.\nOn Dread the cards you generate also increase his [gold]Supermassive[/gold] damage.",
     "NECROBINDER_BOSS.soul_bound_dread":  "영혼 유대\n당신이 턴 중에 카드를 뽑으면 네크로바인더가 뽑은 것으로도 취급됩니다('자동화'의 카운트와 '죽음의 행진'의 피해가 증가합니다).\nOn Dread the cards you draw at the start of every turn count too (they also raise the Automation counter and Death March damage).",
-    "REGENT_BOSS.choice_prompt":  "반복해서 사용될 카드 1장을 선택"
+    "REGENT_BOSS.choice_prompt":  "반복해서 사용될 카드 1장을 선택",
+    "FOOL_BOSS.name":  "풀",
+    "FOOL_BOSS.title":  "풀",
+    "FOOL_BOSS.moves.CHARBOSS_PLAY.title":  "플레이",
+    "FOOL_BOSS.fool":  "풀\n풀의 덱에는 [gold]신비의 형상[/gold] 3장뿐이며, 거의 모든 전투를 타로 카드로 합니다.\n당신이 [gold]종말[/gold]을 얻을 때 [gold]방어도[/gold]가 있다면, 그 [gold]방어도[/gold]를 소모해 같은 양의 [gold]종말[/gold]을 먼저 상쇄합니다 (이미 지니고 있는 [gold]종말[/gold]은 영향을 받지 않습니다).\n[red]경고:[/red] 12턴 전에 풀을 처치하십시오. 그렇지 않으면 책임지지 않습니다.",
+    "FOOL_BOSS.fool_dread":  "풀\n풀의 덱에는 [gold]신비의 형상[/gold] 3장뿐이며, 거의 모든 전투를 타로 카드로 합니다.\n당신이 [gold]종말[/gold]을 얻을 때 [gold]방어도[/gold]가 있다면, 그 [gold]방어도[/gold]를 소모해 같은 양의 [gold]종말[/gold]을 먼저 상쇄합니다 (이미 지니고 있는 [gold]종말[/gold]은 영향을 받지 않습니다).\n공포 모드: 풀이 사용하는 무색이 아닌 카드는 모두 업그레이드되며, [gold]마술사[/gold]는 대신 전기 구체 2개와 유리 구체 1개를 생성하고, [gold]기쁨의 선물[/gold]과 [gold]교황[/gold]은 [gold]기량[/gold]을 1장 더 만듭니다.\n[red]경고:[/red] 12턴 전에 풀을 처치하십시오. 그렇지 않으면 책임지지 않습니다."
 }

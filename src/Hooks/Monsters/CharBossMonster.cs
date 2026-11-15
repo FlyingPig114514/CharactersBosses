@@ -363,6 +363,15 @@ public abstract partial class CharBossMonster : MonsterModel
     /// <summary>「充电」这类「下回合 +N 能量」的累计，下个 PrepareTurn 用掉后清零。</summary>
     internal int NextTurnEnergyBonus;
 
+    /// <summary>上一回合结束时**实际**还剩多少能量（「佩尔之泪」据此给本回合 +2，见 BossHookBridge.PaelsTearsBonus）。</summary>
+    internal int LeftoverEnergyLastTurn;
+
+    /// <summary>本回合的「倒吊人额外回合」是否已经触发过（每回合开始清零）。</summary>
+    internal bool _extraTurnFired;
+
+    /// <summary>额外回合的第一张牌要**再打一遍**（用户 2026-11-14；回响形态的计数在影子玩家上不可靠，自己实现）。</summary>
+    internal bool _doubleNextCardOnce;
+
     /// <summary>本回合的计划是否已经算过（即使算出来是空的也算）。用于读档等「没走过 RollMove」的情况。</summary>
     internal bool PlanReady;
 
@@ -469,6 +478,11 @@ public abstract partial class CharBossMonster : MonsterModel
         {
             Logger.Log("[CharBoss] shadow player setup failed: " + e);
         }
+
+        // ★ 用户 2026-11-14：调试开关打开时把真人玩家的血量调到 10000 —— 塔罗愚的「死亡」会上 8 层灾厄，
+        //   而灾厄**无视缓冲**直接秒人（用户原话：「不是 bug，是机制」）⇒ 测试会提前结束。
+        //   只在 charbosses_debug.txt 存在时生效。
+        try { Core.DebugMode.TestPlayerHp(CombatState); } catch { /* 调试用，失败不影响战斗 */ }
 
         // 角色立绘是朝右画的，站到敌方一侧后会背对玩家 → 水平镜像
         BossVisuals.FaceThePlayer(this);
@@ -933,6 +947,7 @@ public abstract partial class CharBossMonster : MonsterModel
         try { await Core.RainbowMimic.PlayPendingAsync(this, pcs, ctx); }
         catch (Exception e) { Logger.Log("[CharBoss] 彩虹机·模仿学习结算失败: " + e.Message); }
 
+        int playedIndex = 0;   // 已打出的张数（「倒吊人的额外回合」按它触发）
         foreach (var play in Plan.ToList())
         {
             if (Creature.IsDead) break;
@@ -965,9 +980,75 @@ public abstract partial class CharBossMonster : MonsterModel
                 else BladesGrowth.RecomputeAll(this, Plan, planTime: false);
 
                 await PlayOne(ctx, pcs, play);
+                // 额外回合的第一张牌：**真的再打一遍**（用户 2026-11-14）
+                if (_doubleNextCardOnce && !Creature.IsDead)
+                {
+                    _doubleNextCardOnce = false;
+                    try
+                    {
+                        Logger.Log($"[CharBoss] 额外回合：{SafeEntryOf(play.Card)} 再打一遍（回响形态式重打）");
+                        await MegaCrit.Sts2.Core.Commands.CardCmd.AutoPlay(
+                            ctx, play.Card, (MegaCrit.Sts2.Core.Entities.Creatures.Creature?)null,
+                            AutoPlayType.Default);
+                    }
+                    catch (Exception e) { Logger.Log("[CharBoss] 额外回合重打失败: " + e.Message); }
+                }
                 try { Core.RainbowMimic.OnCardPlayed(this, play.Card); } catch { /* 忽略 */ }
                 // 「抉择储」：玩家在「抉择，抉择」里选完之后，把「只有挑了那张才打得出」的牌接着打出去
                 //（第 1 回合的天际钻头；见 CharBossMonster.Choice.cs）。其它 Boss / 其它回合是空操作。
+                // ★ 2026-11-14（用户）：「倒吊人并没有真的给他一个额外回合」——
+                //   `TheHangedMan` 只给自己挂 `ExtraTurnPower`，而发额外回合的 `CombatManager` 只在
+                //   `CombatState.Players` 里问 `Hook.ShouldTakeExtraTurn`，**影子玩家不在里面**。
+                //   所以「额外回合」实现在同一个 Boss 回合里：打完剧本标记的那一张之后，
+                //   把「他的回合开始」的钩子**重跑一遍**（水银沙漏再打一次、恶魔形态再 +N 力量…），
+                //   然后接着打后面的牌。剧本见 `TarotFoolScript` 第 14 回合。
+                playedIndex++;
+                try
+                {
+                    int extraAfter = -1;
+                    try { extraAfter = Def.ScriptForAct(ActIndex)?.TurnAt(TurnNumber)?.ExtraTurnAfterCard ?? -1; }
+                    catch { extraAfter = -1; }
+                    if (extraAfter >= 0 && playedIndex > extraAfter && !_extraTurnFired)
+                    {
+                        _extraTurnFired = true;
+                        Logger.Log($"[CharBoss] 倒吊人的额外回合：打完第 {playedIndex} 张 ⇒ 重跑一次「回合开始」钩子" +
+                                   "（水银沙漏 / 恶魔形态 / 遗物…），再补一份本回合能量");
+                        await Core.BossHookBridge.FireTurnStart(this, ctx);
+                        // ★ 用户 2026-11-14：额外回合 = 「又一个回合」⇒
+                        //   ① 回响形态的「本回合前 N 张重打」计数**清零** ⇒ 额外回合的第一张也会被打两次；
+                        //   ② 充能球在**这个回合结束时也结算 1 次**被动（正常回合结束时那一次照旧）。
+                        // 用户 2026-11-14：额外回合开始时，他身上的「额外回合」buff 要消失
+                        //（那层 `ExtraTurnPower` 是我们替他兑现完的，留着只会挂个假图标）。
+                        try
+                        {
+                            // ⚠ 按 entry 名找（`ExtraTurnPower` 这个类型在 107 的引用里不一定存在，
+                            //   而我们只需要「把他身上那层假图标摘掉」，用名字更稳）。
+                            foreach (var pw in new System.Collections.Generic.List<MegaCrit.Sts2.Core.Models.PowerModel>(Creature.Powers))
+                            {
+                                string entry = string.Empty;
+                                try { entry = pw.Id.Entry ?? string.Empty; } catch { continue; }
+                                if (!entry.Contains("EXTRA_TURN", StringComparison.Ordinal)) continue;
+                                try { pw.SetAmount(0); } catch { /* 忽略 */ }
+                                _ = MegaCrit.Sts2.Core.Commands.PowerCmd.Remove(pw);
+                                Logger.Log($"[CharBoss] 额外回合：移除他身上的「额外回合」层（{entry}）");
+                            }
+                        }
+                        catch (Exception e) { Logger.Log("[CharBoss] 移除额外回合层失败: " + e.Message); }
+
+                        // 用户 2026-11-14：「第 14 回合额外回合的第一张牌塔没有被打出两次」——
+                        // 回响形态的「本回合前 N 张重打」计数在影子玩家身上读不到/清不掉（`Data` 是 private 嵌套类），
+                        // 所以不靠它：这里直接打一个标记，**额外回合的第一张牌由我们自己再打一遍**。
+                        _doubleNextCardOnce = true;
+#if STS2_111
+                        try { Core.EchoFormTurnReset.ResetForNewTurn(this); } catch { /* 忽略 */ }
+                        try { await Core.OrbPassiveTick.RunAsync(this, ctx); } catch (Exception e) { Logger.Log("[CharBoss] 额外回合结算球被动失败: " + e.Message); }
+#endif
+                        try { pcs.Energy += Math.Max(0, Def.EnergyForAct(ActIndex)); } catch { /* 忽略 */ }
+                        ScriptEnergySpent = 0;      // 额外回合的钱重新记账
+                        try { CharacterBosses.UI.BossHandUi.RefreshForce(this); } catch { /* 忽略 */ }
+                    }
+                }
+                catch (Exception e) { Logger.Log("[CharBoss] 额外回合失败: " + e.Message); }
                 try { await RunChoiceFollowUpsAsync(ctx, pcs, play.Card); }
                 catch (Exception e) { Logger.Log("[CharBoss] 抉择补打失败: " + e.Message); }
                 lastMs = swAll.ElapsedMilliseconds;      // ← 之前一直没赋值（日志里「最后一张牌后」永远等于总时长）
@@ -1741,6 +1822,14 @@ public abstract partial class CharBossMonster : MonsterModel
             }
             catch { vfxQuiet = false; }
             Patches.BossAttackVfxFacing.Begin(SafeEntryOf(play.Card), vfxQuiet);
+            // 塔罗愚专用出牌日志（用户 2026-11-14 排查「一张牌生效了两次」时加的；
+            // 他的牌全是印出来的、不扣费，日志里没有别的痕迹，留着方便以后核对剧本）。
+            try
+            {
+                if (Def.Key == "FOOL_BOSS")
+                    Logger.Log($"[CharBoss] 塔罗愚出牌：第 {TurnNumber} 回合 {SafeEntryOf(play.Card)}");
+            }
+            catch { /* 诊断而已 */ }
             try { playTask = CardCmd.AutoPlay(ctx, play.Card, target, AutoPlayType.Default); }
             catch
             {

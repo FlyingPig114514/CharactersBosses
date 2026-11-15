@@ -1,0 +1,10 @@
+{
+    "TAROT_FASTING.title":  "Puasa",
+    "TAROT_FASTING.description":  "Dapatkan {MagicNumber} [gold]Kekuatan[/gold].\nDapatkan {MagicNumber} [gold]Ketangkasan[/gold].\nPada awal setiap giliran, dapatkan 1 [gold]Energi[/gold] lebih sedikit.",
+    "TAROT_DEVA_FORM.title":  "Wujud Deva",
+    "TAROT_DEVA_FORM.description":  "Pada awal giliranmu, dapatkan [gold]Energi[/gold]; jumlahnya bertambah {MagicNumber} setiap giliran.",
+    "TAROT_BRAWL.title":  "Baku Hantam",
+    "TAROT_BRAWL.description":  "Pada awal giliranmu, berikan {BrawlPower} [gold]Memar[/gold] ke SEMUA musuh.",
+    "TAROT_ETERNAL_FORM.title":  "Wujud Abadi",
+    "TAROT_ETERNAL_FORM.description":  "4 kartu pertama yang bisa dimainkan yang kamu ambil setiap giliran berbiaya {EternalPower} lebih sedikit pada giliran itu."
+}

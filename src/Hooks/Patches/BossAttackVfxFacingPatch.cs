@@ -61,6 +61,10 @@ internal static class BossAttackVfxFacing
         "NBigSlashImpactVfx",
         "NLargeMagicMissileVfx",    // 轰击的导弹
         "NHitSparkVfx",             // 命中火花（对称）
+        // ★ 2026-11-14（用户「塔罗愚」实测）：「滚石的动画完全反了」——
+        //   `NRollingBoulderVfx` 是「从 Boss 脚下滚出去」的那种，生成时就带着攻守双方、
+        //   方向自己算，翻它就是反的。
+        "NRollingBoulderVfx",
         "NDamageNumVfx",            // 伤害数字（文字，镜像会反着写）
     };
 

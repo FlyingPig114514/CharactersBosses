@@ -35,6 +35,9 @@ public static class BossDefValidator
     private static void ValidateAll()
     {
         Logger.Log("[CharBoss] ===== 定义自检开始 =====");
+#if STS2_111
+        try { BossDefs.RefreshWatcherCharacterType(); } catch { /* 占位，失败无碍 */ }
+#endif
         for (int i = 0; i < BossDefs.ByCharacter.Length; i++)
         {
             var def = BossDefs.ByCharacter[i];
@@ -45,6 +48,9 @@ public static class BossDefValidator
             ValidateVariants(def);
         }
         ValidateVariantOwnership();
+#if STS2_111
+        LogTarotCardArt();
+#endif
         Logger.Log("[CharBoss] ===== 定义自检结束（卡名带 (!) 的表示找不到，请对照 docs\\plans\\cards-*.md 修正）=====");
     }
 
@@ -211,4 +217,55 @@ public static class BossDefValidator
     }
 
     private static string Join(int[] values) => string.Join("/", values);
+
+#if STS2_111
+    /// <summary>
+    /// **塔罗 4 张自造牌的卡图自检**（用户 2026-11-14：「怎么中间那 2 张牌没有卡图？」）。
+    ///
+    /// 反编译 `CardModel.PortraitPath` 是按「池名 + 模型 id」拼贴图路径的，
+    /// 我们自造的 `TAROT_*` 在游戏资源里不存在 ⇒ 卡面空白。
+    /// 现在这 4 个类都覆写了 `PortraitPath` 去借一张原版塔罗牌的图（见 `Cards/TarotCardArt`），
+    /// 这里在开局打一遍「最终拿到的路径 + 资源到底在不在」，下次一眼就能定位。
+    /// </summary>
+    private static void LogTarotCardArt()
+    {
+        (string Name, Type Type)[] cards =
+        {
+            ("斋戒", typeof(Cards.TarotFasting)),
+            ("天人形态", typeof(Cards.TarotDevaForm)),
+            ("斗殴", typeof(Cards.TarotBrawl)),
+            ("永恒形态", typeof(Cards.TarotEternalForm)),
+        };
+        // 5 层「观者 / 亡命之徒」搬来的能力：图标也要用它们自己原来那张
+        foreach (var icon in new[] { "tarot_energy_down", "tarot_deva", "tarot_brawl", "tarot_bruise", "tarot_eternal" })
+        {
+            string iconPath = "res://CharacterBosses/images/powers/" + icon + ".png";
+            bool iconOk = false;
+            try { iconOk = Godot.ResourceLoader.Exists(iconPath); } catch { iconOk = false; }
+            Logger.Log($"[CharBoss]   能力图标自检 {icon}：{(iconOk ? "OK" : "★找不到")} {iconPath}");
+        }
+        foreach (var (name, type) in cards)
+        {
+            try
+            {
+                var id = ModelDb.GetId(type);
+                var model = id == null ? null : ModelDb.GetById<CardModel>(id);
+                if (model == null) { Logger.Log($"[CharBoss]   卡图自检 {name}: 模型取不到"); continue; }
+                string path = model.PortraitPath;
+                bool exists = false;
+                try { exists = !string.IsNullOrEmpty(path) && Godot.ResourceLoader.Exists(path); } catch { exists = false; }
+                bool hasPortrait = false;
+                string poolName = "<null>";
+                try { hasPortrait = model.HasPortrait; } catch { hasPortrait = false; }
+                try { poolName = model.Pool?.Title ?? "<null>"; } catch { poolName = "<抛异常>"; }
+                Logger.Log($"[CharBoss]   卡图自检 {name}（{id!.Entry}）：{(exists ? "OK" : "★找不到")} {path}" +
+                           $" ｜HasPortrait={hasPortrait} 卡池={poolName}");
+            }
+            catch (Exception e)
+            {
+                Logger.Log($"[CharBoss]   卡图自检 {name} 失败: {e.Message}");
+            }
+        }
+    }
+#endif
 }

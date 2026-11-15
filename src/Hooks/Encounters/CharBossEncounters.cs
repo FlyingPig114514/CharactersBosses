@@ -83,6 +83,35 @@ public class RegentBossEncounter : CharBossEncounterBase<RegentBoss>
 {
 }
 
+#if STS2_111
+/// <summary>
+/// **愚者**（0.113 才有的角色）的遭遇。他本身不是「五角色」之一，只有「塔罗愚」这一套设计，
+/// 所以这里只做一个基础遭遇 + 一个档位钉死的专属遭遇（用户 2026-11-14 设计，见 docs/plans/boss-fool-tarot.md）。
+/// </summary>
+public class FoolBossEncounter : CharBossEncounterBase<FoolBoss>
+{
+}
+
+/// <summary>三层 1 号「塔罗愚」：档位钉死第三幕，控制台 `fight FOOL_TAROT_BOSS_ENCOUNTER` 永远打这一套。</summary>
+public class FoolTarotBossEncounter : FoolBossEncounter
+{
+    public override int? TierAct => 2;
+}
+
+/// <summary>调试用的「普通战斗」版：三层塔罗愚。</summary>
+public sealed class FoolTarotBossNormalEncounter : FoolTarotBossEncounter
+{
+    public override RoomType RoomType => RoomType.Monster;
+}
+#endif
+
+#if STS2_111
+/// <summary>**观者 Boss 占位**遭遇（用户 2026-11-15；只有装了观者 mod 才会被排进候选表）。</summary>
+public class WatcherBossEncounter : CharBossEncounterBase<WatcherBoss>
+{
+    public override int? TierAct => 2;
+}
+#endif
 // ── 调试专用的「普通战斗」版本 ──
 // 调试开关换进来的战斗如果仍是 RoomType.Boss，打赢后会走 Boss 结算（第一幕的 Boss 一死就直接进下一幕）。
 // 这几个子类只把房间类型改成 Monster，于是它就是个普通战斗：给普通奖励、能继续走这一层的地图。
@@ -204,6 +233,7 @@ public abstract class CharBossEncounterBase<TMonster> : EncounterModel, Core.IBo
                 Core.DreadCharacters.Defect => typeof(Core.DefectDominion),
                 Core.DreadCharacters.Necrobinder => typeof(Core.NecrobinderDominion),
                 Core.DreadCharacters.Regent => typeof(Core.RegentDominion),
+                Core.DreadCharacters.Fool => typeof(Core.FoolDominion),
                 _ => null,
             };
             if (dominion == null) return null;
@@ -424,6 +454,9 @@ public static class CharBossEncounters
         ModelDb.Encounter<DefectBossNormalEncounter>(),
         ModelDb.Encounter<NecrobinderBossNormalEncounter>(),
         ModelDb.Encounter<RegentBossNormalEncounter>(),
+#if STS2_111
+        ModelDb.Encounter<FoolTarotBossNormalEncounter>(),   // 愚者：调试开关写 fool 时用（107 没有这个角色）
+#endif
     });
 
     /// <summary>
@@ -484,6 +517,10 @@ public static class CharBossEncounters
         ModelDb.Encounter<SilentGrandFinaleBossEncounter>(),   // 三层猎人 3 号：华丽猎（用户 2026-11-09）
         ModelDb.Encounter<NecrobinderFleshBossEncounter>(),    // 一层亡灵 2 号：血肉骨（用户 2026-11-10）
         ModelDb.Encounter<NecrobinderEtherealBossEncounter>(), // 二层亡灵 2 号：虚无骨（用户 2026-11-09）
+#if STS2_111
+        ModelDb.Encounter<FoolTarotBossEncounter>(),           // 三层 12 号：塔罗愚（愚者，用户 2026-11-14）
+        ModelDb.Encounter<WatcherBossEncounter>(),             // 三层：观者占位（只有装了观者 mod 才会进候选表）
+#endif
     });
 
     /// <summary>
@@ -518,6 +555,9 @@ public static class CharBossEncounters
             Add(4, 0, ModelDb.Encounter<RegentDebrisBossEncounter>());           // 一层 碎屑储君
             Add(4, 1, ModelDb.Encounter<RegentForgeBossEncounter>());            // 二层 铸剑储君
             Add(4, 2, ModelDb.Encounter<RegentColorlessBossEncounter>());        // 三层 无色储君
+#if STS2_111
+            Add(5, 2, ModelDb.Encounter<FoolTarotBossEncounter>());              // 三层 塔罗愚（愚者，用户 2026-11-14）
+#endif
             return map;
         });
 
@@ -611,6 +651,9 @@ public static class CharBossEncounters
             if (entry.StartsWith("DEFECT", StringComparison.Ordinal)) return 2;
             if (entry.StartsWith("NECROBINDER", StringComparison.Ordinal)) return 3;
             if (entry.StartsWith("REGENT", StringComparison.Ordinal)) return 4;
+#if STS2_111
+            if (entry.StartsWith("FOOL", StringComparison.Ordinal)) return 5;
+#endif
         }
         catch { /* 忽略 */ }
         return -1;
@@ -624,6 +667,9 @@ public static class CharBossEncounters
         "DEFECT_BOSS" => 2,
         "NECROBINDER_BOSS" => 3,
         "REGENT_BOSS" => 4,
+#if STS2_111
+        "FOOL_BOSS" => 5,
+#endif
         _ => -1,
     };
 
@@ -986,7 +1032,7 @@ public static class CharBossEncounters
         if (DebugMode.IsCycle) return all[DebugMode.NextCycleIndex(all.Length)];
 
         var requested = DebugMode.RequestedCharacter;
-        return all[requested >= 0 ? requested : 0];
+        return all[requested >= 0 && requested < all.Length ? requested : 0];
     }
 
     /// <summary>这个遭遇是不是我们自己的角色 Boss（用于避免二次映射）。</summary>

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Godot;
 using MegaCrit.Sts2.Core.HoverTips;
@@ -37,6 +37,8 @@ namespace CharacterBosses.UI;
 internal static class BossSpecialTip
 {
     private static Control? _anchor;
+    /// <summary>塔罗愚说明框定位日志上限（2 条）。</summary>
+    private static int _foolPlaceLogs;
     private static NHoverTipSet? _tipSet;
 
     /// <summary>"暂时不可见"（菜单打开等）时的重试间隔，避免每帧创建/销毁。</summary>
@@ -48,6 +50,15 @@ internal static class BossSpecialTip
     {
         try
         {
+            // ★ 2026-11-15（用户：「切到地图页面都还能看到」）：
+            //   原版 `NHoverTipSet` 挂在全局提示层上，常驻之后**跨界面存活**。
+            //   所以只要「当前不在战斗房里」就一律收掉 —— 这是这条通路唯一的出口。
+            if (NCombatRoom.Instance == null || !GodotObject.IsInstanceValid(NCombatRoom.Instance))
+            {
+                Hide();
+                return;
+            }
+
             // 多人（同场两只 Boss）时**一律不显示**特殊效果详细说明框 —— 用户要求：显示空间太紧张。
             // 这里是唯一的咽喉点（手牌栏刷新等各处都走它），所以在这里拦最稳。
             try
@@ -101,6 +112,7 @@ internal static class BossSpecialTip
 
             var tips = power.HoverTips.ToList();
             _tipSet = NHoverTipSet.CreateAndShow(_anchor, tips, HoverTipAlignment.Right);
+            Patches.BossSpecialTipRoomGuardPatch.Register(_tipSet);   // 交给「离房即收」的守卫
 
             // 图层压低：说明框只是"常驻提示"，不该盖住抽牌堆/牌堆详情这类交互界面。
             // （ZIndex 只在同一个 CanvasLayer 内比较；这里设成负数让它排在同层兄弟后面。）
@@ -110,6 +122,7 @@ internal static class BossSpecialTip
                 _tipSet.MouseFilter = Control.MouseFilterEnum.Ignore;
             }
             _tipSet?.SetFollowOwner();
+            try { Logger.Log($"[CharBoss] 说明框实际位置: {_tipSet!.GlobalPosition} 尺寸={_tipSet.Size} 锚点={_anchor.Position}"); } catch { }
             Logger.Log($"[CharBoss] 特殊效果说明框已显示: {power.Id.Entry}（{tips.Count} 条）");
         }
         catch (Exception e)
@@ -121,11 +134,17 @@ internal static class BossSpecialTip
     /// <summary>战斗结束/离开房间时调用。</summary>
     public static void Hide()
     {
+        // ★ 2026-11-15（用户：「切到地图页面还是能看到」）：说明框挂在**全局**提示层上，
+        //   而以前只通过锚点 `NHoverTipSet.Remove(_anchor)` 去收 —— 离开战斗房时锚点是随房间
+        //   一起被释放的，`IsInstanceValid(_anchor)` 已经为 false ⇒ **一次都没收过**，
+        //   接着又把 `_tipSet` 清空 ⇒ 那块框永久留在了屏幕上层。
+        //   现在对**框本身**动手：先按锚点 Remove，再对框兜底 Visible=false + QueueFree。
+        var tip = _tipSet;
         try
         {
             if (_anchor != null && GodotObject.IsInstanceValid(_anchor))
             {
-                NHoverTipSet.Remove(_anchor);
+                try { NHoverTipSet.Remove(_anchor); } catch { /* 兜底在下面 */ }
                 _anchor.QueueFree();
             }
         }
@@ -133,6 +152,15 @@ internal static class BossSpecialTip
         {
             Logger.Log("[CharBoss] 特殊效果说明框清除失败: " + e.Message);
         }
+        try
+        {
+            if (tip != null && GodotObject.IsInstanceValid(tip))
+            {
+                tip.Visible = false;
+                tip.QueueFree();
+            }
+        }
+        catch { /* 纯外观 */ }
         _anchor = null;
         _tipSet = null;
     }
@@ -152,10 +180,14 @@ internal static class BossSpecialTip
     }
 
     /// <summary>锚点挂在战斗房 UI 层（屏幕坐标系，和手牌栏同一个父级）。</summary>
-    private static Control? MakeAnchor()
+    private static Control? MakeAnchor(bool atUiRoot = false)
     {
         var ui = NCombatRoom.Instance?.Ui;
-        Node? parent = ui?.GetNodeOrNull<Control>("%PlayContainer") ?? (Node?)ui;
+        // ★ 2026-11-15：`%PlayContainer` 自己带变换（局部坐标 ≠ 屏幕坐标），塔罗愚那条定位怎么算都不对
+        //   ⇒ 他改用 **ui 根节点**（变换为单位矩阵，Position 就是屏幕坐标）。其它 Boss 仍用 PlayContainer。
+        Node? parent = atUiRoot
+            ? (Node?)ui
+            : (ui?.GetNodeOrNull<Control>("%PlayContainer") ?? (Node?)ui);
         if (parent == null) return null;
 
         var anchor = new Control
@@ -198,6 +230,27 @@ internal static class BossSpecialTip
         // **其它 Boss 一律不动**（偏移 0）。用户 2026-10-26 要求。数值可热调：charbosses_ui.txt 的 brewSpecialY。
         if (UsesLongSpecialText(boss)) target.Y += BossUiTuning.BrewSpecialY;
 
+        // ★ 2026-11-15（用户第三次订正：「用原版的框啊」）——
+        //   撤回自绘面板，**塔罗愚也用原版 `NHoverTipSet`**；只做一件事：
+        //   原公式算出来 `target.X = 立绘右缘 + 框宽 = 1982` 会顶出 1920 的屏幕 ⇒ 把它收到屏内。
+        //   `target` 是**框的右缘**（其它 Boss 实测：框占 [target−框宽, target]），
+        //   所以这里只需 `target.X = min(target.X, 屏宽 − 8)`，Y 完全不碰。
+        //   其它 Boss 本来就不越界 ⇒ 这个 min 对它们没有任何影响。
+        if (IsFoolBoss(boss))
+        {
+            try
+            {
+                var viewport = _anchor.GetViewportRect().Size;
+                float maxRight = Math.Max(8f, viewport.X - 8f);
+                if (target.X > maxRight)
+                {
+                    Logger.Log($"[CharBoss] 塔罗愚的说明框右缘越界 ⇒ 收到屏内: X {target.X:0} → {maxRight:0}" +
+                               $"（屏幕 {viewport}，框宽 {BoxWidth():0}）");
+                    target.X = maxRight;
+                }
+            }
+            catch { /* 量不到就原样放 */ }
+        }
         _anchor.Position = target;
     }
 
@@ -222,5 +275,22 @@ internal static class BossSpecialTip
         }
         catch { /* 忽略 */ }
         return 320f;
+    }
+
+    /// <summary>说明框高度（量不到就给个经验值）。</summary>
+    private static float BoxHeight()
+    {
+        try
+        {
+            var box = _tipSet ?? throw new InvalidOperationException();
+            return box.Size.Y > 1f ? box.Size.Y : 160f;
+        }
+        catch { return 160f; }
+    }
+
+    /// <summary>是不是「塔罗愚」（愚者）。他的说明框固定贴屏幕右上角（用户 2026-11-15）。</summary>
+    private static bool IsFoolBoss(CharBossMonster? boss)
+    {
+        try { return boss?.Def?.Key == "FOOL_BOSS"; } catch { return false; }
     }
 }

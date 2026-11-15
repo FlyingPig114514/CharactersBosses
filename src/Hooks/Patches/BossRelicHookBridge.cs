@@ -269,6 +269,26 @@ public static class BossRelicSuppressChandelierPatch
     }
 }
 
+/// <summary>压掉原版的「佩尔之泪」——由 <see cref="BossHookBridge.PaelsTearsBonus"/> 在
+/// `PrepareTurn` 里按卡面加进本回合预算。
+///
+/// ★ 2026-11-15（用户：「佩尔之泪的加费效果好像被重复实现了，一回合给他加了 4 费」）：
+///   反编译 `PaelsTears.AfterSideTurnStart(...)` —— 它是**真的会跑到**的（影子玩家是合法 `Player`，
+///   遗物钩子照收），于是它给的那 2 点又叠在我们已经算进预算的那 2 点之上 ⇒ 一共 4 点。
+///   和「吊灯」同一类问题，同样处理：**只留我们自己那一次**。
+/// </summary>
+[HarmonyPatch(typeof(PaelsTears), nameof(PaelsTears.AfterSideTurnStart))]
+public static class BossRelicSuppressPaelsTearsPatch
+{
+    [HarmonyPrefix]
+    public static bool Prefix(PaelsTears __instance, ref Task __result)
+    {
+        if (!BossRelicHookBridge.IsOurBossRelicPublic(__instance)) return true;
+        __result = Task.CompletedTask;
+        return false;
+    }
+}
+
 /// <summary>压掉原版的「弹珠袋」——由 <see cref="BossRelicHookBridge"/> 在战斗开始时自己做一次
 /// （否则可能和她身上那件一起触发两次易伤）。</summary>
 [HarmonyPatch(typeof(BagOfMarbles), nameof(BagOfMarbles.BeforeSideTurnStart))]

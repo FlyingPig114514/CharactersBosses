@@ -66,5 +66,42 @@ public static class BossLossMessageKillerPatch
         {
             Logger.Log("[CharBoss] 死亡提示按凶手显示失败（忽略）: " + e.Message);
         }
+        finally
+        {
+            // ★ 用户 2026-11-14：「死于塔罗愚时，如果玩家角色的名字属于那张塔罗牌对应的角色，
+            //   就把死亡提示改成 `[character]成为了愚者牌组中新的[对应卡牌]`」。
+            //   这里统一做一次收尾（不管上面走的是哪条分支），只对**愚者的遭遇**生效。
+            try { ApplyTarotMessage(__instance, character, ref __result); }
+            catch (Exception e) { Logger.Log("[CharBoss] 塔罗死亡提示失败（忽略）: " + e.Message); }
+        }
+    }
+
+    /// <summary>
+    /// 把「死于塔罗愚」的提示换成「成为了愚者牌组中新的 XX」。
+    /// 文案 key 是同表的 `.loss_tarot`（16 语言），里面用 `{Card}` 引用 `cards` 表的塔罗牌名
+    ///（牌名本来就带 16 语言，不用重复翻译）。
+    /// </summary>
+    private static void ApplyTarotMessage(EncounterModel? encounter, CharacterModel character, ref LocString result)
+    {
+        if (encounter == null) return;
+        string entry;
+        try { entry = encounter.Id.Entry ?? string.Empty; } catch { return; }
+        if (!entry.StartsWith("FOOL_", StringComparison.Ordinal)) return;   // 只认愚者的遭遇
+
+#if STS2_111
+        string? card = Core.FoolTarotDeaths.CardEntryFor(character);
+#else
+        string? card = null;
+#endif
+        if (card == null) return;
+
+        string key = entry + ".loss_tarot";
+        var message = new LocString("encounters", key);
+        character?.AddDetailsTo(message);
+        try { message.Add("Card", new LocString("cards", card + ".title")); }
+        catch { Logger.Log("[CharBoss] 塔罗死亡提示：取不到牌名 " + card); return; }
+
+        result = message;
+        Logger.Log($"[CharBoss] 塔罗死亡提示：{entry} + {card}（角色 {character?.Id.Entry}）");
     }
 }

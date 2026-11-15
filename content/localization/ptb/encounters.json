@@ -125,5 +125,11 @@
     "BASELIB_MISSING_HEADER":  "Mod obrigatório ausente: BaseLib",
     "BASELIB_MISSING_BODY":  "Esta máquina não tem o mod BaseLib instalado (id da Steam Workshop 3737335127).\n\nIndisponível:\n· a tela de configuração de mods no jogo\n· a sincronização das configurações do anfitrião no multijogador\n\nTodo o resto funciona (substituição de chefes, baralhos/relíquias/roteiros, formações multijogador). Inscreva-se no BaseLib e reinicie o jogo.",
     "BASELIB_MISSING_OK":  "Entendi",
-    "BASELIB_MISSING_CLOSE":  "Fechar"
+    "BASELIB_MISSING_CLOSE":  "Fechar",
+    "FOOL_BOSS_ENCOUNTER.title":  "O Bufão",
+    "FOOL_BOSS_ENCOUNTER.loss":  "{character} foi derrotado pelo tarô do [gold]Bufão[/gold].",
+    "FOOL_TAROT_BOSS_ENCOUNTER.title":  "O Bufão",
+    "FOOL_TAROT_BOSS_ENCOUNTER.loss":  "{character} foi derrotado pelo tarô do [gold]Bufão[/gold].",
+    "FOOL_BOSS_ENCOUNTER.loss_tarot":  "{character} se tornou a nova carta [gold]{Card}[/gold] no baralho de [gold]O Bufão[/gold].",
+    "FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot":  "{character} se tornou a nova carta [gold]{Card}[/gold] no baralho de [gold]O Bufão[/gold]."
 }

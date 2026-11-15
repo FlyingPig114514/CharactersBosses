@@ -1354,3 +1354,368 @@ attackCommand.WithHitVfxNode((Creature t) => NShivThrowVfx.Create(Owner.Creature
 **仍待确认的一处**：`NDaggerSprayImpactVfx`（匕首雨的**命中**特效）签名是
 `Create(Creature, tint, goingRight)` —— 方向被卡面写死成 `true`，而它落在**玩家**身上，
 按现在的规则「落在玩家身上一律不碰」⇒ 它可能仍然是反的。等用户看一眼再决定要不要一起翻。
+---
+
+## 进度 · v0.2.657 塔罗愚（2026-11-14 第二轮，用户实测反馈）
+
+用户实测报了 4 条，本轮按顺序处理：
+
+| # | 反馈 | 处理 |
+|---|---|---|
+| 1 | 「你怎么第一回合给了他 20 费？」 | `BossDefs.Fool` 的 `Energy` 从 `{3,3,20,20}` 改回 **`{3,3,3,3}`**（`HandSize` 也从 12 改回 6），剧本里逐回合的 `Energy` 覆盖**全部删掉**。依据：用户第 1 回合写「神话形态、神话形态（没费）、神话形态（没费）」= 3 费只够打 1 张 3 费的神话形态；多出来的能量来自塔罗牌本身（**皇帝 = 获得 7 点能量**、星星 = 下回合 3 点、太阳 = 2 点）。实测第 1 回合只出 1 张、第 2 回合皇帝之后连出 2 张，与表格一致。 |
+| 2 | 「力量获得的力量被你翻倍了」 | 根因：`AbstractModel.ModifyPowerAmountGivenAdditive` 名字里的 **Additive 是增量**（基类默认 `return 0m`，调用方算 `amount + 返回值`）。`BossFoolPower` 第一版在「不改动」分支把 `amount` 原样返回 ⇒ 他身上**每一个** power 都被翻倍（神话形态一次 +2、力量一次 +10）。现在不改动返回 `0m`、要抵消返回 `-absorb`。实测力量正好 +5。 |
+| 3 | 「魔术师并没有生成指定的充能球，也没有球的伤害预览」 | ①新增 `Patches/FoolMagicianOrbPatch.cs`：对我们 Boss 打出的 `TheMagician` 接管 `OnPlay`，先 `AddSlots(Repeat)` 再按 **电 → 冰 → 玻璃** 固定入队（升级版 `Repeat=4` 正好 = 恐惧模式的 2 电 1 冰 1 玻璃，不用另判模式；玩家的愚者不受影响）。②`BossOrbSim.Predict` 在「彩虹」旁边加同款分支（先涨球位再推球），并把 `BossHandPanel` 的「球被动预告」门槛从「球位容量 <= 0 就返回 0」改成只判 `queue == null` —— 他本来没有球位，第 4 回合打出魔术师才有。 |
+| 4 | 「恶魔怎么打出了神话形态」 | 恶魔会「消耗手牌 → 每消耗一张就从抽牌堆顶打一张」，而他抽牌堆里还躺着没打出去的神话形态。新增 `Patches/FoolNoopCardsPatch.cs`：对我们 Boss 把 `TheDevil`、`TheWorld`（弃牌堆捞牌）整张空转。`TheFool` 不拦（设计就是「自动打出后面 2 张牌」）。同时第 5 回合按用户要求补一张**恶魔（无效果）**。 |
+
+另外本轮一起做的：
+
+- **意图整行左移（>10 张）**：`BossHandPanel.Layout` 新增「整块等比缩放 + 右侧给能量球留一格」
+  （`_panelScale` / `EnergyReserve = 62`），并把 `FollowBoss` 里会抛异常的 `Math.Clamp(min>max)` 改成手动夹。
+  16 张牌时整块按可用宽度缩小、能量球不再被顶出屏幕。
+- **恶魔形态增伤提前计入**：`BossIntentBuilder.PendingRise` 新增 `DemonFormPower` 分支（他回合开始才 +N 力量，
+  而意图在玩家回合就画好），只在 `CombatState.CurrentSide == Player` 时补，避免重复计入。
+- **群蛇形态伤害条**：`BladesGrowth.RecomputeAll` 有球位就 `return`，而塔罗愚第 4 回合之后**永久有球位** ⇒
+  炼药猎那套群蛇意图对他完全失效。改为把「这张牌那一刻的群蛇层数」在规划期存进新的
+  `PlannedPlay.SerpentDamage`，`BossScriptPlanner` / `BladesGrowth` / 有球那条 `RefreshPlannedIntents` 三处都用它。
+- **滚石动画**：`NRollingBoulderVfx` 加进 `BossAttackVfxFacing.Excluded`（它生成时就知道攻守双方、方向自己算）。
+
+**还没做**：第 14 回合「倒吊人给的额外回合」—— 反编译确认 `TheHangedMan` 只是给自己挂
+`ExtraTurnPower`，而 `CombatManager` 只在 `CombatState.Players` 里挨个问 `Hook.ShouldTakeExtraTurn`，
+影子玩家**不在那个集合里** ⇒ 额外回合从来没发生。需要自己给 Boss 侧再开一个回合（并让意图分成两行）。
+## 进度 · v0.2.657 塔罗愚（2026-11-14 第三轮，用户实测反馈）
+
+| # | 反馈 | 处理 |
+|---|---|---|
+| 1 | 「滚石的动画完全反了」 | `NRollingBoulderVfx` 加进 `BossAttackVfxFacing.Excluded`（它 `Create` 时就带着攻守双方、方向自己算，翻它就是反的）。 |
+| 2 | 「他获得群蛇形态后每张牌下面并没有显示伤害」 | 根因：炼药猎那套群蛇意图是 `BladesGrowth.RecomputeAll` 顺手算的，而那条路 **`if (球位容量 > 0) return;`** —— 塔罗愚第 4 回合打出魔术师之后**永久有球位** ⇒ 整条失效。现在规划期按剧本顺序把「这张牌那一刻的群蛇层数」存进新的 `PlannedPlay.SerpentDamage`，三条重算路径（`BossScriptPlanner` / `BladesGrowth` / 有球那条 `RefreshPlannedIntents`）都原样再用。 |
+| 3 | 「第一次使用魔术师的当回合还是没有将要生成的球的意图」 | `BossHandPanel.OrbPassiveDamageCore` 的门槛从 `queue.Capacity <= 0 就返回 0` 改成只判 `queue == null` —— 他本来没有球位，魔术师才 +3 个（球位推进交给 `BossOrbSim.OrbsAfter`，它的 `Predict` 里已有魔术师分支）。 |
+| 4 | 「倒吊人并没有真的给他一个额外回合」 | **未完成**，原因已查清：`TheHangedMan` 只是给自己挂 `ExtraTurnPower`，而 `CombatManager` 只在 `CombatState.Players` 里挨个问 `Hook.ShouldTakeExtraTurn` —— **影子玩家不在那个集合里**。需要自己给 Boss 侧再开一个回合。 |
+| 5 | 「难绷，灾厄无视缓冲，把玩家秒了 —— 不是 bug，是机制。下次测试把玩家的最大生命值调到 10000」 | `DebugMode` 新增 `TestPlayerMaxHp = 10000` + `TestPlayerHp(state)`，在 `CharBossMonster.AfterAddedToRoom` 里调；**只在 `charbosses_debug.txt` 存在时生效**。注意 `Creature.MaxHp/CurrentHp` 对外是只读属性（CS0200）⇒ 走 `SetMaxHpInternal` / `SetCurrentHpInternal`。实测进战斗后 `player hp: 10000/10000`。 |
+| 6 | 「把第四回合的命运之轮和第六回合的女祭司调换位置，保证第六回合的月亮能被正常打出」 | 第 4 回合 = 愚者 / 魔术师 / **命运之轮**，第 6 回合 = 节制 / **女祭司** / 月亮。根因：命运之轮是「**丢弃你的手牌** → 抽 7 张」，而月亮就躺在手牌里 ⇒ 被它丢掉，第 6 回合根本打不出来。 |
+| 7 | 「这 10 张小刀会被打出（要在月亮下面显示这 10 把小刀的伤害意图）」 | 新增 `Patches/FoolMoonShivPatch.cs`：接管 `TheMoon.OnPlay`，对我们的 Boss 固定 `Shiv.CreateInHand(owner, 10, combatState)`（原版是「补到手牌上限」，只剩 9 把）；`BossIntentBuilder.ShivsFrom` 对 `THE_MOON` 直接返回 10 ⇒ 意图画 10 把、`PlannedPlay.GeneratedShivs = 10` ⇒ 出牌阶段走既有的 `SilentBlades.FrontloadRealShivs` 逐把打出。实测日志：`月亮：生成 10 把小刀` → `小刀摆上牌桌: 10 把` → 10 行 `塔罗愚出牌：第 6 回合 SHIV`。 |
+| 8 | 「修改进阶 9 加成，把获得玉之剑改成获得金刚杵」 | `BossDefs.Fool.AscensionRelicsByAct` 里 `SwordOfJade` → `Vajra`，插入位置仍是「涅奥的祝福与闪亮口红之间」。实测：`进阶 10（第 3 幕）额外获得遗物 Vajra（插在 SparklingRouge 前面）` + `金刚杵：战斗开始给 +1 力量`。 |
+## 进度 · v0.2.657 塔罗愚（2026-11-14 第四轮，用户实测截图）
+
+| # | 反馈 | 处理 |
+|---|---|---|
+| 1 | 截图：「怎么中间那 2 张牌没有卡图？」 | 空着的正是第 9 回合的**天人形态 / 永恒形态**（我们 v0.2.655 自造的四张牌都这样）。根因：`CardModel.PortraitPath` 是 `public virtual`，默认按「池名 + 模型 id」拼贴图（`atlases/card_atlas.sprites/<pool>/<entry>.tres`），我们的 `TAROT_*` 在游戏资源里不存在 ⇒ 卡面空白。现在 4 个类都覆写 `PortraitPath`，借一张**气质相近的原版塔罗牌**：斋戒→女皇、天人形态→星星、斗殴→正义、永恒形态→回响形态（`Cards/TarotCardArt.Borrow<T>()`，取不到退回 `MissingPortraitPath`，绝不会更糟）。加了开局自检 `卡图自检`，实测：`斋戒 → token/the_empress.tres OK` / `天人形态 → token/the_star.tres OK` / `斗殴 → token/justice.tres OK` / `永恒形态 → defect/echo_form.tres OK`。 |
+| 2 | 「第四回合刚刚那个命运之轮也换成女祭司吧」 | 第 4 回合 = 愚者 / 魔术师 / **女祭司**，第 6 回合 = 节制 / **女祭司** / 月亮。命运之轮从此不在剧本里（它本来是「丢弃手牌 → 抽 7 张」，对这套剧本只有破坏性）。 |
+
+### 顺带确认（不是这次引入的）
+
+`godot.log` 里每个我们自己的类型都有一条
+`Attempting to register type CharacterBosses.X in assembly CharacterBosses.Impl111 … but it is not associated with any mod!`
+—— 共 304 条，**包括早就存在的 `NeowBlessing` / `BossBashPower` 等**，也就是双版本外壳加载器（`AssemblyLoadContext` 直接读 `.dll.bin`）的既有现象，不是塔罗愚引入的。
+它在提示「多人时类型排序可能不一致」，属于加载器层面的遗留问题，单独记一笔，暂不动。
+## 进度 · v0.2.657 塔罗愚（2026-11-14 第五轮，用户实测反馈）
+
+| # | 反馈 | 处理 |
+|---|---|---|
+| 1 | 「第四回合刚刚那个命运之轮也换成女祭司吧」 | 第 4 回合 = 愚者 / 魔术师 / 女祭司（命运之轮不再出现）。实测 `剧本第 4 回合: 打 [THE_FOOL,THE_MAGICIAN,THE_HIGH_PRIESTESS]`。 |
+| 2 | 「把第三回合的力量和第七回合的女祭司调换位置」 | 第 3 回合 = 女祭司 / 正义 / 女皇，第 7 回合 = 死亡 / **力量** / 隐者。实测 `剧本第 3 回合: 打 [THE_HIGH_PRIESTESS,JUSTICE,THE_EMPRESS]`。 |
+| 3 | 「把闪亮口红换成钨合金棍」 | `TarotFoolScript.Relics()` 里 `SparklingRouge` → `TungstenRod`（进阶 9 的「插在…之前」也跟着改成 TungstenRod）。实测遗物串：`[SONG_BOW,NEOW_BLESSING,TUNGSTEN_ROD,RINGING_TRIANGLE,PAELS_TEARS,PERMAFROST,PHILOSOPHERS_STONE,MERCURY_HOURGLASS]`。 |
+| 4 | 「第九回合的费用应该够打虚空形态吧」+「还有本身的 2+1+2 费呢（基础和贤者之石和佩尔之泪）」 | 两处根因都补了：<br>①**星星的下回合能量从来没到账** —— `BossHookBridge.RemoveNextTurnPowers` 在回合开始就把 `EnergyNextTurnPower` 删了（当年为了储君/灵魂骨写的「只删不发」，因为它们的剧本把这笔能量写死在逐回合预算里）⇒ `PendingNextTurnEnergyCredit()` 永远读不到。新增 `BossDefinition.KeepsNextTurnEnergyPower`（默认 false = 老行为不变），塔罗愚打开；同时规划期也把这条 power 的层数算进预算（`BossScriptPlanner`，和「下回合辉星」同一套处理）——否则计划是玩家回合算的，看不到那 6 点。<br>②**佩尔之泪完全没生效** —— 它挂 `BeforeSideTurnEnd`（记剩余能量）+ `AfterSideTurnStart`（发 2 能量），影子玩家两条都收不到，而且 `PrepareTurn` 的 `pcs.Energy = …` 会把任何到账的能量覆盖掉。现在 `CharBossMonster` 新增 `LeftoverEnergyLastTurn`（在清零 `ScriptEnergySpent` **之前**按「上一回合设的能量 − 逐张记账花掉的」算），`BossHookBridge.PaelsTearsBonus` 据此给本回合 +2 并算进预算。<br>实测：第 9 回合的 16 张牌**全部打出**（含最后那张 `PLAY VOID_FORM (cost 3)`）；`佩尔之泪：上回合还剩 5 能量 ⇒ 本回合 +2 能量` 每回合都在打。 |
+
+### 说明：能量口径
+
+`BossDefs.Fool.Energy = {3,3,3,3}` 这个 3 = **愚者本体 2 点 + 贤者之石 1 点**（本模组的约定是
+「定义里的 Energy 就是含遗物加成的每回合总量」，无色储君同款）。
+`星星`（下回合 +3）、`太阳`（+2）、`皇帝`（当回合 +7）、`鬼火`（+1）、`佩尔之泪`（下回合 +2）都是牌/遗物自己产生、额外叠上去的。
+## 进度 · v0.2.657 塔罗愚（2026-11-14 第六轮）
+
+| # | 反馈 | 处理 |
+|---|---|---|
+| 1 | 「第六回合改成节制、魔术师、命运之轮 / 第八回合改成星星、星星、月亮」 | 照改。第 6 回合 = 节制 / 魔术师 / 命运之轮；第 8 回合 = 星星 / 星星 / 月亮（10 把小刀整套搬到这里）。 |
+| 2 | 「钨合金棍换锚」 | `TarotFoolScript.Relics()` → `Anchor`，进阶 9 的「插在…之前」同步改成 Anchor。 |
+| 3 | 「战斗里那里还是空的。而且就用原本他们的卡图，不要乱改」 | **两个根因**：<br>①**卡池是 null** —— `CardModel.Pool` 的默认实现是「在 `ModelDb.AllCardPools` 里找谁的 `AllCardIds` 含这张牌」，我们自造的 id 不在任何池子里 ⇒ 返回 null。而 `NCard.UpdatePortrait()` 要连着读 `Model.Frame` / `PortraitBorder` / `BannerTexture` / `BannerMaterial`，这些都走 `Pool` ⇒ 整条方法抛异常 ⇒ 卡面**整块空白**（不只是图，连边框都没画）。现在 4 个类都覆写 `Pool`，借原版塔罗牌（皇帝）所在的 `token` 池。<br>②**用的是真·原图**：新增 `tools/art/dump_texture_png.gd`（从别的 mod 的 pck 里把 `.ctex` 解成 PNG），从**观者 mod**（`workshop/.../3747526116/Watcher.pck`）导出「斋戒」「天人形态」，从**崩坠 Hermit**（`workshop/.../3747508091/Hermit.pck`）导出「斗殴」「永恒形态」（都是 500×380 的原版卡图，`.tres` 图集切片也能直接 `get_image()` 出来）。4 张图随我们的 PCK 发布（`tools\art\import_proj\CharacterBosses\images\cards\` → `res://CharacterBosses/images/cards/tarot_*.png`，`pck_extras.txt` 从 66 → 78 条），`PortraitPath` / `PortraitPngPath` 都指向它们。<br>实测自检：4 张全是 `HasPortrait=True 卡池=token`，路径 `res://CharacterBosses/images/cards/tarot_*.png`。 |
+
+> 说明：这 4 张卡图是从**别的 mod 的 pck** 里导出来的原始美术，不是我自己画/借的替代品。
+> 观者那两张要玩家装了观者 mod 才有出处，但图已经打进我们自己的 PCK ⇒ 只装我们这一个 mod 也能显示。
+## 进度 · v0.2.657 塔罗愚（2026-11-14 第七轮）
+
+| # | 反馈 | 处理 |
+|---|---|---|
+| 1 | 「第八回合的月亮再改回魔术师，其他不回退也不变」 | 第 8 回合 = 星星 / 星星 / **魔术师**（第 6 回合的命运之轮、第 3/7 回合的调换、锚 全部保留）。实测 `剧本第 8 回合: 打 [THE_STAR,THE_STAR,THE_MAGICIAN]`。 |
+| 2 | 「你怎么给第 11 和第 12 回合印出来的牌全变成零费了？」 | 根因：他第 9 回合打出了**虚空形态**。反编译 `VoidFormPower.TryModifyEnergyCostInCombatLate` = 「本回合免费」、`ShouldSkip` 判 `cardsPlayedThisTurn >= Amount`，而那个计数器只在 `AfterCardPlayed` 里 +1 —— **影子玩家收不到这条钩子** ⇒ 计数器永远 0 ⇒ 每张牌都在「免费额度内」⇒ 卡面费用全变 0。新增 `Patches/FoolVoidFormNoFreeCostPatch.cs`：对我们的 Boss 直接跳过这层改写，卡面保持原本费用（他本来也不花能量，这条对他只剩「显示错」一个后果）。 |
+| 3 | 「第 12 回合的那些牌都是原本的费用」 | 「永恒形态」（我们自造的 `TarotEternalPower`）会按「每回合前 4 张**抽到**的牌减 1 费」改费用，而他的牌是**印**出来的。按 `docs/plans/boss-fool-tarot.md` §3.7「永恒形态对他没有实际效果」⇒ 在 `AfterCardDrawn` 开头加一条「持有者是我们自己的 Boss 就 `return Task.CompletedTask`」，卡面费用不再被改。 |
+| 4 | 「记得考虑天人形态的加费」 | `天人形态`（`TarotDevaPower`）挂的是 `AfterEnergyReset(Player)`，影子玩家收不到；而且 `PrepareTurn` 的 `pcs.Energy = …` 会把到账的能量硬覆盖掉 ⇒ 之前完全没生效。现在两处都按 `TarotDevaPower.Amount`（= 本回合该给的数）补进预算并递增：`CharBossMonster.Turn`（真能量）+ `BossScriptPlanner`（规划期/意图）。实测 `天人形态：本回合 +1 能量（下一回合 2）` → `+2（下一回合 3）`。 |
+| 5 | 「因为充能球栏位是有上限的，所以记得显示被激发的充能球会造成的伤害」 | `BossOrbSim.Channel` 本来就照原版 `OrbCmd.Channel` 的语义写（满了先 `EvokeNext` 再入队，并把激发伤害 `AddDamage` 进意图），所以球位满了之后魔术师下面会自动多出激发那几颗球的伤害。第 2 张魔术师之后球位是 6/6（4、8 回合各 +3），再往后的魔术师就会触发激发预览。 |
+
+**第 11 回合印出来的无色牌只 -1 费**：那是「教皇」自己卡面的效果（`TheHierophant`：这 3 张无色牌本回合耗能 -1），由原版结算，我们只拦掉了「虚空形态全免」和「永恒形态 -1」这两层，所以现在是「原价 -1」。
+## 进度 · v0.2.657 塔罗愚（2026-11-14 第八轮）
+
+| # | 反馈 | 处理 |
+|---|---|---|
+| 1 | 「回响形态被打出两次的牌下方因为群蛇形态造成的伤害并没有标成 4×2（恐惧则为 6×2）」 | 规划期新增「本回合还能重打几张」= `EchoFormPower.Amount`（反编译：`ModifyCardPlayCount` 对本回合前 `Amount` 张 +1），逐张扣额度算出 `echoPlayCount`，传进 `BossIntentBuilder.IntentsFor(playCount:)` ⇒ 群蛇那一条按 `4×2 / 6×2` 画。同时把这个数存进新的 `PlannedPlay.PlayCount`，**两条重算路径**（`BladesGrowth` / 有球那条 `RefreshPlannedIntents`）原样再用 —— 否则出牌期一重算就被覆盖回 1 次。 |
+| 2 | 「力量作为一回合的第一张牌因为回响被复制时，后面攻击牌的伤害预览只考虑了 1 次力量的增幅」 | 规划期累计「本回合后续攻击意图 +N」那一句改成 `inTurnStrength += add * echoPlayCount` —— 被重打的牌，它的力量也要按次数算进后面的攻击预览。 |
+| 3 | 「第十回合让愚者优先打女祭司，从而让女祭司被回响形态重打而非魔术师」 | ①第 10 回合顺序改成 **愚者 / 女祭司 / 魔术师**（实测 `剧本第 10 回合: 打 [THE_FOOL,THE_HIGH_PRIESTESS,THE_MAGICIAN]`）。②新增 `Patches/FoolTheFoolOrderedPatch.cs`：反编译 `TheFool.OnPlay` 是「每张都从手牌里 `StableShuffle` 之后取第一张」= **随机**，所以「回响重打的是哪一张」每局都不一样。现在对我们的 Boss 改成**按手牌顺序（= 剧本顺序）依次打出**，玩家的愚者仍走原版随机。 |
+## 进度 · v0.2.657 塔罗愚（2026-11-14 第九轮）
+
+| # | 反馈 | 处理 |
+|---|---|---|
+| 1 | 「从观者和亡命之徒那里新加的几个 buff 图标都用他们原本自己的」 | 5 层能力的图标全部换成原版：**观者**（`Watcher.pck`）→ `energy_down_power.png`（斋戒的每回合少 1 能量）、`deva_power.png`（天人形态）；**崩坠 Hermit**（`Hermit.pck`）→ `brawl_power.png`（斗殴）、`bruise_power.png`（瘀伤）、`eternal_power.png`（永恒形态）。用 `tools/art/dump_texture_png.gd` 导出成 PNG（128×128 / 256×256），随我们的 PCK 发布（`res://CharacterBosses/images/powers/tarot_*.png`，`pck_extras.txt` 78 → 93 条），`BossSpecialPowerIconPatch` 里在「本 mod 的 Power ⇒ 好奇灯泡」那条通用规则**之前**加了映射。<br>实测自检：5 张全部 `OK res://CharacterBosses/images/powers/tarot_*.png`。 |
+| 2 | 「伤害预览似乎没有考虑瘀伤（可能因为在玩家的回合内玩家身上没有瘀伤）」 | 猜得完全正确。`斗殴`（`TarotBrawlPower`）是在**他自己回合开始**给敌人上瘀伤的，而意图在**玩家回合**就算完了 ⇒ 那时玩家身上没有瘀伤，每段攻击都少算「瘀伤层数」。瘀伤在原版是 `ModifyDamageAdditive`（每段 +N），所以并进 `strengthBonus` 这个「每段固定加值」的口径：新增 `BossIntentBuilder.PendingBruise(creature)`（**只在他回合还没开始时**返回层数，`CurrentSide == Player` 为判据 —— 一旦瘀伤真上身，`FinalDamage` 已含这一笔，再补就翻倍），在 `BossScriptPlanner` 里 `strengthBonus: inTurnStrength + pendingBruise`。 |
+## 进度 · **v0.2.658** · 塔罗愚收尾（2026-11-14 第十轮，「把没做完的赶紧做了」）
+
+### ① 倒吊人的额外回合（最后一块硬骨头）
+
+根因（前面几轮已查明）：`TheHangedMan` 只是给自己挂 `ExtraTurnPower`，而真正发额外回合的
+`CombatManager` 只在 `CombatState.Players` 里挨个问 `Hook.ShouldTakeExtraTurn` ——
+**影子玩家不在那个集合里**，所以那层 power 挂上去也没人问。
+
+**做法**：把「额外回合」实现在**同一个 Boss 回合里**。
+`BossTurn` 新增 `ExtraTurnAfterCard`（打完第 N 张之后…），第 14 回合的剧本并成一行：
+`节制 / 倒吊人 / 死神` **⇒ 重跑一次「他的回合开始」钩子 ⇒** `高塔 / 星星 / 恶魔`。
+`PlayPlannedCards` 里按 `playedIndex` 触发：调 `BossHookBridge.FireTurnStart`（水银沙漏再打 3、
+恶魔形态再 +N 力量、遗物回合开始效果全部再走一遍）→ 再补一份本回合基础能量 → 继续打后面的牌。
+
+⚠ 顺带修掉一个**错位 bug**：原来「14 额外回合」是剧本里的**独立一行**（第 15 行），
+而 `TurnAt` 是按回合号取行的 ⇒ 第 15 回合打到的是「额外回合」那一行、第 16 回合打到的是「第 15 回合」那一行，
+后面全部错一格。合并成一行后 `LoopFrom = 10 / LoopLength = 7` 重新对上了。
+
+实测：
+```
+剧本第 14 回合: 打 [TEMPERANCE,THE_HANGED_MAN,DEATH,THE_TOWER,THE_STAR,THE_DEVIL] 余费=25
+塔罗愚出牌：第 14 回合 TEMPERANCE → THE_HANGED_MAN → DEATH
+倒吊人的额外回合：打完第 3 张 ⇒ 重跑一次「回合开始」钩子（水银沙漏 / 恶魔形态 / 遗物…），再补一份本回合能量
+塔罗愚出牌：第 14 回合 THE_TOWER → THE_STAR → THE_DEVIL
+恶魔形态：他回合开始会 +3 力量（当前力量 28 → 31 → **34**）   ← 一个回合里涨了两次
+```
+
+### ② 恐惧模式：新生之喜 / 教皇 多印 1 张「非凡技艺」
+
+新增 `Patches/FoolDreadExtraProwessPatch.cs`：对 `BundleOfJoy` / `TheHierophant` 的 `OnPlay`
+加 **postfix**，把返回的 Task 串成「原版结算完 → 再往手牌补 1 张 `Prowess`」。
+只在「我们自己的 Boss + `DreadMode.IsActive`」生效，不动原版那套随机无色牌逻辑，玩家侧完全不受影响。
+
+### ③ 本轮一起进的（上一轮遗留，已实测）
+
+- 瘀伤计入伤害预览（`BossIntentBuilder.PendingBruise`，只在他回合开始前补，避免瘀伤真上身时翻倍）。
+- 回响形态重打计入意图：群蛇那一条 `4×2`（恐惧 `6×2`）、被重打的力量算两遍。
+- `愚者`按剧本顺序打牌（反编译原版是 `StableShuffle` 随机挑），第 10 回合固定「愚者 → 女祭司 → 魔术师」。
+- `虚空形态`不再把卡面显示成 0 费；`永恒形态`对他彻底空转；`天人形态`的递增能量进预算。
+- 5 层观者 / Hermit 能力用各自原版图标、4 张塔罗牌用各自原版卡图（都从别的 mod 的 pck 导出，随本模组 PCK 发布）。
+- 遗物换成锚、进阶 9 = 金刚杵、调试开关下玩家最大生命值 10000。
+
+**`[verify] 两份实现的版本串都是 v0.2.658 OK`，16 语言本地化全过。**
+## 进度 · v0.2.658 · 额外回合三件事（2026-11-14 第十一轮）
+
+用户三条：「额外回合打出的第一张牌会真的被打出 2 次」「正常回合和额外回合结束时都结算 1 次充能球」
+「开始时都触发水银沙漏」「由于意图中的所有牌（除了 3 张神话形态）都是印的，要能正常触发创世之柱」。
+
+| 项 | 做法 | 实测 |
+|---|---|---|
+| 额外回合第一张打两次 | `Core/EchoFormTurnExtras.cs` 的 `EchoFormTurnReset`：额外回合边界把 `EchoFormPower` 的 `cardsPlayedThisTurn` 清零 ⇒ 那一张重新落在「本回合前 Amount 张」里 ⇒ 被 `ModifyCardPlayCount` 打两次。清零走两条路：先扫实例字段找 `Data`，找不到再反射调基类 `GetInternalData<T>()`（`Data` 是 private 嵌套类）。 | 待实机确认（这一版的安装在我最后一次跑到第 14 回合之后） |
+| 额外回合结束也结算 1 次球 | `OrbPassiveTick.RunAsync`：边界上逐颗 `orb.BeforeTurnEndOrbTrigger(ctx)` + `orb.TriggerPassive(ctx, null)`。 | ✅ 日志 `额外回合：结算了 10 颗充能球的被动` |
+| 开始都触发水银沙漏 | 额外回合走的是 `BossHookBridge.FireTurnStart`（和正常回合开始**同一条路**），水银沙漏挂 `AfterPlayerTurnStart`，由它内部的 `FirePlayerTurnStartPerModel` 派发；同一条路已经实测出「恶魔形态 +3 力量一个回合涨两次」。 | 同路径已验证（恶魔形态 ×2）；水银沙漏建议实机再确认一次 |
+| 创世之柱 | `CharBossMonster.PlayPlannedCards`：每打出一张剧本印出来的牌，替他补一次 `PillarOfCreationPower.AfterCardGeneratedForCombat(card, Shadow)`（原版判据 `creator == 我`）。 | ✅ 第 12 回合之后 Boss 状态里有 `创世之柱x2`、格挡 72 |
+
+另：`额外回合` 的剧本合并（第 14 回合 = 节制/倒吊人/死神 +【额外回合】高塔/星星/恶魔）在上一轮已经做完并实测。
+## 进度 · v0.2.658 · 第十二轮
+
+| # | 反馈 | 处理 |
+|---|---|---|
+| 1 | 「创世之柱的触发时机不对，应该在印牌时触发而非打出印出的牌时触发」 | 删掉上一轮那版「每打出一张剧本牌就补一次」；新增 `Patches/FoolPillarOnGeneratePatch.cs`：**后置补在 `CardPileCmd.AddGeneratedCardToCombat` 上** —— 只要新牌归他所有、而 `creator` 又不是他自己，就替他补一次 `PillarOfCreationPower.AfterCardGeneratedForCombat(card, shadow)`（原版判据是 `creator == 我`）。<br>· 「月亮」的小刀 creator 就是他 ⇒ 原版本来就触发，这里 `ReferenceEquals(creator, shadow)` 直接跳过，不会双份（用户也说月亮不用动）；<br>· 神话形态每回合印的塔罗牌 / 恋人印的 10 张 / 新生之喜·教皇印的无色牌 ⇒ creator 不是他，由这条补。 |
+| 2 | 「月亮要把小刀打出时会触发的群蛇形态伤害列出来（4×10 或恐惧 6×10，不受力量等影响）」 | `BossScriptPlanner`：打出 `THE_MOON` 时把「段数」按印出来的小刀数（10）算（`playCount = 10`），群蛇那一条就会画成 `4×10`；恐惧模式下群蛇形态本身是 6 ⇒ `6×10`。月亮自己没有攻击伤害，放大段数不影响别的数字。 |
+| 3 | 「教皇印的无色牌并没有正确减少 1 费」 | **还没定位**。反编译确认教皇的减费是 `current.EnergyCost.AddThisTurnOrUntilPlayed(-1)`（加进手牌后逐张调用），按理不该失效。为了下一次能一眼定位，在 `FoolPillarOnGeneratePatch` 里加了一行诊断：每印出一张牌就打 `印牌：<ENTRY> 当前费用 N（creator=… 是他自己=…）`。下次教皇那一手把这几行发我即可。 |
+
+**待用户实机确认**：创世之柱现在只在「印牌」时触发（第 12 回合拿到之后才有效果）、月亮那一条 `4×10`。
+## 进度 · v0.2.658 · 第十三轮
+
+| # | 反馈 | 状态 |
+|---|---|---|
+| 1 | 「月亮的群蛇伤害改成 4×11（恐惧 6×11），因为月亮本身也算一张牌」 | ✅ 已改（`playCount = 小刀数 + 1`）。**注意**：按你之前的口径，第 8 回合已经从「月亮」改回「魔术师」，现在剧本里没有月亮了 ⇒ 这条要生效得先把月亮放回某一回合。 |
+| 2 | 「第 14 回合额外回合的第一张牌塔没有被打出两次」 | ✅ 换成**不依赖回响形态计数**的做法：额外回合边界打个标记 `_doubleNextCardOnce`，第一张牌 `PlayOne` 之后再 `CardCmd.AutoPlay` 打一遍。上一版想清 `EchoFormPower` 的内部计数（private 嵌套 `Data`），实测清不到。 |
+| 3 | 「额外回合开始时，他身上的『额外回合』buff 没有消失」 | ✅ 边界上按 entry 名（含 `EXTRA_TURN`）把他身上那层 power 摘掉（不依赖类型名，107 引用里没有那个类型）。 |
+| 4 | 「创世之柱应该在印牌时触发」 | ✅ 第一版挂在 `CardPileCmd.AddGeneratedCardToCombat` 的后置补丁**一次都没触发**（日志里没有任何「印牌：」行）⇒ 改成在已知印牌点逐个补：恋人 10 张、新生之喜 / 教皇按卡面 `Cards`、（月亮原版已触发，不补）。神话形态回合开始印的那几张待确认实际路径。 |
+| 5 | 「教皇印的无色牌没有正确减少 1 费」 | ⏳ 反编译确认是 `current.EnergyCost.AddThisTurnOrUntilPlayed(-1)`。需要你给一条具体信息：**哪张牌、显示几费**（或把第 11 回合的 `mod_log` 发我）。 |
+| 6 | 「装载观者 mod 时，天人形态 / 斋戒 / 审判 打出时也触发观者的特效和动画」 | ⏳ 未开始。需要读观者 mod 的卡类型（`Watcher.pck` 里的 C# 程序集）拿到它的 VFX 入口，属于下一步。 |
+| 7 | 22 张塔罗牌 ↔ 角色的对应表 + 「死于塔罗愚」的专属死亡提示 | ⏳ 未开始。需要：①各角色的**内部 id**（诺努佩普 / 建筑师 / 商人 / 欧洛巴斯 / 达弗 / 坦克斯 / 永世沙漏 / 仪式兽 / 佩尔 / 瓦库 / 尖塔 / 特兹卡塔拉 这些来自其它 mod，得逐个反查）；②你的表里 **III. 皇后** 那一行**角色名是空的** —— 请补一下「皇后对应哪个角色」。 |
+| 8 | 「伤害预览没考虑恶魔形态本回合将获得的力量 + 会给玩家的瘀伤」 | 代码里两条都在（`PendingRise` 的 `DemonFormPower` 分支 / `PendingBruise` 的 `斗殴` 分支），日志也确认在跑（`恶魔形态：他回合开始会 +3 力量 ⇒ 意图预览先补上`、`塔罗·斗殴：给所有敌人 3 层瘀伤`）。如果实机数字还是偏低，给我一处具体例子（哪张牌、预览多少、实际多少）。 |
+## 进度 · v0.2.658 · 第十四轮（两件大件落地）
+
+### ① 「死于塔罗愚」的 22 张塔罗专属死亡提示
+
+- 新增 `Core/FoolTarotDeaths.cs`：22 张大阿卡纳 ↔ 角色的对应表（用户 2026-11-15 给的完整表，
+  **III. 皇后 = 女王**；其余「诺努佩普 / 建筑师 / 商人 / 欧洛巴斯 / 达弗 / 坦克斯 / 永世沙漏 / 仪式兽 / 佩尔 / 瓦库 / 尖塔 / 特兹卡塔拉」按用户口径「**检测角色名字就行**」处理）。
+- 匹配方式：把角色的**内部 id**（`IRONCLAD`）与**本地化显示名**（`铁甲战士` / `The Ironclad`）都归一化
+  （只留字母数字与 CJK、转小写）后跟候选 token 表比对 —— 这样别的 mod 把先古之民/Boss 做成可游玩角色时，
+  只要名字对得上就能命中；对不上就保持原来的死亡提示（零风险）。
+- 接在 `BossLossMessageKillerPatch` 的 `finally` 里（不管前面走哪条分支都会收尾），
+  只对 `FOOL_` 前缀的遭遇生效；文案换读 `<ENCOUNTER>.loss_tarot`，里面用 `{Card}` 引用
+  `cards` 表的塔罗牌名（牌名本来就带 16 语言，不用重复翻译）。
+- 新增 16 语言 × 2 条 key（`FOOL_BOSS_ENCOUNTER.loss_tarot` / `FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot`），
+  `check-localization` 全过。效果：`铁甲战士成为了[gold]愚者[/gold]牌组中新的[gold]倒吊人[/gold]。`
+
+### ② 观者 mod 的特效/动画
+
+反编译 `Watcher.dll` 找到它的特效中心：`internal static class WatcherMod.WatcherAttackVfxHelper`，里面有
+`StartDevaEyeSweep` / `StopDevaEyeSweep`（天人形态的开眼扫场）和 `PlayJudgment(caster, target, title)`（审判的处决演出）。
+另外确认 **`WatcherMod.WatcherFasting2.OnPlay` 里没有任何特效调用** ⇒ 斋戒本身没有专属动画，不需要「借」。
+
+- 新增 `Core/WatcherVfx.cs`：**反射**按程序集名（含 `Watcher`）找到那个 internal 类型再调方法 ——
+  观者 mod 没装就静默跳过，我们对它**零硬依赖**。
+- 天人形态（`TarotDevaForm.OnPlay`）：放 `StartDevaEyeSweep` → 1.2 秒后 `StopDevaEyeSweep`（免得眼睛一直挂着）。
+- 审判：新增 `Patches/FoolJudgementWatcherVfxPatch.cs`，对我们 Boss 打出的原版塔罗牌 `Judgement`
+  在结算完之后播 `PlayJudgment`（玩家自己打的那张不受影响）。
+
+`[verify] v0.2.658 OK`，107/111 双目标 0 错误，16 语言本地化全过。
+## 进度 · v0.2.658 · 第十五轮
+
+### ① 特殊效果文案加警告（已完成）
+
+用户：「在特殊效果中加一条警告：警告：请在第12回合前击杀愚者，否则后果自负。」
+⇒ 4 条文案各追加一行（**16 语言 × 4 条**，`check-localization` 全过）：
+`FOOL_BOSS.fool` / `FOOL_BOSS.fool_dread` / `BOSS_FOOL_POWER.description` / `BOSS_FOOL_POWER.description_dread`。
+样式沿用本模组其它警告的写法 `[red]警告：[/red]…`。zhs 抽样：
+```
+愚者的卡组中只有 3 张[gold]神话形态[/gold]，杝主要靠塔罗牌战斗。
+每当你获得[gold]灾厄[/gold]时，若你有[gold]格挡[/gold]…
+[red]警告：[/red]请在第12回合前击杀愚者，否则后果自负。
+```
+
+### ② 「特殊效果没在右侧常驻显示」—— 待定位
+
+查了代码与日志：正常局（没装斗蛐蛐）走 `BossSpecialTip`（原版 `NHoverTipSet`，钉在立绘右侧），
+而日志里确实有 `特殊效果说明框已显示: BOSS_FOOL_POWER（1 条）` ⇒ **说明框是创建了的**。
+所以问题要么是「位置跑到屏幕外/被立绘挡住」，要么是「过一会儿自己消失」。
+需要用户确认是哪一种（或给一张截图）；如果是位置问题，`BossSpecialTip.Place` 里可以给愚者强制一个屏幕右上角的固定坐标。
+## 进度 · v0.2.658 · 第十六轮（特殊效果描述看不见 = 真 bug，已定位并修）
+
+### 根因：说明框被摆到屏幕**外面**了
+
+`BossSpecialTip.Place` 把原版说明框放在「立绘右缘 + 说明框宽度」的位置：
+```csharp
+target = bounds.GetScreenPosition() + new Vector2(bounds.Size.X * 0.98f, bounds.Size.Y * 0.26f);
+target.X += BoxWidth();     // 说明框是从锚点向右展开的
+```
+塔罗愚站得比其它 Boss 靠右（anchor x ≈ 1486）⇒ 算出来 **x = 1982.5**，而屏幕只有 1920 宽
+⇒ 整块说明框画在屏幕外，看起来就是「一直没有描述」。
+
+**修法**：算完位置后统一**夹进屏幕内**（对所有 Boss 生效，本来就放得下的位置一个像素都不变），并打日志。
+实测（这一行就是证据）：
+```
+特殊效果说明框超出屏幕 ⇒ 夹回屏内: (1982.5, 503.42) → (1552, 503.42)（屏幕 (1920, 1080)，框 360x116）
+```
+
+### 天人形态的特效没看到
+
+日志里 `观者特效：StartDevaEyeSweep 已播放` / `StopDevaEyeSweep 已播放` 都打了 ⇒ 调用是成功的，
+问题是**1.2 秒就收掉**，扫场动画还没展开。已把播放时长改成 **4 秒**（`Core/WatcherVfx.cs`）。
+（审判的 `PlayJudgment` 一次到位，用户确认正常。）
+## 进度 · v0.2.658 · 第十七轮
+
+| # | 反馈 | 处理 |
+|---|---|---|
+| 1 | 「说明框位置不对」（截图：框压在立绘下方） | 夹回屏内之后仍然会压在立绘身上（他站得靠右、立绘又高，以「立绘右缘」为基准怎么夹都不好看）⇒ **塔罗愚的说明框改成固定贴屏幕右上角**（`(屏幕宽 − 框宽 − 16, 150)`）；其它 Boss 仍走原版「立绘右侧」那条，一个像素不改。 |
+| 2 | 「不让他替换普通战斗，只可能作为 3 层 boss 出现」 | 他本来就只登记在**第三幕候选人名单**（`BossKeys.RosterFor(2)`）里；之前会在普通战斗里出现，是因为我测试时在 mod 目录放了 `charbosses_debug.txt`（那个开关会把第一幕第一场普通战斗换成角色 Boss）。**已删除该文件**。 |
+| 3 | 意图表 / 打他的指令 | 已整理给用户（见对话）。控制台：`fight FOOL_TAROT_BOSS_ENCOUNTER`。 |
+| 4 | 「四张牌变成他们原本的颜色（观者紫色），不装模组也显示」 | 待做。卡框颜色由卡池/角色决定（`VisualCardPool` / `FrameMaterial`），要做得先把观者/亡命之徒的卡框材质打进我们自己的 PCK，再覆写这 4 张牌的 `VisualCardPool`。 |
+| 5 | 「地图图标用他头像剪影；顶栏与历史记录也用他的头像」 | 待做。需要先从游戏本体导出愚者的角色头像（`ui/top_panel/character_icon_fool.png`）并生成剪影，再接到 `BossMapPointCharacterIconPatch` / `EncounterIconPathPatch` 的名单里。 |
+| 6 | 「联动观者 mod：装了观者后 boss 可能为观者（暂未设计），先设置好；图标用她头像剪影，顶栏与历史也用她的头像」 | 待做。需要一个「观者」Boss 条目（占位剧本）+ 只在检测到观者 mod 时进候选表 + 她的头像/剪影。 |
+## 进度 · v0.2.658 · 第十八轮（特殊效果说明框：最终解法）
+
+三轮试错记录（都只针对塔罗愚，其它 Boss 从第二轮起就完全没动过）：
+
+1. **第一版（错）**：把「夹进屏幕」写成**所有 Boss 通用** ⇒ 把别人的说明框全挪了（用户：「本来都挺正常，你怎么全都搞乱了」）。已回退成只有愚者生效。
+2. **第二版（错）**：发现他算出 `x = 1982 > 屏宽 1920`，于是夹到 1552 —— 但**锚点父级 `%PlayContainer` 自带变换**，
+   `Position`（局部坐标）≠ 屏幕坐标，所以按屏幕像素算出来的数塞进局部坐标必然错位。
+3. **第三版（错）**：改用 `GlobalPosition`、再把锚点改挂到 ui 根节点（`Position == GlobalPosition` 已验证）
+   —— 结果原版 `NHoverTipSet` 的朝向/偏移算法仍然把它摆到左上，压住意图。
+
+**最终解法**：塔罗愚的说明框改走**自绘面板** `BossSpecialRichUi`（本来是斗蛐蛐环境才用的那套：
+位置由我们自己算、还能拖动），`BossSpecialUi.Ensure` 里加一条 `fool ⇒ UseRich` 分流。
+实测日志：
+```
+特殊效果面板创建: FoolBoss parent=战斗房 UI 层 位置=(1750, 212)
+```
+—— 屏幕 1920 宽，面板落在最右侧（1750 起），不再压立绘/意图。其它 33 只 Boss 仍然走原版说明框（一个像素不改）。
+## 进度 · v0.2.658 · 第十九轮
+
+| # | 反馈 | 处理 |
+|---|---|---|
+| 1 | 「女皇的意图应该是策略而非强化」 | `BossIntentBuilder.ForceDebuffCards` 加 `THE_EMPRESS` —— 它的 `DynamicVar("Power", 3)` 是**普通** DynamicVar，自动判定认不出来，会掉到「技能牌兜底 = 强化」；它实际给敌人 3 虚弱 + 3 易伤 ⇒ 策略（红下箭头）。 |
+| 2 | 「设置里给他加能力面板（放易伤战右侧）」 | `BossInfoTable` 加 `["FOOL_TAROT"]`（顺序紧跟 `IRONCLAD_VULN` 易伤战）：循环 10~16 / 单体极强 / 群攻强 / 单体高压 7、9、12~16 / 群体高压 5、12 / 特殊效果类型：单体 / 群体减益能力：强。 |
+| 3 | 「愚者的地图图标 / 顶栏 / 历史用他头像（剪影）」 | **本来就已经生效**：`CharacterFor(encounter)` 走 `BossDefs.All["FOOL_BOSS"].CharacterType` → 愚者角色，然后拼 `res://images/ui/top_panel/character_icon_fool.png`（**这个文件是 0.113 本体自带的**，`_outline` 也有）⇒ 顶栏/结算/历史用头像、地图用同色深灰剪影（`CharacterEmblem.Silhouette`）。日志里对 NECROBINDER 的那两行就是同一套代码，愚者走的是同一条路，**不需要额外做**。 |
+| 4 | 「四张牌原本的卡框颜色」 | 待做（下一步）：需要先反编译 `CardModel.Frame` / `VisualCardPool` / `FrameMaterial` 的实际取值方式，再把观者 / Hermit 的卡框材质纹理导出来打进我们 PCK。 |
+| 5 | 「观者 Boss（占位）」 | 待做（下一步）：`BossDefinition Watcher`（只有第三幕）+ `BossKeys` 条目 + 怪物/遭遇类 + 候选表按「检测到观者 mod」动态放行。 |
+## 进度 · v0.2.658 · 第二十轮（卡框颜色）
+
+### 反编译结论（三步都核过）
+
+- `CardModel.FramePath` = `atlases/ui_atlas.sprites/card/card_frame_power_s.tres` —— **所有卡池共用同一张框贴图**，颜色不在这。
+- 颜色来自 `CardModel.FrameMaterial => VisualCardPool.FrameMaterial`，`CardPoolModel` 从
+  `materials/cards/frames/card_frame_*_mat.tres` 加载。
+- 观者 mod 的紫色框就是它自己加的一份材质：
+  ```
+  [gd_resource type="ShaderMaterial"]
+  [ext_resource type="Shader" path="res://shaders/hsv.gdshader"]   ← 游戏本体自带
+  shader_parameter/h = 0.715  s = 0.65  v = 1.1
+  ```
+  ⇒ **按同样参数新建一份即可**，不用从别人 mod 拷美术资源 ⇒「不装模组也显示原本颜色」成立。
+- 亡命之徒（Hermit）：`Hermit.pck` 与 `Downfall.pck` 里**没有任何 card_frame 材质** ⇒ 它用的是本体自带的那几份之一。
+
+### 实现 `Patches/FoolTarotFrameColorPatch.cs`
+
+Harmony postfix 补 `CardModel.get_FrameMaterial`：
+- 斋戒 / 天人形态 → 用 `res://shaders/hsv.gdshader` 新建的**观者紫**（h 0.715 / s 0.65 / v 1.1，原参数照抄）；
+- 斗殴 / 永恒形态 → **装了 Hermit 就借它卡池的 `FrameMaterial`**（在 `ModelDb.AllCardPools` 里找 `AllCardIds` 含 `BRAWL` 的池子），
+  没装就退回一份黄褐色 HSV 材质；
+- 其它卡一律不碰（`__result` 保持原版）。
+
+这 4 张牌仍然是 `CardRarity.Token`、不进任何卡池的 `AllCardIds`、也不会出现在奖励/商店里 —— 只是**框色**被换掉。
+## 进度 · v0.2.658 · 第二十一轮
+
+### ① 4 张牌的稀有度按用户口径改
+
+| 牌 | 旧 | 新 |
+|---|---|---|
+| 斋戒 `TarotFasting` | Token | **Uncommon（罕见）** |
+| 斗殴 `TarotBrawl` | Token | **Uncommon（罕见）** |
+| 天人形态 `TarotDevaForm` | Token | **Rare（稀有）** |
+| 永恒形态 `TarotEternalForm` | Token | **Rare（稀有）** |
+
+它们仍然**不在任何卡池的 `AllCardIds` 里**（那张表是数据驱动的，我们只是覆写了 `Pool` 用来找贴图/框材质）
+⇒ 不进奖励、不进商店，只在 Boss 剧本里出现。
+
+### ② 观者 Boss 占位（联动观者 mod）
+
+新增：
+- `Core/WatcherModPresence.cs`：按**程序集名**探测观者 mod（和 `BaseLibPresence` 同一套思路），
+  再从它的类型里找 `CharacterModel` 子类、`Id.Entry` 含 `WATCHER` 的那一个。
+- `BossDefs.Watcher`（`#if STS2_111`）：`Key = WATCHER_BOSS`、第三幕、卡组/剧本/遗物**全留空**（占位，
+  `BossLoadout` 会按角色卡池自动配占位卡组），特殊效果暂不挂。
+  `CharacterType` 先填愚者占位，运行期由 `WatcherModPresence` 解析后写回（`RefreshWatcherCharacterType`，开局自检时调用一次）。
+- `Monsters/CharacterBosses.cs`：`WatcherBoss : CharBossMonster`；`Encounters/CharBossEncounters.cs`：`WatcherBossEncounter`（`TierAct => 2`）。
+- `BossKeys`：`All` 条目 `new("WATCHER_BOSS", 6, 2, 1, typeof(WatcherBoss))`、设计名 `观者`、`EncounterOf`；
+  **第三幕候选表按运行期条件加入**（`WatcherRoster()` → 装了观者 mod 才 `Add("WATCHER_BOSS")`）⇒ 没装时行为与以前完全一致。
+- `CharBossEncounters.TierEncounters` 登记（`IsOurs` 才认得它，地图/顶栏图标才会接管）。
+- 图标：顶栏/结算/历史走 `res://images/ui/top_panel/character_icon_watcher.png`（观者 mod 自己带的），
+  地图走同色深灰剪影 —— 和愚者/其它角色**同一条通路**，不用另写。
+
+实测日志（用户环境装了观者 mod）：
+```
+观者 mod 探测到：程序集 Watcher，角色类型 WatcherMod.Watcher（entry=WATCHER）
+观者 Boss：角色类型已换成 WatcherMod.Watcher
+```
+## 进度 · v0.2.658 · 第二十二轮
+
+| # | 反馈 | 处理 |
+|---|---|---|
+| 1 | 「让玩家在对局中暂时遇不到观者（因为还没做，别放半成品上去）」 | `BossKeys.WatcherRoster()` 改成**返回空数组**（占位的定义 / 怪物 / 遭遇 / 探测全部留着，下一轮把那一行 `if (Core.WatcherModPresence.Installed) return new[] { "WATCHER_BOSS" };` 恢复就上场）。现在观者**不会**出现在任何一局里。 |
+| 2 | 「打天人形态还是看不到动画，而且还会卡一下 → 干脆别播动画，也别卡；审判照常」 | **根因就是我自己写的 await**：`TarotDevaForm.OnPlay` 里 `await WatcherVfx.PlayDevaEyeSweepAsync(owner)`，而那个方法内部 `await Task.Delay(4000)` —— 等于把 Boss 的出牌序列**卡死 4 秒**，而那套扫场动画在敌人侧又看不出来。现在**整段删掉**（`WatcherVfx` 的 helper 保留，将来要用再接）。审判的 `PlayJudgment` 是一次性演出，保持不变。 |
+
+## 进度 · v0.2.659 · 第二十三轮
+
+| # | 反馈 | 处理 |
+|---|---|---|
+| 1 | 四张塔罗牌（斋戒 / 天人形态 / 斗殴 / 永恒形态）的费用宝石颜色不对，要和本家一样（观者紫 / 亡命之徒黄褐），而且**不装那两个模组也得成立** | 卡面费用宝石的来源（反编译）：`CardModel.EnergyIcon => VisualCardPool.EnergyIconPath => EnergyIconHelper.GetPath(EnergyColorName)`，最终是 `res://images/atlases/ui_atlas.sprites/card/energy_<名字>.tres`，找不到再退 `res://images/packed/energy_icons/energy_<名字>.png`。两边的实情：`WatcherCardPool.EnergyColorName = "watcher"`、`CardFrameMaterialPath = "card_frame_purple"`，但 **Watcher.pck 里一张 `energy_watcher` 宝石都没有**（里面只有战斗能量球 `images/ui/combat/energy_counters/watcher/*`）；`Hermit.pck` 同样没有（只有 `Hermit/images/character/energy_icon.png`）。⇒ 本家的宝石贴图在本体里不存在，抄不到。做法：拿**本体**的中性灰宝石 `energy_colorless.png` 乘上角色色（`WatcherCardPool.DeckEntryCardColor = #9E68FF`、`Hermit.DeckEntryCardColor = #CEA477`）生成两张 PNG（新增工具 `tools\art\tint_png.gd`），随本模组 PCK 一起发布，再用 `NCard.Reload` 的 Harmony postfix 把 `_energyIcon` / `_unplayableEnergyIcon` 的 `Texture` 换成对应那张（只对这 4 张牌生效，别的卡和别的模组的卡一律不动）。 |
+| 2 | 顺手修工具 | `tools\art\dump_texture_png.gd` 导 AtlasTexture（`energy_*.tres` 都是）时必挂 —— `AtlasTexture.get_image()` 内部去 blit VRAM 压缩图，报 `Cannot blit_rect in compressed image formats` 且存出空图。现在自己取整张图集、`decompress()` 后按 `region` 裁，导出正常（71x72）。 |
+| 3 | 实机验证（v0.2.659，观者存档第 12 回合） | `mod_log.txt` 出现两行：`塔罗牌费用宝石（观者紫）= res://CharacterBosses/images/cards/tarot_energy_watcher.png`、`塔罗牌费用宝石（亡命之徒黄褐）= res://CharacterBosses/images/cards/tarot_energy_hermit.png`，都是手牌渲染到自己那 4 张时命中的；截图里「斋戒」= 紫色卡框 + 紫色费用宝石，与观者原版一致。PCK 内含 `res://CharacterBosses/images/cards/tarot_energy_{watcher,hermit}.png`（打包 99 个 extra 文件）。 |
+## 进度 · v0.2.660 · 第二十四轮（用户实机三条）
+
+| # | 反馈 | 处理 |
+|---|---|---|
+| 1 | 「特殊效果描述图层太高了，切到地图页面都还能看到」 | 根因：原版 `NHoverTipSet` 挂在**全局**提示层，常驻之后跨界面存活；而 `BossUiSession.EnsureFresh` 在「没有战斗房」（`id == 0`）时**直接 return，什么都不收**。两处修：① `id == 0` 时调 `HideTransient()`（收说明框 / 附加状态栏 / 自建 HUD 层，不碰手牌面板与锁定记账）；② `BossSpecialTip.Ensure` 开头「不在战斗房里就 Hide」的硬闸门。 |
+| 2 | 「滚石的动画目前完全是反的（和玩家的方向一样），翻转过来（不影响玩家自己的滚石）」 | 反编译 `NRollingBoulderVfx.PlayAnim`：`impactPoint.X = 屏幕中线`、`start = impact − xOffset`、`velocity.X = (impact.X − start.X)/t > 0` ⇒ **永远从屏幕中线左侧掉下来往右滚**（玩家打时右边是敌人所以对）。`GlobalPosition` 是绝对坐标、动画每帧自己写 ⇒ 镜像父节点无效（父级变换正好抵消）、每帧回写同坐标会形成反馈抽搐。落地改成**替身**：原版节点照跑（伤害靠它的 `HitCreature` 信号结算，不能拦），只把石头贴图 `_boulder` 与原影子 `_shadow` 隐藏，另建一个 `Sprite2D` 替身每帧按 `x → 2*中线 − x` 对位、`Rotation` 取反 ⇒ 看到的是从右往左滚。只在「目标全是玩家」时登记（`Creature.Monster == null`）⇒ 玩家自己的滚石零影响。新文件 `RollingBoulderTwin.cs`（111 独占），每帧由 `BossFrameTickPatch` 调 `RollingBoulderFacing.Tick()`。 |
+| 3 | 「有的攻击意图似乎还是没有考虑瘀伤（直接根据自己身上斗殴的层数多显示伤害预览吧）」 | `PendingBruise` 去掉 `CurrentSide == Player` 的闸门（意图是我们自己按牌面 + 力量算的，不走原版伤害管线，不存在「已经算进去」的情况）；并把 `BossScriptPlanner` 里走 `PreviewIntents` 的三条路径（普通 / Sly / Burn）都补上 `+ pendingBruise` —— 以前只有主路径加了，这三条一直是少的。 |

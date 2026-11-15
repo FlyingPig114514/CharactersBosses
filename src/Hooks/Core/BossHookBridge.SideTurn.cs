@@ -1126,6 +1126,23 @@ public static partial class BossHookBridge
     ///      并且这时当前阵营还是 Player，需要 <see cref="HittableEnemiesSidePatch.ForceRelativeSide"/>
     ///      把「可命中敌人」解释成玩家侧，否则弹珠袋会给 Boss 自己上易伤。
     /// </summary>
+    /// <summary>这只 Boss 身上是不是已经有这条特殊效果了（避免重复 `Apply` 叠层）。</summary>
+    private static bool SpecialAlreadyOn(Creature? creature, Type powerType)
+    {
+        try
+        {
+            var powers = creature?.Powers;
+            if (powers == null) return false;
+            for (int i = 0; i < powers.Count; i++)
+            {
+                var p = powers[i];
+                if (p != null && powerType.IsInstanceOfType(p)) return true;
+            }
+        }
+        catch { /* 查不到就按没施加处理 */ }
+        return false;
+    }
+
     public static async Task FireCombatStart(CharBossMonster boss)
     {
         var combat = boss.CombatState;
@@ -1133,6 +1150,25 @@ public static partial class BossHookBridge
         if (combat == null || shadow == null) return;
 
         var ctx = new BlockingPlayerChoiceContext();
+
+        // ★ 2026-11-15（用户：「让所有 boss 的特殊效果始终在 buff 栏的第一个」）：
+        //   特殊效果原本是这套「战斗开始」流程的**最后一步**才施加的（见下面的原位置���，
+        //   于是任何在它之前挂上的 buff（金刚杵力量 / 神话形态 / 遗物给的）都会把它挤到后面。
+        //   现在**先施加特殊效果**再跑遗物与其它 buff ⇒ 它永远是 buff 栏第一个。
+        //   原位置那段改成「已经有了就跳过」（`PowerCmd.Apply` 是叠层，重复施加会翻倍）。
+        var earlySpecial = boss.Def.SpecialPowerForAct(boss.ActIndex);
+        if (earlySpecial != null && boss.Creature != null)
+        {
+            try
+            {
+                var m = typeof(BossHookBridge)
+                    .GetMethod(nameof(ApplySpecialPower), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)!
+                    .MakeGenericMethod(earlySpecial);
+                await (Task)m.Invoke(null, new object[] { ctx, boss.Creature })!;
+                Logger.Log($"[CharBoss] 特殊效果已施加（最先，buff 栏第一位）: {earlySpecial.Name}");
+            }
+            catch (Exception e) { Logger.Log("[CharBoss] 特殊效果提前施加失败（原位置会再试）: " + e.Message); }
+        }
 
         var swSide = System.Diagnostics.Stopwatch.StartNew();
         var participants = new List<Creature> { boss.Creature };
@@ -1316,6 +1352,8 @@ public static partial class BossHookBridge
         var powerType = boss.Def.SpecialPowerForAct(boss.ActIndex);
         if (powerType != null && boss.Creature != null)
         {
+            // 上面「最先施加」那一步已经上过了 ⇒ 这里只补后续初始化，不再叠一次层数。
+            if (SpecialAlreadyOn(boss.Creature, powerType)) Logger.Log($"[CharBoss] 特殊效果已在最前面施加过，跳过重复施加: {powerType.Name}"); else
             try
             {
                 // 用泛型 Apply 让游戏自己建模型并初始化，别自己 ToMutable（会 NRE）

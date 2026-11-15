@@ -100,5 +100,11 @@
     "BASELIB_MISSING_HEADER":  "Missing required mod: BaseLib",
     "BASELIB_MISSING_BODY":  "This machine does not have the BaseLib mod installed (Steam Workshop id 3737335127).\n\nUnavailable:\n· the in-game mod config screen\n· host-driven boss picks & gameplay setting sync in multiplayer\n\nEverything else works (boss replacement, decks/relics/scripts, multiplayer lineups). Subscribe to BaseLib and restart the game to restore these.",
     "BASELIB_MISSING_OK":  "Got it",
-    "BASELIB_MISSING_CLOSE":  "Close"
+    "BASELIB_MISSING_CLOSE":  "Close",
+    "FOOL_BOSS_ENCOUNTER.title":  "The Fool",
+    "FOOL_BOSS_ENCOUNTER.loss":  "{character} was dealt the wrong card by the [gold]Fool[/gold].",
+    "FOOL_TAROT_BOSS_ENCOUNTER.title":  "The Fool",
+    "FOOL_TAROT_BOSS_ENCOUNTER.loss":  "{character} was dealt the wrong card by the [gold]Fool[/gold].",
+    "FOOL_BOSS_ENCOUNTER.loss_tarot":  "{character} became the new [gold]{Card}[/gold] in the [gold]Fool[/gold]'s deck.",
+    "FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot":  "{character} became the new [gold]{Card}[/gold] in the [gold]Fool[/gold]'s deck."
 }

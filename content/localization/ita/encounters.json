@@ -125,5 +125,11 @@
     "BASELIB_MISSING_HEADER":  "Mod richiesta mancante: BaseLib",
     "BASELIB_MISSING_BODY":  "Su questa macchina non è installata la mod BaseLib (id Steam Workshop 3737335127).\n\nNon disponibile:\n· la schermata di configurazione delle mod nel gioco\n· la sincronizzazione delle impostazioni dell'host in multigiocatore\n\nTutto il resto funziona (sostituzione dei boss, mazzi/reliquie/copioni, schieramenti multigiocatore). Iscriviti a BaseLib e riavvia il gioco.",
     "BASELIB_MISSING_OK":  "Ho capito",
-    "BASELIB_MISSING_CLOSE":  "Chiudi"
+    "BASELIB_MISSING_CLOSE":  "Chiudi",
+    "FOOL_BOSS_ENCOUNTER.title":  "Fool",
+    "FOOL_BOSS_ENCOUNTER.loss":  "{character} è stato liquidato dai tarocchi di [gold]Fool[/gold].",
+    "FOOL_TAROT_BOSS_ENCOUNTER.title":  "Fool",
+    "FOOL_TAROT_BOSS_ENCOUNTER.loss":  "{character} è stato liquidato dai tarocchi di [gold]Fool[/gold].",
+    "FOOL_BOSS_ENCOUNTER.loss_tarot":  "{character} è diventato la nuova carta [gold]{Card}[/gold] nel mazzo di [gold]Fool[/gold].",
+    "FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot":  "{character} è diventato la nuova carta [gold]{Card}[/gold] nel mazzo di [gold]Fool[/gold]."
 }

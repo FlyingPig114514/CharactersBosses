@@ -680,6 +680,22 @@ public static class BossIntentBuilder
             intents.Add(new RawAttackIntent(letterOpenerHit));
             Logger.Log($"[CharBoss] 牌底下挂全体伤害：{entry} → {letterOpenerHit} 点（开信刀）");
         }
+        // ★ 2026-11-15（用户：「群蛇形态的伤害怎么把这些卡原本的意图给替换掉了？群蛇形态给这些牌是
+        //   **额外**添加一个伤害意图，不会替换卡牌原本的意图，而且应该排在这张牌自己的意图**后面**」）：
+        //   根因就是下面的 `if (intents.Count == 0)` 兜底 —— 群蛇 / 开信刀 / 灰烬 / 黑洞 / 速行者
+        //   这些「附加伤害行」都是在这之前就 `Add` 进来的，于是纯能力牌（死神形态 / 回响形态 /
+        //   天人形态 / 创世之柱 / 非凡技艺 / 虚空形态…）的 `Count` 已经不是 0 ⇒ 自己那条「强化」
+        //   兜底意图**永远补不上**，看起来就像被群蛇攻击替换掉了。
+        //   现在把这些附加行当成「不算数」的：先按牌自己的意图补兜底，附加行照旧排在它后面。
+        if (intents.Count == 0)
+        {
+            intents.Add(card.Type switch
+            {
+                CardType.Attack => new SingleAttackIntent(Math.Max(1, damage)),
+                _ => new BuffIntent(),
+            });
+        }
+
         if (serpentDamage > 0)
         {
             // ⚠ 多人：群蛇形态虽然写的是「随机一名敌人」，但在「跟踪锁定」下**随机攻击也只会打被锁定的那位**
@@ -1031,6 +1047,12 @@ public static class BossIntentBuilder
                            || BuffVarCards.Contains(entry)));
         if (selfBenefit) intents.Add(new BuffIntent());
 
+        // ★ 2026-11-15（用户：「你这 1 张牌 2 个强化图标是何意味？」）：
+        //   上面为了「附加伤害行不吃掉牌自己的意图」先补了一条兜底强化，这里 `selfBenefit`
+        //   又补一条 ⇒ 被遗忘的仪式 / 鬼火这类牌出现两个蓝色上箭头。
+        //   现在只保留**一条**强化意图（位置不变，仍在附加伤害行之前）。
+        DedupeBuffIntent(intents);
+
         // ★ 苦难（MISERY）的那一笔血肉戏法**已经并进牌面伤害意图**了
         //   （见上面 `MiserySleightPerHit(card) is int miseryPer` 那个分支）——
         //   用户 2026-11-12 要求显示成「苦难基础伤害 + 被锁玩家负面种类数 × 9」这一个数，
@@ -1178,6 +1200,41 @@ public static class BossIntentBuilder
         {
             Logger.Log("[CharBoss] 估算「回合前涨力量」失败: " + e.Message);
         }
+
+        // ★ 2026-11-14（用户「塔罗愚」口径）：「攻击牌伤害预览要先算进**恶魔形态**的增伤（他获得恶魔形态之后）」。
+        //   反编译 `DemonFormPower.AfterSideTurnStart`：
+        //     `PowerCmd.Apply&lt;StrengthPower&gt;(Owner, Amount, Owner, null)` —— 也就是**他自己回合开始**那一刻
+        //     才把 Amount 点力量加上去（`Amount` 就是每回合的力量，塔罗愚第 9 回合拿到的是 3）。
+        //   而意图是在**玩家回合**就画好了 ⇒ 所有吃力量的攻击牌预览都少这么多。
+        //   判据：只在「玩家侧正在行动」时补 —— 一旦他自己的回合开始、这笔力量真到账，
+        //   `CombatState.CurrentSide` 就不是 Player 了，于是不会重复计入。
+        try
+        {
+            bool playerSideActing = false;
+            try
+            {
+                playerSideActing = boss.CombatState?.CurrentSide
+                                   == MegaCrit.Sts2.Core.Combat.CombatSide.Player;
+            }
+            catch { playerSideActing = false; }
+
+            if (playerSideActing)
+            {
+                var demon = boss.GetPower<DemonFormPower>();
+                if (demon != null)
+                {
+                    int gain = Math.Max(0, (int)Math.Round((double)demon.Amount));
+                    if (gain > 0)
+                    {
+                        total += gain;
+                        Logger.Log($"[CharBoss] 恶魔形态：他回合开始会 +{gain} 力量 ⇒ 意图预览先补上" +
+                                   $"（当前力量 {SafeStrength(boss)}）");
+                    }
+                }
+            }
+        }
+        catch { /* 读不到就按 0 */ }
+
         return total;
     }
 
@@ -1260,6 +1317,10 @@ public static class BossIntentBuilder
         // （普通 DynamicVar，不是 PowerVar）⇒ 同样自动认不出来，会显示成「强化」。
         // 用户 2026-10-24：它是给**敌人**扣力量的，应为策略（红色下箭头）。
         "DARK_SHACKLES",
+        // 女皇（TheEmpress）：`DynamicVar("Power", 3)` 是**普通** DynamicVar（不是 PowerVar&lt;WeakPower&gt; 那种）
+        // ⇒ 自动判定认不出来，会掉到「技能牌兜底 = 强化」上（用户 2026-11-15：「女皇的意图应该是策略而非强化」）。
+        // 它实际是给敌人上 3 层虚弱 + 3 层易伤 ⇒ 策略（红色下箭头）。
+        "THE_EMPRESS",
         // 震荡波（Shockwave）：`PowerVar<WeakPower>` + `PowerVar<FrailPower>` 都是**正数**变量，
         // 自动判定会当成「强化」（用户 2026-11-05 实测：被标成蓝色上箭头）。它是给敌人上虚弱+易伤
         // ⇒ 应为策略（红色下箭头）。
@@ -1849,6 +1910,14 @@ public static class BossIntentBuilder
     {
         try
         {
+            // ★ 2026-11-14（用户「塔罗愚」）：「月亮」要生成并打出**固定的 10 把**小刀。
+            //   原版那张牌是「用手牌填满」，牌面没有任何变量 ⇒ 下面按变量名读只会得到 0。
+            //   真正生成 10 把的是 `Patches.FoolMoonShivPatch`（接管 `TheMoon.OnPlay`），
+            //   这个数字只负责「意图里画几把小刀」+ `PlannedPlay.GeneratedShivs`（出牌阶段打几把）。
+#if STS2_111   // 「愚者 / 塔罗牌」只在 0.113 存在
+            if (string.Equals(card.Id.Entry, "THE_MOON", StringComparison.Ordinal))
+                return CharacterBosses.Patches.FoolMoonShivPatch.ShivCount;
+#endif
             if (!ShivGeneratorCards.Contains(card.Id.Entry)) return 0;
             int n = (int)Math.Round(Var(card, "Shivs", -1));
             if (n < 0) n = (int)Math.Round(Var(card, "Cards", 0));
@@ -2174,5 +2243,44 @@ public static class BossIntentBuilder
         {
             return card.Id.Entry;
         }
+    }
+
+    /// <summary>
+    /// 「瘀伤」的**预览补偿**（用户 2026-11-14：「伤害预览似乎没有考虑瘀伤（可能因为在玩家的回合内
+    /// 玩家身上没有瘀伤）」）。
+    ///
+    /// 塔罗愚的「斗殴」(`<see cref="Powers.TarotBrawlPower"/>) 是在**他自己的回合开始**给敌人上瘀伤的，
+    /// 而意图是在**玩家回合**就算好的 ⇒ 那时玩家身上还没有瘀伤，每一段攻击都少算了 `瘀伤层数` 点。
+    /// 瘀伤在原版是 `ModifyDamageAdditive`（每段 +N），所以把这一笔并进 `strengthBonus` 这个
+    /// 「每段固定加值」的口径即可。
+    ///
+    /// ⚠ 用户 2026-11-15：「有的攻击意图似乎还是没有考虑瘀伤（你要不直接根据自己身上斗殴的层数
+    ///   多显示伤害预览吧）」⇒ **取消「只在玩家回合补」的闸门**。原因：意图数字现在全部由我们自己
+    ///   的剧本规划器（`BossScriptPlanner`）按牌面 + 力量算，**根本不走原版伤害管线**，
+    ///   所以不存在「瘀伤已经算进去」的情况；而他回合内（玩家身上已经有瘀伤时）刷新面板同样要补。
+    /// <summary>同一个意图列表里只留一条「强化」（蓝色上箭头），避免兜底 + selfBenefit 各加一条。</summary>
+    private static void DedupeBuffIntent(List<AbstractIntent> intents)
+    {
+        bool seenBuff = false;
+        for (int i = 0; i < intents.Count; i++)
+        {
+            if (intents[i] is not BuffIntent) continue;
+            if (!seenBuff) { seenBuff = true; continue; }
+            intents.RemoveAt(i);
+            i--;
+        }
+    }
+
+    /// </summary>
+    public static int PendingBruise(Creature? boss)
+    {
+        try
+        {
+            if (boss == null) return 0;
+            var brawl = boss.GetPower<CharacterBosses.Powers.TarotBrawlPower>();
+            if (brawl == null) return 0;
+            return Math.Max(0, (int)Math.Round((double)brawl.Amount));
+        }
+        catch { return 0; }
     }
 }

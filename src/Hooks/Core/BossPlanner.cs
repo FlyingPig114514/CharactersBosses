@@ -102,6 +102,26 @@ public sealed class PlannedPlay
     ///   所以规划期把它定死存在这里，重算原样再用（和 `SmokePerHit` / `LetterOpenerHit` 同一套做法）。
     /// </summary>
     public int StarHits { get; init; } = -1;
+
+    /// <summary>
+    /// 这张牌**打出去时**群蛇形态会额外造成的伤害（0 = 不画那一条）。
+    ///
+    /// ★ 2026-11-14（用户「塔罗愚」口径）：「获得群蛇形态之后，他每张牌下面都要加上『因此牌会造成的群蛇伤害』
+    ///   （参考炼药猎那套做法）」。
+    ///   炼药猎靠 `BladesGrowth.RecomputeAll` 顺手算这一条，但那条路**有球位就直接 return**
+    ///   （塔罗愚第 4 回合打出「魔术师」之后就永久有球位了）⇒ 他第 9 回合拿到群蛇形态后，
+    ///   意图里一条群蛇伤害都不会出现。所以和 <see cref="StarHits"/> 一样：**规划期按剧本顺序
+    ///   把每张牌那一刻的层数存进计划**，两条重算路径（`BladesGrowth` / 有球那条 `RefreshPlannedIntents`）
+    ///   都原样再用。
+    /// </summary>
+    public int SerpentDamage { get; init; }
+
+    /// <summary>
+    /// 这张牌本回合**会被打出几次**（1 = 正常；2 = 回响形态 / 爆发 / 复制药水这类重打一次）。
+    /// 用途：意图里的「群蛇形态因此牌造成的伤害」要画成 `4×2`，而「这张牌给的力量」也要按次数累计。
+    /// ★ 2026-11-14（用户：「回响形态被打出两次的牌下方因为群蛇形态造成的伤害并没有标成 4*2（恐惧则为 6*2）」）。
+    /// </summary>
+    public int PlayCount { get; init; } = 1;
 }
 
 /// <summary>

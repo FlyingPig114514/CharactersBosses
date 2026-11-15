@@ -39,6 +39,24 @@ public static class BossSpecialPowerIconPatch
             return false;
         }
 
+        // ★ v0.2.654（用户 2026-11-14）：「你把她给的 debuff『命运同担』改一下，**图标换成『抑制』的**」。
+        //   「抑制」= 三层华丽猎的特殊效果 `BossSuppressionPower`，它走下面那条「本 mod 的 Power ⇒ 好奇灯泡」
+        //   的通用规则。这里直接**把它的图标路径借过来**（而不是再写死一次好奇的路径），
+        //   以后「抑制」的图标若更换，命运同担会自动跟着换。
+        if (__instance is Powers.SharedFateDiscardPower)
+        {
+            try
+            {
+                var suppression = ModelDb.Power<Powers.BossSuppressionPower>();
+                if (suppression != null)
+                {
+                    __result = suppression.PackedIconPath;
+                    return false;
+                }
+            }
+            catch { /* 拿不到就继续走通用规则 */ }
+        }
+
         // 「麻痹」（二层「王储」施加给玩家的减益）：mod 自带的黄色闪电
         // （`tools/art/import_proj/.../images/powers/paralysis.png`，随 PCK 打包，见 pck_extras.txt）。
         if (__instance is Powers.ParalysisPower)
@@ -47,7 +65,17 @@ public static class BossSpecialPowerIconPatch
             return false;
         }
 
-        // 「跟踪锁定」（多人）用塔1 的 lock-on 图标：从 SlayTheSpire/desktop-1.0.jar 的
+        // ★ 2026-11-14（用户「塔罗愚」）：「从观者和亡命之徒那里新加的几个 buff 图标都用他们原本自己的」——
+        //   这 5 层能力是我们从**观者 mod**（`Watcher.pck`）和**崩坠 Hermit**（`Hermit.pck`）搬过来的牌给的，
+        //   图标就用它们原版那一张（已导出成 PNG 随我们的 PCK 发布，见 tools\art\pck_extras.txt）。
+        var tarotIcon = TarotPowerIconOf(__instance);
+        if (!string.IsNullOrEmpty(tarotIcon))
+        {
+            __result = tarotIcon!;
+            return false;
+        }
+
+        // 「跟踪锁定」（多人）用塔1 的 lock-on 图标        // 「跟踪锁定」（多人）用塔1 的 lock-on 图标：从 SlayTheSpire/desktop-1.0.jar 的
         // powers/powers.atlas 里裁出 `128/lockon` 区域（xy 979,933 size 89,89），经 Godot 导入后随 PCK 发布。
         if (__instance is Powers.LockOnPower)
         {
@@ -175,5 +203,31 @@ public static class BossSpecialPowerIconPatch
             if (cur.Assembly == ours) return true;
         }
         return false;
+    }
+
+    /// <summary>
+    /// 从观者 / 亡命之徒搬来的 5 层能力，图标用它们自己原来那张（用户 2026-11-14）。
+    /// 图已导出到 `res://CharacterBosses/images/powers/tarot_*.png`（观者：能量降低、天人化；Hermit：斗殴、瘀伤、永恒形态）。
+    /// </summary>
+    private static string? TarotPowerIconOf(PowerModel? power)
+    {
+        try
+        {
+            if (power == null) return null;
+            string? file = power switch
+            {
+                Powers.TarotEnergyDownPower => "tarot_energy_down",   // 观者 · 斋戒的「每回合少 1 能量」
+                Powers.TarotDevaPower => "tarot_deva",                 // 观者 · 天人形态
+                Powers.TarotBrawlPower => "tarot_brawl",               // Hermit · 斗殴
+                Powers.TarotBruisePower => "tarot_bruise",             // Hermit · 瘀伤
+                Powers.TarotEternalPower => "tarot_eternal",           // Hermit · 永恒形态
+                _ => null,
+            };
+            if (file == null) return null;
+            string path = "res://CharacterBosses/images/powers/" + file + ".png";
+            try { if (!Godot.ResourceLoader.Exists(path)) return null; } catch { return null; }
+            return path;
+        }
+        catch { return null; }
     }
 }

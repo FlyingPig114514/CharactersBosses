@@ -125,5 +125,11 @@
     "BASELIB_MISSING_HEADER":  "Mod wajib tidak ada: BaseLib",
     "BASELIB_MISSING_BODY":  "Mesin ini belum memasang mod BaseLib (id Steam Workshop 3737335127).\n\nTidak tersedia:\n· layar konfigurasi mod di dalam game\n· sinkronisasi pengaturan host saat multipemain\n\nSisanya tetap berjalan (penggantian boss, dek/relik/skenario, susunan multipemain). Langganan BaseLib lalu mulai ulang game.",
     "BASELIB_MISSING_OK":  "Mengerti",
-    "BASELIB_MISSING_CLOSE":  "Tutup"
+    "BASELIB_MISSING_CLOSE":  "Tutup",
+    "FOOL_BOSS_ENCOUNTER.title":  "Fool",
+    "FOOL_BOSS_ENCOUNTER.loss":  "{character} dihabisi oleh kartu tarot [gold]Fool[/gold].",
+    "FOOL_TAROT_BOSS_ENCOUNTER.title":  "Fool",
+    "FOOL_TAROT_BOSS_ENCOUNTER.loss":  "{character} dihabisi oleh kartu tarot [gold]Fool[/gold].",
+    "FOOL_BOSS_ENCOUNTER.loss_tarot":  "{character} menjadi kartu baru [gold]{Card}[/gold] di dek [gold]Fool[/gold].",
+    "FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot":  "{character} menjadi kartu baru [gold]{Card}[/gold] di dek [gold]Fool[/gold]."
 }

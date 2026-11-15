@@ -1,0 +1,10 @@
+{
+    "TAROT_FASTING.title":  "Fasten",
+    "TAROT_FASTING.description":  "Erhalte {MagicNumber} [gold]Stärke[/gold].\nErhalte {MagicNumber} [gold]Geschick[/gold].\nZu Beginn jedes Zuges erhältst du 1 [gold]Energie[/gold] weniger.",
+    "TAROT_DEVA_FORM.title":  "Deva-Form",
+    "TAROT_DEVA_FORM.description":  "Zu Beginn deines Zuges erhältst du [gold]Energie[/gold]; der Betrag steigt jede Runde um {MagicNumber}.",
+    "TAROT_BRAWL.title":  "Rauferei",
+    "TAROT_BRAWL.description":  "Zu Beginn deines Zuges füge ALLEN Gegnern {BrawlPower} [gold]Prellung[/gold] zu.",
+    "TAROT_ETERNAL_FORM.title":  "Ewige Form",
+    "TAROT_ETERNAL_FORM.description":  "Die ersten 4 spielbaren Karten, die du jede Runde ziehst, kosten in dieser Runde {EternalPower} weniger."
+}

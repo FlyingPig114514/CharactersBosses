@@ -399,6 +399,18 @@ public sealed class BossTurn
     /// </summary>
     public int Energy { get; init; }
 
+    /// <summary>
+    /// **倒吊人给的「额外回合」**（用户 2026-11-14）：打完第 N 张牌（0 起）之后，
+    /// 立刻重新跑一次「他的回合开始」的钩子（水银沙漏再打 3、恶魔形态再 +N 力量…），再接着打后面的牌。
+    /// -1 = 没有额外回合（默认）。
+    ///
+    /// 为什么不是真的再开一个回合：`TheHangedMan` 只是给自己挂 `ExtraTurnPower`，而真正发额外回合的
+    /// `CombatManager` 只在 `CombatState.Players` 里挨个问 `Hook.ShouldTakeExtraTurn` —— **影子玩家不在那个集合里**，
+    /// 所以那层 power 挂上去也没人问（用户实测：「倒吊人并没有真的给他一个额外回合」）。
+    /// 这里把「额外回合」实现在同一个 Boss 回合里：钩子重跑 = 水银沙漏 / 恶魔形态这些「回合开始」效果真的再触发一次。
+    /// </summary>
+    public int ExtraTurnAfterCard { get; init; } = -1;
+
     /// <summary>这一回合**强制 0 费**（压过定义值）。见 <see cref="Energy"/> 的注释。</summary>
     public bool ForceZeroEnergy { get; init; }
 

@@ -1,0 +1,10 @@
+{
+    "TAROT_FASTING.title":  "Oruç",
+    "TAROT_FASTING.description":  "{MagicNumber} [gold]Güç[/gold] kazan.\n{MagicNumber} [gold]Çeviklik[/gold] kazan.\nHer turun başında 1 daha az [gold]Enerji[/gold] kazan.",
+    "TAROT_DEVA_FORM.title":  "Deva Formu",
+    "TAROT_DEVA_FORM.description":  "Turunun başında [gold]Enerji[/gold] kazan; miktar her tur {MagicNumber} artar.",
+    "TAROT_BRAWL.title":  "Yumruk Yumruğa",
+    "TAROT_BRAWL.description":  "Turunun başında TÜM düşmanlara {BrawlPower} [gold]Berezelenme[/gold] uygula.",
+    "TAROT_ETERNAL_FORM.title":  "Ebedi Form",
+    "TAROT_ETERNAL_FORM.description":  "Her tur çektiğin ilk 4 oynanabilir kart o tur {EternalPower} daha az maliyetlidir."
+}

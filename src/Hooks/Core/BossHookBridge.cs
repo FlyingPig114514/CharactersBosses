@@ -128,6 +128,13 @@ public static partial class BossHookBridge
             {
                 if (power is MegaCrit.Sts2.Core.Models.Powers.EnergyNextTurnPower)
                 {
+                    // ★ 2026-11-14（塔罗愚）：打开 `KeepsNextTurnEnergyPower` 的 Boss **不删** ——
+                    //   交给 `PendingNextTurnEnergyCredit()` 在算本回合能量时兑现并自行移除。
+                    if (boss.Def.KeepsNextTurnEnergyPower)
+                    {
+                        Logger.Log($"[CharBoss] 「下回合 +{power.Amount} 能量」留给回合能量结算（KeepsNextTurnEnergyPower）");
+                        continue;
+                    }
                     Logger.Log($"[CharBoss] 「下回合 +{power.Amount} 能量」到期移除（原版 AfterEnergyReset 对影子玩家不派发）");
                     await PowerCmd.Remove(power);
                 }
@@ -321,4 +328,30 @@ public static partial class BossHookBridge
     /// <summary>把异步钩子丢到主循环里跑（<c>PrepareTurn</c> 是同步方法，不能 await）。</summary>
     public static void FireCombatStartWithoutAwait(CharBossMonster boss)
         => TaskHelper.RunSafely(FireCombatStart(boss));
+
+    /// <summary>
+    /// 「佩尔之泪」（<c>PaelsTears</c>，用户 2026-11-14 换给塔罗愚）：上回合结束时有未花费能量 ⇒ 本回合 +2 能量。
+    /// 原版靠 `BeforeSideTurnEnd` + `AfterSideTurnStart` 两条钩子，影子玩家都收不到；
+    /// 而且即使收到了，`PrepareTurn` 里 `pcs.Energy = …` 也会把它覆盖掉 ⇒ 必须自己算进预算。
+    /// 「还剩多少」由 `CharBossMonster.LeftoverEnergyLastTurn` 在回合开始记账。
+    /// </summary>
+    internal static int PaelsTearsBonus(CharBossMonster boss)
+    {
+        try
+        {
+            if (boss == null || boss.LeftoverEnergyLastTurn <= 0) return 0;
+            var relics = boss.Shadow?.Relics;
+            if (relics == null) return 0;
+            for (int i = 0; i < relics.Count; i++)
+            {
+                var relic = relics[i];
+                if (relic == null) continue;
+                if (!string.Equals(relic.Id.Entry, "PAELS_TEARS", StringComparison.Ordinal)) continue;
+                try { return Math.Max(0, (int)Math.Round((double)relic.DynamicVars["Energy"].BaseValue)); }
+                catch { return 2; }
+            }
+        }
+        catch { /* 忽略 */ }
+        return 0;
+    }
 }

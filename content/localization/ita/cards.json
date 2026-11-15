@@ -1,0 +1,10 @@
+{
+    "TAROT_FASTING.title":  "Digiuno",
+    "TAROT_FASTING.description":  "Ottieni {MagicNumber} di [gold]Forza[/gold].\nOttieni {MagicNumber} di [gold]Destrezza[/gold].\nAll'inizio di ogni turno ottieni 1 [gold]Energia[/gold] in meno.",
+    "TAROT_DEVA_FORM.title":  "Forma Deva",
+    "TAROT_DEVA_FORM.description":  "All'inizio del tuo turno ottieni [gold]Energia[/gold]; la quantità aumenta di {MagicNumber} ogni turno.",
+    "TAROT_BRAWL.title":  "Rissa",
+    "TAROT_BRAWL.description":  "All'inizio del tuo turno, applica {BrawlPower} di [gold]Livido[/gold] a TUTTI i nemici.",
+    "TAROT_ETERNAL_FORM.title":  "Forma eterna",
+    "TAROT_ETERNAL_FORM.description":  "Le prime 4 carte giocabili pescate ogni turno costano {EternalPower} in meno in quel turno."
+}

@@ -1,0 +1,10 @@
+{
+    "TAROT_FASTING.title":  "Пост",
+    "TAROT_FASTING.description":  "Получите {MagicNumber} [gold]Силы[/gold].\nПолучите {MagicNumber} [gold]Ловкости[/gold].\nВ начале каждого хода вы получаете на 1 [gold]энергии[/gold] меньше.",
+    "TAROT_DEVA_FORM.title":  "Облик дэвы",
+    "TAROT_DEVA_FORM.description":  "В начале вашего хода получите [gold]энергию[/gold]; её количество растёт на {MagicNumber} каждый ход.",
+    "TAROT_BRAWL.title":  "Драка",
+    "TAROT_BRAWL.description":  "В начале вашего хода наложите {BrawlPower} [gold]ушиба[/gold] на ВСЕХ врагов.",
+    "TAROT_ETERNAL_FORM.title":  "Вечный облик",
+    "TAROT_ETERNAL_FORM.description":  "Первые 4 разыгрываемые карты, взятые за ход, в этот ход стоят на {EternalPower} меньше."
+}

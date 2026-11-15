@@ -50,6 +50,8 @@ internal static class DreadCharacters
     public const int Defect = 2;
     public const int Necrobinder = 3;
     public const int Regent = 4;
+    /// <summary>愚者（0.113 才有的角色；本模组的「塔罗愚」用它）。</summary>
+    public const int Fool = 5;
 }
 
 #if STS2_111
@@ -106,6 +108,33 @@ public sealed class SilentDominion : MegaCrit.Sts2.Core.Models.Dread.DominionMod
                     new ThrowingPlayerChoiceContext(), creature, -1m, null, null);
                 await MegaCrit.Sts2.Core.Commands.PowerCmd.Apply<MegaCrit.Sts2.Core.Models.Powers.WeakPower>(
                     new ThrowingPlayerChoiceContext(), creature, 1m, null, null);
+
+                // ★ v0.2.652（用户：「静默猎手的支配给予的虚弱持续了 2 回合，在第三回合开始时才失去。
+                //   应当第二回合开始时就失去」）：
+                //   反编译 `PowerCmd.Apply` 里有一段
+                //   <code>
+                //   if (target.Side == CombatSide.Player
+                //       &amp;&amp; combatState.CurrentSide == CombatSide.Enemy
+                //       &amp;&amp; power.Type == PowerType.Debuff)
+                //       power.SkipNextDurationTick = true;
+                //   </code>
+                //   —— 「**在敌方回合里给玩家上负面**」时，原版会跳过下一次时长结算，
+                //   免得同一次敌方回合结束就把它扣掉。而我们在**房间进入**那一刻上虚弱，
+                //   那时的 `CurrentSide` 还是 Enemy（玩家回合要到下一帧才开始）⇒ 被跳过一次
+                //   ⇒ 虚弱多撑一整轮，到第 3 回合才掉。
+                //   这里把标记清掉，让它照常在「第一次敌方回合结束」时结算：
+                //   第 1 回合吃到，第 2 回合开始时就没有了（与用户口径一致）。
+                try
+                {
+                    var weak = creature.GetPower<MegaCrit.Sts2.Core.Models.Powers.WeakPower>();
+                    if (weak != null && weak.SkipNextDurationTick)
+                    {
+                        weak.SkipNextDurationTick = false;
+                        Logger.Log("[CharBoss] 恐惧模式·静默猎手的支配：已清掉虚弱的「跳过本次结算」标记" +
+                                   "（否则会多撑一整个回合）");
+                    }
+                }
+                catch (Exception e) { Logger.Log("[CharBoss] 静默猎手的支配：清 Weak 跳过标记失败: " + e.Message); }
             }
             Logger.Log("[CharBoss] 恐惧模式·静默猎手的支配：所有玩家 −1 力量、+1 虚弱");
         }

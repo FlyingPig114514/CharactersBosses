@@ -607,6 +607,13 @@ public static class BossFrameTick
             //     每帧跑（要跟手），节点带缓存；没有炸弹的 Boss 直接返回。
             try { BombBlink.Tick(everyBoss); } catch { /* 忽略 */ }
 
+            // ①b2 「滚石」的滚向（用户 2026-11-15）：原版动画几何写死「向右滚」，她打出来是反的
+            //     ⇒ 隐藏原贴图 + 一个镜像替身跟着它每帧对位（伤害仍由原版节点结算，不受影响）。
+            //     滚石只有 0.113+ 的塔罗愚会打 ⇒ 这段只在 111 里编译。
+#if STS2_111
+            try { RollingBoulderFacing.Tick(); } catch { /* 纯外观 */ }
+#endif
+
             // ①c 钻石头冠的 20 点格挡**不再在这里补**（v0.2.241）。
             //    以前这里每帧调 `EnsureDiamondDiademBlock`：只要她还没格挡就 `Task.Delay(120)` 后异步补 20 点 ——
             //    而「战斗开始清零」的时序两端不同 ⇒ 有的客户端补到了 20、有的没补到 0

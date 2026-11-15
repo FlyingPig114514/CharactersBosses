@@ -1,0 +1,10 @@
+{
+    "TAROT_FASTING.title":  "단식",
+    "TAROT_FASTING.description":  "[gold]힘[/gold]을 {MagicNumber} 얻습니다.\n[gold]민첩[/gold]을 {MagicNumber} 얻습니다.\n매 턴 시작 시 얻는 [gold]에너지[/gold]가 1 줄어듭니다.",
+    "TAROT_DEVA_FORM.title":  "천인 형태",
+    "TAROT_DEVA_FORM.description":  "턴 시작 시 [gold]에너지[/gold]를 얻습니다. 얻는 양은 매 턴 {MagicNumber}씩 증가합니다.",
+    "TAROT_BRAWL.title":  "난투",
+    "TAROT_BRAWL.description":  "턴 시작 시 모든 적에게 [gold]타박상[/gold]을 {BrawlPower} 부여합니다.",
+    "TAROT_ETERNAL_FORM.title":  "영원한 형태",
+    "TAROT_ETERNAL_FORM.description":  "매 턴 처음 뽑는 사용 가능한 카드 4장은 그 턴 동안 비용이 {EternalPower} 감소합니다."
+}

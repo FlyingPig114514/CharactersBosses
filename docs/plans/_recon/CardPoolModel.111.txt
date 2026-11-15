@@ -1,0 +1,97 @@
+﻿// ===== MegaCrit.Sts2.Core.Models.CardPoolModel =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Godot;
+using MegaCrit.Sts2.Core.Assets;
+using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Helpers;
+using MegaCrit.Sts2.Core.Modding;
+using MegaCrit.Sts2.Core.Unlocks;
+
+namespace MegaCrit.Sts2.Core.Models;
+
+public abstract class CardPoolModel : AbstractModel, IPoolModel
+{
+	private CardModel[]? _allCards;
+
+	private HashSet<ModelId>? _allCardIds;
+
+	public abstract string Title { get; }
+
+	public abstract string EnergyColorName { get; }
+
+	public abstract string CardFrameMaterialPath { get; }
+
+	public string FrameMaterialPath => "res://materials/cards/frames/" + CardFrameMaterialPath + "_mat.tres";
+
+	public Material FrameMaterial => PreloadManager.Cache.GetMaterial(FrameMaterialPath);
+
+	public abstract Color DeckEntryCardColor { get; }
+
+	public virtual Color EnergyOutlineColor => new Color("5C5440");
+
+	public string EnergyIconPath => EnergyIconHelper.GetPath(EnergyColorName);
+
+	public virtual System.Collections.Generic.IEnumerable<CardModel> AllCards
+	{
+		get
+		{
+			if (_allCards == null)
+			{
+				_allCards = GenerateAllCards();
+				_allCards = Enumerable.ToArray<CardModel>(ModHelper.ConcatModelsFromMods(this, _allCards));
+			}
+			return _allCards;
+		}
+	}
+
+	public System.Collections.Generic.IEnumerable<ModelId> AllCardIds => (System.Collections.Generic.IEnumerable<ModelId>)(_allCardIds ?? (_allCardIds = Enumerable.ToHashSet<ModelId>(Enumerable.Select<CardModel, ModelId>(AllCards, (Func<CardModel, ModelId>)((CardModel c) => c.Id)))));
+
+	public abstract bool IsColorless { get; }
+
+	public override bool ShouldReceiveCombatHooks => false;
+
+	protected abstract CardModel[] GenerateAllCards();
+
+	protected void InvalidateCardCache()
+	{
+		_allCards = null;
+		_allCardIds = null;
+	}
+
+	protected override void DeepCloneFields()
+	{
+		base.DeepCloneFields();
+		InvalidateCardCache();
+	}
+
+	public System.Collections.Generic.IEnumerable<CardModel> GetUnlockedCards(UnlockState unlockState, CardMultiplayerConstraint multiplayerConstraint)
+	{
+		List<CardModel> val = Enumerable.ToList<CardModel>(FilterThroughEpochs(unlockState, AllCards));
+		switch (multiplayerConstraint)
+		{
+		case CardMultiplayerConstraint.MultiplayerOnly:
+			val.RemoveAll((Predicate<CardModel>)((CardModel c) => c.MultiplayerConstraint == CardMultiplayerConstraint.SingleplayerOnly));
+			break;
+		case CardMultiplayerConstraint.SingleplayerOnly:
+			val.RemoveAll((Predicate<CardModel>)((CardModel c) => c.MultiplayerConstraint == CardMultiplayerConstraint.MultiplayerOnly));
+			break;
+		}
+		return (System.Collections.Generic.IEnumerable<CardModel>)val;
+	}
+
+	protected virtual System.Collections.Generic.IEnumerable<CardModel> FilterThroughEpochs(UnlockState unlockState, System.Collections.Generic.IEnumerable<CardModel> cards)
+	{
+		return (System.Collections.Generic.IEnumerable<CardModel>)Enumerable.ToList<CardModel>(cards);
+	}
+
+	public CardPoolModel ToMutable()
+	{
+		AssertCanonical();
+		return (CardPoolModel)MutableClone();
+	}
+}
+
+// ===== MegaCrit.Sts2.Core.Models.CardPoolModel.<>c =====
+// ERROR: Could not find type definition MegaCrit.Sts2.Core.Models.CardPoolModel.<>c in type system.

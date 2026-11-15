@@ -106,6 +106,20 @@ public abstract partial class CharBossMonster
             PlannedStrengthGainedThisTurn = 0;
             PendingReturnStrength = 0;     // 「一心化万」的待结算力量池：每回合从 0 起
             PotionsDrunkThisTurn = 0;      // 本回合还没喝药（爬行动物饰品的力量预补要用，见 BladesGrowth）
+            // ★ 2026-11-14（用户「塔罗愚」）：「第九回合还有本身的 2+1 费…」
+            //   「佩尔之泪」= 「如果你在拥有未花费能量的情况下结束回合，则下个回合额外获得 2 能量」。
+            //   反编译它挂的是 `BeforeSideTurnEnd`（记 `HadLeftoverEnergy`）+ `AfterSideTurnStart`（发能量），
+            //   而影子玩家两条都不派发；更要紧的是下面 `pcs.Energy = …` 会把任何到账的能量硬覆盖掉。
+            //   所以在这里按「上一回合**实际**还剩多少」自己记账，再补进本回合预算：
+            //   `CardCmd.AutoPlay` 不扣费 ⇒ 真实剩余 = 上一回合设的能量 − 逐张记账花掉的（`ScriptEnergySpent`）。
+            //   ⚠ 必须在这行清零**之前**算。
+            try
+            {
+                LeftoverEnergyLastTurn = Math.Max(0, pcs.Energy - Math.Max(0, ScriptEnergySpent));
+            }
+            catch { LeftoverEnergyLastTurn = 0; }
+            _extraTurnFired = false;   // 「倒吊人额外回合」每回合重置
+            _doubleNextCardOnce = false;
             ScriptEnergySpent = 0;         // ★ v0.2.532：本回合「已花能量」从 0 起（补打重算预算要用）
             var script = Def.ScriptForAct(ActIndex);
             var scriptedTurn = script?.TurnAt(TurnNumber);
@@ -145,6 +159,29 @@ public abstract partial class CharBossMonster
             // —— 对影子玩家不生效（下面第 129 行的 `pcs.Energy = …` 还会把任何到账的能量硬覆盖掉），
             // 于是三层「易伤战」第 3 回合只有 3 费、打不出「主宰」（用户 2026-10-25 实测）。
             // 这里按卡面直接补进本回合预算（原版那条已被 BossRelicSuppressChandelierPatch 压掉，不会双份）。
+            // 「佩尔之泪」：上回合结束时还有未花费能量 ⇒ 本回合 +2（自己记账，见上面 LeftoverEnergyLastTurn）
+            try
+            {
+                int tears = BossHookBridge.PaelsTearsBonus(this);
+                if (tears > 0) { energy += tears; Logger.Log($"[CharBoss] 佩尔之泪：上回合还剩 {LeftoverEnergyLastTurn} 能量 ⇒ 本回合 +{tears} 能量"); }
+            }
+            catch (Exception e) { Logger.Log("[CharBoss] 佩尔之泪加费失败: " + e.Message); }
+            // ★ 用户 2026-11-14：「记得考虑天人形态的加费」——
+            //   `天人形态`（我们自造的 `TarotDevaPower`）挂的是 `AfterEnergyReset(Player)`，
+            //   影子玩家收不到；而且下面 `pcs.Energy = …` 会把任何到账的能量硬覆盖掉 ⇒
+            //   必须自己算进预算并按卡面递增（`Amount` 就写着「这一回合会给多少」）。
+            try
+            {
+                var deva = Creature?.GetPower<Powers.TarotDevaPower>();
+                if (deva != null)
+                {
+                    int gain = Math.Max(1, (int)Math.Round((double)deva.Amount));
+                    energy += gain;
+                    try { deva.SetAmount(gain + 1, true); } catch { /* 只是图标数字 */ }
+                    Logger.Log($"[CharBoss] 天人形态：本回合 +{gain} 能量（下一回合 {gain + 1}）");
+                }
+            }
+            catch (Exception e) { Logger.Log("[CharBoss] 天人形态加费失败: " + e.Message); }
             try { energy += BossHookBridge.ChandelierEnergyBonusAtTurnStart(this, pcs, TurnNumber); }
             catch (Exception e) { Logger.Log("[CharBoss] 吊灯加费失败: " + e.Message); }
 
@@ -418,6 +455,9 @@ public abstract partial class CharBossMonster
                     shivOverride: entry == "STORM_OF_STEEL" ? Math.Max(0, play.GeneratedShivs) : 0,
                     // ★ 2026-11-10：星尘/辐射的段数（辉星口径）在规划期定死，这里原样再用
                     starHits: play.StarHits,
+                    // ★ 2026-11-14：群蛇形态的「这张牌会因此多打 N」（规划期定死，这里原样再用）
+                    serpentDamage: play.SerpentDamage,
+                    playCount: Math.Max(1, play.PlayCount),   // 回响形态重打（群蛇那条要 ×2）
                     aoeFromCaller: true);
                 // ★ 2026-11-10（用户：「暴风雨激发电球的 8×2 意图被吃掉了（回合开始时闪了一下）」）：
                 //   `BossOrbSim.Predict(card, xEnergy)` 的 **X 是参数**，默认 0 —— 规划期

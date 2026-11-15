@@ -359,6 +359,15 @@ public abstract partial class CharBossMonster
             }
         }
         catch (System.Exception e) { Logger.Log("[CharBoss] hand ui cleanup failed: " + e.Message); }
+        // ★ 2026-11-15（用户：「切到地图页面还是能看到特殊效果说明框」）：
+        //   说明框挂在**全局**提示层上，必须在「本场战斗结束、离房」这一刻主动收掉，
+        //   否则它会跟着玩家跑到奖励页/地图页（锚点随房间释放之后就没法再按锚点收了）。
+        try
+        {
+            if (!Core.MultiBossPlan.AnyOtherBossAlive(this))
+                CharacterBosses.UI.BossSpecialUi.HideAll();
+        }
+        catch { /* 纯外观 */ }
         // 同上：只在这场战斗真的结束（没有别的 Boss 活着）时才还原音乐 ——
         // 否则「打死一只、其余还在打」时背景音乐会突然消失（用户 2026-10-29）。
         try { if (ShouldStopBgmOnLeaveRoom()) Core.BossBgm.OnFightEnded("Boss 被移出房间（收面板后）", bossDied: !bossStillAlive); }

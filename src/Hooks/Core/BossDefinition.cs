@@ -226,6 +226,21 @@ public sealed class BossDefinition
     /// 二层「物理机」的「超越光速」会抽牌，而剧本已经把那几张写好了 ⇒ 打开这个开关。
     /// </summary>
     public bool BlocksVanillaDraw;
+    /// <summary>
+    /// **不要**把「下回合 +N 能量」（<c>EnergyNextTurnPower</c>）当成到期删掉，而是留给
+    /// <c>CharBossMonster.PendingNextTurnEnergyCredit()</c> 在算本回合能量时兑现。
+    ///
+    /// 背景（塔罗愚，用户 2026-11-14）：「第九回合的费用应该够打虚空形态吧，有 2 张皇帝，
+    /// 上回合有 2 张星星，还有被遗忘的仪式和鬼火」——
+    /// `星星`（TheStar）给的是**下回合** 3 点能量，可 `BossHookBridge.RemoveNextTurnPowers`
+    /// 在回合开始就把这条 power 删了（当时的注释写「只删不发」，因为储君/灵魂骨的剧本已经把
+    /// 这两笔能量写进逐回合预算）⇒ `PendingNextTurnEnergyCredit()` 永远读不到，这 6 点从没到账。
+    ///
+    /// 所以给「剧本里**不**预先写死这笔能量、要靠牌自己产生」的 Boss 一个显式开关：
+    /// 打开后不删，交给 credit 那一步兑现并自行移除（同一层只结算一次）。
+    /// 默认 false = 老行为一个字节都不变。
+    /// </summary>
+    public bool KeepsNextTurnEnergyPower;
 
     /// <summary>
     /// **哪些幕**要「打出的牌抽进来的牌放回抽牌堆顶」（手牌恒等于剧本，但抽牌本身照常发生）。

@@ -1538,6 +1538,24 @@
       "error_message": "boss 打小刀的动画被镜像翻反了（小刀投掷朝反方向飞）",
       "fix": "镜像范围太宽：原先「她出牌期间所有 *Vfx」都翻。Shiv 用的是 NShivThrowVfx.Create(attacker, target, color)——生成时同时拿到攻击者与目标，方向自己算，翻了就反。现改为只翻「锚在她身上」的特效（父链能到她自己 NCreature；或 NVfxSpine/NVfxParticleSystem 且离她 1.6 身位内），并加排除名单 NShivThrowVfx/NBigSlashVfx/NBigSlashImpactVfx/NLargeMagicMissileVfx/NHitSparkVfx/NDamageNumVfx。落在玩家身上的特效一律不碰。",
       "at": "2026-11-14T04:34:05.978Z"
+    },
+    {
+      "id": "bug-236-mwg6ubi6",
+      "error_message": "恐惧模式·静默猎手的支配给的「虚弱」持续了 2 个回合，到第 3 回合开始才消失；应当第 2 回合开始就没有",
+      "fix": "PowerCmd.Apply 里有 `if (target.Side == Player && combatState.CurrentSide == Enemy && power.Type == Debuff) power.SkipNextDurationTick = true;`——在敌方回合给玩家上负面会跳过下一次时长结算。支配是在「房间进入」时刻施加的，那时 CurrentSide 仍是 Enemy ⇒ 被跳过 ⇒ 虚弱多撑一整轮。修法：Apply 之后取 creature.GetPower<WeakPower>()，把 SkipNextDurationTick 清回 false，让它在第一次敌方回合结束时正常结算。WeakPower.AfterSideTurnEnd 只在 side==Enemy 时 TickDownDuration。",
+      "at": "2026-11-14T09:13:15.966Z"
+    },
+    {
+      "id": "bug-237-mwg7k4si",
+      "error_message": "恐惧模式·奇巧猎的「命运同担」并不会让玩家一次弃 2 张（玩家侧 debuff 写死了只弃 1 张，虽然施加时传了 2）",
+      "fix": "按用户新口径重做：SharedFateDiscardPower 改成可叠加（PowerStackType.Counter，去掉 DisplayAmount=0），层数=玩家回合开始时按层数弃牌（CardSelectorPrefs(DiscardSelectionPrompt, 层数)，clamp 到手牌数），弃完 PowerCmd.Remove 清空；SharedFatePower 触发时给 1 层（普通）/2 层（恐惧）；图标在 BossSpecialPowerIconPatch 里借用「抑制」BossSuppressionPower.PackedIconPath；16 语言 powers/monsters 文案同步改成「获得 N 层」的说法。",
+      "at": "2026-11-14T09:33:20.322Z"
+    },
+    {
+      "id": "bug-238-mwge6fs7",
+      "error_message": "往 powers.json 类的新表里用 Add-LocKey 逐键追加时，若文件是新建的（内容只有 `{` 和 `}`），第一行会变成 `{,` ⇒ JSON 解析失败（和 v0.2.628 那次裸换行同一个坑的变体）",
+      "fix": "新建表不要走 Add-LocKey（它会在 `{` 后面补逗号）⇒ 改用 .tmp/apply-loc-table.ps1 整表重写：首行 `{`、逐键 `\"KEY\":  \"value\",`、末行 `}`，写完立刻 ConvertFrom-Json 回读校验。已用它修好 16 语言的 cards.json。",
+      "at": "2026-11-14T12:38:38.695Z"
     }
   ]
 }

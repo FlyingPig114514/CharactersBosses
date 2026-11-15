@@ -50,7 +50,15 @@ internal static class BossUiSession
 
             // 注意：id == 0 表示「现在没有战斗房」，也要清理（回主菜单 / 选人界面前的一帧）。
             _roomId = id;
-            if (id == 0) return;
+            if (id == 0)
+            {
+                // ★ 2026-11-15（用户：「特殊效果描述图层太高了，切到地图页面都还能看到」）：
+                //   原版 `NHoverTipSet` 是挂在**全局**悬停提示层上的，一旦常驻就跟到哪个界面都显示；
+                //   以前这里 `id == 0` 直接 return ⇒ 离开战斗房（去奖励/地图）时**什么都没收**
+                //   ⇒ 说明框一直挂在地图上。现在离开战斗房就把我们挂上去的东西全收掉。
+                try { HideTransient(); } catch { /* 忽略 */ }
+                return;
+            }
 
             Reset("新的战斗房 " + id);
             _rebuildRequested = true;      // 让每帧驱动立刻把面板重建回来（见字段注释）
@@ -59,6 +67,18 @@ internal static class BossUiSession
         {
             Logger.Log("[CharBoss] 会话切换检查失败: " + e.Message);
         }
+    }
+
+    /// <summary>
+    /// 只收「跟着房间走」的东西：特殊效果说明框 / 附加状态栏 / 自建 HUD 层。
+    /// 不碰手牌面板与锁定记账 —— 那些在下一场战斗的 <see cref="Reset"/> 里统一处理，
+    /// 这里只保证**离开战斗房之后屏幕上不留我们的残留**（用户实测：说明框跟到地图页）。
+    /// </summary>
+    private static void HideTransient()
+    {
+        try { BossSpecialUi.HideAll(); } catch { /* 忽略 */ }
+        try { BossExtraStatusRow.HideAll(); } catch { /* 忽略 */ }
+        try { BossHudLayer.Release(); } catch { /* 忽略 */ }
     }
 
     /// <summary>把上一场留下的面板 / 层 / 计数 / 锁定全部拆掉。</summary>

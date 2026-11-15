@@ -1,0 +1,10 @@
+{
+    "TAROT_FASTING.title":  "Fasting",
+    "TAROT_FASTING.description":  "Gain {MagicNumber} [gold]Strength[/gold].\nGain {MagicNumber} [gold]Dexterity[/gold].\nAt the start of each turn, gain 1 less [gold]Energy[/gold].",
+    "TAROT_DEVA_FORM.title":  "Deva Form",
+    "TAROT_DEVA_FORM.description":  "At the start of your turn, gain [gold]Energy[/gold]; the amount increases by {MagicNumber} each turn.",
+    "TAROT_BRAWL.title":  "Brawl",
+    "TAROT_BRAWL.description":  "At the start of your turn, apply {BrawlPower} [gold]Bruise[/gold] to ALL enemies.",
+    "TAROT_ETERNAL_FORM.title":  "Eternal Form",
+    "TAROT_ETERNAL_FORM.description":  "The first 4 playable cards you draw each turn cost {EternalPower} less that turn."
+}

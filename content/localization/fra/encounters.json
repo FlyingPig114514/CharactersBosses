@@ -125,5 +125,11 @@
     "BASELIB_MISSING_HEADER":  "Mod requis manquant : BaseLib",
     "BASELIB_MISSING_BODY":  "Cette machine n'a pas le mod BaseLib installé (id Steam Workshop 3737335127).\n\nIndisponible :\n· l'écran de configuration des mods en jeu\n· la synchronisation des réglages de l'hôte en multijoueur\n\nTout le reste fonctionne (remplacement des boss, decks/reliques/scripts, compositions multijoueur). Abonnez-vous à BaseLib puis relancez le jeu.",
     "BASELIB_MISSING_OK":  "Compris",
-    "BASELIB_MISSING_CLOSE":  "Fermer"
+    "BASELIB_MISSING_CLOSE":  "Fermer",
+    "FOOL_BOSS_ENCOUNTER.title":  "L'Insensé",
+    "FOOL_BOSS_ENCOUNTER.loss":  "{character} a perdu la partie face aux tarots de [gold]l'Insensé[/gold].",
+    "FOOL_TAROT_BOSS_ENCOUNTER.title":  "L'Insensé",
+    "FOOL_TAROT_BOSS_ENCOUNTER.loss":  "{character} a perdu la partie face aux tarots de [gold]l'Insensé[/gold].",
+    "FOOL_BOSS_ENCOUNTER.loss_tarot":  "{character} est devenu la nouvelle carte [gold]{Card}[/gold] du deck de [gold]l'Insensé[/gold].",
+    "FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot":  "{character} est devenu la nouvelle carte [gold]{Card}[/gold] du deck de [gold]l'Insensé[/gold]."
 }

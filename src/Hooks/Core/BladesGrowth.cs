@@ -427,9 +427,10 @@ public static class BladesGrowth
                         // 精确切击：打出那一刻的手牌数（用户 2026-10-26 要求「按真实手牌数提前算」）
                         handAtPlay: handAtPlay,
                         // 群蛇形态：每张牌额外打 4（随机敌人、不吃力量；只画图，不额外造成伤害）
-                        serpentDamage: serpentHere,
+                        serpentDamage: Math.Max(serpentHere, play.SerpentDamage),
                         // 这张牌会被打几次（复制药水 / 爆发）：2 就要画成「4×2」
-                        playCount: playCount,
+                        // 复制药水 / 爆发 / **回响形态**（规划期已按额度算好）：2 就要画成「4×2」
+                        playCount: playCount * Math.Max(1, play.PlayCount),
                         // 铭记死亡：打出这张牌之前本回合已丢弃几张（规划期靠剧本累加）
                         discardsThisTurn: discardsAtPlay,
                         // 全身撞击：用手牌栏里这一手真正会有的格挡值（见上面 simBlock 注释）
