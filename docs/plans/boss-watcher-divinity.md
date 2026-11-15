@@ -340,3 +340,17 @@ WatcherCombatHelper.ChooseOne(PlayerChoiceContext, Player, IReadOnlyList<CardMod
 - `BossDefs.Watcher`：加 `HonorsNextTurnEnergyActs = new[] { 2 }`（三层 ⇒ act 索引 2）让这笔能量真的进预算。
 
 107 / 111 均 0 错误。
+
+## 第 10 轮（2026-11-15）—— 缺模组时换人（多人一致）
+
+用户：「如果玩家在一局游戏中遇到观者 boss，但他退出游戏并关闭了观者 mod，用一个别的 boss 替换原本的观者 boss，保证游戏能正常进行（多人时要保持同步）」。
+
+- BossKeys.SubstituteIfUnavailable(key)：key == WATCHER_BOSS 且**现在**探测不到观者模组 ⇒ 返回写死的 `FOOL_BOSS`（同为三层、同为 0.113 独占）。**不用随机数、不看本地设置** ⇒ 多人两端各跑一遍结果相同，不会分叉。
+- 接线点：`BossKeys.EncounterOf(key)` 开头先过一遍替换（`key = SubstituteIfUnavailable(key);`）⇒ 读档后要生成这只 Boss 时直接换成塔罗愚，房间能正常建立。
+- 日志：`观者 Boss：这一局是装过观者模组时开的，但现在探测不到它 ⇒ 换成塔罗愚继续`。
+
+107 / 111 均 0 错误。
+
+### 仍等用户确认
+
+「怪物获得 10 层真言也进神格」里的「怪物」指她自己还是别的怪物（见第 9 轮末尾的提问）。在此之前不动伤害侧代码，避免把她的 ×3 做成两份。

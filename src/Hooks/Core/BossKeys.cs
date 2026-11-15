@@ -340,6 +340,7 @@ internal static class BossKeys
     /// <summary>Key → 遭遇（正常流程与控制台用的是同一批，见 CharBossEncounters.TierEncounters）。</summary>
     internal static EncounterModel? EncounterOf(string? key)
     {
+        key = SubstituteIfUnavailable(key);
         switch (key)
         {
             case "IRONCLAD_ANGER": return ModelDb.Encounter<IroncladAngerBossEncounter>();
@@ -432,6 +433,27 @@ internal static class BossKeys
     /// 候选表里「按运行期条件才加入」的那几只（目前只有观者占位）。
     /// 装了观者 mod 才返回 `["WATCHER_BOSS"]`，否则空数组 —— 没装时行为和以前一模一样。
     /// </summary>
+    /// <summary>
+    /// **观者 Boss 的「缺模组就换人」兜底**（用户 2026-11-15）：
+    /// > 「如果玩家在一局游戏中遇到观者 boss，但他退出游戏并关闭了观者 mod，
+    /// >   用一个别的 boss 替换原本的观者 boss，保证游戏能正常进行（多人时要保持同步）」
+    ///
+    /// 判据：这一局记下/正在生成 `WATCHER_BOSS`，但**现在**探测不到观者模组。
+    /// 替换目标**写死** `FOOL_BOSS`（同为三层、同为 0.113 独占）—— 不用随机数、不看本地设置，
+    /// 多人两端各跑一遍得到的也是同一只 ⇒ 不会分叉。
+    /// </summary>
+    internal static string SubstituteIfUnavailable(string? key)
+    {
+        try
+        {
+            if (!string.Equals(key, "WATCHER_BOSS", StringComparison.Ordinal)) return key ?? string.Empty;
+            if (Core.WatcherModPresence.Installed) return key!;
+            Logger.Log("[CharBoss] 观者 Boss：这一局是装过观者模组时开的，但现在探测不到它 ⇒ 换成塔罗愚继续");
+            return "FOOL_BOSS";
+        }
+        catch { return key ?? string.Empty; }
+    }
+
     private static string[] WatcherRoster()
     {
         // ★ 2026-11-15（用户）：「让玩家在对局中暂时遇不到观者（因为还没做，别放半成品上去）」
