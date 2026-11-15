@@ -295,6 +295,7 @@ public sealed class FoolDominion : MegaCrit.Sts2.Core.Models.Dread.DominionModel
     }
 }
 #endif
+#if STS2_111
 
 /// <summary>
 /// **观者的支配**（用户 2026-11-15）：恐惧模式下「所有敌人获得 2 层虔信」。
@@ -329,3 +330,4 @@ public sealed class WatcherDevotionDominion : MegaCrit.Sts2.Core.Models.Dread.Do
         catch (Exception e) { Logger.Log("[CharBoss] 观者的支配失败: " + e.Message); }
     }
 }
+#endif
