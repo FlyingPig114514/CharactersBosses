@@ -159,7 +159,27 @@ public abstract partial class CharBossMonster
             // —— 对影子玩家不生效（下面第 129 行的 `pcs.Energy = …` 还会把任何到账的能量硬覆盖掉），
             // 于是三层「易伤战」第 3 回合只有 3 费、打不出「主宰」（用户 2026-10-25 实测）。
             // 这里按卡面直接补进本回合预算（原版那条已被 BossRelicSuppressChandelierPatch 压掉，不会双份）。
-            // 「佩尔之泪」：上回合结束时还有未花费能量 ⇒ 本回合 +2（自己记账，见上面 LeftoverEnergyLastTurn）
+            // ── 观者（神格观）的能量账（用户 2026-11-15 第 6 条）──
+            //   「第一回合默认 3（= 基础 2 + 灯笼 1），之后默认 2，进一次神格当回合 +3」。
+            //   基础能量来自 `BossDefs.Watcher.Energy = 2`；这里补两笔：
+            //     ① 第 1 回合的「灯笼」（Lantern：开场 +1 能量，原版挂 `AfterSideTurnStart`，影子玩家收不到）；
+            //     ② 本回合进过神格的次数 × 3（`BossDevotionPower` 每次进神格记账）。
+#if STS2_111
+            try
+            {
+                if (Creature?.GetPower<Powers.BossDevotionPower>() != null)
+                {
+                    int lantern = (TurnNumber <= 1 && HasRelic("LANTERN")) ? 1 : 0;
+                    int divinity = Powers.BossDevotionPower.TakePendingDivinityEnergy(this);
+                    if (lantern + divinity > 0)
+                    {
+                        energy += lantern + divinity;
+                        Logger.Log($"[CharBoss] 观者加费：灯笼 +{lantern}、神格 +{divinity} ⇒ 本回合 {energy} 能量");
+                    }
+                }
+            }
+            catch (Exception e) { Logger.Log("[CharBoss] 观者加费失败: " + e.Message); }
+#endif            // 「佩尔之泪」：上回合结束时还有未花费能量 ⇒ 本回合 +2（自己记账，见上面 LeftoverEnergyLastTurn）
             try
             {
                 int tears = BossHookBridge.PaelsTearsBonus(this);

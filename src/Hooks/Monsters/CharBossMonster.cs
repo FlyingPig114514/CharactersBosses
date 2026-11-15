@@ -1928,6 +1928,19 @@ public abstract partial class CharBossMonster : MonsterModel
 
             // 原版出牌队列会把「怪物打出的牌」当成远程玩家出牌挂一张卡面在屏幕中上方，且没人收走
             // ⇒ 打完之后立刻扫一遍把它藏掉（慢车道 4Hz 只是兜底，见 StrayBossCardQueuePatch）。
+            // ★ 2026-11-15（用户：「她打出聚能成刃时，向玩家展示她生成的那一张灭除之刃（要保证段数正确），
+            //   用事件机的羽化一样的方法展示」）——
+            //   聚能成刃（X 费）打完会在她手里生成一张「灭除之刃」，段数 = 刚才那个 X。
+            //   这里照「羽化」的做法用原版预览界面（`BossCardPreview.ShowAsync`）把它亮出来，
+            //   牌本身就是带 X 段的那张实体（`WithHitCount(X)` 由观者模组在生成时写死）⇒ 段数天然正确。
+#if STS2_111
+            try
+            {
+                if (SurpriseWatcherConjureShown(play.Card))
+                    MegaCrit.Sts2.Core.Helpers.TaskHelper.RunSafely(Core.BossCardPreview.ShowAsync(this, WatcherGeneratedCards(), 1.8f));
+            }
+            catch (Exception e) { Logger.Log("[CharBoss] 灭除之刃展示失败: " + e.Message); }
+#endif
             try { Patches.StrayBossCardQueuePatch.Reap(); } catch { /* 忽略 */ }
         }
         finally

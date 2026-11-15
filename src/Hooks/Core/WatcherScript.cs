@@ -29,9 +29,8 @@ public static class WatcherScript
     {
         var turns = new List<BossTurn>
         {
-            T("1. 许愿（永生不死）、打击（有费就打）、警惕（有费就打）、奇迹（不出）",
-                W(WatcherCards.Wish), W(WatcherCards.Strike), W(WatcherCards.Vigilance),
-                W(WatcherCards.Miracle, holdInstead: true)),
+            T("1. 许愿+（永生不死）、打击（有费就打）、警惕（有费就打）",
+                W(WatcherCards.Wish, upgraded: true), W(WatcherCards.Strike), W(WatcherCards.Vigilance)),
 
             T("2. 光辉、防御、敬拜（有费就打）、奇迹（不出）",
                 W(WatcherCards.Brilliance), W(WatcherCards.Defend), W(WatcherCards.Worship),

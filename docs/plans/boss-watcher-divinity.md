@@ -458,3 +458,18 @@ WatcherCombatHelper.ChooseOne(PlayerChoiceContext, Player, IReadOnlyList<CardMod
    `Hp = { 103, 103, 103, 103 }`（72 + 31）。
 
 107 / 111 均 0 错误 · `[verify] v0.2.671 OK` · 已安装。
+## 第 15 轮（2026-11-15）—— 用户实机七条
+
+| # | 用户反馈 | 处理 |
+|---|---|---|
+| 1 | 灯笼第一回合的加费没算 ⇒ 许愿不会被优先打出 | `CharBossMonster.PrepareTurn` 新增「观者加费」：`TurnNumber <= 1 && HasRelic("LANTERN")` ⇒ +1（原版挂 `AfterSideTurnStart`，影子玩家收不到） |
+| 2 | 「打出卡牌并没有让她**真的**获得真言，而是积累特殊效果的层数。这个特殊效果应该是没有层数的」 | `BossDevotionPower` 重写：`StackType.Single`（**不再显示层数**）；出牌 ⇒ `WatcherCards.GainMantraAsync`（观者自己的 `WatcherMod.Mantra` power = 界面上的真言图标）；她的回合开始 ⇒ 把那个 power 层数 −5（恐惧 −3）并**钳到 0** |
+| 3 | 进神格后「有费就打」的牌没打出去 | `WatchDivinity`：观察到「她这一下真的进了神格」⇒ +力量（3/4）、记本回合 +3 能量、`RefreshPlannedIntents` + `BossHandUi.RefreshForce` ⇒ 预算变大后下一张就打得出去 |
+| 4 | 第一回合手里仍有两张奇迹（至纯之水没拦住） | 按用户口径：**第 1 回合剧本里那张奇迹去掉**（至纯之水自己印的那张留着） |
+| 5 | 全难度升级许愿 | 第 1 回合 `W(WatcherCards.Wish, upgraded: true)` |
+| 6 | 费用口径怪 | 第 1 回合 3（2 + 灯笼）、之后每回合 2、**每进一次神格当回合 +3**（`TakePendingDivinityEnergy` 在 `PrepareTurn` 里兑现并清零） |
+| 7 | 打聚能成刃要展示生成的灭除之刃（像羽化那样，段数要对） | `PlayOne` 打完牌后：`IsConjureBlade` 且手里有 `WATCHER_EXPUNGER` ⇒ `BossCardPreview.ShowAsync`（原版预览界面）。牌是观者模组按当时 X **现场造的实体**（`WithHitCount(X)` 写在牌上）⇒ 段数天然正确 |
+
+新增 `src/Hooks/Monsters/CharBossMonster.Watcher.cs`（partial）：`IsConjureBlade` / `GeneratedExpungers` / `SurpriseWatcherConjureShown` / `WatcherGeneratedCards`。
+
+107 / 111 均 0 错误 · `[verify] v0.2.672 OK` · 已安装。

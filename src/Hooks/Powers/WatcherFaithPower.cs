@@ -46,10 +46,11 @@ public sealed class WatcherFaithPower : PowerModel
             var boss = WatcherBossOwning();
             if (boss == null) return;
 
-            var devotion = boss.Creature?.GetPower<BossDevotionPower>();
-            if (devotion == null) return;
+            if (boss.Creature?.GetPower<BossDevotionPower>() == null) return;
+            var shadow = boss.Shadow;
+            if (shadow == null) return;
 
-            await devotion.AddMantraAsync(new ThrowingPlayerChoiceContext(), amount);
+            await Core.WatcherCards.GainMantraAsync(shadow, amount, null);
             Logger.Log($"[CharBoss] 虔信：{Owner?.Name} 的回合开始 ⇒ 观者获得 {amount} 层真言");
         }
         catch (Exception e) { Logger.Log("[CharBoss] 虔信 buff 结算失败: " + e.Message); }

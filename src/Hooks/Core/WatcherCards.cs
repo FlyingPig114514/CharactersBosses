@@ -170,6 +170,60 @@ internal static class WatcherCards
         catch (Exception e) { Logger.Log("[CharBoss] 获得真言失败: " + e.Message); return Task.CompletedTask; }
     }
 
+    /// <summary>她身上**现在的**真言层数（观者 `WatcherMod.Mantra` 这个 power 的 Amount）。</summary>
+    internal static int MantraOf(Player? owner)
+    {
+        try
+        {
+            var powers = owner?.Creature?.Powers;
+            if (powers == null) return 0;
+            for (int i = 0; i < powers.Count; i++)
+            {
+                var p = powers[i];
+                if (p == null) continue;
+                if (!string.Equals(p.GetType().Name, "Mantra", StringComparison.Ordinal)) continue;
+                return (int)Math.Round((double)p.Amount);
+            }
+        }
+        catch { /* 忽略 */ }
+        return 0;
+    }
+
+    /// <summary>把真言直接改到指定层数（不转负由调用方保证）。</summary>
+    internal static void SetMantra(Player? owner, int value)
+    {
+        try
+        {
+            var powers = owner?.Creature?.Powers;
+            if (powers == null) return;
+            for (int i = 0; i < powers.Count; i++)
+            {
+                var p = powers[i];
+                if (p == null) continue;
+                if (!string.Equals(p.GetType().Name, "Mantra", StringComparison.Ordinal)) continue;
+                p.SetAmount(Math.Max(0, value), true);
+                return;
+            }
+        }
+        catch { /* 忽略 */ }
+    }
+
+    /// <summary>她现在是不是在神格里（观者 `WatcherMod.Divinity` 这个 power 在不在）。</summary>
+    internal static bool InDivinity(Player? owner)
+    {
+        try
+        {
+            var powers = owner?.Creature?.Powers;
+            if (powers == null) return false;
+            for (int i = 0; i < powers.Count; i++)
+            {
+                var p = powers[i];
+                if (p != null && string.Equals(p.GetType().Name, "Divinity", StringComparison.Ordinal)) return true;
+            }
+        }
+        catch { /* 忽略 */ }
+        return false;
+    }
     /// <summary>本场战斗累计获得过多少真言（观者自己的账本）。</summary>
     internal static int TotalMantraGained(Player? owner)
     {

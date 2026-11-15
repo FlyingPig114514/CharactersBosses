@@ -5528,3 +5528,6 @@ Chronological action log.
 | 2026-11-15 21:15 | write | `src/Hooks/Core/WatcherCricketRule.cs` | ok | 0 |
 | 2026-11-15 21:27 | write | `src/Hooks/Core/WatcherRuntimePatches.cs` | ok | 0 |
 | 2026-11-15 21:29 | write | `docs/plans/_recon/round11-note.md` | ok | 0 |
+| 2026-11-15 21:56 | write | `src/Hooks/Powers/BossDevotionPower.cs` | error | 0 |
+| 2026-11-15 21:57 | write | `src/Hooks/Powers/BossDevotionPower.cs` | ok | 0 |
+| 2026-11-15 21:58 | write | `src/Hooks/Monsters/CharBossMonster.Watcher.cs` | ok | 0 |
