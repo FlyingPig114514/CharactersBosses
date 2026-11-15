@@ -133,6 +133,19 @@ public sealed class BossDevotionPower : PowerModel
         try { await WatcherCards.EnterDivinityAsync(shadow, null); }
         catch (Exception e) { Logger.Log("[CharBoss] 虔信：进入神格失败: " + e.Message); }
 
+        // 进神格拿到的 3 点能量要能真的花出去：她的回合能量是被 `PrepareTurn` 硬写进去的（`pcs.Energy = 预算`）
+        // ⇒ 观者模组当场加的那 3 点会被覆盖掉。这里记进「下回合能量加成」，和「星星 / 佩尔之泪」同一条通道
+        // （`BossDefinition.HonorsNextTurnEnergyActs` 已声明第三幕）。
+        try
+        {
+            if (boss != null)
+            {
+                boss.NextTurnEnergyBonus += 3;
+                Logger.Log("[CharBoss] 虔信：进神格 +3 能量已记入她下回合的能量预算");
+            }
+        }
+        catch { /* 纯能量记账 */ }
+
         // 进神格会额外给 3 点能量，可能让「有费就打」的牌打得出去 ⇒ 意图必须重算
         try { boss?.RefreshPlannedIntents(); } catch { /* 下一帧刷新 */ }
         try { UI.BossHandUi.RefreshForce(boss!); } catch { /* 纯显示 */ }

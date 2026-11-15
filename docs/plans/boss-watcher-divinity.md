@@ -322,3 +322,21 @@ WatcherCombatHelper.ChooseOne(PlayerChoiceContext, Player, IReadOnlyList<CardMod
 - 新增 `src/Hooks/Core/WatcherCricketRule.cs`（111 独占）：对手是角色 Boss ⇒ 他出牌 +1 真言（`BossDevotionPower.AfterCardPlayed` 本来就覆盖，对方 Boss 的牌 Owner 是对方影子玩家）；否则开局给她 3 层 `WatcherFaithPower`（每回合开始 +3 真言）。判据 = 场上除自己外还有没有第二只 `CharBossMonster`；只在 `CricketCompat.Installed` 时生效；接线点在 `FireCombatStart`。
 - 进阶 9 手摇鼓：新增 `BossDefs.RefreshWatcherExtras()`（幂等，解析到 `WatcherMod.Damaru` 后追加 `(9, 3, damaru, null)`），由 `BossDefValidator` 调。
 - 107 / 111 均 0 错误。
+
+## 第 9 轮（2026-11-15）—— X 费段数联动 + 神格能量入预算
+
+### 聚能成刃 → 灭除之刃 的段数
+
+聚能成刃（`WATCHER_CONJURE_BLADE`）是 X 费牌，打出时生成一张灭除之刃（`WATCHER_EXPUNGER`），那张牌的段数 = 打聚能成刃时的 X。
+
+- `BossScriptPlanner`：新增局部 `conjuredX`。规划到她打 **聚能成刃** 时记下 `cost`（= 那一刻剩余能量，已含奇迹给的 1 费），之后遇到 **灭除之刃** 就把 `xHits = X − 1` 递进去（`IntentsFor` 对非 X 牌也认 `xHits`，按 `1 + xHits` 还原段数）。
+- 用户口径对上：第 3 回合奇迹 +1 与回合开始 2 费 ⇒ X=3 ⇒ 3 段；进了神格多 3 费 ⇒ X=6 ⇒ 6 段；多次进神格同理。
+
+### 进神格给的 3 点能量要真的能花
+
+她的回合能量是 `PrepareTurn` 里硬写进去的（`pcs.Energy = 预算`）⇒ 观者模组**当场**加的 3 点会被下次覆盖掉。
+
+- `BossDevotionPower.TriggerDivinity`：进神格后 `boss.NextTurnEnergyBonus += 3`（和「星星 / 佩尔之泪」同一条通道）；
+- `BossDefs.Watcher`：加 `HonorsNextTurnEnergyActs = new[] { 2 }`（三层 ⇒ act 索引 2）让这笔能量真的进预算。
+
+107 / 111 均 0 错误。

@@ -199,6 +199,7 @@ public static class BossScriptPlanner
         //   炼药猎那条是 `BladesGrowth.RecomputeAll` 顺手算的，可它**有球位就直接 return**
         //   （塔罗愚第 4 回合「魔术师」之后就永久有球位）⇒ 必须在规划期按剧本顺序自己算，
         //   并存进 `PlannedPlay.SerpentDamage` 供两条重算路径原样再用。
+        int conjuredX = 0;   // 观者「聚能成刃」本回合花掉的 X（⇐ 后面「灭除之刃」的段数）
         int serpentNow = SerpentStacksOf(boss.Creature);   // 身上已有的层数（之前的回合拿到的）
         int serpentSoFar = 0;                              // 本回合剧本里、排在当前牌**之前**会拿到的层数
 
@@ -512,6 +513,22 @@ public static class BossScriptPlanner
             //   · 辐射 `Radiate`：段数 = **本回合获得过的辉星数**（战斗历史里的正数 `StarsModifiedEntry`）。
             //   两者的段数在规划期都算不出来（历史空 / 还没花星）⇒ 由这里按剧本顺序把数递进去。
             string entryNow = SafeEntry(card);
+            // 观者「聚能成刃」（X 费牌）⇒ 打出时生成一张「灭除之刃」，那张牌的**段数 = 这里的 X**
+            // （用户 2026-11-15：奇迹 +1、回合开始 2 费 ⇒ X=3 ⇒ 灭除之刃 3 段；进了神格多 3 费 ⇒ X=6 ⇒ 6 段）。
+            // `IntentsFor` 对非 X 牌也认 `xHits`（按 `1 + xHits` 还原段数），所以这里直接把 X−1 递进去。
+            try
+            {
+                if (string.Equals(entryNow, "WATCHER_CONJURE_BLADE", StringComparison.Ordinal))
+                {
+                    conjuredX = Math.Max(0, cost);
+                    if (conjuredX > 0) Logger.Log($"[CharBoss] 聚能成刃：本回合 X={conjuredX} ⇒ 之后的灭除之刃 {conjuredX} 段");
+                }
+                else if (string.Equals(entryNow, "WATCHER_EXPUNGER", StringComparison.Ordinal) && conjuredX > 0)
+                {
+                    xHits = Math.Max(0, conjuredX - 1);
+                }
+            }
+            catch { /* 纯预览 */ }
             int starHits = -1;
             // 回响形态：这一张会不会被打两次（额度用完就回到 1 次）
             // ★ 用户 2026-11-14：「月亮要把小刀打出时会触发的群蛇形态伤害列出来（4×10 或恐惧 6×10，
