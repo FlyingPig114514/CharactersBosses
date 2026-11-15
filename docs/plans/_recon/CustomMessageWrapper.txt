@@ -1,0 +1,134 @@
+﻿// ===== BaseLib.Abstracts.CustomMessageWrapper =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using BaseLib.Extensions;
+using MegaCrit.Sts2.Core.Helpers;
+using MegaCrit.Sts2.Core.Logging;
+using MegaCrit.Sts2.Core.Multiplayer.Game;
+using MegaCrit.Sts2.Core.Multiplayer.Serialization;
+using MegaCrit.Sts2.Core.Multiplayer.Transport;
+using MegaCrit.Sts2.Core.Runs;
+
+namespace BaseLib.Abstracts;
+
+[RequiredMember]
+public sealed class CustomMessageWrapper : INetMessage, IPacketSerializable
+{
+	[RequiredMember]
+	public ICustomMessage Message;
+
+	private static List<System.Type>? _customMessages;
+
+	private static readonly Dictionary<System.Type, int> CustomMessageToId = new Dictionary<System.Type, int>();
+
+	private static readonly Dictionary<int, System.Type> IdToCustomMessage = new Dictionary<int, System.Type>();
+
+	[field: CompilerGenerated]
+	public static byte WrapperMessageId
+	{
+		[CompilerGenerated]
+		get;
+		[CompilerGenerated]
+		set;
+	}
+
+	public static List<System.Type> CustomMessages
+	{
+		get
+		{
+			if (_customMessages == null)
+			{
+				_customMessages = Enumerable.ToList<System.Type>(ReflectionHelper.GetSubtypesInMods<ICustomMessage>());
+				_customMessages.Sort((Comparison<System.Type>)((System.Type a, System.Type b) => string.Compare(a.FullName, b.FullName, (StringComparison)4)));
+			}
+			return _customMessages;
+		}
+	}
+
+	public int MessageType => CustomMessageToId[((object)Message).GetType()];
+
+	public bool ShouldBroadcast => Message.ShouldBroadcast;
+
+	public bool ShouldBuffer => Message.ShouldBuffer;
+
+	public NetTransferMode Mode => Message.Mode;
+
+	public LogLevel LogLevel => Message.LogLevel;
+
+	public static void Initialize()
+	{
+		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+		Enumerator<System.Type> enumerator = CustomMessages.GetEnumerator();
+		try
+		{
+			System.Type type = default(System.Type);
+			while (enumerator.MoveNext())
+			{
+				System.Type current = enumerator.Current;
+				int i;
+				for (i = (current.FullName ?? ((MemberInfo)current).Name).ComputeBasicHash(); IdToCustomMessage.TryGetValue(i, ref type); i++)
+				{
+					BaseLibMain.Logger.Warn($"Message key hash collision: {type} and {current} with key {i}", 1);
+				}
+				IdToCustomMessage[i] = current;
+				CustomMessageToId[current] = i;
+			}
+		}
+		finally
+		{
+			((System.IDisposable)enumerator/*cast due to .constrained prefix*/).Dispose();
+		}
+	}
+
+	internal static void Register(INetGameService messageBuffer)
+	{
+		messageBuffer.RegisterMessageHandler<CustomMessageWrapper>((MessageHandlerDelegate<CustomMessageWrapper>)HandleCustomMessage);
+	}
+
+	internal static void Unregister(INetGameService messageBuffer)
+	{
+		messageBuffer.UnregisterMessageHandler<CustomMessageWrapper>((MessageHandlerDelegate<CustomMessageWrapper>)HandleCustomMessage);
+	}
+
+	private static void HandleCustomMessage(CustomMessageWrapper message, ulong senderId)
+	{
+		message.Message.HandleMessage(senderId);
+	}
+
+	public void Serialize(PacketWriter writer)
+	{
+		writer.WriteInt(MessageType, 32);
+		((IPacketSerializable)Message).Serialize(writer);
+	}
+
+	public void Deserialize(PacketReader reader)
+	{
+		int num = reader.ReadInt(32);
+		System.Type type = IdToCustomMessage[num];
+		Message = (ICustomMessage)Activator.CreateInstance(type);
+		((IPacketSerializable)Message).Deserialize(reader);
+	}
+
+	public static void Send(ICustomMessage msg, INetGameService? netService = null)
+	{
+		(netService ?? RunManager.Instance.NetService).SendMessage<CustomMessageWrapper>(new CustomMessageWrapper
+		{
+			Message = msg
+		});
+	}
+
+	[Obsolete("Constructors of types with required members are not supported in this version of your compiler.", true)]
+	[CompilerFeatureRequired("RequiredMembers")]
+	public CustomMessageWrapper()
+	{
+	}
+}
+
+// ===== BaseLib.Abstracts.CustomMessageWrapper.<>O =====
+// ERROR: Could not find type definition BaseLib.Abstracts.CustomMessageWrapper.<>O in type system.
+// ===== BaseLib.Abstracts.CustomMessageWrapper.<>c =====
+// ERROR: Could not find type definition BaseLib.Abstracts.CustomMessageWrapper.<>c in type system.

@@ -151,6 +151,8 @@ internal static class BossPicksSync
             var net = MegaCrit.Sts2.Core.Runs.RunManager.Instance?.NetService;
             if (net == null) return;
 
+            // ★ 2026-11-15：先确认 BaseLib 已经认识 BossPicksMessage（否则它会抛 KeyNotFound ⇒ 广播失败）
+            try { BaseLibMessageRegistration.TryFix(); } catch { /* 忽略 */ }
             CustomMessageWrapper.Send(new BossPicksMessage { Payload = payload, Settings = settings }, net);
             _lastSent = combined;
             Logger.Log($"[CharBoss] 勾选同步：房主已广播本局勾选 + 玩法设置（勾选={payload}；设置={settings}）" +

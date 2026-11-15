@@ -41,6 +41,7 @@ public sealed class BossDevourLifePower : PowerModel
     public override bool ShouldPlayVfx => false;
 
     private int _logs;
+    private int _guestLogs;
 
     private static string SafeEntry(PowerModel? power)
     {
@@ -105,6 +106,18 @@ public sealed class BossDevourLifePower : PowerModel
                               && amount > 0m);                                  // 只认「加层」，衰减（−1）不算
             if (!fromHer) return;
 
+            // ★★ 2026-11-15（玩家反馈：「联机给血肉骨上 debuff 会不同步」，日志 mod_log(26) 22:23:12）：
+            //   这个钩子**每台机器都会跑一遍**，而下面直接改战斗状态（她自己 +格挡、被上负面的玩家补血肉戏法伤害）。
+            //   两端各算一遍 —— 一侧跑、另一侧没跑，或者先后顺序不同 —— 就会让 Boss 的格挡 / 玩家血量分叉
+            //   （日志里 `⚠ 不同步状态摘要（轮次 2）` 正是在玩家给她上易伤 / 魔力灼烧那两行之后出现的）。
+            //   处理原则与本仓库既有的「战斗状态只在**一个确定的地方**改」一致：
+            //   **只有房主（或单人）真正结算**，客人只打一行日志，数值由房主的战况同步过来。
+            if (!NetRole.IsHostOrSolo)
+            {
+                if (_guestLogs++ < 3)
+                    Logger.Log("[CharBoss] 吞噬生命：本机是客人 ⇒ 只记录、不改状态（避免联机不同步）");
+                return;
+            }
             await CreatureCmd.GainBlock(owner, FleshBone.DevourBlockNow, ValueProp.Unpowered, null);
 
             // ★ 2026-11-10 第二轮（用户：「命运同担还是不对玩家造成伤害」）：

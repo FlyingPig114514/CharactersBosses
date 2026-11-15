@@ -493,3 +493,18 @@ WatcherCombatHelper.ChooseOne(PlayerChoiceContext, Player, IReadOnlyList<CardMod
 2. **补打之后刷新意图**：原来「回合中补打」这条通道只打牌、不重排意图 ⇒ 玩家看到的意图还是旧的（用户：「意图没有刷新她要打额外的牌」）。现在补打循环结束后 `RefreshPlannedIntents()` + `BossHandUi.RefreshForce`。
 
 107 / 111 均 0 错误 · `[verify] v0.2.675 OK` · 已安装。
+
+## 第 19 轮（2026-11-15）—— 联机不同步（玩家反馈，血肉骨）
+
+日志 `mod_log (26).txt`（v0.2.667，Host）：
+```n[22:23:12] 吞噬生命钩子：power=VULNERABLE_POWER amount=1 目标=亡灵契约师 … 钩子施加者=infrared
+[22:23:12] 吞噬生命钩子：power=AWAKENED-MANABURN_POWER amount=8 目标=亡灵契约师 …
+… ⚠ 不同步状态摘要（检测到不同步）：轮次 2
+```
+
+1. **根因**：`BossDevourLifePower.AfterPowerAmountChanged` 在每台机器上都会跑，而它在里面**直接改战斗状态**（`CreatureCmd.GainBlock` + 补血肉戏法伤害）⇒ 两端各算一遍、次序还可能不同 ⇒ Boss 格挡 / 玩家血量分叉。
+   **修法**：在真正结算之前加门禁 —— `if (!NetRole.IsHostOrSolo) { 记一行日志; return; }`，只让房主（或单人）结算，客人只记录。
+2. **顺带修**：日志里另一条独立问题 `勾选同步：广播失败（客人将退回整张候补表）: The given key 'CharacterBosses.Core.BossPicksMessage' was not present in the dictionary` —— 反编译 `BaseLib.Abstracts.CustomMessageWrapper`：它用 `_customMessages ??= ReflectionHelper.GetSubtypesInMods<ICustomMessage>()` **只扫一次并缓存**，我们这套「外壳 + Impl107/111 两份 DLL」的实现在扫描时还没被登记 ⇒ `CustomMessageToId` 里没有我们的消息 ⇒ `Send` 抛 KeyNotFound ⇒ 房主勾选广播失败（阵容候选两端就有机会不一致）。
+   新增 `Core/BaseLibMessageRegistration.cs`（纯反射、不引 BaseLib）：发消息前清掉 `_customMessages` 并重跑公开的 `Initialize()`；BaseLib 的 id 分配是「按 FullName 排序 + 哈希避让」**确定性**的 ⇒ 同一个模组集合的两端重算结果一致，不会分叉。接在 `BossPicksSync.BroadcastIfHost` 的 Send 之前。
+
+107 / 111 均 0 错误 · 16 语言通过 · `[verify] v0.2.676 OK` · 已安装（需两端同版本再测）。

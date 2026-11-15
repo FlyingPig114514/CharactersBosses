@@ -5531,3 +5531,4 @@ Chronological action log.
 | 2026-11-15 21:56 | write | `src/Hooks/Powers/BossDevotionPower.cs` | error | 0 |
 | 2026-11-15 21:57 | write | `src/Hooks/Powers/BossDevotionPower.cs` | ok | 0 |
 | 2026-11-15 21:58 | write | `src/Hooks/Monsters/CharBossMonster.Watcher.cs` | ok | 0 |
+| 2026-11-15 22:32 | write | `src/Hooks/Core/BaseLibMessageRegistration.cs` | ok | 0 |
