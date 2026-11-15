@@ -427,3 +427,16 @@ WatcherCombatHelper.ChooseOne(PlayerChoiceContext, Player, IReadOnlyList<CardMod
 验证：PCK 里已含 `res://CharacterBosses/images/map/watcher_divinity.png` / `..._outline.png`（打包 extra 106 个文件）。
 
 107 / 111 均 0 错误 · 16 语言检查通过 · `[verify] v0.2.669 OK` · 已安装。
+## 第 13 轮（2026-11-15）—— 遗物订正 + 前两回合补「奇迹（不出）」
+
+用户三条：
+
+1. **初始遗物是「至纯之水」不是「圣水」** ⇒ `WatcherScript.Relics()` 把 `WatcherCards.T("HolyWater")` 换成 `WatcherCards.T("PureWater")`
+   （观者 zhs relics.json：`圣水 = HOLY_WATER`、`至纯之水 = PURE_WATER`；dll 里是 `WatcherMod.PureWater`）。
+2. **第 1、2 回合末尾各补一张「奇迹（不出）」** ⇒ `W(WatcherCards.Miracle, holdInstead: true)`；
+   `ScriptCard.HoldInstead` 的口径是「**即使有费也不出**，留在手里、下回合照常按剧本出」（规划期跳过：不耗能、不出牌、不产生意图）。
+   `W()` 加了 `holdInstead` 参数。
+3. **拦掉原版的抽牌印牌** ⇒ `BossDefs.Watcher.BlocksVanillaDraw = true` 本来就有（走 `ShadowBossNoDrawPatch`，
+   和塔罗愚同一条通路），这次确认在位上。
+
+107 / 111 均 0 错误 · `[verify] v0.2.670 OK` · 已安装。

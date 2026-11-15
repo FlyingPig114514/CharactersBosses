@@ -29,11 +29,13 @@ public static class WatcherScript
     {
         var turns = new List<BossTurn>
         {
-            T("1. 许愿（永生不死）、打击（有费就打）、警惕（有费就打）",
-                W(WatcherCards.Wish), W(WatcherCards.Strike), W(WatcherCards.Vigilance)),
+            T("1. 许愿（永生不死）、打击（有费就打）、警惕（有费就打）、奇迹（不出）",
+                W(WatcherCards.Wish), W(WatcherCards.Strike), W(WatcherCards.Vigilance),
+                W(WatcherCards.Miracle, holdInstead: true)),
 
-            T("2. 光辉、防御、敬拜（有费就打）",
-                W(WatcherCards.Brilliance), W(WatcherCards.Defend), W(WatcherCards.Worship)),
+            T("2. 光辉、防御、敬拜（有费就打）、奇迹（不出）",
+                W(WatcherCards.Brilliance), W(WatcherCards.Defend), W(WatcherCards.Worship),
+                W(WatcherCards.Miracle, holdInstead: true)),
 
             T("3. 奇迹、聚能成刃（X 费）、供奉、贪婪",
                 W(WatcherCards.Miracle), W(WatcherCards.ConjureBlade),
@@ -92,7 +94,7 @@ public static class WatcherScript
     public static List<Type> Relics()
     {
         var relics = new List<Type>();
-        if (WatcherCards.T("HolyWater") is Type holy) relics.Add(holy);
+        if (WatcherCards.T("PureWater") is Type pure) relics.Add(pure);      // 至纯之水（观者初始遗物；用户 2026-11-15 订正：不是圣水）
         relics.Add(typeof(CharacterBosses.Relics.NeowBlessing));                    // 涅奥的祝福（我们自己复制的一份）
         relics.Add(typeof(MegaCrit.Sts2.Core.Models.Relics.Lantern));
         relics.Add(typeof(MegaCrit.Sts2.Core.Models.Relics.PaelsLegion));
@@ -119,7 +121,7 @@ public static class WatcherScript
     }
 
     /// <summary>观者的牌：类型是运行期反射拿的，取不到就返回 null（这一格会被剔掉）。</summary>
-    private static ScriptCard? W(Type? card, bool upgraded = false, int upgradeMinAscension = 0)
+    private static ScriptCard? W(Type? card, bool upgraded = false, int upgradeMinAscension = 0, bool holdInstead = false)
     {
         if (card == null) return null;
         return new ScriptCard
@@ -127,6 +129,7 @@ public static class WatcherScript
             Card = card,
             Upgraded = upgraded,
             UpgradeMinAscension = upgradeMinAscension,   // 进阶 8 起升级「摆手」
+            HoldInstead = holdInstead,                   // 有费也不出（留在手里）
             From = "deck",
         };
     }
