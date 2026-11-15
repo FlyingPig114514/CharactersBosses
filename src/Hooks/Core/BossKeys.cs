@@ -460,12 +460,14 @@ internal static class BossKeys
 
     private static string[] WatcherRoster()
     {
-        // ★ 2026-11-15（用户）：「让玩家在对局中暂时遇不到观者（因为还没做，别放半成品上去）」
-        //   ⇒ 占位的定义 / 怪物 / 遭遇 / 探测全部保留（下一轮做设计时直接接上），
-        //     但**暂时不进候选表**：等真正的设计做完，把下面这三行恢复即可
-        //     （`if (Core.WatcherModPresence.Installed) return new[] { "WATCHER_BOSS" };`）。
+        // ★ 2026-11-15 第二轮（用户要「神格观」上场）：设计做完 ⇒ **恢复登场**。
+        //   条件：装了观者模组（工坊 3747526116）才进候选表；没装时行为和以前一模一样。
 #if STS2_111
-        // 未完成，先不上场。
+        try
+        {
+            if (Core.WatcherModPresence.Installed) return new[] { "WATCHER_BOSS" };
+        }
+        catch { /* 探测失败就当没装 */ }
 #endif
         return Array.Empty<string>();
     }

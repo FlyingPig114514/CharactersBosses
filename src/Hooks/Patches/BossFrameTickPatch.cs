@@ -665,7 +665,7 @@ public static class BossFrameTick
             try { Core.MintySpireDamagePreviewCompat.TryInstall(); } catch { /* 忽略 */ }
 #if STS2_111
             // 「许愿」固定选「永生不死」：观者模组可能比我们晚加载 ⇒ 放慢车道里重试（幂等）
-            try { WatcherWishChoiceCompat.TryInstall(); } catch { /* 忽略 */ }
+            try { Core.WatcherRuntimePatches.TryInstall(); } catch { /* 忽略 */ }
 #endif
             // ★ 2026-11-05（用户：「召唤的 2 个仆从叠一起了，让它们分开」）：
             //   仆从是战斗中陆续召出来的，`PositionEnemies` 只在进战斗/重排时跑一次 ⇒

@@ -5526,3 +5526,5 @@ Chronological action log.
 | 2026-11-15 21:09 | write | `src/Hooks/Patches/WatcherWishChoiceCompat.cs` | ok | 0 |
 | 2026-11-15 21:11 | write | `src/Hooks/Powers/WatcherFaithPower.cs` | ok | 0 |
 | 2026-11-15 21:15 | write | `src/Hooks/Core/WatcherCricketRule.cs` | ok | 0 |
+| 2026-11-15 21:27 | write | `src/Hooks/Core/WatcherRuntimePatches.cs` | ok | 0 |
+| 2026-11-15 21:29 | write | `docs/plans/_recon/round11-note.md` | ok | 0 |

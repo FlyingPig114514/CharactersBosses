@@ -354,3 +354,44 @@ WatcherCombatHelper.ChooseOne(PlayerChoiceContext, Player, IReadOnlyList<CardMod
 ### 仍等用户确认
 
 「怪物获得 10 层真言也进神格」里的「怪物」指她自己还是别的怪物（见第 9 轮末尾的提问）。在此之前不动伤害侧代码，避免把她的 ×3 做成两份。
+
+## 第 11 轮（2026-11-15）—— 神格观登场 + 两处补丁改成运行期挂
+
+### ① 恢复登场
+
+`BossKeys.WatcherRoster()` 不再返回空：装了观者模组（工坊 3747526116）时返回 `["WATCHER_BOSS"]`
+⇒ **三层 1 号候选里会有神格观**；没装时行为和以前完全一致。
+
+### ② 两处补丁挂载失败的根因与修法（重要）
+
+第一次装上后日志出现：
+
+```
+补丁类 WatcherDivinityKeepPatch 挂载失败: HarmonyException: Patching exception in method null
+补丁类 WatcherWishChoiceCompat 挂载失败: HarmonyException: Patching exception in method null
+```
+
+两个原因都找到了：
+
+1. **`AfterSideTurnEnd` 是 `AbstractModel` 上的虚方法，而观者的 `WatcherMod.Divinity` 是覆写**
+   ⇒ 用 `[HarmonyPatch(typeof(PowerModel), nameof(...))]` 去补**基类声明**，Harmony 在 `PowerModel` 上
+   找不到**声明**的方法（method null）；而且就算补上基类也拦不到派生类的覆写。
+2. `WatcherWishChoiceCompat` 本来就没有 `[HarmonyPatch]` 特性（它是运行期挂的），但 `ModEntry` 会扫
+   `CharacterBosses.Patches` 命名空间里所有类去 `PatchAll` ⇒ 必然抛一次（无害但污染日志）。
+
+修法：两处合并成 `src/Hooks/Core/WatcherRuntimePatches.cs`（放在 `Core` 命名空间，不被扫），**都用运行期 Harmony**：
+
+- `WatcherCards.T("Divinity").GetMethod("AfterSideTurnEnd")` → 拿到**覆写本身**的 MethodInfo 再挂 prefix；
+- `WatcherCombatHelper.ChooseOne` 同上；
+- 统一由慢车道 `Core.WatcherRuntimePatches.TryInstall()` 幂等调用（观者模组可能后加载 ⇒ 可重试）。
+
+修完重启验证：**那两行挂载失败消失了**（只剩既有的 MintySpire 兼容补丁那条）。
+
+### 现状
+
+107 / 111 均 0 错误；`[verify] v0.2.668 OK`；16 语言检查通过；已安装并重启游戏。
+早前日志里已经出现过她真的在打牌的证据：`[Cinematic] play '打击' attacker=观者`（`WATCHER_STRIKE_P` 6 点伤害）。
+
+### 仍等用户确认
+
+「怪物获得 10 层真言也进神格」里的「怪物」指她自己还是别的怪物。
