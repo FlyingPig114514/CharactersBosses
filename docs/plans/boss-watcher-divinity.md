@@ -479,3 +479,10 @@ WatcherCombatHelper.ChooseOne(PlayerChoiceContext, Player, IReadOnlyList<CardMod
 2. **说明框文案**：去掉特殊效果正文的首行白色「虔信」（上方黄色 buff 名已表达）；神格说明里三个能量图标后面的「能量」删掉。16 语言 ×（monsters 2 键 + powers 2 键）共 64 条一起改，`check-localization` 全绿。
 
 107 / 111 均 0 错误 · `[verify] v0.2.673 OK` · 已安装。
+
+## 第 17 轮（2026-11-15）
+
+1. **第 2 回合默认 4 费**：`TurnNumber` 是 0 起，`TurnNumber <= 1` 在第 2 回合也成立 ⇒ 灯笼那 1 点又被算一遍。改成一次性标志 `_watcherLanternGiven`（给过就不再给）。
+2. **进神格后打击/警惕不打**：原来「回合中又拿到资源 ⇒ 按剧本补打」这条门禁只给灵魂骨和三层第 3 回合开，观者进神格多出来的是**同回合**的能量，同样需要补打 ⇒ 门禁加上 `BossDevotionPower`（`#if STS2_111`）。
+
+107 / 111 均 0 错误 · `[verify] v0.2.674 OK` · 已安装。

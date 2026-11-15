@@ -169,7 +169,9 @@ public abstract partial class CharBossMonster
             {
                 if (Creature?.GetPower<Powers.BossDevotionPower>() != null)
                 {
-                    int lantern = (TurnNumber <= 1 && HasRelic("LANTERN")) ? 1 : 0;
+                    // 灯笼只在**第一次**算一次（`TurnNumber` 是 0 起，用 <= 1 会在第 2 回合再算一遍 ⇒ 用户实测第 2 回合 4 费）
+                    int lantern = (!_watcherLanternGiven && HasRelic("LANTERN")) ? 1 : 0;
+                    if (lantern > 0) _watcherLanternGiven = true;
                     int divinity = Powers.BossDevotionPower.TakePendingDivinityEnergy(this);
                     if (lantern + divinity > 0)
                     {

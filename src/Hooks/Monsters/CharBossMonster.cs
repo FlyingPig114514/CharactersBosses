@@ -365,6 +365,8 @@ public abstract partial class CharBossMonster : MonsterModel
 
     /// <summary>上一回合结束时**实际**还剩多少能量（「佩尔之泪」据此给本回合 +2，见 BossHookBridge.PaelsTearsBonus）。</summary>
     internal int LeftoverEnergyLastTurn;
+    /// <summary>观者的「灯笼」那 1 点能量只给一次（TurnNumber 是 0 起，用 &lt;= 1 会在第 2 回合再给一遍）。</summary>
+    internal bool _watcherLanternGiven;
 
     /// <summary>本回合的「倒吊人额外回合」是否已经触发过（每回合开始清零）。</summary>
     internal bool _extraTurnFired;
@@ -1087,7 +1089,12 @@ public abstract partial class CharBossMonster : MonsterModel
         try
         {
             bool act3Turn3 = ActIndex == 2 && TurnNumber == 3;
-            bool honorLeftoverReplay = Creature?.GetPower<Powers.BossSoulBoundPower>() != null || act3Turn3;
+            bool honorLeftoverReplay = Creature?.GetPower<Powers.BossSoulBoundPower>() != null || act3Turn3
+#if STS2_111
+                // ★ 观者：进神格会多 3 点能量 ⇒ 本回合里也要按剧本把「有费就打」的牌补上
+                || Creature?.GetPower<Powers.BossDevotionPower>() != null
+#endif
+                ;
             var scriptedTurn = Def.ScriptForAct(ActIndex)?.TurnAt(TurnNumber);
             if (honorLeftoverReplay && scriptedTurn != null && !Creature.IsDead
                 && pcs.Hand.Cards.Count > 0 && pcs.Energy > 0)
