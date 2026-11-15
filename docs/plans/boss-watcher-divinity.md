@@ -270,3 +270,29 @@ var chosen  = await WatcherCombatHelper.ChooseOne(choiceContext, Owner, options,
 **下一轮做这个（先只对「牌是 WATCHER_WISH_P」时生效，收得比 owner 更紧）。**
 
 107 / 111 均 0 错误。
+
+## 第 6 轮（2026-11-15）—— 许愿固定选「永生不死」
+
+新增 src/Hooks/Patches/WatcherWishChoiceCompat.cs（111 独占）：**运行期**给观者的
+WatcherCombatHelper.ChooseOne(PlayerChoiceContext, Player, IReadOnlyList<CardModel>, LocString, bool)
+挂 Harmony prefix（别人的类型不能编译期 [HarmonyPatch]，先例见 Core/MintySpireDamagePreviewCompat）。
+
+命中条件（两个都满足才短路）：
+1. owner 是我们某只 Boss 的**影子玩家**（ReferenceEquals(boss.Shadow, owner)）；
+2. 候选项里存在 WatcherWishLiveForever（**只有「许愿」会开出这张**，所以不会误伤观者其它几十张也用 ChooseOne 的牌）。
+
+命中后 __result = Task.FromResult(liveForever)、eturn false ⇒ 她永远许「永生不死」（WishPlatedArmorPower）。
+
+安装时机：幂等，挂在每帧慢车道（BossFrameTickPatch 里 MintySpireDamagePreviewCompat.TryInstall() 旁边）——
+观者模组可能比我们晚加载，所以必须能重试。日志：许愿固定选项：已挂上观者的 ChooseOne。
+
+107 / 111 均 0 错误。
+
+### 恐惧支配的设计（下一轮实现）
+
+用户：「恐惧模式时观者的支配：**所有敌人获得 2 层虔信**。」
+结合斗蛐蛐那条「观者在战斗开始时获得 3 层**虔信**（buff，回合开始时获得 3 真言）」可知：
+**虔信 = 一个「回合开始时产生真言」的 buff**。所以支配的含义是：战斗开始时给**每位玩家** 2 层虔信，
+他们每人回合开始 ⇒ 观者得到真言（支配是给 Boss 加码的，和愚者「塞 2 张悲伤」同向）。
+落地需要：WatcherFaithPower（挂在玩家身上、回合开始给观者 +N 真言）+ WatcherDevotionDominion
++ CharBossEncounterBase.GetDominion() 按角色分流 + 16 语言 scension.json 文案。

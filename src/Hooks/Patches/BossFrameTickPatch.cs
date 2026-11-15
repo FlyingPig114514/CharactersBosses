@@ -663,6 +663,10 @@ public static class BossFrameTick
             //   之后永远没有「已给她补上」那一行）。这里放到 4Hz 慢车道里持续重试
             //   （`TryInstall` 内部只在「程序集数量变了」时才真的扫类型，装好之后立刻早退，开销可忽略）。
             try { Core.MintySpireDamagePreviewCompat.TryInstall(); } catch { /* 忽略 */ }
+#if STS2_111
+            // 「许愿」固定选「永生不死」：观者模组可能比我们晚加载 ⇒ 放慢车道里重试（幂等）
+            try { WatcherWishChoiceCompat.TryInstall(); } catch { /* 忽略 */ }
+#endif
             // ★ 2026-11-05（用户：「召唤的 2 个仆从叠一起了，让它们分开」）：
             //   仆从是战斗中陆续召出来的，`PositionEnemies` 只在进战斗/重排时跑一次 ⇒
             //   后召出来的那只没被摆过，就和前一只重叠。这里放慢车道兜一次（纯坐标，不改状态）。
