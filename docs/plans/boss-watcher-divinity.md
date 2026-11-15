@@ -317,3 +317,8 @@ WatcherCombatHelper.ChooseOne(PlayerChoiceContext, Player, IReadOnlyList<CardMod
 - 16 语言 scension.json 新增 DREAD.WATCHER.description（观者的支配：每场战斗开始时，所有玩家获得 2 层虔信…）。check-localization 全绿。
 
 107 / 111 均 0 错误。
+## 第 8 轮（2026-11-15）—— 斗蛐蛐两条规则 + 进阶 9 手摇鼓
+
+- 新增 `src/Hooks/Core/WatcherCricketRule.cs`（111 独占）：对手是角色 Boss ⇒ 他出牌 +1 真言（`BossDevotionPower.AfterCardPlayed` 本来就覆盖，对方 Boss 的牌 Owner 是对方影子玩家）；否则开局给她 3 层 `WatcherFaithPower`（每回合开始 +3 真言）。判据 = 场上除自己外还有没有第二只 `CharBossMonster`；只在 `CricketCompat.Installed` 时生效；接线点在 `FireCombatStart`。
+- 进阶 9 手摇鼓：新增 `BossDefs.RefreshWatcherExtras()`（幂等，解析到 `WatcherMod.Damaru` 后追加 `(9, 3, damaru, null)`），由 `BossDefValidator` 调。
+- 107 / 111 均 0 错误。

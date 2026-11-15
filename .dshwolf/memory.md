@@ -5525,3 +5525,4 @@ Chronological action log.
 | 2026-11-15 21:08 | write | `src/Hooks/Patches/WatcherDivinityKeepPatch.cs` | ok | 0 |
 | 2026-11-15 21:09 | write | `src/Hooks/Patches/WatcherWishChoiceCompat.cs` | ok | 0 |
 | 2026-11-15 21:11 | write | `src/Hooks/Powers/WatcherFaithPower.cs` | ok | 0 |
+| 2026-11-15 21:15 | write | `src/Hooks/Core/WatcherCricketRule.cs` | ok | 0 |

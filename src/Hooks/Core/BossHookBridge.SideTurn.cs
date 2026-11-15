@@ -1170,6 +1170,17 @@ public static partial class BossHookBridge
             catch (Exception e) { Logger.Log("[CharBoss] 特殊效果提前施加失败（原位置会再试）: " + e.Message); }
         }
 
+#if STS2_111
+        // 斗蛐蛐（CricketFight）模式的虔信规则：对手是角色 Boss ⇒ 他出牌 +1 真言；否则开局给 3 层虔信
+        // （只有观者 Boss 会命中：内部先判 CricketCompat.Installed + 这只 Boss 有没有 BossDevotionPower）
+        try
+        {
+            if (boss.Creature?.GetPower<Powers.BossDevotionPower>() != null)
+                await Core.WatcherCricketRule.ApplyAtCombatStart(boss);
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 斗蛐蛐虔信规则失败: " + e.Message); }
+#endif
+
         var swSide = System.Diagnostics.Stopwatch.StartNew();
         var participants = new List<Creature> { boss.Creature };
         var relics = shadow.Relics;

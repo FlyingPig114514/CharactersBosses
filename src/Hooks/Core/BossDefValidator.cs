@@ -37,6 +37,7 @@ public static class BossDefValidator
         Logger.Log("[CharBoss] ===== 定义自检开始 =====");
 #if STS2_111
         try { BossDefs.RefreshWatcherCharacterType(); } catch { /* 占位，失败无碍 */ }
+        try { BossDefs.RefreshWatcherExtras(); } catch { /* 占位，失败无碍 */ }
 #endif
         for (int i = 0; i < BossDefs.ByCharacter.Length; i++)
         {

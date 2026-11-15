@@ -1127,6 +1127,25 @@ public static class BossDefs
         SpecialPowerDreadByAct = new Type?[] { null, null, typeof(Powers.BossDevotionPower), null }
     };
 
+    /// <summary>
+    /// 运行期补「进阶 9 = 手摇鼓」：`Damaru` 是**观者模组**的遗物，静态初始化那会儿模组可能还没加载完
+    /// ⇒ 不能写进 `AscensionRelicsByAct` 的初始化列表，只能等解析得到类型后追加（幂等）。
+    /// </summary>
+    internal static void RefreshWatcherExtras()
+    {
+        try
+        {
+            var damaru = WatcherCards.T("Damaru");
+            if (damaru == null) return;
+            foreach (var (minAsc, act, relic, _) in Watcher.AscensionRelicsByAct)
+            {
+                if (relic == damaru) return;                  // 已经加过
+            }
+            Watcher.AscensionRelicsByAct.Add((9, 3, damaru, null));
+            Logger.Log("[CharBoss] 观者 Boss：进阶 9 的手摇鼓（Damaru）已挂上");
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 观者 Boss 进阶遗物接线失败: " + e.Message); }
+    }
     /// <summary>运行期把观者的真实 `CharacterModel` 类型写回占位定义（找不到就保持愚者占位）。</summary>
     internal static void RefreshWatcherCharacterType()
     {
