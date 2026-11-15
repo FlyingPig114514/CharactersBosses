@@ -70,7 +70,7 @@ public sealed class BossDevotionPower : PowerModel
             if (ownerPlayer == null) return;
             if (ownerPlayer == OwnerMonster()?.Shadow) return;      // 她自己打的牌不算
 
-            await AddMantra(choiceContext, 1);
+            await AddMantraAsync(choiceContext, 1);
         }
         catch (Exception e) { Logger.Log("[CharBoss] 虔信：出牌加真言失败: " + e.Message); }
     }
@@ -95,7 +95,7 @@ public sealed class BossDevotionPower : PowerModel
     }
 
     // ── 加真言（含满层结算） ───────────────────────────────────────────────
-    private async Task AddMantra(PlayerChoiceContext ctx, int amount)
+    internal async Task AddMantraAsync(PlayerChoiceContext ctx, int amount)
     {
         int cur = (int)Math.Round((double)Amount);
         int next = cur + amount;

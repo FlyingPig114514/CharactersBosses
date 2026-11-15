@@ -234,6 +234,7 @@ public abstract class CharBossEncounterBase<TMonster> : EncounterModel, Core.IBo
                 Core.DreadCharacters.Necrobinder => typeof(Core.NecrobinderDominion),
                 Core.DreadCharacters.Regent => typeof(Core.RegentDominion),
                 Core.DreadCharacters.Fool => typeof(Core.FoolDominion),
+                Core.DreadCharacters.Watcher => typeof(Core.WatcherDevotionDominion),
                 _ => null,
             };
             if (dominion == null) return null;

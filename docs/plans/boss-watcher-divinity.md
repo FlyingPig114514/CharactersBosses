@@ -296,3 +296,24 @@ WatcherCombatHelper.ChooseOne(PlayerChoiceContext, Player, IReadOnlyList<CardMod
 他们每人回合开始 ⇒ 观者得到真言（支配是给 Boss 加码的，和愚者「塞 2 张悲伤」同向）。
 落地需要：WatcherFaithPower（挂在玩家身上、回合开始给观者 +N 真言）+ WatcherDevotionDominion
 + CharBossEncounterBase.GetDominion() 按角色分流 + 16 语言 scension.json 文案。
+
+## 第 7 轮（2026-11-15）—— 虔信 buff + 恐惧支配
+
+### 新增 src/Hooks/Powers/WatcherFaithPower.cs（111 独占）
+
+「**虔信**」buff = 挂在**持有者**身上，**持有者回合开始时给观者 Amount 层真言**。
+一个 power 同时服务两条需求（语义本来就一致）：
+- 斗蛐蛐：观者自己身上挂 3 层 ⇒ 她回合开始 +3 真言（**下一轮**接那条规则）；
+- 恐惧支配：挂在**每位玩家**身上 ⇒ 他们各自回合开始，观者收真言。
+
+结算走 BossDevotionPower.AddMantraAsync（由 private 放开成 internal），所以
+「加真言 / 满 10 层结算 / 进神格 / 刷新意图」这一整条链完全复用，没有第二份实现。
+
+### 恐惧模式「观者的支配」
+
+- Core/CharDominions.cs：新增 DreadCharacters.Watcher = 6 + WatcherDevotionDominion
+  （AfterRoomEntered：给每位真人玩家 2 层 WatcherFaithPower，影子玩家与怪物跳过）。
+- CharBossEncounters.GetDominion() 的分流加一行 Core.DreadCharacters.Watcher => typeof(Core.WatcherDevotionDominion)。
+- 16 语言 scension.json 新增 DREAD.WATCHER.description（观者的支配：每场战斗开始时，所有玩家获得 2 层虔信…）。check-localization 全绿。
+
+107 / 111 均 0 错误。
