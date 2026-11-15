@@ -486,3 +486,10 @@ WatcherCombatHelper.ChooseOne(PlayerChoiceContext, Player, IReadOnlyList<CardMod
 2. **进神格后打击/警惕不打**：原来「回合中又拿到资源 ⇒ 按剧本补打」这条门禁只给灵魂骨和三层第 3 回合开，观者进神格多出来的是**同回合**的能量，同样需要补打 ⇒ 门禁加上 `BossDevotionPower`（`#if STS2_111`）。
 
 107 / 111 均 0 错误 · `[verify] v0.2.674 OK` · 已安装。
+
+## 第 18 轮（2026-11-15）
+
+1. **削弱：布质果实 → 空鸟笼**（`LoomingFruit` → `EmptyCage`）。用户指出果实的 +31 最大生命本来就没生效 ⇒ 血量不变（`Hp` 仍是 103）。
+2. **补打之后刷新意图**：原来「回合中补打」这条通道只打牌、不重排意图 ⇒ 玩家看到的意图还是旧的（用户：「意图没有刷新她要打额外的牌」）。现在补打循环结束后 `RefreshPlannedIntents()` + `BossHandUi.RefreshForce`。
+
+107 / 111 均 0 错误 · `[verify] v0.2.675 OK` · 已安装。

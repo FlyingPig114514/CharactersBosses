@@ -1116,9 +1116,13 @@ public abstract partial class CharBossMonster : MonsterModel
                         if (!pcs.Hand.Cards.Any(c => ReferenceEquals(c, extraPlay.Card))) continue;
                         await PlayOne(ctx, pcs, extraPlay);
                     }
+                // ★ 2026-11-15（用户：「进神格确实能让她打出额外的牌，但意图没有刷新她要打额外的牌」）：
+                //   补打之后必须重排意图并重画手牌栏，否则玩家看到的还是「只打原来那几张」。
+                try { RefreshPlannedIntents(); } catch { /* 下一帧兜底 */ }
+                try { CharacterBosses.UI.BossHandUi.RefreshForce(this); } catch { /* 纯显示 */ }
                     CharacterBosses.UI.BossHandUi.RefreshForce(this);
                 }
-            }
+                }
         }
         catch (Exception e)
         {

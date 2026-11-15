@@ -98,7 +98,8 @@ public static class WatcherScript
         relics.Add(typeof(MegaCrit.Sts2.Core.Models.Relics.Lantern));
         relics.Add(typeof(MegaCrit.Sts2.Core.Models.Relics.PaelsLegion));
         relics.Add(typeof(MegaCrit.Sts2.Core.Models.Relics.OddlySmoothStone));
-        relics.Add(typeof(MegaCrit.Sts2.Core.Models.Relics.LoomingFruit));
+        // 用户 2026-11-15：「削弱，把布制果实换成空鸟笼」（布质果实的 +31 生命本来就没生效，所以血量不变）
+        relics.Add(typeof(MegaCrit.Sts2.Core.Models.Relics.EmptyCage));
         relics.Add(typeof(MegaCrit.Sts2.Core.Models.Relics.Gorget));
         return relics;
     }
