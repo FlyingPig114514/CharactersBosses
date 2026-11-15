@@ -1111,13 +1111,16 @@ public static class BossDefs
         VisualScene = "watcher",
         CharacterType = typeof(MegaCrit.Sts2.Core.Models.Characters.Fool),   // 占位，运行期会被替换
         Hp = new[] { 72, 72, 72, 72 },
-        Energy = new[] { 3, 3, 3, 3 },
+        // ★ 2026-11-15（用户口径）：「第 3 回合打出奇迹给自己 1 费，再加上**回合开始时的 2 费**，
+        //   最少是 3 费」⇒ 每回合基础能量就是 **2**（多出来的来自奇迹 / 进神格的 3 点）。
+        Energy = new[] { 2, 2, 2, 2 },
         HandSize = new[] { 5, 5, 6, 6 },
-        // 卡组/剧本先空着（占位）⇒ `BossLoadout` 会按角色卡池自动配一套占位卡组
-        DeckByAct = new List<Type>?[] { null, null, null, null },
-        RelicsByAct = new List<Type>?[] { null, null, null, null },
-        ScriptByAct = new BossScript?[] { null, null, null, null },
-        // 特殊效果暂时不写（还没有设计）⇒ 不挂 Panel、不施加 Power
+        DeckByAct = new List<Type>?[] { null, null, WatcherScript.Deck(), null },
+        RelicsByAct = new List<Type>?[] { null, null, WatcherScript.Relics(), null },
+        ScriptByAct = new BossScript?[] { null, null, WatcherScript.Build(), null },
+        // 手牌完全由剧本生成 ⇒ 拦掉原版抽牌（同塔罗愚）
+        BlocksVanillaDraw = true,
+        // 特殊效果「虔信」下一轮接（`BossDevotionPower`）
     };
 
     /// <summary>运行期把观者的真实 `CharacterModel` 类型写回占位定义（找不到就保持愚者占位）。</summary>

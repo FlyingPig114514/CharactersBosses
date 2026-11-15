@@ -215,7 +215,7 @@ internal static class BossKeys
 #if STS2_111
         ["FOOL_TAROT"] = "塔罗愚",   // 三层 1 号（愚者）
 #if STS2_111
-    ["WATCHER_BOSS"] = "观者",  // 三层占位（观者 mod）
+    ["WATCHER_BOSS"] = "神格观",  // 三层 1 号（观者 mod）
 #endif
 #endif
         ["REGENT_BOMBARD"] = "轰击储",

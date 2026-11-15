@@ -145,3 +145,39 @@ WatcherStatePower 是观者自己记状态的地方（TotalMantraGainedThisComba
 ### 下一轮
 
 WatcherScript（11 回合牌表 + 有费就打 + 7~11 循环 + 进阶 8 升级摆手 / 进阶 9 手摇鼓），并把它接到 BossDefs.Watcher 的 Script。
+
+## 第 2 轮（2026-11-15）—— 剧本 + 定义接线
+
+### 新增 src/Hooks/Core/WatcherScript.cs（111 独占）
+
+- 11 回合牌表**逐字照用户顺序**；标「有费就打」的排后面（BossScriptPlanner 按顺序出牌、能量不够自动跳过，等同「有费就打」，与 SoulBoneScript 同一口径）。
+- LoopFrom = 7 / LoopLength = 5 ⇒ 之后 7～11 循环。
+- 进阶 8：**摆手**用 ScriptCard.UpgradeMinAscension = 8（第 4、11 回合那两张）。
+- Deck()：3 张打击 + 3 张防御占位（每回合手牌由剧本生成）。
+- Relics()：圣水（WatcherMod.HolyWater，反射）+ 涅奥的祝福（我们自己的 CharacterBosses.Relics.NeowBlessing）+ 灯笼 + 佩尔的士兵 + 意外光滑的石头 + 布质果实 + 护喉甲。
+  内部 id 已核对（本体 zhs relics.json）：GORGET / LANTERN / LOOMING_FRUIT / ODDLY_SMOOTH_STONE / PAELS_LEGION；观者 zhs relics.json：HOLY_WATER / DAMARU。
+- AscensionRelics()：手摇鼓 = WatcherMod.Damaru（进阶 9，待接进定义的 AscensionRelicsByAct）。
+- 观者的牌全部来自运行期反射，取不到就从那一回合里剔掉，不会让整场崩。
+
+### BossDefs.Watcher 接线
+
+`csharp
+Energy    = { 2, 2, 2, 2 }      // 用户：「回合开始时的 2 费」
+DeckByAct   = { null, null, WatcherScript.Deck(),   null }
+RelicsByAct = { null, null, WatcherScript.Relics(), null }
+ScriptByAct = { null, null, WatcherScript.Build(),  null }
+BlocksVanillaDraw = true        // 手牌完全由剧本生成
+`
+
+BossKeys.DesignNames["WATCHER_BOSS"] 由「观者」改为「**神格观**」。
+
+### 仍未接
+
+1. **特殊效果「虔信」**（下一轮的主菜）—— SpecialLocByAct / SpecialPowerByAct 仍是 null。
+2. 进阶 9 的手摇鼓还没进 AscensionRelicsByAct（要等运行期解析 WatcherMod.Damaru，写法照 RefreshWatcherCharacterType）。
+3. BossKeys.WatcherRoster() 仍返回空 ⇒ **这只 Boss 现在还不会出现在任何一局里**（用户明确要求别放半成品，等特殊效果做完再开）。
+
+### 待用户确认
+
+- 第 7 回合的「**洗牌**」查不到（观者 + 本体两份 cards.json 都没有）。
+- 第 1 回合「许愿（**选择永生不死**）」需要指定选项 —— 观者的 WatcherWish_P 里有 WatcherWishLiveForever / Almighty / FameAndFortune 三个子选项，要确认走哪个 API 指定。
