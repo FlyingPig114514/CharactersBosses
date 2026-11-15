@@ -447,7 +447,11 @@ internal static class BossKeys
         try
         {
             if (!string.Equals(key, "WATCHER_BOSS", StringComparison.Ordinal)) return key ?? string.Empty;
+#if STS2_111
             if (Core.WatcherModPresence.Installed) return key!;
+#else
+            return key!;                    // 107 里根本不会有观者 Boss
+#endif
             Logger.Log("[CharBoss] 观者 Boss：这一局是装过观者模组时开的，但现在探测不到它 ⇒ 换成塔罗愚继续");
             return "FOOL_BOSS";
         }
