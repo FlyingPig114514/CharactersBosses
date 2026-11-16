@@ -6,45 +6,62 @@ using MegaCrit.Sts2.Core.Models;
 namespace CharacterBosses.Core;
 
 /// <summary>
-/// **二层 1 号观者 Boss「印牌观」**的剧本（用户 2026-11-16 设计）。
+/// **二层 1 号观者 Boss「印牌观」**的剧本（用户 2026-11-16 设计，v0.2.713 按用户订正重排）。
 ///
 /// 用户原话（逐字）：
 /// ```
 /// 1.武器库+、操控现实+、改造现实、惩恶+（没费）
 /// 2.奇迹、心灵堡垒、警惕、打击（没费）、惩恶+（没费）
-/// 3.暴怒+、惩恶+、创世之柱
-/// 4.供奉、义愤填膺、内心宁静
+/// 3.义愤填膺、惩恶+、创世之柱
+/// 4.供奉、暴怒+、内心宁静
 /// 5.欺瞒现实、平安+、何人僭越、化拳为空（没费）
 /// 6.洗牌。改造现实、化拳为空、警惕、惩恶+（没费）
-/// 7.暴怒+、欺瞒现实、惩恶+、供奉、平安+
-/// 8.义愤填膺、内心宁静、打击（没费）
+/// 7.暴怒+、欺瞒现实、惩恶+、平安+、打击（没费）
+/// 8.供奉、义愤填膺、内心宁静（没费）
 /// 之后6～8循环。
 /// ```
 ///
-/// ## 每回合能量（**用户没给**，按他列的牌 + 标了「（没费）」的那几张反推）
-/// 用户只在个别牌后面标「没费」⇒ 那些是**打不出来**的，其余都要打得出来。卡费（已反编译核实）：
-/// 武器库 1 / 操控现实 1 / 改造现实 1 / 惩恶 1 / 奇迹 0(+1 能量) / 心灵堡垒 1 / 警惕 2 / 打击 1 /
-/// 暴怒+ 2 / 创世之柱 1 / 供奉 0 / 义愤填膺 1 / 内心宁静 1 / 欺瞒现实 2 / 平安 0 / 何人僭越 0 / 化拳为空 1。
-/// ⇒ 逐回合 `Energy` = **3 / 2 / 4 / 2 / 3 / 4 / 5 / 2**，正好让用户标了「没费」的那几张差 1 点。
+/// ## 能量（用户 2026-11-16 订正：「你好好算算，你有费打吗？每回合只有2费」）
+/// ⚠ `BossTurn.Energy` **会覆盖她那个回合的真实能量**（`CharBossMonster.Turn.cs` 的
+/// `if (scriptedTurn != null &amp;&amp; scriptedTurn.Energy &gt; 0) energy = scriptedTurn.Energy;`），
+/// 而 `CardCmd.AutoPlay` **不扣费** ⇒ 写大了就会出现「没费的牌照样被打出来」。
+/// 所以这一栏必须严格按**真实卡费**算：
+///
+/// | 牌 | 费 | 牌 | 费 |
+/// |---|---|---|---|
+/// | 操控现实+ | **0**（升级 −1） | 暴怒+ | **1**（升级 −1） |
+/// | 供奉 / 何人僭越 / 奇迹 | 0 | 武器库 / 创世之柱 / 改造现实 / 欺瞒现实 / 惩恶 / 平安 / 义愤填膺 / 内心宁静 / 化拳为空 / 打击 / 心灵堡垒 | 1 |
+/// | 警惕 | 2 | （奇迹打出时 +1 能量） | |
+///
+/// 逐回合预算（= 用户列出的**要打出来**那些牌的费用之和；标了「没费」的不计入，
+/// 并保证它们再差 1 点打不出来）：
+/// 1 → **2**（武器库+ 1 + 操控现实+ 0 + 改造现实 1；惩恶+ 还差 1 ⇒ 没费 ✔）
+/// 2 → **2**（奇迹 0 但 +1 能量 + 心灵堡垒 1 + 警惕 2 = 3；打击 / 惩恶+ 还差 1 ✔）
+/// 3 → **3**（义愤填膺 1 + 惩恶+ 1 + 创世之柱 1）
+/// 4 → **2**（供奉 0 + 暴怒+ 1 + 内心宁静 1）
+/// 5 → **2**（欺瞒现实 1 + 平安+ 1 + 何人僭越 0；化拳为空还差 1 ✔）
+/// 6 → **3**（改造现实 1 + 警惕 2；化拳为空 1 再打就差 1 ⇒ 没费 ✔，惩恶+ 同样 ✔）
+/// 7 → **4**（暴怒+ 1 + 欺瞒现实 1 + 惩恶+ 1 + 平安+ 1；打击还差 1 ✔）
+/// 8 → **1**（供奉 0 + 义愤填膺 1；内心宁静还差 1 ✔）
 ///
 /// ## 「拦掉原版的印牌」
 /// 「改造现实」会把一张「惩恶」、「欺瞒现实」会把一张「平安」塞进她手牌（反编译确认）。
 /// 而剧本本来就写着这两张 ⇒ 由 `CharBossMonster.BlocksGeneratedCardsEntries` 拦掉原版那份，
 /// **改由我们手动结算一次「生成了一张牌」**（触发她的「创世之柱」+格挡 /「武器库」+力量），
-/// 见 `BossMasterRealityPower.TriggerPrint`。
+/// 见 `BossMasterRealityPower.TriggerPrintAsync`。
 ///
 /// ## 进阶（用户给的）
 /// · **进阶 8**：升级「创世之柱」与「心灵堡垒」；
 /// · **进阶 9**：升级「改造现实」「供奉」「义愤填膺」。
 /// </summary>
-public static class WatcherPrintScript
+public static class WatcherCreateScript
 {
     public static BossScript Build()
     {
         var turns = new List<BossTurn>
         {
-            // ── 1 ── 武器库+ / 操控现实+ / 改造现实 / 惩恶+（没费）   （3 费）
-            Turn(3, "1. 武器库+、操控现实+、改造现实、惩恶+（没费）",
+            // ── 1 ── 武器库+ / 操控现实+ / 改造现实 / 惩恶+（没费）   （2 费）
+            Turn(2, "1. 武器库+、操控现实+、改造现实、惩恶+（没费）",
                 W(WatcherCards.Arsenal, upgraded: true),
                 W(WatcherCards.MasterReality, upgraded: true),
                 W(WatcherCards.CarveReality, upgradeMinAscension: 9),
@@ -58,45 +75,49 @@ public static class WatcherPrintScript
                 W(WatcherCards.Strike),
                 W(WatcherCards.Smite, upgraded: true)),
 
-            // ── 3 ── 暴怒+ / 惩恶+ / 创世之柱（进阶 8 起升级）   （4 费）— 单体高压
-            Turn(4, "3. 暴怒+、惩恶+、创世之柱（进阶8起升级）",
-                W(WatcherCards.Eruption, upgraded: true),
+            // ── 3 ── 义愤填膺（进阶 9 起升级）/ 惩恶+ / 创世之柱（进阶 8 起升级）   （3 费）— 单体高压
+            Turn(3, "3. 义愤填膺（进阶9起升级）、惩恶+、创世之柱（进阶8起升级）",
+                W(WatcherCards.Indignation, upgradeMinAscension: 9),
                 W(WatcherCards.Smite, upgraded: true),
                 W(WatcherCards.PillarOfCreation, upgradeMinAscension: 8)),
 
-            // ── 4 ── 供奉（进阶 9 起升级）/ 义愤填膺（进阶 9 起升级）/ 内心宁静   （2 费）— 群体高压
-            Turn(2, "4. 供奉（进阶9起升级）、义愤填膺（进阶9起升级）、内心宁静",
+            // ── 4 ── 供奉（进阶 9 起升级）/ 暴怒+ / 内心宁静   （2 费）— 群体高压
+            Turn(2, "4. 供奉（进阶9起升级）、暴怒+、内心宁静",
                 W(WatcherCards.Consecrate, upgradeMinAscension: 9),
-                W(WatcherCards.Indignation, upgradeMinAscension: 9),
+                W(WatcherCards.Eruption, upgraded: true),
                 W(WatcherCards.InnerPeace)),
 
-            // ── 5 ── 欺瞒现实 / 平安+ / 何人僭越 / 化拳为空（没费）   （3 费：2 + 0 + 0，化拳为空再 1 ⇒ 差 1）
-            Turn(3, "5. 欺瞒现实、平安+、何人僭越、化拳为空（没费）",
+            // ── 5 ── 欺瞒现实 / 平安+ / 何人僭越 / 化拳为空（没费）   （2 费）
+            Turn(2, "5. 欺瞒现实、平安+、何人僭越、化拳为空（没费）",
                 W(WatcherCards.DeceiveReality),
                 W(WatcherCards.Safety, upgraded: true),
                 W(WatcherCards.KnowThyPlace),
                 W(WatcherCards.EmptyFist)),
 
-            // ── 6 ── 洗牌 / 改造现实（进阶 9 起升级）/ 化拳为空 / 警惕 / 惩恶+（没费）   （4 费）← 6～8 循环起点
-            Turn(4, "6. 洗牌（她重新洗牌）、改造现实（进阶9起升级）、化拳为空、警惕、惩恶+（没费）",
+            // ── 6 ── 洗牌 / 改造现实（进阶 9 起升级）/ 化拳为空（没费）/ 警惕 / 惩恶+（没费）   （3 费）← 6～8 循环起点
+            //   ★ v0.2.713（用户 2026-11-16）：「第6回合化拳为空被错误的打出」⇒ 它属于「没费」那一档，
+            //     真实 3 费里 改造现实(1) + 警惕(2) 正好花光 ⇒ 化拳为空 / 惩恶+ 都打不出来。
+            Turn(3, "6. 洗牌（她重新洗牌）、改造现实（进阶9起升级）、化拳为空（没费）、警惕、惩恶+（没费）",
                 W(WatcherCards.CarveReality, upgradeMinAscension: 9),
-                W(WatcherCards.EmptyFist),
+                // ⚠ 化拳为空排在警惕前面、而且只有 1 费 —— 光靠能量挡不住它（3 费里 改造现实 1 之后它照样付得起）。
+                //   用户 2026-11-16 明确「第6回合化拳为空被错误的打出」⇒ 用 HoldInstead 明确「留在手里不打」。
+                W(WatcherCards.EmptyFist, holdInstead: true),
                 W(WatcherCards.Vigilance),
                 W(WatcherCards.Smite, upgraded: true)),
 
-            // ── 7 ── 暴怒+ / 欺瞒现实 / 惩恶+ / 供奉（进阶 9 起升级）/ 平安+   （5 费）— 单体 + 群体高压
-            Turn(5, "7. 暴怒+、欺瞒现实、惩恶+、供奉（进阶9起升级）、平安+",
+            // ── 7 ── 暴怒+ / 欺瞒现实 / 惩恶+ / 平安+ / 打击（没费）   （4 费）— 单体 + 群体高压
+            Turn(4, "7. 暴怒+、欺瞒现实、惩恶+、平安+、打击（没费）",
                 W(WatcherCards.Eruption, upgraded: true),
                 W(WatcherCards.DeceiveReality),
                 W(WatcherCards.Smite, upgraded: true),
-                W(WatcherCards.Consecrate, upgradeMinAscension: 9),
-                W(WatcherCards.Safety, upgraded: true)),
-
-            // ── 8 ── 义愤填膺（进阶 9 起升级）/ 内心宁静 / 打击（没费）   （2 费）
-            Turn(2, "8. 义愤填膺（进阶9起升级）、内心宁静、打击（没费）",
-                W(WatcherCards.Indignation, upgradeMinAscension: 9),
-                W(WatcherCards.InnerPeace),
+                W(WatcherCards.Safety, upgraded: true),
                 W(WatcherCards.Strike)),
+
+            // ── 8 ── 供奉（进阶 9 起升级）/ 义愤填膺（进阶 9 起升级）/ 内心宁静（没费）   （1 费）
+            Turn(1, "8. 供奉（进阶9起升级）、义愤填膺（进阶9起升级）、内心宁静（没费）",
+                W(WatcherCards.Consecrate, upgradeMinAscension: 9),
+                W(WatcherCards.Indignation, upgradeMinAscension: 9),
+                W(WatcherCards.InnerPeace)),
         };
 
         return new BossScript

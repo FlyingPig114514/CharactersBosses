@@ -834,7 +834,7 @@ public static class DownfallCollectibleCompat
             {
 #if STS2_111
                 // 二层 1 号 印牌观（用户 2026-11-16）：藏品 = **操控现实**（观者模组那张「生成牌被升级」）
-                case "WATCHER_PRINT":
+                case "WATCHER_CREATE":
                     cardType = Core.WatcherCards.MasterReality;
                     upgraded = false;
                     Logger.Log("[CharBoss] 收藏家藏品：印牌观 → 操控现实");

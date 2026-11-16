@@ -342,7 +342,12 @@ internal static class BossSpecialTip
             //   神格观（塔罗牌之后第二长的说明：虔信 4 行 + 空行 + 神格 2 行）和炼药猎的「调制」一样，
             //   套用同一个偏移（`BossUiTuning.BrewSpecialY`，默认 −120，`charbosses_ui.txt` 可热调）。
             //   **只加这一只，其它 Boss 的说明框位置一个像素都不动。**
-            if (boss.Def.Key == "WATCHER_DIVINITY") return true;
+            //
+            // ★ v0.2.713（用户 2026-11-16：「这个特殊效果的描述并不长，你描述框用正常的位置就行，
+            //   目前的位置有些偏高」）：印牌观（`WATCHER_CREATE`）是**同一个观者角色的第三套设计**，
+            //   它的 `Def.Key` 也是 `WATCHER_DIVINITY` ⇒ 以前会白吃神格观那个 −120 偏移。
+            //   但它那条说明只有两行 ⇒ 必须排除掉，用正常位置。
+            if (boss.Def.Key == "WATCHER_DIVINITY" && !Core.BossLineups.WatcherCreateActive()) return true;
             return boss.Def.SpecialPowerForAct(boss.ActIndex) == typeof(Powers.BrewModPower);
         }
         catch { return false; }

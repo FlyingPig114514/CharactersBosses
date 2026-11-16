@@ -88,18 +88,18 @@ public sealed class WatcherOmegaBoss : WatcherBoss
 }
 
 /// <summary>
-/// **二层 1 号「印牌观」**（设计 Key <c>WATCHER_PRINT</c>，用户 2026-11-16）。
+/// **二层 1 号「印牌观」**（设计 Key <c>WATCHER_CREATE</c>，用户 2026-11-16）。
 ///
 /// 同一个观者角色的第三套设计 ⇒ 走 `BossDefs.Watcher` 的 `ExtraVariants[1]`
-/// （剧本 `WatcherPrintScript`、遗物五件、特殊效果「操控现实」）。
-/// 控制台：`fight WATCHER_PRINT_BOSS_ENCOUNTER`。
+/// （剧本 `WatcherCreateScript`、遗物五件、特殊效果「操控现实」）。
+/// 控制台：`fight WATCHER_CREATE_BOSS_ENCOUNTER`。
 /// </summary>
-public sealed class WatcherPrintBoss : WatcherBoss
+public sealed class WatcherCreateBoss : WatcherBoss
 {
-    public WatcherPrintBoss() { SpawnVariantKey = "WATCHER_PRINT"; }
+    public WatcherCreateBoss() { SpawnVariantKey = "WATCHER_CREATE"; }
 
     public override int? TierAct => 1;      // 第二幕
 
-    public override string? PinnedVariantKey => "WATCHER_PRINT";
+    public override string? PinnedVariantKey => "WATCHER_CREATE";
 }
 #endif

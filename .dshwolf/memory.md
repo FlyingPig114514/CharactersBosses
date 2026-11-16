@@ -5767,3 +5767,12 @@ Chronological action log.
 | 2026-11-16 20:00 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/tmp/apply-print-loc.ps1` | ok | 0 |
 | 2026-11-16 20:00 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/tmp/apply-print-loc.ps1` | ok | 0 |
 | 2026-11-16 20:15 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/boss-watcher-print.md` | ok | 0 |
+| 2026-11-16 20:35 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherCreateScript.cs` | ok | 0 |
+| 2026-11-16 20:36 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossInfoTable.cs` | error | 0 |
+| 2026-11-16 20:36 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossInfoTable.cs` | ok | 0 |
+| 2026-11-16 20:36 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/UI/BossSpecialTip.cs` | ok | 0 |
+| 2026-11-16 20:36 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/tmp/create-loc-data.json` | ok | 0 |
+| 2026-11-16 20:37 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/tmp/apply-create-loc.ps1` | ok | 0 |
+| 2026-11-16 20:37 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/tmp/apply-loc.js` | ok | 0 |
+| 2026-11-16 20:38 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/tmp/apply-loc.js` | ok | 0 |
+| 2026-11-16 20:38 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherCreateScript.cs` | ok | 0 |

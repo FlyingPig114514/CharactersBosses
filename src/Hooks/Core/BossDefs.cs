@@ -1145,14 +1145,14 @@ public static class BossDefs
             {
                 new BossVariant
                 {
-                    Key = "WATCHER_PRINT",
-                    Enabled = Core.BossLineups.WatcherPrintActive,
-                    Deck = WatcherPrintScript.Deck(),
-                    Relics = WatcherPrintScript.Relics(),
-                    Script = WatcherPrintScript.Build(),
+                    Key = "WATCHER_CREATE",
+                    Enabled = Core.BossLineups.WatcherCreateActive,
+                    Deck = WatcherCreateScript.Deck(),
+                    Relics = WatcherCreateScript.Relics(),
+                    Script = WatcherCreateScript.Build(),
                     // 特殊效果「操控现实」：生成牌被降级、非衍生牌获得消耗
-                    SpecialLoc = "WATCHER_BOSS.print_reality",
-                    SpecialLocDread = "WATCHER_BOSS.print_reality_dread",
+                    SpecialLoc = "WATCHER_BOSS.create_reality",
+                    SpecialLocDread = "WATCHER_BOSS.create_reality_dread",
                     SpecialPower = typeof(Powers.BossMasterRealityPower),
                     SpecialPowerDread = typeof(Powers.BossMasterRealityPower),
                     BlocksVanillaDraw = true,
