@@ -810,17 +810,27 @@ public static class BossScriptPlanner
             //   这里把这笔算进规划期预算，否则面板会先把它们画成压暗、回合里又补打出去 ⇒ 看着像 bug。
             try
             {
-                if (CharBossMonster.WatcherIdIs(entryNow, "EMPTY_FIST") && watcherCalm)
+                // ★ v0.2.721（用户 2026-11-16「第六回合的警惕怎么不打了」）：
+                //   化拳为空已经换成**化体为空**，而「退出姿态」这条两个都会触发 ⇒ 都要算 +2。
+                //   同时把**内心宁静**（不在平静时进入平静）也算进 `watcherCalm`：
+                //   她的剧本里进平静靠的正是 内心宁静（第 4 / 8 回合），以前只认「警惕」⇒
+                //   规划期以为她一直不在平静 ⇒ 第 6 回合化体为空退出时那 +2 没算 ⇒ 警惕（2 费）被跳过。
+                if ((CharBossMonster.WatcherIdIs(entryNow, "EMPTY_FIST")
+                     || CharBossMonster.WatcherIdIs(entryNow, "EMPTY_BODY")) && watcherCalm)
                 {
                     watcherCalm = false;
                     energy += 2;
                     Logger.Log($"[CharBoss] 观者姿态：{SafeEntry(card)} 退出「平静」⇒ 原版 +2 能量" +
                                $"（规划期算入，之后预算 {energy}）");
                 }
-                else if (CharBossMonster.WatcherIdIs(entryNow, "VIGILANCE"))
+                else if (CharBossMonster.WatcherIdIs(entryNow, "VIGILANCE")
+                         || CharBossMonster.WatcherIdIs(entryNow, "INNER_PEACE")
+                         || CharBossMonster.WatcherIdIs(entryNow, "MEDITATE")
+                         || CharBossMonster.WatcherIdIs(entryNow, "TRANQUILITY"))
                 {
                     watcherCalm = true;
-                    Logger.Log("[CharBoss] 观者姿态：警惕 ⇒ 进入「平静」（后面那张化拳为空会给她 +2 能量）");
+                    Logger.Log($"[CharBoss] 观者姿态：{SafeEntry(card)} ⇒ 进入「平静」" +
+                               "（后面那张退出姿态的牌会给她 +2 能量）");
                 }
             }
             catch { /* 纯预览 */ }
