@@ -1165,13 +1165,14 @@ public static class BossIntentBuilder
         // 数据上会带上「失去力量」这类减益变量，画出来就是用户看到的那个多余的下箭头）。
         if (madScience) hasSacrifice = false;
 #if STS2_111
-        // ★ v0.2.716（用户 2026-11-16）
-        //   ①「所有会使观者进入愤怒的卡牌的意图加上**强化和牺牲**（已经有的不要重复加）」——
-        //     进入愤怒 = 之后**受到的**伤害也翻倍 ⇒ 属于「付出代价换强力」⇒ 强化（蓝上）+ 牺牲（蓝下）。
-        //   ②「所有会使观者进入平静的卡牌意图加上**强化**」。
-        //   ③「义愤填膺」看姿态二选一：不在愤怒 ⇒ 进愤怒（强化 + 牺牲）；已在愤怒 ⇒ 只施加易伤 ⇒ **只**策略。
-        //   ④「不惧妖邪」：她这一手会进平静的前提是「被锁玩家本回合打出过攻击牌」
-        //     （`WatcherFearNoEvilAimPower.PlayerAttacked`）⇒ 只有那时才加强化（刷新由面板指纹负责）。
+        // ★ v0.2.717（用户 2026-11-16 订正）
+        //   「应该让所有愤怒牌都是**未在愤怒时**才会加上强化和牺牲；如果已经处于愤怒
+        //     （比如第四回合的暴怒），就**只显示攻势**（因为已经在愤怒了，所以就只打伤害了）」
+        //   ⇒ 愤怒牌 = 暴怒 / 渐强 / 义愤填膺：
+        //     · 未在愤怒 ⇒ 强化（蓝上）+ 牺牲（蓝下）；
+        //     · 已在愤怒 ⇒ 不加强化、不加牺牲；暴怒 / 渐强 只剩**攻势**，
+        //       义愤填膺在愤怒里只会施加易伤 ⇒ 只剩**策略**（上一轮已确认）。
+        //   ⚠ 平静牌（警惕 / 安宁 / 冥想 / 内心宁静）**按用户要求保持现状**，这里一个字都不动。
         try
         {
             string e2 = string.Empty;
@@ -1181,13 +1182,9 @@ public static class BossIntentBuilder
             try { inWrath = StanceMultiplierOf(card.Owner?.Creature) >= 2; } catch { inWrath = false; }
 
             bool isIndignation = Monsters.CharBossMonster.WatcherIdIs(e2, "INDIGNATION");
-            bool enterWrath = Monsters.CharBossMonster.WatcherIdIs(e2, "ERUPTION")
-                              || Monsters.CharBossMonster.WatcherIdIs(e2, "CRESCENDO")
-                              || (isIndignation && !inWrath);
-            bool enterCalm = Monsters.CharBossMonster.WatcherIdIs(e2, "VIGILANCE")
-                             || Monsters.CharBossMonster.WatcherIdIs(e2, "TRANQUILITY")
-                             || Monsters.CharBossMonster.WatcherIdIs(e2, "MEDITATE")
-                             || Monsters.CharBossMonster.WatcherIdIs(e2, "INNER_PEACE");
+            bool isWrathCard = isIndignation
+                               || Monsters.CharBossMonster.WatcherIdIs(e2, "ERUPTION")
+                               || Monsters.CharBossMonster.WatcherIdIs(e2, "CRESCENDO");
             bool fearAim = false;
             if (Monsters.CharBossMonster.WatcherIdIs(e2, "FEAR_NO_EVIL"))
             {
@@ -1201,15 +1198,19 @@ public static class BossIntentBuilder
 
             if (isIndignation && inWrath)
             {
-                hasBuff = false; hasDebuff = true; hasSacrifice = false;   // 只给易伤 ⇒ 只策略
+                hasBuff = false; hasSacrifice = false; hasDebuff = true;   // 只给易伤 ⇒ 只策略
             }
-            else if (enterWrath)
+            else if (isWrathCard && inWrath)
             {
-                hasBuff = true; hasSacrifice = true;                       // 强化 + 牺牲
+                hasBuff = false; hasSacrifice = false;                     // 已经在愤怒 ⇒ 只打伤害（只攻势）
             }
-            else if (enterCalm || fearAim)
+            else if (isWrathCard)
             {
-                hasBuff = true;                                            // 强化
+                hasBuff = true; hasSacrifice = true;                       // 未在愤怒 ⇒ 强化 + 牺牲
+            }
+            else if (fearAim)
+            {
+                hasBuff = true;                                            // 不惧妖邪（会被锁玩家打过攻击牌 ⇒ 这手进平静）
             }
         }
         catch { /* 纯预览 */ }
