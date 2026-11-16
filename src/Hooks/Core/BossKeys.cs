@@ -89,6 +89,8 @@ internal static class BossKeys
         new("WATCHER_DIVINITY",         6, 2, 1, typeof(WatcherBoss)),
         // 三层 2 号：**Ω观**（用户 2026-11-16）—— 同一观者角色的第二套设计（阿尔法/贝塔/欧米伽 + 特殊效果「斋戒」）
         new("WATCHER_OMEGA",            6, 2, 2, typeof(WatcherOmegaBoss)),
+        // 二层 1 号：**印牌观**（用户 2026-11-16）—— 武器库/创世之柱 印牌流 + 特殊效果「操控现实」
+        new("WATCHER_PRINT",            6, 1, 1, typeof(WatcherPrintBoss)),
 #endif
     };
 
@@ -151,7 +153,8 @@ internal static class BossKeys
                 "REGENT_MINION",        // 二层 储君 3 号：仆从储（用户 2026-11-05）
                 "IRONCLAD_BLOOD",       // 二层 铁甲 1 号：放血战
                 "IRONCLAD_JUGGLER",     // 二层 铁甲 2 号：杂耍战
-            };
+                // ★ v0.2.712（用户 2026-11-16）：二层 3 号是**印牌观**（观者 mod）⇒ 运行期按观者闸门追加
+            }.Concat(WatcherRosterAct2()).ToArray();
         }
         // 第一幕：7 个（猎 1 / 机 2 / 骨 1 / 储 2 / 战 1）
         return new[]
@@ -221,6 +224,7 @@ internal static class BossKeys
 #if STS2_111
     ["WATCHER_DIVINITY"] = "神格观",  // 三层 1 号（观者 mod）
     ["WATCHER_OMEGA"] = "Ω观",        // 三层 2 号（观者 mod，用户 2026-11-16）
+    ["WATCHER_PRINT"] = "印牌观",      // 二层 1 号（观者 mod，用户 2026-11-16）
 #endif
 #endif
         ["REGENT_BOMBARD"] = "轰击储",
@@ -390,6 +394,7 @@ internal static class BossKeys
 #if STS2_111
             case "WATCHER_DIVINITY": return ModelDb.Encounter<WatcherDivinityBossEncounter>();
             case "WATCHER_OMEGA": return ModelDb.Encounter<WatcherOmegaBossEncounter>();
+            case "WATCHER_PRINT": return ModelDb.Encounter<WatcherPrintBossEncounter>();
 #endif
 #endif
             default: return null;
@@ -470,9 +475,28 @@ internal static class BossKeys
         catch { return key ?? string.Empty; }
     }
 
-    private static string[] WatcherRoster()
+    /// <summary>
+    /// **第二幕**的观者候补（2026-11-16：二层 1 号「印牌观」）。
+    ///
+    /// 与三层的 <see cref="WatcherRoster"/> 同一套闸门：装了观者 mod、且
+    /// `BossPicksSync.WatcherAllowedHere()` 认为「全端同一实现」才进候补表 ——
+    /// 候补表条数一变阵容就会分叉，所以这条判断不能只写在本机。
+    /// </summary>
+    private static string[] WatcherRosterAct2()
     {
-        // ★ 2026-11-15 第二轮（用户要「神格观」上场）：设计做完 ⇒ **恢复登场**。
+#if STS2_111
+        try
+        {
+            if (Core.WatcherModPresence.Installed && Core.BossPicksSync.WatcherAllowedHere())
+                return new[] { "WATCHER_PRINT" };
+        }
+        catch { /* 探测失败就当没装 */ }
+#endif
+        return Array.Empty<string>();
+    }
+
+    private static string[] WatcherRoster()
+    {        // ★ 2026-11-15 第二轮（用户要「神格观」上场）：设计做完 ⇒ **恢复登场**。
         //   条件：装了观者模组才进候选表；没装时行为和以前一模一样。
         //
         // ★★ v0.2.711（用户 2026-11-16）：

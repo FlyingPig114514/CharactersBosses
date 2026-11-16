@@ -110,5 +110,7 @@
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "Göttlicher Beobachter",
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} wurde von der göttlichen Macht des [gold]Göttlichen Beobachters[/gold] zermalmt.",
     "WATCHER_OMEGA_BOSS_ENCOUNTER.title": "Omega-Waechter",
-    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character} wurde vom Fasten des [gold]Omega-Waechters[/gold] zermalmt."
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character} wurde vom Fasten des [gold]Omega-Waechters[/gold] zermalmt.",
+  "WATCHER_PRINT_BOSS_ENCOUNTER.title": "Druckender Wächter",
+  "WATCHER_PRINT_BOSS_ENCOUNTER.loss": "{character} wurde vom [gold]Druckenden Wächter[/gold] zermalmt."
 }

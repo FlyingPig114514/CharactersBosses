@@ -110,5 +110,7 @@
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "ผู้เฝ้ามองสวรรค์",
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} ถูกพลังสวรรค์ของ[gold]ผู้เฝ้ามองสวรรค์[/gold]บดขยี้",
     "WATCHER_OMEGA_BOSS_ENCOUNTER.title": "ผู้เฝ้ามองโอเมก้า",
-    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character} ถูกบดขยี้ด้วยการอดอาหารของ[gold]ผู้เฝ้ามองโอเมก้า[/gold]"
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character} ถูกบดขยี้ด้วยการอดอาหารของ[gold]ผู้เฝ้ามองโอเมก้า[/gold]",
+  "WATCHER_PRINT_BOSS_ENCOUNTER.title": "ผู้เฝ้ามองผู้พิมพ์",
+  "WATCHER_PRINT_BOSS_ENCOUNTER.loss": "{character} ถูกบดขยี้โดย[gold]ผู้เฝ้ามองผู้พิมพ์[/gold]"
 }

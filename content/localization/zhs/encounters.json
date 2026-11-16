@@ -109,5 +109,7 @@
     "FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot":  "{character}成为了[gold]愚者[/gold]牌组中新的[gold]{Card}[/gold]。",
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "神格观",
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character}被[gold]神格观[/gold]的神格之力碾碎。","WATCHER_OMEGA_BOSS_ENCOUNTER.title": "Ω观",
-    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character}被[gold]Ω观[/gold]的斋戒碾碎。"
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character}被[gold]Ω观[/gold]的斋戒碾碎。",
+  "WATCHER_PRINT_BOSS_ENCOUNTER.title": "印牌观",
+  "WATCHER_PRINT_BOSS_ENCOUNTER.loss": "{character}被[gold]印牌观[/gold]的操控现实碾碎。"
 }

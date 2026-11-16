@@ -110,5 +110,7 @@
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "Божественный Наблюдатель",
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} был раздавлен божественной мощью [gold]Божественного Наблюдателя[/gold].",
     "WATCHER_OMEGA_BOSS_ENCOUNTER.title": "Омега-Наблюдатель",
-    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character} раздавлен [gold]Омега-Наблюдателем[/gold]."
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character} раздавлен [gold]Омега-Наблюдателем[/gold].",
+  "WATCHER_PRINT_BOSS_ENCOUNTER.title": "Печатный Наблюдатель",
+  "WATCHER_PRINT_BOSS_ENCOUNTER.loss": "{character} был раздавлен [gold]Печатным Наблюдателем[/gold]."
 }

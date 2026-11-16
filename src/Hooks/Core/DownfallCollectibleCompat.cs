@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using MegaCrit.Sts2.Core.Entities.Players;
@@ -833,6 +833,12 @@ public static class DownfallCollectibleCompat
             switch (boss.SpawnVariantKey)
             {
 #if STS2_111
+                // 二层 1 号 印牌观（用户 2026-11-16）：藏品 = **操控现实**（观者模组那张「生成牌被升级」）
+                case "WATCHER_PRINT":
+                    cardType = Core.WatcherCards.MasterReality;
+                    upgraded = false;
+                    Logger.Log("[CharBoss] 收藏家藏品：印牌观 → 操控现实");
+                    return cardType != null;
                 // 三层 2 号 Ω观（用户 2026-11-16）：藏品 = 阿尔法
                 case "WATCHER_OMEGA":
                     cardType = Core.WatcherCards.Alpha;

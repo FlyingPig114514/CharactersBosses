@@ -1136,6 +1136,30 @@ public static class BossDefs
         // 所以第二套挂在 `ExtraVariants`，判定顺序 = 先主定义（神格观），再按本表取第一个 Enabled 为真的。
         ExtraVariants = new Dictionary<int, List<BossVariant>>
         {
+            // ★ v0.2.712（用户 2026-11-16）：**二层 1 号「印牌观」** —— 与神格观/Ω观同一个观者角色，
+            //   第三套设计，挂在**第二幕**（`ExtraVariants[1]`）。特殊效果「操控现实」是**对玩家的削弱**
+            //   （见 `Powers/BossMasterRealityPower.cs`）：玩家在战斗中生成的牌被降级、非衍生牌再加消耗。
+            //   她自己的两张印牌（改造现实⇒惩恶 / 欺瞒现实⇒平安）的原版生成被拦掉，
+            //   改由 `CharBossMonster` 在出牌后手动触发「创世之柱 / 武器库」。
+            [1] = new List<BossVariant>
+            {
+                new BossVariant
+                {
+                    Key = "WATCHER_PRINT",
+                    Enabled = Core.BossLineups.WatcherPrintActive,
+                    Deck = WatcherPrintScript.Deck(),
+                    Relics = WatcherPrintScript.Relics(),
+                    Script = WatcherPrintScript.Build(),
+                    // 特殊效果「操控现实」：生成牌被降级、非衍生牌获得消耗
+                    SpecialLoc = "WATCHER_BOSS.print_reality",
+                    SpecialLocDread = "WATCHER_BOSS.print_reality_dread",
+                    SpecialPower = typeof(Powers.BossMasterRealityPower),
+                    SpecialPowerDread = typeof(Powers.BossMasterRealityPower),
+                    BlocksVanillaDraw = true,
+                    // 进阶 8 / 9 的升级写在剧本里（创世之柱 / 心灵堡垒；改造现实 / 供奉 / 义愤填膺）
+                    // 血量：观者基础 72，没有布质果实 ⇒ 不加 HpBonus
+                },
+            },
             [2] = new List<BossVariant>
             {
                 new BossVariant

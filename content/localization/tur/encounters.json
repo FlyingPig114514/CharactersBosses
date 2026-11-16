@@ -110,5 +110,7 @@
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "Kutsal Gözcü",
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character}, [gold]Kutsal Gözcü[/gold]\u0027nün ilahi gücüyle ezildi.",
     "WATCHER_OMEGA_BOSS_ENCOUNTER.title": "Omega Gozcu",
-    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character}, [gold]Omega Gozcu[/gold] orucuyla ezildi."
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character}, [gold]Omega Gozcu[/gold] orucuyla ezildi.",
+  "WATCHER_PRINT_BOSS_ENCOUNTER.title": "Baskı Gözcüsü",
+  "WATCHER_PRINT_BOSS_ENCOUNTER.loss": "{character}, [gold]Baskı Gözcüsü[/gold] tarafından ezildi."
 }

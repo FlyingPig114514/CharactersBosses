@@ -110,5 +110,7 @@
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "Boski Obserwator",
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} został zmiażdżony boską mocą [gold]Boskiego Obserwatora[/gold].",
     "WATCHER_OMEGA_BOSS_ENCOUNTER.title": "Obserwator Omega",
-    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character} zostal zmiazdzony przez post [gold]Obserwatora Omega[/gold]."
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character} zostal zmiazdzony przez post [gold]Obserwatora Omega[/gold].",
+  "WATCHER_PRINT_BOSS_ENCOUNTER.title": "Drukujący Obserwator",
+  "WATCHER_PRINT_BOSS_ENCOUNTER.loss": "{character} został zmiażdżony przez [gold]Drukującego Obserwatora[/gold]."
 }

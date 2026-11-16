@@ -110,5 +110,7 @@
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "Divinity Watcher",
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} was crushed by the divine might of [gold]Divinity Watcher[/gold].",
     "WATCHER_OMEGA_BOSS_ENCOUNTER.title": "Omega Watcher",
-    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character} was crushed by the fast of the [gold]Omega Watcher[/gold]."
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character} was crushed by the fast of the [gold]Omega Watcher[/gold].",
+  "WATCHER_PRINT_BOSS_ENCOUNTER.title": "Printing Watcher",
+  "WATCHER_PRINT_BOSS_ENCOUNTER.loss": "{character} was crushed by the [gold]Printing Watcher[/gold]'s Master Reality."
 }

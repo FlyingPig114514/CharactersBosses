@@ -729,7 +729,31 @@ public static class BossDamagePredictor
     {
         int gain = StrengthGainOf(card);
         gain += DiscardReturnStrengthOf(card, boss);
+        gain += PrintStrengthOf(card, boss);
         return gain;
+    }
+
+    /// <summary>
+    /// **「印牌」带来的回合内加力量**（用户 2026-11-16「印牌观」：
+    /// 「记得让回合内的加力量提前被伤害预览计算（这比如第6、7回合）」）。
+    ///
+    /// 「改造现实」/「欺瞒现实」会各印一张牌，而她身上挂着本体牌「武器库」
+    /// （`ArsenalPower`：**每生成一张牌 +N 力量**）⇒ 这两张牌后面**同回合**的攻击
+    /// （第 6 / 7 回合的「惩恶+」）必须按加过力量的数值预览。
+    /// 走的是和「万物一心 / 全息影像」同一条通道（规划期的「预补力量」）。
+    /// </summary>
+    private static int PrintStrengthOf(CardModel? card, Monsters.CharBossMonster? boss)
+    {
+        if (card == null || boss == null) return 0;
+        try
+        {
+            string entry = EntryOf(card);
+            if (entry.IndexOf("CARVE_REALITY", StringComparison.Ordinal) < 0 &&
+                entry.IndexOf("DECEIVE_REALITY", StringComparison.Ordinal) < 0) return 0;
+            var arsenal = boss.Creature?.GetPower<MegaCrit.Sts2.Core.Models.Powers.ArsenalPower>();
+            return arsenal != null ? (int)Math.Round((double)arsenal.Amount) : 0;
+        }
+        catch { return 0; }
     }
 
     /// <summary>

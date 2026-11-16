@@ -770,6 +770,42 @@ internal static class BossLineups
     /// </summary>
     internal static bool WatcherOmegaActive() => Latched("WATCHER_OMEGA", ComputeWatcherOmega);
 
+    /// <summary>
+    /// **二层 1 号「印牌观」这套设计**（设计 Key `WATCHER_PRINT`，用户 2026-11-16）。
+    ///
+    /// 与 Ω观 同一套判据：只看「本场遭遇是谁」—— 印牌观有自己专属的遭遇
+    /// （`WATCHER_PRINT_BOSS_ENCOUNTER`），造怪时 `WatcherPrintBoss` 还会把
+    /// `SpawnVariantKey` / `PinnedVariantKey` 钉成 `WATCHER_PRINT` ⇒ 认不出就明确「不是印牌观」，
+    /// **不按种子 50/50 兜底**（否则控制台点名 / 读档会串到别的观者设计上）。
+    /// </summary>
+    internal static bool WatcherPrintActive() => Latched("WATCHER_PRINT", ComputeWatcherPrint);
+
+    private static (bool Value, bool Decisive) ComputeWatcherPrint()
+    {
+        try
+        {
+            string? entry = CurrentEncounterEntry();
+            if (!string.IsNullOrEmpty(entry))
+            {
+                if (entry == "WATCHER_PRINT_BOSS_ENCOUNTER") return (true, true);
+                if (entry.StartsWith("WATCHER_", StringComparison.Ordinal)) return (false, true);
+            }
+        }
+        catch { /* 往下走 */ }
+        try
+        {
+            foreach (var c in MegaCrit.Sts2.Core.Combat.CombatManager.Instance?.DebugOnlyGetState()?.Enemies
+                                ?? (IEnumerable<MegaCrit.Sts2.Core.Entities.Creatures.Creature>)Array.Empty<MegaCrit.Sts2.Core.Entities.Creatures.Creature>())
+            {
+                if (c?.Monster is not Monsters.CharBossMonster boss) continue;
+                string? pinned = boss.PinnedVariantKey ?? boss.SpawnVariantKey;
+                if (string.Equals(pinned, "WATCHER_PRINT", StringComparison.Ordinal)) return (true, true);
+            }
+        }
+        catch { /* 忽略 */ }
+        return (false, false);
+    }
+
     private static (bool Value, bool Decisive) ComputeWatcherOmega()
     {
         try

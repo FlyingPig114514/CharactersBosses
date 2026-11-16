@@ -140,5 +140,8 @@
     "WATCHER_FEAR_NO_EVIL_AIM_POWER.description": "W tej turze Obserwator zagra [gold]Nie lekaj sie zla[/gold].\nJesli wskazany gracz zagra karte ataku, wejdzie w [gold]Spokoj[/gold].",
     "WATCHER_FASTING_POWER.description": "Omega aktywuje sie co druga ture.\nObrazenia od Punktow nacisku mozna blokowac.\nOstrzezenie: Omega zadaje obrazenia bez zrodla, Punkty nacisku obrazenia od oslabienia; sludzy nie przyjma tych obrazen za ciebie. Przywołania z „Lojalność Vapiego“ także nie przyjmą tych obrażeń za ciebie.\nOmega: Na koniec twojej tury zadaj 50 obrażeń WSZYSTKIM wrogom.",
     "WATCHER_FASTING_POWER.description_dread": "Omega aktywuje sie co druga ture.\nObrazenia od Punktow nacisku mozna blokowac.\nOstrzezenie: Omega zadaje obrazenia bez zrodla, Punkty nacisku obrazenia od oslabienia; sludzy nie przyjma tych obrazen za ciebie. Przywołania z „Lojalność Vapiego“ także nie przyjmą tych obrażeń za ciebie.\nOmega: Na koniec twojej tury zadaj 50 obrażeń WSZYSTKIM wrogom.",
-    "WATCHER_FEAR_NO_EVIL_AIM_POWER.title": "Zagraj"
+    "WATCHER_FEAR_NO_EVIL_AIM_POWER.title": "Zagraj",
+  "BOSS_MASTER_REALITY_POWER.title": "Władza nad rzeczywistością",
+  "BOSS_MASTER_REALITY_POWER.description": "Za każdym razem, gdy tworzysz kartę w walce, zostaje ona [gold]obniżona[/gold] (ulepszona karta traci ulepszenie); jeśli nie jest żetonem, zyskuje też [gold]Wygaszenie[/gold].\nObserwator zdobył [gold]Arsenał[/gold], [gold]Filar Stworzenia[/gold] i [gold]Znaj swoje miejsce[/gold] dzięki Barwnemu Filozofowi.",
+  "BOSS_MASTER_REALITY_POWER.description_dread": "Za każdym razem, gdy tworzysz kartę w walce, zostaje ona [gold]obniżona[/gold] (ulepszona karta traci ulepszenie); jeśli nie jest żetonem, zyskuje też [gold]Wygaszenie[/gold].\nObserwator zdobył [gold]Arsenał[/gold], [gold]Filar Stworzenia[/gold] i [gold]Znaj swoje miejsce[/gold] dzięki Barwnemu Filozofowi."
 }

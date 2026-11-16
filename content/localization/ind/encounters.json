@@ -110,5 +110,7 @@
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "Pengamat Ilahi",
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} dihancurkan oleh kekuatan ilahi [gold]Pengamat Ilahi[/gold].",
     "WATCHER_OMEGA_BOSS_ENCOUNTER.title": "Pengamat Omega",
-    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character} dihancurkan oleh puasa [gold]Pengamat Omega[/gold]."
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character} dihancurkan oleh puasa [gold]Pengamat Omega[/gold].",
+  "WATCHER_PRINT_BOSS_ENCOUNTER.title": "Pengamat Pencetak",
+  "WATCHER_PRINT_BOSS_ENCOUNTER.loss": "{character} dihancurkan oleh [gold]Pengamat Pencetak[/gold]."
 }

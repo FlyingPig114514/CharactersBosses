@@ -204,5 +204,10 @@
     "WATCHER_OMEGA_BOSS.title": "Omega-Waechter",
     "WATCHER_OMEGA_BOSS.name": "Omega-Waechter",
     "WATCHER_OMEGA_BOSS.fasting": "Omega wird nur jeden zweiten Zug ausgeloest.\nSchaden durch Druckpunkte kann geblockt werden.\nWarnung: Omega verursacht quellenlosen Schaden, Druckpunkte Debuff-Schaden; Diener nehmen diesen Schaden nicht fuer dich. Diener mit „Vapis Loyalität“ fangen diesen Schaden auch nicht für dich ab.\nOmega: Am Ende deines Zuges fügst du ALLEN Gegnern 50 Schaden zu.",
-    "WATCHER_OMEGA_BOSS.fasting_dread": "Omega wird nur jeden zweiten Zug ausgeloest.\nSchaden durch Druckpunkte kann geblockt werden.\nWarnung: Omega verursacht quellenlosen Schaden, Druckpunkte Debuff-Schaden; Diener nehmen diesen Schaden nicht fuer dich. Diener mit „Vapis Loyalität“ fangen diesen Schaden auch nicht für dich ab.\nOmega: Am Ende deines Zuges fügst du ALLEN Gegnern 50 Schaden zu."
+    "WATCHER_OMEGA_BOSS.fasting_dread": "Omega wird nur jeden zweiten Zug ausgeloest.\nSchaden durch Druckpunkte kann geblockt werden.\nWarnung: Omega verursacht quellenlosen Schaden, Druckpunkte Debuff-Schaden; Diener nehmen diesen Schaden nicht fuer dich. Diener mit „Vapis Loyalität“ fangen diesen Schaden auch nicht für dich ab.\nOmega: Am Ende deines Zuges fügst du ALLEN Gegnern 50 Schaden zu.",
+  "WATCHER_PRINT_BOSS.name": "Druckender Wächter",
+  "WATCHER_PRINT_BOSS.title": "Druckender Wächter",
+  "WATCHER_PRINT_BOSS.moves.CHARBOSS_PLAY.title": "Karte spielen",
+  "WATCHER_BOSS.print_reality": "Immer wenn du im Kampf eine Karte erzeugst, wird sie [gold]herabgestuft[/gold] (eine aufgewertete Karte verliert ihre Aufwertung); ist sie kein Token, erhält sie zusätzlich [gold]Erschöpfen[/gold].\nDer Wächter erlangte [gold]Arsenal[/gold], [gold]Säule der Schöpfung[/gold] und [gold]Kenne deinen Platz[/gold] durch den Farbphilosophen.",
+  "WATCHER_BOSS.print_reality_dread": "Immer wenn du im Kampf eine Karte erzeugst, wird sie [gold]herabgestuft[/gold] (eine aufgewertete Karte verliert ihre Aufwertung); ist sie kein Token, erhält sie zusätzlich [gold]Erschöpfen[/gold].\nDer Wächter erlangte [gold]Arsenal[/gold], [gold]Säule der Schöpfung[/gold] und [gold]Kenne deinen Platz[/gold] durch den Farbphilosophen."
 }

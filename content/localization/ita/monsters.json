@@ -204,5 +204,10 @@
     "WATCHER_OMEGA_BOSS.title": "Osservatore Omega",
     "WATCHER_OMEGA_BOSS.name": "Osservatore Omega",
     "WATCHER_OMEGA_BOSS.fasting": "Omega si attiva un turno si e uno no.\nI danni dei Punti di pressione possono essere bloccati.\nAttenzione: Omega infligge danni senza fonte, i Punti di pressione danni da debuff; i servitori non subiranno quei danni al posto tuo. Anche i servitori con «Lealtà di Vapi» non assorbiranno quei danni al posto tuo.\nOmega: Alla fine del tuo turno, infliggi 50 danni a TUTTI i nemici.",
-    "WATCHER_OMEGA_BOSS.fasting_dread": "Omega si attiva un turno si e uno no.\nI danni dei Punti di pressione possono essere bloccati.\nAttenzione: Omega infligge danni senza fonte, i Punti di pressione danni da debuff; i servitori non subiranno quei danni al posto tuo. Anche i servitori con «Lealtà di Vapi» non assorbiranno quei danni al posto tuo.\nOmega: Alla fine del tuo turno, infliggi 50 danni a TUTTI i nemici."
+    "WATCHER_OMEGA_BOSS.fasting_dread": "Omega si attiva un turno si e uno no.\nI danni dei Punti di pressione possono essere bloccati.\nAttenzione: Omega infligge danni senza fonte, i Punti di pressione danni da debuff; i servitori non subiranno quei danni al posto tuo. Anche i servitori con «Lealtà di Vapi» non assorbiranno quei danni al posto tuo.\nOmega: Alla fine del tuo turno, infliggi 50 danni a TUTTI i nemici.",
+  "WATCHER_PRINT_BOSS.name": "Osservatore Stampante",
+  "WATCHER_PRINT_BOSS.title": "Osservatore Stampante",
+  "WATCHER_PRINT_BOSS.moves.CHARBOSS_PLAY.title": "Gioca carta",
+  "WATCHER_BOSS.print_reality": "Ogni volta che crei una carta in combattimento, essa viene [gold]declassata[/gold] (una carta potenziata perde il potenziamento); se non è un segnalino, ottiene anche [gold]Esaurimento[/gold].\nL'Osservatore ha ottenuto [gold]Arsenale[/gold], [gold]Pilastro della Creazione[/gold] e [gold]Conosci il tuo posto[/gold] tramite il Filosofo dei Colori.",
+  "WATCHER_BOSS.print_reality_dread": "Ogni volta che crei una carta in combattimento, essa viene [gold]declassata[/gold] (una carta potenziata perde il potenziamento); se non è un segnalino, ottiene anche [gold]Esaurimento[/gold].\nL'Osservatore ha ottenuto [gold]Arsenale[/gold], [gold]Pilastro della Creazione[/gold] e [gold]Conosci il tuo posto[/gold] tramite il Filosofo dei Colori."
 }

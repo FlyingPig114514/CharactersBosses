@@ -204,5 +204,10 @@
     "WATCHER_OMEGA_BOSS.title": "Observador Omega",
     "WATCHER_OMEGA_BOSS.name": "Observador Omega",
     "WATCHER_OMEGA_BOSS.fasting": "Omega e ativado a cada dois turnos.\nO dano dos Pontos de pressao pode ser bloqueado.\nAviso: Omega causa dano sem fonte e Pontos de pressao dano de penalidade; lacaios nao receberao esse dano por voce. Lacaios com «Lealdade de Vapi» também não receberão esse dano por você.\nÔmega: No fim do seu turno, causa 50 de dano a TODOS os inimigos.",
-    "WATCHER_OMEGA_BOSS.fasting_dread": "Omega e ativado a cada dois turnos.\nO dano dos Pontos de pressao pode ser bloqueado.\nAviso: Omega causa dano sem fonte e Pontos de pressao dano de penalidade; lacaios nao receberao esse dano por voce. Lacaios com «Lealdade de Vapi» também não receberão esse dano por você.\nÔmega: No fim do seu turno, causa 50 de dano a TODOS os inimigos."
+    "WATCHER_OMEGA_BOSS.fasting_dread": "Omega e ativado a cada dois turnos.\nO dano dos Pontos de pressao pode ser bloqueado.\nAviso: Omega causa dano sem fonte e Pontos de pressao dano de penalidade; lacaios nao receberao esse dano por voce. Lacaios com «Lealdade de Vapi» também não receberão esse dano por você.\nÔmega: No fim do seu turno, causa 50 de dano a TODOS os inimigos.",
+  "WATCHER_PRINT_BOSS.name": "Observador Impressor",
+  "WATCHER_PRINT_BOSS.title": "Observador Impressor",
+  "WATCHER_PRINT_BOSS.moves.CHARBOSS_PLAY.title": "Jogar carta",
+  "WATCHER_BOSS.print_reality": "Sempre que você criar uma carta em combate, ela será [gold]rebaixada[/gold] (uma carta aprimorada perde o aprimoramento); se não for uma ficha, também ganha [gold]Exaurir[/gold].\nO Observador obteve [gold]Arsenal[/gold], [gold]Pilar da Criação[/gold] e [gold]Conheça Seu Lugar[/gold] através do Filósofo das Cores.",
+  "WATCHER_BOSS.print_reality_dread": "Sempre que você criar uma carta em combate, ela será [gold]rebaixada[/gold] (uma carta aprimorada perde o aprimoramento); se não for uma ficha, também ganha [gold]Exaurir[/gold].\nO Observador obteve [gold]Arsenal[/gold], [gold]Pilar da Criação[/gold] e [gold]Conheça Seu Lugar[/gold] através do Filósofo das Cores."
 }

@@ -140,5 +140,8 @@
     "WATCHER_FEAR_NO_EVIL_AIM_POWER.description": "Bu tur Gozcu [gold]Kotulukten Korkma[/gold] oynayacak.\nKilitledigi oyuncu saldiri karti oynarsa [gold]Sukunet[/gold]e girer.",
     "WATCHER_FASTING_POWER.description": "Omega iki turda bir tetiklenir.\nBasinc Noktalari hasari bloklanabilir.\nUyari: Omega kaynaksiz hasar verir, Basinc Noktalari zayiflatma hasari verir; cagrilar bu hasari senin yerine almaz. «Vapi Sadakati» olan çağrılar da bu hasarı senin yerine almaz.\nOmega: Turunun sonunda TÜM düşmanlara 50 hasar ver.",
     "WATCHER_FASTING_POWER.description_dread": "Omega iki turda bir tetiklenir.\nBasinc Noktalari hasari bloklanabilir.\nUyari: Omega kaynaksiz hasar verir, Basinc Noktalari zayiflatma hasari verir; cagrilar bu hasari senin yerine almaz. «Vapi Sadakati» olan çağrılar da bu hasarı senin yerine almaz.\nOmega: Turunun sonunda TÜM düşmanlara 50 hasar ver.",
-    "WATCHER_FEAR_NO_EVIL_AIM_POWER.title": "Oyna"
+    "WATCHER_FEAR_NO_EVIL_AIM_POWER.title": "Oyna",
+  "BOSS_MASTER_REALITY_POWER.title": "Gerçekliğe Hükmetme",
+  "BOSS_MASTER_REALITY_POWER.description": "Savaşta bir kart oluşturduğunda o kart [gold]düşürülür[/gold] (yükseltilmiş kart yükseltmesini kaybeder); jeton değilse ayrıca [gold]Tüketim[/gold] kazanır.\nGözcü, Renk Filozofu sayesinde [gold]Cephanelik[/gold], [gold]Yaratılış Sütunu[/gold] ve [gold]Yerini Bil[/gold] elde etti.",
+  "BOSS_MASTER_REALITY_POWER.description_dread": "Savaşta bir kart oluşturduğunda o kart [gold]düşürülür[/gold] (yükseltilmiş kart yükseltmesini kaybeder); jeton değilse ayrıca [gold]Tüketim[/gold] kazanır.\nGözcü, Renk Filozofu sayesinde [gold]Cephanelik[/gold], [gold]Yaratılış Sütunu[/gold] ve [gold]Yerini Bil[/gold] elde etti."
 }

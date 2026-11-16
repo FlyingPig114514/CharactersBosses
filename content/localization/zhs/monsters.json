@@ -203,5 +203,10 @@
     "WATCHER_OMEGA_BOSS.title": "Ω观",
     "WATCHER_OMEGA_BOSS.name": "Ω观",
     "WATCHER_OMEGA_BOSS.fasting": "欧米伽改为隔一回合触发 1 次。\n点穴造成的伤害可以被你格挡。\n警告：欧米伽属于无来源伤害，点穴属于 debuff 伤害，带有“为你而死”和“瓦皮的忠诚”的召唤物不会替你承受该伤害。\n欧米伽：在你的回合结束时，对所有敌人造成50点伤害。",
-    "WATCHER_OMEGA_BOSS.fasting_dread": "欧米伽改为隔一回合触发 1 次。\n点穴造成的伤害可以被你格挡。\n警告：欧米伽属于无来源伤害，点穴属于 debuff 伤害，带有“为你而死”和“瓦皮的忠诚”的召唤物不会替你承受该伤害。\n欧米伽：在你的回合结束时，对所有敌人造成50点伤害。"
+    "WATCHER_OMEGA_BOSS.fasting_dread": "欧米伽改为隔一回合触发 1 次。\n点穴造成的伤害可以被你格挡。\n警告：欧米伽属于无来源伤害，点穴属于 debuff 伤害，带有“为你而死”和“瓦皮的忠诚”的召唤物不会替你承受该伤害。\n欧米伽：在你的回合结束时，对所有敌人造成50点伤害。",
+  "WATCHER_PRINT_BOSS.name": "印牌观",
+  "WATCHER_PRINT_BOSS.title": "印牌观",
+  "WATCHER_PRINT_BOSS.moves.CHARBOSS_PLAY.title": "出牌",
+  "WATCHER_BOSS.print_reality": "每当你在战斗中生成卡牌时，该牌会被[gold]降级[/gold]（已升级的退回未升级）；如果它不是衍生牌，还会获得[gold]消耗[/gold]。\n观者通过色彩哲学家获得了[gold]武器库[/gold]、[gold]创世之柱[/gold]和[gold]何人僭越[/gold]。",
+  "WATCHER_BOSS.print_reality_dread": "每当你在战斗中生成卡牌时，该牌会被[gold]降级[/gold]（已升级的退回未升级）；如果它不是衍生牌，还会获得[gold]消耗[/gold]。\n观者通过色彩哲学家获得了[gold]武器库[/gold]、[gold]创世之柱[/gold]和[gold]何人僭越[/gold]。"
 }

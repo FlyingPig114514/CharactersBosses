@@ -140,5 +140,8 @@
     "WATCHER_FEAR_NO_EVIL_AIM_POWER.description": "Turn ini Pengamat akan memainkan [gold]Tak Takut Kejahatan[/gold].\nJika pemain yang dikunci memainkan kartu serangan, ia masuk [gold]Tenang[/gold].",
     "WATCHER_FASTING_POWER.description": "Omega dipicu setiap dua turn.\nDamage Titik Tekan dapat kamu blokir.\nPeringatan: Omega memberi damage tanpa sumber, Titik Tekan memberi damage debuff; minion tidak akan menahan damage itu untukmu. Minion dengan «Kesetiaan Vapi» juga tidak akan menahan damage itu untukmu.\nOmega: Di akhir turnmu, berikan 50 damage ke SEMUA musuh.",
     "WATCHER_FASTING_POWER.description_dread": "Omega dipicu setiap dua turn.\nDamage Titik Tekan dapat kamu blokir.\nPeringatan: Omega memberi damage tanpa sumber, Titik Tekan memberi damage debuff; minion tidak akan menahan damage itu untukmu. Minion dengan «Kesetiaan Vapi» juga tidak akan menahan damage itu untukmu.\nOmega: Di akhir turnmu, berikan 50 damage ke SEMUA musuh.",
-    "WATCHER_FEAR_NO_EVIL_AIM_POWER.title": "Mainkan"
+    "WATCHER_FEAR_NO_EVIL_AIM_POWER.title": "Mainkan",
+  "BOSS_MASTER_REALITY_POWER.title": "Menguasai Realitas",
+  "BOSS_MASTER_REALITY_POWER.description": "Setiap kali kamu membuat kartu dalam pertarungan, kartu itu [gold]diturunkan[/gold] (kartu yang telah di-upgrade kehilangan upgrade-nya); jika bukan token, kartu itu juga mendapat [gold]Habis[/gold].\nSang Pengamat memperoleh [gold]Gudang Senjata[/gold], [gold]Pilar Penciptaan[/gold], dan [gold]Kenali Tempatmu[/gold] melalui Filsuf Warna.",
+  "BOSS_MASTER_REALITY_POWER.description_dread": "Setiap kali kamu membuat kartu dalam pertarungan, kartu itu [gold]diturunkan[/gold] (kartu yang telah di-upgrade kehilangan upgrade-nya); jika bukan token, kartu itu juga mendapat [gold]Habis[/gold].\nSang Pengamat memperoleh [gold]Gudang Senjata[/gold], [gold]Pilar Penciptaan[/gold], dan [gold]Kenali Tempatmu[/gold] melalui Filsuf Warna."
 }

@@ -140,5 +140,8 @@
     "WATCHER_FEAR_NO_EVIL_AIM_POWER.description": "このターン観者は[gold]妖邪を恐れず[/gold]をプレイする。\nロックされたプレイヤーが攻撃カードをプレイした場合、[gold]平穏[/gold]に入る。",
     "WATCHER_FASTING_POWER.description": "オメガは1ターンおきに発動する。\n点穴によるダメージはブロックできる。\n警告：オメガは発生源なしのダメージ、点穴はデバフダメージ。サモンは身代わりにならない。 「ヴァピの忠誠」を持つ召喚物も身代わりにならない。\nオメガ：あなたのターンの終了時、すべての敵に50ダメージを与える。",
     "WATCHER_FASTING_POWER.description_dread": "オメガは1ターンおきに発動する。\n点穴によるダメージはブロックできる。\n警告：オメガは発生源なしのダメージ、点穴はデバフダメージ。サモンは身代わりにならない。 「ヴァピの忠誠」を持つ召喚物も身代わりにならない。\nオメガ：あなたのターンの終了時、すべての敵に50ダメージを与える。",
-    "WATCHER_FEAR_NO_EVIL_AIM_POWER.title": "カードプレイ"
+    "WATCHER_FEAR_NO_EVIL_AIM_POWER.title": "カードプレイ",
+  "BOSS_MASTER_REALITY_POWER.title": "現実操作",
+  "BOSS_MASTER_REALITY_POWER.description": "戦闘中にあなたがカードを生成するたび、そのカードは[gold]ダウングレード[/gold]される（強化済みなら強化が外れる）。トークンでない場合、さらに[gold]消滅[/gold]を得る。\nウォッチャーは色彩哲学者を通じて[gold]武器庫[/gold]、[gold]創世の柱[/gold]、[gold]何人僭越[/gold]を手に入れた。",
+  "BOSS_MASTER_REALITY_POWER.description_dread": "戦闘中にあなたがカードを生成するたび、そのカードは[gold]ダウングレード[/gold]される（強化済みなら強化が外れる）。トークンでない場合、さらに[gold]消滅[/gold]を得る。\nウォッチャーは色彩哲学者を通じて[gold]武器庫[/gold]、[gold]創世の柱[/gold]、[gold]何人僭越[/gold]を手に入れた。"
 }

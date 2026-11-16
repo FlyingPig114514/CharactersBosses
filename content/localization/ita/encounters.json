@@ -110,5 +110,7 @@
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "Osservatore Divino",
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} è stato schiacciato dalla potenza divina dell\u0027[gold]Osservatore Divino[/gold].",
     "WATCHER_OMEGA_BOSS_ENCOUNTER.title": "Osservatore Omega",
-    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character} e stato schiacciato dal digiuno dell [gold]Osservatore Omega[/gold]."
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character} e stato schiacciato dal digiuno dell [gold]Osservatore Omega[/gold].",
+  "WATCHER_PRINT_BOSS_ENCOUNTER.title": "Osservatore Stampante",
+  "WATCHER_PRINT_BOSS_ENCOUNTER.loss": "{character} è stato schiacciato dall'[gold]Osservatore Stampante[/gold]."
 }

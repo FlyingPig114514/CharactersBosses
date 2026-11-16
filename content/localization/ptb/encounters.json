@@ -110,5 +110,7 @@
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "Observador Divino",
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} foi esmagado pelo poder divino do [gold]Observador Divino[/gold].",
     "WATCHER_OMEGA_BOSS_ENCOUNTER.title": "Observador Omega",
-    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character} foi esmagado pelo jejum do [gold]Observador Omega[/gold]."
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character} foi esmagado pelo jejum do [gold]Observador Omega[/gold].",
+  "WATCHER_PRINT_BOSS_ENCOUNTER.title": "Observador Impressor",
+  "WATCHER_PRINT_BOSS_ENCOUNTER.loss": "{character} foi esmagado pelo [gold]Observador Impressor[/gold]."
 }

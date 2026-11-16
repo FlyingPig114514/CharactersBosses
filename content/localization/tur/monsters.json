@@ -204,5 +204,10 @@
     "WATCHER_OMEGA_BOSS.title": "Omega Gozcu",
     "WATCHER_OMEGA_BOSS.name": "Omega Gozcu",
     "WATCHER_OMEGA_BOSS.fasting": "Omega iki turda bir tetiklenir.\nBasinc Noktalari hasari bloklanabilir.\nUyari: Omega kaynaksiz hasar verir, Basinc Noktalari zayiflatma hasari verir; cagrilar bu hasari senin yerine almaz. «Vapi Sadakati» olan çağrılar da bu hasarı senin yerine almaz.\nOmega: Turunun sonunda TÜM düşmanlara 50 hasar ver.",
-    "WATCHER_OMEGA_BOSS.fasting_dread": "Omega iki turda bir tetiklenir.\nBasinc Noktalari hasari bloklanabilir.\nUyari: Omega kaynaksiz hasar verir, Basinc Noktalari zayiflatma hasari verir; cagrilar bu hasari senin yerine almaz. «Vapi Sadakati» olan çağrılar da bu hasarı senin yerine almaz.\nOmega: Turunun sonunda TÜM düşmanlara 50 hasar ver."
+    "WATCHER_OMEGA_BOSS.fasting_dread": "Omega iki turda bir tetiklenir.\nBasinc Noktalari hasari bloklanabilir.\nUyari: Omega kaynaksiz hasar verir, Basinc Noktalari zayiflatma hasari verir; cagrilar bu hasari senin yerine almaz. «Vapi Sadakati» olan çağrılar da bu hasarı senin yerine almaz.\nOmega: Turunun sonunda TÜM düşmanlara 50 hasar ver.",
+  "WATCHER_PRINT_BOSS.name": "Baskı Gözcüsü",
+  "WATCHER_PRINT_BOSS.title": "Baskı Gözcüsü",
+  "WATCHER_PRINT_BOSS.moves.CHARBOSS_PLAY.title": "Kart Oyna",
+  "WATCHER_BOSS.print_reality": "Savaşta bir kart oluşturduğunda o kart [gold]düşürülür[/gold] (yükseltilmiş kart yükseltmesini kaybeder); jeton değilse ayrıca [gold]Tüketim[/gold] kazanır.\nGözcü, Renk Filozofu sayesinde [gold]Cephanelik[/gold], [gold]Yaratılış Sütunu[/gold] ve [gold]Yerini Bil[/gold] elde etti.",
+  "WATCHER_BOSS.print_reality_dread": "Savaşta bir kart oluşturduğunda o kart [gold]düşürülür[/gold] (yükseltilmiş kart yükseltmesini kaybeder); jeton değilse ayrıca [gold]Tüketim[/gold] kazanır.\nGözcü, Renk Filozofu sayesinde [gold]Cephanelik[/gold], [gold]Yaratılış Sütunu[/gold] ve [gold]Yerini Bil[/gold] elde etti."
 }

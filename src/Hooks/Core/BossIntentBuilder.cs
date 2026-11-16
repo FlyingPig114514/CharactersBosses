@@ -1530,6 +1530,11 @@ public static class BossIntentBuilder
         //   ⇒ 自动判定什么都认不出来，会掉到「技能牌兜底 = 强化」上（蓝上箭头）。
         //   用户要求：它应该是「**策略 + 牺牲**」（给敌人扣力量 = 策略；自己也扣力量 = 牺牲）。
         "SHARED_FATE",
+        // ★ 二层 1 号「印牌观」（用户 2026-11-16：「义愤填膺的意图应当显示为策略」）。
+        //   义愤填膺：在愤怒 ⇒ 给所有敌人易伤；否则进入愤怒 ⇒ 归「策略」（红色下箭头）。
+        "WATCHER-INDIGNATION", "WATCHER_INDIGNATION",
+        // 何人僭越（本体 `KnowThyPlace`，0 费）：给目标 易伤 + 虚弱 ⇒ 同样是策略。
+        "KNOW_THY_PLACE",
     };
 
     /// <summary>看这张牌施加的 power 是增益还是减益（数值为负的也算减益，如「下砸」减敌人力量）。</summary>

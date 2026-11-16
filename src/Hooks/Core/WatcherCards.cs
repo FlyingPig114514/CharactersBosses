@@ -217,6 +217,36 @@ internal static class WatcherCards
     /// <summary>笨拙（本体状态牌，用户剧本第 2 回合手里那张）。</summary>
     internal static Type? Clumsy => typeof(MegaCrit.Sts2.Core.Models.Cards.Clumsy);
 
+    // ── 二层 1 号「印牌观」用到的牌（用户 2026-11-16）────────────────────────
+    /// <summary>改造现实（B `WATCHER-CARVE_REALITY`）：伤害 + **印一张「惩恶」进手牌**。</summary>
+    internal static Type? CarveReality => Card("WatcherCarveReality", "CarveReality",
+        "WATCHER_CARVE_REALITY", "WATCHER-CARVE_REALITY");
+
+    /// <summary>惩恶（衍生牌，`CardRarity.Token`）：改造现实印出来的那张。</summary>
+    internal static Type? Smite => Card("WatcherSmite", "Smite", "WATCHER_SMITE", "WATCHER-SMITE");
+
+    /// <summary>义愤填膺：在愤怒 ⇒ 给所有敌人易伤；否则进入愤怒。**意图按「策略」显示**（用户要求）。</summary>
+    internal static Type? Indignation => Card("WatcherIndignation", "Indignation",
+        "WATCHER_INDIGNATION", "WATCHER-INDIGNATION");
+
+    /// <summary>内心宁静：在平静 ⇒ 抽牌；否则进入平静。</summary>
+    internal static Type? InnerPeace => Card("WatcherInnerPeace", "InnerPeace",
+        "WATCHER_INNER_PEACE", "WATCHER-INNER-PEACE");
+
+    /// <summary>操控现实（**藏品/卡**，模组自带）：她这只 Boss 的特殊效果同名，但效果相反（见 `BossMasterRealityPower`）。</summary>
+    internal static Type? MasterReality => Card("WatcherMasterReality", "MasterReality",
+        "WATCHER_MASTER_REALITY", "WATCHER-MASTER_REALITY");
+
+    // ── 「印牌观」通过色彩哲学家拿到的三张**储君**牌（本体牌，编译期已知）──────────
+    /// <summary>武器库（本体 `Arsenal`，1 费 Power）：`ArsenalPower(N)` ⇒ **每生成一张牌 +N 力量**。</summary>
+    internal static Type? Arsenal => typeof(MegaCrit.Sts2.Core.Models.Cards.Arsenal);
+
+    /// <summary>创世之柱（本体 `PillarOfCreation`，1 费 Power）：`PillarOfCreationPower(N)` ⇒ **每生成一张牌 +N 格挡**。</summary>
+    internal static Type? PillarOfCreation => typeof(MegaCrit.Sts2.Core.Models.Cards.PillarOfCreation);
+
+    /// <summary>何人僭越（本体 `KnowThyPlace`，**0 费** Skill）：给目标 易伤 + 虚弱。</summary>
+    internal static Type? KnowThyPlace => typeof(MegaCrit.Sts2.Core.Models.Cards.KnowThyPlace);
+
     /// <summary>
     /// **B 版（lamali）她此刻的姿态倍率**：1（无/平静）/ 2（愤怒）/ 3（神格）。
     ///

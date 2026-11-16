@@ -110,5 +110,7 @@
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "神格観",
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character}は[gold]神格観[/gold]の神格の力に押し潰された。",
     "WATCHER_OMEGA_BOSS_ENCOUNTER.title": "オメガウォッチャー",
-    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character}は[gold]オメガウォッチャー[/gold]の断食に砕かれた。"
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character}は[gold]オメガウォッチャー[/gold]の断食に砕かれた。",
+  "WATCHER_PRINT_BOSS_ENCOUNTER.title": "プリントウォッチャー",
+  "WATCHER_PRINT_BOSS_ENCOUNTER.loss": "{character}は[gold]プリントウォッチャー[/gold]の現実操作に砕かれた。"
 }

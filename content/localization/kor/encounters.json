@@ -110,5 +110,7 @@
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "신격관",
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character}은(는) [gold]신격관[/gold]의 신격의 힘에 짓눌렸다.",
     "WATCHER_OMEGA_BOSS_ENCOUNTER.title": "오메가 왓처",
-    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character}는 [gold]오메가 왓처[/gold]의 단식에 부서졌다."
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character}는 [gold]오메가 왓처[/gold]의 단식에 부서졌다.",
+  "WATCHER_PRINT_BOSS_ENCOUNTER.title": "프린트 왓처",
+  "WATCHER_PRINT_BOSS_ENCOUNTER.loss": "{character}은(는) [gold]프린트 왓처[/gold]의 현실 조작에 짓밟혔다."
 }

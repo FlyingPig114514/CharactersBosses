@@ -110,5 +110,7 @@
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "神格觀",
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character}被[gold]神格觀[/gold]的神格之力碾碎。",
     "WATCHER_OMEGA_BOSS_ENCOUNTER.title": "Ω觀",
-    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character}被[gold]Ω觀[/gold]的齋戒碾碎。"
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character}被[gold]Ω觀[/gold]的齋戒碾碎。",
+  "WATCHER_PRINT_BOSS_ENCOUNTER.title": "印牌觀",
+  "WATCHER_PRINT_BOSS_ENCOUNTER.loss": "{character}被[gold]印牌觀[/gold]的操控現實碾碎。"
 }

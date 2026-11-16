@@ -138,6 +138,25 @@ public class WatcherOmegaBossEncounter : CharBossEncounterBase<WatcherOmegaBoss>
     /// <summary>地图节点图标（暂与神格观共用一代崩坠那张；`res://CharacterBosses/images/map/`）。</summary>
     public override string BossNodePath => "res://CharacterBosses/images/map/watcher_divinity";
 }
+
+/// <summary>调试用的「普通战斗」版：二层 1 号「印牌观」。</summary>
+public sealed class WatcherPrintBossNormalEncounter : WatcherPrintBossEncounter
+{
+    public override RoomType RoomType => RoomType.Monster;
+}
+
+/// <summary>
+/// **二层 1 号「印牌观」**（设计 Key `WATCHER_PRINT`，用户 2026-11-16）：
+/// 观者角色 + 「武器库 / 创世之柱」印牌流 + 特殊效果「操控现实」。
+/// 控制台：`fight WATCHER_PRINT_BOSS_ENCOUNTER`。
+/// </summary>
+public class WatcherPrintBossEncounter : CharBossEncounterBase<WatcherPrintBoss>
+{
+    public override int? TierAct => 1;      // 第二幕
+
+    /// <summary>地图节点图标（暂与神格观共用；`res://CharacterBosses/images/map/`）。</summary>
+    public override string BossNodePath => "res://CharacterBosses/images/map/watcher_divinity";
+}
 #endif
 // ── 调试专用的「普通战斗」版本 ──
 // 调试开关换进来的战斗如果仍是 RoomType.Boss，打赢后会走 Boss 结算（第一幕的 Boss 一死就直接进下一幕）。
@@ -555,6 +574,7 @@ public static class CharBossEncounters
         ModelDb.Encounter<FoolTarotBossEncounter>(),           // 三层 12 号：塔罗愚（愚者，用户 2026-11-14）
         ModelDb.Encounter<WatcherDivinityBossEncounter>(),             // 三层 1 号：神格观（只有装了观者 mod 才会进候选表）
         ModelDb.Encounter<WatcherOmegaBossEncounter>(),                // 三层 2 号：Ω观（用户 2026-11-16）
+        ModelDb.Encounter<WatcherPrintBossEncounter>(),                // 二层 1 号：印牌观（用户 2026-11-16）
 #endif
     });
 
@@ -592,6 +612,9 @@ public static class CharBossEncounters
             Add(4, 2, ModelDb.Encounter<RegentColorlessBossEncounter>());        // 三层 无色储君
 #if STS2_111
             Add(5, 2, ModelDb.Encounter<FoolTarotBossEncounter>());              // 三层 塔罗愚（愚者，用户 2026-11-14）
+            // 观者（角色下标 6）：她的每套设计各自一幕 ⇒ 二层＝印牌观、三层＝神格观（主）/Ω观（变体）
+            Add(6, 1, ModelDb.Encounter<WatcherPrintBossEncounter>());           // 二层 1 号 印牌观（用户 2026-11-16）
+            Add(6, 2, ModelDb.Encounter<WatcherDivinityBossEncounter>());        // 三层 1 号 神格观
 #endif
             return map;
         });

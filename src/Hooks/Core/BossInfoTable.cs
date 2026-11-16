@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace CharacterBosses.Core;
@@ -248,6 +248,14 @@ internal static class BossInfoTable
         //   单体高压回合：2、3、8、9 / 群体高压回合：9 / 特殊效果类型：全局」。
         //   「全局」= 特殊效果「压制」（她每打出华丽收场，就把一张虚空塞进**所有玩家**的抽牌堆顶）。
         // ── 观者（用户 2026-11-16 给的原文）──────────────────────────────────────
+    ["WATCHER_PRINT"] = Lines(
+        "循环：6～8",
+        "单体能力：偏强",
+        "群攻能力：中",
+        "单体高压回合：3、7",
+        "群体高压回合：4、7",
+        "特殊效果类型：单体",
+        "群体减益能力：强"),
     ["WATCHER_OMEGA"] = Lines(
         "循环：9～12",
         "单体能力：极强",

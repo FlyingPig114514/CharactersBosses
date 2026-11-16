@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -453,6 +453,12 @@ public abstract partial class CharBossMonster : MonsterModel
         "SEVERANCE",
         "WATCHER_DECEIVE_REALITY",
         "WATCHER-DECEIVE_REALITY",
+        // ★ v0.2.712（二层 1 号「印牌观」，用户 2026-11-16）：「改造现实」同样会印一张「惩恶」，
+        //   而剧本第 1 / 6 回合本来就写着「惩恶+」⇒ 拦掉原版那份，改由
+        //   `Powers.BossMasterRealityPower.TriggerPrintAsync` 手动补结算「生成了一张牌」
+        //   （触发她的「创世之柱」+格挡 /「武器库」+力量）。
+        "WATCHER_CARVE_REALITY",
+        "WATCHER-CARVE_REALITY",
     };
 
     public override async Task AfterAddedToRoom()
@@ -987,6 +993,24 @@ public abstract partial class CharBossMonster : MonsterModel
                 else BladesGrowth.RecomputeAll(this, Plan, planTime: false);
 
                 await PlayOne(ctx, pcs, play);
+
+#if STS2_111
+                // ★ v0.2.712（用户 2026-11-16「印牌观」）：「每当她打出改造现实和欺瞒现实时都会“印牌”，
+                //   此时要触发创世之柱和武器库（如果她有）」。
+                //   那两张牌原版会往手牌里塞一张惩恶 / 平安，而那次生成被 `BlocksGeneratedCardsEntries`
+                //   拦掉了（剧本里本来就写着那两张，不拦会多一份）⇒ 原版 `AfterCardGeneratedForCombat`
+                //   也就不会派发 ⇒ 这里手动补结算一次。
+                try
+                {
+                    string entry = SafeEntryOf(play.Card) ?? string.Empty;
+                    if (entry.IndexOf("CARVE_REALITY", StringComparison.Ordinal) >= 0 ||
+                        entry.IndexOf("DECEIVE_REALITY", StringComparison.Ordinal) >= 0)
+                    {
+                        await Powers.BossMasterRealityPower.TriggerPrintAsync(this, entry);
+                    }
+                }
+                catch (Exception e) { Logger.Log("[CharBoss] 印牌触发失败: " + e.Message); }
+#endif
                 // 额外回合的第一张牌：**真的再打一遍**（用户 2026-11-14）
                 if (_doubleNextCardOnce && !Creature.IsDead)
                 {

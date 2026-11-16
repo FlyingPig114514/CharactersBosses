@@ -204,5 +204,10 @@
     "WATCHER_OMEGA_BOSS.title": "Obserwator Omega",
     "WATCHER_OMEGA_BOSS.name": "Obserwator Omega",
     "WATCHER_OMEGA_BOSS.fasting": "Omega aktywuje sie co druga ture.\nObrazenia od Punktow nacisku mozna blokowac.\nOstrzezenie: Omega zadaje obrazenia bez zrodla, Punkty nacisku obrazenia od oslabienia; sludzy nie przyjma tych obrazen za ciebie. Przywołania z „Lojalność Vapiego“ także nie przyjmą tych obrażeń za ciebie.\nOmega: Na koniec twojej tury zadaj 50 obrażeń WSZYSTKIM wrogom.",
-    "WATCHER_OMEGA_BOSS.fasting_dread": "Omega aktywuje sie co druga ture.\nObrazenia od Punktow nacisku mozna blokowac.\nOstrzezenie: Omega zadaje obrazenia bez zrodla, Punkty nacisku obrazenia od oslabienia; sludzy nie przyjma tych obrazen za ciebie. Przywołania z „Lojalność Vapiego“ także nie przyjmą tych obrażeń za ciebie.\nOmega: Na koniec twojej tury zadaj 50 obrażeń WSZYSTKIM wrogom."
+    "WATCHER_OMEGA_BOSS.fasting_dread": "Omega aktywuje sie co druga ture.\nObrazenia od Punktow nacisku mozna blokowac.\nOstrzezenie: Omega zadaje obrazenia bez zrodla, Punkty nacisku obrazenia od oslabienia; sludzy nie przyjma tych obrazen za ciebie. Przywołania z „Lojalność Vapiego“ także nie przyjmą tych obrażeń za ciebie.\nOmega: Na koniec twojej tury zadaj 50 obrażeń WSZYSTKIM wrogom.",
+  "WATCHER_PRINT_BOSS.name": "Drukujący Obserwator",
+  "WATCHER_PRINT_BOSS.title": "Drukujący Obserwator",
+  "WATCHER_PRINT_BOSS.moves.CHARBOSS_PLAY.title": "Zagranie karty",
+  "WATCHER_BOSS.print_reality": "Za każdym razem, gdy tworzysz kartę w walce, zostaje ona [gold]obniżona[/gold] (ulepszona karta traci ulepszenie); jeśli nie jest żetonem, zyskuje też [gold]Wygaszenie[/gold].\nObserwator zdobył [gold]Arsenał[/gold], [gold]Filar Stworzenia[/gold] i [gold]Znaj swoje miejsce[/gold] dzięki Barwnemu Filozofowi.",
+  "WATCHER_BOSS.print_reality_dread": "Za każdym razem, gdy tworzysz kartę w walce, zostaje ona [gold]obniżona[/gold] (ulepszona karta traci ulepszenie); jeśli nie jest żetonem, zyskuje też [gold]Wygaszenie[/gold].\nObserwator zdobył [gold]Arsenał[/gold], [gold]Filar Stworzenia[/gold] i [gold]Znaj swoje miejsce[/gold] dzięki Barwnemu Filozofowi."
 }

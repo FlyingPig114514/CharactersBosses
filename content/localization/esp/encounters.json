@@ -110,5 +110,7 @@
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "Observador Divino",
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} fue aplastado por el poder divino del [gold]Observador Divino[/gold].",
     "WATCHER_OMEGA_BOSS_ENCOUNTER.title": "Observador Omega",
-    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character} fue aplastado por el ayuno del [gold]Observador Omega[/gold]."
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character} fue aplastado por el ayuno del [gold]Observador Omega[/gold].",
+  "WATCHER_PRINT_BOSS_ENCOUNTER.title": "Vigía Impresor",
+  "WATCHER_PRINT_BOSS_ENCOUNTER.loss": "{character} fue aplastado por el [gold]Vigía Impresor[/gold]."
 }
