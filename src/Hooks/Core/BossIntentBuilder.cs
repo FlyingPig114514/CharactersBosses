@@ -1320,19 +1320,14 @@ public static class BossIntentBuilder
             // 与 `StanceBake` 同一把尺子）。⚠ 不能用「此刻的真实姿态」—— 计划是在她上一回合结束时
             // 就算好的，那时第 4 回合的暴怒还没打出去（用户实测就卡在这里）。
             bool inWrath = stanceMul >= 2;
+            bool indignation = Monsters.CharBossMonster.WatcherIdIs(e, "INDIGNATION");
 
             bool wantBuff;
             bool wantSacrifice;
             if (isWrath)
             {
-                bool indignation = Monsters.CharBossMonster.WatcherIdIs(e, "INDIGNATION");
                 wantBuff = !inWrath;
                 wantSacrifice = !inWrath;
-                if (inWrath && indignation)
-                {
-                    // 只施加易伤 ⇒ 只留策略
-                    RemoveAll<DebuffIntent>(intents, keepFirst: true);
-                }
             }
             else if (isCalm) { wantBuff = true; wantSacrifice = false; }
             else if (isPrint) { wantBuff = true; wantSacrifice = false; }
@@ -1349,13 +1344,28 @@ public static class BossIntentBuilder
                 wantBuff = aim; wantSacrifice = false;
             }
 
-            if (wantBuff) EnsureBuffIntent(intents);
-            else RemoveAll<BuffIntent>(intents);
+            // ⚠ `SacrificeIntent` **继承** `BuffIntent`（共用蓝色箭头，UI 翻转让它朝下），
+            //   所以不能再走 `DedupeBuffIntent`（它会把「牺牲」当成重复的强化删掉 ——
+            //   用户截图「义愤填膺+ 只有强化 + 策略、没有牺牲」就是这么来的）。
+            //   这里先按「意图家族」整体清掉，再按需依次放回：强化 → 牺牲。
+            intents.RemoveAll(it => it is BuffIntent);
+            if (wantBuff) intents.Add(new BuffIntent());
+            if (wantSacrifice) intents.Add(new SacrificeIntent());
 
-            if (wantSacrifice) EnsureSacrificeIntent(intents);
-            else RemoveAll<SacrificeIntent>(intents);
-
-            if (wantBuff) DedupeBuffIntent(intents);
+            // 策略：义愤填膺**只在已经愤怒时**才施加易伤（不在这张表就别动别的牌的策略）
+            if (indignation)
+            {
+                if (inWrath)
+                {
+                    bool hasDebuff = false;
+                    foreach (var it in intents) if (it is DebuffIntent) { hasDebuff = true; break; }
+                    if (!hasDebuff) intents.Add(new DebuffIntent(false));
+                }
+                else
+                {
+                    intents.RemoveAll(it => it is DebuffIntent);
+                }
+            }
         }
         catch { /* 纯预览 */ }
 #endif
