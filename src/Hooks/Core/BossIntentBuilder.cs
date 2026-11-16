@@ -1164,6 +1164,25 @@ public static class BossIntentBuilder
         // 「疯狂科学」只要「守势 + 强化」两条：牺牲意图也去掉（它是三套模板的混合体，
         // 数据上会带上「失去力量」这类减益变量，画出来就是用户看到的那个多余的下箭头）。
         if (madScience) hasSacrifice = false;
+#if STS2_111
+        // ★ v0.2.715（用户 2026-11-16「印牌观」）：
+        //   「当义愤填膺会使观者进入愤怒时意图应显示为**强化**，如果会让观者给予易伤的话则显示为**策略**」
+        //   反编译 `Indignation.OnPlay`：不在愤怒 ⇒ 进入愤怒；已在愤怒 ⇒ 给**所有敌人**易伤。
+        //   ⇒ 按她**此刻**的姿态二选一（`StanceMultiplierOf`：愤怒 = 2）。
+        try
+        {
+            string indEntry = string.Empty;
+            try { indEntry = card.Id?.Entry ?? string.Empty; } catch { indEntry = string.Empty; }
+            if (Monsters.CharBossMonster.WatcherIdIs(indEntry, "INDIGNATION"))
+            {
+                bool inWrath = false;
+                try { inWrath = StanceMultiplierOf(card.Owner?.Creature) >= 2; } catch { inWrath = false; }
+                hasBuff = !inWrath;        // 不在愤怒 ⇒ 进入愤怒（强化）
+                hasDebuff = inWrath;       // 已在愤怒 ⇒ 给敌人易伤（策略）
+            }
+        }
+        catch { /* 纯预览 */ }
+#endif
         // ★ v0.2.701：Ω观点穴的「策略」我们已经自己加过了（B 版点穴带 `PowerVar<MarkPower>`，
         //   通用分类也会补一条 ⇒ 屏幕上出现两个红箭头）。这里只是不重复加，见上面那段注释。
         if (hasDebuff && !suppressGenericDebuff) intents.Add(new DebuffIntent(false));
@@ -1530,9 +1549,9 @@ public static class BossIntentBuilder
         //   ⇒ 自动判定什么都认不出来，会掉到「技能牌兜底 = 强化」上（蓝上箭头）。
         //   用户要求：它应该是「**策略 + 牺牲**」（给敌人扣力量 = 策略；自己也扣力量 = 牺牲）。
         "SHARED_FATE",
-        // ★ 二层 1 号「印牌观」（用户 2026-11-16：「义愤填膺的意图应当显示为策略」）。
-        //   义愤填膺：在愤怒 ⇒ 给所有敌人易伤；否则进入愤怒 ⇒ 归「策略」（红色下箭头）。
-        "WATCHER-INDIGNATION", "WATCHER_INDIGNATION",
+        // ★ 二层 1 号「印牌观」：**义愤填膺不在这张表里** —— 它的意图是**条件化的**
+        //   （不在愤怒 ⇒ 强化「进入愤怒」；已在愤怒 ⇒ 策略「给敌人易伤」），
+        //   见上面 `IntentsFor` 里那段按姿态二选一的处理。
         // 何人僭越（本体 `KnowThyPlace`，0 费）：给目标 易伤 + 虚弱 ⇒ 同样是策略。
         "KNOW_THY_PLACE",
     };
