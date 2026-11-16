@@ -325,7 +325,15 @@ internal static class WatcherCards
     /// 第 1 回合她**不会打它**（剧本没写），第 2 回合重建手牌时随弃手牌一起进弃牌堆。
     ///
     /// 所以这里**只给 lamali 版补一张**（Boninall 版原版自己会印，补了就成两张）；
-    /// 时机（战斗开始）、张数（1）、落点（手牌末尾）、不升级 —— 全部对齐 A 版。
+    /// 张数（1）、落点（手牌末尾）、不升级 —— 全部对齐 A 版。
+    ///
+    /// ⚠ **调用点必须是「她第 1 回合的手牌建完之后」**（`CharBossMonster.PrepareTurn` 里
+    /// `BossScriptRunner.BuildHand` 之后），不能放 `BossHookBridge.FireCombatStart`：
+    /// `FireCombatStart` 早于 `PrepareTurn`，而 `PrepareTurn` 第一句就是 `BossPiles.DiscardHand(pcs)`
+    /// ⇒ 补进去的牌下一步就进弃牌堆了（v0.2.723 实测：`补 1 张「奇迹」` → `手牌栏：1 张…`
+    /// → `剧本手牌(4)`、`discard=1`，界面上看得见变化、她手里却没有）。
+    /// A 版能看见正是因为它的 `BeforeCombatStart` 派发得**更晚**（晚于 `PrepareTurn`），躲过了这次弃牌。
+    ///
     /// ⚠ 因为剧本没写这张牌，她**永远不会打出它** ⇒ 不会多出「奇迹打出 +1 能量」，
     ///   每回合的能量账（`BossTurn.Energy`）一个字都不用改。
     /// </summary>

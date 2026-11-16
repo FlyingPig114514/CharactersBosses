@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Models;
@@ -272,6 +272,24 @@ public abstract partial class CharBossMonster
             {
                 BossPiles.Draw(pcs, Math.Max(1, handSize));
             }
+
+#if STS2_111
+            // ★ v0.2.724（用户 2026-11-16：「这A版的至纯之水能生效，B版的至纯之水不能」→ 上一版补了但没看见）：
+            //   **必须在她手牌建好之后补**。`FireCombatStart` 早于 `PrepareTurn`，而 `PrepareTurn` 开头就是
+            //   `BossPiles.DiscardHand(pcs)` ⇒ 在 FireCombatStart 里补的那张，下一步就被丢进弃牌堆了。
+            //   日志实证（v0.2.723，21:46:53 印牌观）：
+            //     `至纯之水…⇒ 战斗开始自己补 1 张「奇迹」到她手里`
+            //     → `手牌栏：1 张里有 1 张本回合不会打 [WATCHER-MIRACLE]`
+            //     → `重建手牌：清掉上一批「打击」旧牌 3 张` → `剧本手牌(4)`、`discard=1`（那张奇迹在里面）
+            //   A 版（Boninall）之所以能看见，是因为它的 `BeforeCombatStart` 派发得**更晚**
+            //   （在 `PrepareTurn` 之后，21:34:29 手牌才从 4 变 5）⇒ 正好躲过了这次弃牌。
+            //   现在把补牌挪到这里（建完手牌的第一时间），两版看到她第 1 回合的手牌就都是 5 张。
+            try
+            {
+                if (TurnNumber == 1) Core.WatcherCards.EnsurePureWaterMiracle(Shadow, CombatState);
+            }
+            catch (Exception e) { Logger.Log("[CharBoss] 至纯之水补「奇迹」失败: " + e.Message); }
+#endif
 
             // 「等离子球回合开始 +1 能量」和「充电：下回合 +1 能量」都在这里补进预算
             int plasma = BossOrbMath.PlasmaEnergyFor(pcs.OrbQueue);

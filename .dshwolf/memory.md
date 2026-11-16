@@ -5808,3 +5808,6 @@ Chronological action log.
 | 2026-11-16 21:30 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
 | 2026-11-16 21:43 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherCards.cs` | ok | 0 |
 | 2026-11-16 21:43 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossHookBridge.SideTurn.cs` | ok | 0 |
+| 2026-11-16 21:47 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossHookBridge.SideTurn.cs` | ok | 0 |
+| 2026-11-16 21:47 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Monsters/CharBossMonster.Turn.cs` | ok | 0 |
+| 2026-11-16 21:48 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherCards.cs` | ok | 0 |
