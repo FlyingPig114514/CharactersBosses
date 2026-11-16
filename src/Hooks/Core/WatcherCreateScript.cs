@@ -84,22 +84,23 @@ public static class WatcherCreateScript
                 W(WatcherCards.Eruption, upgraded: true),
                 W(WatcherCards.InnerPeace)),
 
-            // ── 5 ── 欺瞒现实 / 平安+ / 何人僭越 / 化拳为空（没费）   （2 费）
-            Turn(2, "5. 欺瞒现实、平安+、何人僭越、化拳为空（没费）",
+            // ── 5 ── 欺瞒现实 / 平安+ / 何人僭越 / 化体为空（没费）   （2 费）
+            //   ★ v0.2.720（用户 2026-11-16）：「削弱，化拳为空改成化体为空，其它不变」
+            //     —— 化体为空（`WATCHER-EMPTY_BODY`，1 费：获得格挡 + 退出姿态）不再打伤害，
+            //     费用与 化拳为空 相同 ⇒ 这里的能量账一个字都不用改。
+            Turn(2, "5. 欺瞒现实、平安+、何人僭越、化体为空（没费）",
                 W(WatcherCards.DeceiveReality),
                 W(WatcherCards.Safety, upgraded: true),
                 W(WatcherCards.KnowThyPlace),
-                W(WatcherCards.EmptyFist)),
+                W(WatcherCards.EmptyBody)),
 
-            // ── 6 ── 洗牌 / 改造现实（进阶 9 起升级）/ 化拳为空 / 警惕 / 惩恶+（没费）   ← 6～8 循环起点
-            //   ★ v0.2.718（用户 2026-11-16「第6回合为什么还是打惩恶」）：
-            //     日志实证 `观者姿态：WATCHER-EMPTY_FIST 退出「平静」⇒ 原版 +2 能量`
-            //     —— 化拳为空**离开平静白送 2 费**，所以 4 费的回合实际有 6 费，惩恶照样付得起。
-            //     按「化拳为空 1 + 离开平静 +2 + 警惕 2 花光、改造现实 1」算，她这回合**只需要 2 费**：
-            //     2 −改造现实1 = 1 → 化拳为空 1 = 0 → 离开平静 +2 = 2 → 警惕 2 = 0 → 惩恶+ 差 1 ⇒ 没费 ✔
-            Turn(2, "6. 洗牌（她重新洗牌）、改造现实（进阶9起升级）、化拳为空、警惕、惩恶+（没费）",
+            // ── 6 ── 洗牌 / 改造现实（进阶 9 起升级）/ 化体为空 / 警惕 / 惩恶+（没费）   ← 6～8 循环起点
+            //   ★ v0.2.720（用户 2026-11-16）：「化拳为空改成化体为空，其它不变」⇒ 化体为空同样**退出姿态**，
+            //     离开平静照旧 +2 能量，所以能量账不变：
+            //     2 −改造现实1 = 1 → 化体为空 1 = 0 → 离开平静 +2 = 2 → 警惕 2 = 0 → 惩恶+ 差 1 ⇒ 没费 ✔
+            Turn(2, "6. 洗牌（她重新洗牌）、改造现实（进阶9起升级）、化体为空、警惕、惩恶+（没费）",
                 W(WatcherCards.CarveReality, upgradeMinAscension: 9),
-                W(WatcherCards.EmptyFist),
+                W(WatcherCards.EmptyBody),
                 W(WatcherCards.Vigilance),
                 W(WatcherCards.Smite, upgraded: true)),
 
