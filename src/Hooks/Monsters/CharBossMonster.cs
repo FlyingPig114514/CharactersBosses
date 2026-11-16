@@ -730,6 +730,19 @@ public abstract partial class CharBossMonster : MonsterModel
             {
                 if (card == null) continue;
                 if (Creature == null || Creature.IsDead) return;
+                // ★ v0.2.716（用户 2026-11-16「印牌观」）：「奇迹」**不再每回合复燃**。
+                //   「至纯之水」给的那张奇迹打完就进消耗堆，而它的复燃钩子**每回合白送 1 点能量**
+                //   ⇒ 她的能量永远比剧本多 1（日志铁证：`回合开始复燃：WATCHER-MIRACLE（在消耗牌堆里）
+                //   已按其自身钩子打出`，紧接着那一回合 `剧本第 9 回合 … 余费=1`，多打出一张「惩恶」）。
+                //   她每一回合的能量必须严格等于剧本值，否则「没费」的牌就会被打出来。
+                string skipEntry = string.Empty;
+                try { skipEntry = card.Id?.Entry ?? string.Empty; } catch { skipEntry = string.Empty; }
+                if (skipEntry.IndexOf("MIRACLE", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    if (_miracleSkipLogs++ < 5)
+                        Logger.Log("[CharBoss] 消耗牌堆复燃：跳过「奇迹」（否则每回合白送 1 点能量，剧本能量就对不上了）");
+                    continue;
+                }
                 try
                 {
                     await card.AfterAutoPrePlayPhaseEnteredEarly(ctx, Shadow);
@@ -748,6 +761,8 @@ public abstract partial class CharBossMonster : MonsterModel
     }
 
     /// <summary>调试用的安全取牌名。</summary>
+    private static int _miracleSkipLogs;
+
     private static string SafeEntryOfCard(MegaCrit.Sts2.Core.Models.CardModel? card)
     {
         try { return card?.Id.Entry ?? "?"; } catch { return "?"; }

@@ -1143,6 +1143,18 @@ public static class BossFrameTick
                 }
             }
             catch { /* 拿不到玩家就只比她自己 */ }
+#if STS2_111
+            // ★ v0.2.716（用户 2026-11-16）：「如果玩家在观者要打不惧妖邪的回合打出了攻击牌，
+            //   为不惧妖邪的意图加上强化并**刷新意图显示**」——
+            //   这一刻变的是 `WatcherFearNoEvilAimPower.PlayerAttacked`（能力层数没变）
+            //   ⇒ 必须把它拼进指纹，否则面板不会重建、强化图标不会出现。
+            try
+            {
+                var aim = creature.GetPower<CharacterBosses.Powers.WatcherFearNoEvilAimPower>();
+                print += aim != null ? (aim.PlayerAttacked ? "|A1" : "|A0") : "|A-";
+            }
+            catch { /* 没有这只能力就跳过 */ }
+#endif
 
             if (!LastPowerPrint.TryGetValue(boss, out var last))
             {

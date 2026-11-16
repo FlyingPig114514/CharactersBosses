@@ -5788,3 +5788,7 @@ Chronological action log.
 | 2026-11-16 20:54 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherCreateScript.cs` | ok | 0 |
 | 2026-11-16 20:54 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherCreateScript.cs` | ok | 0 |
 | 2026-11-16 20:54 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherCreateScript.cs` | ok | 0 |
+| 2026-11-16 21:03 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Monsters/CharBossMonster.cs` | ok | 0 |
+| 2026-11-16 21:03 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Monsters/CharBossMonster.cs` | ok | 0 |
+| 2026-11-16 21:03 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-16 21:03 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Patches/BossFrameTickPatch.cs` | ok | 0 |
