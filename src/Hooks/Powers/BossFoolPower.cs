@@ -3,6 +3,7 @@ using System;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Powers;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Powers;
 using CharacterBosses.Core;
@@ -17,13 +18,29 @@ namespace CharacterBosses.Powers;
 /// > PS：与灾厄骨的时候不同，这里是被施加灾厄的时候，如果玩家有格挡，就用格挡抵消等额灾厄，
 /// >     玩家身上已经有的灾厄没法通过这种方式消除或减少。
 ///
-/// 实现：挂在**她（他）自己**身上（`BossDefinition.SpecialPowerByAct`），
-/// 走 `AbstractModel.ModifyPowerAmountGivenAdditive` —— 这个钩子在「**即将**把 power 层数给到某个目标」
-/// 时被调用，返回值就是**实际会给的层数**。所以我们只改「这一次的施加量」：
-///   · 只认 `DoomPower`（灾厄）、正向层数、目标是有 `Player` 的真玩家；
-///   · 多人时只对「被他锁定的那位」生效（`BossLockOn.SpecialEffectAppliesTo`，单人恒成立）；
-///   · 目标有格挡 ⇒ `LoseBlockInternal(min(格挡, 灾厄))` 扣掉等量格挡，并把灾厄等量减掉；
-///   · **已经在他身上的灾厄完全不受影响**（这个钩子只在「施加」那一刻触发）。
+/// ## ★ v0.2.726 重做原因（用户 2026-11-16）
+/// > 「我刚刚在和塔罗愚对战，为什么他打死亡的那回合我的格挡会自己消失？
+/// >   我打一张防牌然后刚获得的格挡就马上消失了，我拿控制台调格挡也会消失」
+///
+/// 旧实现把「扣格挡」写在了 <see cref="ModifyPowerAmountGivenAdditive"/> 里。反编译
+/// `PowerCmd.Apply`（`sts2.dll`）的调用顺序是：
+/// <code>
+/// await Hook.BeforePowerAmountChanged(...);
+/// modifiedAmount = Hook.ModifyPowerAmountGiven(...);   ← 我们的钩子在这里（**只要有人算一次就会调用**）
+/// ...TryModifyPowerAmountReceived / BeforeApplied / AfterApplied...
+/// await Hook.AfterPowerAmountChanged(..., modifiedAmount, ...);   ← 真的挂上去了才会走到这里
+/// </code>
+/// 也就是说这个「给定层数」钩子**并不保证后面真的会施加**：任何「先算一下会加多少」的预览/试算
+/// 路径（UI 重绘、别的 mod 的意图预测…）都会把它调用一遍 —— 而旧实现**顺手就把玩家的格挡扣了**。
+/// 实机日志正好是这个症状：`愚者：静默猎手 用 48 点格挡抵消了 48 层灾厄（原本 75 → 27）`
+/// 在一次 `PLAY DEATH` 之前就出现了 3 次（22:25:58 规划期 / 22:26:12 / 22:26:21 玩家回合中），
+/// 而她第 7 回合出手前的玩家快照里**根本没有 DOOM_POWER** ⇒ 那几次灾厄一次都没真正加上去，
+/// 只有格挡被扣掉了。所以玩家一打防牌，格挡就在下一次预览时被吃掉，控制台加的格挡同样保不住。
+///
+/// 现在：**「给定层数」钩子只读不写**（永远返回 0，绝不改任何状态）；
+/// 真正扣格挡 + 减灾厄放到 <see cref="AfterPowerAmountChanged"/>（只有真的挂上了才会触发），
+/// 那里 `amount` 就是这次实际给出的层数，`power.Owner` 就是被施加的那位，
+/// 于是「只减这次新增的量、已经存在的灾厄一点不动」这条口径天然满足。
 /// </summary>
 public sealed class BossFoolPower : PowerModel
 {
@@ -34,92 +51,88 @@ public sealed class BossFoolPower : PowerModel
     public override bool ShouldPlayVfx => false;
 
     /// <summary>
-    /// 这次给出去的灾厄层数的**加值**。⚠ 名字里的 Additive 是**增量**、不是最终值：
-    /// `AbstractModel` 里的默认实现就是 `return 0m`，调用方算的是 `amount + 本方法的返回值`。
+    /// **只读**：这里一个副作用都不能有（见类注释）。返回 0 =「不改变这次要给的层数」，
+    /// 真正的「格挡抵灾厄」在 <see cref="AfterPowerAmountChanged"/> 里做。
     ///
-    /// 所以这里**只能返回「要扣掉的负数」**：返回 `-absorb` ⇒ 实际施加量 = `amount - absorb`。
-    /// （v0.2.657 的第一版误按「返回最终值」写、把 `amount` 原样返回 ⇒ 他身上**每一个** power
-    ///   都被翻倍：神话形态一次 +2 层、力量一次 +10，用户实机一眼看出来。）
+    /// 诊断计数器保留：`_hookCalls` = 这个钩子被调用的次数（包含预览），
+    /// `_applied` = 真的挂上灾厄的次数。两者差得越大，说明「有人在白白试算」越频繁。
     /// </summary>
     public override decimal ModifyPowerAmountGivenAdditive(PowerModel power, Creature giver, decimal amount,
                                                           Creature target, CardModel cardSource)
     {
-        // ── 临时诊断（v0.2.725，用户 2026-11-16：「他打死亡的那回合我的格挡会自己消失，
-        //    打一张防牌刚获得的格挡就马上消失，控制台调格挡也会消失」）──
-        // 现象是**格挡一有就被吃**，而本方法只在 `PowerCmd.Apply<DoomPower>` 里被调用。
-        // 所以要么这个钩子被反复调用（预览？别的 mod 试算？），要么真有人在反复施加灾厄。
-        // 这里把「调用次数 + 调用栈」打出来，下次一进日志就能定位是谁在叫。
         try
         {
             if (power is DoomPower)
             {
-                _doomHookCalls++;
-                if (_doomHookCalls <= 12 || _doomHookCalls % 25 == 0)
+                _hookCalls++;
+                if (_hookCalls <= 6 || _hookCalls % 40 == 0)
                 {
-                    string blockNow = "?";
-                    try { blockNow = target?.Block.ToString() ?? "null"; } catch { /* 忽略 */ }
-                    Logger.Log($"[CharBoss] 愚者·灾厄钩子第 {_doomHookCalls} 次：amount={amount} " +
-                               $"target={target?.Name ?? "null"} 格挡={blockNow} " +
-                               $"来源牌={SafeEntry(cardSource)}");
-                    if (_doomHookCalls == 1)
-                    {
-                        try
-                        {
-                            var frames = (Environment.StackTrace ?? string.Empty)
-                                .Split('\n');
-                            int shown = 0;
-                            foreach (var f in frames)
-                            {
-                                if (shown >= 14) break;
-                                var t = f.Trim();
-                                if (t.Length == 0) continue;
-                                if (t.StartsWith("at System.Environment", StringComparison.Ordinal)) continue;
-                                Logger.Log("[CharBoss] 愚者·灾厄钩子调用栈 " + (++shown) + ": " + t);
-                            }
-                        }
-                        catch { /* 诊断失败不影响功能 */ }
-                    }
+                    Logger.Log($"[CharBoss] 愚者·灾厄试算第 {_hookCalls} 次（只读，不改任何状态）：" +
+                               $"amount={amount} target={target?.Name ?? "null"} " +
+                               $"格挡={SafeBlock(target)} 来源={SafeEntry(cardSource)}" +
+                               $"｜真正挂上过 {_applied} 次");
                 }
             }
         }
         catch { /* 诊断失败不影响功能 */ }
+        return 0m;
+    }
 
+    /// <summary>
+    /// 灾厄**真的**挂到某个真人玩家身上之后：用他的格挡抵消等量灾厄（只抵消这一次新增的那部分）。
+    ///
+    /// `amount` = 这次实际给的层数（已过 `RuinedHelmet` 之类的「收到量」修正），
+    /// `power.Owner` = 被施加的那位生物；`power.Amount` = 叠加后的总数。
+    /// </summary>
+    public override async Task AfterPowerAmountChanged(PlayerChoiceContext choiceContext, PowerModel power,
+                                                       decimal amount, Creature applier, CardModel cardSource)
+    {
         try
         {
-            if (power is not DoomPower) return 0m;
-            if (amount <= 0m) return 0m;                     // 只处理「获得」灾厄
-            if (target?.Player == null) return 0m;           // 只对真人玩家；召唤物/影子玩家不管
+            if (power is not DoomPower) return;
+            if (amount <= 0m) return;                       // 只处理「获得」灾厄（减灾厄的调用跳过）
+
+            var target = power.Owner;
+            if (target?.Player == null) return;             // 只对真人玩家；召唤物/影子玩家不管
 
             var boss = Owner?.Monster as Monsters.CharBossMonster;
-            if (!BossLockOn.SpecialEffectAppliesTo(boss, target.Player)) return 0m;
+            if (!BossLockOn.SpecialEffectAppliesTo(boss, target.Player)) return;
 
-            decimal block = 0m;
-            try { block = target.Block; } catch { block = 0m; }
-            if (block <= 0m) return 0m;
+            decimal block = SafeBlock(target);
+            if (block <= 0m) return;
 
             decimal absorb = Math.Min(block, amount);
-            if (absorb <= 0m) return 0m;
+            if (absorb <= 0m) return;
 
             try { target.LoseBlockInternal(absorb); }
             catch (Exception e)
             {
                 Logger.Log("[CharBoss] 愚者：扣格挡失败（这次不抵消）: " + e.Message);
-                return 0m;
+                return;
             }
+            // 抵消掉的那部分灾厄从总数里减掉（`SetAmount` 静默，不走完整的「移除能力」链路）
+            try { power.SetAmount(Math.Max(0, power.Amount - (int)absorb), true); }
+            catch (Exception e) { Logger.Log("[CharBoss] 愚者：减灾厄层数失败: " + e.Message); }
 
+            _applied++;
             Logger.Log($"[CharBoss] 愚者：{target.Name} 用 {absorb} 点格挡抵消了 {absorb} 层灾厄" +
-                       $"（原本 {amount} → {(amount - absorb)}）");
-            return -absorb;
+                       $"（这次给 {amount} → 实际 {Math.Max(0m, amount - absorb)}，当前灾厄 {power.Amount}）");
         }
         catch (Exception e)
         {
-            Logger.Log("[CharBoss] 愚者：格挡抵灾厄时出错（按原样施加）: " + e.Message);
-            return 0m;
+            Logger.Log("[CharBoss] 愚者：格挡抵灾厄时出错（灾厄按原样保留）: " + e.Message);
         }
+        await Task.CompletedTask;
     }
 
-    /// <summary>诊断用：本场战斗里「灾厄钩子」被调用的次数。</summary>
-    private static int _doomHookCalls;
+    // ── 诊断计数器（v0.2.726 起只做观测，不再影响任何结算）──────────────
+    private static int _hookCalls;
+    private static int _applied;
+
+    private static decimal SafeBlock(Creature? creature)
+    {
+        try { return creature?.Block ?? 0m; } catch { return 0m; }
+    }
 
     private static string SafeEntry(CardModel? card)
     {
