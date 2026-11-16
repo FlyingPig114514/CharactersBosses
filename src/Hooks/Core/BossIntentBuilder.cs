@@ -1314,7 +1314,10 @@ public static class BossIntentBuilder
             bool isPrint = e.IndexOf("CARVE_REALITY", StringComparison.Ordinal) >= 0
                            || e.IndexOf("DECEIVE_REALITY", StringComparison.Ordinal) >= 0;
             bool isFear = Monsters.CharBossMonster.WatcherIdIs(e, "FEAR_NO_EVIL");
-            if (!isWrath && !isCalm && !isPrint && !isFear) return;
+            // ★ v0.2.722（用户 2026-11-16 截图）：「何人僭越错误的显示了强化，应该只有策略」
+            //   它是**纯减益**技能牌（给目标 1 层虚弱 + 1 层易伤、消耗）⇒ 只该有一条策略。
+            bool isPureDebuff = Monsters.CharBossMonster.WatcherIdIs(e, "KNOW_THY_PLACE");
+            if (!isWrath && !isCalm && !isPrint && !isFear && !isPureDebuff) return;
 
             // 她**这一刻**在不在愤怒：用剧本推演出来的 `stanceMul`（这个数组按出牌顺序推演，
             // 与 `StanceBake` 同一把尺子）。⚠ 不能用「此刻的真实姿态」—— 计划是在她上一回合结束时
@@ -1324,7 +1327,11 @@ public static class BossIntentBuilder
 
             bool wantBuff;
             bool wantSacrifice;
-            if (isWrath)
+            if (isPureDebuff)
+            {
+                wantBuff = false; wantSacrifice = false;      // 纯减益 ⇒ 只有策略
+            }
+            else if (isWrath)
             {
                 wantBuff = !inWrath;
                 wantSacrifice = !inWrath;
@@ -1353,6 +1360,18 @@ public static class BossIntentBuilder
             if (wantSacrifice) intents.Add(new SacrificeIntent());
 
             // 策略：义愤填膺**只在已经愤怒时**才施加易伤（不在这张表就别动别的牌的策略）
+            if (isPureDebuff)
+            {
+                // 何人僭越：保证**恰好一条**策略（兜底强化已被上面清掉）
+                int debuffs = 0;
+                for (int i = intents.Count - 1; i >= 0; i--)
+                {
+                    if (intents[i] is not DebuffIntent) continue;
+                    if (debuffs == 0) { debuffs = 1; continue; }
+                    intents.RemoveAt(i);
+                }
+                if (debuffs == 0) intents.Add(new DebuffIntent(false));
+            }
             if (indignation)
             {
                 if (inWrath)
