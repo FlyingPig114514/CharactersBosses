@@ -1418,6 +1418,17 @@ public static partial class BossHookBridge
             }
         }
 
+#if STS2_111
+        // ★ v0.2.723（用户 2026-11-16：「这A版的至纯之水能生效，B版的至纯之水不能，什么情况？」）：
+        //   两版给的牌一样（1 张「奇迹」进手牌），差别只在钩子 ——
+        //   Boninall 走 `BeforeCombatStart`（无 player 参数，所有监听者都收得到），
+        //   lamali 走 `BeforeHandDraw`（只在 `CombatManager.SetupPlayerTurn` 里派发，
+        //   而 `StartTurn` 只对 `CurrentSide == Player` 的玩家派发 ⇒ 敌方侧的影子玩家永远收不到）。
+        //   ⇒ 只给 lamali 版补一张，详见 `Core.WatcherCards.EnsurePureWaterMiracle` 的注释。
+        try { Core.WatcherCards.EnsurePureWaterMiracle(shadow, combat); }
+        catch (Exception e) { Logger.Log("[CharBoss] 至纯之水补「奇迹」失败: " + e.Message); }
+#endif
+
         CharacterBosses.UI.BossHandUi.Refresh(boss);
     }
 

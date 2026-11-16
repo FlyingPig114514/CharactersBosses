@@ -300,6 +300,123 @@ internal static class WatcherCards
     /// <summary>至纯之水（观者初始遗物）：A = `WatcherMod.PureWater`，B = `Watcher.Code.Relics.PureWater`。</summary>
     internal static Type? PureWater => T("PureWater");
 
+    /// <summary>
+    /// **至纯之水两版对齐**（用户 2026-11-16：「这A版的至纯之水能生效，B版的至纯之水不能，什么情况？
+    /// 能不能让它们都生效？或都不生效？」）——这里选**都生效**。
+    ///
+    /// 两版给的**牌完全一样**（战斗开始时把 1 张「奇迹」放进她的手牌，不升级），差别只在**钩子**：
+    ///
+    /// | | 3747526116（Boninall） | 3747492505（lamali） |
+    /// |---|---|---|
+    /// | 钩子 | `PureWater.BeforeCombatStart()` | `PureWater.BeforeHandDraw(player, ctx, state)` |
+    /// | 条件 | 无（**没有 player 参数**） | `player == Owner` **且** `Owner.PlayerCombatState.TurnNumber == 1` |
+    /// | 对影子玩家 | **会**触发（`Hook.BeforeCombatStart` 把所有监听者逐个派发一遍） | **永远不触发** |
+    ///
+    /// 反编译实证（`sts2.dll`）：
+    ///   · `Hook.BeforeHandDraw(ICombatState, Player, ctx)` = 把所有监听者的 `BeforeHandDraw` 都叫一遍，
+    ///     「是不是**我**的回合」这段判断在**遗物自己**的方法体里（`player == Owner`）；
+    ///   · 但派发它的只有 `CombatManager.SetupPlayerTurn(turnState, player, …)`，而 `StartTurn` 里
+    ///     `playersStartingTurn = CurrentSide == Player ? state.Players : new List<Player>()`
+    ///     ⇒ **敌方回合根本不会为任何 Player 派发这条钩子**，她的影子玩家是敌方侧的 ⇒ B 版那张奇迹从来没出现过。
+    ///
+    /// 实机日志实证（A 版印牌观，2026-11-16 21:34:28→29）：
+    /// `剧本手牌(4): [ARSENAL+,WATCHER_MASTER_REALITY+,WATCHER_CARVE_REALITY+,WATCHER_SMITE+]`
+    /// 之后手牌变 5 张并多出 `WATCHER_MIRACLE`（`手牌栏：5 张里有 2 张本回合不会打 [WATCHER_SMITE,WATCHER_MIRACLE]`），
+    /// 第 1 回合她**不会打它**（剧本没写），第 2 回合重建手牌时随弃手牌一起进弃牌堆。
+    ///
+    /// 所以这里**只给 lamali 版补一张**（Boninall 版原版自己会印，补了就成两张）；
+    /// 时机（战斗开始）、张数（1）、落点（手牌末尾）、不升级 —— 全部对齐 A 版。
+    /// ⚠ 因为剧本没写这张牌，她**永远不会打出它** ⇒ 不会多出「奇迹打出 +1 能量」，
+    ///   每回合的能量账（`BossTurn.Energy`）一个字都不用改。
+    /// </summary>
+    internal static void EnsurePureWaterMiracle(Player? shadow, MegaCrit.Sts2.Core.Combat.ICombatState? combat)
+    {
+        try
+        {
+            if (shadow == null || combat == null) return;
+
+            // ① 她身上真有这件遗物吗（按**类型**判最稳：两版类名都叫 PureWater）
+            var pureType = PureWater;
+            bool has = false;
+            try
+            {
+                var relics = shadow.Relics;
+                for (int i = 0; i < (relics?.Count ?? 0); i++)
+                {
+                    var r = relics![i];
+                    if (r == null) continue;
+                    if (pureType != null && r.GetType() == pureType) { has = true; break; }
+                    string? e = null;
+                    try { e = r.Id.Entry; } catch { /* 忽略 */ }
+                    if (!string.IsNullOrEmpty(e) &&
+                        (e!.IndexOf("PURE_WATER", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                         e.IndexOf("CLEAN_WATER", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                         e.IndexOf("PUREWATER", StringComparison.OrdinalIgnoreCase) >= 0))
+                    { has = true; break; }
+                }
+            }
+            catch { has = false; }
+            if (!has) return;
+
+            // ② A 版原版自己会印 ⇒ 一个字都不动
+            if (Current != Provider.Lamali)
+            {
+                Logger.Log("[CharBoss] 至纯之水：Boninall 版走 `BeforeCombatStart`（无 player 参数）⇒ 原版自己会印「奇迹」，不重复补");
+                return;
+            }
+
+            var pcs = shadow.PlayerCombatState;
+            if (pcs == null) return;
+
+            // ③ 幂等：手里已经有一张「奇迹」（比如剧本那一手正好也写了）就别再补
+            int existing = 0;
+            try
+            {
+                foreach (var c in pcs.Hand.Cards)
+                {
+                    if (c == null) continue;
+                    string entry = string.Empty;
+                    try { entry = c.Id.Entry ?? string.Empty; } catch { /* 忽略 */ }
+                    if (entry.IndexOf("MIRACLE", StringComparison.OrdinalIgnoreCase) >= 0) existing++;
+                }
+            }
+            catch { existing = 0; }
+            if (existing > 0)
+            {
+                Logger.Log($"[CharBoss] 至纯之水（lamali 版）：她手里已经有 {existing} 张「奇迹」⇒ 不重复补");
+                return;
+            }
+
+            // ④ 造一张「奇迹」放进她手牌（和 A 版同一张牌：`CreateCard` 复制原型再绑 Owner）
+            var miracleType = Miracle;
+            if (miracleType == null)
+            {
+                Logger.Log("[CharBoss] 至纯之水（lamali 版）：取不到「奇迹」这张牌 ⇒ 无法补");
+                return;
+            }
+            var canonical = ModelDb.GetById<CardModel>(ModelDb.GetId(miracleType));
+            if (canonical == null)
+            {
+                Logger.Log("[CharBoss] 至纯之水（lamali 版）：「奇迹」原型取不到 ⇒ 无法补");
+                return;
+            }
+            var card = combat.CreateCard(canonical, shadow);
+            if (card == null)
+            {
+                Logger.Log("[CharBoss] 至纯之水（lamali 版）：造牌失败 ⇒ 无法补");
+                return;
+            }
+            pcs.Hand.AddInternal(card, -1, true);
+            Logger.Log("[CharBoss] 至纯之水（lamali 版钩子是 `BeforeHandDraw`，只在真人玩家回合派发；" +
+                       "敌方侧的影子玩家永远收不到）⇒ 战斗开始自己补 1 张「奇迹」到她手里，与 Boninall 版一致" +
+                       "（剧本没写这张牌 ⇒ 她不会打它，能量账不变）");
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 至纯之水补「奇迹」失败（不影响战斗）: " + e.Message);
+        }
+    }
+
     /// <summary>手摇鼓（进阶 9 遗物）。</summary>
     internal static Type? Damaru => T("Damaru");
 
