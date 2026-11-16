@@ -44,6 +44,46 @@ public sealed class BossFoolPower : PowerModel
     public override decimal ModifyPowerAmountGivenAdditive(PowerModel power, Creature giver, decimal amount,
                                                           Creature target, CardModel cardSource)
     {
+        // ── 临时诊断（v0.2.725，用户 2026-11-16：「他打死亡的那回合我的格挡会自己消失，
+        //    打一张防牌刚获得的格挡就马上消失，控制台调格挡也会消失」）──
+        // 现象是**格挡一有就被吃**，而本方法只在 `PowerCmd.Apply<DoomPower>` 里被调用。
+        // 所以要么这个钩子被反复调用（预览？别的 mod 试算？），要么真有人在反复施加灾厄。
+        // 这里把「调用次数 + 调用栈」打出来，下次一进日志就能定位是谁在叫。
+        try
+        {
+            if (power is DoomPower)
+            {
+                _doomHookCalls++;
+                if (_doomHookCalls <= 12 || _doomHookCalls % 25 == 0)
+                {
+                    string blockNow = "?";
+                    try { blockNow = target?.Block.ToString() ?? "null"; } catch { /* 忽略 */ }
+                    Logger.Log($"[CharBoss] 愚者·灾厄钩子第 {_doomHookCalls} 次：amount={amount} " +
+                               $"target={target?.Name ?? "null"} 格挡={blockNow} " +
+                               $"来源牌={SafeEntry(cardSource)}");
+                    if (_doomHookCalls == 1)
+                    {
+                        try
+                        {
+                            var frames = (Environment.StackTrace ?? string.Empty)
+                                .Split('\n');
+                            int shown = 0;
+                            foreach (var f in frames)
+                            {
+                                if (shown >= 14) break;
+                                var t = f.Trim();
+                                if (t.Length == 0) continue;
+                                if (t.StartsWith("at System.Environment", StringComparison.Ordinal)) continue;
+                                Logger.Log("[CharBoss] 愚者·灾厄钩子调用栈 " + (++shown) + ": " + t);
+                            }
+                        }
+                        catch { /* 诊断失败不影响功能 */ }
+                    }
+                }
+            }
+        }
+        catch { /* 诊断失败不影响功能 */ }
+
         try
         {
             if (power is not DoomPower) return 0m;
@@ -76,6 +116,14 @@ public sealed class BossFoolPower : PowerModel
             Logger.Log("[CharBoss] 愚者：格挡抵灾厄时出错（按原样施加）: " + e.Message);
             return 0m;
         }
+    }
+
+    /// <summary>诊断用：本场战斗里「灾厄钩子」被调用的次数。</summary>
+    private static int _doomHookCalls;
+
+    private static string SafeEntry(CardModel? card)
+    {
+        try { return card?.Id.Entry ?? "null"; } catch { return "?"; }
     }
 }
 #endif
