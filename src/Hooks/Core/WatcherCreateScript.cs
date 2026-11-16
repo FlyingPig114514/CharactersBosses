@@ -91,8 +91,13 @@ public static class WatcherCreateScript
                 W(WatcherCards.KnowThyPlace),
                 W(WatcherCards.EmptyFist)),
 
-            // ── 6 ── 洗牌 / 改造现实（进阶 9 起升级）/ 化拳为空 / 警惕 / 惩恶+（没费）   （4 费）← 6～8 循环起点
-            Turn(4, "6. 洗牌（她重新洗牌）、改造现实（进阶9起升级）、化拳为空、警惕、惩恶+（没费）",
+            // ── 6 ── 洗牌 / 改造现实（进阶 9 起升级）/ 化拳为空 / 警惕 / 惩恶+（没费）   ← 6～8 循环起点
+            //   ★ v0.2.718（用户 2026-11-16「第6回合为什么还是打惩恶」）：
+            //     日志实证 `观者姿态：WATCHER-EMPTY_FIST 退出「平静」⇒ 原版 +2 能量`
+            //     —— 化拳为空**离开平静白送 2 费**，所以 4 费的回合实际有 6 费，惩恶照样付得起。
+            //     按「化拳为空 1 + 离开平静 +2 + 警惕 2 花光、改造现实 1」算，她这回合**只需要 2 费**：
+            //     2 −改造现实1 = 1 → 化拳为空 1 = 0 → 离开平静 +2 = 2 → 警惕 2 = 0 → 惩恶+ 差 1 ⇒ 没费 ✔
+            Turn(2, "6. 洗牌（她重新洗牌）、改造现实（进阶9起升级）、化拳为空、警惕、惩恶+（没费）",
                 W(WatcherCards.CarveReality, upgradeMinAscension: 9),
                 W(WatcherCards.EmptyFist),
                 W(WatcherCards.Vigilance),

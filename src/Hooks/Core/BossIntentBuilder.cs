@@ -1164,57 +1164,9 @@ public static class BossIntentBuilder
         // 「疯狂科学」只要「守势 + 强化」两条：牺牲意图也去掉（它是三套模板的混合体，
         // 数据上会带上「失去力量」这类减益变量，画出来就是用户看到的那个多余的下箭头）。
         if (madScience) hasSacrifice = false;
-#if STS2_111
-        // ★ v0.2.717（用户 2026-11-16 订正）
-        //   「应该让所有愤怒牌都是**未在愤怒时**才会加上强化和牺牲；如果已经处于愤怒
-        //     （比如第四回合的暴怒），就**只显示攻势**（因为已经在愤怒了，所以就只打伤害了）」
-        //   ⇒ 愤怒牌 = 暴怒 / 渐强 / 义愤填膺：
-        //     · 未在愤怒 ⇒ 强化（蓝上）+ 牺牲（蓝下）；
-        //     · 已在愤怒 ⇒ 不加强化、不加牺牲；暴怒 / 渐强 只剩**攻势**，
-        //       义愤填膺在愤怒里只会施加易伤 ⇒ 只剩**策略**（上一轮已确认）。
-        //   ⚠ 平静牌（警惕 / 安宁 / 冥想 / 内心宁静）**按用户要求保持现状**，这里一个字都不动。
-        try
-        {
-            string e2 = string.Empty;
-            try { e2 = card.Id?.Entry ?? string.Empty; } catch { e2 = string.Empty; }
-
-            bool inWrath = false;
-            try { inWrath = StanceMultiplierOf(card.Owner?.Creature) >= 2; } catch { inWrath = false; }
-
-            bool isIndignation = Monsters.CharBossMonster.WatcherIdIs(e2, "INDIGNATION");
-            bool isWrathCard = isIndignation
-                               || Monsters.CharBossMonster.WatcherIdIs(e2, "ERUPTION")
-                               || Monsters.CharBossMonster.WatcherIdIs(e2, "CRESCENDO");
-            bool fearAim = false;
-            if (Monsters.CharBossMonster.WatcherIdIs(e2, "FEAR_NO_EVIL"))
-            {
-                try
-                {
-                    var aim = card.Owner?.Creature?.GetPower<Powers.WatcherFearNoEvilAimPower>();
-                    fearAim = aim != null && aim.PlayerAttacked;
-                }
-                catch { fearAim = false; }
-            }
-
-            if (isIndignation && inWrath)
-            {
-                hasBuff = false; hasSacrifice = false; hasDebuff = true;   // 只给易伤 ⇒ 只策略
-            }
-            else if (isWrathCard && inWrath)
-            {
-                hasBuff = false; hasSacrifice = false;                     // 已经在愤怒 ⇒ 只打伤害（只攻势）
-            }
-            else if (isWrathCard)
-            {
-                hasBuff = true; hasSacrifice = true;                       // 未在愤怒 ⇒ 强化 + 牺牲
-            }
-            else if (fearAim)
-            {
-                hasBuff = true;                                            // 不惧妖邪（会被锁玩家打过攻击牌 ⇒ 这手进平静）
-            }
-        }
-        catch { /* 纯预览 */ }
-#endif
+        // ★ v0.2.718：观者「姿态牌」的意图（强化 / 牺牲 / 策略）不再在这里改标志位 ——
+        //   前面这些分支和别处都会顺手加意图，改标志位压不住（实测第 8 回合义愤填膺仍出双箭头）。
+        //   统一放到函数末尾的 `ApplyWatcherStanceIntents` 按**意图列表**做增删。
         // ★ v0.2.701：Ω观点穴的「策略」我们已经自己加过了（B 版点穴带 `PowerVar<MarkPower>`，
         //   通用分类也会补一条 ⇒ 屏幕上出现两个红箭头）。这里只是不重复加，见上面那段注释。
         if (hasDebuff && !suppressGenericDebuff) intents.Add(new DebuffIntent(false));
@@ -1320,7 +1272,122 @@ public static class BossIntentBuilder
             });
         }
 
+        ApplyWatcherStanceIntents(intents, card, stanceMul);
+
         return intents;
+    }
+
+    /// <summary>
+    /// **观者姿态牌的意图收口**（用户 2026-11-16 反复订正后的最终口径）。
+    ///
+    /// ★ 为什么放在**最后**再动一遍：前面那些分支（`ClassifyPowers` / `selfBenefit` /
+    ///   `intents.Count == 0` 兜底 / 别处补的强化）都可能顺手加一条强化或策略，
+    ///   只靠"改标志位"根本压不住（实测第 8 回合的义愤填膺还是 `[BuffIntent+DebuffIntent]`、
+    ///   第 7 回合的暴怒只剩牺牲没有强化）。这里按**意图列表**做增删，幂等。
+    ///
+    /// 口径：
+    ///   · **愤怒牌**（暴怒 / 渐强 / 义愤填膺）——「未在愤怒时才会加上强化和牺牲；已经在愤怒
+    ///     （比如第四回合的暴怒）就只显示攻势（已经在愤怒了，所以就只打伤害了）」：
+    ///       - 未在愤怒 ⇒ 保证**恰好一条强化 + 一条牺牲**；
+    ///       - 已在愤怒 ⇒ 暴怒 / 渐强 把强化与牺牲都摘掉（只剩牌面攻势）；
+    ///                    义愤填膺 摘掉强化与牺牲、只留策略（它那时只施加易伤）。
+    ///   · **平静牌**（警惕 / 安宁 / 冥想 / 内心宁静）⇒ 保证一条强化（用户：「加回来」）。
+    ///   · **改造现实 / 欺瞒现实**（印牌）⇒ 保证一条强化（用户要求）。
+    ///   · **不惧妖邪**：只在「被锁玩家本回合打出过攻击牌」（`PlayerAttacked`）时才加强化。
+    /// </summary>
+    private static void ApplyWatcherStanceIntents(List<AbstractIntent> intents, CardModel card, int stanceMul)
+    {
+#if STS2_111
+        try
+        {
+            string e = string.Empty;
+            try { e = card?.Id?.Entry ?? string.Empty; } catch { e = string.Empty; }
+            if (string.IsNullOrEmpty(e)) return;
+
+            bool isWrath = Monsters.CharBossMonster.WatcherIdIs(e, "ERUPTION")
+                           || Monsters.CharBossMonster.WatcherIdIs(e, "CRESCENDO")
+                           || Monsters.CharBossMonster.WatcherIdIs(e, "INDIGNATION");
+            bool isCalm = Monsters.CharBossMonster.WatcherIdIs(e, "VIGILANCE")
+                          || Monsters.CharBossMonster.WatcherIdIs(e, "TRANQUILITY")
+                          || Monsters.CharBossMonster.WatcherIdIs(e, "MEDITATE")
+                          || Monsters.CharBossMonster.WatcherIdIs(e, "INNER_PEACE");
+            bool isPrint = e.IndexOf("CARVE_REALITY", StringComparison.Ordinal) >= 0
+                           || e.IndexOf("DECEIVE_REALITY", StringComparison.Ordinal) >= 0;
+            bool isFear = Monsters.CharBossMonster.WatcherIdIs(e, "FEAR_NO_EVIL");
+            if (!isWrath && !isCalm && !isPrint && !isFear) return;
+
+            // 她**这一刻**在不在愤怒：用剧本推演出来的 `stanceMul`（这个数组按出牌顺序推演，
+            // 与 `StanceBake` 同一把尺子）。⚠ 不能用「此刻的真实姿态」—— 计划是在她上一回合结束时
+            // 就算好的，那时第 4 回合的暴怒还没打出去（用户实测就卡在这里）。
+            bool inWrath = stanceMul >= 2;
+
+            bool wantBuff;
+            bool wantSacrifice;
+            if (isWrath)
+            {
+                bool indignation = Monsters.CharBossMonster.WatcherIdIs(e, "INDIGNATION");
+                wantBuff = !inWrath;
+                wantSacrifice = !inWrath;
+                if (inWrath && indignation)
+                {
+                    // 只施加易伤 ⇒ 只留策略
+                    RemoveAll<DebuffIntent>(intents, keepFirst: true);
+                }
+            }
+            else if (isCalm) { wantBuff = true; wantSacrifice = false; }
+            else if (isPrint) { wantBuff = true; wantSacrifice = false; }
+            else
+            {
+                // 不惧妖邪
+                bool aim = false;
+                try
+                {
+                    var p = BossOf(card)?.GetPower<Powers.WatcherFearNoEvilAimPower>();
+                    aim = p != null && p.PlayerAttacked;
+                }
+                catch { aim = false; }
+                wantBuff = aim; wantSacrifice = false;
+            }
+
+            if (wantBuff) EnsureBuffIntent(intents);
+            else RemoveAll<BuffIntent>(intents);
+
+            if (wantSacrifice) EnsureSacrificeIntent(intents);
+            else RemoveAll<SacrificeIntent>(intents);
+
+            if (wantBuff) DedupeBuffIntent(intents);
+        }
+        catch { /* 纯预览 */ }
+#endif
+    }
+
+    /// <summary>这张牌的主人那只 Boss（拿不到就返回 null）。</summary>
+    private static MegaCrit.Sts2.Core.Entities.Creatures.Creature? BossOf(CardModel? card)
+    {
+        try { return card?.Owner?.Creature; } catch { return null; }
+    }
+
+    private static void EnsureBuffIntent(List<AbstractIntent> intents)
+    {
+        foreach (var it in intents) if (it is BuffIntent) return;
+        intents.Add(new BuffIntent());
+    }
+
+    private static void EnsureSacrificeIntent(List<AbstractIntent> intents)
+    {
+        foreach (var it in intents) if (it is SacrificeIntent) return;
+        intents.Add(new SacrificeIntent());
+    }
+
+    private static void RemoveAll<T>(List<AbstractIntent> intents, bool keepFirst = false) where T : AbstractIntent
+    {
+        bool kept = false;
+        for (int i = intents.Count - 1; i >= 0; i--)
+        {
+            if (intents[i] is not T) continue;
+            if (keepFirst && !kept) { kept = true; continue; }
+            intents.RemoveAt(i);
+        }
     }
 
     /// <summary>
