@@ -1,4 +1,4 @@
-{
+﻿{
     "IRONCLAD_BOSS_ENCOUNTER.title":  "Ironclad",
     "IRONCLAD_BOSS_ENCOUNTER.loss":  "L\u0027[gold]Ironclad[/gold] ha spezzato {character}.",
     "IRONCLAD_ANGER_BOSS_ENCOUNTER.title":  "Ironclad",
@@ -108,5 +108,7 @@
     "FOOL_BOSS_ENCOUNTER.loss_tarot":  "{character} è diventato la nuova carta [gold]{Card}[/gold] nel mazzo di [gold]Fool[/gold].",
     "FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot":  "{character} è diventato la nuova carta [gold]{Card}[/gold] nel mazzo di [gold]Fool[/gold].",
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "Osservatore Divino",
-    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} è stato schiacciato dalla potenza divina dell\u0027[gold]Osservatore Divino[/gold]."
+    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} è stato schiacciato dalla potenza divina dell\u0027[gold]Osservatore Divino[/gold].",
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.title": "Osservatore Omega",
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character} e stato schiacciato dal digiuno dell [gold]Osservatore Omega[/gold]."
 }

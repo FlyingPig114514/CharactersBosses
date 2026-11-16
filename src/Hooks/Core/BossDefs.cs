@@ -1130,7 +1130,34 @@ public static class BossDefs
         SpecialLocByAct = new string?[] { null, null, "WATCHER_BOSS.devotion", null },
         SpecialLocDreadByAct = new string?[] { null, null, "WATCHER_BOSS.devotion_dread", null },
         SpecialPowerByAct = new Type?[] { null, null, typeof(Powers.BossDevotionPower), null },
-        SpecialPowerDreadByAct = new Type?[] { null, null, typeof(Powers.BossDevotionPower), null }
+        SpecialPowerDreadByAct = new Type?[] { null, null, typeof(Powers.BossDevotionPower), null },
+        // 三层**第二套观者设计「Ω观」**（用户 2026-11-16）：同角色、不同剧本/遗物/特殊效果。
+        // 一幕只能放一套 `VariantsByAct`（下标 2 已经被「神格观」占着 ⇒ 神格观就是主定义本身），
+        // 所以第二套挂在 `ExtraVariants`，判定顺序 = 先主定义（神格观），再按本表取第一个 Enabled 为真的。
+        ExtraVariants = new Dictionary<int, List<BossVariant>>
+        {
+            [2] = new List<BossVariant>
+            {
+                new BossVariant
+                {
+                    Key = "WATCHER_OMEGA",
+                    Enabled = Core.BossLineups.WatcherOmegaActive,
+                    Deck = WatcherOmegaScript.Deck(),
+                    Relics = WatcherOmegaScript.Relics(),
+                    Script = WatcherOmegaScript.Build(),
+                    // 特殊效果「斋戒」：欧米伽隔一回合触发一次（只在 5/7/9/11… 这些回合结算）、
+                    // 点穴造成的伤害可以被格挡。
+                    SpecialLoc = "WATCHER_OMEGA_BOSS.fasting",
+                    SpecialLocDread = "WATCHER_OMEGA_BOSS.fasting_dread",
+                    SpecialPower = typeof(Powers.WatcherFastingPower),
+                    SpecialPowerDread = typeof(Powers.WatcherFastingPower),
+                    // 观者模组初始生命 72（用户给的遗物里没有布质果实 ⇒ 主定义的 103 要减掉那 31）
+                    HpBonus = -31,
+                    BlocksVanillaDraw = true,
+                    // 进阶 8 / 9 的升级写在剧本里（如水、心灵堡垒；第 6、11 回合的点穴）
+                },
+            },
+        }
     };
 
     /// <summary>
@@ -1152,6 +1179,37 @@ public static class BossDefs
         }
         catch (Exception e) { Logger.Log("[CharBoss] 观者 Boss 进阶遗物接线失败: " + e.Message); }
     }
+
+    /// <summary>
+    /// 三层 2 号观者 Boss「**Ω观**」（用户 2026-11-16）—— 与「神格观」同角色、不同设计：
+    /// 剧本走「阿尔法→贝塔→欧米伽」那套、特殊效果是「斋戒」（欧米伽隔一回合触发一次 / 点穴伤害可被格挡）。
+    ///
+    /// 用户给的全套：
+    /// · 遗物：至纯之水、涅奥的祝福、永冻冰晶、空鸟笼、舵盘、钗、金刚杵（见 `WatcherOmegaScript.Relics()`）；
+    /// · １２ 回合剧本 + 9～12 循环（`WatcherOmegaScript`）；
+    /// · 进阶 8：升级**如水 / 心灵堡垒**；进阶 9：只升级**第 6 / 11 回合的点穴**（写在剧本里）。
+    /// </summary>
+    public static readonly BossDefinition WatcherOmega = new()
+    {
+        Key = "WATCHER_OMEGA",
+        VisualScene = "watcher",
+        CharacterType = typeof(MegaCrit.Sts2.Core.Models.Characters.Fool),   // 占位，运行期会被替换
+        // 观者模组初始生命 72（用户给的遗物里没有布质果实 ⇒ 不加 +31）
+        Hp = new[] { 72, 72, 72, 72 },
+        // ⚠ 每回合能量由剧本逐回合写死（用户只在个别牌后标「（没费）」，其它牌都要打得出来），
+        //    这里的值只是「剧本没写时的兜底」。
+        Energy = new[] { 3, 3, 3, 3 },
+        HandSize = new[] { 5, 5, 6, 6 },
+        DeckByAct = new List<Type>?[] { null, null, WatcherOmegaScript.Deck(), null },
+        RelicsByAct = new List<Type>?[] { null, null, WatcherOmegaScript.Relics(), null },
+        ScriptByAct = new BossScript?[] { null, null, WatcherOmegaScript.Build(), null },
+        BlocksVanillaDraw = true,
+        // 特殊效果「斋戒」：欧米伽隔一回合触发一次（5/7/9/11…）、点穴造成的伤害可以被格挡。
+        SpecialLocByAct = new string?[] { null, null, "WATCHER_OMEGA_BOSS.fasting", null },
+        SpecialLocDreadByAct = new string?[] { null, null, "WATCHER_OMEGA_BOSS.fasting_dread", null },
+        SpecialPowerByAct = new Type?[] { null, null, typeof(Powers.WatcherFastingPower), null },
+        SpecialPowerDreadByAct = new Type?[] { null, null, typeof(Powers.WatcherFastingPower), null }
+    };
     /// <summary>运行期把观者的真实 `CharacterModel` 类型写回占位定义（找不到就保持愚者占位）。</summary>
     internal static void RefreshWatcherCharacterType()
     {
@@ -1162,6 +1220,11 @@ public static class BossDefs
             {
                 Watcher.CharacterType = type;
                 Logger.Log($"[CharBoss] 观者 Boss：角色类型已换成 {type.FullName}");
+            }
+            if (type != null && WatcherOmega.CharacterType != type)
+            {
+                WatcherOmega.CharacterType = type;
+                Logger.Log($"[CharBoss] Ω观：角色类型已换成 {type.FullName}");
             }
         }
         catch (Exception e) { Logger.Log("[CharBoss] 观者 Boss 角色类型解析失败: " + e.Message); }

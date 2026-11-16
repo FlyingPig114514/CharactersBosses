@@ -35,11 +35,31 @@ public static class MultiBossPlan
             //   （拉房间发生在遭遇生成之前）。只在 late 阶段才有值的它会让 `ForVanillaBoss` 的多人分支
             //   误判成单人 ⇒ 多人第三幕第一场又变回根除骨（用户实测）。
             var state = CurrentRunState();
-            playerCount = state?.Players?.Count ?? 1;
-            return playerCount >= 2;
+            playerCount = state?.Players?.Count ?? 0;
         }
-        catch { return false; }
+        catch { playerCount = 0; }
+
+        // ★★ v0.2.710（自检「第三幕第二只 Boss 多人不同步」时发现的不一致）：
+        //   这里以前**读不到就按 1 个人算**，而 `BossLineups.PlayerCount()` 早有「记住上一次读到的人数」的兜底
+        //   （2026-11-05 修「房主 2 只 / 客人 1 只」时加的）。两边判据不一样 ⇒ 只要有一瞬间
+        //   `RunManager.Instance` 还拿不到（拉房间 / 换幕那一刻），就会出现：
+        //     · `BossLineups.Build` 按记住的人数排了 2 只的阵容；
+        //     · 而 `PartnersForWithKeys` 走 `WantsSecondBoss` 判成「单人」⇒ **一只伙伴都不加**
+        //   ⇒ 阵容说有 2 只、场上只有 1 只（正是「房主两只、客人一只」那种形态）。
+        //   现在两边用同一个数：读不到就用 `BossLineups.PlayerCount()` 记住的那个。
+        if (playerCount <= 0)
+        {
+            try { playerCount = BossLineups.PlayerCount(); } catch { playerCount = 1; }
+            if (playerCount >= 2 && _fallbackLogged++ < 6)
+            {
+                Logger.Log($"[CharBoss] 多人判定：这一刻读不到 RunState 的玩家数 ⇒ 沿用记住的 {playerCount} 人" +
+                           "（与 `BossLineups.PlayerCount()` 同一口径，避免「阵容按 2 只算、只造 1 只」）");
+            }
+        }
+        return playerCount >= 2;
     }
+
+    private static int _fallbackLogged;
 
     /// <summary>当前局的 RunState（`RunManager.State` 是 private ⇒ 反射；拿不到就退回抓取到的那个）。</summary>
     private static IRunState? CurrentRunState()

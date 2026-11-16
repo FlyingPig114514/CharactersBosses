@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
@@ -53,6 +54,27 @@ internal static class WatcherCards
         Provider.Lamali => "3747492505（lamali）",
         _ => "未装",
     };
+
+    /// <summary>
+    /// 观者实现的**身份串**（联机能力位用）：`boninall` / `lamali` / 空串 = 没装。
+    ///
+    /// ★ v0.2.711（用户 2026-11-16）：「只有当所有玩家都装了相同的观者 mod（指统一为 A 或 B 版）
+    ///   时才让观者有可能作为 boss 出现」⇒ 每台机器把自己的这个串广播出去，
+    ///   房主确认「所有人都一样」才把观者放进三层候补表（见 `BossPicksSync.WatcherAllowedHere`）。
+    /// </summary>
+    internal static string ProviderId
+    {
+        get
+        {
+            Probe();
+            return _provider switch
+            {
+                Provider.Boninall => "boninall",
+                Provider.Lamali => "lamali",
+                _ => string.Empty,
+            };
+        }
+    }
 
     /// <summary>优先那一份（有 Boninall 就用它）。</summary>
     internal static Assembly? ModAssembly()
@@ -178,15 +200,205 @@ internal static class WatcherCards
     internal static Type? Conclude => Card("WatcherConclude", "Conclude", "WATCHER_CONCLUDE", "WATCHER-CONCLUDE");
     internal static Type? Greed => typeof(MegaCrit.Sts2.Core.Models.Cards.Greed);   // 贪婪（本体牌）
 
+    // ── 三层 2 号「Ω观」用到的牌（用户 2026-11-16）────────────────────────────
+    internal static Type? Alpha => Card("WatcherAlpha", "Alpha", "WATCHER_ALPHA", "WATCHER-ALPHA");
+    internal static Type? Beta => Card("WatcherBeta", "Beta", "WATCHER_BETA", "WATCHER-BETA");
+    internal static Type? Omega => Card("WatcherOmega", "Omega", "WATCHER_OMEGA", "WATCHER-OMEGA");
+    internal static Type? PressurePoints => Card("WatcherPressurePoints", "PressurePoints", "WATCHER_PRESSURE_POINTS", "WATCHER-PRESSURE_POINTS");
+    internal static Type? Establishment => Card("WatcherEstablishment", "Establishment", "WATCHER_ESTABLISHMENT", "WATCHER-ESTABLISHMENT");
+    internal static Type? Meditate => Card("WatcherMeditate", "Meditate", "WATCHER_MEDITATE", "WATCHER-MEDITATE");
+    internal static Type? EmptyBody => Card("WatcherEmptyBody", "EmptyBody", "WATCHER_EMPTY_BODY", "WATCHER-EMPTY_BODY");
+    internal static Type? Eruption => Card("WatcherEruption_P", "Eruption", "WATCHER_ERUPTION_P", "WATCHER-ERUPTION");
+    internal static Type? Crescendo => Card("WatcherCrescendo", "Crescendo", "WATCHER_CRESCENDO", "WATCHER-CRESCENDO");
+    internal static Type? Tranquility => Card("WatcherTranquility", "Tranquility", "WATCHER_TRANQUILITY", "WATCHER-TRANQUILITY");
+    internal static Type? FearNoEvil => Card("WatcherFearNoEvil", "FearNoEvil", "WATCHER_FEAR_NO_EVIL", "WATCHER-FEAR_NO_EVIL");
+    internal static Type? MentalFortress => Card("WatcherMentalFortress", "MentalFortress", "WATCHER_MENTAL_FORTRESS", "WATCHER-MENTAL_FORTRESS");
+    internal static Type? LikeWater => Card("WatcherLikeWater", "LikeWater", "WATCHER_LIKE_WATER", "WATCHER-LIKE_WATER");
+    /// <summary>笨拙（本体状态牌，用户剧本第 2 回合手里那张）。</summary>
+    internal static Type? Clumsy => typeof(MegaCrit.Sts2.Core.Models.Cards.Clumsy);
+
+    /// <summary>
+    /// **B 版（lamali）她此刻的姿态倍率**：1（无/平静）/ 2（愤怒）/ 3（神格）。
+    ///
+    /// ★ v0.2.706（用户 2026-11-16：「B 版欧米伽观愤怒时打出的攻击牌还是不翻倍」）：
+    ///   B 版的姿态**不是挂在生物身上的 power**，而是绑在**玩家**上的模型：
+    ///   <code>
+    ///   private static readonly SpireField&lt;PlayerCombatState, WatcherStanceModel&gt; ActiveStance;
+    ///   public static WatcherStanceModel GetStanceModel(Player player);   // WatcherModel
+    ///   public static bool IsInStance&lt;T&gt;(Player player);
+    ///   </code>
+    ///   ⇒ `Creature.Powers` 里永远看不到它，`StanceMultiplierOf` 一直是 1（所以「预览按计划 ×2、实伤没翻」）。
+    ///   这里直接问它自己的 API，靠类型名（`WrathStance` / `DivinityStance` / `CalmStance` / `NoStance`）判档。
+    /// </summary>
+    internal static int StanceMultiplierFromModel(Player? player)
+    {
+#if STS2_111
+        try
+        {
+            if (player == null) return 1;
+            if (Current != Provider.Lamali) return 1;
+            var m = Method("Watcher.Code.Core.WatcherModel", "GetStanceModel");
+            if (m == null) return 1;
+            object? model = m.Invoke(null, new object?[] { player });
+            string name = model?.GetType().Name ?? string.Empty;
+            if (name.Contains("Divinity")) return 3;
+            if (name.Contains("Wrath")) return 2;
+            return 1;
+        }
+        catch { return 1; }
+#else
+        return 1;
+#endif
+    }
+
+    /// <summary>
+    /// 「点穴」这张牌会施加多少层印记（B 版实测订正，用户 2026-11-16）。
+    ///
+    /// · A 版：普通 `DynamicVar("MagicNumber")`（`WatcherPressurePoints.OnPlay` 里 `PowerCmd.Apply&lt;MarkPower&gt;(…, MagicNumber, …)`）；
+    /// · B 版（lamali）：`WithPower&lt;MarkPower&gt;(8, 3)` ⇒ 变量键是 **`MarkPower`**。
+    /// 以前只读 `MagicNumber` ⇒ B 版恒为 0：第 1 回合目标没有印记时攻势整条消失，
+    /// 后面回合只显示「目标已有印记」那部分，且「本回合前面那张点穴叠的印记」永远是 0。
+    /// </summary>
+    internal static int PressurePointsMarks(CardModel? card)
+    {
+        if (card == null) return 0;
+        int v = BossDamagePredictor.VarPreviewInt(card, "MarkPower", 0);
+        if (v <= 0) v = BossDamagePredictor.VarPreviewInt(card, "MagicNumber", 0);
+        return Math.Max(0, v);
+    }
+
     /// <summary>至纯之水（观者初始遗物）：A = `WatcherMod.PureWater`，B = `Watcher.Code.Relics.PureWater`。</summary>
     internal static Type? PureWater => T("PureWater");
 
     /// <summary>手摇鼓（进阶 9 遗物）。</summary>
     internal static Type? Damaru => T("Damaru");
 
+    /// <summary>她现在的姿态模型类型名（B 版：`GetStanceModel(player)` 的类型；A 版没有这个概念 ⇒ 空串）。</summary>
+    internal static string StanceModelName(Player? owner)
+    {
+#if STS2_111
+        try
+        {
+            if (owner == null) return string.Empty;
+            if (Current != Provider.Lamali) return string.Empty;
+            var m = Method("Watcher.Code.Core.WatcherModel", "GetStanceModel");
+            if (m == null) return string.Empty;
+            object? model = m.Invoke(null, new object?[] { owner });
+            return model?.GetType().Name ?? string.Empty;
+        }
+        catch { return string.Empty; }
+#else
+        return string.Empty;
+#endif
+    }
+
+    /// <summary>
+    /// **silent 强制**把她设成某个姿态（不需要 `PlayerChoiceContext`，`WatcherModel.SetStanceSilently&lt;T&gt;`）。
+    ///
+    /// ⚠ 语义（反编译 `WatcherModel.SetStance(…, silent: true)`）：走的是
+    /// `current.CleanupWithoutExit(player)` + 直接写 `ActiveStance[pcs]`，
+    /// **不跑 `OnExitStance`**（所以离开平静不会给那 +2），**也不跑 `OnEnterStance`**
+    /// （所以进神格不会给那 +3 —— 那笔要自己补跑，见 <see cref="ForceDivinitySilentlyAsync"/>）。
+    /// 只当 ctx 那条正规路真的失败时用。
+    /// </summary>
+    private static async Task<bool> SetStanceSilentlyAsync(Player? owner, string stanceTypeName)
+    {
+#if STS2_111
+        try
+        {
+            if (owner == null || string.IsNullOrEmpty(stanceTypeName)) return false;
+            var stanceType = ModAssembly()?.GetType("Watcher.Code.Stances." + stanceTypeName, false);
+            var setSilently = Method("Watcher.Code.Core.WatcherModel", "SetStanceSilently");
+            if (stanceType == null || setSilently == null)
+            {
+                Logger.Log($"[CharBoss] 强制设姿态（silent）：找不到 {stanceTypeName} / SetStanceSilently");
+                return false;
+            }
+            var task = setSilently.MakeGenericMethod(stanceType)
+                .Invoke(null, new object?[] { owner }) as Task;
+            if (task != null) await task;
+            return true;
+        }
+        catch (Exception e)
+        {
+            Logger.Log($"[CharBoss] 强制设姿态（silent {stanceTypeName}）失败: " + e.Message);
+            return false;
+        }
+#else
+        await Task.CompletedTask;
+        return false;
+#endif
+    }
+
+    private static async Task<bool> ForceDivinitySilentlyAsync(Player? owner,
+                                                            MegaCrit.Sts2.Core.GameActions.Multiplayer.PlayerChoiceContext? ctx,
+                                                            CardModel? source)
+    {
+#if STS2_111
+        try
+        {
+            if (owner == null) return false;
+            if (!await SetStanceSilentlyAsync(owner, "DivinityStance"))
+            {
+                Logger.Log("[CharBoss] 进神格（强制）：找不到 DivinityStance / SetStanceSilently");
+                return false;
+            }
+            string after = StanceModelName(owner);
+            Logger.Log($"[CharBoss] 进神格（强制 SetStanceSilently<DivinityStance>）⇒ 姿态模型 = {after}");
+            if (!after.Contains("Divinity")) return false;
+
+            // ★ v0.2.708（用户 2026-11-16 第五轮实测）：v0.2.707 的日志证明**姿态确实设上了**
+            //   <code>
+            //   进神格：StanceCmd.EnterDivinity 之后姿态模型 = NoStance
+            //   进神格（强制 SetStanceSilently<DivinityStance>）⇒ 姿态模型 = DivinityStance
+            //   </code>
+            //   但 `SetStanceSilently` 是 **silent** 版 ⇒ 它**跳过了 `OnEnterStance`**（那 +3 能量、
+            //   以及入姿态的其它钩子都在里面）⇒ 玩家看到的就是「没进神格」（能量没涨、也不亮）。
+            //   所以这里补跑一次姿态模型自己的 `OnEnterStance(ctx, owner, source)`。
+            try
+            {
+                int before = -1;
+                try { before = owner.PlayerCombatState?.Energy ?? -1; } catch { /* 忽略 */ }
+
+                var getModel = Method("Watcher.Code.Core.WatcherModel", "GetStanceModel");
+                object? stance = getModel?.Invoke(null, new object?[] { owner });
+                var onEnter = stance?.GetType().GetMethod(
+                    "OnEnterStance", BindingFlags.Public | BindingFlags.Instance);
+                if (onEnter != null)
+                {
+                    var useCtx = ctx ?? new MegaCrit.Sts2.Core.GameActions.Multiplayer.BlockingPlayerChoiceContext();
+                    var t2 = onEnter.Invoke(stance, new object?[] { useCtx, owner, source }) as Task;
+                    if (t2 != null) await t2;
+                }
+
+                int energyAfter = -1;
+                try { energyAfter = owner.PlayerCombatState?.Energy ?? -1; } catch { /* 忽略 */ }
+                Logger.Log($"[CharBoss] 进神格：已补跑 OnEnterStance（能量 {before} → {energyAfter}，" +
+                           $"神格里={InDivinity(owner)}）");
+            }
+            catch (Exception e) { Logger.Log("[CharBoss] 进神格：补跑 OnEnterStance 失败: " + e.Message); }
+
+            return true;
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 进神格（强制）失败: " + e.Message);
+            return false;
+        }
+#else
+        await Task.CompletedTask;
+        return false;
+#endif
+    }
+
     // ── 姿态 / 真言（两份实现的接口不同，这里抹平）─────────────────────────
     /// <summary>进神格（观者自己的实现：+3 能量、攻击三倍）。</summary>
-    internal static Task EnterDivinityAsync(Player? owner, CardModel? source)
+    internal static Task EnterDivinityAsync(Player? owner, CardModel? source,
+                                            MegaCrit.Sts2.Core.GameActions.Multiplayer.PlayerChoiceContext? ctx = null)
+        => EnterDivinityCoreAsync(owner, source, ctx);
+
+    private static async Task EnterDivinityCoreAsync(Player? owner, CardModel? source,
+                                                     MegaCrit.Sts2.Core.GameActions.Multiplayer.PlayerChoiceContext? ctx)
     {
         try
         {
@@ -194,21 +406,74 @@ internal static class WatcherCards
             if (_provider == Provider.Boninall)
             {
                 var m = Method("WatcherMod.WatcherCombatHelper", "EnterDivinity");
-                return m?.Invoke(null, new object?[] { owner, source }) as Task ?? Task.CompletedTask;
+                var t = m?.Invoke(null, new object?[] { owner, source }) as Task;
+                if (t != null) await t;
+                return;
             }
             if (_provider == Provider.Lamali)
             {
-                var m = Method("Watcher.Code.Commands.StanceCmd", "EnterDivinity");
-                return m?.Invoke(null, new object?[] { new ThrowingPlayerChoiceContext(), owner, source }) as Task
-                       ?? Task.CompletedTask;
+                // ★ v0.2.709（用户 2026-11-16 第六轮：「她已经处在神格时，再积累 10 层真言，不会像
+                //   特殊效果里说的一样先退出姿态然后再进入神格（这会导致没有成功加费）」）：
+                //   反编译 `WatcherModel.SetStance` 第一件事就是
+                //   `if (current?.GetType() == newCanonical.GetType()) return;`
+                //   ⇒ **本来就该由调用方先退姿态**（`ResolveDivinityAsync` 的 ① 会退）。
+                //   但 v0.2.708 及之前 `StanceCmd.ExitStance` 因为反射重载歧义根本没被调到
+                //   （见 `Overload` 的注释），于是她一直停在神格里，重新进神格被那句 return 吃掉 ⇒ 不加费。
+                //   这里再兜一层：进来时发现她已经在神格，就先 silent 退掉，保证「退出 → 再进入」真的发生。
+                string beforeStance = StanceModelName(owner);
+                if (beforeStance.Contains("Divinity"))
+                {
+                    await SetStanceSilentlyAsync(owner, "NoStance");
+                    Logger.Log($"[CharBoss] 进神格：她本来就在神格 ⇒ 先退出姿态再重新进" +
+                               $"（退完 = {Describe(StanceModelName(owner))}）");
+                }
+
+                // 参数类型写全：`StanceCmd.EnterDivinity` 有 Player / IEnumerable<Player> 两个重载，
+                // 只按名字取会抛 AmbiguousMatchException（旧写法被吞掉 ⇒ 静默不执行）。
+                var m = Overload("Watcher.Code.Commands.StanceCmd", "EnterDivinity",
+                                 new[]
+                                 {
+                                     typeof(PlayerChoiceContext), typeof(Player),
+                                     typeof(CardModel),
+                                 });
+                var useCtx = ctx ?? new MegaCrit.Sts2.Core.GameActions.Multiplayer.BlockingPlayerChoiceContext();
+                try
+                {
+                    var task = m?.Invoke(null, new object?[] { useCtx, owner, source }) as Task;
+                    if (task != null) await task;
+                }
+                catch (Exception e)
+                {
+                    // 姿态可能已经设上了（`ActiveStance` 的赋值在 OnEnterStance 之前），
+                    // 后面那句「之后姿态模型」会照实打印；这里只记一行，别把兜底也跳过。
+                    Logger.Log("[CharBoss] 进神格：StanceCmd.EnterDivinity 抛异常（继续看姿态模型 / 走兜底）: "
+                               + e.Message);
+                }
+
+                string after = StanceModelName(owner);
+                Logger.Log($"[CharBoss] 进神格：StanceCmd.EnterDivinity 之后姿态模型 = " +
+                           $"{(string.IsNullOrEmpty(after) ? "（A 版没有这个）" : Describe(after))}");
+                if (!after.Contains("Divinity"))
+                {
+                    if (await ForceDivinitySilentlyAsync(owner, ctx, source)) return;
+                    Logger.Log("[CharBoss] 进神格：两条路都没成功（姿态模型仍不是 Divinity）");
+                }
+                return;
             }
         }
         catch (Exception e) { Logger.Log("[CharBoss] 进神格失败: " + e.Message); }
-        return Task.CompletedTask;
     }
 
-    /// <summary>退出当前姿态。**进神格前必须先退**，否则拿不到入姿态的 3 点能量。</summary>
-    internal static Task ExitStanceAsync(Player? owner)
+    /// <summary>
+    /// 退出当前姿态。**进神格前必须先退**，否则拿不到入姿态的 3 点能量。
+    ///
+    /// ★ v0.2.709：B 版这条路以前**从来没生效过** —— `StanceCmd.ExitStance` 有两份重载
+    ///   （`Player` / `IEnumerable&lt;Player&gt;`），旧反射工具只按名字取 ⇒ 抛歧义被吞 ⇒ 返回 null
+    ///   ⇒ `m?.Invoke` 什么都不做。现在：①按参数类型精确取；②真的 await 完再读姿态模型；
+    ///   ③还没退掉就 silent 强制清（静默版不给「离开平静 +2」，所以只当兜底）。
+    /// </summary>
+    internal static async Task ExitStanceAsync(Player? owner,
+                                               MegaCrit.Sts2.Core.GameActions.Multiplayer.PlayerChoiceContext? ctx = null)
     {
         try
         {
@@ -216,17 +481,47 @@ internal static class WatcherCards
             if (_provider == Provider.Boninall)
             {
                 var m = Method("WatcherMod.WatcherCombatHelper", "ExitStance");
-                return m?.Invoke(null, new object?[] { owner }) as Task ?? Task.CompletedTask;
+                var t = m?.Invoke(null, new object?[] { owner }) as Task;
+                if (t != null) await t;
+                return;
             }
             if (_provider == Provider.Lamali)
             {
-                var m = Method("Watcher.Code.Commands.StanceCmd", "ExitStance");
-                return m?.Invoke(null, new object?[] { new ThrowingPlayerChoiceContext(), owner, null }) as Task
-                       ?? Task.CompletedTask;
+                var m = Overload("Watcher.Code.Commands.StanceCmd", "ExitStance",
+                                 new[]
+                                 {
+                                     typeof(PlayerChoiceContext), typeof(Player),
+                                     typeof(CardModel),
+                                 });
+                var useCtx = ctx ?? new MegaCrit.Sts2.Core.GameActions.Multiplayer.BlockingPlayerChoiceContext();
+                string before = StanceModelName(owner);
+                try
+                {
+                    var t = m?.Invoke(null, new object?[] { useCtx, owner, null }) as Task;
+                    if (t != null) await t;
+                }
+                catch (Exception e)
+                {
+                    Logger.Log("[CharBoss] 退出姿态：StanceCmd.ExitStance 抛异常（继续看姿态模型 / 走兜底）: "
+                               + e.Message);
+                }
+
+                string after = StanceModelName(owner);
+                Logger.Log($"[CharBoss] 退出姿态：{Describe(before)} → {Describe(after)}" +
+                           (m == null ? "（⚠ 反射没找到 ExitStance）" : string.Empty));
+
+                if (!after.Contains("NoStance"))
+                {
+                    if (await SetStanceSilentlyAsync(owner, "NoStance"))
+                    {
+                        Logger.Log($"[CharBoss] 退出姿态（silent 强制清）⇒ " +
+                                   $"{Describe(StanceModelName(owner))}");
+                    }
+                }
+                return;
             }
         }
         catch (Exception e) { Logger.Log("[CharBoss] 退出姿态失败: " + e.Message); }
-        return Task.CompletedTask;
     }
 
     /// <summary>获得真言。A 走 `WatcherCombatHelper.GainMantra`；B 直接给 `MantraPower` 加层（它自己结算神格）。</summary>
@@ -248,7 +543,8 @@ internal static class WatcherCards
                 var apply = typeof(MegaCrit.Sts2.Core.Commands.PowerCmd)
                     .GetMethods(BindingFlags.Public | BindingFlags.Static)
                     .FirstOrDefault(x => x.Name == "Apply" && x.IsGenericMethodDefinition
-                                         && x.GetParameters().Length == 6);
+                                         && x.GetParameters().Length == 6
+                                                                              && x.GetParameters()[1].ParameterType == typeof(Creature));
                 if (apply == null) return Task.CompletedTask;
                 return apply.MakeGenericMethod(mantra)
                     .Invoke(null, new object?[]
@@ -286,8 +582,146 @@ internal static class WatcherCards
         catch { /* 忽略 */ }
     }
 
+    /// <summary>进「平静」（A: `WatcherCombatHelper.EnterCalm`；B: `StanceCmd.EnterCalm`）。</summary>
+    internal static Task EnterCalmAsync(Player? owner)
+    {
+        try
+        {
+            Probe();
+            if (_provider == Provider.Boninall)
+            {
+                var m = Method("WatcherMod.WatcherCombatHelper", "EnterCalm");
+                return m?.Invoke(null, new object?[] { owner, null }) as Task ?? Task.CompletedTask;
+            }
+            if (_provider == Provider.Lamali)
+            {
+                // ⚠ v0.2.709：这里同样要**按参数类型取重载**（`EnterCalm` 也有 Player / IEnumerable<Player> 两份），
+                //   否则返回 null ⇒ 静默不执行（「如水」「渐强」进平静那条路以前一直没生效）。
+                var m = Overload("Watcher.Code.Commands.StanceCmd", "EnterCalm",
+                                 new[]
+                                 {
+                                     typeof(PlayerChoiceContext), typeof(Player),
+                                     typeof(CardModel),
+                                 });
+                return m?.Invoke(null, new object?[] { new ThrowingPlayerChoiceContext(), owner, null }) as Task
+                       ?? Task.CompletedTask;
+            }
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 进入平静失败: " + e.Message); }
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// 按**运行期拿到的 Type** 施加一个能力（我们编译期没有观者模组的类型 ⇒ 只能反射泛型）。
+    /// 与 <see cref="GainMantraAsync"/> 里 B 版那段完全同一套写法，这里抽出来给「印记」等复用。
+    /// </summary>
+    internal static Task ApplyPowerAsync(Type powerType, Creature target, decimal amount,
+                                         Creature applier, CardModel? source)
+    {
+        try
+        {
+            if (powerType == null || target == null || amount <= 0m) return Task.CompletedTask;
+            var apply = typeof(MegaCrit.Sts2.Core.Commands.PowerCmd)
+                .GetMethods(BindingFlags.Public | BindingFlags.Static)
+                .FirstOrDefault(x => x.Name == "Apply" && x.IsGenericMethodDefinition
+                                     && x.GetParameters().Length == 6
+                                                                          && x.GetParameters()[1].ParameterType == typeof(Creature));
+            if (apply == null) return Task.CompletedTask;
+            return apply.MakeGenericMethod(powerType)
+                .Invoke(null, new object?[]
+                {
+                    new ThrowingPlayerChoiceContext(), target, amount, applier, source, false,
+                }) as Task ?? Task.CompletedTask;
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 施加能力失败（" + powerType.Name + "）: " + e.Message); }
+        return Task.CompletedTask;
+    }
+
+    /// <summary>她是不是在「平静」姿态里（给「不惧妖邪」/「如水」这类判断用）。</summary>
+    internal static bool InCalmState(Player? owner) => HasPowerNamed(owner, "Calm", "CalmStance");
     /// <summary>她现在是不是在神格里（A: `Divinity` / B: `DivinityStance`）。</summary>
-    internal static bool InDivinity(Player? owner) => HasPowerNamed(owner, "Divinity", "DivinityStance");
+    internal static bool InDivinity(Player? owner)
+    {
+        // ★ v0.2.707：B 版的姿态**不是生物身上的 power**（见 `StanceMultiplierFromModel`），
+        //   所以还要问一下姿态模型，否则日志永远报「神格里=False」（哪怕真的进去了）。
+        if (HasPowerNamed(owner, "Divinity", "DivinityStance")) return true;
+        return StanceModelName(owner).Contains("Divinity");
+    }
+
+    /// <summary>她现在是不是在「**平静**」姿态里（A: `Calm` / B: `CalmStance`）。
+    ///
+    /// 用途（用户 2026-11-16：「第四回合的欺瞒现实和平安即使没进神格也被打了」）：
+    /// 观者原版规则里**离开平静 = +2 能量**，而剧本第 4 / 11 回合的「化拳为空」正是「退出当前姿态」
+    /// ⇒ 那两张「有费就打」靠的就是这一笔。规划期得先知道她此刻在不在平静，才能算准预算。
+    ///
+    /// ⚠ v0.2.709：B 版的姿态**不是生物身上的 power**（见 `StanceMultiplierFromModel`），
+    ///   只查 power 会永远返回 false —— 日志里 `虔信：真言满 10 ⇒ ① 退出姿态（本来在平静=False）`
+    ///   而同一秒的姿态模型明明是 `CalmStance`，就是这么来的。现在再问一次姿态模型。
+    /// </summary>
+    internal static bool InCalm(Player? owner)
+    {
+        if (HasPowerNamed(owner, "Calm", "CalmStance")) return true;
+        return StanceModelName(owner).Contains("Calm");
+    }
+
+    /// <summary>
+    /// **本场战斗累计获得的真言层数**（A 版：`WatcherStatePower.TotalMantraGainedThisCombat`）。
+    ///
+    /// 用途：观者「光辉」的真实伤害 = 牌面 + 这个数（反编译 `WatcherBrilliance.OnPlay` =
+    /// `DamageCmd.Attack(DynamicVars.Damage.BaseValue + GetTotalMantraGained(owner))`，
+    /// 而 `GetTotalMantraGained` 就是读这个属性）。用户 2026-11-16：
+    /// 「光辉的伤害预览似乎没有计算虔信、手摇鼓和她特殊效果…导致的她在回合开始时的真言变化」。
+    ///
+    /// ⚠ 注意它是「**累计获得**」：她特殊效果每回合扣掉的那 5 层**不会**让它变小
+    ///   （我们的 `SetMantra` 只改 `Mantra` power 自己的层数）。
+    /// ⚠ B 版（lamali）的光辉走 `WithCalculatedDamage(12, MantraGainedThisCombat, …)`，
+    ///   那个数**已经在牌面的 `DynamicVars.Damage` 里**了 ⇒ 调用方不要再加一遍（见 BossIntentBuilder 的 gate）。
+    /// </summary>
+    internal static int TotalMantraGained(Player? owner)
+    {
+        try
+        {
+            var powers = owner?.Creature?.Powers;
+            if (powers == null) return 0;
+            for (int i = 0; i < powers.Count; i++)
+            {
+                var p = powers[i];
+                if (p == null) continue;
+                string name;
+                try { name = p.GetType().Name; } catch { continue; }
+                if (name != "WatcherStatePower" && name != "WatcherState") continue;
+                var prop = p.GetType().GetProperty("TotalMantraGainedThisCombat",
+                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                var value = prop?.GetValue(p);
+                if (value is int gained) return Math.Max(0, gained);
+            }
+        }
+        catch { /* 读不到当 0 */ }
+        return 0;
+    }
+
+    /// <summary>
+    /// 她身上有没有「**手摇鼓**」（`Damaru`：`AfterPlayerTurnStart` ⇒ +1 真言）。
+    /// 我们替影子玩家广播那条钩子的时机是**她回合开始** ⇒ 计划（玩家回合）排的时候这笔还没到账，
+    /// 意图要把它当「pending +1」先补上（用户 2026-11-16 点名的三条之一）。
+    /// </summary>
+    internal static bool HasDamaru(Player? owner)
+    {
+        try
+        {
+            var relics = owner?.Relics;
+            for (int i = 0; i < (relics?.Count ?? 0); i++)
+            {
+                string? entry = null;
+                try { entry = relics![i]?.Id.Entry; } catch { continue; }
+                if (string.IsNullOrEmpty(entry)) continue;
+                if (entry.Replace("-", "").Replace("_", "")
+                        .Equals("DAMARU", StringComparison.OrdinalIgnoreCase)) return true;
+            }
+        }
+        catch { /* 忽略 */ }
+        return false;
+    }
 
     private static int PowerAmount(Player? owner, params string[] names)
     {
@@ -330,6 +764,31 @@ internal static class WatcherCards
     }
 
     private static MethodInfo? Method(string typeFullName, string methodName)
+        => Overload(typeFullName, methodName, null);
+
+    private static int _overloadLogs;
+
+    /// <summary>
+    /// 按**参数类型**精确取重载（拿不到就按名字兜底，再有歧义就自己挑）。
+    ///
+    /// ★ v0.2.709（用户 2026-11-16 第六轮：「她已经处在神格时，再积累 10 层真言，不会像特殊效果里
+    ///   说的一样先退出姿态然后再进入神格（这会导致没有成功加费）」）—— **真凶不是策略，是这个工具**：
+    ///   B 版（lamali）`Watcher.Code.Commands.StanceCmd` 里
+    ///   `EnterDivinity` / `ExitStance` / `EnterCalm` **各有两份重载**
+    ///   （`(ctx, Player, CardModel?)` 与 `(ctx, IEnumerable&lt;Player&gt;, CardModel?)`），
+    ///   而旧写法 `t.GetMethod(name, flags)` 遇到歧义会抛 `AmbiguousMatchException`，
+    ///   被本函数的 catch 吞掉 ⇒ 返回 null ⇒ 调用点 `m?.Invoke(...)` **静默什么都不做**。
+    ///
+    ///   日志铁证（三次「之后」都等于「之前」，说明这一步从来没执行过）：
+    ///   <code>
+    ///   进神格：StanceCmd.EnterDivinity 之后姿态模型 = NoStance      （她本来是 NoStance）
+    ///   进神格：StanceCmd.EnterDivinity 之后姿态模型 = CalmStance    （她本来是平静）
+    ///   进神格：StanceCmd.EnterDivinity 之后姿态模型 = DivinityStance（她本来就在神格）
+    ///   </code>
+    ///   ⇒ 于是「退姿态」从来没退过（平静的 +2 也一次都没给过），「进神格」全靠 v0.2.707 的
+    ///   silent 强制兜底 + v0.2.708 的补跑 OnEnterStance 才勉强成立。
+    /// </summary>
+    private static MethodInfo? Overload(string typeFullName, string methodName, Type[]? parameterTypes)
     {
         try
         {
@@ -338,12 +797,72 @@ internal static class WatcherCards
                 if (asm == null) continue;
                 var t = asm.GetType(typeFullName, false);
                 if (t == null) continue;
-                var m = t.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-                if (m != null) return m;
+
+                if (parameterTypes != null)
+                {
+                    try
+                    {
+                        var exact = t.GetMethod(methodName,
+                            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static,
+                            null, parameterTypes, null);
+                        if (exact != null) return exact;
+                    }
+                    catch { /* 往下走 */ }
+                }
+
+                MethodInfo? byName = null;
+                try
+                {
+                    byName = t.GetMethod(methodName,
+                        BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+                }
+                catch { byName = null; }
+                if (byName != null) return byName;
+
+                // 还是有歧义 ⇒ 自己挑：两份实现的姿态命令都首选「第二个参数是 Player」那一条
+                MethodInfo? best = null;
+                try
+                {
+                    foreach (var cand in t.GetMethods(
+                                 BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
+                    {
+                        if (!string.Equals(cand.Name, methodName, StringComparison.Ordinal)) continue;
+                        var ps = cand.GetParameters();
+                        if (ps.Length < 2) continue;
+                        if (ps[1].ParameterType != typeof(Player)) continue;
+                        if (best == null || ps.Length < best.GetParameters().Length) best = cand;
+                    }
+                }
+                catch { /* 忽略 */ }
+                if (best != null)
+                {
+                    if (_overloadLogs++ < 8)
+                    {
+                        var names = new List<string>();
+                        foreach (var p in best.GetParameters()) names.Add(p.ParameterType.Name);
+                        Logger.Log($"[CharBoss] 反射消歧：{t.Name}.{methodName} 有多个重载 ⇒ 取 " +
+                                   $"({string.Join(", ", names)})");
+                    }
+                    return best;
+                }
             }
         }
         catch { /* 忽略 */ }
         return null;
+    }
+
+    /// <summary>姿态模型类型名 → 中文说明（只给日志用）。</summary>
+    private static string Describe(string stanceName)
+    {
+        if (string.IsNullOrEmpty(stanceName)) return "（拿不到）";
+        return stanceName switch
+        {
+            "NoStance" => "无姿态",
+            "CalmStance" => "平静",
+            "WrathStance" => "愤怒",
+            "DivinityStance" => "神格",
+            _ => stanceName,
+        };
     }
 }
 #endif

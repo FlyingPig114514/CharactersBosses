@@ -1,4 +1,4 @@
-#if STS2_111   // 「观者」角色只在 0.113 的观者 mod 里 ⇒ 107 不参与
+﻿#if STS2_111   // 「观者」角色只在 0.113 的观者 mod 里 ⇒ 107 不参与
 using System;
 using System.Reflection;
 using MegaCrit.Sts2.Core.Models;
@@ -21,6 +21,8 @@ namespace CharacterBosses.Core;
 internal static class WatcherModPresence
 {
     private static bool _probed;
+    /// <summary>上一次探测的时间戳（毫秒）：未装观者 mod 时用来限流，见 `Probe()`。</summary>
+    private static long _lastProbeMs;
     private static bool _installed;
     private static Type? _characterType;
 
@@ -44,7 +46,17 @@ internal static class WatcherModPresence
     private static void Probe()
     {
         if (_probed) return;
-        _probed = true;
+        // 未装时每次调用都全扫 AppDomain 会很贵 ⇒ 2 秒最多探一次（慢车道一直在调 Installed）
+        try
+        {
+            long nowMs = Environment.TickCount64;
+            if (!_installed && nowMs - _lastProbeMs < 2000) return;
+            _lastProbeMs = nowMs;
+        }
+        catch { /* 忽略 */ }
+        // ★ v0.2.686（用户实测：整场立绘是愚者）：**只在真的探测到之后才锁**。
+        //   以前第一行就 `_probed = true`，而这次探测很可能**早于**观者 mod 的程序集加载 ⇒
+        //   缓存成「没装」就再也不重试（候补表/角色类型/立绘全都会错）。现在没找到就下次再来。
         try
         {
             foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
@@ -78,6 +90,8 @@ internal static class WatcherModPresence
             Logger.Log("[CharBoss] 观者 mod 探测失败: " + e.Message);
         }
         if (!_installed) Logger.Log("[CharBoss] 没装观者 mod ⇒ 第三幕候选里不会有观者 Boss");
+        // 只有真的探测到观者 mod 才锁死；没找到就保持未锁，下一帧再试（慢车道会反复调 Installed）
+        if (_installed) _probed = true;
     }
 }
 #endif

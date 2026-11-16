@@ -278,7 +278,22 @@ public static class BossFrameTick
                     }
                     catch { readyToEnd = false; }
 
-                    if (!readyToEnd)
+                    // ★ v0.2.700（用户 2026-11-16：「观者出冥想的下个玩家回合开始时，玩家的回合结束按钮会消失」）：
+                    //   冥想（`Meditate.OnPlay`）最后会替出牌者 `PlayerCmd.EndTurn` —— 对我们的影子玩家来说
+                    //   那是「她这一手还没打完就被人结束回合」⇒ 原版那个「已结束回合」的标记会残留，
+                    //   于是 `AllPlayersReadyToEndTurn()` 在我们这边看着像「已经结束」，
+                    //   下面那个保险就被 `!readyToEnd` 挡掉、按钮一直 Hidden。
+                    //   现在**再问一次「本机玩家自己是不是已经点了结束回合」**：他还没点，就照样把按钮打开。
+                    //   （冥想本体那条命令已经由 `ShadowPlayerEndTurnSkipPatch` 吞掉，这里是第二道保险。）
+                    bool meReady = false;
+                    try
+                    {
+                        var mgr = MegaCrit.Sts2.Core.Combat.CombatManager.Instance;
+                        meReady = mgr != null && mgr.IsPlayerReadyToEndTurn(me);
+                    }
+                    catch { meReady = false; }
+
+                    if (!readyToEnd || !meReady)
                     {
                         if (++_endTurnHiddenStreak >= 2)
                         {
@@ -666,6 +681,24 @@ public static class BossFrameTick
 #if STS2_111
             // 「许愿」固定选「永生不死」：观者模组可能比我们晚加载 ⇒ 放慢车道里重试（幂等）
             try { Core.WatcherRuntimePatches.TryInstall(); } catch { /* 忽略 */ }
+            // Ω观的三处接管（欧米伽隔回合触发 / 点穴可被格挡 / 不惧妖邪进平静）：同样幂等、同样要重试
+            try { Core.WatcherOmegaMechanics.TryInstall(); } catch { /* 忽略 */ }
+            // ★ v0.2.686（用户实测：「怎么tm是愚者，这是观者boss」）：
+            //   `BossDefs.Watcher.CharacterType` 是**愚者占位**，靠 `RefreshWatcherCharacterType()` 在运行期换成
+            //   真正的观者角色；而那个函数只在 `BossDefValidator` 里**跑一次** —— 那一跑常常**早于**观者 mod
+            //   的程序集加载（`WatcherModPresence` 那时返回 null）⇒ 占位符原地保留、之后永不重试，
+            //   于是立绘走 `res://scenes/creature_visuals/fool.tscn`（日志里那行
+            //   `WATCHER_DIVINITY 立绘用角色模型的 VisualsPath：…/fool.tscn（⚠ 与缺省路径不同）` 就是它）。
+            //   两个函数都是幂等且「只在值真的变了时打日志」⇒ 放慢车道里一直重试到解析成功为止。
+            try
+            {
+                if (Core.BossDefs.Watcher.CharacterType == typeof(MegaCrit.Sts2.Core.Models.Characters.Fool))
+                {
+                    Core.BossDefs.RefreshWatcherCharacterType();
+                    Core.BossDefs.RefreshWatcherExtras();
+                }
+            }
+            catch { /* 忽略 */ }
 #endif
             // ★ 2026-11-05（用户：「召唤的 2 个仆从叠一起了，让它们分开」）：
             //   仆从是战斗中陆续召出来的，`PositionEnemies` 只在进战斗/重排时跑一次 ⇒

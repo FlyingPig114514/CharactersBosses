@@ -1556,6 +1556,34 @@
       "error_message": "往 powers.json 类的新表里用 Add-LocKey 逐键追加时，若文件是新建的（内容只有 `{` 和 `}`），第一行会变成 `{,` ⇒ JSON 解析失败（和 v0.2.628 那次裸换行同一个坑的变体）",
       "fix": "新建表不要走 Add-LocKey（它会在 `{` 后面补逗号）⇒ 改用 .tmp/apply-loc-table.ps1 整表重写：首行 `{`、逐键 `\"KEY\":  \"value\",`、末行 `}`，写完立刻 ConvertFrom-Json 回读校验。已用它修好 16 语言的 cards.json。",
       "at": "2026-11-14T12:38:38.695Z"
+    },
+    {
+      "id": "bug-239-mwj2ptkx",
+      "error_message": "B 版观者（lamali）「退姿态 / 进神格」调用了却毫无效果：日志里 `StanceCmd.EnterDivinity 之后姿态模型` 的「之后」永远等于「之前」（NoStance→NoStance、CalmStance→CalmStance、DivinityStance→DivinityStance），能量不变；她已在神格时再满 10 层真言既不退姿态也不加费",
+      "fix": "不是策略问题，是反射工具：`Watcher.Code.Commands.StanceCmd` 的 EnterDivinity / ExitStance / EnterCalm **各有两份重载**（(ctx, Player, CardModel?) 与 (ctx, IEnumerable<Player>, CardModel?)），而 `t.GetMethod(name, Public|NonPublic|Static)` 遇歧义抛 `AmbiguousMatchException`，被 catch 吞掉后返回 null ⇒ 调用点 `m?.Invoke(...)` 静默什么都不做。改用 `Overload(type, name, Type[])` 按参数类型精确取（取不到再按名字，最后自选「第二个参数是 Player」那条并打一行 `反射消歧`）；`ExitStanceAsync` 改成真 await + 打 `退出姿态：X → Y` + 没退掉就 `SetStanceSilently<NoStance>` 兜底；`EnterDivinityCoreAsync` 发现她已在神格就先 silent 退掉再进（否则 `SetStance` 里 `current.GetType()==newCanonical.GetType()` 会直接 return，那 +3 拿不到）。教训：反射取方法**必须写全参数类型**，`GetMethod(name)` 的歧义异常一旦被 catch 就等于「静默空转」。",
+      "file": "src/Hooks/Core/WatcherCards.cs",
+      "at": "2026-11-16T09:41:06.177Z"
+    },
+    {
+      "id": "bug-240-mwj2ptl8",
+      "error_message": "特殊效果说明框（NHoverTipSet 常驻框）压在「图例 / 地图 / 牌堆」等界面上面，切到地图页面还能看见；日志里没有「已离开战斗房 ⇒ 收掉常驻特殊效果说明框」这行",
+      "fix": "说明框挂在**全局**提示层 `NGame.HoverTipsContainer`，而旧收框判据只有 `NCombatRoom.Instance == null` —— 战斗中打开地图/图例/牌堆时战斗房**还活着**，判据放行 ⇒ 框压在这些界面之上。新增 `BossSpecialTip.CombatScreenActive()` 四条一起判：①战斗房有效 ②`NOverlayStack.Instance.ScreenCount == 0` ③`NMapScreen.Instance.IsOpen == false` ④`ActiveScreenContext.Instance.IsCurrent(room)`；`Ensure` 与「每帧挂在 NHoverTipSet._Process 上的守卫」都改用它，并在判据失败时打一行限流日志说明是哪一条不满足。",
+      "file": "src/Hooks/UI/BossSpecialTip.cs",
+      "at": "2026-11-16T09:41:06.188Z"
+    },
+    {
+      "id": "bug-241-mwj3f47k",
+      "error_message": "多人联机「Boss 只数」两端不一致（房主 N 只 / 客人少一只）的潜在半截状态：`MultiBossPlan.WantsSecondBoss` 读不到 RunState 时按 1 人算，而 `BossLineups.PlayerCount()` 有「记住上次读到的人数」的兜底 ⇒ 阵容按 2 只排、PartnersForWithKeys 判成单人 ⇒ 一只伙伴都不加",
+      "fix": "`WantsSecondBoss` 读不到 RunState 玩家数时改用 `BossLineups.PlayerCount()`（同一个数、同一套兜底），并打一行「多人判定：这一刻读不到 RunState 的玩家数 ⇒ 沿用记住的 N 人」。教训：**「排几只」和「造几只」必须读同一个函数**，凡是同一语义有两个读取口、其中一个带兜底另一个不带，就会在瞬态读失败时变成半截状态。",
+      "file": "src/Hooks/Core/MultiBossPlan.cs",
+      "at": "2026-11-16T10:00:46.352Z"
+    },
+    {
+      "id": "bug-242-mwj3p1oq",
+      "error_message": "多人联机第三幕第二场 Boss 不同步（房主换成角色 Boss、客人保持原版）：客人端只有在 `act.SecondBossEncounter` 原值已经是我们的遭遇时才跟随房主，第二场经常不是 ⇒ 客人只能自己按确定性规则重算，而重算输入（候补表/房主勾选/地图替换开关默认值）每台机器可能不同",
+      "fix": "让房主把**结论**直接广播：`BossPicksMessage` 加 `Bosses`（`幕:场|KEY` 或 `幕:场|VANILLA`）与 `Caps`（客人观者实现身份），消息改成双向；`CharBossEncounters.ForVanillaBoss` 拆成薄壳 + `ForVanillaBossCore`，客人先问 `BossPicksSync.HostBossOf(幕,场)` —— `VANILLA` 就不替换、给 Key 就直接用、没收到才退回确定性规则；房主每次算完 `NoteHostBoss` 并重播（结论变化才发；新客人首次上报时强制清 `_lastSent` 重播一次）。**教训：跨机器「各自用同一套算法重算」永远不如「房主算一次、把结论广播出去」——前者要求所有输入完全一致，后者只需要一条消息到达。**",
+      "file": "src/Hooks/Core/BossPicksSync.cs",
+      "at": "2026-11-16T10:08:29.642Z"
     }
   ]
 }

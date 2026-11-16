@@ -6,6 +6,9 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Nodes.Combat;
 using MegaCrit.Sts2.Core.Nodes.HoverTips;
 using MegaCrit.Sts2.Core.Nodes.Rooms;
+using MegaCrit.Sts2.Core.Nodes.Screens.Map;
+using MegaCrit.Sts2.Core.Nodes.Screens.Overlays;
+using MegaCrit.Sts2.Core.Nodes.Screens.ScreenContext;
 using CharacterBosses.Monsters;
 
 namespace CharacterBosses.UI;
@@ -45,17 +48,93 @@ internal static class BossSpecialTip
     private const long RetryIntervalMs = 400;
     private static readonly System.Diagnostics.Stopwatch _retryClock = System.Diagnostics.Stopwatch.StartNew();
 
+    /// <summary>
+    /// **此刻该不该显示这条说明框**（用户 2026-11-16 第六轮：「特殊效果描述的层级不对，
+    /// 切到地图页面了还能看见」）。
+    ///
+    /// 以前只判「有没有战斗房」。而这块框挂在**全局**提示层（`NGame.HoverTipsContainer`）上，
+    /// 层级比地图 / 图例 / 牌堆详情这些界面还高 ⇒ 只要战斗房还活着（战斗中打开地图、图例、
+    /// 牌堆详情都算），框就压在这些界面上面 —— 症状正是「切到地图页面还能看见」。
+    ///
+    /// 现在四条一起判，任一不满足就收掉（`Ensure` 下一帧会按需重建，不需要别的出口）：
+    ///   ① 有战斗房且实例有效；
+    ///   ② 没有任何浮层打开（`NOverlayStack.ScreenCount == 0`：地图 / 牌堆 / 选牌 / 图例都走它）；
+    ///   ③ 地图屏没开着（`NMapScreen.IsOpen`，它有时不算浮层）；
+    ///   ④ 当前屏幕就是战斗房（`ActiveScreenContext.IsCurrent(room)`，与 `NCombatRoom` 自己用的判据一致）。
+    /// </summary>
+    internal static bool CombatScreenActive()
+    {
+        string reason;
+        bool ok = CombatScreenActive(out reason);
+        if (!ok && reason != null && _screenLogs++ < 8)
+        {
+            Logger.Log($"[CharBoss] 特殊效果说明框：当前不该显示（{reason}）⇒ 收掉");
+        }
+        return ok;
+    }
+
+    private static int _screenLogs;
+
+    private static bool CombatScreenActive(out string? reason)
+    {
+        reason = null;
+        try
+        {
+            var room = NCombatRoom.Instance;
+            if (room == null || !GodotObject.IsInstanceValid(room))
+            {
+                reason = "没有战斗房";
+                return false;
+            }
+
+            try
+            {
+                var overlays = NOverlayStack.Instance;
+                if (overlays != null && GodotObject.IsInstanceValid(overlays) && overlays.ScreenCount > 0)
+                {
+                    reason = $"有 {overlays.ScreenCount} 层浮层压着（地图/牌堆/图例一类）";
+                    return false;
+                }
+            }
+            catch { /* 拿不到就按没开 */ }
+
+            try
+            {
+                var map = NMapScreen.Instance;
+                if (map != null && GodotObject.IsInstanceValid(map) && map.IsOpen)
+                {
+                    reason = "地图屏开着";
+                    return false;
+                }
+            }
+            catch { /* 拿不到就按没开 */ }
+
+            try
+            {
+                if (!ActiveScreenContext.Instance.IsCurrent(room))
+                {
+                    reason = "当前屏幕不是战斗房";
+                    return false;
+                }
+            }
+            catch { /* 拿不到判据就放行 */ }
+
+            return true;
+        }
+        catch { reason = "判据本身抛异常"; return false; }
+    }
+
     /// <summary>手牌/意图每次刷新时调一次；幂等。</summary>
     public static void Ensure(CharBossMonster boss)
     {
         try
         {
-            // ★ 2026-11-15（用户：「切到地图页面都还能看到」）：
-            //   原版 `NHoverTipSet` 挂在全局提示层上，常驻之后**跨界面存活**。
-            //   所以只要「当前不在战斗房里」就一律收掉 —— 这是这条通路唯一的出口。
-            if (NCombatRoom.Instance == null || !GodotObject.IsInstanceValid(NCombatRoom.Instance))
+            // ★ 2026-11-15（用户：「切到地图页面都还能看到」）+ 2026-11-16（「层级不对」）：
+            //   原版 `NHoverTipSet` 挂在**全局提示层**上，常驻之后**跨界面存活、且压在别的界面上面**。
+            //   所以只要「当前不是战斗屏」就一律收掉（判据见 `CombatScreenActive`）。
+            if (!CombatScreenActive())
             {
-                Hide();
+                if (_tipSet != null || _anchor != null) Hide();
                 return;
             }
 

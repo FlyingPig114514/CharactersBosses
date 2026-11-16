@@ -20,6 +20,14 @@ public static class BossScriptPlanner
     public static List<PlannedPlay> Plan(CharBossMonster boss, PlayerCombatState pcs,
                                          BossTurn turn, int turnNumber, int spentThisTurn = 0)
     {
+#if STS2_111
+        // ★ v0.2.680（用户 2026-11-16 第 4 条「灭除之刃段数恒为 1」）：
+        //   剧本第 5 / 9 回合的灭除之刃是这里**按类型新造**的一张牌（`Repeat` 默认 1），
+        //   而真正的 X 只有她上次打聚能成刃时那张实体才知道（它还在抽牌堆里躺着）。
+        //   所以每次规划前先把「她实付过的 X」写进手牌这张的 `Repeat` ——
+        //   意图（`BossDamagePredictor.Hits`）和真实结算（牌自己的 `WithHitCount(Repeat)`）读的是同一个变量。
+        try { boss.ApplyWatcherConjuredHits(); } catch { /* 纯显示 */ }
+#endif
         // ★ 2026-11-05（状态机）：本回合到目前为止「她生成的状态牌张数」与「已打出的技能牌数」，
         //   用来把烟囱 / 开信刀的伤害挂到**触发它的那张牌**底下，并让散射炮算上本回合将生成的状态牌。
         int statusesThisTurn = 0;
@@ -199,8 +207,20 @@ public static class BossScriptPlanner
         //   炼药猎那条是 `BladesGrowth.RecomputeAll` 顺手算的，可它**有球位就直接 return**
         //   （塔罗愚第 4 回合「魔术师」之后就永久有球位）⇒ 必须在规划期按剧本顺序自己算，
         //   并存进 `PlannedPlay.SerpentDamage` 供两条重算路径原样再用。
-        int conjuredX = 0;   // 观者「聚能成刃」本回合花掉的 X（⇐ 后面「灭除之刃」的段数）
         int serpentNow = SerpentStacksOf(boss.Creature);   // 身上已有的层数（之前的回合拿到的）
+        // ★ v0.2.691（用户截图：同一回合里「先打暴怒、再打打击」时后者少算一半；
+        //   以及「点穴的伤害没有考虑本回合会施加的印记」）：规划期按剧本顺序推演两件事 ——
+        //   · 她的**姿态倍率**（愤怒 ×2 / 神格 ×3），后面那些牌按打出那一刻的姿态算；
+        //   · 本回合前面的点穴已经给目标叠了多少层**印记**，后面那张点穴的伤害要累加。
+        //   ⚠ 这两个变量**不能放进 `#if STS2_111`**：`IntentsFor` 与 `PlannedPlay` 是两个版本共用的。
+        int plannedStanceMul = BossIntentBuilder.StanceMultiplierOf(boss.Creature);
+        int plannedMarks = 0;
+#if STS2_111
+        // 观者：她的**姿态**会随剧本变化（警惕 = 进平静；化拳为空 = 退出姿态），
+        // 而离开平静在原版规则里就是 **+2 能量** —— 见下面「观者姿态」那段记账。
+        bool watcherCalm = false;
+        try { watcherCalm = Core.WatcherCards.InCalm(boss.Shadow); } catch { watcherCalm = false; }
+#endif
         int serpentSoFar = 0;                              // 本回合剧本里、排在当前牌**之前**会拿到的层数
 
         var orbSim = new BossOrbSim(boss.Creature, pcs.OrbQueue);
@@ -515,20 +535,21 @@ public static class BossScriptPlanner
             string entryNow = SafeEntry(card);
             // 观者「聚能成刃」（X 费牌）⇒ 打出时生成一张「灭除之刃」，那张牌的**段数 = 这里的 X**
             // （用户 2026-11-15：奇迹 +1、回合开始 2 费 ⇒ X=3 ⇒ 灭除之刃 3 段；进了神格多 3 费 ⇒ X=6 ⇒ 6 段）。
-            // `IntentsFor` 对非 X 牌也认 `xHits`（按 `1 + xHits` 还原段数），所以这里直接把 X−1 递进去。
+            // ★ v0.2.680：段数**不再**靠这里递 `xHits` 了 —— 那张剧本牌自己的 `Repeat` 会被
+            //   `CharBossMonster.ApplyWatcherConjuredHits()` 改成她实付的 X（跨回合也成立），
+            //   而 `xHits` 只在「同一回合里先聚能成刃、再打灭除之刃」时才有意义（剧本里不存在这种回合）。
+            //   这里只留一行诊断日志，用于核对规划期的 X 与实付是否一致。
+#if STS2_111
             try
             {
-                if (entryNow == "WATCHER_CONJURE_BLADE" || entryNow == "WATCHER-CONJURE_BLADE")
+                if (CharBossMonster.WatcherIdIs(entryNow, "CONJURE_BLADE"))
                 {
-                    conjuredX = Math.Max(0, cost);
-                    if (conjuredX > 0) Logger.Log($"[CharBoss] 聚能成刃：本回合 X={conjuredX} ⇒ 之后的灭除之刃 {conjuredX} 段");
-                }
-                else if ((entryNow == "WATCHER_EXPUNGER" || entryNow == "WATCHER-EXPUNGER") && conjuredX > 0)
-                {
-                    xHits = Math.Max(0, conjuredX - 1);
+                    int conjureX = Math.Max(0, cost);
+                    if (conjureX > 0) Logger.Log($"[CharBoss] 聚能成刃：本回合规划 X={conjureX}");
                 }
             }
             catch { /* 纯预览 */ }
+#endif
             int starHits = -1;
             // 回响形态：这一张会不会被打两次（额度用完就回到 1 次）
             // ★ 用户 2026-11-14：「月亮要把小刀打出时会触发的群蛇形态伤害列出来（4×10 或恐惧 6×10，
@@ -589,6 +610,9 @@ public static class BossScriptPlanner
                 letterOpenerHit: Core.StatusBossMath.IsSkillForLetterOpener(card, skillsThisTurn) ? loDamage : 0,
                 pendingStatusCards: statusesThisTurn,
                 aoeFromCaller: true,
+                // ★ v0.2.691：这张牌**打出时**的姿态倍率 / 本回合前面点穴叠的印记（见上面 plannedStanceMul）
+                stanceMul: plannedStanceMul,
+                pendingMarks: plannedMarks,
                 // ★ v0.2.388：金斧的伤害 = 本场战斗打出的牌数，而意图是出手前算的
                 //   ⇒ 本回合排在它前面、还没打出来的牌要补上（规划期 `Plan` 还是空的，只能这样传）。
                 playsBeforeThisTurn: result.Count,
@@ -659,11 +683,30 @@ public static class BossScriptPlanner
                 PendingStatusCards = statusesThisTurn,
                 // ★ 2026-11-10：星尘/辐射的段数（辉星口径）在这里定死，重算路径原样再用
                 StarHits = starHits,
+                // ★ v0.2.691：姿态倍率与「前面那张点穴已叠的印记」定格存下，供两条重算路径原样再用
+                StanceMul = plannedStanceMul,
+                PendingMarks = plannedMarks,
                 SerpentDamage = serpentHere,   // 群蛇形态（重算路径原样再用）
                 PlayCount = echoPlayCount,     // 回响形态（重算路径原样再用）
             });
             // 这张牌真的会打出去 ⇒ 用掉一次「回响形态」的重打额度
             if (echoCardsLeft > 0) echoCardsLeft--;
+#if STS2_111
+            // ★ v0.2.691：这张牌真的会打出去 ⇒ 推进「姿态推演」与「已叠印记」两个状态
+            try
+            {
+                if (CharBossMonster.WatcherIdIs(entryNow, "ERUPTION") || CharBossMonster.WatcherIdIs(entryNow, "CRESCENDO"))
+                    plannedStanceMul = 2;                       // 暴怒 / 渐强 ⇒ 进入愤怒
+                else if (CharBossMonster.WatcherIdIs(entryNow, "TRANQUILITY") || CharBossMonster.WatcherIdIs(entryNow, "MEDITATE")
+                         || CharBossMonster.WatcherIdIs(entryNow, "VIGILANCE"))
+                    plannedStanceMul = 1;                       // 安宁 / 冥想 / 警惕 ⇒ 进入平静（平静不加伤）
+                else if (CharBossMonster.WatcherIdIs(entryNow, "EMPTY_BODY") || CharBossMonster.WatcherIdIs(entryNow, "EMPTY_FIST"))
+                    plannedStanceMul = 1;                       // 化体为空 / 化拳为空 ⇒ 退出姿态
+                if (CharBossMonster.WatcherIdIs(entryNow, "PRESSURE_POINTS"))
+                    plannedMarks += Math.Max(0, Core.WatcherCards.PressurePointsMarks(card));
+            }
+            catch { /* 纯预览 */ }
+#endif
             // ★ v0.2.300：「踩踏」的减费看的是「本回合已经打完的攻击牌数」⇒ 每计划一张攻击牌就 +1
             //   （必须在扣费之后记，位置无所谓；放在这里与 energy 记账相邻，方便以后核对）。
             try
@@ -751,6 +794,31 @@ public static class BossScriptPlanner
             // 根除是 X 费牌（X = 花光本回合剩余能量），打出这一下必然 ≥3 → 回 1 费，
             // 后面那张「违逆」就打得出。游戏里确实回了 1 费，但规划期没记账 → 违逆被跳过（用户实测）。
             if (cost >= 3 && HasIvoryTile(boss)) energy += 1;
+#if STS2_111
+            // ★ v0.2.680（用户 2026-11-16：「第四回合的欺瞒现实和平安即使没进神格也被打了」）：
+            //   **不是多给了能量** —— 是「化拳为空」这个牌本身写着「退出当前姿态」，而观者原版规则里
+            //   「离开平静 ⇒ +2 能量」（A 版走 `WatcherCombatHelper.ExitStance` → `OnStanceChanged`）。
+            //   实测：她第 4 回合开始时 2 点，打完化拳为空后 `pcs.Energy` 变 4（日志 `done WATCHER_EMPTY_FIST:
+            //   energy=4`），所以后面那两张标了「有费就打」的牌真的打得出去 —— 用的就是**她自己的原版加费**
+            //   （用户口径：「你别给她补，用她原版的加费就行」）。
+            //   这里把这笔算进规划期预算，否则面板会先把它们画成压暗、回合里又补打出去 ⇒ 看着像 bug。
+            try
+            {
+                if (CharBossMonster.WatcherIdIs(entryNow, "EMPTY_FIST") && watcherCalm)
+                {
+                    watcherCalm = false;
+                    energy += 2;
+                    Logger.Log($"[CharBoss] 观者姿态：{SafeEntry(card)} 退出「平静」⇒ 原版 +2 能量" +
+                               $"（规划期算入，之后预算 {energy}）");
+                }
+                else if (CharBossMonster.WatcherIdIs(entryNow, "VIGILANCE"))
+                {
+                    watcherCalm = true;
+                    Logger.Log("[CharBoss] 观者姿态：警惕 ⇒ 进入「平静」（后面那张化拳为空会给她 +2 能量）");
+                }
+            }
+            catch { /* 纯预览 */ }
+#endif
             // 奥斯提出过手 → 记下来，后面那张「重压」就是 0 费了
             if (IsOstyAttack(card)) { ostyAttacked = true; ostyAttacksThisTurn++; }
             // 这张牌本回合会印几张牌（给后面的超质量体算加伤）

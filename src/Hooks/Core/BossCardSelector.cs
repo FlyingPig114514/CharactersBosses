@@ -508,7 +508,14 @@ public sealed class BossCardSelector : ICardSelector
     public Task<IEnumerable<CardModel>> GetSelectedCards(IEnumerable<CardModel> options, int minSelect, int maxSelect)
     {
         var list = options?.ToList() ?? new List<CardModel>();
-        int count = Math.Clamp(minSelect, 0, list.Count);
+        // ★ v0.2.701（用户 2026-11-16）：「许愿完全无效果（什么都没有获得）」。
+        //   反编译 B 版 `WishWatcher.OnPlay`：它把三张许愿牌（BecomeAlmighty / FameAndFortune / LiveForever）
+        //   摆出来走 `CardSelectCmd.FromChooseACardScreen(ctx, 三张, owner, false)` —— 那一路进来的
+        //   `minSelect` 是 **0**、`maxSelect` 是 **1**，于是我们「只选必须选的最少张数」这条策略
+        //   一张都不选 ⇒ 返回 null ⇒ 许愿什么都不给。
+        //   现在：**允许选的时候至少选 1 张**（`maxSelect ≥ 1` 就选 1），再往上才按 `minSelect` 走。
+        int want = Math.Max(minSelect, maxSelect >= 1 ? 1 : 0);
+        int count = Math.Clamp(want, 0, list.Count);
 
         var picked = new List<CardModel>();
         var rest = new List<CardModel>(list);
@@ -552,6 +559,53 @@ public sealed class BossCardSelector : ICardSelector
         // 兜底排序要知道「这一回合剧本要打哪些牌」（`Order()` 里用），这里显式传下去
         _orderBoss = bossNow;
         _orderTurn = turnNow;
+
+        // ★ v0.2.702（用户 2026-11-16）：「许愿会错误的选择力大无穷，应固定为永生不死」。
+        //   B 版 `WishWatcher.OnPlay` 把三张许愿牌交给 `CardSelectCmd.FromChooseACardScreen`：
+        //   `WATCHER-BECOME_ALMIGHTY`（力大无穷）/ `WATCHER-FAME_AND_FORTUNE`（名利双收）/
+        //   `WATCHER-LIVE_FOREVER`（永生不死）。用户口径固定拿「永生不死」⇒ 这里显式优先挑它。
+        //   （A 版另有 `WatcherRuntimePatches.InstallWishChoice` 直接改 `OnPlay` 的返回值，这里是与版本无关的第二道。）
+        if (count > 0)
+        {
+            for (int i = 0; i < rest.Count && picked.Count < count; i++)
+            {
+                string e = string.Empty;
+                try { e = rest[i].Id.Entry ?? string.Empty; } catch { /* 忽略 */ }
+                if (e.IndexOf("LIVE_FOREVER", StringComparison.OrdinalIgnoreCase) < 0) continue;
+                picked.Add(rest[i]);
+                rest.RemoveAt(i);
+                i--;
+                Logger.Log($"[CharBoss] 许愿：按用户要求固定挑「永生不死」（{e}）");
+            }
+        }
+
+
+        // ★ v0.2.696（用户 2026-11-16：「更改冥想的捞牌，让它一定会捞到点穴」）：
+        //   「冥想」是 `CardSelectCmd.FromCombatPile(弃牌堆)`（反编译 `Watcher.Code.Cards.Uncommon.Meditate`：
+        //   `FromCombatPile(ctx, GetPile((PileType)3, owner), ...)` ⇒ 从**弃牌堆**捞 N 张回手，然后进平静、结束回合）。
+        //   用户要的是「一定捞点穴」⇒ 这一条排在**所有**点名之前：只要候选（= 弃牌堆）里有「点穴」就先拿它。
+#if STS2_111
+        if (count > 0 && actingCard != null)
+        {
+            string actingEntry = string.Empty;
+            try { actingEntry = actingCard.Id.Entry; } catch { /* 忽略 */ }
+            if (Monsters.CharBossMonster.WatcherIdIs(actingEntry, "MEDITATE"))
+            {
+                for (int i = 0; i < rest.Count && picked.Count < count; i++)
+                {
+                    string entry = string.Empty;
+                    try { entry = rest[i].Id.Entry; } catch { /* 忽略 */ }
+                    if (!Monsters.CharBossMonster.WatcherIdIs(entry, "PRESSURE_POINTS")) continue;
+                    picked.Add(rest[i]);
+                    rest.RemoveAt(i);
+                    i--;
+                    Logger.Log("[CharBoss] 冥想：按用户要求优先捞「点穴」");
+                }
+                if (picked.Count == 0)
+                    Logger.Log("[CharBoss] 冥想：弃牌堆里没有「点穴」⇒ 退回普通挑牌");
+            }
+        }
+#endif
 
         // ⓠ **必备工具的「回合开始弃 1 张」**：优先挑剧本用 `ToolsDiscard` 点名的那一张
         //   （用户 2026-11-09：「第七回合必备工具弃的牌也不对，提前把要上奇巧的防御给弃掉了」）。

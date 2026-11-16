@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Models;
@@ -421,6 +421,9 @@ public static class BladesGrowth
                         // ★ 2026-11-10：星尘（花光所有星）/ 辐射（本回合获得的星）的段数 ——
                         //   规划期定死在计划里，这里原样再用（否则会被「历史口径」覆盖回 1 段）。
                         starHits: play.StarHits,
+                        // ★ v0.2.691：姿态倍率 / 前面那张点穴叠的印记 —— 规划期定格在 PlannedPlay 里，这里原样再用
+                        stanceMul: Math.Max(1, play.StanceMul),
+                        pendingMarks: Math.Max(0, play.PendingMarks),
                         // 幻影之刃：这张牌印出来的**第一把小刀** +9（其余刀不加）
                         shivBonus: phantomHere,
                         shivBonusBakedIn: phantomOnHer,

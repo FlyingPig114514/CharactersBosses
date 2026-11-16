@@ -555,3 +555,238 @@ WatcherCombatHelper.ChooseOne(PlayerChoiceContext, Player, IReadOnlyList<CardMod
 | 6 | 第 5 回合不出虔信、第 6 回合不出圣洁；**后面回合只有 1 费** | 能量定义写 2，而**涅奥的祝福每回合 −1** ⇒ 实际只剩 **1**。改成定义 **3**（实际 2，第 1 回合灯笼 +1 ⇒ 3） |
 
 107 / 111 均 0 错误 · `[verify] v0.2.679 OK` · 已安装。
+
+## 第 23 轮（2026-11-16）—— 用户五条 + 平静退出（全部实机验收）
+
+> 详细取证与反编译结论见 `docs/plans/watcher-divinity-fixes-2026-11-16.md`。
+
+| # | 反馈 | 根因（反编译实证） | 处理 |
+|---|---|---|---|
+| A | 能量全错：第 2 回合 5 费、第 4 回合超；「你别给她补，用她原版的加费就行」 | 我们**补了两笔**：`BossDevotionPower` 进神格立刻 `pcs.Energy += 3`，`_pendingEnergy` 再在下回合预算里 +3；而观者 `Divinity.<AfterApplied>d__8` 里本来就是 `PlayerCmd.GainEnergy(3m, Owner.Player)`（Owner = 影子玩家） | 两笔全删（连同 `TakePendingDivinityEnergy`、`_watcherLanternGiven` 与 `PrepareTurn` 里那块 `#if STS2_111` 观测者加费）；`PrepareTurn` 对观者**不再手动加灯笼**（`Relics.Lantern.AfterSideTurnStart` 真给她 +1，实测 her turn 1 = 5 → Wish 后 6）；「奇迹」也不再走通用「回能」补偿（`WatcherMiracle.OnPlay` 自己 `GainEnergy(1)`） |
+| B | 进神格后意图预览不重算 | `RefreshPlannedIntents` 只拿**旧 Plan** 重算，而计划是玩家回合开始前按 2 费排的 | 新增 `CharBossMonster.ReplanForExtraEnergy(why)`：按此刻真实能量**整块重跑剧本规划** → `BladesGrowth.RecomputeAll` → `PublishVanillaIntents` → `BossHandUi.RefreshForce` |
+| C | 打出聚能成刃不展示灭除之刃 | 生成的 token 牌进的是 **`(PileType)1` = 抽牌堆**，而 `GeneratedExpungers()` 只扫 `pcs.Hand` | 改扫 `pcs.AllPiles` 并把「在哪个堆」打进日志；预览副本额外抄 `Repeat`（`BossCardPreview` 是 `ModelDb.GetById + CreateCard` 造的原版新牌，段数会掉回 1） |
+| D | 灭除之刃段数恒为 1（应 3/6/9…） | 第 5/9 回合那张是 `BossScriptRunner.BuildHand` **按类型新造**的（`Repeat` 默认 1），带 X 的实体躺在抽牌堆里 | 打完聚能成刃时读实体牌的 `Repeat`（= 实付 X，升级 +1）存进 `WatcherExpungerHits`；规划前由 `ApplyWatcherConjuredHits()` 写进手牌那张的 `Repeat` ⇒ 意图（`BossDamagePredictor.Hits`）与真实结算（牌自己的 `WithHitCount(Repeat)`）同源 |
+| E | 两个观者模组卡 id 不同（`WATCHER_X` / `WATCHER-X`） | — | `CharBossMonster.WatcherIdIs(entry, suffix)`：去掉 `-`/`_` 再比后缀，所有运行期按 id 比的地方统一改用它 |
+| 6 | 「第四回合的欺瞒现实和平安即使没进神格也被打了」 | **不是多给能量**：`化拳为空` 自己写着「退出当前姿态」，而观者原版规则里**离开平静 = +2 能量**（用户已自行实机确认） | 行为本来就对，但**规划期没算这笔** ⇒ 面板先把两张画成压暗、回合里又补打出去。`BossScriptPlanner` 新增「观者姿态」记账：警惕 ⇒ 进平静、化拳为空且当前在平静 ⇒ `energy += 2`（`WatcherCards.InCalm` 双版认 `Calm|CalmStance`） |
+
+### 实机日志证据（v0.2.680，`mod_log.txt`）
+
+```
+WATCHER_DIVINITY turn 1: hand=3 energy=2/2      ← 预算 2（定义 3 − 涅奥 1），灯笼由原版钩子另给 1
+虔信：她进入神格 ⇒ +2 力量；能量**不补**（原版 Divinity.AfterApplied 自己 GainEnergy(3)）⇒ 此刻能量 5
+进神格多 3 点能量 ⇒ 按当前能量 5 整块重规划第 1 回合：2 张 [WATCHER_WISH_P,WATCHER_STRIKE_P]
+虔信：她回合开始时的实际能量 = 5              ← 我们的监听器比遗物钩子先跑，所以这里还是 5
+done WATCHER_WISH_P: energy=6                 ← 灯笼的 +1 在这之后到账（Lantern.AfterSideTurnStart）
+done WATCHER_STRIKE_P / VIGILANCE: energy=6   ← Wish3+打击1+警惕2 = 6，正好花光
+WATCHER_DIVINITY turn 2/3/4/5: energy=2/2     ← 不再有 5 费
+聚能成刃：生成的灭除之刃在「Draw」(1 张)，段数(Repeat)=3 ⇒ 之后剧本里的灭除之刃都按 3 段
+聚能成刃：用原版预览界面展示 1 张灭除之刃（段数 3）
+灭除之刃：剧本那张的段数 1 → 3（按她上次聚能成刃实付的 X）
+意图 WATCHER_EXPUNGER: [LiveMultiAttackIntent]
+意图伤害管道 WATCHER_EXPUNGER: 牌面 9 → 11
+效果追踪 HP Ironclad −11 ×3                   ← 真实伤害 3 段（33 点），与预览 11×3 一致
+观者姿态：WATCHER_EMPTY_FIST 退出「平静」⇒ 原版 +2 能量（规划期算入，之后预算 3）
+剧本第 16 回合: 打 [EMPTY_FIST,WAVE_OF_THE_HAND,DECEIVE_REALITY,SAFETY] 余费=0   ← 手牌栏「4 张全部会打」
+```
+
+107 / 111 均 0 错误 · 16 语言检查通过 · `[verify] 两份实现的版本串都是 v0.2.680  OK` · 已安装。
+
+## 第 24 轮（2026-11-16）—— 用户第二轮实测（三条 + 光辉/平安两条）
+
+> 取证与反编译结论见 `docs/plans/watcher-divinity-fixes-2026-11-16.md` §7。
+
+| # | 反馈（用户原话） | 根因（反编译实证） | 处理 |
+|---|---|---|---|
+| 1 | 「第一回合灯笼的加费没有被提前计算，导致如果不让她进神格，她会显示只打出打击，然后实际上她会打出打击和警惕（应该只打出许愿）」 | `Relics.Lantern.AfterSideTurnStart` 的 +1 是在**她回合开始之后**到账的，而计划在**玩家回合**就排死了（那时 `pcs.Energy` 只有 2）⇒ 面板只有「打击」，回合里钱到了又被补打通道打出「警惕」 | v0.2.680 我把预算里那 +1 删了（靠原版给）——那是错的。现在**预算里加**（规划期就看到 3 费 ⇒ 正确计划 = 只打许愿），并用 `BossRelicSuppressLanternForWatcherPatch` 把原版钩子**只对观者**压掉，不双份 |
+| 2 | 「第二回合…她进神阁应该变成五费，但实际上显示变成了七费」 | `Calm.AfterRemoved` = `GainEnergy(2)`；进神格时 `ChangeStance` 先 `RemoveAllStances` ⇒ 2（预算）+ 2（平静）+ 3（神格）= 7 | 我们自己触发「退姿态→进神格」期间用 `WatcherRuntimePatches.SuppressCalmExitEnergy` 压掉那 2 点（她「化拳为空」正常退平静照旧 +2，用户已确认）⇒ 2 → **5** |
+| 3 | 「她获得 10 层真言会先退出当前姿态再进神格…但现在再进神格的力量和加费都没有」 | 满 10 层是**观者模组自己**触发的：`Mantra.AfterPowerAmountChangedCompat` → `EnterDivinity` → `ChangeStance<Divinity>` 见到「已经在神格里」就原样返回 ⇒ 不退姿态、没有那 3 点能量、也没有力量 | 压掉模组那条自动触发（`InstallMantraTakeover`），改由 `BossDevotionPower.ResolveDivinityAsync` 按用户口径走：扣 10 层 → **先退出姿态** → +力量（普通 2 / 恐惧 3）→ **再进神格**（原版自己 +3） |
+| 4 | 「光辉的伤害预览似乎没有计算虔信、手摇鼓和她特殊效果…导致的她在回合开始时的真言变化」 | `WatcherBrilliance.OnPlay` = `Damage.BaseValue + GetTotalMantraGained(owner)`，后者 = `WatcherStatePower.TotalMantraGainedThisCombat`（累计获得，扣真言不减它）；「手摇鼓」= `Damaru.AfterPlayerTurnStart` +1（我们替她广播，发生在**她回合开始**） | `BossIntentBuilder` 对 `WATCHER_BRILLIANCE` 加「累计真言 + 回合开始手摇鼓 pending 1」；玩家本回合每打牌 +1 由意图重算实时跟上；⚠ 只对 A 版加（B 版把真言做进牌面的计算型伤害里） |
+| 5 | 「平安不知道为什么会被打两次（是你没有拦住原版欺瞒现实的印牌吗？）」 | 反编译 `WatcherDeceiveReality.OnPlay`：`GainBlock(4)` + `AddGeneratedCardToCombat(CreateCard<WatcherSafety>(), (PileType)2 = 手牌)` ⇒ 手牌里多一张「平安」，补打重规划按类型又匹配一次 | 把 `WATCHER_DECEIVE_REALITY` / `WATCHER-DECEIVE_REALITY` 加进 `CharBossMonster.BlocksGeneratedCardsEntries`（拦 token，它自己的 4 点格挡照旧） |
+
+另：用户要求「不再让第一场战斗变为神格观」⇒ 已删除游戏目录里的 `charbosses_debug.txt`
+（那张调试开关本来也只是把普通战斗换成角色 Boss；用户当时其实是用控制台 `fight` 进的战斗）。
+
+107 / 111 均 0 错误 · 16 语言通过 · `[verify] 两份实现的版本串都是 v0.2.682  OK` · 已安装。
+
+## 第 25 轮（2026-11-16 傍晚）—— 用户两条订正
+
+| # | 用户原话 | 处理 |
+|---|---|---|
+| 1 | 「哦那个第二回合我忘记算退平静了，不是bug，**让那2费正常加**」 | 撤掉 v0.2.682 里「进神格时压掉离开平静 +2」的补丁（`WatcherRuntimePatches.InstallCalmEnergySuppress` / `SuppressCalmExitEnergy` 全删）。离开平静的 +2 是她的原版机制（`Calm.AfterRemoved` = `GainEnergy(2)`；B 版 `CalmStance.OnExitStance`）⇒ 我们触发的退姿态与「化拳为空」都照常给：**从平静进神格当回合共 +5（2 平静 + 3 神格），不在平静就只有 +3** |
+| 2 | 「修改进阶8，不再升级摆手，而是升级**警惕、旋身和欺瞒现实**」 | `WatcherScript`：摆手恢复未升级；警惕（第 1 / 8 回合）、欺瞒现实（第 4 / 11 回合）、旋身（第 5 / 9 回合）都加 `upgradeMinAscension: 8`（`BossScriptRunner.BuildHand` 会按 `UpgradeMinAscension` 造升级版手牌） |
+
+107 / 111 均 0 错误 · 16 语言通过 · `[verify] 两份实现的版本串都是 v0.2.683  OK` · 已安装。
+
+---
+
+# 三层 2 号 · 观者 Boss「Ω观」（用户 2026-11-16 设计，v0.2.684 首版已落地）
+
+> 需求原文（用户逐字）：见本文件末尾「第 26 轮」。实现细节与踩坑：`docs/plans/watcher-omega.md`。
+
+## 第 26 轮（2026-11-16）—— Ω观首版 + 设置顺序 + 能力面板 + 藏品
+
+| 项 | 落地位置 |
+|---|---|
+| 内部 id / 编号 | `BossKeys`：`new("WATCHER_OMEGA", 6, 2, 2, typeof(WatcherOmegaBoss))`（三层 2 号，角色 6 = 观者）；`DesignNames["WATCHER_OMEGA"] = "Ω观"` |
+| 怪物类 | `Monsters/CharacterBosses.cs`：`WatcherOmegaBoss : WatcherBoss`（`SpawnVariantKey` + `PinnedVariantKey` = `WATCHER_OMEGA`，`TierAct = 2`） |
+| 定义 | **不新开 BossDefinition**，挂 `BossDefs.Watcher.ExtraVariants[2]`（剧本/遗物/特殊效果/`HpBonus = -31` ⇒ 72 血）；`WatcherOmegaActive()` 在 `BossLineups` 里按遭遇判定 |
+| 遭遇 | `WatcherOmegaBossEncounter`（`TierAct = 2`）+ `WatcherOmegaBossNormalEncounter`；控制台 **`fight WATCHER_OMEGA_BOSS_ENCOUNTER`**；已登记 `TierEncounters` / `DebugEncounters` |
+| 剧本 | `Core/WatcherOmegaScript.cs`：12 回合 + **9～12 循环**；逐回合写死能量 3/2/4/5/2/2/3/4/2/2/4/3（按用户列的牌 + 他标的「（没费）」反推，见文件头注释） |
+| 进阶 | 8 = 升级**如水 / 心灵堡垒**；9 = 只升级**第 6 / 11 回合的点穴**（都写在剧本里，`UpgradeMinAscension`） |
+| 遗物 | 至纯之水（观者模组）/ 涅奥的祝福 / 永冻冰晶 / 空鸟笼 / 舵盘 / 钗 / 金刚杵 |
+| 特殊效果「斋戒」 | `Powers/WatcherFastingPower.cs` + `Core/WatcherOmegaMechanics.cs`：① 欧米伽隔一回合触发（压掉 `OmegaPower.AfterSideTurnEnd`，只在奇数回合结算）；② 点穴伤害可被格挡（整条接管 `PressurePoints.OnPlay`，`ValueProp` 从含 Unblockable 换成 `Unpowered`） |
+| 生成牌展示 | `WatcherOmegaMechanics.NoteGeneratedAsync`：打完阿尔法/贝塔 ⇒ 从她牌堆里找出贝塔/欧米伽，走原版预览界面（与灭除之刃同一套） |
+| 不惧妖邪 buff | `Powers/WatcherFearNoEvilAimPower.cs`（图标 = 1 代崩坠 `WatcherFearNoEvil84.png` → `res://CharacterBosses/images/powers/watcher_fear_no_evil.png`）；规划期挂上、被锁玩家打出攻击牌 ⇒ 她那记不惧妖邪进「平静」（`WatcherOmegaMechanics.FearNoEvilPostfix`） |
+| 意图 | `BossIntentBuilder`：**点穴 = 攻势（目标印记 + 本张印记）+ 策略**；**欧米伽 = 炸弹式攻势**（只在触发回合画） |
+| 设置界面顺序 | `Config/BossConfigModConfig.cs` 的 `PickColumns = { 1,2,3,4,0,5,6 }` ⇒ 猎机骨储战 → **愚者** → **观者**（同列内：神格观在上、Ω观在下） |
+| 能力面板 | `BossInfoTable`：`WATCHER_OMEGA`（循环 9～12 / 单体极强 / 群攻极强 / 单体高压 5、7、8～12 / 群体高压 5、7、9、11 / 单体）与 `WATCHER_DIVINITY`（7～11 / 极强 / 强 / 2、5、7、9 / 6、10 / 单体） |
+| 藏品 | `DownfallCollectibleCompat`：`case "WATCHER_OMEGA"` → **阿尔法** |
+| 顺带修的缺口 | 观者遭遇的角色映射 `WATCHER` 前缀 → 6（以前 -1）；`WATCHER_BOSS` → 6；`SubstituteIfUnavailable` 认所有 `WATCHER_*`（关掉观者模组会被换成塔罗愚，不再坏档）；`DebugEncounters` 补第 7 项（以前写 `watcher` 越界 ⇒ 退化成**易伤战**，用户实测过）；`WatcherDivinity` ↔ `WatcherOmega` 互为 `ComplementVariant` |
+| 本地化 | 16 语言 × 10 个新键（`WATCHER_OMEGA_BOSS.*` / `WATCHER_OMEGA_BOSS_ENCOUNTER.*` / `WATCHER_FASTING_POWER.*` / `WATCHER_FEAR_NO_EVIL_AIM_POWER.*`），`check-localization` 全绿 |
+
+**还没做（下一步）**：
+1. 全部「带『为你而死』的召唤物不会替你承受该伤害」的警告改成同时写「**瓦皮的忠诚**」（34 个键 × 16 语言；107 是否要单独一版待定 —— 文案表是两版共用的）；
+2. **灾厄骨**：灾厄牌额外一条等于灾厄层数的攻势意图（无处可逃累计本回合其它灾厄、荒疫打击吃力量/虚弱、其余不吃），并确认薄荷尖塔不会双算；
+3. **实机验证** 上面这一整轮（本会话只做到「107/111 编译 0 错误 + 16 语言通过 + 装机 OK」）。
+
+## 第 27 轮（2026-11-16）—— 灾厄骨灾厄意图 + 16 语言警告文案（v0.2.685）
+
+| 项 | 落地 |
+|---|---|
+| 灾厄牌额外攻势意图 | `BossIntentBuilder.IntentsFor` 里、`intents.Count == 0` 兜底**之前**新增一段：死亡使者（群体，全玩家可见）/ 鞭打（单体，只有被锁定玩家看真实数字，其他人 0）/ 无处可逃（单体，`10/15 + 5 × floor((目标已有灾厄 + 本回合其它灾厄牌) / 阈值)`，`DoomFromOtherPlannedCards` 按 `boss.Plan` 累计）；三者都走 `RawAttackIntent`（不吃力量/虚弱/易伤）。**荒疫打击跳过** —— 它的灾厄 = 它自己的伤害，已有攻势意图就是那个数，再画一条会让薄荷尖塔双算（日志会说明）。薄荷尖塔方面**不需要额外适配**：意图进了 `PlannedPlay.Intents` 后由 `PublishVanillaIntents` 写进 `NextMove.Intents`，它自然算得到；**不可**在 `PendingSourcelessDamage` 再补。 |
+| 警告文案加「瓦皮的忠诚」 | 16 语言全部处理：zhs/zht/eng 先做「和」的合并写法（zhs 30 + zht 24 + eng 28 处，含 `[gold]` 标记形态），其余语言按各自已有的译名做合并，剩下的（多为**未翻译的英文条目**和措辞变体）统一追加一句「带瓦皮的忠诚的召唤物也不会替你承受」并**保持换行数不变**（`check-localization` 全绿）。107 与 111 共用同一份文案 ⇒ 107 里只是多提一件它没有的遗物，不影响机制。 |
+
+顺带修的既有缺口（同批）：观者遭遇的角色映射 `WATCHER*` → 6、`WATCHER_BOSS` → 6、`SubstituteIfUnavailable` 认所有 `WATCHER_*`、`DebugEncounters` 补观者那一项（以前写 `watcher` 越界 ⇒ 第一场退化成一层的**易伤战**）、`WatcherDivinity ↔ WatcherOmega` 的 `ComplementVariant`、设置界面 `PickColumns = {1,2,3,4,0,5,6}`、两张能力面板、藏品 Ω观 = 阿尔法。
+
+**仍待实机验证**（本轮只做到编译/本地化/装机）：Ω观整场（剧本 12 回合 + 9～12 循环、斋戒的欧米伽隔回合、点穴可格挡、不惧妖邪 buff、点穴/欧米伽意图、阿尔法与贝塔的展示）与灾厄骨的灾厄意图（死亡使者 21、鞭打 13、无处可逃累计、荒疫打击不重复）。
+
+## 第 28 轮（2026-11-16）—— 姿态倍率改在「过完伤害管道之后」补差 + 欧米伽意图挪到回合结束那一排（v0.2.695）
+
+### ① 用户：「愤怒是伤害*2 不是额外加一个基础伤害」
+
+v0.2.691 的做法是「把**牌面基础值**乘上 `计划倍率 ÷ 此刻倍率`，再把结果交给意图」。
+错在**乘的位置**：意图渲染时会走原版伤害管道 `Hook.ModifyDamage`，而姿态倍率本身就是管道里的
+一个 `IModifyDamageMultiplicative`（反编译 `Watcher.Code.Stances.WrathStance.ModifyDamageMultiplicativeCompability`：
+`dealer == Owner.Creature ⇒ return 2m + WatcherHook.ModifyWrathDamage(...)`，并且 `props` 带 `(ValueProp)4` 时返回 1）。
+
+于是「牌面 6 + 力量 8、愤怒里」= `6×2 + 8 = 20`，而真实是 `(6+8)×2 = 28` —— 力量/虚弱/易伤那一段没跟着翻倍，
+玩家看到的就不是「牌面 ×2」。
+
+修法：`BossIntentBuilder` **不再改数字**，只登记「这张牌打出时的姿态倍率」
+（`BossDamagePredictor.SetPlannedStance(card, stanceMul)`，键是卡实例）；
+真正的补差在 `FinalDamageFor` 里、管道算完**之后**做：`结果 × 计划倍率 ÷ 此刻倍率`，
+且只在 ① dealer 就是出牌的人（她本人，奥斯提 / 召唤物不吃她的姿态）、② 计划倍率 > 此刻倍率 时才动手
+（她此刻已经在愤怒 ⇒ 管道已经乘过，绝不双份）。日志：`姿态倍率（渲染时补差）：… 管道值 6 × 2 ÷ 此刻 1 ⇒ 12`。
+
+顺带删掉重复的 `StanceDamageMultiplier`（与 `StanceMultiplierOf` 完全一样）。
+
+### ② 用户：「欧米伽的意图应当像炸弹一样在会触发的回合显示在最后面」
+
+- 牌下那条欧米伽意图**整段删掉**（`BossIntentBuilder` 里原来那段已移除）；
+- 改到 `BossHandPanel.Extra` 的**回合结束那一排**（和冰雹风暴 / 炸弹 / 球被动同一行）：
+  `欧米伽（回合结束，全体）`，只在 `OmegaTriggersOn`（奇数回合 5/7/9/11…）且伤害 > 0 时画。
+- `WatcherOmegaMechanics.OmegaDamage` 补了**牌面兜底**：她这一回合才要打出欧米伽（power 还没上身）时，
+  退回读她本回合计划里那张欧米伽的 `MagicNumber` —— 否则第 5 回合那一下根本画不出来。
+- 因为它只进「我们自己的行」、不进 `NextMove.Intents`，**薄荷尖塔不会双算**，所以没有再往 `PendingOf` 里加。
+
+**验证**：107 / 111 均 0 错误；`[verify] 两份实现的版本串都是 v0.2.695 OK`；已安装到游戏目录
+（`Impl107/111.dll.bin` 时间戳刷新）。
+
+## 第 29 轮（2026-11-16）—— 姿态倍率改成「渲染时现推」+ 欧米伽读 `Amount` + 冥想必捞点穴（v0.2.696）
+
+### ① 用户：「第四回合的打击和第八回合的不惧妖邪的伤害预览还是没有翻倍」
+
+v0.2.695 把「计划倍率」登记进字典（`SetPlannedStance`），但**只要有一条重算路**在重新规划剩余手牌时
+没带上 `stanceMul`（默认 1），登记就被覆盖回 1 ⇒ 玩家回合里看到的仍是 7。
+日志证据：`姿态倍率（渲染时补差）：WATCHER_STRIKE_P 管道值 7 × 2 ÷ 此刻 1 ⇒ 14` 只在**她回合开始那一刻**
+出现过，说明补差逻辑本身没问题、是「登记」在半路被抹掉了。
+
+现在**不再存任何东西**：
+
+- `BossIntentBuilder.PlannedStanceAt(她, 这张牌)` = 用「她**此刻**的真实姿态」+ 剩余计划顺序现推
+  （暴怒/渐强 ⇒ ×2；安宁/冥想/警惕 ⇒ ×1；化体为空/化拳为空 ⇒ ×1 —— 与剧本规划期同一套规则）；
+- `BossDamagePredictor.ApplyPlannedStance` 在管道算完之后补 `值 × 计划 ÷ 此刻`（两个倍率相同就不动手）。
+- 依据：`Hook.ModifyDamageInternal` 被观者模组的 `StanceModifyDamageMultiplicativePatch` 转译过，
+  stance 模型（`WrathStance : IModifyDamageMultiplicative`，`dealer == Owner.Creature ⇒ 2m`）**就是**管道里的
+  一个乘算监听者 ⇒ 管道值里已经含「此刻」那一档，所以只能补差、且必须补在最终值上。
+
+### ② 用户：「欧米伽的伤害预览没有再出现，应该在 7、9、11 等回合也出现」
+
+反编译 `Watcher.Code.Powers.OmegaPower.AfterSideTurnEnd`：
+`if (Owner.Side == side && Amount > 0) CreatureCmd.Damage(..., Amount, (ValueProp)4, Owner)`
+—— 伤害就是 **power 的 `Amount`**（「欧米伽」这张牌 = `WithPower<OmegaPower>(50, 10)`）。
+上一版读的是 `DynamicVars["MagicNumber"]`（那是**点穴**的变量名）⇒ 抛异常后被 `catch { break; }` 吞掉，
+只剩「她这回合正好要打欧米伽」的牌面兜底 ⇒ 第 7/9/11 回合整条消失。
+现在按 ① `Amount` ② power 上的 `MagicNumber` ③ 计划里那张欧米伽的 `PowerVar<OmegaPower>` / `MagicNumber` 三级取。
+
+### ③ 用户：「更改冥想的捞牌，让它一定会捞到点穴」
+
+`Meditate.OnPlay` 是 `CardSelectCmd.FromCombatPile(弃牌堆)` ⇒ 走我们的 `BossCardSelector`。
+给「发起者是冥想」的选择加一条**最高优先**规则：候选（弃牌堆）里有「点穴」就先拿它
+（日志 `冥想：按用户要求优先捞「点穴」`；没有则打一行「弃牌堆里没有点穴 ⇒ 退回普通挑牌」）。
+
+**验证**：107 / 111 均 0 错误；`[verify] 两份实现的版本串都是 v0.2.696 OK`；已安装。
+
+另：本机 `C:\Program Files\dotnet\sdk` 消失（只剩 9.x 运行时）⇒ 构建改用项目自带的
+`tools\dotnet\dotnet.exe`（10.0.401，`install-mod.bat` 本来就用它）。
+
+## 第 30 轮（2026-11-16）—— 姿态倍率「烤进意图对象」+ 斋戒/神格文案订正（v0.2.697）
+
+### ① 用户截图（打击 6+金刚杵=7、打完暴怒再打它还是 7）：「你改了个寂寞」
+
+前两版都在**渲染时**去找「计划倍率」：
+
+- v0.2.695：按卡实例查字典（`SetPlannedStance`）—— 任何一条重算路没带上 `stanceMul`（默认 1）就把登记抹掉；
+- v0.2.696：渲染时按 `boss.Plan` 现推 —— 玩家回合里 `Plan` 可能已经换过牌实例甚至被清掉 ⇒ 一律退回「此刻姿态」。
+
+现在改成**在造意图那一刻**把倍率烤进意图对象：
+
+- `BossIntentBuilder.IntentsFor` 入口 `StanceBake = stanceMul`（`[ThreadStatic]`，退出还原）；
+- `LiveSingleAttackIntent` / `LiveMultiAttackIntent` / `LiveDelegateSingleAttackIntent` **构造时**读走存成字段；
+- 渲染时只换算一次：`BossDamagePredictor.ScaleToPlannedStance(card, dealer, 管道值, 烤入值)`
+  = `管道值 × 计划 ÷ 此刻`，且只在「计划 > 此刻」时动手（她已在愤怒 ⇒ 不动手，绝不双份）；
+- `FinalDamageFor` 里那层渲染时补差**已删除**，避免双重。
+- 兜底（烤入值为 0 时）：`PlannedStanceAt` 三级来源 —— ① 计划里按**卡实例** ② 计划里按**同一种牌**
+  ③ 按**剧本**第 `TurnNumber+1` 回合的顺序推。
+- 诊断日志：`剧本姿态：<牌> 造意图时 ×2（此刻她 ×1）`、`姿态倍率（意图层）：<牌> 管道值 7 × 计划 2 ÷ 此刻 1 ⇒ 14`。
+- 依据（为什么必须「补在最终值上」）：`Hook.ModifyDamageInternal` 被 `StanceModifyDamageMultiplicativePatch`
+  转译过，`WrathStance`（`dealer == Owner.Creature ⇒ 2m`）本身就是管道里的乘算监听者 ⇒ 管道值已含「此刻」那一档。
+
+### ② 文案（用户要求，16 语言全改）
+
+- 斋戒：「（只在 5、7、9、11… 这些回合结束时结算）」整段括号删掉；
+- 警告上方那一个空行删掉（`\n\n` → `\n`）；
+- 警告下面再加一行：「欧米伽：在你的回合结束时，对所有敌人造成50点伤害。」（各语言给译文）；
+- 神格观的神格说明与上方正文之间那个空行也删掉（`BOSS_DEVOTION_POWER.description(_dread)` 与
+  `WATCHER_BOSS.devotion(_dread)` 四处）；
+- 顺带修掉英文里 `or Vapi Loyalty` 被重复 3 次的拼接 bug（`eng/powers.json`、`eng/monsters.json`）。
+- `check-localization` 16 语言全绿。
+
+**验证**：107 / 111 均 0 错误；`[verify] 两份实现的版本串都是 v0.2.697 OK`；已安装
+（装机前先关掉了正在跑的游戏，否则 `Impl111.dll.bin` 被占用拷不进去）。
+
+## 第 31 轮（2026-11-16）—— 真凶：`WatcherIdIs` 认不出带 `_P` 的玩家版 id（v0.2.699）
+
+用户第三轮截图（第 4 回合打击 7、第 8 回合不惧妖邪 9）。日志两条铁证：
+
+1. `剧本第 4 回合: 打 [WATCHER_ERUPTION_P, WATCHER_STRIKE_P, WATCHER_VIGILANCE]`
+   —— 观者模组还有**第三套 id**：玩家版牌带 `_P` 后缀（`WATCHER_ERUPTION_P` = 暴怒、`WATCHER_STRIKE_P` = 打击）；
+2. `意图伤害管道 WATCHER_STRIKE_P: 牌面 6 → 14` —— 她**已经在愤怒**时，原版管道自己就乘了 ×2。
+
+也就是说：姿态补差逻辑是对的，问题在**规划期的姿态推演**从未前进过 ——
+`WatcherIdIs("WATCHER_ERUPTION_P", "ERUPTION")` 规范化后是 `WATCHERERUPTIONP.EndsWith("ERUPTION")` = **false**
+⇒ 「暴怒 ⇒ 进入愤怒」这一步在剧本推演里永远不命中 ⇒ 它后面的所有牌都按 ×1 烤进意图（显示 7 / 9）。
+
+修法：`WatcherIdIs` 多比一次「去掉末尾单个字母」的形态（`_P` / `_A` / `_B`）。
+顺带修的两条（同轮用户要求）：
+
+- **欧米伽的伤害要进薄荷尖塔**：那一笔挂在 power 上、不进 `NextMove.Intents` ⇒
+  `MintySpireDamagePreviewCompat.PendingOf` 补 `BossHandPanel.OmegaRowDamage`（与「本回合会不会触发」同一位）。
+- **进阶 9 改成升级所有打击**：两张点穴恢复永不升级；第 4/7/9/10 回合的四张「打击」加 `upgradeMinAscension: 9`
+  （进阶 8 仍是如水 / 心灵堡垒）。
+
+**验证**：107 / 111 均 0 错误；`[verify] 两份实现的版本串都是 v0.2.699 OK`；已安装。
+
+
+
+

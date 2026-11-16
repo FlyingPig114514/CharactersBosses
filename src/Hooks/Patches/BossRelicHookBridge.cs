@@ -269,6 +269,39 @@ public static class BossRelicSuppressChandelierPatch
     }
 }
 
+#if STS2_111
+/// <summary>
+/// 压掉原版「灯笼」给**观者那只**影子玩家的 +1（用户 2026-11-16 第 1 条）。
+///
+/// 反编译 `Relics.Lantern.AfterSideTurnStart`：
+/// <code>
+/// if (participants.Contains(Owner.Creature) &amp;&amp; Owner.PlayerCombatState.TurnNumber &lt;= 1)
+///     await PlayerCmd.GainEnergy(1, Owner);
+/// </code>
+/// 它是在**她回合开始之后**才到账的，而剧本计划早在**玩家回合**就排完了（那时只有 2 费）
+/// ⇒ 面板显示「只打打击」、实际她打完打击又用补打通道打出了警惕。
+/// 现在这笔由 `PrepareTurn` 的预算统一给（规划期就能看到 3 费），这里把原版这条压掉以免双份。
+///
+/// ⚠ 只压**观者**（BossDevotionPower 未安装时不生效）—— 其它 32 只 Boss 的能量账一个字节都不动。
+/// </summary>
+[HarmonyPatch(typeof(Lantern), nameof(Lantern.AfterSideTurnStart))]
+public static class BossRelicSuppressLanternForWatcherPatch
+{
+    [HarmonyPrefix]
+    public static bool Prefix(Lantern __instance, ref Task __result)
+    {
+        if (!BossRelicHookBridge.IsOwnedByOurBoss(__instance)) return true;
+        bool watcher = false;
+        try { watcher = __instance.Owner?.Creature?.GetPower<Powers.BossDevotionPower>() != null; }
+        catch { watcher = false; }
+        if (!watcher) return true;
+
+        __result = Task.CompletedTask;   // ⚠ 必须给：目标返回 Task，留 null 会让调用方 await null 崩
+        return false;
+    }
+}
+#endif
+
 /// <summary>压掉原版的「佩尔之泪」——由 <see cref="BossHookBridge.PaelsTearsBonus"/> 在
 /// `PrepareTurn` 里按卡面加进本回合预算。
 ///

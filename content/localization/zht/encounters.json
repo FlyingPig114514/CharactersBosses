@@ -1,4 +1,4 @@
-{
+﻿{
     "IRONCLAD_BOSS_ENCOUNTER.title":  "鐵甲戰士",
     "IRONCLAD_BOSS_ENCOUNTER.loss":  "{character} 被[gold]鐵甲戰士[/gold]擊潰了。",
     "IRONCLAD_ANGER_BOSS_ENCOUNTER.title":  "鐵甲戰士",
@@ -108,5 +108,7 @@
     "FOOL_BOSS_ENCOUNTER.loss_tarot":  "{character}成為了[gold]愚者[/gold]牌組中新的[gold]{Card}[/gold]。",
     "FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot":  "{character}成為了[gold]愚者[/gold]牌組中新的[gold]{Card}[/gold]。",
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "神格觀",
-    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character}被[gold]神格觀[/gold]的神格之力碾碎。"
+    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character}被[gold]神格觀[/gold]的神格之力碾碎。",
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.title": "Ω觀",
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character}被[gold]Ω觀[/gold]的齋戒碾碎。"
 }

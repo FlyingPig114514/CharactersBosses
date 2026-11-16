@@ -120,6 +120,9 @@ internal sealed class LiveSingleAttackIntent : SingleAttackIntent
     private readonly MegaCrit.Sts2.Core.Models.CardModel _card;
     private readonly int _base;
 
+    /// <summary>造意图那一刻烤进来的「这张牌打出时的姿态倍率」（0/1 = 不用补）。见 `BossDamagePredictor.ScaleToPlannedStance`。</summary>
+    private readonly int _plannedStance;
+
     private int _cacheFrame = -1;
     private int _cache;
 
@@ -128,6 +131,7 @@ internal sealed class LiveSingleAttackIntent : SingleAttackIntent
     {
         _card = card;
         _base = Math.Max(0, baseDamage);
+        _plannedStance = BossIntentBuilder.StanceBake;
     }
 
     public override int GetTotalDamage(System.Collections.Generic.IEnumerable<Creature> targets, Creature owner)
@@ -162,7 +166,10 @@ internal sealed class LiveSingleAttackIntent : SingleAttackIntent
                 }
             }
             catch { /* 忽略 */ }
-            _cache = Math.Max(0, BossDamagePredictor.FinalDamage(_card, _base, victim));
+            _cache = BossDamagePredictor.ScaleToPlannedStance(
+                _card, _card?.Owner?.Creature,
+                Math.Max(0, BossDamagePredictor.FinalDamage(_card, _base, victim)),
+                _plannedStance);
         }
         catch (Exception e)
         {
@@ -190,6 +197,9 @@ internal sealed class LiveDelegateSingleAttackIntent : SingleAttackIntent
 {
     private readonly Func<System.Collections.Generic.IEnumerable<Creature>?, Creature?, int> _calc;
 
+    /// <summary>造意图那一刻烤进来的姿态倍率（见 <see cref="LiveSingleAttackIntent"/>）。</summary>
+    private readonly int _plannedStance;
+
     private int _cacheFrame = -1;
     private int _cache;
 
@@ -197,6 +207,7 @@ internal sealed class LiveDelegateSingleAttackIntent : SingleAttackIntent
         : base(0)
     {
         _calc = calc;
+        _plannedStance = BossIntentBuilder.StanceBake;
     }
 
     public override int GetTotalDamage(System.Collections.Generic.IEnumerable<Creature> targets, Creature owner)
@@ -216,7 +227,11 @@ internal sealed class LiveDelegateSingleAttackIntent : SingleAttackIntent
         catch { frame = -1; }
         if (frame >= 0 && frame == _cacheFrame) return _cache;
 
-        try { _cache = Math.Max(0, _calc(targets, owner)); }
+        try
+        {
+            _cache = BossDamagePredictor.ScaleToPlannedStance(
+                null, owner, Math.Max(0, _calc(targets, owner)), _plannedStance);
+        }
         catch (Exception e) { Logger.Log("[CharBoss] 动态单段（委托）意图重算失败（保留上一次的数）: " + e.Message); }
         _cacheFrame = frame;
         return _cache;
@@ -243,6 +258,9 @@ internal sealed class LiveMultiAttackIntent : MultiAttackIntent
 {
     private readonly Func<IEnumerable<Creature>?, Creature?, (int PerHit, int Times)> _calc;
 
+    /// <summary>造意图那一刻烤进来的姿态倍率（见 <see cref="LiveSingleAttackIntent"/>）。</summary>
+    private readonly int _plannedStance;
+
     private int _cacheFrame = -1;
     private int _cachePerHit;
     private int _cacheTimes = 1;
@@ -251,6 +269,7 @@ internal sealed class LiveMultiAttackIntent : MultiAttackIntent
         : base(0, 1)
     {
         _calc = calc;
+        _plannedStance = BossIntentBuilder.StanceBake;
     }
 
     public override int Repeats => Value(null, null).Times;
@@ -282,7 +301,7 @@ internal sealed class LiveMultiAttackIntent : MultiAttackIntent
         try
         {
             var (perHit, times) = _calc(targets, owner);
-            _cachePerHit = Math.Max(0, perHit);
+            _cachePerHit = BossDamagePredictor.ScaleToPlannedStance(null, owner, Math.Max(0, perHit), _plannedStance);
             _cacheTimes = Math.Max(1, times);
         }
         catch (Exception e)

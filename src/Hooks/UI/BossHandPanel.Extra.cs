@@ -49,6 +49,23 @@ public partial class BossHandPanel
     ///     4. **抱抱先生**（`MrStruggles`，二层「王储」进阶 9 的遗物）：她**回合开始**对所有玩家
     ///        造成「她的回合数」点无来源伤害。它发生在**任何一张牌之前** ⇒ 画在最左边
     ///        （见 <see cref="PlaceLeftIntent"/>）。
+    /// </summary>
+    // ★ v0.2.695：欧米伽这一回合结束会不会打、打多少（「斋戒」⇒ 只在她的**奇数回合**结算）。
+    // 伤害读她身上的 `OmegaPower` 的 `Amount`；牌还没打出去、power 不在身上时退回她本回合计划里那张的牌面。
+    internal static int OmegaRowDamage(CharBossMonster boss)
+    {
+#if STS2_111
+        try
+        {
+            if (!Core.WatcherOmegaMechanics.OmegaTriggersOn(boss)) return 0;
+            return Core.WatcherOmegaMechanics.OmegaDamage(boss);
+        }
+        catch { return 0; }
+#else
+        return 0;
+#endif
+    }
+
     private void BuildExtraIntents(CharBossMonster boss)
     {
         if (_extraIntents != null && IsInstanceValid(_extraIntents)) _extraIntents.QueueFree();
@@ -150,6 +167,14 @@ public partial class BossHandPanel
 
             int bomb = BombDamage(boss);
             if (bomb > 0) damages.Add((bomb, "炸弹"));
+
+            // ★ v0.2.695（用户 2026-11-16：「欧米伽的意图应当**像炸弹一样**在会触发的回合显示在最后面，
+            //   而不是显示在欧米伽自己的下方、后续回合不再显示」）：
+            //   `OmegaPower.AfterSideTurnEnd` = 她**回合结束**时对所有敌人造成伤害，而「斋戒」让它
+            //   隔一回合才触发（5 / 7 / 9 / 11…）⇒ 和冰雹风暴 / 炸弹完全同一类：放这一行（回合结束那一排），
+            //   只在**会触发**的回合画，与手里有没有那张牌无关。
+            int omega = OmegaRowDamage(boss);
+            if (omega > 0) damages.Add((omega, "欧米伽（回合结束，全体）"));
 
             int orbs = OrbPassiveDamage(boss, quiet: false, out int orbsAoe);
             // ⚠ 球被动是**单体随机**伤害（用户 2026-10-29）：

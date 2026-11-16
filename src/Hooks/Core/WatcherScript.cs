@@ -29,8 +29,11 @@ public static class WatcherScript
     {
         var turns = new List<BossTurn>
         {
+            // 进阶 8 起的升级：**警惕 / 旋身 / 欺瞒现实**（用户 2026-11-16 订正；
+            // 不再是「摆手」）。三张牌分别出现在第 1/8（警惕）、第 4/11（欺瞒现实）、第 5/9（旋身）回合。
             T("1. 许愿+（永生不死）、打击（有费就打）、警惕（有费就打）",
-                W(WatcherCards.Wish, upgraded: true), W(WatcherCards.Strike), W(WatcherCards.Vigilance)),
+                W(WatcherCards.Wish, upgraded: true), W(WatcherCards.Strike),
+                W(WatcherCards.Vigilance, upgradeMinAscension: 8)),
 
             T("2. 光辉、防御、敬拜（有费就打）、奇迹（不出）",
                 W(WatcherCards.Brilliance), W(WatcherCards.Defend), W(WatcherCards.Worship),
@@ -41,11 +44,12 @@ public static class WatcherScript
                 W(WatcherCards.Consecrate), W(WatcherCards.Greed)),
 
             T("4. 化拳为空、摆手、欺瞒现实（有费就打）、平安（有费就打）",
-                W(WatcherCards.EmptyFist), W(WatcherCards.WaveOfTheHand, upgradeMinAscension: 8),
-                W(WatcherCards.DeceiveReality), W(WatcherCards.Safety)),
+                W(WatcherCards.EmptyFist), W(WatcherCards.WaveOfTheHand),
+                W(WatcherCards.DeceiveReality, upgradeMinAscension: 8), W(WatcherCards.Safety)),
 
             T("5. 灭除之刃（段数 = 本回合 X 费）、虔信、旋身（有费就打）",
-                W(WatcherCards.Expunger), W(WatcherCards.Devotion), W(WatcherCards.Swivel)),
+                W(WatcherCards.Expunger), W(WatcherCards.Devotion),
+                W(WatcherCards.Swivel, upgradeMinAscension: 8)),
 
             T("6. 打击、圣洁、结末（有费就打）",
                 W(WatcherCards.Strike), W(WatcherCards.Sanctity), W(WatcherCards.Conclude)),
@@ -56,17 +60,19 @@ public static class WatcherScript
                 W(WatcherCards.Brilliance), W(WatcherCards.Worship), W(WatcherCards.Greed)),
 
             T("8. 打击、供奉、警惕（有费就打）",
-                W(WatcherCards.Strike), W(WatcherCards.Consecrate), W(WatcherCards.Vigilance)),
+                W(WatcherCards.Strike), W(WatcherCards.Consecrate),
+                W(WatcherCards.Vigilance, upgradeMinAscension: 8)),
 
             T("9. 灭除之刃、防御、旋身（有费就打）",
-                W(WatcherCards.Expunger), W(WatcherCards.Defend), W(WatcherCards.Swivel)),
+                W(WatcherCards.Expunger), W(WatcherCards.Defend),
+                W(WatcherCards.Swivel, upgradeMinAscension: 8)),
 
             T("10. 打击、圣洁、结末（有费就打）",
                 W(WatcherCards.Strike), W(WatcherCards.Sanctity), W(WatcherCards.Conclude)),
 
             T("11. 化拳为空、摆手、欺瞒现实（有费就打）、平安（有费就打）",
-                W(WatcherCards.EmptyFist), W(WatcherCards.WaveOfTheHand, upgradeMinAscension: 8),
-                W(WatcherCards.DeceiveReality), W(WatcherCards.Safety)),
+                W(WatcherCards.EmptyFist), W(WatcherCards.WaveOfTheHand),
+                W(WatcherCards.DeceiveReality, upgradeMinAscension: 8), W(WatcherCards.Safety)),
         };
 
         return new BossScript
@@ -100,7 +106,8 @@ public static class WatcherScript
         relics.Add(typeof(MegaCrit.Sts2.Core.Models.Relics.OddlySmoothStone));
         // 用户 2026-11-15：「削弱，把布制果实换成空鸟笼」（布质果实的 +31 生命本来就没生效，所以血量不变）
         relics.Add(typeof(MegaCrit.Sts2.Core.Models.Relics.EmptyCage));
-        relics.Add(typeof(MegaCrit.Sts2.Core.Models.Relics.Gorget));
+        // ★ v0.2.707（用户 2026-11-16）：「修改神格观，护喉甲换奥利哈刚」
+        relics.Add(typeof(MegaCrit.Sts2.Core.Models.Relics.Orichalcum));   // 奥利哈刚（护喉甲 Gorget → 奥利哈刚）
         return relics;
     }
 
@@ -128,7 +135,7 @@ public static class WatcherScript
         {
             Card = card,
             Upgraded = upgraded,
-            UpgradeMinAscension = upgradeMinAscension,   // 进阶 8 起升级「摆手」
+            UpgradeMinAscension = upgradeMinAscension,   // 进阶 8 起升级：警惕 / 旋身 / 欺瞒现实（用户 2026-11-16）
             HoldInstead = holdInstead,                   // 有费也不出（留在手里）
             From = "deck",
         };

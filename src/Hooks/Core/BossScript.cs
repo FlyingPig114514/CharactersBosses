@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using MegaCrit.Sts2.Core.Combat;
@@ -835,6 +835,22 @@ public static class BossScriptRunner
                                // 多人换牌表可以要求「换上那张是升级版」（第一幕：余像 → 鬼祟+）
                                || MultiplayerCardSwap.ForcesUpgrade(entry.Card, cardBoss);
                 if (upgrade && !card.IsUpgraded) card.UpgradeInternal();
+                // ★ v0.2.689（用户实测「第三回合的点穴应当是零费」）：剧本写了 `CostOverride` 的牌，
+                //   以前只在**规划期记账**按 0 费算（`entry.CostOverride`），牌面本身仍是 1 费 ⇒
+                //   玩家看到的费用和实际不符。这里把这个覆盖真正落到**本场战斗的牌费**上。
+                if (entry.CostOverride >= 0)
+                {
+                    try
+                    {
+                        int now = card.EnergyCost.GetWithModifiers(MegaCrit.Sts2.Core.Entities.Cards.CostModifiers.All);
+                        if (now != entry.CostOverride)
+                        {
+                            card.EnergyCost.AddThisCombat(entry.CostOverride - now, true);
+                            Logger.Log($"[CharBoss] 剧本改费：{card.Id.Entry} {now} → {entry.CostOverride}（本场战斗）");
+                        }
+                    }
+                    catch (Exception e) { Logger.Log("[CharBoss] 剧本改费失败: " + e.Message); }
+                }
                 // 剧本点名要给「奇巧」的牌（后空翻：被丢弃后自动打出，见 ScriptCard.Sly）
                 if (entry.Sly)
                 {

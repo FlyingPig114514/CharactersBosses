@@ -1,4 +1,4 @@
-using CharacterBosses.Core;
+﻿using CharacterBosses.Core;
 
 namespace CharacterBosses.Monsters;
 
@@ -67,5 +67,23 @@ public class FoolBoss : CharBossMonster
 public class WatcherBoss : CharBossMonster
 {
     public override BossDefinition DefSource => BossDefs.Watcher;
+}
+#endif
+
+#if STS2_111
+/// <summary>
+/// 三层 2 号「**Ω观**」（设计 Key <c>WATCHER_OMEGA</c>，用户 2026-11-16）。
+///
+/// 与「神格观」是**同一个观者角色**的第二套设计 ⇒ 走 `BossDefs.Watcher` 的 `ExtraVariants[2]`
+/// （剧本 `WatcherOmegaScript`、遗物七件、特殊效果「斋戒」）。`PinnedVariantKey` 保证
+/// 「控制台 `fight WATCHER_OMEGA_BOSS_ENCOUNTER`」永远打这一套，不会退化成按种子 50/50。
+/// </summary>
+public sealed class WatcherOmegaBoss : WatcherBoss
+{
+    public WatcherOmegaBoss() { SpawnVariantKey = "WATCHER_OMEGA"; }
+
+    public override int? TierAct => 2;
+
+    public override string? PinnedVariantKey => "WATCHER_OMEGA";
 }
 #endif

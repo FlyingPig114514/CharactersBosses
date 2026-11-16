@@ -1,4 +1,4 @@
-{
+﻿{
     "IRONCLAD_BOSS_ENCOUNTER.title":  "아이언클래드",
     "IRONCLAD_BOSS_ENCOUNTER.loss":  "{character}는 [gold]아이언클래드[/gold]에게 무너졌습니다.",
     "IRONCLAD_ANGER_BOSS_ENCOUNTER.title":  "아이언클래드",
@@ -108,5 +108,7 @@
     "FOOL_BOSS_ENCOUNTER.loss_tarot":  "{character}은(는) [gold]풀[/gold]의 덱에 새로운 [gold]{Card}[/gold]이(가) 되었습니다.",
     "FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot":  "{character}은(는) [gold]풀[/gold]의 덱에 새로운 [gold]{Card}[/gold]이(가) 되었습니다.",
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "신격관",
-    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character}은(는) [gold]신격관[/gold]의 신격의 힘에 짓눌렸다."
+    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character}은(는) [gold]신격관[/gold]의 신격의 힘에 짓눌렸다.",
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.title": "오메가 왓처",
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character}는 [gold]오메가 왓처[/gold]의 단식에 부서졌다."
 }

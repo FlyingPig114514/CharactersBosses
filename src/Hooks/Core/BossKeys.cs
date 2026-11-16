@@ -87,6 +87,8 @@ internal static class BossKeys
 #if STS2_111
         // 观者 Boss 占位（用户 2026-11-15）：只有装了观者 mod 才会进候选表（见 RosterFor）
         new("WATCHER_DIVINITY",         6, 2, 1, typeof(WatcherBoss)),
+        // 三层 2 号：**Ω观**（用户 2026-11-16）—— 同一观者角色的第二套设计（阿尔法/贝塔/欧米伽 + 特殊效果「斋戒」）
+        new("WATCHER_OMEGA",            6, 2, 2, typeof(WatcherOmegaBoss)),
 #endif
     };
 
@@ -193,6 +195,8 @@ internal static class BossKeys
         2 => "故障",
         3 => "亡灵",
         4 => "储君",
+        5 => "愚者",
+        6 => "观者",
         _ => "?",
     };
 
@@ -216,6 +220,7 @@ internal static class BossKeys
         ["FOOL_TAROT"] = "塔罗愚",   // 三层 1 号（愚者）
 #if STS2_111
     ["WATCHER_DIVINITY"] = "神格观",  // 三层 1 号（观者 mod）
+    ["WATCHER_OMEGA"] = "Ω观",        // 三层 2 号（观者 mod，用户 2026-11-16）
 #endif
 #endif
         ["REGENT_BOMBARD"] = "轰击储",
@@ -297,6 +302,9 @@ internal static class BossKeys
             case "SILENT_BREWER": return "SILENT_GRAND_FINALE";
             case "SILENT_GRAND_FINALE": return "SILENT_SHIV";
             case "IRONCLAD_VULN": return "IRONCLAD_BOULDER";
+            // 观者三层两只（进阶 10 两场别都取同一只）
+            case "WATCHER_DIVINITY": return "WATCHER_OMEGA";
+            case "WATCHER_OMEGA": return "WATCHER_DIVINITY";
             case "IRONCLAD_BOULDER": return "IRONCLAD_VULN";
             case "REGENT_COLORLESS": return "REGENT_STAR";
             case "REGENT_STAR": return "REGENT_CHOICE";      // 三层储君三套设计的链式互补
@@ -381,6 +389,7 @@ internal static class BossKeys
             case "FOOL_TAROT": return ModelDb.Encounter<FoolTarotBossEncounter>();
 #if STS2_111
             case "WATCHER_DIVINITY": return ModelDb.Encounter<WatcherDivinityBossEncounter>();
+            case "WATCHER_OMEGA": return ModelDb.Encounter<WatcherOmegaBossEncounter>();
 #endif
 #endif
             default: return null;
@@ -446,7 +455,10 @@ internal static class BossKeys
     {
         try
         {
-            if (!string.Equals(key, "WATCHER_DIVINITY", StringComparison.Ordinal)) return key ?? string.Empty;
+            // 观者的**所有**设计都要走这条兜底（用户 2026-11-16 新增 Ω观后，
+            // 只认 WATCHER_DIVINITY 会让关掉观者模组后那只旧档里的 Ω观不被替换 ⇒ 坏档 + 多人分叉）
+            if (key == null) return string.Empty;
+            if (!key.StartsWith("WATCHER_", StringComparison.Ordinal)) return key;
 #if STS2_111
             if (Core.WatcherModPresence.Installed) return key!;
 #else
@@ -461,11 +473,22 @@ internal static class BossKeys
     private static string[] WatcherRoster()
     {
         // ★ 2026-11-15 第二轮（用户要「神格观」上场）：设计做完 ⇒ **恢复登场**。
-        //   条件：装了观者模组（工坊 3747526116）才进候选表；没装时行为和以前一模一样。
+        //   条件：装了观者模组才进候选表；没装时行为和以前一模一样。
+        //
+        // ★★ v0.2.711（用户 2026-11-16）：
+        //   「只有当所有玩家都装了相同的观者 mod（指统一为 A 或 B 版）时才让观者有可能作为 boss 出现」。
+        //   为什么必须加这一条：候补表的**条数**会随观者进出一变，而阵容是
+        //   `(种子, 幕, 场, 候补表)` 的纯函数 ⇒ 一端有观者、一端没有，第三幕两场的阵容都可能分叉；
+        //   而且客人那边解不出观者时 `SubstituteIfUnavailable` 只会换成塔罗愚 ⇒ 两端仍然打不同的 Boss。
+        //   判定在 `BossPicksSync.WatcherAllowedHere()`：单人只看本机；多人要「玩家数 − 1」份客人上报、
+        //   且每份的观者实现都跟房主一致（客人则用房主广播下来的结论，没收到就保守地不放）。
 #if STS2_111
         try
         {
-            if (Core.WatcherModPresence.Installed) return new[] { "WATCHER_DIVINITY" };
+            // 三层两只观者设计：1 号神格观 / 2 号 Ω观（用户 2026-11-16）。
+            // 顺序 = 配置界面同一列里的行序（见 BossConfigModConfig 的 PickColumns）。
+            if (Core.WatcherModPresence.Installed && Core.BossPicksSync.WatcherAllowedHere())
+                return new[] { "WATCHER_DIVINITY", "WATCHER_OMEGA" };
         }
         catch { /* 探测失败就当没装 */ }
 #endif

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using BaseLib.Config;
 using BaseLib.Config.UI;
@@ -520,7 +520,10 @@ public sealed class BossConfigModConfig : SimpleModConfig
     /// **列次序：猎 → 机 → 骨 → 储 → 战**（与 `BossKeys.RosterFor` 的候选顺序一致，
     /// 也和用户给的第三幕样例一致）。同一列 = 同一个角色，一个角色本幕有几只就竖着排几只。
     /// </summary>
-    private static readonly int[] PickColumns = { 1, 2, 3, 4, 0 };
+    // ★ 2026-11-16（用户：「把塔罗愚放在易伤战的右侧；观者排在愚者右侧；神格观在塔罗愚右侧」）：
+    //   列 = 角色下标 ⇒ 猎 → 机 → 骨 → 储 → 战 → **愚者** → **观者**。
+    //   观者那一列里按 `BossKeys.RosterFor` 的行序排：神格观（1 号）在上、Ω观（2 号）在下。
+    private static readonly int[] PickColumns = { 1, 2, 3, 4, 0, 5, 6 };
 
     /// <summary>每格名字列的固定宽度 —— 让「王储」「刀猎」这种两个字的名字也能和三个字的对齐。</summary>
     private const float PickNameWidth = 88f;

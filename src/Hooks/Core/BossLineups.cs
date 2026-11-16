@@ -80,6 +80,7 @@ internal static class BossLineups
                 Cache.Clear();
                 ResetPlayerCountMemory();      // 换局：人数也要重新读，别把上局的人数带过来
                 try { Encounters.CharBossEncounters.ResetSharePoolLog(); } catch { /* 忽略 */ }
+                try { Core.BossPicksSync.ResetForNewRun(); } catch { /* 忽略 */ }
                 Logger.Log($"[CharBoss] 阵容随机种子 = {_runSeed}（来源：RunState.Rng.Seed）" +
                            (realign ? "（重新对齐：之前用的是本地随机，联机必须两端一致）" : string.Empty));
                 try
@@ -232,6 +233,7 @@ internal static class BossLineups
                 Logger.Log($"[CharBoss] 第 {act + 1} 层第 {fight + 1} 场阵容：" +
                            $"（{PlayerCount()} 人局，进阶 {Ascension()}，种子 {CurrentSeed()}，指纹 {FingerprintOf(result)}）" +
                            $"[{string.Join(" | ", System.Array.ConvertAll(result, k => BossKeys.LabelOf(k)))}]");
+                LogInputs(act, fight, result);
                 return result;
             }
             finally { Computing.Remove((act, fight)); }
@@ -252,6 +254,68 @@ internal static class BossLineups
 
     /// <summary>重入保护日志每个 (幕, 场) 只打一次。</summary>
     private static readonly HashSet<(int Act, int Fight)> _reentryLogged = new();
+
+    /// <summary>
+    /// **一行诊断：把「决定阵容的全部输入」打在同一行**（2026-11-16 自检多人不同步时新增）。
+    ///
+    /// 背景：有玩家在工坊评论里报「新版多人联机 n10 第三幕第二个 boss 不同步（房主俩玩家 Boss、
+    /// 客人一个原来的 Boss）」，但**没有日志**。阵容本身是 (种子, 幕, 场) 的纯函数，
+    /// 可它前面还有三处**每台机器可能不一样**的输入：
+    ///   ① 候补表 `BossKeys.RosterFor(act)` —— **观者模组装没装会改变三层的候补条数**（只有第三幕受影响）；
+    ///   ② 勾选 `BossSelection.AvailableFor` —— 多人靠房主广播（`BossPicksSync`，需要 BaseLib），
+    ///      **没收到就退回整张候补表**；
+    ///   ③ 地图 id + 该图的「替换」开关 —— 客人端默认值：原版图 = 替换、模组加的图 = **不替换**。
+    /// 三者任一不同 ⇒ 两端算出不同的 Boss。有了这一行，两份日志并排一比就知道是谁不同。
+    /// </summary>
+    private static void LogInputs(int act, int fight, string[] result)
+    {
+        try
+        {
+            string role = Core.NetRole.Type.ToString();
+            int players = PlayerCount();
+            int asc = Ascension();
+            ulong seed = CurrentSeed();
+
+            string mapEntry = "?";
+            bool mapOn = false;
+            try
+            {
+                mapEntry = Core.BossSelection.MapEntryOfAct(act) ?? "?";
+                var state = MultiBossPlan.RunStateOrNull();
+                if (state != null && state.CurrentActIndex == act) mapOn = Core.BossConfig.IsMapEnabledForGameplay(state.Act);
+                else mapOn = Core.BossConfig.IsMapEnabledById(mapEntry);
+            }
+            catch { /* 保留 ? / false */ }
+
+            int roster = 0;
+            try { roster = BossKeys.RosterFor(act).Length; } catch { /* 忽略 */ }
+            bool watcher = false;
+#if STS2_111
+            try { watcher = Core.WatcherModPresence.Installed; } catch { /* 忽略 */ }
+#endif
+            int cand = 0;
+            try { cand = Core.BossSelection.AvailableFor(act, mapEntry).Length; } catch { /* 忽略 */ }
+
+            bool picksReceived = false, settingsReceived = false;
+            try { picksReceived = Core.BossPicksSync.Received; } catch { /* 忽略 */ }
+            try { settingsReceived = Core.BossPicksSync.HostSettingsReceived; } catch { /* 忽略 */ }
+
+            bool sharePool = false;
+            try { sharePool = Core.BossConfig.SharePoolForGameplay; } catch { /* 忽略 */ }
+
+            if (_inputLogs++ < 24)
+            {
+                Logger.Log($"[CharBoss] ※阵容输入※ 第 {act + 1} 层第 {fight + 1} 场 · 本机={role} · 玩家={players} · " +
+                           $"进阶={asc} · 种子={seed} · 地图={mapEntry}（替换={mapOn}）· 候补表={roster} 条" +
+                           $"（含观者={watcher}）· 勾选后候选={cand} 条 · 已收到房主勾选={picksReceived}" +
+                           $"（玩法设置={settingsReceived}）· 共用匹配池={sharePool} · 指纹={FingerprintOf(result)}" +
+                           "（两端这一行不同 ⇒ 就是它导致 Boss 不同）");
+            }
+        }
+        catch { /* 纯诊断 */ }
+    }
+
+    private static int _inputLogs;
 
     /// <summary>
     /// 阵容的**短指纹**（只用于联机对表）：两台机器的这一行必须完全一样。
@@ -696,6 +760,44 @@ internal static class BossLineups
     /// 现在改成：**战斗内以房间遭遇为准**（遭遇是炼药猎 ⇒ 用炼药猎那套卡组/剧本/药水），
     /// 只有在拿不到遭遇时（战斗外、开局自检 dump）才退回按种子算。结果由 <see cref="Latched"/> 本场锁定。
     /// </summary>
+    /// <summary>
+    /// 三层观者的第二套设计「**Ω观**」（设计 Key `WATCHER_OMEGA`，用户 2026-11-16）。
+    ///
+    /// 判据只看「本场遭遇是谁」：两只观者各有自己的遭遇类
+    /// （`WATCHER_DIVINITY_BOSS_ENCOUNTER` / `WATCHER_OMEGA_BOSS_ENCOUNTER`），
+    /// 而造怪时 `WatcherOmegaBoss` 还会把 `SpawnVariantKey` / `PinnedVariantKey` 钉成 `WATCHER_OMEGA`
+    /// ⇒ 这里不需要（也不该）有按种子的 50/50 兜底：认不出就明确「不是 Ω观」。
+    /// </summary>
+    internal static bool WatcherOmegaActive() => Latched("WATCHER_OMEGA", ComputeWatcherOmega);
+
+    private static (bool Value, bool Decisive) ComputeWatcherOmega()
+    {
+        try
+        {
+            string? entry = CurrentEncounterEntry();
+            if (!string.IsNullOrEmpty(entry))
+            {
+                if (entry == "WATCHER_OMEGA_BOSS_ENCOUNTER") return (true, true);
+                if (entry == "WATCHER_DIVINITY_BOSS_ENCOUNTER") return (false, true);
+            }
+        }
+        catch { /* 往下走 */ }
+        // 拿不到遭遇：靠 Boss 身上钉的变体 Key 兜底（`PinnedVariantKey` / `SpawnVariantKey`）
+        try
+        {
+            foreach (var c in MegaCrit.Sts2.Core.Combat.CombatManager.Instance?.DebugOnlyGetState()?.Enemies
+                                ?? (IEnumerable<MegaCrit.Sts2.Core.Entities.Creatures.Creature>)Array.Empty<MegaCrit.Sts2.Core.Entities.Creatures.Creature>())
+            {
+                if (c?.Monster is not Monsters.CharBossMonster boss) continue;
+                string? pinned = boss.PinnedVariantKey ?? boss.SpawnVariantKey;
+                if (string.Equals(pinned, "WATCHER_OMEGA", StringComparison.Ordinal)) return (true, true);
+                if (string.Equals(pinned, "WATCHER_DIVINITY", StringComparison.Ordinal)) return (false, true);
+            }
+        }
+        catch { /* 忽略 */ }
+        return (false, true);
+    }
+
     internal static bool BrewerActive() => Latched("SILENT_BREWER", ComputeBrewer);
 
     private static (bool Value, bool Decisive) ComputeBrewer()

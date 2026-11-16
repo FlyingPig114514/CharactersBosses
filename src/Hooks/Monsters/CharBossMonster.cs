@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -365,8 +365,6 @@ public abstract partial class CharBossMonster : MonsterModel
 
     /// <summary>上一回合结束时**实际**还剩多少能量（「佩尔之泪」据此给本回合 +2，见 BossHookBridge.PaelsTearsBonus）。</summary>
     internal int LeftoverEnergyLastTurn;
-    /// <summary>观者的「灯笼」那 1 点能量只给一次（TurnNumber 是 0 起，用 &lt;= 1 会在第 2 回合再给一遍）。</summary>
-    internal bool _watcherLanternGiven;
 
     /// <summary>本回合的「倒吊人额外回合」是否已经触发过（每回合开始清零）。</summary>
     internal bool _extraTurnFired;
@@ -443,11 +441,18 @@ public abstract partial class CharBossMonster : MonsterModel
     /// <summary>
     /// **印牌要被拦掉的牌**（按 entry 点名）：它们生成出来的牌，剧本里已经摆好了，
     /// 再印一张就会让手牌/计划对不上。
-    /// 目前只有「切断」（`SEVERANCE` → 3 张灵魂：抽牌堆随机一张 / 弃牌堆一张 / **手牌一张**）。
+    ///   · 「切断」（`SEVERANCE` → 3 张灵魂：抽牌堆随机一张 / 弃牌堆一张 / **手牌一张**）；
+    ///   · 观者「**欺瞒现实**」（`WATCHER_DECEIVE_REALITY`，用户 2026-11-16：「平安不知道为什么会被打两次」）
+    ///     —— 反编译 `WatcherDeceiveReality.OnPlay`：`GainBlock(4)` + `AddGeneratedCardToCombat(CreateCard&lt;WatcherSafety&gt;(), (PileType)2, …)`
+    ///     即**往手牌里再塞一张「平安」**。而剧本第 4 / 11 回合本来就写着「平安」，
+    ///     多出来的那张会在补打重规划时按类型又被匹配一次 ⇒ 平安打两次。
+    ///     拦掉那张 token，欺瞒现实自己那 4 点格挡照旧（它走 `GainBlock`，不走印牌）。
     /// </summary>
     internal static readonly HashSet<string> BlocksGeneratedCardsEntries = new(StringComparer.Ordinal)
     {
         "SEVERANCE",
+        "WATCHER_DECEIVE_REALITY",
+        "WATCHER-DECEIVE_REALITY",
     };
 
     public override async Task AfterAddedToRoom()
@@ -1949,12 +1954,12 @@ public abstract partial class CharBossMonster : MonsterModel
             //   这里照「羽化」的做法用原版预览界面（`BossCardPreview.ShowAsync`）把它亮出来，
             //   牌本身就是带 X 段的那张实体（`WithHitCount(X)` 由观者模组在生成时写死）⇒ 段数天然正确。
 #if STS2_111
-            try
-            {
-                if (SurpriseWatcherConjureShown(play.Card))
-                    MegaCrit.Sts2.Core.Helpers.TaskHelper.RunSafely(Core.BossCardPreview.ShowAsync(this, WatcherGeneratedCards(), 1.8f));
-            }
-            catch (Exception e) { Logger.Log("[CharBoss] 灭除之刃展示失败: " + e.Message); }
+            // ★ v0.2.680（用户 2026-11-16 第 3/4 条）：这里以前只看「她手牌里有没有灭除之刃」，
+            //   而观者模组把生成的那张塞进的是**抽牌堆** ⇒ 一次都没展示过、段数也永远没记上。
+            //   现在不管它在哪个堆都找出来：先记段数（后面几回合的剧本牌要用），再亮给玩家看。
+            try { NoteWatcherConjuredBlade(play.Card); } catch (Exception e) { Logger.Log("[CharBoss] 灭除之刃展示失败: " + e.Message); }
+            // Ω观：打完「阿尔法」/「贝塔」⇒ 把生成的贝塔 / 欧米伽用原版预览界面亮一下（用户 2026-11-16）
+            try { Core.WatcherOmegaMechanics.NoteGeneratedAsync(this, play.Card); } catch { /* 纯展示 */ }
 #endif
             try { Patches.StrayBossCardQueuePatch.Reap(); } catch { /* 忽略 */ }
         }
@@ -2207,7 +2212,13 @@ public abstract partial class CharBossMonster : MonsterModel
                 try { if (play.Card.DynamicVars.TryGetValue("Energy", out var ev) && ev != null) gainE = ev.BaseValue; }
                 catch { gainE = 0m; }
                 int addE = (int)Math.Round((double)gainE);
-                if (addE > 0 && !Core.BossScriptPlanner.DeferredEnergyCard(play.Card))
+                // ★ v0.2.680（用户 2026-11-16：「你别给她补，用她原版的加费就行」）：
+                //   观者的牌**自己就会给影子玩家加能量**（反编译 `WatcherMod.WatcherMiracle.OnPlay` =
+                //   `PlayerCmd.GainEnergy(DynamicVars.Energy.BaseValue, Owner)`，Owner 就是影子玩家），
+                //   这里再补一笔就是双份 —— 实测日志 `WATCHER_MIRACLE 回能 +1 → 本回合能量 4`（2 + 2）。
+                //   所以只对观者这只 Boss 关掉这笔补偿；其它 Boss 的行为一个字节都不动。
+                bool compensationNeeded = Def.Key != "WATCHER_DIVINITY";
+                if (addE > 0 && compensationNeeded && !Core.BossScriptPlanner.DeferredEnergyCard(play.Card))
                 {
                     pcs.Energy += addE;
                     Logger.Log($"[CharBoss] {play.Card.Id.Entry} 回能 +{addE} → 本回合能量 {pcs.Energy}");
@@ -2903,4 +2914,3 @@ public abstract partial class CharBossMonster : MonsterModel
     }
 
 }
-

@@ -54,6 +54,8 @@ public static class BossIntentBuilder
                                 bhIdx = i;
                                 amt = Math.Max(0, (int)Math.Round(Var(pc, "BlackHolePower", 0m)));
                             }
+
+
                             if (idx < 0 && ReferenceEquals(pc, card)) idx = i;
                         }
                         if (bhIdx >= 0 && idx > bhIdx) stacks = amt;
@@ -83,6 +85,17 @@ public static class BossIntentBuilder
 
     private static readonly string[] HealKeys = { "Heal", "MaxHp", "HpLoss" };
 
+    /// <summary>
+    /// 构造意图期间「这张牌打出时的姿态倍率」（由 <see cref="IntentsFor"/> 在入口设好、退出时还原）。
+    /// `LiveSingle/LiveMulti/LiveDelegateSingleAttackIntent` 在构造时把它读走并存在自己身上 ——
+    /// 这样渲染那一刻不再需要去猜（重规划会换牌实例、`Plan` 也可能已经清掉）。
+    /// 见 <c>BossDamagePredictor.ScaleToPlannedStance</c> 上的说明。
+    /// </summary>
+    [ThreadStatic] internal static int StanceBake;
+
+    /// <summary>「造意图时的姿态倍率」日志计数器。</summary>
+    private static int StanceBakeLogs;
+
     public static List<AbstractIntent> IntentsFor(CardModel card, Creature? target, int pendingDrop = 0,
                                                   int pendingRise = 0, int extraDamage = 0, int extraHits = 0,
                                                   int xHits = 0, int shivBonus = 0, bool shivBonusBakedIn = false,
@@ -93,11 +106,47 @@ public static class BossIntentBuilder
                                                   int letterOpenerHit = 0, int pendingStatusCards = 0,
                                                   bool aoeFromCaller = false, bool minionSummon = false,
                                                   int shivOverride = 0, int etherealBefore = 0,
-                                                  int starHits = -1)
+                                                  int starHits = -1,
+        int stanceMul = 1, int pendingMarks = 0)
+    {
+        int savedBake = StanceBake;
+        StanceBake = stanceMul > 1 ? stanceMul : 0;
+        if (StanceBake > 1 && StanceBakeLogs++ < 30)
+        {
+            Logger.Log($"[CharBoss] 剧本姿态：{SafeEntry(card)} 造意图时 ×{StanceBake}" +
+                       $"（此刻她 ×{StanceMultiplierOf(card?.Owner?.Creature)}）");
+        }
+        try
+        {
+            return IntentsForCore(card, target, pendingDrop, pendingRise, extraDamage, extraHits, xHits,
+                shivBonus, shivBonusBakedIn, handAtPlay, serpentDamage, playCount, discardsThisTurn,
+                bodySlamBlock, strengthBonus, playsBeforeThisTurn, smokePerHit, smokeHits, letterOpenerHit,
+                pendingStatusCards, aoeFromCaller, minionSummon, shivOverride, etherealBefore, starHits,
+                stanceMul, pendingMarks);
+        }
+        finally { StanceBake = savedBake; }
+    }
+
+    private static List<AbstractIntent> IntentsForCore(CardModel card, Creature? target, int pendingDrop = 0,
+                                                  int pendingRise = 0, int extraDamage = 0, int extraHits = 0,
+                                                  int xHits = 0, int shivBonus = 0, bool shivBonusBakedIn = false,
+                                                  int handAtPlay = -1, int serpentDamage = 0, int playCount = 1,
+                                                  int discardsThisTurn = -1, int bodySlamBlock = -1,
+                                                  int strengthBonus = 0, int playsBeforeThisTurn = 0,
+                                                  int smokePerHit = 0, int smokeHits = 0,
+                                                  int letterOpenerHit = 0, int pendingStatusCards = 0,
+                                                  bool aoeFromCaller = false, bool minionSummon = false,
+                                                  int shivOverride = 0, int etherealBefore = 0,
+                                                  int starHits = -1,
+        int stanceMul = 1, int pendingMarks = 0)
     {
         var intents = new List<AbstractIntent>();
 
         var entry = SafeEntry(card);
+
+        // ★ v0.2.701：某些分支已经自己加过「策略/减益」意图（例如 Ω观点穴），
+        //   置这个开关让后面通用的 `ClassifyPowers` 减益那一段不要再补一条（B 版会出两个红箭头）。
+        bool suppressGenericDebuff = false;
 
         // ★ 2026-11-05（用户）：「当储君的仆从牌满足召唤仆从的条件时，其意图应该为**召唤**而非攻势/强化/守势。
         //   这个需要根据场上的仆从数量实时计算。」——仆从只会在**她的回合**里被召唤，玩家的回合里数量不变，
@@ -377,6 +426,106 @@ public static class BossIntentBuilder
             aimedElsewhere = MementoMoriAimedElsewhere(card);
         }
 #endif
+#if STS2_111
+        // ★ v0.2.681（用户 2026-11-16）：「光辉的伤害预览似乎没有计算虔信、手摇鼓和她特殊效果
+        //   （回合开始时扣真言）导致的她在回合开始时的真言变化（光辉的伤害受本场战斗观者获得的真言层数影响）」。
+        //
+        //   反编译 `WatcherMod.WatcherBrilliance.OnPlay`：
+        //     DamageCmd.Attack(DynamicVars.Damage.BaseValue + WatcherCombatHelper.GetTotalMantraGained(owner))
+        //   而 `GetTotalMantraGained` = `WatcherStatePower.TotalMantraGainedThisCombat`（**累计获得**的，
+        //   她特殊效果每回合扣的 5 层不减它）⇒ 牌面上根本没有这个数，意图必须自己加。
+        //   · 「手摇鼓」是 `AfterPlayerTurnStart` 里 +1 真言，我们替她广播那条钩子的时机是**她回合开始**
+        //     ⇒ 计划在玩家回合排的时候还差这一层，先当 pending 补上（否则预览永远少 1）。
+        //   · 玩家本回合每打一张牌 +1（虔信）由 `TotalMantraGained` 实时读出来，配「能力变化自动重算意图」一起刷新。
+        //   ⚠ B 版（lamali）的光辉把真言做进了牌面的计算型伤害里 ⇒ 只对 A 版加，免得双份。
+        if (Monsters.CharBossMonster.WatcherIdIs(entry, "BRILLIANCE"))
+        {
+            try
+            {
+                var watcherShadow = card.Owner;
+                int mantraTotal = Core.WatcherCards.Current == Core.WatcherCards.Provider.Boninall
+                    ? Core.WatcherCards.TotalMantraGained(watcherShadow)
+                    : 0;
+                int pendingDamaru = 0;
+                try
+                {
+                    // 还在**玩家回合**里 ⇒ 她回合开始时手摇鼓那 +1 还没到账
+                    bool playerSide = card.Owner?.Creature?.CombatState?.CurrentSide
+                                      == MegaCrit.Sts2.Core.Combat.CombatSide.Player;
+                    if (playerSide && Core.WatcherCards.HasDamaru(watcherShadow)) pendingDamaru = 1;
+                }
+                catch { pendingDamaru = 0; }
+
+                if (mantraTotal + pendingDamaru > 0)
+                {
+                    extraDamage += mantraTotal + pendingDamaru;
+                    if (WatcherBrillianceLogs++ < 12)
+                    {
+                        Logger.Log($"[CharBoss] 光辉：本场累计真言 {mantraTotal}" +
+                                   $"{(pendingDamaru > 0 ? " + 回合开始手摇鼓 1（还没到账）" : string.Empty)}" +
+                                   $" ⇒ 伤害预览加 {(mantraTotal + pendingDamaru)}");
+                    }
+                }
+            }
+            catch { /* 算不出就按牌面 */ }
+        }
+#endif
+#if STS2_111
+        // ★ v0.2.683（用户 2026-11-16，三层 2 号「Ω观」）：
+        //
+        // ## ① 点穴：策略 + 伤害
+        //   反编译 `WatcherPressurePoints.OnPlay`：先给目标 Apply `MarkPower`（层数 = `MagicNumber`），
+        //   再对**每个有印记的敌人**按「印记层数」受一次伤害。而这张牌的变量是普通
+        //   `DynamicVar("MagicNumber")`（不是 `PowerVar<>`）⇒ `ClassifyPowers` 认不出减益，
+        //   以前它落到「技能牌兜底 = 强化」。用户要求：意图里除策略外还要写出会造成的伤害
+        //   =「目标身上的点穴层数 + 这张点穴会给予的点穴层数」。
+        //   （「斋戒」让这一下**可以被格挡**，但数值不变 ⇒ 预览不加也不减。）
+        //
+        // ## ② 欧米伽：像炸弹那样显示这一下会打多少
+        //   它是能力牌，伤害在**她回合结束**由 `OmegaPower.AfterSideTurnEnd` 结算；
+        //   「斋戒」让它隔一回合才触发 ⇒ 只有该触发的那一回合才画这条攻势。
+        try
+        {
+            var omegaBoss = card.Owner?.Creature?.Monster as Monsters.CharBossMonster;
+            bool fasting = false;
+            try { fasting = card.Owner?.Creature?.GetPower<Powers.WatcherFastingPower>() != null; }
+            catch { fasting = false; }
+
+            if (fasting && Monsters.CharBossMonster.WatcherIdIs(entry, "PRESSURE_POINTS"))
+            {
+                // ★ v0.2.701（用户 2026-11-16，B 版实测）：
+                //   A 版点穴的层数是普通 `DynamicVar("MagicNumber")`；
+                //   B 版（lamali）是 `WithPower&lt;MarkPower&gt;(8, 3)` ⇒ 变量键叫 **`MarkPower`**
+                //   ⇒ 以前只读 `MagicNumber` 得到 0：第 1 回合目标没有印记时整条攻势消失、
+                //   后面回合只显示「目标已有印记」那一部分，而且「本回合前面那张点穴叠的印记」永远是 0。
+                int marksHere = Core.WatcherCards.PressurePointsMarks(card);
+                int marksOnTarget = Core.WatcherOmegaMechanics.MarkAmount(target);
+                int pressureDamage = Math.Max(0, marksHere + marksOnTarget + Math.Max(0, pendingMarks));
+                if (StsOmegaIntentLogs++ < 14)
+                {
+                    Logger.Log($"[CharBoss] 点穴意图：目标已有印记 {marksOnTarget} + 本回合前面那张 {Math.Max(0, pendingMarks)}" +
+                               $" + 这张施加 {marksHere} ⇒ 攻势 {pressureDamage}（可被格挡）+ 策略");
+                }
+                // ⚠ v0.2.694（用户截图：点穴下面只有一个蓝色强化箭头）：
+                //   v0.2.691 清理重复日志时把**真正 Add 意图的两行**一起删掉了，只剩日志 ⇒
+                //   意图退化成 `intents.Count == 0` 兜底的 BuffIntent（蓝色上箭头）。补回来：
+                //   · 攻势 = 每个有印记的敌人按层数掉血（我们的「斋戒」让它**可被格挡**），
+                //     数值不吃力量/虚弱/易伤 ⇒ 走 `RawAttackIntent`；
+                //   · 再加一条**策略**（它是减益牌）。
+                //
+                // ★ v0.2.701（用户 2026-11-16，B 版截图「有 2 个红色策略箭头」）：
+                //   B 版的点穴带 `PowerVar<MarkPower>` ⇒ `ClassifyPowers` 自己也会补一条「策略」，
+                //   和我们这条重复。这里挂一个开关，让后面的通用减益意图本节跳过（A 版无影响）。
+                if (pressureDamage > 0)
+                    intents.Add(new RawAttackIntent(pressureDamage));
+                intents.Add(new MegaCrit.Sts2.Core.MonsterMoves.Intents.DebuffIntent(false));
+                suppressGenericDebuff = true;
+            }
+
+
+        }
+        catch { /* 纯预览 */ }
+#endif
         // 「还没到账的加成」（熔炉铸造 / 剑圣重放）只对本来就有伤害的牌生效，
         // 否则技能牌会被算出一条幻影攻击（踩过）。
         // 这张牌「还没跑力量/虚弱/易伤」的牌面伤害 —— X 费那张（根除）要用它去走原版伤害管道。
@@ -404,6 +553,20 @@ public static class BossIntentBuilder
             // 走 Raw 意图的分支（奥斯提 / X 费 / 群蛇 / 速行者）本来就不吃节点修正，
             // 那些数字是 `ValueProp.Unpowered` 之类的原样值，也不该乘虚弱。
         }
+#if STS2_111
+        // ★ v0.2.691（用户截图：「第四回合的第二张打击是在进入愤怒后打出的，应为 14 而不是 7」）：
+        //   姿态倍率（愤怒 ×2 / 神格 ×3）在**真实结算**里由伤害管道里的 stance 模型生效，
+        //   而意图是我们自己按牌面算的 ⇒ 必须自己补。
+        //
+        // ★ v0.2.696（用户 2026-11-16：「第四回合的打击和第八回合的不惧妖邪的伤害预览**还是**没有翻倍」）：
+        //   前三版的做法都**把「计划倍率」当一次性数据传**（先乘牌面 → 再登记到字典里），
+        //   而只要有一条重算路（`BossPlanner.Plan` 重新规划剩余手牌）没带上它，
+        //   登记就被覆盖回 1 ⇒ 玩家回合里看到的仍然是没翻倍的 7。
+        //   现在**不再存任何东西**：渲染那一刻由 `BossDamagePredictor.ApplyPlannedStance` 直接问
+        //   `BossIntentBuilder.PlannedStanceAt(她, 这张牌)` —— 拿「她**此刻**的真实姿态」+ 剩余计划
+        //   的顺序现推一遍（和剧本规划期同一套规则），谁重新规划都不会丢。
+        //   这里保留 `stanceMul` 参数只为 `PlannedPlay.StanceMul` 记账，不再影响意图数字。
+#endif
         LogSpecialDamageOnce(card, damage, extraDamage, hits);
         if (entry == "SUPERMASSIVE") LogSupermassive(card, damage, extraDamage);
 
@@ -687,6 +850,41 @@ public static class BossIntentBuilder
         //   天人形态 / 创世之柱 / 非凡技艺 / 虚空形态…）的 `Count` 已经不是 0 ⇒ 自己那条「强化」
         //   兜底意图**永远补不上**，看起来就像被群蛇攻击替换掉了。
         //   现在把这些附加行当成「不算数」的：先按牌自己的意图补兜底，附加行照旧排在它后面。
+        // ★ v0.2.685（用户 2026-11-16）：**灾厄骨的灾厄牌**额外画一条「等同于会施加的灾厄层数」的攻势意图。
+        //   · 死亡使者 `DEATHBRINGER`（21/26，群体）⇒ 每个玩家都看得到；
+        //   · 鞭打 `SCOURGE`（13/16，单体）⇒ 只有被她锁定的那位看到真实数字，其它人看 0；
+        //   · 无处可逃 `NO_ESCAPE`（10/15 + 5 × floor(灾厄/阈值)，单体）⇒ 同上，并按用户口径
+        //     把**本回合其它灾厄牌**会施加的层数也累计进去；
+        //   · 荒疫打击 `BLIGHT_STRIKE`：灾厄 = 它实际造成的伤害（本来就吃力量/虚弱）⇒ 它自己那条
+        //     攻势意图已经是这个数，再画一条会让薄荷尖塔把两条相加 ⇒ 跳过。
+        //   除荒疫打击外都不吃力量/虚弱/易伤 ⇒ 用 `RawAttackIntent`（数字原样）。
+        //   ⚠ 必须放在下面 `intents.Count == 0` 兜底**之前**，否则这三张技能牌会被补一条「强化」。
+        try
+        {
+            if (entry == "DEATHBRINGER" || entry == "SCOURGE" || entry == "NO_ESCAPE" || entry == "BLIGHT_STRIKE")
+            {
+                if (entry == "BLIGHT_STRIKE")
+                {
+                    if (DoomIntentLogs++ < 12)
+                        Logger.Log("[CharBoss] 荒疫打击：灾厄层数就等于它自己的伤害 ⇒ 不额外画第二条攻势（否则薄荷尖塔会双算）");
+                }
+                else
+                {
+                    int doom = DoomIntentAmount(card, entry, target);
+                    bool groupDoom = entry == "DEATHBRINGER";
+                    if (doom > 0)
+                    {
+                        if (!groupDoom && aimedElsewhere) intents.Add(new RawAttackIntent(0));
+                        else intents.Add(new RawAttackIntent(doom));
+                        if (DoomIntentLogs++ < 20)
+                            Logger.Log($"[CharBoss] 灾厄牌 {entry}：会施加 {doom} 层灾厄 ⇒ 额外一条" +
+                                       $"{(groupDoom ? "群体" : "单体")}攻势意图 {doom}（不吃力量/虚弱/易伤）");
+                    }
+                }
+            }
+        }
+        catch { /* 纯预览 */ }
+
         if (intents.Count == 0)
         {
             intents.Add(card.Type switch
@@ -966,7 +1164,9 @@ public static class BossIntentBuilder
         // 「疯狂科学」只要「守势 + 强化」两条：牺牲意图也去掉（它是三套模板的混合体，
         // 数据上会带上「失去力量」这类减益变量，画出来就是用户看到的那个多余的下箭头）。
         if (madScience) hasSacrifice = false;
-        if (hasDebuff) intents.Add(new DebuffIntent(false));
+        // ★ v0.2.701：Ω观点穴的「策略」我们已经自己加过了（B 版点穴带 `PowerVar<MarkPower>`，
+        //   通用分类也会补一条 ⇒ 屏幕上出现两个红箭头）。这里只是不重复加，见上面那段注释。
+        if (hasDebuff && !suppressGenericDebuff) intents.Add(new DebuffIntent(false));
         if (hasSacrifice) intents.Add(new SacrificeIntent());   // 付出代价换强力效果（蓝色向下箭头）
         // ★ 2026-11-13（用户新增）：**诱惑** = 以给你正面效果为代价换强力效果（策略图标上下翻转）
         if (hasTemptation) intents.Add(new TemptationIntent());
@@ -1464,6 +1664,248 @@ public static class BossIntentBuilder
     }
 
     private static int _superMassiveLogs;
+
+    /// <summary>灾厄牌「会施加多少层灾厄」——给那条额外攻势意图用（用户 2026-11-16）。</summary>
+    private static int DoomIntentAmount(CardModel card, string entry, Creature? target)
+    {
+        try
+        {
+            if (entry == "DEATHBRINGER" || entry == "SCOURGE")
+                return Math.Max(0, BossDamagePredictor.VarPreviewInt(card, "Doom", 0));
+
+            if (entry == "NO_ESCAPE")
+            {
+                int existing = 0;
+                try { existing = target?.GetPowerAmount<MegaCrit.Sts2.Core.Models.Powers.DoomPower>() ?? 0; }
+                catch { existing = 0; }
+                int turnOther = DoomFromOtherPlannedCards(card);
+                int threshold = Math.Max(1, BossDamagePredictor.VarPreviewInt(card, "DoomThreshold", 10));
+                int baseValue = Math.Max(0, BossDamagePredictor.VarPreviewInt(card, "CalculationBase", 10));
+                int extra = Math.Max(0, BossDamagePredictor.VarPreviewInt(card, "CalculationExtra", 5));
+                int total = Math.Max(0, existing + turnOther);
+                int amount = baseValue + extra * (total / threshold);
+                if (DoomIntentLogs++ < 20)
+                    Logger.Log($"[CharBoss] 无处可逃：目标已有灾厄 {existing} + 本回合其它灾厄牌 {turnOther}" +
+                               $" = {total}（阈值 {threshold}）⇒ 会施加 {amount} 层");
+                return amount;
+            }
+        }
+        catch { /* 算不出按 0 */ }
+        return 0;
+    }
+
+    /// <summary>本回合剧本里**其它**灾厄牌还会施加的灾厄合计（规划期 `Plan` 为空 ⇒ 0）。</summary>
+    private static int DoomFromOtherPlannedCards(CardModel self)
+    {
+        try
+        {
+            var boss = self?.Owner?.Creature?.Monster as Monsters.CharBossMonster;
+            var plan = boss?.Plan;
+            if (plan == null) return 0;
+            int sum = 0;
+            foreach (var play in plan)
+            {
+                var c = play?.Card;
+                if (c == null || ReferenceEquals(c, self)) continue;
+                string e;
+                try { e = c.Id.Entry ?? string.Empty; } catch { continue; }
+                if (e == "DEATHBRINGER" || e == "SCOURGE")
+                    sum += Math.Max(0, BossDamagePredictor.VarPreviewInt(c, "Doom", 0));
+            }
+            return sum;
+        }
+        catch { return 0; }
+    }
+
+    /// <summary>
+    /// 她**此刻姿态**给攻击牌的伤害倍率（观者：愤怒 ×2 / 神格 ×3；没有姿态 = 1）。
+    /// 反编译：A 版 `Wrath` / `Divinity`、B 版 `WrathStance` / `DivinityStance` 都是 power。
+    /// </summary>
+    /// <summary>按**生物**读姿态倍率（规划期推演的起点用；没有姿态 = 1）。</summary>
+    internal static int StanceMultiplierOf(Creature? creature)
+    {
+        try
+        {
+            var powers = creature?.Powers;
+            if (powers == null) return 1;
+            bool wrath = false, divinity = false;
+            for (int i = 0; i < powers.Count; i++)
+            {
+                var p = powers[i];
+                if (p == null) continue;
+                // ★ v0.2.701：**先看 id**（日志实证她身上的姿态 power 就叫 `WRATH` / `CALM`），
+                //   再看类型名（A 版 `Wrath` / B 版 `WrathStance` 一类）—— 两把尺子都试，
+                //   以后哪一版改了命名也认得出来。
+                string key = string.Empty;
+                try { key = (p.Id.Entry ?? string.Empty).ToUpperInvariant(); } catch { key = string.Empty; }
+                string name;
+                try { name = p.GetType().Name; } catch { name = string.Empty; }
+                bool isDiv = key.Contains("DIVINITY") || name == "Divinity" || name == "DivinityStance";
+                bool isWrath = key.Contains("WRATH") || name == "Wrath" || name == "WrathStance";
+                if (isDiv) divinity = true;
+                else if (isWrath) wrath = true;
+            }
+            if (divinity) return 3;
+            if (wrath) return 2;
+
+            // ★ v0.2.706（用户 2026-11-16：「B 版欧米伽观愤怒时打出的攻击牌还是不翻倍」）：
+            //   B 版（lamali）的姿态**不在 `Creature.Powers` 里**，而是绑在玩家上的
+            //   `SpireField<PlayerCombatState, WatcherStanceModel>`（`WatcherModel.GetStanceModel(player)`）
+            //   ⇒ 上面那轮 power 扫描永远是「没姿态」。这里补一条：直接问她自己的 API。
+#if STS2_111
+            int fromModel = Core.WatcherCards.StanceMultiplierFromModel(creature?.Player);
+            if (fromModel > 1) return fromModel;
+#endif
+        }
+        catch { /* 读不到按 1 */ }
+        return 1;
+    }
+
+    /// <summary>这张牌打出去之后她的姿态倍率会变成多少（暴怒/渐强 ⇒ 2；安宁/冥想/警惕/化体为空/化拳为空 ⇒ 1）。</summary>
+    internal static int StanceAfterPlay(int mul, CardModel? played)
+    {
+#if STS2_111
+        try
+        {
+            string e;
+            try { e = played?.Id.Entry ?? string.Empty; } catch { return mul; }
+            if (Monsters.CharBossMonster.WatcherIdIs(e, "ERUPTION")
+                || Monsters.CharBossMonster.WatcherIdIs(e, "CRESCENDO")) return 2;
+            if (Monsters.CharBossMonster.WatcherIdIs(e, "TRANQUILITY")
+                || Monsters.CharBossMonster.WatcherIdIs(e, "MEDITATE")
+                || Monsters.CharBossMonster.WatcherIdIs(e, "VIGILANCE")) return 1;
+            if (Monsters.CharBossMonster.WatcherIdIs(e, "EMPTY_BODY")
+                || Monsters.CharBossMonster.WatcherIdIs(e, "EMPTY_FIST")) return 1;
+        }
+        catch { /* 忽略 */ }
+#endif
+        return mul;
+    }
+
+    /// <summary>两张牌算不算「同一种牌」（升级版/未升级版、多人换牌都算同一种）。</summary>
+    private static bool SameCardKind(CardModel? a, CardModel? b)
+    {
+        if (a == null || b == null) return false;
+        try
+        {
+            if (ReferenceEquals(a, b)) return true;
+            if (a.GetType() == b.GetType()) return true;
+            return string.Equals(a.Id.Entry, b.Id.Entry, StringComparison.Ordinal);
+        }
+        catch { return false; }
+    }
+
+    /// <summary>
+    /// 「这张牌**真的打出去**那一刻，她的姿态倍率是多少」—— 用「她此刻的真实姿态」+ 剩余计划顺序现推。
+    ///
+    /// 规则与剧本规划期（`BossScriptPlanner` 的 `plannedStanceMul`）逐字相同：
+    ///   暴怒 / 渐强 ⇒ ×2；安宁 / 冥想 / 警惕 ⇒ 平静（×1）；化体为空 / 化拳为空 ⇒ 退出姿态（×1）。
+    ///
+    /// 三级来源（前一级拿不到就用下一级，全部拿不到才退回「此刻姿态」）：
+    ///   ① 剩余计划里按**卡实例**定位（最准）；
+    ///   ② 实例对不上（重规划换过牌实例）⇒ 按**同一种牌**在计划里定位第一张；
+    ///   ③ `Plan` 已经清掉 ⇒ 按**剧本**第 `TurnNumber+1`（她的下一回合，也就是正在预告的那一回合）的顺序推。
+    ///
+    /// 注：v0.2.697 起首选来源是「造意图时烤进意图对象的倍率」（`StanceBake`），这里只是它缺失时的兜底。
+    /// </summary>
+    internal static int PlannedStanceAt(Creature? dealer, CardModel? card)
+    {
+        int start = Math.Max(1, StanceMultiplierOf(dealer));
+        if (dealer == null || card == null) return start;
+#if STS2_111
+        var boss = dealer.Monster as Monsters.CharBossMonster;
+        if (boss == null) return start;
+
+        // ① 按实例
+        try
+        {
+            int mul = start;
+            bool found = false;
+            foreach (var play in boss.Plan)
+            {
+                var c = play?.Card;
+                if (c == null) continue;
+                if (ReferenceEquals(c, card)) { found = true; break; }
+                mul = StanceAfterPlay(mul, c);
+            }
+            if (found) return mul;
+        }
+        catch { /* 继续下一级 */ }
+
+        // ② 按「同一种牌」
+        try
+        {
+            int mul = start;
+            bool found = false;
+            foreach (var play in boss.Plan)
+            {
+                var c = play?.Card;
+                if (c == null) continue;
+                if (SameCardKind(c, card)) { found = true; break; }
+                mul = StanceAfterPlay(mul, c);
+            }
+            if (found) return mul;
+        }
+        catch { /* 继续下一级 */ }
+
+        // ③ 按剧本
+        try
+        {
+            var script = boss.Def?.ScriptForAct(boss.ActIndex);
+            if (script == null) return start;
+            foreach (int turn in new[] { boss.TurnNumber + 1, boss.TurnNumber })
+            {
+                var scriptTurn = script.TurnAt(turn);
+                if (scriptTurn?.Cards == null) continue;
+                int mul = start;
+                bool found = false;
+                var cardType = card.GetType();
+                foreach (var e in scriptTurn.Cards)
+                {
+                    if (e?.Card == null) continue;
+                    bool played = !e.DiscardInstead && !e.Burned && !e.DisplayOnly && !e.HoldInstead;
+                    if (!played) continue;
+                    if (e.Card == cardType) { found = true; break; }
+                    mul = StanceAfterEntry(mul, e);
+                }
+                if (found) return mul;
+            }
+        }
+        catch { /* 忽略 */ }
+#endif
+        return start;
+    }
+
+    /// <summary>剧本条目打出去之后她的姿态倍率会变成多少（按 `ScriptCard.Card` 的类型判断）。</summary>
+    private static int StanceAfterEntry(int mul, ScriptCard entry)
+    {
+#if STS2_111
+        try
+        {
+            var type = entry?.Card;
+            if (type == null) return mul;
+            var entryName = MegaCrit.Sts2.Core.Models.ModelDb.GetId(type)?.Entry;
+            if (entryName == null) return mul;
+            if (Monsters.CharBossMonster.WatcherIdIs(entryName, "ERUPTION")
+                || Monsters.CharBossMonster.WatcherIdIs(entryName, "CRESCENDO")) return 2;
+            if (Monsters.CharBossMonster.WatcherIdIs(entryName, "TRANQUILITY")
+                || Monsters.CharBossMonster.WatcherIdIs(entryName, "MEDITATE")
+                || Monsters.CharBossMonster.WatcherIdIs(entryName, "VIGILANCE")) return 1;
+            if (Monsters.CharBossMonster.WatcherIdIs(entryName, "EMPTY_BODY")
+                || Monsters.CharBossMonster.WatcherIdIs(entryName, "EMPTY_FIST")) return 1;
+        }
+        catch { /* 忽略 */ }
+#endif
+        return mul;
+    }
+
+    /// <summary>灾厄意图的日志计数器。</summary>
+    private static int DoomIntentLogs;
+    /// <summary>Ω观「点穴 / 欧米伽」意图日志（最多 14 条）。</summary>
+    private static int StsOmegaIntentLogs;
+
+    /// <summary>观者「光辉」的真言加成日志（最多 12 条）。</summary>
+    private static int WatcherBrillianceLogs;
 
     /// <summary>
     /// 诊断：超质量体的意图数字到底从哪来（用户 2026-10-24：玩家印牌也会涨，还出现两个不一样的红剑）。

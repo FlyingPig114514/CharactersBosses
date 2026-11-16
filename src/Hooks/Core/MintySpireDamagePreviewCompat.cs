@@ -260,6 +260,14 @@ internal static class MintySpireDamagePreviewCompat
         //    `PublishVanillaIntents` 进 `NextMove.Intents`，这里再加就是双份。
         try { total += BossHandPanel.BlackHoleAtTurnStart(boss); } catch { /* 忽略 */ }
 
+        // 「欧米伽」（Ω观，观者模组的 `OmegaPower`）：她**回合结束**对所有敌人打 `Amount` 点
+        // `ValueProp(4)` 伤害；「斋戒」让它隔一回合才结算。
+        // ★ v0.2.699（用户 2026-11-16：「欧米伽的伤害不会被薄荷尖塔统计」）：
+        //   这一笔挂在 power 上、**不进 `NextMove.Intents`**（我们只把它画在自己的「回合结束那一排」）
+        //   ⇒ 薄荷尖塔一个数都算不到。这里按「本回合会不会触发」补进去（`OmegaTriggersOn` 与真实结算同一位）。
+        //   群攻（每名真人玩家都挨）⇒ 不做 `RandomAimIsElsewhere` 判断。
+        try { total += BossHandPanel.OmegaRowDamage(boss); } catch { /* 忽略 */ }
+
         return total;
     }
 }

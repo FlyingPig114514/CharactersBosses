@@ -5536,3 +5536,201 @@ Chronological action log.
 | 2026-11-15 22:49 | write | `src/Hooks/Core/WatcherCards.cs` | ok | 0 |
 | 2026-11-15 23:00 | write | `src/Hooks/Patches/WatcherWishLowLevelChoicePatch.cs` | ok | 0 |
 | 2026-11-15 23:17 | write | `docs/plans/handover-watcher-2026-11-15.md` | ok | 0 |
+| 2026-11-15 23:24 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/watcher-divinity-fixes-2026-11-16.md` | ok | 0 |
+| 2026-11-15 23:25 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Monsters/CharBossMonster.Turn.cs` | ok | 0 |
+| 2026-11-15 23:25 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Monsters/CharBossMonster.Turn.cs` | ok | 0 |
+| 2026-11-15 23:25 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Monsters/CharBossMonster.Turn.cs` | ok | 0 |
+| 2026-11-15 23:25 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Powers/BossDevotionPower.cs` | ok | 0 |
+| 2026-11-15 23:25 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Powers/BossDevotionPower.cs` | ok | 0 |
+| 2026-11-15 23:25 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Powers/BossDevotionPower.cs` | ok | 0 |
+| 2026-11-15 23:25 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Monsters/CharBossMonster.cs` | ok | 0 |
+| 2026-11-15 23:25 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Monsters/CharBossMonster.Watcher.cs` | ok | 0 |
+| 2026-11-15 23:25 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Monsters/CharBossMonster.cs` | ok | 0 |
+| 2026-11-15 23:25 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossScriptPlanner.cs` | ok | 0 |
+| 2026-11-15 23:25 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossScriptPlanner.cs` | ok | 0 |
+| 2026-11-15 23:25 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossScriptPlanner.cs` | ok | 0 |
+| 2026-11-15 23:25 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossScriptPlanner.cs` | ok | 0 |
+| 2026-11-15 23:25 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossScriptPlanner.cs` | ok | 0 |
+| 2026-11-15 23:26 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossCardPreview.cs` | ok | 0 |
+| 2026-11-15 23:26 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-15 23:26 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/CharacterBosses.json` | ok | 0 |
+| 2026-11-15 23:26 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Monsters/CharBossMonster.Watcher.cs` | ok | 0 |
+| 2026-11-15 23:26 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Monsters/CharBossMonster.Watcher.cs` | ok | 0 |
+| 2026-11-15 23:27 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Monsters/CharBossMonster.Watcher.cs` | ok | 0 |
+| 2026-11-15 23:33 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Monsters/CharBossMonster.cs` | ok | 0 |
+| 2026-11-15 23:33 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Monsters/CharBossMonster.Turn.cs` | ok | 0 |
+| 2026-11-15 23:33 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Powers/BossDevotionPower.cs` | ok | 0 |
+| 2026-11-15 23:38 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherCards.cs` | ok | 0 |
+| 2026-11-15 23:38 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossScriptPlanner.cs` | ok | 0 |
+| 2026-11-15 23:38 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossScriptPlanner.cs` | ok | 0 |
+| 2026-11-15 23:44 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/watcher-divinity-fixes-2026-11-16.md` | ok | 0 |
+| 2026-11-15 23:45 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-15 23:49 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/watcher-divinity-fixes-2026-11-16.md` | ok | 0 |
+| 2026-11-16 10:00 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Monsters/CharBossMonster.Turn.cs` | ok | 0 |
+| 2026-11-16 10:00 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Patches/BossRelicHookBridge.cs` | ok | 0 |
+| 2026-11-16 10:00 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherRuntimePatches.cs` | ok | 0 |
+| 2026-11-16 10:00 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherRuntimePatches.cs` | ok | 0 |
+| 2026-11-16 10:00 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherRuntimePatches.cs` | ok | 0 |
+| 2026-11-16 10:00 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Powers/BossDevotionPower.cs` | ok | 0 |
+| 2026-11-16 10:00 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Powers/BossDevotionPower.cs` | ok | 0 |
+| 2026-11-16 10:00 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Powers/BossDevotionPower.cs` | ok | 0 |
+| 2026-11-16 10:00 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Powers/WatcherFaithPower.cs` | ok | 0 |
+| 2026-11-16 10:01 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Powers/BossDevotionPower.cs` | ok | 0 |
+| 2026-11-16 10:01 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-16 10:10 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Monsters/CharBossMonster.cs` | ok | 0 |
+| 2026-11-16 10:10 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherCards.cs` | ok | 0 |
+| 2026-11-16 10:10 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-16 10:10 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-16 10:11 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-16 10:17 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherRuntimePatches.cs` | ok | 0 |
+| 2026-11-16 10:17 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Powers/BossDevotionPower.cs` | ok | 0 |
+| 2026-11-16 10:17 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Powers/BossDevotionPower.cs` | ok | 0 |
+| 2026-11-16 10:18 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherScript.cs` | ok | 0 |
+| 2026-11-16 10:18 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherScript.cs` | ok | 0 |
+| 2026-11-16 10:18 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-16 10:29 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherOmegaScript.cs` | ok | 0 |
+| 2026-11-16 10:29 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherCards.cs` | ok | 0 |
+| 2026-11-16 10:29 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossDefs.cs` | ok | 0 |
+| 2026-11-16 10:29 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossDefs.cs` | ok | 0 |
+| 2026-11-16 10:30 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossDefs.cs` | ok | 0 |
+| 2026-11-16 10:31 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Powers/WatcherFastingPower.cs` | ok | 0 |
+| 2026-11-16 10:32 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherOmegaMechanics.cs` | ok | 0 |
+| 2026-11-16 10:32 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Powers/WatcherFearNoEvilAimPower.cs` | ok | 0 |
+| 2026-11-16 12:40 | edit | `src/Hooks/UI/BossHandPanel.Extra.cs` | error | 0 |
+| 2026-11-16 12:40 | edit | `src/Hooks/UI/BossHandPanel.Extra.cs` | ok | 0 |
+| 2026-11-16 12:40 | edit | `src/Hooks/UI/BossHandPanel.Extra.cs` | ok | 0 |
+| 2026-11-16 12:40 | edit | `src/Hooks/UI/BossHandPanel.Extra.cs` | ok | 0 |
+| 2026-11-16 12:43 | edit | `src/Hooks/Core/BossDamagePredictor.cs` | ok | 0 |
+| 2026-11-16 12:43 | edit | `src/Hooks/Core/BossDamagePredictor.cs` | ok | 0 |
+| 2026-11-16 12:43 | edit | `src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-16 12:43 | edit | `src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-16 12:44 | edit | `src/CharacterBosses.json` | ok | 0 |
+| 2026-11-16 12:44 | edit | `src/Hooks/Core/BuildInfo.cs` | error | 0 |
+| 2026-11-16 12:44 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-16 12:45 | edit | `src/Hooks/Core/WatcherOmegaMechanics.cs` | ok | 0 |
+| 2026-11-16 12:46 | edit | `docs/plans/boss-watcher-divinity.md` | ok | 0 |
+| 2026-11-16 12:53 | edit | `src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-16 12:53 | edit | `src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-16 12:53 | edit | `src/Hooks/Core/BossDamagePredictor.cs` | ok | 0 |
+| 2026-11-16 12:53 | edit | `src/Hooks/Core/WatcherOmegaMechanics.cs` | ok | 0 |
+| 2026-11-16 12:53 | edit | `src/Hooks/Core/BossCardSelector.cs` | ok | 0 |
+| 2026-11-16 12:54 | edit | `src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-16 12:54 | edit | `src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-16 12:54 | edit | `src/Hooks/Core/BossCardSelector.cs` | ok | 0 |
+| 2026-11-16 12:54 | edit | `src/Hooks/Core/BossCardSelector.cs` | ok | 0 |
+| 2026-11-16 12:54 | edit | `src/CharacterBosses.json` | ok | 0 |
+| 2026-11-16 12:54 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-16 12:55 | edit | `docs/plans/boss-watcher-divinity.md` | ok | 0 |
+| 2026-11-16 13:03 | write | `tools/tmp/fix_fasting_text.ps1` | ok | 0 |
+| 2026-11-16 13:05 | edit | `src/Hooks/Core/BossDamagePredictor.cs` | ok | 0 |
+| 2026-11-16 13:05 | edit | `src/Hooks/Core/BossDamagePredictor.cs` | ok | 0 |
+| 2026-11-16 13:05 | edit | `src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-16 13:05 | edit | `src/Hooks/Core/RawAttackIntent.cs` | ok | 0 |
+| 2026-11-16 13:05 | edit | `src/Hooks/Core/RawAttackIntent.cs` | ok | 0 |
+| 2026-11-16 13:05 | edit | `src/Hooks/Core/RawAttackIntent.cs` | ok | 0 |
+| 2026-11-16 13:05 | edit | `src/Hooks/Core/RawAttackIntent.cs` | ok | 0 |
+| 2026-11-16 13:05 | edit | `src/Hooks/Core/RawAttackIntent.cs` | ok | 0 |
+| 2026-11-16 13:05 | edit | `src/Hooks/Core/RawAttackIntent.cs` | ok | 0 |
+| 2026-11-16 13:06 | edit | `src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-16 13:06 | edit | `src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-16 13:08 | edit | `src/CharacterBosses.json` | ok | 0 |
+| 2026-11-16 13:08 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-16 13:09 | edit | `src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-16 13:10 | edit | `src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-16 13:10 | edit | `src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-16 13:10 | edit | `src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-16 13:10 | edit | `src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-16 13:11 | edit | `docs/plans/boss-watcher-divinity.md` | ok | 0 |
+| 2026-11-16 13:11 | edit | `src/Hooks/Core/WatcherOmegaMechanics.cs` | ok | 0 |
+| 2026-11-16 13:16 | edit | `src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-16 13:16 | edit | `src/Hooks/Core/BossPlanner.cs` | ok | 0 |
+| 2026-11-16 13:16 | edit | `src/Hooks/Core/WatcherOmegaMechanics.cs` | ok | 0 |
+| 2026-11-16 13:16 | edit | `src/Hooks/Core/WatcherOmegaMechanics.cs` | ok | 0 |
+| 2026-11-16 13:17 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-16 15:19 | edit | `src/Hooks/Core/MintySpireDamagePreviewCompat.cs` | ok | 0 |
+| 2026-11-16 15:19 | edit | `src/Hooks/UI/BossHandPanel.Extra.cs` | ok | 0 |
+| 2026-11-16 15:19 | edit | `src/Hooks/UI/BossHandPanel.Extra.cs` | ok | 0 |
+| 2026-11-16 15:19 | edit | `src/Hooks/UI/BossHandPanel.Extra.cs` | ok | 0 |
+| 2026-11-16 15:19 | edit | `src/Hooks/Monsters/CharBossMonster.Watcher.cs` | ok | 0 |
+| 2026-11-16 15:19 | edit | `src/Hooks/Core/WatcherOmegaScript.cs` | ok | 0 |
+| 2026-11-16 15:19 | edit | `src/Hooks/Core/WatcherOmegaScript.cs` | ok | 0 |
+| 2026-11-16 15:19 | edit | `src/Hooks/Core/WatcherOmegaScript.cs` | ok | 0 |
+| 2026-11-16 15:20 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-16 15:21 | edit | `docs/plans/boss-watcher-divinity.md` | ok | 0 |
+| 2026-11-16 15:25 | write | `src/Hooks/Patches/ShadowPlayerEndTurnSkipPatch.cs` | ok | 0 |
+| 2026-11-16 15:26 | edit | `src/Hooks/Core/WatcherOmegaScript.cs` | ok | 0 |
+| 2026-11-16 15:26 | edit | `src/Hooks/Patches/BossFrameTickPatch.cs` | ok | 0 |
+| 2026-11-16 15:26 | edit | `src/Hooks/Patches/BossFrameTickPatch.cs` | ok | 0 |
+| 2026-11-16 15:27 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-16 15:42 | edit | `src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-16 15:42 | edit | `src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-16 15:42 | edit | `src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-16 15:42 | edit | `src/Hooks/Core/BossIntentBuilder.cs` | error | 0 |
+| 2026-11-16 15:42 | edit | `src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-16 15:42 | edit | `src/Hooks/Core/WatcherCards.cs` | ok | 0 |
+| 2026-11-16 15:43 | edit | `src/Hooks/Core/BossScriptPlanner.cs` | ok | 0 |
+| 2026-11-16 15:43 | edit | `src/Hooks/Core/BossCardSelector.cs` | ok | 0 |
+| 2026-11-16 15:43 | edit | `src/Hooks/Powers/BossDevotionPower.cs` | ok | 0 |
+| 2026-11-16 15:43 | edit | `src/Hooks/Core/WatcherRuntimePatches.cs` | ok | 0 |
+| 2026-11-16 15:43 | edit | `src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-16 15:44 | edit | `src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-16 15:44 | edit | `src/Hooks/Core/BossDamagePredictor.cs` | ok | 0 |
+| 2026-11-16 15:44 | edit | `src/Hooks/Monsters/CharBossMonster.Watcher.cs` | ok | 0 |
+| 2026-11-16 15:45 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-16 15:52 | edit | `src/Hooks/Core/WatcherCards.cs` | ok | 0 |
+| 2026-11-16 15:53 | edit | `src/Hooks/Core/WatcherRuntimePatches.cs` | ok | 0 |
+| 2026-11-16 15:53 | edit | `src/Hooks/Core/BossCardSelector.cs` | ok | 0 |
+| 2026-11-16 15:53 | edit | `src/Hooks/Core/BossCardSelector.cs` | ok | 0 |
+| 2026-11-16 15:54 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-16 16:17 | edit | `src/Hooks/Patches/EncounterIconPathPatch.cs` | ok | 0 |
+| 2026-11-16 16:18 | edit | `src/Hooks/Patches/EncounterIconPathPatch.cs` | ok | 0 |
+| 2026-11-16 16:19 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-16 16:30 | edit | `src/Hooks/Patches/EncounterIconPathPatch.cs` | ok | 0 |
+| 2026-11-16 16:30 | edit | `src/Hooks/Patches/EncounterIconPathPatch.cs` | ok | 0 |
+| 2026-11-16 16:30 | edit | `src/Hooks/Patches/EncounterIconPathPatch.cs` | ok | 0 |
+| 2026-11-16 16:31 | edit | `src/Hooks/Patches/EncounterIconPathPatch.cs` | ok | 0 |
+| 2026-11-16 16:33 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-16 16:35 | edit | `src/Hooks/Patches/EncounterIconPathPatch.cs` | ok | 0 |
+| 2026-11-16 16:36 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-16 16:43 | edit | `src/Hooks/Core/WatcherCards.cs` | ok | 0 |
+| 2026-11-16 16:43 | edit | `src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-16 16:43 | edit | `src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-16 16:43 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-16 16:50 | edit | `src/Hooks/Core/WatcherScript.cs` | ok | 0 |
+| 2026-11-16 16:50 | edit | `src/Hooks/Core/WatcherCards.cs` | ok | 0 |
+| 2026-11-16 16:50 | edit | `src/Hooks/Core/WatcherCards.cs` | ok | 0 |
+| 2026-11-16 16:50 | edit | `src/Hooks/Core/WatcherCards.cs` | ok | 0 |
+| 2026-11-16 16:51 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-16 17:18 | write | `docs/plans/handover-watcher-b-version-2026-11-16.md` | ok | 0 |
+| 2026-11-16 17:19 | edit | `src/Hooks/Core/WatcherCards.cs` | ok | 0 |
+| 2026-11-16 17:19 | edit | `docs/plans/handover-watcher-b-version-2026-11-16.md` | ok | 0 |
+| 2026-11-16 17:19 | edit | `docs/plans/handover-watcher-b-version-2026-11-16.md` | ok | 0 |
+| 2026-11-16 17:37 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherCards.cs` | ok | 0 |
+| 2026-11-16 17:37 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherCards.cs` | ok | 0 |
+| 2026-11-16 17:37 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherCards.cs` | ok | 0 |
+| 2026-11-16 17:37 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherCards.cs` | ok | 0 |
+| 2026-11-16 17:37 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherCards.cs` | ok | 0 |
+| 2026-11-16 17:37 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherCards.cs` | ok | 0 |
+| 2026-11-16 17:37 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherCards.cs` | ok | 0 |
+| 2026-11-16 17:37 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/UI/BossSpecialTip.cs` | ok | 0 |
+| 2026-11-16 17:37 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/UI/BossSpecialTip.cs` | ok | 0 |
+| 2026-11-16 17:37 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Patches/BossSpecialTipRoomGuardPatch.cs` | ok | 0 |
+| 2026-11-16 17:38 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Patches/BossSpecialTipRoomGuardPatch.cs` | ok | 0 |
+| 2026-11-16 17:38 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-16 17:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherCards.cs` | ok | 0 |
+| 2026-11-16 17:40 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/watcher-b-divinity-reentry-2026-11-16.md` | ok | 0 |
+| 2026-11-16 17:57 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/MultiBossPlan.cs` | ok | 0 |
+| 2026-11-16 17:58 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossLineups.cs` | ok | 0 |
+| 2026-11-16 17:58 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossLineups.cs` | ok | 0 |
+| 2026-11-16 17:58 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossLineups.cs` | ok | 0 |
+| 2026-11-16 18:00 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/desync-2026-11-16-mp-act3-second-boss.md` | ok | 0 |
+| 2026-11-16 18:03 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherCards.cs` | ok | 0 |
+| 2026-11-16 18:04 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossPicksSync.cs` | ok | 0 |
+| 2026-11-16 18:04 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossKeys.cs` | ok | 0 |
+| 2026-11-16 18:04 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Encounters/CharBossEncounters.cs` | ok | 0 |
+| 2026-11-16 18:05 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossPicksSync.cs` | ok | 0 |
+| 2026-11-16 18:05 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossLineups.cs` | ok | 0 |
+| 2026-11-16 18:07 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossPicksSync.cs` | ok | 0 |
+| 2026-11-16 18:08 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/desync-2026-11-16-mp-act3-second-boss.md` | ok | 0 |
+| 2026-11-16 18:12 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/workshop/description.txt` | ok | 0 |
+| 2026-11-16 18:13 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/workshop/changenote.txt` | ok | 0 |

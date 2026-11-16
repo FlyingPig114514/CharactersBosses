@@ -30,9 +30,13 @@ namespace CharacterBosses.Powers;
 /// 所以现在：
 ///   · 玩家出牌 ⇒ `WatcherCards.GainMantraAsync`（观者自己的 `WatcherMod.Mantra` power，界面上就是真言图标）；
 ///   · 她的回合开始 ⇒ 把那个 power 的层数 −5（恐惧 −3），**钳到 0、绝不为负**；
-///   · 满 10 层的结算由观者模组的 `Mantra` 自己触发（它会退姿态 + 进神格），
-///     我们只**观察「她这一下真的进了神格」**这件事，然后补上用户要求的那 3 点力量（恐惧 4 点）、
-///     记下本回合的 +3 能量，并刷新意图。
+///   · 满 10 层 ⇒ **我们自己结算**（v0.2.681，用户 2026-11-16 第 3 条）：
+///     扣 10 层 → **先退出当前姿态** → 给力量（普通 2 / 恐惧 3）→ 进入神格（原版自己 +3 能量）。
+///     ⚠ 以前是观者模组的 `Mantra` 自己触发 `EnterDivinity`，而她已经在神格里时
+///       `ChangeStance` 会「原样返回」⇒ 既不退姿态、也没有那 3 点能量和力量（用户实测「再进神格都没有」）。
+///       现在模组那条自动触发被 `WatcherRuntimePatches.InstallMantraTakeover()` 压掉了。
+///     ⚠ 用户 2026-11-16：「你别给她补，用她原版的加费就行」⇒ 能量**只由原版给**，
+///       我们一笔都不加（v0.2.679 补的两笔正是「第 2 回合 5 费」的根因）。
 ///
 /// 本 Power 本身 `StackType.Single` ⇒ **不显示任何层数**，只作为「她的特殊效果」的载体和 buff 栏第一位。
 /// </summary>
@@ -61,24 +65,6 @@ public sealed class BossDevotionPower : PowerModel
         catch { return 3; }
     }
 
-    // 每只 Boss 的「本回合进神格还没兑现的能量」与「上次看到的在神格状态」
-    private static readonly Dictionary<int, int> _pendingEnergy = new();
-    private static readonly Dictionary<int, bool> _wasInDivinity = new();
-
-    /// <summary>取走「本回合因进神格该加的能量」（取一次就清零，由 `PrepareTurn` 调用）。</summary>
-    internal static int TakePendingDivinityEnergy(Monsters.CharBossMonster boss)
-    {
-        try
-        {
-            if (boss == null) return 0;
-            int key = unchecked((int)(boss.Creature?.CombatId ?? 0u));
-            if (!_pendingEnergy.TryGetValue(key, out int v) || v == 0) return 0;
-            _pendingEnergy[key] = 0;
-            return v;
-        }
-        catch { return 0; }
-    }
-
     // ── ① 玩家每打出一张牌 ⇒ 观者**真的**获得 1 层真言 ─────────────────────
     public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
@@ -93,10 +79,91 @@ public sealed class BossDevotionPower : PowerModel
             var shadow = boss.Shadow;
             if (shadow == null) return;
 
-            await WatcherCards.GainMantraAsync(shadow, 1, null);
-            await WatchDivinity(choiceContext, shadow);
+            await GainMantraAndResolveAsync(boss, shadow, 1, choiceContext, null);
         }
         catch (Exception e) { Logger.Log("[CharBoss] 虔信：出牌加真言失败: " + e.Message); }
+    }
+
+    /// <summary>
+    /// **观者获得真言的唯一入口**：加真言 → 立刻结算「满 10 层」。
+    ///
+    /// 谁会给真言：玩家每打一张牌（上面）、以及 `WatcherFaithPower`（虔信 buff，回合开始给 N 层）。
+    /// 满 10 层的结算**不再交给观者模组**（它会直接 `EnterDivinity`，而她已经在神格里时
+    /// `ChangeStance` 会「原样返回」⇒ 既不退姿态也没有那 3 点能量，正是用户 2026-11-16 第 3 条），
+    /// 改由 <see cref="ResolveDivinityAsync"/> 按用户口径走：扣 10 层 → **先退出姿态** → 力量 → 进神格。
+    /// </summary>
+    internal static async Task GainMantraAndResolveAsync(Monsters.CharBossMonster boss,
+                                                         MegaCrit.Sts2.Core.Entities.Players.Player shadow,
+                                                         int amount, PlayerChoiceContext? ctx, CardModel? source)
+    {
+        if (boss == null || shadow == null || amount <= 0) return;
+        await WatcherCards.GainMantraAsync(shadow, amount, source);
+        await ResolveDivinityAsync(boss, shadow, ctx);
+    }
+
+    /// <summary>
+    /// 用户口径（特殊效果原文）：
+    /// > 「每当她获得 10 层真言时，她会退出当前姿态、获得 3 点力量并进入神格」
+    /// > 「先退出当前姿态…这是为了保证她已处在神格时玩家再打满 10 张牌，观者也可以加费和获得力量」
+    ///
+    /// 所以每满 10 层都完整走一遍：**扣 10 → 退出姿态 → 力量 → 进入神格**。
+    /// 「进入神格」那一步的 +3 能量由观者原版 `Divinity.AfterApplied` 自己给（用户：「别给她补，用她原版的加费」）；
+    /// 而退出姿态时原版「平静」会给 +2（`Calm.AfterRemoved`），那笔**按用户口径不算**（否则进神格一会儿 +5 一会儿 +3，
+    /// 用户实测「应该五费、实际七费」）⇒ 期间用 `WatcherRuntimePatches.SuppressCalmExitEnergy` 压掉。
+    /// </summary>
+    internal static async Task ResolveDivinityAsync(Monsters.CharBossMonster boss,
+                                                   MegaCrit.Sts2.Core.Entities.Players.Player shadow,
+                                                   PlayerChoiceContext? ctx)
+    {
+        try
+        {
+            var creature = boss.Creature;
+            if (creature == null) return;
+            var pcs = shadow.PlayerCombatState;
+
+            int guard = 0;
+            while (guard++ < 8)
+            {
+                int cur = WatcherCards.MantraOf(shadow);
+                if (cur < Threshold) break;
+
+                WatcherCards.SetMantra(shadow, cur - Threshold);     // 消耗 10 层
+
+                bool wasCalm = WatcherCards.InCalm(shadow);
+                int energyBefore = -1;
+                try { energyBefore = pcs?.Energy ?? -1; } catch { /* 忽略 */ }
+
+                // ① 先退出当前姿态（她本来在神格里也照样退 —— 这样「重新进入」才有那 3 点能量）
+                //    ⚠ 用户 2026-11-16 傍晚订正：「那个第二回合我忘记算退平静了，不是bug，**让那2费正常加**」
+                //    ⇒ 离开平静的 +2 是她的原版机制（`Calm.AfterRemoved` / `CalmStance.OnExitStance`），
+                //      这里**不压**；所以从平静进神格当回合共 +5（2 平静 + 3 神格），不进平静就只有 +3。
+                try { await WatcherCards.ExitStanceAsync(shadow, ctx); }
+                catch (Exception e) { Logger.Log("[CharBoss] 虔信：退出姿态失败: " + e.Message); }
+
+                // ② 力量（普通 2 / 恐惧 3，用户 2026-11-15 削弱后的数值）
+                int str = StrengthOnDivinity();
+                try
+                {
+                    var useCtx = ctx ?? new MegaCrit.Sts2.Core.GameActions.Multiplayer.BlockingPlayerChoiceContext();
+                    await PowerCmd.Apply<StrengthPower>(useCtx, creature, str, creature, null, false);
+                }
+                catch (Exception e) { Logger.Log("[CharBoss] 虔信：加力量失败: " + e.Message); }
+
+                // ③ 进入神格（观者原版：+3 能量、攻击三倍）
+                await WatcherCards.EnterDivinityAsync(shadow, null, ctx);
+
+                int energyAfter = -1;
+                try { energyAfter = pcs?.Energy ?? -1; } catch { /* 忽略 */ }
+                Logger.Log($"[CharBoss] 虔信：真言满 {Threshold} ⇒ ① 退出姿态（本来在平静={wasCalm}" +
+                           "，在平静就照原版 +2 能量）② 力量 +" + str +
+                           $" ③ 进入神格（原版 Divinity 自己 +3 能量）⇒ 能量 {energyBefore} → {energyAfter}" +
+                           $"，神格里={WatcherCards.InDivinity(shadow)}");
+
+                // 多出来的能量会让「有费就打」的牌打得出去 ⇒ 整块重规划再刷意图
+                try { boss.ReplanForExtraEnergy("进神格多 3 点能量"); } catch { /* 下一帧兜底 */ }
+            }
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 虔信：满 10 层结算失败: " + e.Message); }
     }
 
     // ── ② 她的回合开始 ⇒ 失去 N 层真言（钳到 0） ────────────────────────────
@@ -110,6 +177,17 @@ public sealed class BossDevotionPower : PowerModel
             var shadow = OwnerMonster()?.Shadow;
             if (shadow == null) return Task.CompletedTask;
 
+            // 诊断（用户 2026-11-16 第 1 条的能量对账）：她回合开始那一刻**真实**拿到多少能量。
+            // `PrepareTurn` 写进去的是预算；原版遗物钩子（灯笼这类）会在这之后再补进来 —— 两者一比就知道
+            // 「我们该不该手动加」。期望：第 1 回合 3、之后每回合 2。
+            try
+            {
+                int energyNow = shadow.PlayerCombatState?.Energy ?? -1;
+                Logger.Log($"[CharBoss] 虔信：她回合开始时的实际能量 = {energyNow}" +
+                           "（= PrepareTurn 的预算 + 原版钩子到账的部分）");
+            }
+            catch { /* 纯诊断 */ }
+
             int cur = WatcherCards.MantraOf(shadow);
             if (cur <= 0) return Task.CompletedTask;
             int loss = Math.Min(cur, LossPerTurn());
@@ -118,60 +196,6 @@ public sealed class BossDevotionPower : PowerModel
         }
         catch (Exception e) { Logger.Log("[CharBoss] 虔信：回合开始扣真言失败: " + e.Message); }
         return Task.CompletedTask;
-    }
-
-    /// <summary>
-    /// 观察「她这一下真的进了神格」：给力量、记本回合 +3 能量、刷新意图。
-    /// 神格本身（退姿态 + 进神格 + 3 点能量）是观者模组在满 10 层时自己做的，我们只加用户要的那部分。
-    /// </summary>
-    private async Task WatchDivinity(PlayerChoiceContext ctx, MegaCrit.Sts2.Core.Entities.Players.Player shadow)
-    {
-        try
-        {
-            var boss = OwnerMonster();
-            if (boss == null) return;
-            int key = unchecked((int)(boss.Creature?.CombatId ?? 0u));
-
-            bool now = WatcherCards.InDivinity(shadow);
-            _wasInDivinity.TryGetValue(key, out bool before);
-
-            if (now && !before)
-            {
-                _wasInDivinity[key] = true;
-                int str = StrengthOnDivinity();
-                var creature = Owner ?? boss.Creature;
-                if (creature != null)
-                {
-                    try { await PowerCmd.Apply<StrengthPower>(ctx, creature, str, creature, null, false); }
-                    catch (Exception e) { Logger.Log("[CharBoss] 虔信：加力量失败: " + e.Message); }
-                }
-
-                _pendingEnergy.TryGetValue(key, out int pend);
-                _pendingEnergy[key] = pend + 3;
-
-                // ★ 2026-11-15（用户第 3 条：进神格后「有费就打」的牌没亮也没打）：
-                //   她的回合预算在 `PrepareTurn` 里**已经算好并写进 `pcs.Energy`** 了，
-                //   而她是在**玩家回合**里进的这个神格 ⇒ 计划还是按旧预算排的。
-                //   所以这里**立刻**把那 3 点加到当前的 `pcs.Energy` 上，再重排计划；
-                //   `_pendingEnergy` 留给「她的回合还没开始」的情况（`PrepareTurn` 会覆盖成新预算再补这一笔）。
-                try
-                {
-                    var pcs = shadow?.PlayerCombatState;
-                    if (pcs != null) pcs.Energy += 3;
-                }
-                catch (Exception e) { Logger.Log("[CharBoss] 虔信：立刻加 3 点能量失败: " + e.Message); }
-
-                Logger.Log($"[CharBoss] 虔信：她进入神格 ⇒ +{str} 力量，本回合 +3 能量");
-
-                try { boss.RefreshPlannedIntents(); } catch { /* 下一帧会刷新 */ }
-                try { UI.BossHandUi.RefreshForce(boss); } catch { /* 纯显示 */ }
-            }
-            else if (!now && before)
-            {
-                _wasInDivinity[key] = false;
-            }
-        }
-        catch (Exception e) { Logger.Log("[CharBoss] 虔信：神格观察失败: " + e.Message); }
     }
 
     private Monsters.CharBossMonster? OwnerMonster()

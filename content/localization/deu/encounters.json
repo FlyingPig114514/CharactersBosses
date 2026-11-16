@@ -1,4 +1,4 @@
-{
+﻿{
     "IRONCLAD_BOSS_ENCOUNTER.title":  "Der Eiserne",
     "IRONCLAD_BOSS_ENCOUNTER.loss":  "{character} wurde vom [gold]Eisernen[/gold] gebrochen.",
     "IRONCLAD_ANGER_BOSS_ENCOUNTER.title":  "Der Eiserne",
@@ -108,5 +108,7 @@
     "FOOL_BOSS_ENCOUNTER.loss_tarot":  "{character} wurde die neue Karte [gold]{Card}[/gold] im Deck des [gold]Narren[/gold].",
     "FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot":  "{character} wurde die neue Karte [gold]{Card}[/gold] im Deck des [gold]Narren[/gold].",
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "Göttlicher Beobachter",
-    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} wurde von der göttlichen Macht des [gold]Göttlichen Beobachters[/gold] zermalmt."
+    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} wurde von der göttlichen Macht des [gold]Göttlichen Beobachters[/gold] zermalmt.",
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.title": "Omega-Waechter",
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character} wurde vom Fasten des [gold]Omega-Waechters[/gold] zermalmt."
 }

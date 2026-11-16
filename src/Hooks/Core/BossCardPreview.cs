@@ -61,6 +61,23 @@ internal static class BossCardPreview
 
                 // 展示的是「现在这张牌的样子」：升级过就显示升级后的
                 try { if (shown.IsUpgraded && !copy.IsUpgraded) copy.UpgradeInternal(); } catch { /* 忽略 */ }
+                // ★ v0.2.680（用户 2026-11-16 第 3/4 条「展示灭除之刃要保证段数正确」）：
+                //   上面是 `ModelDb.GetById` + `CreateCard` 造的**原版新牌** ⇒ 它身上没有原牌的那些
+                //   「生成时写死的动态值」（观者的灭除之刃就是 `HitCount` → `DynamicVars.Repeat` = 聚能成刃实付的 X）。
+                //   所以把 `Repeat` 一起抄过来；不需要它的牌（羽化印的 0 费攻击牌等）本来就是默认值，
+                //   抄一遍等于没变化 —— 其它 Boss 的展示行为不受影响。
+                try
+                {
+                    if (shown.DynamicVars.TryGetValue("Repeat", out var srcRepeat) && srcRepeat != null
+                        && copy.DynamicVars.TryGetValue("Repeat", out var dstRepeat) && dstRepeat != null
+                        && dstRepeat.BaseValue != srcRepeat.BaseValue)
+                    {
+                        dstRepeat.BaseValue = srcRepeat.BaseValue;
+                        Logger.Log($"[CharBoss] 预览：{shown.Id.Entry} 的段数(Repeat) {dstRepeat.BaseValue} → {srcRepeat.BaseValue}" +
+                                   "（抄自原牌；不然展示出来的会是原版默认值）");
+                    }
+                }
+                catch { /* 忽略 */ }
                 // 羽化印出来的牌本场免费 ⇒ 预览也按 0 费显示
                 if (makeFree)
                 {

@@ -1,4 +1,4 @@
-{
+﻿{
     "IRONCLAD_BOSS_ENCOUNTER.title":  "El Blindado",
     "IRONCLAD_BOSS_ENCOUNTER.loss":  "{character} fue destrozado por [gold]El Blindado[/gold].",
     "IRONCLAD_ANGER_BOSS_ENCOUNTER.title":  "El Blindado",
@@ -108,5 +108,7 @@
     "FOOL_BOSS_ENCOUNTER.loss_tarot":  "{character} se convirtió en la nueva carta [gold]{Card}[/gold] del mazo del [gold]Juglar[/gold].",
     "FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot":  "{character} se convirtió en la nueva carta [gold]{Card}[/gold] del mazo del [gold]Juglar[/gold].",
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "Observador Divino",
-    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} fue aplastado por el poder divino del [gold]Observador Divino[/gold]."
+    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} fue aplastado por el poder divino del [gold]Observador Divino[/gold].",
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.title": "Observador Omega",
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character} fue aplastado por el ayuno del [gold]Observador Omega[/gold]."
 }

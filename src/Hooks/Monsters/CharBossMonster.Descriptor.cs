@@ -1,4 +1,4 @@
-using MegaCrit.Sts2.Core.Entities.Cards;
+﻿using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 using CharacterBosses.Core;
@@ -141,6 +141,33 @@ public abstract partial class CharBossMonster
             {
                 if (_visualsPathCache == null)
                 {
+                    // ★ v0.2.687（用户实测：Ω观打出来是**愚者**的模型）：
+                    //   `Def.CharacterType` 是愚者占位符，靠 `RefreshWatcherCharacterType()` 运行期换成真的
+                    //   观者角色 —— 而它原来只在 `BossDefValidator` 里跑一次，那一跑常常早于观者 mod 的程序集加载
+                    //   （那时 `WatcherModPresence` 返回 null）⇒ 占位符原地保留，立绘就成了 fool.tscn。
+                    //   慢车道重试是「迟早会好」，但**立绘只取一次并缓存** ⇒ 必须在这里、算路径之前当场解析一次。
+#if STS2_111
+                    try
+                    {
+                        if (Def.Key != null && Def.Key.StartsWith("WATCHER_", StringComparison.Ordinal)
+                            && Def.CharacterType == typeof(MegaCrit.Sts2.Core.Models.Characters.Fool))
+                        {
+                            Core.BossDefs.RefreshWatcherCharacterType();
+                            Core.BossDefs.RefreshWatcherExtras();
+                            // ★ v0.2.688（用户实测「我用观者打，boss 还是愚者」；日志 11:16:41：`Ω观：角色类型已换成 …`
+                            //   紧跟着 `WATCHER_DIVINITY 立绘… fool.tscn`）：**变体（`ExtraVariants`）拿到的是
+                            //   BossDefinition 的副本**，而 `RefreshWatcherCharacterType()` 只改正本 ⇒
+                            //   副本里那个「愚者占位」没人改。这里把**这只怪物自己的 Def** 也改掉。
+                            var watcherType = Core.WatcherModPresence.CharacterType();
+                            if (watcherType != null && Def.CharacterType != watcherType)
+                            {
+                                Def.CharacterType = watcherType;
+                                Logger.Log($"[CharBoss] {Def.Key} 的 BossDefinition 副本角色类型 → {watcherType.Name}");
+                            }
+                        }
+                    }
+                    catch { /* 解析不了就按占位符走 */ }
+#endif
                     var character = ModelDb.GetById<CharacterModel>(ModelDb.GetId(Def.CharacterType));
                     // ⚠ `CharacterModel.VisualsPath` 是 protected，编译期读不到 ⇒ 走反射。
                     //   反射调用的是**运行时真正的 getter**，所以皮肤 mod 用 Harmony 改过它也能读到。

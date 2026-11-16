@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using MegaCrit.Sts2.Core.Entities.Players;
@@ -832,6 +832,14 @@ public static class DownfallCollectibleCompat
             //   就会掉回按 (角色, 幕) 查的静态表，而这三只和它们的兄弟设计**落在同一格** ⇒ 掉错牌。
             switch (boss.SpawnVariantKey)
             {
+#if STS2_111
+                // 三层 2 号 Ω观（用户 2026-11-16）：藏品 = 阿尔法
+                case "WATCHER_OMEGA":
+                    cardType = Core.WatcherCards.Alpha;
+                    upgraded = false;
+                    Logger.Log("[CharBoss] 收藏家藏品：Ω观 → 阿尔法");
+                    return true;
+#endif
                 case "SILENT_SNAKEBITE":     // 一层 蛇咬猎（用户 2026-11-11：藏品 = 群蛇形态）
                     // 她和同层「奇巧猎」落在同一格（掉落表按「角色 + 幕」索引 ⇒ 会掉余像）⇒ 必须点名。
                     cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.SerpentForm);   // 群蛇形态

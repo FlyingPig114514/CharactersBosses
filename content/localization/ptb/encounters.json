@@ -1,4 +1,4 @@
-{
+﻿{
     "IRONCLAD_BOSS_ENCOUNTER.title":  "O Rígido",
     "IRONCLAD_BOSS_ENCOUNTER.loss":  "{character} foi despedaçado por [gold]O Rígido[/gold].",
     "IRONCLAD_ANGER_BOSS_ENCOUNTER.title":  "O Rígido",
@@ -108,5 +108,7 @@
     "FOOL_BOSS_ENCOUNTER.loss_tarot":  "{character} se tornou a nova carta [gold]{Card}[/gold] no baralho de [gold]O Bufão[/gold].",
     "FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot":  "{character} se tornou a nova carta [gold]{Card}[/gold] no baralho de [gold]O Bufão[/gold].",
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "Observador Divino",
-    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} foi esmagado pelo poder divino do [gold]Observador Divino[/gold]."
+    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} foi esmagado pelo poder divino do [gold]Observador Divino[/gold].",
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.title": "Observador Omega",
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character} foi esmagado pelo jejum do [gold]Observador Omega[/gold]."
 }

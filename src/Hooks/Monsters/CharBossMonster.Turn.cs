@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Models;
@@ -82,6 +82,13 @@ public abstract partial class CharBossMonster
 
             // 灯笼：**第 1 回合 +1 能量**。它是战斗内一次性加成、不走 MaxEnergy，
             // 所以上面那笔「MaxEnergy 差值」读不到它（用户实测：面板 3 费，第 1 回合四张牌打不完）。
+            //
+            // ★ v0.2.681（用户 2026-11-16 第 1 条：「第一回合灯笼的加费没有被提前计算」）：
+            //   以前观者这只**不加**这笔，靠原版 `Relics.Lantern.AfterSideTurnStart` 到账 —— 但那一笔是
+            //   **她回合开始之后**才落地的，而计划是在**玩家回合**就算好的（当时 `pcs.Energy` 只有 2）
+            //   ⇒ 面板显示「只打打击」、实际她打完打击又用补打通道打出了警惕（用户实测就是这个）。
+            //   现在反过来：**预算里加**（规划期就能看到 3 费 ⇒ 正确计划是「只打许愿」），
+            //   同时把原版那条钩子对观者压掉（见 `BossRelicSuppressLanternForWatcherPatch`），不重复。
             try
             {
                 if (TurnNumber == 0)   // 这里还没 ++，第 1 回合就是 0
@@ -159,29 +166,15 @@ public abstract partial class CharBossMonster
             // —— 对影子玩家不生效（下面第 129 行的 `pcs.Energy = …` 还会把任何到账的能量硬覆盖掉），
             // 于是三层「易伤战」第 3 回合只有 3 费、打不出「主宰」（用户 2026-10-25 实测）。
             // 这里按卡面直接补进本回合预算（原版那条已被 BossRelicSuppressChandelierPatch 压掉，不会双份）。
-            // ── 观者（神格观）的能量账（用户 2026-11-15 第 6 条）──
-            //   「第一回合默认 3（= 基础 2 + 灯笼 1），之后默认 2，进一次神格当回合 +3」。
-            //   基础能量来自 `BossDefs.Watcher.Energy = 2`；这里补两笔：
-            //     ① 第 1 回合的「灯笼」（Lantern：开场 +1 能量，原版挂 `AfterSideTurnStart`，影子玩家收不到）；
-            //     ② 本回合进过神格的次数 × 3（`BossDevotionPower` 每次进神格记账）。
-#if STS2_111
-            try
-            {
-                if (Creature?.GetPower<Powers.BossDevotionPower>() != null)
-                {
-                    // 灯笼只在**第一次**算一次（`TurnNumber` 是 0 起，用 <= 1 会在第 2 回合再算一遍 ⇒ 用户实测第 2 回合 4 费）
-                    int lantern = 0;   // 灯笼那 1 点由原版遗物钩子自己到账（以前这里再补一次 ⇒ 重复计算）
-                    _watcherLanternGiven = true;
-                    int divinity = Powers.BossDevotionPower.TakePendingDivinityEnergy(this);
-                    if (lantern + divinity > 0)
-                    {
-                        energy += lantern + divinity;
-                        Logger.Log($"[CharBoss] 观者加费：灯笼 +{lantern}、神格 +{divinity} ⇒ 本回合 {energy} 能量");
-                    }
-                }
-            }
-            catch (Exception e) { Logger.Log("[CharBoss] 观者加费失败: " + e.Message); }
-#endif            // 「佩尔之泪」：上回合结束时还有未花费能量 ⇒ 本回合 +2（自己记账，见上面 LeftoverEnergyLastTurn）
+            // ── 观者（神格观）的能量账（用户 2026-11-16：「你别给她补，用她原版的加费就行」）──
+            //   这里**一笔都不加**了。反编译实证（`3747526116\Watcher.dll`）：
+            //     · `Divinity.<AfterApplied>d__8.MoveNext` 里就是 `PlayerCmd.GainEnergy(3m, Owner.Player)`
+            //       ⇒ 她进神格的那一刻，**原版自己**把那 3 点加到了影子玩家的 `pcs.Energy` 上；
+            //     · 所以我们原来在这里补的「神格 +3」（`_pendingEnergy`）是**第二份**，
+            //       而用户实测的「第 2 回合 5 费」= 基础 2 + 这第二份 3（v0.2.679 日志 9513 行）。
+            //   基础能量仍来自 `BossDefs.Watcher.Energy = 3`（涅奥的祝福每回合 −1 ⇒ 实际 2），
+            //   第 1 回合灯笼那 1 点也已由上面的 `LANTERN` 分支算进 `energy`。
+            // 「佩尔之泪」：上回合结束时还有未花费能量 ⇒ 本回合 +2（自己记账，见上面 LeftoverEnergyLastTurn）
             try
             {
                 int tears = BossHookBridge.PaelsTearsBonus(this);
@@ -379,6 +372,33 @@ public abstract partial class CharBossMonster
             }
             catch (Exception e) { Logger.Log("[CharBoss] 挂「眼部攻击」buff 失败: " + e.Message); }
 
+
+#if STS2_111
+            // 三层 2 号「Ω观」：**本回合的计划里有「不惧妖邪」⇒ 现在就挂上它的预示 buff**（用户 2026-11-16）。
+            // 与上面「眼部攻击」完全同一套做法：玩家看到这层 buff 就知道「这回合我打攻击牌 ⇒
+            // 她那记不惧妖邪会进平静」。buff 由 `WatcherFearNoEvilAimPower` 记「被锁玩家打过攻击牌」，
+            // 她自己回合结束时摘掉。
+            try
+            {
+                bool fearsNoEvil = false;
+                foreach (var play in Plan)
+                {
+                    string entry = string.Empty;
+                    try { entry = play?.Card?.Id.Entry ?? string.Empty; } catch { /* 忽略 */ }
+                    if (Monsters.CharBossMonster.WatcherIdIs(entry, "FEAR_NO_EVIL")) { fearsNoEvil = true; break; }
+                }
+                if (fearsNoEvil && Creature != null
+                    && Creature.GetPower<Powers.WatcherFearNoEvilAimPower>() == null)
+                {
+                    _ = MegaCrit.Sts2.Core.Commands.PowerCmd.Apply<Powers.WatcherFearNoEvilAimPower>(
+                        new MegaCrit.Sts2.Core.GameActions.Multiplayer.BlockingPlayerChoiceContext(),
+                        Creature, 1m, Creature, null, false);
+                    Logger.Log("[CharBoss] 她的计划里有「不惧妖邪」→ 给她挂上预示 buff"
+                               + "（本回合被锁定的玩家若打出攻击牌，她那记不惧妖邪就进「平静」）");
+                }
+            }
+            catch (Exception e) { Logger.Log("[CharBoss] 挂「不惧妖邪」buff 失败: " + e.Message); }
+#endif
             // 新回合：冷却剂的「本回合黑球不打被动」清掉（上一回合用过就算了）
             DarkPassiveSuppressed = false;
         }
@@ -414,6 +434,50 @@ public abstract partial class CharBossMonster
         {
             Logger.Log("[CharBoss] 药水初始化失败: " + e.Message);
         }
+    }
+
+    /// <summary>
+    /// **玩家回合里她又拿到了能量**（神格观：进神格 ⇒ 原版 `Divinity.AfterApplied` 给 +3）⇒ 整块重规划。
+    ///
+    /// 为什么不能只调 <see cref="RefreshPlannedIntents"/>（v0.2.679 的死角，用户 2026-11-16 第 2 条）：
+    /// 那个方法只是「拿**现有的** `Plan` 重算意图」，而 `Plan` 是**玩家回合开始前**按当时的能量排好的
+    /// ⇒ 多出来的 3 点能量永远不会让它多出一张牌，面板上看到的还是旧计划。
+    /// 这里按**此刻真实的** `pcs.Energy` 重跑一遍 `BossScriptPlanner.Plan`（等同 `PrepareTurn` 那条规划路径），
+    /// 于是「有费就打」的牌会真的进 `Plan`（也就会真的被打出，见 `PlayPlannedCards` 的补打通道）。
+    ///
+    /// 位置：`TurnNumber` 在玩家回合里已经 `++` 到她**即将到来的**那一回合，所以剧本取的是同一回合。
+    /// </summary>
+    internal void ReplanForExtraEnergy(string why)
+    {
+        var pcs = Shadow?.PlayerCombatState;
+        if (pcs == null) return;
+
+        try
+        {
+            // 被击晕：本回合她一张都不会打，计划必须原封不动（见 `PrepareTurn` 顶部那条闸门）
+            if (Stunned) return;
+
+            var turn = Def.ScriptForAct(ActIndex)?.TurnAt(TurnNumber);
+            if (turn == null)
+            {
+                try { RefreshPlannedIntents(); } catch { /* 下一帧兜底 */ }
+                return;
+            }
+
+            // `ScriptEnergySpent` = 本回合（她的回合）已经花掉的能量；玩家回合里它刚被清零过，
+            // 万一这次调用发生在她的回合中途，扣掉已花的部分才是正确预算（与补打通道同一口径）。
+            var fresh = BossScriptPlanner.Plan(this, pcs, turn, TurnNumber, ScriptEnergySpent);
+            Plan.Clear();
+            Plan.AddRange(fresh);
+            Logger.Log($"[CharBoss] {why} ⇒ 按当前能量 {pcs.Energy} 整块重规划第 {TurnNumber} 回合：" +
+                       $"{Plan.Count} 张 [{string.Join(",", Plan.ConvertAll(p => p.Card.Id.Entry))}]" +
+                       $"（已花 {ScriptEnergySpent}）");
+
+            try { BladesGrowth.RecomputeAll(this, Plan); } catch { /* 纯显示 */ }
+            PublishVanillaIntents();
+            try { CharacterBosses.UI.BossHandUi.RefreshForce(this); } catch { /* 纯显示 */ }
+        }
+        catch (Exception e) { Logger.Log($"[CharBoss] {why} 重规划失败: " + e.Message); }
     }
 
     /// <summary>
@@ -479,6 +543,9 @@ public abstract partial class CharBossMonster
                     starHits: play.StarHits,
                     // ★ 2026-11-14：群蛇形态的「这张牌会因此多打 N」（规划期定死，这里原样再用）
                     serpentDamage: play.SerpentDamage,
+                    // ★ v0.2.691：姿态倍率 / 本回合前面点穴叠的印记（规划期定格）
+                    stanceMul: Math.Max(1, play.StanceMul),
+                    pendingMarks: Math.Max(0, play.PendingMarks),
                     playCount: Math.Max(1, play.PlayCount),   // 回响形态重打（群蛇那条要 ×2）
                     aoeFromCaller: true);
                 // ★ 2026-11-10（用户：「暴风雨激发电球的 8×2 意图被吃掉了（回合开始时闪了一下）」）：

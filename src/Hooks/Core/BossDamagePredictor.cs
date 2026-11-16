@@ -76,6 +76,19 @@ public static class BossDamagePredictor
             if (repeat > hits) hits = repeat;
         }
 
+        // ★ v0.2.690（玩家反馈：「辉星储恐惧模式第 4 回合打出的七星伤害预览只显示 1 个 7」）：
+        //   反编译 `.refs/sts2_111.dll` 的 `Models.Cards.SevenStars`：
+        //     `CanonicalVars` = `DamageVar(7, Move)` + **`DynamicVar("HitCount", 7)`**，
+        //     `OnPlay` = `Attack(Damage).WithHitCount(DynamicVars.HitCount.IntValue)`
+        //   ⇒ 段数存在 **`HitCount`** 变量里、不是 `Repeat` ⇒ 我们只读 `Repeat` 就永远算 1 段。
+        //   普通模式第 4 回合她星不够、打不出七星，所以一直没暴露；恐惧模式把隐秘藏品+ 提到第 3 回合，
+        //   七星真打出来了才看见（7×7 被画成一个 7）。
+        if (hits <= 1)
+        {
+            int hitCountVar = (int)Math.Round(PreviewVar(card, target, "HitCount", 1));
+            if (hitCountVar > hits) hits = hitCountVar;
+        }
+
         if (FixedHitCounts.TryGetValue(entry, out var fixedHits)) hits = Math.Max(hits, fixedHits);
         return Math.Max(1, hits) * ReplayMultiplier(card);
     }
@@ -956,6 +969,55 @@ public static class BossDamagePredictor
         }
         catch { return Math.Max(0, FloorToInt(VarValue(card, "CalculatedDamage", 0m))); }
 #endif
+    }
+
+    // ───────────────────── 观者「姿态」倍率（愤怒 ×2 / 神格 ×3）─────────────────────
+
+    /// <summary>姿态补差日志计数器。</summary>
+    private static int StanceFixLogs;
+
+    /// <summary>
+    /// 把「这张牌打出时的姿态」补到**过完伤害管道**的结果上：<c>值 × 计划倍率 ÷ 此刻倍率</c>。
+    ///
+    /// ★ v0.2.697（用户 2026-11-16 截图：「打击 6+金刚杵=7，打完暴怒再打它还是 7，你改了个寂寞」）：
+    ///   前几版都在**渲染时**想办法找「计划倍率」（先按卡实例查字典 → 再按 `boss.Plan` 现推），
+    ///   而那两个来源在玩家回合里都可能拿不到（重规划会换牌实例、`Plan` 也可能已经清掉）
+    ///   ⇒ 一律退回「此刻姿态」，于是永远显示没翻倍的 7。
+    ///   现在改成**在造意图那一刻**就把倍率烤进意图对象（`BossIntentBuilder.StanceBake` ⇒
+    ///   `LiveSingle/LiveMulti/LiveDelegateSingleAttackIntent` 构造时读走），渲染时只做一次换算：
+    ///   管道值（已含「此刻」那一档）× 烤进来的计划倍率 ÷ 此刻倍率。
+    ///
+    /// · 管道里的姿态倍率来自 `Hook.ModifyDamageInternal` 的 stance 监听者
+    ///   （反编译 `Watcher.Code.Stances.WrathStance`：`dealer == Owner.Creature ⇒ 2m`）
+    ///   ⇒ 火焰值里已经乘过一次，绝不能整份再乘一遍；
+    /// · 只在「计划倍率 &gt; 此刻倍率」时才动手（她此刻已经在愤怒 ⇒ 管道已经乘过，绝不双份）；
+    /// · 乘在**最终值**上，不是牌面值：「打击 6 + 力量 8」在愤怒里必须是 (6+8)×2 = 28。
+    /// </summary>
+    internal static int ScaleToPlannedStance(CardModel? card, Creature? dealer, int value, int bakedPlanned)
+    {
+        if (value <= 0) return value;
+        try
+        {
+            int now = Math.Max(1, BossIntentBuilder.StanceMultiplierOf(dealer));
+            int planned = bakedPlanned > 1
+                ? bakedPlanned
+                : BossIntentBuilder.PlannedStanceAt(dealer, card);
+            planned = Math.Max(1, planned);
+            // ★ v0.2.701：两个方向都补（`计划 < 此刻` 说明这张牌是在**退出姿态之后**打的，
+            //   比如「不惧妖邪」把她带进平静之后的那张打击 —— 以前只在 `计划 > 此刻` 时动手，
+            //   那种情况就原样显示成翻倍的数字）。相等时一律不动手。
+            if (planned == now) return value;
+
+            int scaled = (int)Math.Floor((double)value * planned / Math.Max(1, now));
+            if (StanceFixLogs++ < 24)
+            {
+                string entry = card != null ? SafeEntryOf(card) : "(无卡)";
+                Logger.Log($"[CharBoss] 姿态倍率（意图层）：{entry} 管道值 {value}" +
+                           $" × 计划 {planned} ÷ 此刻 {now} ⇒ {scaled}");
+            }
+            return scaled;
+        }
+        catch { return value; }
     }
 
     /// <summary>

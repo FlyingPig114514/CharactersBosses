@@ -103,6 +103,21 @@ public sealed class PlannedPlay
     /// </summary>
     public int StarHits { get; init; } = -1;
 
+
+    /// <summary>
+    /// ★ v0.2.691（用户截图：「第四回合的第二张打击是在进入愤怒后打出的，应为 14，而不是 7」）：
+    /// **这张牌被打出时**她的姿态倍率（1 = 无姿态 / 2 = 愤怒 / 3 = 神格）。
+    /// 规划期按剧本顺序推演（暴怒/渐强 → 愤怒；安宁/冥想/警惕 → 平静；化体为空 → 退出），
+    /// 重算路径原样再用 —— 否则同一回合里「先打暴怒、再打打击」的那张打击会因为
+    /// 读取的是**此刻**（还没进愤怒）的姿态而少算一半。
+    /// </summary>
+    public int StanceMul { get; init; } = 1;
+
+    /// <summary>
+    /// ★ v0.2.691（用户截图：「点穴的伤害没有考虑本回合会施加的印记」）：
+    /// 本回合剧本里排在它**前面**的点穴一共会给目标叠多少层印记 —— 后面那张点穴的伤害要算进去。
+    /// </summary>
+    public int PendingMarks { get; init; }
     /// <summary>
     /// 这张牌**打出去时**群蛇形态会额外造成的伤害（0 = 不画那一条）。
     ///
@@ -147,6 +162,12 @@ public static class BossPlanner
                    $"[{string.Join(",", hand.Select(c => c.Id.Entry))}]" +
                    (skipped.Count > 0 ? $" skip=[{string.Join(",", skipped)}]" : ""));
 
+        // ★ v0.2.698（用户 2026-11-16：「打击和不惧妖邪的预览还是没有翻倍」）：
+        //   这条**通用规划路**（没有剧本的 Boss、以及某些帧里被当成「预演计划」跑的那一路）
+        //   以前完全不传姿态倍率 ⇒ 它造出来的意图烤进去的是 1，渲染时自然不翻倍。
+        //   现在和剧本规划期一样，按出牌顺序推演「这张牌打出时她是几倍姿态」并一路传下去。
+        int stanceMul = Math.Max(1, BossIntentBuilder.StanceMultiplierOf(boss.Creature));
+
         foreach (var card in hand.OrderBy(c => PriorityOf(def, c)).ThenBy(c => CostOf(c)))
         {
             if (!IsUsable(def, card)) continue;
@@ -159,7 +180,7 @@ public static class BossPlanner
             if (target == null) continue;
 
             // 先按顺序推进球位模拟（会激发球的话，意图里要补上攻势/守势）
-            var intents = BossIntentBuilder.IntentsFor(card, target, pendingDrop, pendingRise);
+            var intents = BossIntentBuilder.IntentsFor(card, target, pendingDrop, pendingRise, stanceMul: stanceMul);
             var evoke = orbSim.Predict(card);
             BossOrbSim.AppendIntents(intents, evoke, pendingDrop, BossIntentBuilder.RandomAimIsElsewhere(card));
 
@@ -172,7 +193,9 @@ public static class BossPlanner
                 Intents = intents,
                 EvokeDamage = evoke.TotalDamage,
                 GeneratedShivs = BossIntentBuilder.ShivsFrom(card),
+                StanceMul = stanceMul,
             });
+            stanceMul = BossIntentBuilder.StanceAfterPlay(stanceMul, card);
             energy -= cost;
             stars -= starCost;
         }

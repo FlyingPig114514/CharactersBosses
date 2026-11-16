@@ -139,25 +139,81 @@ internal static class OurEncounterIconPaths
                 // ★ v0.2.499（用户 2026-11-08：要的是「游戏内最上方那一栏放的头像」，不是地图徽章）：
                 //   那就是原版的**角色头像图** `res://images/ui/top_panel/character_icon_<角色>.png`
                 //   （顶栏那颗 Boss 图标用的同一套美术）。先找它，找不到再退回我们自己的地图徽章。
+                //
+                // ★ v0.2.703（用户 2026-11-16：「历史记录中观者的头像不对，是头像不是地图图标」）：
+                //   观者是**另一个模组**的角色，它的头像不一定挂在基础游戏那条路径上：
+                //     · A 版（Boninall，3747526116）自带 `res://images/ui/top_panel/character_icon_watcher.png` ✓
+                //     · B 版（lamali，3747492505）只放在自己的命名空间：
+                //       `res://Watcher/images/watcher/character_icon_watcher.png`
+                //   以前只试基础游戏那条 ⇒ B 版直接退回**地图徽章**（那颗骷髅+光环），历史上看着就像地图图标。
+                //   现在两套路径都试。
                 try
                 {
-                    var character = TopBarBossIconFallbackPatch.CharacterFor(enc);
+                    var character = TopBarBossIconFallbackPatch.CharacterFor(enc)
+                                    ?? WatcherCharacterFallback(enc);
                     if (character != null)
                     {
-                        string name = character.GetType().Name.ToLowerInvariant();   // ironclad / silent / defect / necrobinder / regent
-                        foreach (var cand in new[]
+                        // ★★ v0.2.704（用户 2026-11-16 第二次实测：还是地图图标）：
+                        //   **别猜路径，直接问她自己的贴图**。`CharacterModel` 上就有
+                        //   `IconTexture` / `IconOutlineTexture`（顶栏那颗 Boss 图标用的正是它们，
+                        //   `TopBarBossIconFallbackPatch.ApplyCharacter` 已经验证可取），
+                        //   模组角色的贴图挂在哪个 `res://` 前缀下由它自己决定 —— 猜路径必错。
+                        try
                         {
-                            "res://images/ui/top_panel/character_icon_" + name + ".png",
-                            "res://images/ui/top_panel/character_icon_" + name + "_outline.png",
-                        })
-                        {
-                            if (outline && !cand.Contains("_outline")) continue;
-                            if (!outline && cand.Contains("_outline")) continue;
-                            if (ResourceLoader.Exists(cand)) return cand;
+                            var tex = outline ? (character.IconOutlineTexture ?? character.IconTexture)
+                                              : character.IconTexture;
+                            string? rp = tex?.ResourcePath;
+                            if (!string.IsNullOrEmpty(rp) && ResourceLoader.Exists(rp))
+                            {
+                                if (Logged.Add("char:" + rp!))
+                                    Logger.Log($"[CharBoss] 结算/历史图标：用角色 {character.Id.Entry} 自己的贴图 {rp}");
+                                return rp;
+                            }
                         }
-                        // 描边实在没有就用同一张头像
-                        string main = "res://images/ui/top_panel/character_icon_" + name + ".png";
-                        if (ResourceLoader.Exists(main)) return main;
+                        catch { /* 贴图取不到就退回猜路径 */ }
+
+                        string name = character.GetType().Name.ToLowerInvariant();   // ironclad / silent / defect / necrobinder / regent / watcher
+                        var bases = new List<string>
+                        {
+                            "res://images/ui/top_panel/character_icon_" + name,
+                            "res://Watcher/images/watcher/character_icon_" + name,      // B 版（lamali）
+                            "res://Watcher/_imported/character_icon_" + name,           // A 版（Boninall）的导出目录
+                        };
+                        // `outline=true` 先找描边图；`outline=false` 先找主图；都没有就用另一边兜底。
+                        if (outline)
+                        {
+                            foreach (var b in bases)
+                                if (ResourceLoader.Exists(b + "_outline.png")) return b + "_outline.png";
+                            foreach (var b in bases)
+                                if (ResourceLoader.Exists(b + ".png")) return b + ".png";
+                        }
+                        else
+                        {
+                            foreach (var b in bases)
+                                if (ResourceLoader.Exists(b + ".png")) return b + ".png";
+                            foreach (var b in bases)
+                                if (ResourceLoader.Exists(b + "_outline.png")) return b + "_outline.png";
+                        }
+
+                        // 诊断（每个遭遇只打一次）：下次再不对，这一行就能看出卡在哪一步。
+                        if (Logged.Add("diag:" + entry))
+                        {
+                            string texInfo = "null";
+                            try
+                            {
+                                var t = character.IconTexture;
+                                texInfo = t == null ? "null" : (string.IsNullOrEmpty(t.ResourcePath) ? "无 ResourcePath" : t.ResourcePath);
+                            }
+                            catch (Exception ex) { texInfo = "异常:" + ex.Message; }
+                            Logger.Log($"[CharBoss] 结算/历史图标诊断：{entry} → 角色 {character.Id.Entry}（name={name}），" +
+                                       $"IconTexture={texInfo}；候选存在性 " +
+                                       string.Join(" / ", bases.ConvertAll(b => b + ".png=" + ResourceLoader.Exists(b + ".png"))) +
+                                       " ⇒ 退回地图徽章");
+                        }
+                    }
+                    else if (Logged.Add("null:" + entry))
+                    {
+                        Logger.Log($"[CharBoss] 结算/历史图标诊断：{entry} 解析不出角色模型（CharacterFor 与 Watcher 兜底都为 null）⇒ 用地图徽章");
                     }
                 }
                 catch { /* 忽略，继续走地图徽章 */ }
@@ -175,6 +231,38 @@ internal static class OurEncounterIconPaths
         catch { /* 忽略 */ }
         return null;
     }
+    /// <summary>
+    /// 观者遭遇的**角色兜底**：`BossDefs.Watcher.CharacterType` 是运行期解析出来的
+    /// （`RefreshWatcherCharacterType`），比「按怪物 id 查定义」更稳 —— 用户 2026-11-16 实测
+    /// B 版历史图标仍是地图徽章，说明 `CharacterFor` 那条链解析不出角色模型。
+    /// 这里只要遭遇 id 以 `WATCHER_` 开头（观者的两个 Boss）就直接拿观者角色。
+    /// </summary>
+    private static CharacterModel? WatcherCharacterFallback(EncounterModel? enc)
+    {
+#if STS2_111
+        try
+        {
+            string? entry = enc?.Id.Entry;
+            if (string.IsNullOrEmpty(entry)) return null;
+            if (!entry!.StartsWith("WATCHER_", StringComparison.Ordinal)) return null;
+
+            // ★ v0.2.705（用户 2026-11-16 截图：历史里变成了**愚者**头像）：
+            //   `BossDefs.Watcher.CharacterType` 的初值是**愚者占位**
+            //   （`typeof(Characters.Fool)`，见 BossDefs 那行注释），真正类型由
+            //   `WatcherModPresence.CharacterType()` 运行期解析后写回。
+            //   这里直接问那个探测函数；问不到 / 还是愚者占位就返回 null（宁可退回地图徽章，
+            //   也不能把别的角色头像安到观者头上）。
+            var type = Core.WatcherModPresence.CharacterType() ?? Core.BossDefs.Watcher?.CharacterType;
+            if (type == null) return null;
+            if (type == typeof(MegaCrit.Sts2.Core.Models.Characters.Fool)) return null;
+            return ModelDb.GetById<CharacterModel>(ModelDb.GetId(type));
+        }
+        catch { return null; }
+#else
+        return null;
+#endif
+    }
+
     /// <summary>原版占位 Boss 图标（TheKinBoss）的同款路径；取不到就返回 null。</summary>
     private static string? Fallback(bool outline)
     {

@@ -119,6 +119,25 @@ public class WatcherDivinityBossEncounter : CharBossEncounterBase<WatcherBoss>
     /// <summary>地图节点图标（`.png` + `_outline.png`，资源在 `res://CharacterBosses/images/map/`）。</summary>
     public override string BossNodePath => "res://CharacterBosses/images/map/watcher_divinity";
 }
+
+/// <summary>调试用的「普通战斗」版：三层 Ω观。</summary>
+public sealed class WatcherOmegaBossNormalEncounter : WatcherOmegaBossEncounter
+{
+    public override RoomType RoomType => RoomType.Monster;
+}
+
+/// <summary>
+/// 三层 2 号「**Ω观**」遭遇（用户 2026-11-16）。
+/// 与「神格观」同一个观者角色、不同设计（阿尔法/贝塔/欧米伽 + 特殊效果「斋戒」）⇒ 走 `ExtraVariants[2]`。
+/// 控制台：`fight WATCHER_OMEGA_BOSS_ENCOUNTER`。
+/// </summary>
+public class WatcherOmegaBossEncounter : CharBossEncounterBase<WatcherOmegaBoss>
+{
+    public override int? TierAct => 2;
+
+    /// <summary>地图节点图标（暂与神格观共用一代崩坠那张；`res://CharacterBosses/images/map/`）。</summary>
+    public override string BossNodePath => "res://CharacterBosses/images/map/watcher_divinity";
+}
 #endif
 // ── 调试专用的「普通战斗」版本 ──
 // 调试开关换进来的战斗如果仍是 RoomType.Boss，打赢后会走 Boss 结算（第一幕的 Boss 一死就直接进下一幕）。
@@ -465,6 +484,12 @@ public static class CharBossEncounters
         ModelDb.Encounter<RegentBossNormalEncounter>(),
 #if STS2_111
         ModelDb.Encounter<FoolTarotBossNormalEncounter>(),   // 愚者：调试开关写 fool 时用（107 没有这个角色）
+#if STS2_111
+        // ⚠ 2026-11-16：`DebugMode.CharacterKeys` 里 `watcher` 是下标 6，而这个数组以前只到 6 项（0..5）
+        //   ⇒ 写 `watcher` 会越界、`ForDebug()` 回退成 `all[0]`＝铁甲战士（用户实测「第一场变成了易伤战」）。
+        //   现在把观者这一项补上，下标才对得上。
+        ModelDb.Encounter<WatcherDivinityBossNormalEncounter>(),
+#endif
 #endif
     });
 
@@ -528,7 +553,8 @@ public static class CharBossEncounters
         ModelDb.Encounter<NecrobinderEtherealBossEncounter>(), // 二层亡灵 2 号：虚无骨（用户 2026-11-09）
 #if STS2_111
         ModelDb.Encounter<FoolTarotBossEncounter>(),           // 三层 12 号：塔罗愚（愚者，用户 2026-11-14）
-        ModelDb.Encounter<WatcherDivinityBossEncounter>(),             // 三层：观者占位（只有装了观者 mod 才会进候选表）
+        ModelDb.Encounter<WatcherDivinityBossEncounter>(),             // 三层 1 号：神格观（只有装了观者 mod 才会进候选表）
+        ModelDb.Encounter<WatcherOmegaBossEncounter>(),                // 三层 2 号：Ω观（用户 2026-11-16）
 #endif
     });
 
@@ -662,6 +688,9 @@ public static class CharBossEncounters
             if (entry.StartsWith("REGENT", StringComparison.Ordinal)) return 4;
 #if STS2_111
             if (entry.StartsWith("FOOL", StringComparison.Ordinal)) return 5;
+            // ★ 2026-11-16：观者以前**没有这一行** ⇒ 观者遭遇的角色下标是 -1，
+            //   多人搭子兜底与「第二场主 Boss 不同角色」的判定都会退化。
+            if (entry.StartsWith("WATCHER", StringComparison.Ordinal)) return 6;
 #endif
         }
         catch { /* 忽略 */ }
@@ -678,6 +707,8 @@ public static class CharBossEncounters
         "REGENT_BOSS" => 4,
 #if STS2_111
         "FOOL_BOSS" => 5,
+        // ★ 2026-11-16：观者也以前没有这一行 ⇒ `EncounterForBoss` 对观者返回 null（死亡提示退回默认）
+        "WATCHER_BOSS" => 6,
 #endif
         _ => -1,
     };
@@ -754,6 +785,64 @@ public static class CharBossEncounters
     /// 第一/第二幕的 <see cref="ActTable"/> 那一行本来就是同一个角色，所以对它们没有影响。
     /// </param>
     public static EncounterModel? ForVanillaBoss(ActModel act, EncounterModel? vanilla, bool secondBoss = false)
+    {
+        // ★★ v0.2.711（用户 2026-11-16）：**房主把结论广播给客人，客人无条件采用**。
+        //   以前客人端只有在「同步槽位已经是我们的遭遇」时才跟随房主；第三幕**第二场**经常不是
+        //   （`act.SecondBossEncounter` 原值还是原版）⇒ 客人只能自己按「确定性规则」重算一遍，
+        //   而重算的输入里有三处每台机器可能不同（候补表 / 房主勾选有没有收到 / 地图替换开关默认值）
+        //   ⇒ 客人保持原来的 Boss、房主换成了角色 Boss（就是玩家报的那条）。
+        //   现在：客人先问「房主这一场最后是哪一只」——
+        //     · 房主说 `VANILLA` ⇒ 本机也保持原版；
+        //     · 房主给了 Key ⇒ 直接用那只；
+        //     · 还没收到 ⇒ 才退回原来的确定性规则。
+        try
+        {
+            if (Core.NetRole.IsGuest)
+            {
+                int fightIdx = secondBoss ? 1 : 0;
+                string? hostValue = Core.BossPicksSync.HostBossOf(act?.Index ?? -1, fightIdx);
+                if (!string.IsNullOrEmpty(hostValue))
+                {
+                    if (hostValue == Core.BossPicksSync.VanillaMark)
+                    {
+                        if (GuestHostBossLogged.Add((act!.Index, secondBoss)))
+                        {
+                            Logger.Log($"[CharBoss] 客人端：第 {act.Index + 1} 幕{(secondBoss ? "第二场" : "")}" +
+                                       "房主决定**保持原版 Boss** ⇒ 本机也不替换（不再自己算一遍）");
+                        }
+                        return null;
+                    }
+                    var hostEncounter = BossKeys.EncounterOf(hostValue);
+                    if (hostEncounter != null && hostEncounter.Id != vanilla?.Id)
+                    {
+                        if (GuestHostBossLogged.Add((act!.Index, secondBoss)))
+                        {
+                            Logger.Log($"[CharBoss] 客人端：第 {act.Index + 1} 幕{(secondBoss ? "第二场" : "")}" +
+                                       $"按**房主的结论**替换 ⇒ {hostEncounter.Id.Entry}（房主说 {hostValue}）");
+                        }
+                        return hostEncounter;
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 客人端：采用房主结论失败（改按确定性规则继续算）: " + e.Message);
+        }
+
+        var resolved = ForVanillaBossCore(act, vanilla, secondBoss);
+
+        // 房主：把这一场的结论记下来（会触发广播给客人）。
+        try { Core.BossPicksSync.NoteHostBoss(act, secondBoss ? 1 : 0, resolved); }
+        catch { /* 纯同步，失败不影响本机 */ }
+
+        return resolved;
+    }
+
+    /// <summary>客人端「按房主结论替换」的日志每个 (幕, 是不是第二场) 只打一次。</summary>
+    private static readonly HashSet<(int Act, bool Second)> GuestHostBossLogged = new();
+
+    private static EncounterModel? ForVanillaBossCore(ActModel act, EncounterModel? vanilla, bool secondBoss)
     {
         // ★ 用户 2026-10-29（装了「第四幕心脏」模组）：**第 4 幕及以后一律不碰** ——
         //   我们的设计只做到前三幕；第四幕（心脏）以及以后任何模组加出来的幕，

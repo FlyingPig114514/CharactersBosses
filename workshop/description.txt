@@ -10,9 +10,9 @@ Boss descriptions are available in all 16 languages the game supports (Simplifie
 
 The mod supports multiplayer with up to four players. In multiplayer, boss HP is not increased — instead the number of bosses goes up (one boss per player). Every player is locked onto by one boss (granting the "Tracking Lock" buff): that boss's single-target attacks, random attacks, orbs and single-target special effects only ever affect that one player. Boss AoE attack cards hit every player. When a boss is defeated, the player it had locked onto is released and is afterwards only affected by other bosses' AoE attacks. When a player is defeated, the boss that had locked onto them re-locks onto the remaining player holding the fewest "Tracking Lock" stacks. Because there are only a handful of bosses right now and the battlefield is cramped, multiplayer with more than four players is not planned for the time being.
 
-到目前为止，本模组一共添加了23个Boss（5/8/10）。以后会考虑为所有地图变体也都添加boss，并可能联动观者和亡命之徒。
+到目前为止，本模组一共添加了37个Boss（10/11/16），其中有2个是观者Boss，需要同时装载本模组和Boninall（3747526116）或Lamall（3747492505）的观者mod才会作为Boss出现（同时装载时优先使用Boninall版本的观者）。以后会考虑为所有地图变体也都添加boss，并可能联动亡命之徒。
 
-So far the mod adds 23 bosses in total (5 / 8 / 10). In the future we may also add bosses for every map variant, and possibly a crossover with The Watcher and The Hermit.
+So far the mod adds 37 bosses in total (10 / 11 / 16). Two of them are Watcher bosses: they only appear if this mod and a Watcher mod — either Boninall (3747526116) or Lamall (3747492505) — are both installed (if both are installed, the Boninall version takes priority). In the future we may also add bosses for every map variant, and possibly a crossover with The Hermit.
 
 目前本模组的单人游戏较为稳定，但多人游戏仍有可能出现不同步等问题，并且为了兼顾单人和多人游戏，Boss强度很难平衡。因此，目前本模组会在玩家同意的情况下收集boss战的相关数据，用于进行平衡调整与bug修复，并且绝对不会收集与玩家隐私相关的内容。
 

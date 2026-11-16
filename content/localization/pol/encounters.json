@@ -1,4 +1,4 @@
-{
+﻿{
     "IRONCLAD_BOSS_ENCOUNTER.title":  "Pancernik",
     "IRONCLAD_BOSS_ENCOUNTER.loss":  "{character} został złamany przez [gold]Pancernika[/gold].",
     "IRONCLAD_ANGER_BOSS_ENCOUNTER.title":  "Pancernik",
@@ -108,5 +108,7 @@
     "FOOL_BOSS_ENCOUNTER.loss_tarot":  "{character} stał się nową kartą [gold]{Card}[/gold] w talii [gold]Błazna[/gold].",
     "FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot":  "{character} stał się nową kartą [gold]{Card}[/gold] w talii [gold]Błazna[/gold].",
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "Boski Obserwator",
-    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} został zmiażdżony boską mocą [gold]Boskiego Obserwatora[/gold]."
+    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} został zmiażdżony boską mocą [gold]Boskiego Obserwatora[/gold].",
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.title": "Obserwator Omega",
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss": "{character} zostal zmiazdzony przez post [gold]Obserwatora Omega[/gold]."
 }
