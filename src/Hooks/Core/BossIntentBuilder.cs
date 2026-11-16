@@ -1776,9 +1776,14 @@ public static class BossIntentBuilder
             try { e = played?.Id.Entry ?? string.Empty; } catch { return mul; }
             if (Monsters.CharBossMonster.WatcherIdIs(e, "ERUPTION")
                 || Monsters.CharBossMonster.WatcherIdIs(e, "CRESCENDO")) return 2;
+            // ★ v0.2.714（用户 2026-11-16「印牌观」第 3 回合）：「义愤填膺」不在愤怒时**进入愤怒**
+            //   ⇒ 它后面的攻击（惩恶+）必须按 ×2 预览；已经在愤怒时它只给易伤，倍率不变（同样是 2）✔
+            if (Monsters.CharBossMonster.WatcherIdIs(e, "INDIGNATION")) return 2;
             if (Monsters.CharBossMonster.WatcherIdIs(e, "TRANQUILITY")
                 || Monsters.CharBossMonster.WatcherIdIs(e, "MEDITATE")
                 || Monsters.CharBossMonster.WatcherIdIs(e, "VIGILANCE")) return 1;
+            // 内心宁静：不在平静时进入平静（平静不加伤）⇒ 之后按 ×1
+            if (Monsters.CharBossMonster.WatcherIdIs(e, "INNER_PEACE")) return 1;
             if (Monsters.CharBossMonster.WatcherIdIs(e, "EMPTY_BODY")
                 || Monsters.CharBossMonster.WatcherIdIs(e, "EMPTY_FIST")) return 1;
         }
@@ -1893,9 +1898,12 @@ public static class BossIntentBuilder
             if (entryName == null) return mul;
             if (Monsters.CharBossMonster.WatcherIdIs(entryName, "ERUPTION")
                 || Monsters.CharBossMonster.WatcherIdIs(entryName, "CRESCENDO")) return 2;
+            // ★ v0.2.714：义愤填膺 ⇒ 进入愤怒（同一套规则，见 `StanceAfterPlay`）
+            if (Monsters.CharBossMonster.WatcherIdIs(entryName, "INDIGNATION")) return 2;
             if (Monsters.CharBossMonster.WatcherIdIs(entryName, "TRANQUILITY")
                 || Monsters.CharBossMonster.WatcherIdIs(entryName, "MEDITATE")
                 || Monsters.CharBossMonster.WatcherIdIs(entryName, "VIGILANCE")) return 1;
+            if (Monsters.CharBossMonster.WatcherIdIs(entryName, "INNER_PEACE")) return 1;
             if (Monsters.CharBossMonster.WatcherIdIs(entryName, "EMPTY_BODY")
                 || Monsters.CharBossMonster.WatcherIdIs(entryName, "EMPTY_FIST")) return 1;
         }

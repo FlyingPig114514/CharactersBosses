@@ -114,7 +114,7 @@ internal static class WatcherRuntimePatches
         }
     }
 
-    private static void StanceDamagePostfix(Creature? dealer, decimal damage,
+    private static void StanceDamagePostfix(Creature? dealer, Creature? target, decimal damage,
                                            MegaCrit.Sts2.Core.ValueProps.ValueProp props,
                                            MegaCrit.Sts2.Core.Hooks.ModifyDamageHookType modifyDamageHookType,
                                            ref decimal __result)
@@ -124,6 +124,27 @@ internal static class WatcherRuntimePatches
             if (__result <= 0 || damage <= 0) return;
             if (modifyDamageHookType != MegaCrit.Sts2.Core.Hooks.ModifyDamageHookType.All) return;
             if (((int)props & 4) != 0) return;                 // Unpowered 一类不吃姿态
+
+            // ★ v0.2.714（用户 2026-11-16「印牌观」）：「她在处于愤怒时**受到**的攻击伤害没有翻倍」。
+            //   原版愤怒（Wrath）是**双向**的 —— 造成与受到都 ×2。而 B 版（lamali）的姿态倍率挂在
+            //   `WrathStance.ModifyDamageMultiplicative`，判据是 `dealer == Owner.Creature`
+            //   ⇒ **只管她出手**，玩家打她那一侧没人翻 ⇒ 这里补「她挨打」那一半。
+            //   · 只有**愤怒**翻倍（神格 ×3 是她出手的事，受击不翻，与原版一致）；
+            //   · 只对真人玩家的攻击生效（她自己的牌、无来源伤害不受影响）。
+            if (target != null && target.Monster is Monsters.CharBossMonster victim)
+            {
+                string vkey = string.Empty;
+                try { vkey = victim.Def?.Key ?? string.Empty; } catch { vkey = string.Empty; }
+                if (vkey.StartsWith("WATCHER_", StringComparison.Ordinal)
+                    && WatcherCards.StanceModelName(victim.Shadow) == "WrathStance")
+                {
+                    __result *= 2;
+                    if (_logs3++ < 6)
+                        Logger.Log($"[CharBoss] 姿态倍率兜底：{vkey} 在愤怒中**受到** {damage:0.##} ×2 ⇒ {__result:0.##}");
+                    return;
+                }
+            }
+
             if (dealer == null) return;
             if (dealer.Monster is not Monsters.CharBossMonster boss) return;
             string key = string.Empty;
@@ -140,6 +161,7 @@ internal static class WatcherRuntimePatches
     }
 
     private static int _logs2;
+    private static int _logs3;
 
     // ── ① 神格不退 ─────────────────────────────────────────────────────────
     private static bool InstallDivinityKeep()

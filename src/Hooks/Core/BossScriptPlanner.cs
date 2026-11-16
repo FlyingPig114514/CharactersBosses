@@ -697,9 +697,15 @@ public static class BossScriptPlanner
             {
                 if (CharBossMonster.WatcherIdIs(entryNow, "ERUPTION") || CharBossMonster.WatcherIdIs(entryNow, "CRESCENDO"))
                     plannedStanceMul = 2;                       // 暴怒 / 渐强 ⇒ 进入愤怒
+                // ★ v0.2.714（用户 2026-11-16「印牌观」第 3 回合）：「义愤填膺」不在愤怒时**进入愤怒**
+                //   ⇒ 它后面的攻击（惩恶+）要按 ×2 预览；已经在愤怒时它只给易伤，倍率仍是 2 ✔
+                else if (CharBossMonster.WatcherIdIs(entryNow, "INDIGNATION"))
+                    plannedStanceMul = 2;                       // 义愤填膺 ⇒ 进入愤怒
                 else if (CharBossMonster.WatcherIdIs(entryNow, "TRANQUILITY") || CharBossMonster.WatcherIdIs(entryNow, "MEDITATE")
                          || CharBossMonster.WatcherIdIs(entryNow, "VIGILANCE"))
                     plannedStanceMul = 1;                       // 安宁 / 冥想 / 警惕 ⇒ 进入平静（平静不加伤）
+                else if (CharBossMonster.WatcherIdIs(entryNow, "INNER_PEACE"))
+                    plannedStanceMul = 1;                       // 内心宁静 ⇒ 不在平静时进入平静（不加伤）
                 else if (CharBossMonster.WatcherIdIs(entryNow, "EMPTY_BODY") || CharBossMonster.WatcherIdIs(entryNow, "EMPTY_FIST"))
                     plannedStanceMul = 1;                       // 化体为空 / 化拳为空 ⇒ 退出姿态
                 if (CharBossMonster.WatcherIdIs(entryNow, "PRESSURE_POINTS"))

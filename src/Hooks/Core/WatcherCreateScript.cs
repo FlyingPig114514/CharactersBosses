@@ -94,14 +94,10 @@ public static class WatcherCreateScript
                 W(WatcherCards.KnowThyPlace),
                 W(WatcherCards.EmptyFist)),
 
-            // ── 6 ── 洗牌 / 改造现实（进阶 9 起升级）/ 化拳为空（没费）/ 警惕 / 惩恶+（没费）   （3 费）← 6～8 循环起点
-            //   ★ v0.2.713（用户 2026-11-16）：「第6回合化拳为空被错误的打出」⇒ 它属于「没费」那一档，
-            //     真实 3 费里 改造现实(1) + 警惕(2) 正好花光 ⇒ 化拳为空 / 惩恶+ 都打不出来。
-            Turn(3, "6. 洗牌（她重新洗牌）、改造现实（进阶9起升级）、化拳为空（没费）、警惕、惩恶+（没费）",
+            // ── 6 ── 洗牌 / 改造现实（进阶 9 起升级）/ 化拳为空 / 警惕 / 惩恶+（没费）   （4 费）← 6～8 循环起点
+            Turn(4, "6. 洗牌（她重新洗牌）、改造现实（进阶9起升级）、化拳为空、警惕、惩恶+（没费）",
                 W(WatcherCards.CarveReality, upgradeMinAscension: 9),
-                // ⚠ 化拳为空排在警惕前面、而且只有 1 费 —— 光靠能量挡不住它（3 费里 改造现实 1 之后它照样付得起）。
-                //   用户 2026-11-16 明确「第6回合化拳为空被错误的打出」⇒ 用 HoldInstead 明确「留在手里不打」。
-                W(WatcherCards.EmptyFist, holdInstead: true),
+                W(WatcherCards.EmptyFist),
                 W(WatcherCards.Vigilance),
                 W(WatcherCards.Smite, upgraded: true)),
 
@@ -123,7 +119,10 @@ public static class WatcherCreateScript
         return new BossScript
         {
             Turns = turns,
-            LoopFrom = 5,       // 用户：之后 6～8 循环（0 起下标 5）
+            // ⚠ `LoopFrom` 是**1 起**的回合号（见 `BossScript.TurnAt`：`index = LoopFrom - 1 + (turn - LoopFrom) % LoopLength`）
+            //   ★ v0.2.714（用户 2026-11-16）：「你循环错了，你现在循环的是5~7，而不是6~8，第八回合被错误的跳过了」
+            //   —— 我上一版把 1 起当成了 0 起，填了 5 ⇒ 第 6 回合起跑的是**第 5 回合的牌**。现在写 6。
+            LoopFrom = 6,       // 用户：之后 6～8 循环
             LoopLength = 3,
         };
     }
