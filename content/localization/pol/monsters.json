@@ -213,6 +213,6 @@
     "WATCHER_RETAIN_BOSS.name":  "Zachowujący Obserwator",
     "WATCHER_RETAIN_BOSS.title":  "Zachowujący Obserwator",
     "WATCHER_RETAIN_BOSS.moves.CHARBOSS_PLAY.title":  "Zagraj",
-    "WATCHER_RETAIN_BOSS.establishment":  "Na koniec twojej tury każda zachowana karta w twojej ręce o koszcie niższym niż 2 zwiększa swój koszt o 1 do końca tej walki. Za każdą kartę, której koszt w ten sposób wzrośnie, Obserwatorka traci 2 Siły.",
+    "WATCHER_RETAIN_BOSS.establishment":  "Na koniec twojej tury każda zachowana karta w twojej ręce o koszcie niższym niż 2 zwiększa swój koszt o 1 do końca tej walki. Za każdą kartę, której koszt w ten sposób wzrośnie, Obserwatorka traci 1 Siły.",
     "WATCHER_RETAIN_BOSS.establishment_dread":  "Na koniec twojej tury twoje zachowane karty zwiększają swój koszt o 1 do końca tej walki."
 }

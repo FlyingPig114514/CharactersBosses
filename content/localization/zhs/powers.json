@@ -145,6 +145,6 @@
     "BOSS_MASTER_REALITY_POWER.description":  "每当你在战斗中生成卡牌时，该牌会被[gold]降级[/gold]；如果它不是衍生牌，还会获得[gold]消耗[/gold]。\n观者通过色彩哲学家获得了[gold]武器库[/gold]、[gold]创世之柱[/gold]和[gold]何人僭越[/gold]。",
     "BOSS_MASTER_REALITY_POWER.description_dread":  "每当你在战斗中生成卡牌时，该牌会被[gold]降级[/gold]；如果它不是衍生牌，还会获得[gold]消耗[/gold]。\n观者通过色彩哲学家获得了[gold]武器库[/gold]、[gold]创世之柱[/gold]和[gold]何人僭越[/gold]。",
     "BOSS_ESTABLISHMENT_POWER.title":  "确立基础",
-    "BOSS_ESTABLISHMENT_POWER.description":  "在你的回合结束时，若你有耗能小于2的牌被保留，其在本场战斗中的耗能增加1。每有一张卡牌的耗能被增加，观者就失去2点力量。",
+    "BOSS_ESTABLISHMENT_POWER.description":  "在你的回合结束时，若你有耗能小于2的牌被保留，其在本场战斗中的耗能增加1。每有一张卡牌的耗能被增加，观者就失去1点力量。",
     "BOSS_ESTABLISHMENT_POWER.description_dread":  "在你的回合结束时，你保留的牌在本场战斗中的耗能增加1。"
 }

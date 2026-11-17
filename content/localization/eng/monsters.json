@@ -213,6 +213,6 @@
     "WATCHER_RETAIN_BOSS.name":  "Retaining Watcher",
     "WATCHER_RETAIN_BOSS.title":  "Retaining Watcher",
     "WATCHER_RETAIN_BOSS.moves.CHARBOSS_PLAY.title":  "Play",
-    "WATCHER_RETAIN_BOSS.establishment":  "At the end of your turn, for each retained card in your hand with a cost below 2, its cost is increased by 1 for the rest of this combat. Each time a card's cost is increased this way, the Watcher loses 2 Strength.",
+    "WATCHER_RETAIN_BOSS.establishment":  "At the end of your turn, for each retained card in your hand with a cost below 2, its cost is increased by 1 for the rest of this combat. Each time a card's cost is increased this way, the Watcher loses 1 Strength.",
     "WATCHER_RETAIN_BOSS.establishment_dread":  "At the end of your turn, your retained cards have their cost increased by 1 for the rest of this combat."
 }

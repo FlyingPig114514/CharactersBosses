@@ -145,6 +145,6 @@
     "BOSS_MASTER_REALITY_POWER.description":  "Za każdym razem, gdy tworzysz kartę w walce, zostaje ona [gold]obniżona[/gold]; jeśli nie jest żetonem, zyskuje też [gold]Wygaszenie[/gold].\nObserwator zdobył [gold]Arsenał[/gold], [gold]Filar Stworzenia[/gold] i [gold]Znaj swoje miejsce[/gold] dzięki Barwnemu Filozofowi.",
     "BOSS_MASTER_REALITY_POWER.description_dread":  "Za każdym razem, gdy tworzysz kartę w walce, zostaje ona [gold]obniżona[/gold]; jeśli nie jest żetonem, zyskuje też [gold]Wygaszenie[/gold].\nObserwator zdobył [gold]Arsenał[/gold], [gold]Filar Stworzenia[/gold] i [gold]Znaj swoje miejsce[/gold] dzięki Barwnemu Filozofowi.",
     "BOSS_ESTABLISHMENT_POWER.title":  "Ugruntowanie",
-    "BOSS_ESTABLISHMENT_POWER.description":  "Na koniec twojej tury każda zachowana karta w twojej ręce o koszcie niższym niż 2 zwiększa swój koszt o 1 do końca tej walki. Za każdą kartę, której koszt w ten sposób wzrośnie, Obserwatorka traci 2 Siły.",
+    "BOSS_ESTABLISHMENT_POWER.description":  "Na koniec twojej tury każda zachowana karta w twojej ręce o koszcie niższym niż 2 zwiększa swój koszt o 1 do końca tej walki. Za każdą kartę, której koszt w ten sposób wzrośnie, Obserwatorka traci 1 Siły.",
     "BOSS_ESTABLISHMENT_POWER.description_dread":  "Na koniec twojej tury twoje zachowane karty zwiększają swój koszt o 1 do końca tej walki."
 }

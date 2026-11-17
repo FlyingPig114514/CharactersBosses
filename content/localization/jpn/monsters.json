@@ -213,6 +213,6 @@
     "WATCHER_RETAIN_BOSS.name":  "保持ウォッチャー",
     "WATCHER_RETAIN_BOSS.title":  "保持ウォッチャー",
     "WATCHER_RETAIN_BOSS.moves.CHARBOSS_PLAY.title":  "カードプレイ",
-    "WATCHER_RETAIN_BOSS.establishment":  "あなたのターン終了時、手札のコストが2未満の保留されたカードのコストをこの戦闘中1増やす。コストが増えたカード1枚につき、ウォッチャーは筋力を2失う。",
+    "WATCHER_RETAIN_BOSS.establishment":  "あなたのターン終了時、手札のコストが2未満の保留されたカードのコストをこの戦闘中1増やす。コストが増えたカード1枚につき、ウォッチャーは筋力を1失う。",
     "WATCHER_RETAIN_BOSS.establishment_dread":  "あなたのターン終了時、あなたが保留したカードのコストをこの戦闘中1増やす。"
 }

@@ -19,7 +19,7 @@ namespace CharacterBosses.Powers;
 /// 二层 2 号观者 Boss「**保留观**」的特殊效果「**确立基础**」（用户 2026-11-17）：
 ///
 /// > 确立基础：在你的回合结束时，若你有耗能小于2的牌被保留，其在本场战斗中的耗能增加1；
-/// > 每有一张卡牌的耗能被增加，观者就失去2点力量。
+/// > 每有一张卡牌的耗能被增加，观者就失去1点力量。
 ///
 /// 恐惧版（用户 2026-11-17）：
 /// > 确立基础：在你的回合结束时，你保留的牌在本场战斗中的耗能增加1。
@@ -89,11 +89,31 @@ public sealed class BossEstablishmentPower : PowerModel
 
             int count = 0;
             try { count = retainedCards?.Count ?? 0; } catch { /* 忽略 */ }
+
+            // ★ v0.2.737（用户 2026-11-17：「金字塔和计划妥当**不丢弃**的牌费用也会上涨。
+            //   **不丢弃不等于保留**」）：
+            //   反编译 0.111 里这两样东西压根不是「保留」，而是**干脆不冲洗手牌**：
+            //   `RunicPyramid.ShouldFlush(player) => false`、`WellLaidPlansPower.ShouldFlush(player) => false`
+            //   ⇒ 手里所有牌都会作为「留下来的牌」出现在 `retainedCards` 里（并没有被标记成保留）。
+            //   真正的「保留」只有两种：`CardKeyword.Retain` 关键字，和 `GiveSingleTurnRetain()`
+            //   打上的单回合保留标记 —— 正好就是 `CardModel.ShouldRetainThisTurn` 的定义。
+            //   ⇒ `AfterFlush` 这条主路也必须先按它过一遍，不能把整份 `retainedCards` 当成保留牌。
+            var reallyRetained = new List<CardModel>();
+            int keptButNotRetained = 0;
+            foreach (var card in retainedCards ?? (IReadOnlyCollection<CardModel>)Array.Empty<CardModel>())
+            {
+                if (card == null) continue;
+                if (WillBeRetained(card)) reallyRetained.Add(card);
+                else keptButNotRetained++;
+            }
+
             if (_logs++ < 24)
-                Logger.Log($"[CharBoss] 确立基础：收到 AfterFlush —— {player.Character?.GetType().Name} 这一回合保留 {count} 张" +
+                Logger.Log($"[CharBoss] 确立基础：收到 AfterFlush —— {player.Character?.GetType().Name} 这一回合留在手牌 {count} 张，" +
+                           $"其中**真正被保留** {reallyRetained.Count} 张" +
+                           (keptButNotRetained > 0 ? $"（{keptButNotRetained} 张只是没被弃掉，例如金字塔/计划妥当 ⇒ 不算）" : string.Empty) +
                            $"（整理弃掉 {(flushedCards?.Count ?? 0)} 张）");
 
-            await SettleAsync(choiceContext, player, retainedCards, "AfterFlush");
+            await SettleAsync(choiceContext, player, reallyRetained, "AfterFlush");
         }
         catch (Exception e)
         {
@@ -215,13 +235,13 @@ public sealed class BossEstablishmentPower : PowerModel
                 catch (Exception e) { Logger.Log("[CharBoss] 确立基础：加费失败: " + e.Message); }
             }
 
-            // 普通版：每有一张牌的耗能被增加 ⇒ 她失去 **2** 点力量（恐惧版不扣）
-            // ★ v0.2.734（用户 2026-11-17 改文案）：「每有一张卡牌的耗能被增加，观者就失去2点力量。」
+            // 普通版：每有一张牌的耗能被增加 ⇒ 她失去 **1** 点力量（恐惧版不扣）
+            // ★ v0.2.737（用户 2026-11-17）：「把每有一张牌耗能增加观者减少的力量改回 1」。
             if (!dread && bumped > 0 && boss?.Creature != null && boss.Creature.IsAlive)
             {
                 try
                 {
-                    int loss = bumped * 2;
+                    int loss = bumped;
                     await PowerCmd.Apply<StrengthPower>(choiceContext, boss.Creature, -loss, boss.Creature, null, false);
                     Logger.Log($"[CharBoss] 确立基础：这次给 {bumped} 张保留牌加费 ⇒ 观者失去 {loss} 点力量");
                 }
