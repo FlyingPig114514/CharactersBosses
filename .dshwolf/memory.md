@@ -5828,3 +5828,10 @@ Chronological action log.
 | 2026-11-17 10:17 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
 | 2026-11-17 10:17 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
 | 2026-11-17 10:17 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-17 10:33 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/CardBehaviorScan.cs` | ok | 0 |
+| 2026-11-17 10:33 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-17 10:33 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-17 10:33 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-17 10:33 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-17 10:33 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-17 10:34 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |

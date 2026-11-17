@@ -690,6 +690,12 @@ public static class BossIntentBuilder
             else
             {
                 int totalHits = hits * plays;      // 复制药水/爆发：整张牌打两遍 ⇒ 段数翻倍（4 → 4×2）
+                // ★ v0.2.729（用户 2026-11-17）：「荒疫打击改成显示成多段攻势（基础伤害 ×2）+ 策略（红箭头）」。
+                //   反编译 `BlightStrike.OnPlay`：先打一次 `Damage`（8 / 升级 10），再把**这一击实际造成的总伤害**
+                //   作为灾厄施加给目标 ⇒ 它的「攻势」总量 = 伤害 + 等量灾厄 = **基础伤害 ×2**
+                //   ⇒ 按多段意图画成「8×2」（每段都走原版伤害管道，吃力量/虚弱/易伤，和真实结算同源）。
+                if (string.Equals(entry, "BLIGHT_STRIKE", StringComparison.Ordinal))
+                    totalHits = Math.Max(2, hits) * plays;
                 if (isGoldAxe)
                 {
                     // 每帧现算：基础值 = 战斗历史里已打完的牌数 + 她本回合还差的那几张（见上面 v0.2.388 说明）
@@ -1166,6 +1172,46 @@ public static class BossIntentBuilder
         // 「疯狂科学」只要「守势 + 强化」两条：牺牲意图也去掉（它是三套模板的混合体，
         // 数据上会带上「失去力量」这类减益变量，画出来就是用户看到的那个多余的下箭头）。
         if (madScience) hasSacrifice = false;
+
+        // ── 「塞状态牌」的两种意图（用户 2026-11-17 的意图判定总表）──
+        //   策略（紫灰卡牌）`StatusIntent(数量)` = 给**玩家**塞状态牌；
+        //   牺牲（蓝色向下）            = 给**自己**塞状态牌。
+        //   具体到四只 Boss（用户逐条点名）：
+        //     · 状态机（`DEFECT_STATUS`，特殊效果「同步」`BossSyncPower`）：她生成状态牌时会**复制一份丢进
+        //       每位真人玩家的弃牌堆** ⇒ 紫灰 + 牺牲 两个都画。数量：强撑 2 张，其余 1 张。
+        //     · 碎屑储（一层 `REGENT_BOSS`）的「碰撞轨迹」：反编译生成的是 `Debris`，
+        //       而我们的 `CometDebrisPatch` 会把碎屑**搬进被锁定玩家的抽牌堆**（她自己不留）
+        //       ⇒ 只画紫灰（+ 它自己那条攻势），**不画牺牲**。
+        //     · 仆从储（`REGENT_MINION`）的「碰撞轨迹」⇒ 攻势 + 牺牲（它自己留着）。
+        //     · 能力机（`DEFECT_ABILITY`）的「高速脱离」⇒ 守势 + 牺牲。
+        //   ⇒ 统一实现：会生成状态牌 ⇒ 至少「牺牲」；如果这名 Boss 有「同步」（或用的是碎屑储那套
+        //     「碎屑改判给玩家」的特殊效果）⇒ 再加一条紫灰。
+        int statusCards = 0;
+        try { statusCards = Core.StatusBossMath.StatusCardsGenerated(card); } catch { statusCards = 0; }
+        bool statusGoesToPlayer = false;
+        if (statusCards > 0)
+        {
+            try
+            {
+                var statusBoss = card.Owner?.Creature?.Monster as Monsters.CharBossMonster;
+                bool sync = statusBoss?.Creature?.GetPower<Powers.BossSyncPower>() != null;
+                string key = statusBoss?.Def?.Key ?? string.Empty;
+                // 碎屑储（一层储君第一套设计）：碎屑生成后由 CometDebrisPatch 搬到玩家的抽牌堆
+                bool debrisRegent = string.Equals(key, "REGENT_BOSS", StringComparison.Ordinal)
+                                    && string.Equals(entry, "COLLISION_COURSE", StringComparison.Ordinal);
+                statusGoesToPlayer = sync || debrisRegent;
+                if (!debrisRegent) hasSacrifice = true;      // 她自己留一份 ⇒ 牺牲
+            }
+            catch { hasSacrifice = true; }
+            if (statusGoesToPlayer)
+            {
+                int count = Math.Max(1, statusCards);
+                intents.Add(new StatusIntent(count));
+                Logger.Log($"[CharBoss] 塞状态牌意图：{entry} ⇒ 紫灰「{count} 张」" +
+                           "（同步会把复制品塞进玩家弃牌堆 / 碎屑改判给玩家）");
+            }
+        }
+
         // ★ v0.2.718：观者「姿态牌」的意图（强化 / 牺牲 / 策略）不再在这里改标志位 ——
         //   前面这些分支和别处都会顺手加意图，改标志位压不住（实测第 8 回合义愤填膺仍出双箭头）。
         //   统一放到函数末尾的 `ApplyWatcherStanceIntents` 按**意图列表**做增删。
@@ -1250,6 +1296,25 @@ public static class BossIntentBuilder
                            || Var(card, "Stars", 0) > 0 || Var(card, "Heal", 0) > 0
                            || Var(card, "MaxHp", 0) > 0 || hasBuff
                            || BuffVarCards.Contains(entry)));
+        // ★ v0.2.729（用户 2026-11-17）：「把捞牌、烧牌、返顶也算到强化。牌太多了，你看看能不能自动识别？」
+        //   ⇒ 牌面变量读不出来的行为（抽牌 / 印牌 / 捞牌 / 返顶 / 烧牌 / 变牌 / 进入姿态）交给
+        //     `CardBehaviorScan` 直接扫这句 `OnPlay` 的 IL（详见那个类的注释）。
+        //   ⚠ 这张牌如果是「给自己塞状态牌」的（`statusCards > 0`），它那些 CreateCard/Add(→手牌) 是**牺牲**
+        //     而不是强化（用户：「给自己塞牌 = 牺牲」）⇒ 把这两条理由剔除，别重复算。
+        if (!selfBenefit && !NoBuffIntentCards.Contains(entry))
+        {
+            try
+            {
+                var reasons = Core.CardBehaviorScan.ReasonsOf(card);
+                foreach (var r in reasons)
+                {
+                    if (statusCards > 0 && (r == "印牌" || r == "捞牌")) continue;
+                    selfBenefit = true;
+                    break;
+                }
+            }
+            catch { /* 扫不出来就当没有 */ }
+        }
         if (selfBenefit) intents.Add(new BuffIntent());
 
         // ★ 2026-11-15（用户：「你这 1 张牌 2 个强化图标是何意味？」）：
@@ -1288,7 +1353,52 @@ public static class BossIntentBuilder
 
         ApplyWatcherStanceIntents(intents, card, stanceMul);
 
+        // ★ v0.2.729（用户 2026-11-17）：「保证除攻势外每张卡牌的同一个意图只能有一个，
+        //   不能因为一张牌烧牌又印牌就写两个强化意图给一张牌」
+        //   ⇒ 最后再收一道：攻势（可能有多条：本体一击 + 附带的群蛇/开信刀/黑洞/速行者/灾厄…）不参与去重，
+        //     其它每种**只留第一条**（保留最初插入的位置 = 屏幕上图标顺序不变）。
+        DedupeNonAttackIntents(intents);
+
         return intents;
+    }
+
+    /// <summary>
+    /// 非攻势意图去重：同一种（强化 / 牺牲 / 守势 / 策略 / 塞状态牌 / 诱惑 / 审判）每张牌只留**一条**。
+    ///
+    /// ⚠ `SacrificeIntent` **继承** `BuffIntent`、`TemptationIntent` / `JudgmentIntent` / `StatusIntent`
+    ///   继承或同属 `AbstractIntent` 家族 ⇒ 必须先认子类再认父类，否则「牺牲」会被当成「强化」删掉
+    ///   （这正是 v0.2.719 踩过的坑：义愤填膺只剩强化、没有牺牲）。
+    /// </summary>
+    private static void DedupeNonAttackIntents(List<AbstractIntent> intents)
+    {
+        try
+        {
+            var seen = new HashSet<string>(StringComparer.Ordinal);
+            for (int i = intents.Count - 1; i >= 0; i--)
+            {
+                var it = intents[i];
+                if (it == null) continue;
+                string kind = IntentFamily(it);
+                if (kind.Length == 0) continue;      // 攻势：不去重
+                if (!seen.Add(kind)) intents.RemoveAt(i);
+            }
+        }
+        catch { /* 纯展示 */ }
+    }
+
+    /// <summary>意图的「家族」名字（攻势返回空串 = 不参与去重）。</summary>
+    private static string IntentFamily(AbstractIntent it)
+    {
+        if (it is SacrificeIntent) return "sacrifice";
+        if (it is TemptationIntent) return "temptation";
+#if STS2_111
+        if (it is JudgmentIntent) return "judgment";     // 审判意图只在 0.113 构建里存在
+#endif
+        if (it is StatusIntent) return "status";
+        if (it is BuffIntent) return "buff";
+        if (it is DebuffIntent) return "debuff";
+        if (it is DefendIntent) return "defend";
+        return string.Empty;
     }
 
     /// <summary>
