@@ -93,23 +93,70 @@ public sealed class IroncladDominion : MegaCrit.Sts2.Core.Models.Dread.DominionM
 /// </summary>
 public sealed class SilentDominion : MegaCrit.Sts2.Core.Models.Dread.DominionModel
 {
+    /// <summary>普通战斗给的层数（用户 2026-11-17：普通战保持 −1 力量 +1 虚弱）。</summary>
+    private const int NormalStacks = 1;
+
+    /// <summary>精英战斗给的层数（用户 2026-11-17：精英战 −2 力量 +2 虚弱）。</summary>
+    private const int EliteStacks = 2;
+
+    /// <summary>已经结算过的战斗（「房间进入」与「首个玩家回合开始」两条路只能给一次）。</summary>
+    private static readonly HashSet<object> Applied = new();
+
     public override async Task AfterRoomEntered(AbstractRoom room)
     {
         try
         {
             if (room is not CombatRoom cr) return;
-            var players = cr.CombatState?.Players;
+            await ApplyAsync(cr.CombatState, cr.RoomType == MegaCrit.Sts2.Core.Rooms.RoomType.Elite);
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 静默猎手的支配失败: " + e.Message); }
+    }
+
+    /// <summary>
+    /// **兜底**（用户 2026-11-17：「猎人的支配在精英战中无效果」）：
+    /// 精英战有时在「房间进入」那一刻 `CombatState.Players` 还没就绪（普通战就正常）
+    /// ⇒ 玩家第一个回合开始时再补一次；普通战在房间进入时已经给过，这里靠 `Applied` 跳过。
+    /// </summary>
+    public override async Task AfterSideTurnStart(CombatSide side,
+                                                 IReadOnlyList<Creature> participants,
+                                                 ICombatState combatState)
+    {
+        try
+        {
+            if (side != CombatSide.Player) return;
+            bool elite = false;
+            try { elite = combatState?.RunState?.CurrentRoom?.RoomType == MegaCrit.Sts2.Core.Rooms.RoomType.Elite; } catch { elite = false; }
+            await ApplyAsync(combatState, elite);
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 静默猎手支配（兜底）失败: " + e.Message); }
+    }
+
+    private static async Task ApplyAsync(ICombatState? combatState, bool elite)
+    {
+        try
+        {
+            if (combatState == null) return;
+            lock (Applied)
+            {
+                if (!Applied.Add(combatState)) return;      // 这场战斗已经给过
+                if (Applied.Count > 32) Applied.Clear();    // 防御性
+            }
+
+            var players = combatState.Players;
             if (players == null) return;
 
+            int stacks = elite ? EliteStacks : NormalStacks;
+            int given = 0;
             foreach (var p in players)
             {
                 var creature = p?.Creature;
                 if (creature == null || !creature.IsAlive) continue;
                 if (creature.Monster != null) continue;      // 影子玩家 / 怪物不算
                 await MegaCrit.Sts2.Core.Commands.PowerCmd.Apply<MegaCrit.Sts2.Core.Models.Powers.StrengthPower>(
-                    new ThrowingPlayerChoiceContext(), creature, -1m, null, null);
+                    new ThrowingPlayerChoiceContext(), creature, -(decimal)stacks, null, null);
                 await MegaCrit.Sts2.Core.Commands.PowerCmd.Apply<MegaCrit.Sts2.Core.Models.Powers.WeakPower>(
-                    new ThrowingPlayerChoiceContext(), creature, 1m, null, null);
+                    new ThrowingPlayerChoiceContext(), creature, (decimal)stacks, null, null);
+                given++;
 
                 // ★ v0.2.652（用户：「静默猎手的支配给予的虚弱持续了 2 回合，在第三回合开始时才失去。
                 //   应当第二回合开始时就失去」）：
@@ -138,11 +185,13 @@ public sealed class SilentDominion : MegaCrit.Sts2.Core.Models.Dread.DominionMod
                 }
                 catch (Exception e) { Logger.Log("[CharBoss] 静默猎手的支配：清 Weak 跳过标记失败: " + e.Message); }
             }
-            Logger.Log("[CharBoss] 恐惧模式·静默猎手的支配：所有玩家 −1 力量、+1 虚弱");
+            Logger.Log($"[CharBoss] 恐惧模式·静默猎手的支配（{(elite ? "精英战" : "普通战")}）：" +
+                       $"{given} 名玩家 −{stacks} 力量、+{stacks} 虚弱");
         }
         catch (Exception e) { Logger.Log("[CharBoss] 静默猎手的支配失败: " + e.Message); }
     }
 }
+
 
 /// <summary>
 /// **储君的支配**（用户 2026-11-13 改口径）：

@@ -1,8 +1,9 @@
 {
     "DREAD.IRONCLAD.description":  "Ironclad\u0027s Dominion: at the start of each combat, all enemies gain 1 Demon Form.",
-    "DREAD.SILENT.description":  "Silent\u0027s Dominion: at the start of each combat, you lose 1 Strength and gain 1 Weak.",
+    "DREAD.SILENT.description":  "The Silent's Dominion: at the start of every combat, you lose 1 Strength and gain 1 Weak (in Elite combats: 2 Strength and 2 Weak).",
     "DREAD.DEFECT.description":  "Defect\u0027s Dominion: at the end of your turn, take 3 damage for each enemy.",
     "DREAD.NECROBINDER.description":  "Necrobinder\u0027s Dominion: at the start of your turn, a random card in your hand costs 1 more this turn.",
     "DREAD.REGENT.description":  "Regent\u0027s Dominion: whenever an enemy attacks you, you lose 1 Strength this turn.",
-    "DREAD.WATCHER.description":  "The Watcher\u0027s Dominion: at the start of every combat, all players gain 3 [gold]Devotion[/gold] (when its holder\u0027s turn begins, the Watcher gains 3 [gold]Mantra[/gold])."
+    "DREAD.WATCHER.description":  "The Watcher\u0027s Dominion: at the start of every combat, all players gain 3 [gold]Devotion[/gold] (when its holder\u0027s turn begins, the Watcher gains 3 [gold]Mantra[/gold]).",
+    "DREAD.FOOL.description":  "The Fool's Dominion: at the start of every combat, add 2 [gold]Sadness[/gold] to your draw pile."
 }
