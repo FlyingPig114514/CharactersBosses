@@ -21,7 +21,14 @@ public static class BossDefs
     ///   銆岃繕鏄笉鏄崰浣嶇銆嶇殑鍒ゆ柇锛坄BossFrameTickPatch` / `CharBossMonster.Descriptor`锛夐兘璧板畠銆?    /// </summary>
     public static readonly Type PlaceholderCharacterType =
 #if STS2_113
-        PlaceholderCharacterType;
+        // ★ v0.2.745（严重回归修复）：这里以前写成了 `PlaceholderCharacterType;`（**自己赋值给自己**），
+        //   是 v0.2.732 做「111/113 条件编译拆分」时被脚本改坏的 —— 结果 0.113 构建里这个字段
+        //   运行时是 **null** ⇒ 所有走它的定义（愚者 `FOOL_BOSS`，以及刷新前的观者三家）都拿到
+        //   `CharacterType == null` ⇒ `ShadowPlayerFactory.Attach` 里 `ModelDb.GetId(null)` 直接 NRE
+        //   ⇒ 影子玩家没建起来 ⇒ `PrepareTurn` 失败 ⇒ **Boss 全程不动、意图全空、立绘/图标退回占位**
+        //   （用户截图：557 血的愚者站着不出手，地图图标是占位图；日志 `PrepareTurn failed` /
+        //   `FOOL_BOSS 读角色基础血量失败` 都是这一条）。
+        typeof(MegaCrit.Sts2.Core.Models.Characters.Fool);
 #else
         typeof(MegaCrit.Sts2.Core.Models.Characters.DeprecatedCharacter);
 #endif

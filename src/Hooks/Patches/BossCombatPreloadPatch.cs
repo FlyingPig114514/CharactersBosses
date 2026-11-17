@@ -214,6 +214,11 @@ internal static class BossPreloadAssets
                 2 => "DEFECT_BOSS",
                 3 => "NECROBINDER_BOSS",
                 4 => "REGENT_BOSS",
+                // ★ v0.2.745（用户 2026-11-17：恐惧模式的愚者「地图图标是占位」）：
+                //   愚者 = 角色下标 5、观者 = 6，以前这两个下标**根本没进这张表** ⇒ 他们的
+                //   立绘 / 角色徽章一条都不预载（日志：「没有对应的 BossDefs 定义」）。
+                5 => "FOOL_BOSS",
+                6 => "WATCHER_DIVINITY",
                 _ => null,
             };
             if (baseKey != null && BossDefs.All.TryGetValue(baseKey, out var def)) return def;
