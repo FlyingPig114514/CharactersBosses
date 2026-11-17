@@ -1,8 +1,8 @@
-﻿{
+{
     "DREAD.IRONCLAD.description":  "Ironclad\u0027s Dominion: at the start of each combat, all enemies gain 1 Demon Form.",
     "DREAD.SILENT.description":  "Silent\u0027s Dominion: at the start of each combat, you lose 1 Strength and gain 1 Weak.",
     "DREAD.DEFECT.description":  "Defect\u0027s Dominion: at the end of your turn, take 3 damage for each enemy.",
     "DREAD.NECROBINDER.description":  "Necrobinder\u0027s Dominion: at the start of your turn, a random card in your hand costs 1 more this turn.",
     "DREAD.REGENT.description":  "Regent\u0027s Dominion: whenever an enemy attacks you, you lose 1 Strength this turn.",
-    "DREAD.WATCHER.description":  "Dominio dell\u0027Osservatrice: all\u0027inizio di ogni combattimento tutti i giocatori ottengono 2 [gold]Devozione[/gold] (all\u0027inizio del turno del portatore l\u0027Osservatrice ottiene 2 [gold]Mantra[/gold])."
+    "DREAD.WATCHER.description":  "Dominio dell\u0027Osservatrice: all\u0027inizio di ogni combattimento tutti i giocatori ottengono 3 [gold]Devozione[/gold] (all\u0027inizio del turno del portatore l\u0027Osservatrice ottiene 3 [gold]Mantra[/gold])."
 }

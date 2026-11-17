@@ -298,14 +298,18 @@ public sealed class FoolDominion : MegaCrit.Sts2.Core.Models.Dread.DominionModel
 #if STS2_113
 
 /// <summary>
-/// **观者的支配**（用户 2026-11-15）：恐惧模式下「所有敌人获得 2 层虔信」。
+/// **观者的支配**（用户 2026-11-15；2026-11-17 增强）：恐惧模式下「所有敌人获得 **3** 层虔信」。
 ///
 /// 虔信 = 一个「**回合开始时给观者真言**」的 buff（见 <see cref="Powers.WatcherFaithPower"/>），
-/// 挂在每位玩家身上 ⇒ 他们每人回合开始，观者收 2 层真言（支配是给 Boss 加码的，
+/// 挂在每位玩家身上 ⇒ 他们每人回合开始，观者收 3 层真言（支配是给 Boss 加码的，
 /// 和愚者「开局塞 2 张悲伤」同向）。
+/// ★ v0.2.742（用户 2026-11-17）：「增强恐惧模式下观者的支配：所有敌人获得 3 层虔信」⇒ 2 → 3。
 /// </summary>
 public sealed class WatcherDevotionDominion : MegaCrit.Sts2.Core.Models.Dread.DominionModel
 {
+    /// <summary>每位玩家获得的虔信层数（= 他们每回合开始给观者的真言层数）。</summary>
+    private const int FaithStacks = 3;
+
     public override async Task AfterRoomEntered(AbstractRoom room)
     {
         try
@@ -321,11 +325,11 @@ public sealed class WatcherDevotionDominion : MegaCrit.Sts2.Core.Models.Dread.Do
                 if (creature == null || !creature.IsAlive) continue;
                 if (creature.Monster != null) continue;      // 影子玩家 / 怪物不算
                 await MegaCrit.Sts2.Core.Commands.PowerCmd.Apply<Powers.WatcherFaithPower>(
-                    new ThrowingPlayerChoiceContext(), creature, 2m, null, null);
+                    new ThrowingPlayerChoiceContext(), creature, (decimal)FaithStacks, null, null);
                 given++;
             }
-            Logger.Log($"[CharBoss] 恐惧模式·观者的支配：{given} 名玩家各获得 2 层虔信" +
-                       "（他们回合开始时观者获得 2 层真言）");
+            Logger.Log($"[CharBoss] 恐惧模式·观者的支配：{given} 名玩家各获得 {FaithStacks} 层虔信" +
+                       $"（他们回合开始时观者获得 {FaithStacks} 层真言）");
         }
         catch (Exception e) { Logger.Log("[CharBoss] 观者的支配失败: " + e.Message); }
     }

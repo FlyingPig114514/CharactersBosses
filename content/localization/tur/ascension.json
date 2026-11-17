@@ -1,8 +1,8 @@
-﻿{
+{
     "DREAD.IRONCLAD.description":  "Ironclad\u0027s Dominion: at the start of each combat, all enemies gain 1 Demon Form.",
     "DREAD.SILENT.description":  "Silent\u0027s Dominion: at the start of each combat, you lose 1 Strength and gain 1 Weak.",
     "DREAD.DEFECT.description":  "Defect\u0027s Dominion: at the end of your turn, take 3 damage for each enemy.",
     "DREAD.NECROBINDER.description":  "Necrobinder\u0027s Dominion: at the start of your turn, a random card in your hand costs 1 more this turn.",
     "DREAD.REGENT.description":  "Regent\u0027s Dominion: whenever an enemy attacks you, you lose 1 Strength this turn.",
-    "DREAD.WATCHER.description":  "Gözcü\u0027nün Hükmü: her savaşın başında tüm oyuncular 2 [gold]Dindarlık[/gold] kazanır (sahibinin turu başladığında Gözcü 2 [gold]Mantra[/gold] kazanır)."
+    "DREAD.WATCHER.description":  "Gözcü\u0027nün Hükmü: her savaşın başında tüm oyuncular 3 [gold]Dindarlık[/gold] kazanır (sahibinin turu başladığında Gözcü 3 [gold]Mantra[/gold] kazanır)."
 }
