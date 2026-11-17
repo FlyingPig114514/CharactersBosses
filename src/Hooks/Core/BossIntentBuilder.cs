@@ -859,28 +859,30 @@ public static class BossIntentBuilder
         //     攻势意图已经是这个数，再画一条会让薄荷尖塔把两条相加 ⇒ 跳过。
         //   除荒疫打击外都不吃力量/虚弱/易伤 ⇒ 用 `RawAttackIntent`（数字原样）。
         //   ⚠ 必须放在下面 `intents.Count == 0` 兜底**之前**，否则这三张技能牌会被补一条「强化」。
+        //
+        // ★ v0.2.728（用户 2026-11-17 给的**意图判定总表**）：
+        //   > 「攻势：造成伤害**或施加灾厄**」
+        //   ⇒ 不再点名那四张，改成**凡是会施加灾厄的牌**都画一条「攻势 = 灾厄层数」。
+        //     这样「死神」（`DEATH`，塔罗愚第 7/14 回合那张 75 层灾厄、本身不造成伤害）也会被带上；
+        //     以前它只画策略，玩家看不到 75 点灾厄。
+        //   唯一例外仍然是**荒疫打击**：它的灾厄层数就等于它自己的伤害 ⇒ 它自己那条攻势已经是这个数。
         try
         {
-            if (entry == "DEATHBRINGER" || entry == "SCOURGE" || entry == "NO_ESCAPE" || entry == "BLIGHT_STRIKE")
+            int doom = DoomIntentAmount(card, entry, target);
+            bool doomIsOwnDamage = string.Equals(entry, "BLIGHT_STRIKE", StringComparison.Ordinal);
+            if (doomIsOwnDamage)
             {
-                if (entry == "BLIGHT_STRIKE")
-                {
-                    if (DoomIntentLogs++ < 12)
-                        Logger.Log("[CharBoss] 荒疫打击：灾厄层数就等于它自己的伤害 ⇒ 不额外画第二条攻势（否则薄荷尖塔会双算）");
-                }
-                else
-                {
-                    int doom = DoomIntentAmount(card, entry, target);
-                    bool groupDoom = entry == "DEATHBRINGER";
-                    if (doom > 0)
-                    {
-                        if (!groupDoom && aimedElsewhere) intents.Add(new RawAttackIntent(0));
-                        else intents.Add(new RawAttackIntent(doom));
-                        if (DoomIntentLogs++ < 20)
-                            Logger.Log($"[CharBoss] 灾厄牌 {entry}：会施加 {doom} 层灾厄 ⇒ 额外一条" +
-                                       $"{(groupDoom ? "群体" : "单体")}攻势意图 {doom}（不吃力量/虚弱/易伤）");
-                    }
-                }
+                if (DoomIntentLogs++ < 12)
+                    Logger.Log("[CharBoss] 荒疫打击：灾厄层数就等于它自己的伤害 ⇒ 不额外画第二条攻势（否则薄荷尖塔会双算）");
+            }
+            else if (doom > 0)
+            {
+                bool groupDoom = entry == "DEATHBRINGER" || IsAoE(card);
+                if (!groupDoom && aimedElsewhere) intents.Add(new RawAttackIntent(0));
+                else intents.Add(new RawAttackIntent(doom));
+                if (DoomIntentLogs++ < 20)
+                    Logger.Log($"[CharBoss] 灾厄牌 {entry}：会施加 {doom} 层灾厄 ⇒ 额外一条" +
+                               $"{(groupDoom ? "群体" : "单体")}攻势意图 {doom}（不吃力量/虚弱/易伤）");
             }
         }
         catch { /* 纯预览 */ }
@@ -1651,15 +1653,6 @@ public static class BossIntentBuilder
         //   但 `ClassifyPowers` 把它身上的某个变量认成了增益 ⇒ 多出一条「强化」。
         //   这里点名禁掉；第 4 回合那条「策略」是剧本 `ScriptCard.ForceDebuffIntent` 单独画的。
         "BANSHEES_CRY",
-        // ★ v0.2.727（用户 2026-11-17）：「死亡使者、鞭打等牌意图不对，我上次改之后应该是策略+攻势
-        //   （伤害=施加灾厄层数）」。
-        //   这三张是**灾厄牌**：它们的意图已经由下面那段 `DoomIntentAmount` 画出一条「攻势 = 灾厄层数」
-        //   + 通用分类画出一条「策略」。但它们的变量里还带着 `Cards`（鞭打抽牌）之类看起来像"自我增益"的
-        //   东西 ⇒ `selfBenefit` 会再补一条强化（实机日志：`意图 DEATHBRINGER: [BuffIntent+DebuffIntent]`）。
-        //   按用户口径点名禁掉强化，只留 攻势 + 策略。
-        "DEATHBRINGER",
-        "SCOURGE",
-        "NO_ESCAPE",
     };
 
     /// <summary>
@@ -1809,10 +1802,24 @@ public static class BossIntentBuilder
 
             string entry;
             try { entry = card.Id.Entry; } catch { return false; }
-            if (!string.Equals(entry, "JUDGEMENT", StringComparison.Ordinal)) return false;
-
+            // ★ v0.2.728（用户 2026-11-17 意图判定总表：「审判：满足条件立刻使目标死亡（原版仅审判，
+            //   **观者模组中的审判也满足条件**）」）：
+            //   三张牌三套写法（反编译核对过）：
+            //     · 本体 `Judgement`      → 阈值变量叫 `Threshold`（30 / 升级 40）；
+            //     · 观者 A 版 `WatcherMod.WatcherJudgment` → 变量叫 `MagicNumber`（30）；
+            //     · 观者 B 版 `Watcher.Code.Cards.Rare.Judgment` → 变量叫 `DamageThreshold`（30 / 升级 +10）。
+            //   判据统一成「目标当前生命 ≤ 阈值」，阈值按这三个名字依次找。
             int threshold = (int)Var(card, "Threshold", 0m);
-            if (threshold <= 0) return false;
+            if (threshold <= 0) threshold = (int)Var(card, "DamageThreshold", 0m);
+            bool isVanilla = string.Equals(entry, "JUDGEMENT", StringComparison.Ordinal);
+            bool isWatcher = WatcherJudgmentEntry(entry);
+            if (threshold <= 0)
+            {
+                // A 版把阈值放在 MagicNumber 里；本体有些牌也用 MagicNumber，所以只对「认得出来是审判」的牌读
+                if (isVanilla || isWatcher) threshold = (int)Var(card, "MagicNumber", 0m);
+            }
+            if (!isVanilla && !isWatcher) return false;
+            if (threshold <= 0) threshold = 30;      // 三张牌的初值都是 30
             return target.CurrentHp <= threshold;
         }
         catch { return false; }
@@ -1837,6 +1844,35 @@ public static class BossIntentBuilder
     }
 
     private static int _superMassiveLogs;
+
+    /// <summary>这张牌的 entry 是不是「观者模组的那张审判」（A 版 `WATCHER_JUDGEMENT` / B 版 `WATCHER-JUDGMENT`，
+    /// 去掉 `-`/`_`/空格 再比后缀；也兼容 `_P` 那种玩家版尾巴与 `_WATCHER` 尾巴）。
+    /// ⚠ 这里不调用 `CharBossMonster.WatcherIdIs` —— 那个只在 `STS2_111` 构建里存在（107 也要能编译）。</summary>
+    private static bool WatcherJudgmentEntry(string entry)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(entry)) return false;
+            var sb = new System.Text.StringBuilder(entry.Length);
+            foreach (char c in entry)
+            {
+                if (c == '-' || c == '_' || c == ' ') continue;
+                sb.Append(char.ToUpperInvariant(c));
+            }
+            string e = sb.ToString();
+            foreach (var suffix in new[] { "JUDGEMENT", "JUDGMENT" })
+            {
+                if (e.EndsWith(suffix, StringComparison.Ordinal)) return true;
+                if (e.Length > 1 && char.IsLetter(e[e.Length - 1]) &&
+                    e.Substring(0, e.Length - 1).EndsWith(suffix, StringComparison.Ordinal)) return true;
+                const string Tail = "WATCHER";
+                if (e.Length > Tail.Length && e.EndsWith(Tail, StringComparison.Ordinal) &&
+                    e.Substring(0, e.Length - Tail.Length).EndsWith(suffix, StringComparison.Ordinal)) return true;
+            }
+        }
+        catch { /* 认不出来就当不是 */ }
+        return false;
+    }
 
     /// <summary>
     /// 这张牌「会施加多少层灾厄」（反编译：死亡 `Death` 75 / 死亡使者 `Deathbringer` 21 / 鞭打 `Scourge` 13，
@@ -1895,9 +1931,6 @@ public static class BossIntentBuilder
     {
         try
         {
-            if (entry == "DEATHBRINGER" || entry == "SCOURGE")
-                return DoomAmountOf(card);
-
             if (entry == "NO_ESCAPE")
             {
                 int existing = 0;
@@ -1914,6 +1947,9 @@ public static class BossIntentBuilder
                                $" = {total}（阈值 {threshold}）⇒ 会施加 {amount} 层");
                 return amount;
             }
+
+            // 其它牌一律按牌面/预览的 `PowerVar<DoomPower>` 读（死亡 75 / 死亡使者 21 / 鞭打 13 …）
+            return DoomAmountOf(card);
         }
         catch { /* 算不出按 0 */ }
         return 0;
