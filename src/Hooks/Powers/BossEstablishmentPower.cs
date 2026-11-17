@@ -103,7 +103,7 @@ public sealed class BossEstablishmentPower : PowerModel
             foreach (var card in retainedCards ?? (IReadOnlyCollection<CardModel>)Array.Empty<CardModel>())
             {
                 if (card == null) continue;
-                if (WillBeRetained(card)) reallyRetained.Add(card);
+                if (WillBeRetained(card, player)) reallyRetained.Add(card);
                 else keptButNotRetained++;
             }
 
@@ -147,7 +147,7 @@ public sealed class BossEstablishmentPower : PowerModel
                     foreach (var card in hand)
                     {
                         if (card == null) continue;
-                        if (!WillBeRetained(card)) continue;
+                        if (!WillBeRetained(card, player)) continue;
                         willRetain.Add(card);
                     }
                     await SettleAsync(choiceContext, player, willRetain, "BeforeSideTurnEnd");
@@ -165,18 +165,50 @@ public sealed class BossEstablishmentPower : PowerModel
     }
 
     /// <summary>
-    /// 这张牌这一回合结束时会被保留吗。
+    /// 这张牌算不算「被保留」。
     ///
-    /// 反编译 <c>CardModel.ShouldRetainThisTurn</c> 的实现正好就是
-    /// <c>Keywords.Contains(CardKeyword.Retain) || HasSingleTurnRetain</c>
-    /// ⇒ 一条就同时覆盖「关键字保留」和「被 buff 临时保留」（`GiveSingleTurnRetain`）。
-    /// （`HasSingleTurnRetain` 是私有属性，用不了，也没必要用。）
+    /// ★ 三轮实测逐步收敛出来的口径（用户 2026-11-17）：
+    ///
+    /// | 来源 | 引擎实现 | 算不算保留 |
+    /// |---|---|---|
+    /// | 自带「保留」关键字（时之沙 / 旋转打击 / 坚韧…） | `CardKeyword.Retain` | **算** |
+    /// | 「保留手牌」buff（`RetainHandPower`，计数器 N 回合） | `ShouldFlush(player) =&gt; false` | **算**（用户第 3 轮：「保留手牌 buff 保留的牌又不会费用增加了」⇒ 要算） |
+    /// | 金字塔（遗物 `RunicPyramid`） | `ShouldFlush(player) =&gt; false` | **不算**（用户第 2 轮：「不丢弃不等于保留」） |
+    /// | 计划妥当（`WellLaidPlansPower`） | `ShouldFlush(player) =&gt; false` | **不算**（同上） |
+    /// | 别的「单回合保留」效果 | `GiveSingleTurnRetain()` ⇒ `CardModel.ShouldRetainThisTurn` | **算** |
+    ///
+    /// 麻烦在于：金字塔 / 计划妥当 / 保留手牌**三者引擎层面长得一模一样**（都是「不冲洗手牌」），
+    /// 手里那些牌身上一个标记也没有 ⇒ 只能按**持有者身上有没有「保留手牌」这个 power** 来区分
+    /// （`RetainHandPower` 是 `PowerStackType.Counter`、自己回合结束 −1 层，语义就是「再保留几回合手牌」）。
+    /// 类型名用字符串比，避免版本间类名/命名空间变动把编译搞崩。
     /// </summary>
-    private static bool WillBeRetained(CardModel card)
+    private static bool WillBeRetained(CardModel card, Player? player)
     {
-        try { return card.ShouldRetainThisTurn; } catch { /* 忽略 */ }
-        try { return card.Keywords != null && card.Keywords.Contains(CardKeyword.Retain); }
-        catch { return false; }
+        try
+        {
+            if (card.Keywords != null && card.Keywords.Contains(CardKeyword.Retain)) return true;
+        }
+        catch { /* 忽略 */ }
+        try { if (card.ShouldRetainThisTurn) return true; } catch { /* 忽略 */ }
+        return HasRetainHandBuff(player);
+    }
+
+    /// <summary>这位玩家身上有没有「保留手牌」（`RetainHandPower`）。</summary>
+    private static bool HasRetainHandBuff(Player? player)
+    {
+        try
+        {
+            var powers = player?.Creature?.Powers;
+            if (powers == null) return false;
+            for (int i = 0; i < powers.Count; i++)
+            {
+                var p = powers[i];
+                if (p == null) continue;
+                if (string.Equals(p.GetType().Name, "RetainHandPower", StringComparison.Ordinal)) return true;
+            }
+        }
+        catch { /* 忽略 */ }
+        return false;
     }
 
     private bool IsMine(Player? player)
