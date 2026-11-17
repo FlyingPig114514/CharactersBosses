@@ -1272,6 +1272,18 @@ public static class BossIntentBuilder
             });
         }
 
+        // ★ v0.2.727（用户 2026-11-17）：
+        //   > 「厄运之衣应当是强化而非守势。所有能力牌的意图都应该是强化（有少数例外，
+        //   >   如刀扇和会激发充能球的能力牌会带有攻势意图，但本身也是有强化的）」
+        //   ⇒ **能力牌**一律：摘掉「守势」，保证恰好一条「强化」，其它意图（攻势 / 策略 / 牺牲…）原样保留。
+        //   实机例子：厄运之衣（`SHROUD`）是 `CardType.Power` + `BlockVar(3)`（`ShroudPower` 每回合给格挡）
+        //   ⇒ 以前只画成「守势」；现在画成「强化」。
+        if (card.Type == CardType.Power)
+        {
+            intents.RemoveAll(it => it is DefendIntent);
+            EnsureBuffIntent(intents);
+        }
+
         ApplyWatcherStanceIntents(intents, card, stanceMul);
 
         return intents;
@@ -1639,6 +1651,15 @@ public static class BossIntentBuilder
         //   但 `ClassifyPowers` 把它身上的某个变量认成了增益 ⇒ 多出一条「强化」。
         //   这里点名禁掉；第 4 回合那条「策略」是剧本 `ScriptCard.ForceDebuffIntent` 单独画的。
         "BANSHEES_CRY",
+        // ★ v0.2.727（用户 2026-11-17）：「死亡使者、鞭打等牌意图不对，我上次改之后应该是策略+攻势
+        //   （伤害=施加灾厄层数）」。
+        //   这三张是**灾厄牌**：它们的意图已经由下面那段 `DoomIntentAmount` 画出一条「攻势 = 灾厄层数」
+        //   + 通用分类画出一条「策略」。但它们的变量里还带着 `Cards`（鞭打抽牌）之类看起来像"自我增益"的
+        //   东西 ⇒ `selfBenefit` 会再补一条强化（实机日志：`意图 DEATHBRINGER: [BuffIntent+DebuffIntent]`）。
+        //   按用户口径点名禁掉强化，只留 攻势 + 策略。
+        "DEATHBRINGER",
+        "SCOURGE",
+        "NO_ESCAPE",
     };
 
     /// <summary>
@@ -1817,13 +1838,65 @@ public static class BossIntentBuilder
 
     private static int _superMassiveLogs;
 
+    /// <summary>
+    /// 这张牌「会施加多少层灾厄」（反编译：死亡 `Death` 75 / 死亡使者 `Deathbringer` 21 / 鞭打 `Scourge` 13，
+    /// 全是 `PowerVar&lt;DoomPower&gt;`）。
+    ///
+    /// ★ v0.2.727（用户 2026-11-17：「死亡使者、鞭打等牌意图不对，应该是策略+攻势（伤害=施加灾厄层数）」）：
+    ///   以前只按**变量名** `"Doom"` 读预览值（`BossDamagePredictor.VarPreviewInt`），实机日志证明
+    ///   它读到 **0** —— 于是 `if (doom > 0)` 那条攻势根本不加，牌上只剩「兜底强化 + 通用策略」
+    ///   （`意图 DEATHBRINGER: [BuffIntent+DebuffIntent]`、`意图 SCOURGE: [BuffIntent+DebuffIntent]`）。
+    ///   变量名不可靠（同一套 `PowerVar&lt;T&gt;` 在不同牌上名字并不总等于 `T` 去掉 `Power`），
+    ///   所以这里改成**按泛型类型认**：扫 `DynamicVars` 里所有 `PowerVar&lt;DoomPower&gt;`，
+    ///   取 `BaseValue` 与预览值里较大的那个（升级后 27 / 16 也能读到）。
+    /// </summary>
+    private static int DoomAmountOf(CardModel card)
+    {
+        int best = 0;
+        try
+        {
+            // ① 先试常见变量名（万一名字就叫 Doom，预览值已经把升级算进去了）
+            int byName = BossDamagePredictor.VarPreviewInt(card, "Doom", 0);
+            if (byName > 0) return byName;
+
+            var vars = card.DynamicVars;
+            try
+            {
+                vars.ClearPreview();
+                card.UpdateDynamicVarPreview(CardPreviewMode.Normal, null, vars);
+            }
+            catch { /* 预览失败就用 BaseValue */ }
+
+            foreach (var kv in vars)
+            {
+                var v = kv.Value;
+                if (v == null) continue;
+                var t = v.GetType();
+                if (!t.IsGenericType) continue;
+                if (t.GetGenericTypeDefinition() != typeof(PowerVar<>)) continue;
+                if (t.GetGenericArguments()[0] != typeof(DoomPower)) continue;
+
+                int bv = 0, pv = 0;
+                try { bv = (int)Math.Round((double)v.BaseValue); } catch { bv = 0; }
+                try { pv = (int)Math.Round((double)v.PreviewValue); } catch { pv = 0; }
+                best = Math.Max(best, Math.Max(bv, pv));
+            }
+            try { vars.ClearPreview(); } catch { /* 忽略 */ }
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 读灾厄层数失败: " + e.Message);
+        }
+        return Math.Max(0, best);
+    }
+
     /// <summary>灾厄牌「会施加多少层灾厄」——给那条额外攻势意图用（用户 2026-11-16）。</summary>
     private static int DoomIntentAmount(CardModel card, string entry, Creature? target)
     {
         try
         {
             if (entry == "DEATHBRINGER" || entry == "SCOURGE")
-                return Math.Max(0, BossDamagePredictor.VarPreviewInt(card, "Doom", 0));
+                return DoomAmountOf(card);
 
             if (entry == "NO_ESCAPE")
             {
