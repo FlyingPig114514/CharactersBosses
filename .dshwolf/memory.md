@@ -5857,3 +5857,4 @@ Chronological action log.
 | 2026-11-17 12:37 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossDefs.cs` | error | 0 |
 | 2026-11-17 12:37 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossDefs.cs` | ok | 0 |
 | 2026-11-17 12:40 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/patch-111-split.ps1` | ok | 0 |
+| 2026-11-17 13:22 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/workshop/changenote.txt` | ok | 0 |

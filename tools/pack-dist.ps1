@@ -1,4 +1,4 @@
-# pack-dist.ps1 -- 收尾打包：把「刚构建出来的东西」同步到 workshop\content 和 .dist\
+﻿# pack-dist.ps1 -- 收尾打包：把「刚构建出来的东西」同步到 workshop\content 和 .dist\
 #
 # 用户 2026-11-05：「打包时在这里也放一份 D:\Sts2ModProject\...\.dist」
 #
