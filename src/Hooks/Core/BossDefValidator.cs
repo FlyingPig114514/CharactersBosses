@@ -232,10 +232,12 @@ public static class BossDefValidator
     {
         (string Name, Type Type)[] cards =
         {
+#if STS2_113   // Tarot / Fool content: 0.113 only
             ("斋戒", typeof(Cards.TarotFasting)),
             ("天人形态", typeof(Cards.TarotDevaForm)),
             ("斗殴", typeof(Cards.TarotBrawl)),
             ("永恒形态", typeof(Cards.TarotEternalForm)),
+#endif
         };
         // 5 层「观者 / 亡命之徒」搬来的能力：图标也要用它们自己原来那张
         foreach (var icon in new[] { "tarot_energy_down", "tarot_deva", "tarot_brawl", "tarot_bruise", "tarot_eternal" })

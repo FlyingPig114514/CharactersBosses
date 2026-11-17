@@ -54,7 +54,7 @@ public class RegentBoss : CharBossMonster
     public override BossDefinition DefSource => BossDefs.Regent;
 }
 
-#if STS2_111
+#if STS2_113
 /// <summary>愚者 Boss（三层 1 号「塔罗愚」，用户 2026-11-14）。0.113 才有愚者角色 ⇒ 只在 111 构建里。
 /// </summary>
 public class FoolBoss : CharBossMonster

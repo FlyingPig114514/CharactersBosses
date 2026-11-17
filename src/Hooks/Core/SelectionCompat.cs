@@ -56,7 +56,7 @@ internal static class SelectionCompat
     public static IDisposable Push(Player? player, ICardSelector selector)
     {
         if (player == null || selector == null) return new Noop();
-#if STS2_107
+#if !STS2_113
         try
         {
             return MegaCrit.Sts2.Core.Commands.CardSelectCmd.PushSelector(selector);
@@ -101,7 +101,7 @@ internal static class SelectionCompat
     public static IDisposable SuspendForUi(Player? player)
     {
         if (player == null) return new Noop();
-#if STS2_107
+#if !STS2_113
         try
         {
             return MegaCrit.Sts2.Core.Commands.CardSelectCmd.SuspendSelectorForTest();

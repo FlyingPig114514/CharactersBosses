@@ -112,8 +112,10 @@ public static class BossSpecialPowerIconPatch
     /// 目前用到它的三个（都在 `Powers/DominionPowers.cs`）：
     ///   · `DefectDominionPower`（故障机器人的支配）→ 故障机器人头像；
     ///   · `NecrobinderDominionPower`（亡灵契约师的支配）→ 亡灵契约师头像；
+#if STS2_113
     ///   · `FoolDominionPower`（愚者的支配）→ 愚者头像（`Models.Characters.Fool`，仅 0.113 有）。
     ///
+#endif
     /// 取不到（角色没注册 / 路径为空）时返回 null ⇒ 继续走下面的逻辑（最终落到好奇灯泡），
     /// 绝不会出现「图标空白」。
     /// </summary>
@@ -127,8 +129,10 @@ public static class BossSpecialPowerIconPatch
             if (power is Powers.NecrobinderDominionPower)
                 return ExistingOrNull(CharacterIconPath(typeof(MegaCrit.Sts2.Core.Models.Characters.Necrobinder)));
 #if STS2_111
+#if STS2_113
             if (power is Powers.FoolDominionPower)
-                return ExistingOrNull(CharacterIconPath(typeof(MegaCrit.Sts2.Core.Models.Characters.Fool)));
+                return ExistingOrNull(CharacterIconPath(Core.BossDefs.PlaceholderCharacterType));
+#endif
 #endif
         }
         catch (Exception e)

@@ -2743,7 +2743,7 @@ public static class BossIntentBuilder
             //   原版那张牌是「用手牌填满」，牌面没有任何变量 ⇒ 下面按变量名读只会得到 0。
             //   真正生成 10 把的是 `Patches.FoolMoonShivPatch`（接管 `TheMoon.OnPlay`），
             //   这个数字只负责「意图里画几把小刀」+ `PlannedPlay.GeneratedShivs`（出牌阶段打几把）。
-#if STS2_111   // 「愚者 / 塔罗牌」只在 0.113 存在
+#if STS2_113   // 「愚者 / 塔罗牌」只在 0.113 存在
             if (string.Equals(card.Id.Entry, "THE_MOON", StringComparison.Ordinal))
                 return CharacterBosses.Patches.FoolMoonShivPatch.ShivCount;
 #endif

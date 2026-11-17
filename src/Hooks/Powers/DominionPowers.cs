@@ -232,7 +232,7 @@ public sealed class NecrobinderDominionPower : PowerModel
     }
 }
 
-#if STS2_111
+#if STS2_113
 /// <summary>
 /// 恐惧模式「**愚者的支配**」的**可视载体**（用户 2026-11-13 新增）。
 ///

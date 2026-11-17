@@ -1,4 +1,4 @@
-#if STS2_111   // 愚者 / 塔罗牌 只在 0.113 存在（用户 2026-11-14：107 不加这个 Boss）
+#if STS2_113   // 愚者 / 塔罗牌 只在 0.113 存在（用户 2026-11-14：107 不加这个 Boss）
 using System;
 using Godot;
 using HarmonyLib;

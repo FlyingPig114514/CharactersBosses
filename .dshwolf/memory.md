@@ -5852,3 +5852,8 @@ Chronological action log.
 | 2026-11-17 12:15 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/UI/BossHandPanel.Extra.cs` | ok | 0 |
 | 2026-11-17 12:15 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
 | 2026-11-17 12:15 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-17 12:21 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/pck_builder/dump_pck_file.gd` | ok | 0 |
+| 2026-11-17 12:34 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/CharacterBosses.csproj` | ok | 0 |
+| 2026-11-17 12:37 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossDefs.cs` | error | 0 |
+| 2026-11-17 12:37 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossDefs.cs` | ok | 0 |
+| 2026-11-17 12:40 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/patch-111-split.ps1` | ok | 0 |

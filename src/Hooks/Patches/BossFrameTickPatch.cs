@@ -692,7 +692,7 @@ public static class BossFrameTick
             //   两个函数都是幂等且「只在值真的变了时打日志」⇒ 放慢车道里一直重试到解析成功为止。
             try
             {
-                if (Core.BossDefs.Watcher.CharacterType == typeof(MegaCrit.Sts2.Core.Models.Characters.Fool))
+                if (Core.BossDefs.Watcher.CharacterType == Core.BossDefs.PlaceholderCharacterType)
                 {
                     Core.BossDefs.RefreshWatcherCharacterType();
                     Core.BossDefs.RefreshWatcherExtras();

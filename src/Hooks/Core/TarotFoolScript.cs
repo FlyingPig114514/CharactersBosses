@@ -1,4 +1,4 @@
-#if STS2_111
+#if STS2_113
 using System;
 using System.Collections.Generic;
 using MegaCrit.Sts2.Core.Models.Cards;

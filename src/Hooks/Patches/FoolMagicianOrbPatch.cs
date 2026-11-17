@@ -1,4 +1,4 @@
-#if STS2_111   // ⚠ 「愚者 / 塔罗牌」是 0.113.0 才有的 ⇒ 用户 2026-11-14：107 版本不加这个 Boss
+#if STS2_113   // ⚠ 「愚者 / 塔罗牌」是 0.113.0 才有的 ⇒ 用户 2026-11-14：107 版本不加这个 Boss
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

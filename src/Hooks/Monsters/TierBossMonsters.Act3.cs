@@ -115,7 +115,7 @@ public sealed class IroncladBoulderBoss : IroncladBoss
     public override string? PinnedVariantKey => "IRONCLAD_BOULDER";
 }
 
-#if STS2_111
+#if STS2_113
 /// <summary>塔罗愚（第 3 层）—— 设计 Key <c>FOOL_TAROT</c>。</summary>
 public sealed class FoolTarotBoss : FoolBoss
 {

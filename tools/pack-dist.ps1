@@ -1,4 +1,4 @@
-﻿# pack-dist.ps1 -- 收尾打包：把「刚构建出来的东西」同步到 workshop\content 和 .dist\
+# pack-dist.ps1 -- 收尾打包：把「刚构建出来的东西」同步到 workshop\content 和 .dist\
 #
 # 用户 2026-11-05：「打包时在这里也放一份 D:\Sts2ModProject\...\.dist」
 #
@@ -121,7 +121,7 @@ function Resolve-ImplFile([string]$dir, [string]$base) {
     return $null
 }
 
-$implBases = @('CharacterBosses.Impl107.dll', 'CharacterBosses.Impl111.dll')
+$implBases = @('CharacterBosses.Impl111.dll', 'CharacterBosses.Impl113.dll')
 $implNames = @()
 $badVersion = @()
 foreach ($n in $implBases) {
@@ -141,7 +141,7 @@ if ($badVersion.Count -gt 0) {
 
 if ($implNames.Count -lt 2) {
     Write-Host ('[dist] ✗ 拒绝打包：两份实现缺了一份（找到: ' + $(if ($implNames.Count) { $implNames -join ', ' } else { '一个都没有' }) + '）') -ForegroundColor Red
-    Write-Host '[dist]   双版本外壳要求 Impl107 与 Impl111 同时在场，否则另一个游戏分支的玩家会载入失败。' -ForegroundColor Yellow
+    Write-Host '[dist]   双版本外壳要求 Impl111(正式) 与 Impl113(测试) 同时在场，否则另一个游戏分支的玩家会载入失败。' -ForegroundColor Yellow
     exit 1
 }
 

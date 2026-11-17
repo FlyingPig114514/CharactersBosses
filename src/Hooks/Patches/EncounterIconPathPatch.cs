@@ -254,7 +254,7 @@ internal static class OurEncounterIconPaths
             //   也不能把别的角色头像安到观者头上）。
             var type = Core.WatcherModPresence.CharacterType() ?? Core.BossDefs.Watcher?.CharacterType;
             if (type == null) return null;
-            if (type == typeof(MegaCrit.Sts2.Core.Models.Characters.Fool)) return null;
+            if (type == Core.BossDefs.PlaceholderCharacterType) return null;
             return ModelDb.GetById<CharacterModel>(ModelDb.GetId(type));
         }
         catch { return null; }

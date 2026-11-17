@@ -83,7 +83,7 @@ public class RegentBossEncounter : CharBossEncounterBase<RegentBoss>
 {
 }
 
-#if STS2_111
+#if STS2_113
 /// <summary>
 /// **愚者**（0.113 才有的角色）的遭遇。他本身不是「五角色」之一，只有「塔罗愚」这一套设计，
 /// 所以这里只做一个基础遭遇 + 一个档位钉死的专属遭遇（用户 2026-11-14 设计，见 docs/plans/boss-fool-tarot.md）。
@@ -263,7 +263,7 @@ public abstract class CharBossEncounterBase<TMonster> : EncounterModel, Core.IBo
     /// 否则恐惧模式里游戏会打 `... which doesn't have any dominion set!`（等于没有支配）。
     /// 非恐惧模式下游戏根本不会问这个（`GetDominion()` 只被 DreadRunModel 调用）。
     /// </summary>
-#if STS2_111
+#if STS2_113
     // ⚠ `EncounterModel.GetDominion()` 是 0.113.0 才加的虚方法（恐惧模式用的）⇒ 只在 111 构建里覆盖。
     public override MegaCrit.Sts2.Core.Models.Dread.DominionModel? GetDominion()
     {
@@ -502,7 +502,9 @@ public static class CharBossEncounters
         ModelDb.Encounter<NecrobinderBossNormalEncounter>(),
         ModelDb.Encounter<RegentBossNormalEncounter>(),
 #if STS2_111
+#if STS2_113
         ModelDb.Encounter<FoolTarotBossNormalEncounter>(),   // 愚者：调试开关写 fool 时用（107 没有这个角色）
+#endif
 #if STS2_111
         // ⚠ 2026-11-16：`DebugMode.CharacterKeys` 里 `watcher` 是下标 6，而这个数组以前只到 6 项（0..5）
         //   ⇒ 写 `watcher` 会越界、`ForDebug()` 回退成 `all[0]`＝铁甲战士（用户实测「第一场变成了易伤战」）。
@@ -571,7 +573,9 @@ public static class CharBossEncounters
         ModelDb.Encounter<NecrobinderFleshBossEncounter>(),    // 一层亡灵 2 号：血肉骨（用户 2026-11-10）
         ModelDb.Encounter<NecrobinderEtherealBossEncounter>(), // 二层亡灵 2 号：虚无骨（用户 2026-11-09）
 #if STS2_111
+#if STS2_113
         ModelDb.Encounter<FoolTarotBossEncounter>(),           // 三层 12 号：塔罗愚（愚者，用户 2026-11-14）
+#endif
         ModelDb.Encounter<WatcherDivinityBossEncounter>(),             // 三层 1 号：神格观（只有装了观者 mod 才会进候选表）
         ModelDb.Encounter<WatcherOmegaBossEncounter>(),                // 三层 2 号：Ω观（用户 2026-11-16）
         ModelDb.Encounter<WatcherCreateBossEncounter>(),                // 二层 1 号：印牌观（用户 2026-11-16）
@@ -611,7 +615,9 @@ public static class CharBossEncounters
             Add(4, 1, ModelDb.Encounter<RegentForgeBossEncounter>());            // 二层 铸剑储君
             Add(4, 2, ModelDb.Encounter<RegentColorlessBossEncounter>());        // 三层 无色储君
 #if STS2_111
+#if STS2_113
             Add(5, 2, ModelDb.Encounter<FoolTarotBossEncounter>());              // 三层 塔罗愚（愚者，用户 2026-11-14）
+#endif
             // 观者（角色下标 6）：她的每套设计各自一幕 ⇒ 二层＝印牌观、三层＝神格观（主）/Ω观（变体）
             Add(6, 1, ModelDb.Encounter<WatcherCreateBossEncounter>());           // 二层 1 号 印牌观（用户 2026-11-16）
             Add(6, 2, ModelDb.Encounter<WatcherDivinityBossEncounter>());        // 三层 1 号 神格观

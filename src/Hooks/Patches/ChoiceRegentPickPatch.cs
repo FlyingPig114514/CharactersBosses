@@ -198,7 +198,7 @@ internal static class ChoiceRegentPickPatch
                 && state.CurrentSide == MegaCrit.Sts2.Core.Combat.CombatSide.Player
                 && combat.IsPlayerReadyToEndTurn(chooser))
             {
-#if STS2_111
+#if STS2_113
                 combat.TryUndoReadyToEndTurn(chooser);
 #else
                 combat.UndoReadyToEndTurn(chooser);

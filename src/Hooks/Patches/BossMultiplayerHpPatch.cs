@@ -1,6 +1,6 @@
 // ⚠ 0.113.0 起这个模型从 `Models.Singleton.MultiplayerScalingModel` 挪到了
 //   `Models.MultiplayerScalingModel`（编译实测 CS0234）⇒ 两个版本各指一次。
-#if STS2_107
+#if !STS2_113
 using BossScalingModel = MegaCrit.Sts2.Core.Models.Singleton.MultiplayerScalingModel;
 #else
 using BossScalingModel = MegaCrit.Sts2.Core.Models.MultiplayerScalingModel;

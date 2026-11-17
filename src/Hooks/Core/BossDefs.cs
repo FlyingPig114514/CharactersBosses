@@ -15,6 +15,17 @@ namespace CharacterBosses.Core;
 /// </summary>
 public static class BossDefs
 {
+    /// <summary>
+    /// 瑙傝€?Boss 鐨?*鍗犱綅瑙掕壊绫诲瀷**锛堣繍琛屾湡鐢?`RefreshWatcherCharacterType` 鎹㈡垚鐪熺殑瑙傝€呰鑹诧級銆?    ///
+    /// 鈽?v0.2.732锛堢敤鎴?2026-11-17锛屽畼鏂逛富绾挎洿鏂板埌 0.111 涔嬪悗锛夛細鍘熸潵杩欓噷鍐欐 `Characters.Fool`锛堟剼鑰咃級鈥斺€?    ///   閭ｆ槸 **0.113 娴嬭瘯鍒嗘敮鎵嶆湁鐨勮鑹?*锛?.111 姝ｅ紡鐗堥噷娌℃湁杩欎釜绫诲瀷 鈬?0.111 鏋勫缓缂栬瘧鏈熷氨鎵句笉鍒般€?    ///   鐜板湪鎸夋瀯寤哄垎锛?.113锛坆eta锛夌户缁敤 `Fool`锛?.111锛堟寮忥級鐢?`DeprecatedCharacter`锛堜袱鐗堥兘鏈夛級銆?    ///   涓変釜瀹氫箟锛坄FOOL_BOSS` / `WATCHER_DIVINITY` / `WATCHER_OMEGA` 瑙傛祴鍙樹綋锛変笌涓ゅ
+    ///   銆岃繕鏄笉鏄崰浣嶇銆嶇殑鍒ゆ柇锛坄BossFrameTickPatch` / `CharBossMonster.Descriptor`锛夐兘璧板畠銆?    /// </summary>
+    public static readonly Type PlaceholderCharacterType =
+#if STS2_113
+        PlaceholderCharacterType;
+#else
+        typeof(MegaCrit.Sts2.Core.Models.Characters.DeprecatedCharacter);
+#endif
+
     // ─────────── 铁甲战士的三套卡组（按幕） ───────────
     // 第 1 幕：易伤流 —— 交付的样板
     private static readonly List<Type> IroncladAct1 = new()
@@ -1043,7 +1054,7 @@ public static class BossDefs
         },
     };
 
-#if STS2_111
+#if STS2_113
     // ⚠ 0.113.0 才有「愚者（Fool）」这个角色与整套塔罗牌 ⇒ 这一个 Boss 只在 111 构建里存在。
     /// <summary>
     /// 三层 1 号「**塔罗愚**」（用户 2026-11-14；完整口径见 docs/plans/boss-fool-tarot.md）。
@@ -1053,9 +1064,11 @@ public static class BossDefs
     /// </summary>
     public static readonly BossDefinition Fool = new()
     {
+#if STS2_113
         Key = "FOOL_BOSS",
+#endif
         VisualScene = "fool",
-        CharacterType = typeof(MegaCrit.Sts2.Core.Models.Characters.Fool),
+        CharacterType = PlaceholderCharacterType,
         // 愚者基础血量 77；涅奥的祝福再按幕加（拾起 +120 / 每进一幕 +180）
         Hp = new[] { 77, 77, 77, 77 },
         // ⚠ 能量**就是愚者本人的 3 点**，不要为了「剧本里的牌全打得出去」把它调大：
@@ -1109,7 +1122,7 @@ public static class BossDefs
     {
         Key = "WATCHER_DIVINITY",
         VisualScene = "watcher",
-        CharacterType = typeof(MegaCrit.Sts2.Core.Models.Characters.Fool),   // 占位，运行期会被替换
+        CharacterType = PlaceholderCharacterType,   // 占位，运行期会被替换
         // ⚠ 72 = 观者模组初始生命；再 +31 = **布质果实**（`LoomingFruit`，反编译 `CanonicalVars` = MaxHpVar(31)，
         //   原版靠 `AfterObtained` 给，影子玩家身上那件收不到该钩子 ⇒ 照「根除骨」的先例直接写进血量）。
         Hp = new[] { 103, 103, 103, 103 },
@@ -1217,7 +1230,7 @@ public static class BossDefs
     {
         Key = "WATCHER_OMEGA",
         VisualScene = "watcher",
-        CharacterType = typeof(MegaCrit.Sts2.Core.Models.Characters.Fool),   // 占位，运行期会被替换
+        CharacterType = PlaceholderCharacterType,   // 占位，运行期会被替换
         // 观者模组初始生命 72（用户给的遗物里没有布质果实 ⇒ 不加 +31）
         Hp = new[] { 72, 72, 72, 72 },
         // ⚠ 每回合能量由剧本逐回合写死（用户只在个别牌后标「（没费）」，其它牌都要打得出来），
@@ -1259,7 +1272,9 @@ public static class BossDefs
     {
         Ironclad, Silent, Defect, Necrobinder, Regent,
 #if STS2_111
+#if STS2_113
         Fool,
+#endif
         Watcher,
 #endif
     };
@@ -1274,7 +1289,9 @@ public static class BossDefs
             [Necrobinder.Key] = Necrobinder,
             [Regent.Key] = Regent,
 #if STS2_111
+#if STS2_113
             [Fool.Key] = Fool,
+#endif
             [Watcher.Key] = Watcher,
 #endif
         };

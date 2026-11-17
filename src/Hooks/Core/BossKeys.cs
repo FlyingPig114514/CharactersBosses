@@ -82,7 +82,9 @@ internal static class BossKeys
         new("IRONCLAD_VULN",        0, 2, 1, typeof(IroncladBoss)),        // 铁甲 1 号：易伤战
         new("IRONCLAD_BOULDER",     0, 2, 2, typeof(IroncladBoss)),        // 铁甲 2 号：巨石战
 #if STS2_111
+#if STS2_113
         new("FOOL_TAROT",           5, 2, 1, typeof(FoolTarotBoss)),      // 愚者 1 号：塔罗愚（用户 2026-11-14）
+#endif
 #endif
 #if STS2_111
         // 观者 Boss 占位（用户 2026-11-15）：只有装了观者 mod 才会进候选表（见 RosterFor）
@@ -390,7 +392,9 @@ internal static class BossKeys
             case "SILENT_SNECKO": return ModelDb.Encounter<SilentSneckoBossEncounter>();
             case "DEFECT_EVENT": return ModelDb.Encounter<DefectEventBossEncounter>();
 #if STS2_111
+#if STS2_113
             case "FOOL_TAROT": return ModelDb.Encounter<FoolTarotBossEncounter>();
+#endif
 #if STS2_111
             case "WATCHER_DIVINITY": return ModelDb.Encounter<WatcherDivinityBossEncounter>();
             case "WATCHER_OMEGA": return ModelDb.Encounter<WatcherOmegaBossEncounter>();

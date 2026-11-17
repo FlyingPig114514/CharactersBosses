@@ -145,13 +145,10 @@ public sealed class TarotBruisePower : PowerModel
 
     /// <summary>受到「有来源的攻击」时，多挨 Amount 点。</summary>
     // ⚠ 0.113 给 `ModifyDamageAdditive` 加了第 6 个参数（`CardPlay`），107 只有 5 个 ⇒ 分开写。
-#if STS2_111
+    // ★ v0.2.732：0.111 与 0.113 的 ModifyDamageAdditive 都是 **6 参数**（第 6 个是 CardPlay），
+    //   只有已停编的 0.107 是 5 参数 ⇒ 那段 #if 去掉了，只留这一份。
     public override decimal ModifyDamageAdditive(Creature? target, decimal amount, ValueProp props,
                                                  Creature? dealer, CardModel? cardSource, CardPlay? cardPlay)
-#else
-    public override decimal ModifyDamageAdditive(Creature? target, decimal amount, ValueProp props,
-                                                 Creature? dealer, CardModel? cardSource)
-#endif
     {
         try
         {

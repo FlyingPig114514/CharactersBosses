@@ -9,13 +9,13 @@ namespace CharacterBosses;
 
 /// <summary>
 /// **双版本外壳（loader）** —— 游戏只会加载这一个 dll（文件名 = 清单里的模组 id），
-/// 真正的实现放在同目录的 `CharacterBosses.Impl107.dll.bin` / `CharacterBosses.Impl111.dll.bin`：
+/// 真正的实现放在同目录的 `CharacterBosses.Impl111.dll.bin`（正式 0.111）/ `CharacterBosses.Impl113.dll.bin`（测试 0.113）：
 ///
 /// <code>
 /// mods/CharacterBosses/
 ///   CharacterBosses.dll            ← 本文件（外壳：版本判断 + 转发）
-///   CharacterBosses.Impl107.dll.bin ← 正式版 v0.107 的实现
-///   CharacterBosses.Impl111.dll.bin ← beta v0.111 的实现
+///   CharacterBosses.Impl111.dll.bin ← **正式版 v0.111** 的实现（无愚者/恐惧）
+///   CharacterBosses.Impl113.dll.bin ← **测试分支 v0.113** 的实现（含愚者/恐惧）
 ///   CharacterBosses.pck / .json
 /// </code>
 ///
@@ -30,8 +30,8 @@ namespace CharacterBosses;
 [ModInitializer("Initialize")]
 public static class LoaderEntry
 {
-    private const string ImplBeta = "CharacterBosses.Impl111.dll";
-    private const string ImplRelease = "CharacterBosses.Impl107.dll";
+    private const string ImplBeta = "CharacterBosses.Impl113.dll";
+    private const string ImplRelease = "CharacterBosses.Impl111.dll";
 
     public static void Initialize()
     {
@@ -264,7 +264,15 @@ public static class LoaderEntry
         }
     }
 
-    /// <summary>beta 才有 `OneForAllPower`；正式版（v0.107）没有。</summary>
+    /// <summary>
+    /// 是不是 **0.113+ 测试分支**（有「愚者」与整套塔罗牌 / 恐惧模式）。
+    ///
+    /// ★ v0.2.732（用户 2026-11-17）：原来用 `OneForAllPower` 当判据 —— 那是「0.107 正式版没有、
+    ///   0.111 beta 有」时代的写法。官方把 v0.108–v0.111 合进主线之后 **0.111 正式版也有
+    ///   `OneForAllPower`**（本更新新增的联机牌「一心化万」）⇒ 旧判据会把新正式版误判成 beta，
+    ///   于是加载针对 0.113 编译的实现，进游戏就炸（类型加载期 TypeLoadException）。
+    ///   现在改认**只在 0.113 存在**的类型：塔罗牌 `TheFool`（0.111 = 无 / 0.113 = 有，实测过）。
+    /// </summary>
     private static bool DetectBeta()
     {
         try
@@ -274,7 +282,8 @@ public static class LoaderEntry
                 try
                 {
                     if (asm.GetName().Name != "sts2") continue;
-                    if (asm.GetType("MegaCrit.Sts2.Core.Models.Powers.OneForAllPower", false) != null) return true;
+                    if (asm.GetType("MegaCrit.Sts2.Core.Models.Cards.TheFool", false) != null) return true;
+                    if (asm.GetType("MegaCrit.Sts2.Core.Models.Cards.Judgement", false) != null) return true;
                 }
                 catch { /* 忽略 */ }
             }

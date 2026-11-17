@@ -27,7 +27,7 @@ internal static class DreadMode
     {
         get
         {
-#if STS2_111
+#if STS2_113
             // ⚠ 107 的 `GameMode` 里根本没有 `Dread`（恐惧模式是 0.113.0 才有的）⇒ 只在 111 构建里判定。
             try
             {
@@ -56,7 +56,7 @@ internal static class DreadCharacters
     public const int Watcher = 6;
 }
 
-#if STS2_111
+#if STS2_113
 // ⚠ 恐惧模式（`Models.Dread.DominionModel`）是 0.113.0 才有的类型 ⇒ 下面五个支配类
 //   只在 111 构建里存在；107（正式版）没有恐惧模式，自然也不需要。
 /// <summary>
@@ -295,7 +295,7 @@ public sealed class FoolDominion : MegaCrit.Sts2.Core.Models.Dread.DominionModel
     }
 }
 #endif
-#if STS2_111
+#if STS2_113
 
 /// <summary>
 /// **观者的支配**（用户 2026-11-15）：恐惧模式下「所有敌人获得 2 层虔信」。

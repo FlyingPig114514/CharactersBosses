@@ -1,4 +1,4 @@
-﻿using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 using CharacterBosses.Core;
@@ -150,7 +150,7 @@ public abstract partial class CharBossMonster
                     try
                     {
                         if (Def.Key != null && Def.Key.StartsWith("WATCHER_", StringComparison.Ordinal)
-                            && Def.CharacterType == typeof(MegaCrit.Sts2.Core.Models.Characters.Fool))
+                            && Def.CharacterType == Core.BossDefs.PlaceholderCharacterType)
                         {
                             Core.BossDefs.RefreshWatcherCharacterType();
                             Core.BossDefs.RefreshWatcherExtras();

@@ -98,7 +98,10 @@ if defined RAWVER (
     set "RAWVER=!RAWVER:"=!"
     set "RAWVER=!RAWVER:,=!"
     echo   - Game version: !RAWVER!
-    echo !RAWVER! | findstr /b /c:"v0.107" >nul && set "STS2_TARGET=107"
+    rem v0.113 及以上的测试分支 -> 113（含愚者/恐惧）；其余（0.107~0.112 正式版）-> 111
+    echo !RAWVER! | findstr /b /c:"v0.113" >nul && set "STS2_TARGET=113"
+    echo !RAWVER! | findstr /b /c:"v0.114" >nul && set "STS2_TARGET=113"
+    echo !RAWVER! | findstr /b /c:"v0.115" >nul && set "STS2_TARGET=113"
 )
 echo   - Building for sts2 target: !STS2_TARGET!
 
@@ -124,11 +127,12 @@ if exist "!TOOLS_DIR!loader\Loader.csproj" (
 ) else (
     echo   - WARNING: loader\Loader.csproj not found, 只装单版本实现
 )
-if not "!STS2_TARGET!"=="107" (
-    "!DOTNET_EXE!" build "!MOD_SRC_DIR!\!CSProjFile!" -c Release -p:Sts2Target=107 --verbosity quiet 2>nul
-)
+rem v0.2.732: 正式版(0.111) 与 测试分支(0.113) 各编一份；107 停止构建
 if not "!STS2_TARGET!"=="111" (
     "!DOTNET_EXE!" build "!MOD_SRC_DIR!\!CSProjFile!" -c Release -p:Sts2Target=111 --verbosity quiet 2>nul
+)
+if not "!STS2_TARGET!"=="113" (
+    "!DOTNET_EXE!" build "!MOD_SRC_DIR!\!CSProjFile!" -c Release -p:Sts2Target=113 --verbosity quiet 2>nul
 )
 echo   - Build succeeded
 
@@ -153,15 +157,17 @@ rem   The loader uses AssemblyLoadContext.LoadFromAssemblyPath, which ignores ex
 rem   Also delete leftover ".dll" copies from older versions so both cannot coexist.
 if exist "!MOD_SUBFOLDER!\!MOD_NAME!.Impl107.dll.bin" del /q "!MOD_SUBFOLDER!\!MOD_NAME!.Impl107.dll.bin" >nul 2>nul
 if exist "!MOD_SUBFOLDER!\!MOD_NAME!.Impl111.dll.bin" del /q "!MOD_SUBFOLDER!\!MOD_NAME!.Impl111.dll.bin" >nul 2>nul
+if exist "!MOD_SUBFOLDER!\!MOD_NAME!.Impl113.dll.bin" del /q "!MOD_SUBFOLDER!\!MOD_NAME!.Impl113.dll.bin" >nul 2>nul
 if exist "!MOD_SUBFOLDER!\!MOD_NAME!.Impl107.dll" del /q "!MOD_SUBFOLDER!\!MOD_NAME!.Impl107.dll" >nul 2>nul
 if exist "!MOD_SUBFOLDER!\!MOD_NAME!.Impl111.dll" del /q "!MOD_SUBFOLDER!\!MOD_NAME!.Impl111.dll" >nul 2>nul
-if exist "!MOD_SRC_DIR!\bin\Release-107\!MOD_NAME!.Impl107.dll" (
-    copy /Y "!MOD_SRC_DIR!\bin\Release-107\!MOD_NAME!.Impl107.dll" "!MOD_SUBFOLDER!\!MOD_NAME!.Impl107.dll.bin" >nul
-    echo   - Impl copied: 107 as .dll.bin
-)
+if exist "!MOD_SUBFOLDER!\!MOD_NAME!.Impl113.dll" del /q "!MOD_SUBFOLDER!\!MOD_NAME!.Impl113.dll" >nul 2>nul
 if exist "!MOD_SRC_DIR!\bin\Release-111\!MOD_NAME!.Impl111.dll" (
     copy /Y "!MOD_SRC_DIR!\bin\Release-111\!MOD_NAME!.Impl111.dll" "!MOD_SUBFOLDER!\!MOD_NAME!.Impl111.dll.bin" >nul
-    echo   - Impl copied: 111 as .dll.bin
+    echo   - Impl copied: 111 stable as .dll.bin
+)
+if exist "!MOD_SRC_DIR!\bin\Release-113\!MOD_NAME!.Impl113.dll" (
+    copy /Y "!MOD_SRC_DIR!\bin\Release-113\!MOD_NAME!.Impl113.dll" "!MOD_SUBFOLDER!\!MOD_NAME!.Impl113.dll.bin" >nul
+    echo   - Impl copied: 113 beta as .dll.bin
 )
 
 rem 虚影精灵表以**独立文件**随 mod 一起安装，不再 base64 内嵌进 DLL。

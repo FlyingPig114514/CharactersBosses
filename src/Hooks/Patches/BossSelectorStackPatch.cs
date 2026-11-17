@@ -1,4 +1,4 @@
-#if STS2_111
+#if STS2_113
 using System;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.CardSelection;

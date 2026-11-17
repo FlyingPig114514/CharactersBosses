@@ -1,4 +1,4 @@
-#if STS2_111   // ⚠ 0.113.0 才有「愚者」与整套塔罗牌 ⇒ 用户 2026-11-14：107 版本不加这个 Boss，整个文件只在 111 构建里编译
+#if STS2_113   // ⚠ 0.113.0 才有「愚者」与整套塔罗牌 ⇒ 用户 2026-11-14：107 版本不加这个 Boss，整个文件只在 111 构建里编译
 using System;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Entities.Creatures;
