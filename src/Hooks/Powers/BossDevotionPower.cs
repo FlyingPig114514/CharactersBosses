@@ -160,46 +160,7 @@ public sealed class BossDevotionPower : PowerModel
                            $"，神格里={WatcherCards.InDivinity(shadow)}");
 
                 // 多出来的能量会让「有费就打」的牌打得出去 ⇒ 整块重规划再刷意图
-                //
-                // ★ v0.2.740（用户 2026-11-17：「我指的是进神格的**加费**导致的意图变化」）：
-                //   这笔能量到底算谁的回合，差别很大：
-                //   · 她**自己回合里**攒满真言 ⇒ 能量当场进 `pcs.Energy`，`ReplanForExtraEnergy`
-                //     按「当前能量 − 已花」重规划，意图当场就变（原有行为，不动）；
-                //   · **玩家回合里**攒满（玩家每打一张牌 +1 真言，最常见的路径）⇒ 这 3 点加在
-                //     她的 `pcs.Energy` 上，可她的回合开始时 `PrepareTurn` 会执行
-                //     `pcs.Energy = max(0, energy) + plasma + charged + delayed` **整个覆盖掉**
-                //     ⇒ 这笔能量以前是**静默丢失**的（她根本没多打那张牌，意图当然也不会变）。
-                //     `BossDefs` 里那句「『进神格 +3 能量』记在 `NextTurnEnergyBonus` 里」说的就是
-                //     这条通道，但一直没人往里写。现在按回合分派。
-                int gained = 0;
-                try
-                {
-                    int b = Math.Max(0, energyBefore);
-                    int a = Math.Max(0, energyAfter);
-                    if (energyBefore >= 0 && energyAfter >= 0 && a > b) gained = a - b;
-                }
-                catch { /* 忽略 */ }
-
-                bool herTurn;
-                try { herTurn = boss.CombatState?.CurrentSide == boss.Creature?.Side; }
-                catch { herTurn = true; }
-
-                if (herTurn)
-                {
-                    try { boss.ReplanForExtraEnergy($"进神格多 {gained} 点能量"); }
-                    catch { /* 下一帧兜底 */ }
-                }
-                else if (gained > 0)
-                {
-                    try
-                    {
-                        boss.NextTurnEnergyBonus += gained;
-                        Logger.Log($"[CharBoss] 虔信：进神格多出来的 {gained} 点能量是在**玩家回合**里到账的 " +
-                                   $"⇒ 记入她下回合的预算（NextTurnEnergyBonus={boss.NextTurnEnergyBonus}）。" +
-                                   "以前这笔会被她回合开始的能量覆盖静默吃掉。");
-                    }
-                    catch (Exception e) { Logger.Log("[CharBoss] 虔信：记账下回合能量失败: " + e.Message); }
-                }
+                try { boss.ReplanForExtraEnergy("进神格多 3 点能量"); } catch { /* 下一帧兜底 */ }
             }
         }
         catch (Exception e) { Logger.Log("[CharBoss] 虔信：满 10 层结算失败: " + e.Message); }
