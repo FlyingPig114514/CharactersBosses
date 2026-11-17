@@ -114,5 +114,7 @@
     "WATCHER_PRINT_BOSS_ENCOUNTER.title":  "Watcher",
     "WATCHER_PRINT_BOSS_ENCOUNTER.loss":  "{character} dihancurkan oleh [gold]Pengamat Pencetak[/gold].",
     "WATCHER_CREATE_BOSS_ENCOUNTER.title":  "Watcher",
-    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character} dihancurkan oleh [gold]Pengamat Pencetak[/gold]."
+    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character} dihancurkan oleh [gold]Pengamat Pencetak[/gold].",
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "Watcher",
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "{character} dihancurkan oleh [gold]Pendirian[/gold] [gold]Pengamat Penyimpan[/gold]."
 }

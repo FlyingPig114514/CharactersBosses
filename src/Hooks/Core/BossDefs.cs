@@ -1172,6 +1172,25 @@ public static class BossDefs
                     // 进阶 8 / 9 的升级写在剧本里（创世之柱 / 心灵堡垒；改造现实 / 供奉 / 义愤填膺）
                     // 血量：观者基础 72，没有布质果实 ⇒ 不加 HpBonus
                 },
+                // ★ v0.2.733（用户 2026-11-17）：**二层 2 号「保留观」** —— 与印牌观同幕，
+                //   靠 `BossLineups.WatcherRetainActive()` 分辨这一场是谁。特殊效果「确立基础」：
+                //   玩家回合结束时，被保留的牌本场耗能 +1，然后她按张数掉力量（恐惧版：去限制、不掉力量）。
+                new BossVariant
+                {
+                    Key = "WATCHER_RETAIN",
+                    Enabled = Core.BossLineups.WatcherRetainActive,
+                    Deck = WatcherRetainScript.Deck(),
+                    Relics = WatcherRetainScript.Relics(),
+                    Script = WatcherRetainScript.Build(),
+                    SpecialLoc = "WATCHER_RETAIN_BOSS.establishment",
+                    SpecialLocDread = "WATCHER_RETAIN_BOSS.establishment_dread",
+                    SpecialPower = typeof(Powers.BossEstablishmentPower),
+                    SpecialPowerDread = typeof(Powers.BossEstablishmentPower),
+                    // 观者模组初始生命 72（她这五件遗物里没有布质果实 ⇒ 主定义的 103 减掉 31）
+                    HpBonus = -31,
+                    BlocksVanillaDraw = true,
+                    // 进阶 8 / 9 的升级写在剧本里（心灵堡垒 / 停顿 / 警惕；改造现实 / 旋转打击）
+                },
             },
             [2] = new List<BossVariant>
             {

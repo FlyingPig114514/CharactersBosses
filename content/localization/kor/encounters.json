@@ -114,5 +114,7 @@
     "WATCHER_PRINT_BOSS_ENCOUNTER.title":  "와쳐",
     "WATCHER_PRINT_BOSS_ENCOUNTER.loss":  "{character}은(는) [gold]프린트 왓처[/gold]의 현실 조작에 짓밟혔다.",
     "WATCHER_CREATE_BOSS_ENCOUNTER.title":  "와쳐",
-    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character}은(는) [gold]프린트 왓처[/gold]의 현실 조작에 짓밟혔다."
+    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character}은(는) [gold]프린트 왓처[/gold]의 현실 조작에 짓밟혔다.",
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "와쳐",
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "{character}은(는) [gold]보존 왓처[/gold]의 확립에 짓밟혔다."
 }

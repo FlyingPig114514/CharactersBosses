@@ -806,6 +806,41 @@ internal static class BossLineups
         return (false, false);
     }
 
+    /// <summary>
+    /// **二层 2 号「保留观」这套设计**（设计 Key `WATCHER_RETAIN`，用户 2026-11-17）。
+    ///
+    /// 与印牌观同层（都是 `ExtraVariants[1]`），判据同样只看「本场遭遇是谁」：
+    /// 保留观有自己专属的遭遇（`WATCHER_RETAIN_BOSS_ENCOUNTER`），造怪时 `WatcherRetainBoss`
+    /// 会把 `SpawnVariantKey` / `PinnedVariantKey` 钉成 `WATCHER_RETAIN` ⇒ 认不出就明确「不是保留观」。
+    /// </summary>
+    internal static bool WatcherRetainActive() => Latched("WATCHER_RETAIN", ComputeWatcherRetain);
+
+    private static (bool Value, bool Decisive) ComputeWatcherRetain()
+    {
+        try
+        {
+            string? entry = CurrentEncounterEntry();
+            if (!string.IsNullOrEmpty(entry))
+            {
+                if (entry == "WATCHER_RETAIN_BOSS_ENCOUNTER") return (true, true);
+                if (entry.StartsWith("WATCHER_", StringComparison.Ordinal)) return (false, true);
+            }
+        }
+        catch { /* 往下走 */ }
+        try
+        {
+            foreach (var c in MegaCrit.Sts2.Core.Combat.CombatManager.Instance?.DebugOnlyGetState()?.Enemies
+                                ?? (IEnumerable<MegaCrit.Sts2.Core.Entities.Creatures.Creature>)Array.Empty<MegaCrit.Sts2.Core.Entities.Creatures.Creature>())
+            {
+                if (c?.Monster is not Monsters.CharBossMonster boss) continue;
+                string? pinned = boss.PinnedVariantKey ?? boss.SpawnVariantKey;
+                if (string.Equals(pinned, "WATCHER_RETAIN", StringComparison.Ordinal)) return (true, true);
+            }
+        }
+        catch { /* 忽略 */ }
+        return (false, false);
+    }
+
     private static (bool Value, bool Decisive) ComputeWatcherOmega()
     {
         try

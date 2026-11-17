@@ -114,5 +114,7 @@
     "WATCHER_PRINT_BOSS_ENCOUNTER.title":  "La gardienne",
     "WATCHER_PRINT_BOSS_ENCOUNTER.loss":  "{character} a été écrasé par le [gold]Veilleur Imprimeur[/gold].",
     "WATCHER_CREATE_BOSS_ENCOUNTER.title":  "La gardienne",
-    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character} a été écrasé par le [gold]Veilleur Imprimeur[/gold]."
+    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character} a été écrasé par le [gold]Veilleur Imprimeur[/gold].",
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "La gardienne",
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "{character} a été écrasé par l'[gold]Établissement[/gold] du [gold]Veilleur Conservateur[/gold]."
 }

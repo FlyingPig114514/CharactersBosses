@@ -204,10 +204,15 @@
     "WATCHER_OMEGA_BOSS.title":  "Osservatore Omega",
     "WATCHER_OMEGA_BOSS.name":  "Osservatore Omega",
     "WATCHER_OMEGA_BOSS.fasting":  "Omega si attiva un turno si e uno no.\nI danni dei Punti di pressione possono essere bloccati.\nAttenzione: Omega infligge danni senza fonte, i Punti di pressione danni da debuff; i servitori non subiranno quei danni al posto tuo. Anche i servitori con «Lealtà di Vapi» non assorbiranno quei danni al posto tuo.\nOmega: Alla fine del tuo turno, infliggi 50 danni a TUTTI i nemici.",
-    "WATCHER_OMEGA_BOSS.fasting_dread":  "Omega si attiva un turno si e uno no.\nI danni dei Punti di pressione possono essere bloccati.\nAttenzione: Omega infligge danni senza fonte, i Punti di pressione danni da debuff; i servitori non subiranno quei danni al posto tuo. Anche i servitori con «Lealtà di Vapi» non assorbiranno quei danni al posto tuo.\nOmega: Alla fine del tuo turno, infliggi 50 danni a TUTTI i nemici.",
+    "WATCHER_OMEGA_BOSS.fasting_dread":  "Omega si attiva ogni turno.\nI danni dei Punti di pressione possono essere bloccati.\nAttenzione: Omega infligge danni senza fonte, i Punti di pressione danni da debuff; i servitori non subiranno quei danni al posto tuo. Anche i servitori con «Lealtà di Vapi» non assorbiranno quei danni al posto tuo.\nOmega: Alla fine del tuo turno, infliggi 50 danni a TUTTI i nemici.",
     "WATCHER_CREATE_BOSS.name":  "Osservatore Stampante",
     "WATCHER_CREATE_BOSS.title":  "Osservatore Stampante",
     "WATCHER_CREATE_BOSS.moves.CHARBOSS_PLAY.title":  "Gioca carta",
     "WATCHER_BOSS.create_reality":  "Ogni volta che crei una carta in combattimento, essa viene [gold]declassata[/gold]; se non è un segnalino, ottiene anche [gold]Esaurimento[/gold].\nL\u0027Osservatore ha ottenuto [gold]Arsenale[/gold], [gold]Pilastro della Creazione[/gold] e [gold]Conosci il tuo posto[/gold] tramite il Filosofo dei Colori.",
-    "WATCHER_BOSS.create_reality_dread":  "Ogni volta che crei una carta in combattimento, essa viene [gold]declassata[/gold]; se non è un segnalino, ottiene anche [gold]Esaurimento[/gold].\nL\u0027Osservatore ha ottenuto [gold]Arsenale[/gold], [gold]Pilastro della Creazione[/gold] e [gold]Conosci il tuo posto[/gold] tramite il Filosofo dei Colori."
+    "WATCHER_BOSS.create_reality_dread":  "Ogni volta che crei una carta in combattimento, essa viene [gold]declassata[/gold]; se non è un segnalino, ottiene anche [gold]Esaurimento[/gold].\nL\u0027Osservatore ha ottenuto [gold]Arsenale[/gold], [gold]Pilastro della Creazione[/gold] e [gold]Conosci il tuo posto[/gold] tramite il Filosofo dei Colori.",
+    "WATCHER_RETAIN_BOSS.name":  "Osservatore Trattenitore",
+    "WATCHER_RETAIN_BOSS.title":  "Osservatore Trattenitore",
+    "WATCHER_RETAIN_BOSS.moves.CHARBOSS_PLAY.title":  "Gioca",
+    "WATCHER_RETAIN_BOSS.establishment":  "Alla fine del tuo turno, ogni carta trattenuta nella tua mano con un costo inferiore a 2 aumenta il suo costo di 1 per il resto del combattimento, poi il Watcher perde 1 Forza.\nQuesto effetto si applica solo al giocatore su cui il Watcher è agganciato.",
+    "WATCHER_RETAIN_BOSS.establishment_dread":  "Alla fine del tuo turno, le tue carte trattenute aumentano il loro costo di 1 per il resto del combattimento.\nQuesto effetto si applica solo al giocatore su cui il Watcher è agganciato."
 }

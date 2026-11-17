@@ -114,5 +114,7 @@
     "WATCHER_PRINT_BOSS_ENCOUNTER.title":  "Watcher",
     "WATCHER_PRINT_BOSS_ENCOUNTER.loss":  "{character} è stato schiacciato dall\u0027[gold]Osservatore Stampante[/gold].",
     "WATCHER_CREATE_BOSS_ENCOUNTER.title":  "Watcher",
-    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character} è stato schiacciato dall\u0027[gold]Osservatore Stampante[/gold]."
+    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character} è stato schiacciato dall\u0027[gold]Osservatore Stampante[/gold].",
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "Watcher",
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "{character} è stato schiacciato dallo [gold]Stabilimento[/gold] dell'[gold]Osservatore Trattenitore[/gold]."
 }

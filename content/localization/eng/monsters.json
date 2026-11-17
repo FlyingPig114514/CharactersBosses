@@ -204,10 +204,15 @@
     "WATCHER_OMEGA_BOSS.title":  "Omega Watcher",
     "WATCHER_OMEGA_BOSS.name":  "Omega Watcher",
     "WATCHER_OMEGA_BOSS.fasting":  "Omega triggers only every other turn.\nDamage dealt by Pressure Points can be blocked by you.\nWarning: Omega deals sourceless damage and Pressure Points deals debuff damage; minions with Die for You or Vapi Loyalty will not take that damage for you.\nOmega: At the end of your turn, deal 50 damage to ALL enemies.",
-    "WATCHER_OMEGA_BOSS.fasting_dread":  "Omega triggers only every other turn.\nDamage dealt by Pressure Points can be blocked by you.\nWarning: Omega deals sourceless damage and Pressure Points deals debuff damage; minions with Die for You or Vapi Loyalty will not take that damage for you.\nOmega: At the end of your turn, deal 50 damage to ALL enemies.",
+    "WATCHER_OMEGA_BOSS.fasting_dread":  "Omega triggers every turn.\nDamage dealt by Pressure Points can be blocked by you.\nWarning: Omega deals sourceless damage and Pressure Points deals debuff damage; minions with Die for You or Vapi Loyalty will not take that damage for you.\nOmega: At the end of your turn, deal 50 damage to ALL enemies.",
     "WATCHER_CREATE_BOSS.name":  "Printing Watcher",
     "WATCHER_CREATE_BOSS.title":  "Printing Watcher",
     "WATCHER_CREATE_BOSS.moves.CHARBOSS_PLAY.title":  "Play",
     "WATCHER_BOSS.create_reality":  "Whenever you create a card during combat, it is [gold]downgraded[/gold]; if it is not a token, it also gains [gold]Exhaust[/gold].\nThe Watcher obtained [gold]Arsenal[/gold], [gold]Pillar of Creation[/gold] and [gold]Know Thy Place[/gold] through the Colour Philosopher.",
-    "WATCHER_BOSS.create_reality_dread":  "Whenever you create a card during combat, it is [gold]downgraded[/gold]; if it is not a token, it also gains [gold]Exhaust[/gold].\nThe Watcher obtained [gold]Arsenal[/gold], [gold]Pillar of Creation[/gold] and [gold]Know Thy Place[/gold] through the Colour Philosopher."
+    "WATCHER_BOSS.create_reality_dread":  "Whenever you create a card during combat, it is [gold]downgraded[/gold]; if it is not a token, it also gains [gold]Exhaust[/gold].\nThe Watcher obtained [gold]Arsenal[/gold], [gold]Pillar of Creation[/gold] and [gold]Know Thy Place[/gold] through the Colour Philosopher.",
+    "WATCHER_RETAIN_BOSS.name":  "Retaining Watcher",
+    "WATCHER_RETAIN_BOSS.title":  "Retaining Watcher",
+    "WATCHER_RETAIN_BOSS.moves.CHARBOSS_PLAY.title":  "Play",
+    "WATCHER_RETAIN_BOSS.establishment":  "At the end of your turn, for each retained card in your hand with a cost below 2, its cost is increased by 1 for the rest of this combat, then the Watcher loses 1 Strength.\nThis effect only applies to the player locked onto by the Watcher.",
+    "WATCHER_RETAIN_BOSS.establishment_dread":  "At the end of your turn, your retained cards have their cost increased by 1 for the rest of this combat.\nThis effect only applies to the player locked onto by the Watcher."
 }

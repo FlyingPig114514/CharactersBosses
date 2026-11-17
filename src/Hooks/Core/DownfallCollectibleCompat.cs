@@ -845,6 +845,13 @@ public static class DownfallCollectibleCompat
                     upgraded = false;
                     Logger.Log("[CharBoss] 收藏家藏品：Ω观 → 阿尔法");
                     return true;
+                // 二层 2 号 保留观（用户 2026-11-17）：藏品 = **确立基础**
+                // （和印牌观落在同一格，必须按变体 key 点名，否则会掉成「操控现实」）
+                case "WATCHER_RETAIN":
+                    cardType = Core.WatcherCards.Establishment;
+                    upgraded = false;
+                    Logger.Log("[CharBoss] 收藏家藏品：保留观 → 确立基础");
+                    return cardType != null;
 #endif
                 case "SILENT_SNAKEBITE":     // 一层 蛇咬猎（用户 2026-11-11：藏品 = 群蛇形态）
                     // 她和同层「奇巧猎」落在同一格（掉落表按「角色 + 幕」索引 ⇒ 会掉余像）⇒ 必须点名。

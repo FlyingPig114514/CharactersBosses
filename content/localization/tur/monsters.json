@@ -204,10 +204,15 @@
     "WATCHER_OMEGA_BOSS.title":  "Omega Gozcu",
     "WATCHER_OMEGA_BOSS.name":  "Omega Gozcu",
     "WATCHER_OMEGA_BOSS.fasting":  "Omega iki turda bir tetiklenir.\nBasinc Noktalari hasari bloklanabilir.\nUyari: Omega kaynaksiz hasar verir, Basinc Noktalari zayiflatma hasari verir; cagrilar bu hasari senin yerine almaz. «Vapi Sadakati» olan çağrılar da bu hasarı senin yerine almaz.\nOmega: Turunun sonunda TÜM düşmanlara 50 hasar ver.",
-    "WATCHER_OMEGA_BOSS.fasting_dread":  "Omega iki turda bir tetiklenir.\nBasinc Noktalari hasari bloklanabilir.\nUyari: Omega kaynaksiz hasar verir, Basinc Noktalari zayiflatma hasari verir; cagrilar bu hasari senin yerine almaz. «Vapi Sadakati» olan çağrılar da bu hasarı senin yerine almaz.\nOmega: Turunun sonunda TÜM düşmanlara 50 hasar ver.",
+    "WATCHER_OMEGA_BOSS.fasting_dread":  "Omega her turda tetiklenir.\nBasinc Noktalari hasari bloklanabilir.\nUyari: Omega kaynaksiz hasar verir, Basinc Noktalari zayiflatma hasari verir; cagrilar bu hasari senin yerine almaz. «Vapi Sadakati» olan çağrılar da bu hasarı senin yerine almaz.\nOmega: Turunun sonunda TÜM düşmanlara 50 hasar ver.",
     "WATCHER_CREATE_BOSS.name":  "Baskı Gözcüsü",
     "WATCHER_CREATE_BOSS.title":  "Baskı Gözcüsü",
     "WATCHER_CREATE_BOSS.moves.CHARBOSS_PLAY.title":  "Kart Oyna",
     "WATCHER_BOSS.create_reality":  "Savaşta bir kart oluşturduğunda o kart [gold]düşürülür[/gold]; jeton değilse ayrıca [gold]Tüketim[/gold] kazanır.\nGözcü, Renk Filozofu sayesinde [gold]Cephanelik[/gold], [gold]Yaratılış Sütunu[/gold] ve [gold]Yerini Bil[/gold] elde etti.",
-    "WATCHER_BOSS.create_reality_dread":  "Savaşta bir kart oluşturduğunda o kart [gold]düşürülür[/gold]; jeton değilse ayrıca [gold]Tüketim[/gold] kazanır.\nGözcü, Renk Filozofu sayesinde [gold]Cephanelik[/gold], [gold]Yaratılış Sütunu[/gold] ve [gold]Yerini Bil[/gold] elde etti."
+    "WATCHER_BOSS.create_reality_dread":  "Savaşta bir kart oluşturduğunda o kart [gold]düşürülür[/gold]; jeton değilse ayrıca [gold]Tüketim[/gold] kazanır.\nGözcü, Renk Filozofu sayesinde [gold]Cephanelik[/gold], [gold]Yaratılış Sütunu[/gold] ve [gold]Yerini Bil[/gold] elde etti.",
+    "WATCHER_RETAIN_BOSS.name":  "Saklama Gözcüsü",
+    "WATCHER_RETAIN_BOSS.title":  "Saklama Gözcüsü",
+    "WATCHER_RETAIN_BOSS.moves.CHARBOSS_PLAY.title":  "Oyna",
+    "WATCHER_RETAIN_BOSS.establishment":  "Sıranın sonunda, elinde maliyeti 2'nin altında olan saklanan her kartın maliyeti bu dövüş boyunca 1 artar, ardından Gözlemci 1 Güç kaybeder.\nBu etki yalnızca Gözlemci'nin kilitlendiği oyuncuya uygulanır.",
+    "WATCHER_RETAIN_BOSS.establishment_dread":  "Sıranın sonunda, sakladığın kartların maliyeti bu dövüş boyunca 1 artar.\nBu etki yalnızca Gözlemci'nin kilitlendiği oyuncuya uygulanır."
 }

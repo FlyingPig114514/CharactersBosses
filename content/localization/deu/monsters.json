@@ -204,10 +204,15 @@
     "WATCHER_OMEGA_BOSS.title":  "Omega-Waechter",
     "WATCHER_OMEGA_BOSS.name":  "Omega-Waechter",
     "WATCHER_OMEGA_BOSS.fasting":  "Omega wird nur jeden zweiten Zug ausgeloest.\nSchaden durch Druckpunkte kann geblockt werden.\nWarnung: Omega verursacht quellenlosen Schaden, Druckpunkte Debuff-Schaden; Diener nehmen diesen Schaden nicht fuer dich. Diener mit „Vapis Loyalität“ fangen diesen Schaden auch nicht für dich ab.\nOmega: Am Ende deines Zuges fügst du ALLEN Gegnern 50 Schaden zu.",
-    "WATCHER_OMEGA_BOSS.fasting_dread":  "Omega wird nur jeden zweiten Zug ausgeloest.\nSchaden durch Druckpunkte kann geblockt werden.\nWarnung: Omega verursacht quellenlosen Schaden, Druckpunkte Debuff-Schaden; Diener nehmen diesen Schaden nicht fuer dich. Diener mit „Vapis Loyalität“ fangen diesen Schaden auch nicht für dich ab.\nOmega: Am Ende deines Zuges fügst du ALLEN Gegnern 50 Schaden zu.",
+    "WATCHER_OMEGA_BOSS.fasting_dread":  "Omega wird jeden Zug ausgeloest.\nSchaden durch Druckpunkte kann geblockt werden.\nWarnung: Omega verursacht quellenlosen Schaden, Druckpunkte Debuff-Schaden; Diener nehmen diesen Schaden nicht fuer dich. Diener mit „Vapis Loyalität“ fangen diesen Schaden auch nicht für dich ab.\nOmega: Am Ende deines Zuges fügst du ALLEN Gegnern 50 Schaden zu.",
     "WATCHER_CREATE_BOSS.name":  "Druckender Wächter",
     "WATCHER_CREATE_BOSS.title":  "Druckender Wächter",
     "WATCHER_CREATE_BOSS.moves.CHARBOSS_PLAY.title":  "Karte spielen",
     "WATCHER_BOSS.create_reality":  "Immer wenn du im Kampf eine Karte erzeugst, wird sie [gold]herabgestuft[/gold]; ist sie kein Token, erhält sie zusätzlich [gold]Erschöpfen[/gold].\nDer Wächter erlangte [gold]Arsenal[/gold], [gold]Säule der Schöpfung[/gold] und [gold]Kenne deinen Platz[/gold] durch den Farbphilosophen.",
-    "WATCHER_BOSS.create_reality_dread":  "Immer wenn du im Kampf eine Karte erzeugst, wird sie [gold]herabgestuft[/gold]; ist sie kein Token, erhält sie zusätzlich [gold]Erschöpfen[/gold].\nDer Wächter erlangte [gold]Arsenal[/gold], [gold]Säule der Schöpfung[/gold] und [gold]Kenne deinen Platz[/gold] durch den Farbphilosophen."
+    "WATCHER_BOSS.create_reality_dread":  "Immer wenn du im Kampf eine Karte erzeugst, wird sie [gold]herabgestuft[/gold]; ist sie kein Token, erhält sie zusätzlich [gold]Erschöpfen[/gold].\nDer Wächter erlangte [gold]Arsenal[/gold], [gold]Säule der Schöpfung[/gold] und [gold]Kenne deinen Platz[/gold] durch den Farbphilosophen.",
+    "WATCHER_RETAIN_BOSS.name":  "Bewahrender Wächter",
+    "WATCHER_RETAIN_BOSS.title":  "Bewahrender Wächter",
+    "WATCHER_RETAIN_BOSS.moves.CHARBOSS_PLAY.title":  "Ausspielen",
+    "WATCHER_RETAIN_BOSS.establishment":  "Am Ende deines Zuges wird für jede zurückbehaltene Karte auf deiner Hand mit Kosten unter 2 ihre Kosten für diesen Kampf um 1 erhöht. Danach verliert die Seherin 1 Stärke.\nDieser Effekt gilt nur für den Spieler, den die Seherin im Visier hat.",
+    "WATCHER_RETAIN_BOSS.establishment_dread":  "Am Ende deines Zuges werden die Kosten deiner zurückbehaltenen Karten für diesen Kampf um 1 erhöht.\nDieser Effekt gilt nur für den Spieler, den die Seherin im Visier hat."
 }

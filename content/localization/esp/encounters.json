@@ -114,5 +114,7 @@
     "WATCHER_PRINT_BOSS_ENCOUNTER.title":  "La Vigilante",
     "WATCHER_PRINT_BOSS_ENCOUNTER.loss":  "{character} fue aplastado por el [gold]Vigía Impresor[/gold].",
     "WATCHER_CREATE_BOSS_ENCOUNTER.title":  "La Vigilante",
-    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character} fue aplastado por el [gold]Vigía Impresor[/gold]."
+    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character} fue aplastado por el [gold]Vigía Impresor[/gold].",
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "La Vigilante",
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "{character} fue aplastado por el [gold]Establecimiento[/gold] del [gold]Vigía Retenedor[/gold]."
 }

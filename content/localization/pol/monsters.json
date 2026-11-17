@@ -204,10 +204,15 @@
     "WATCHER_OMEGA_BOSS.title":  "Obserwator Omega",
     "WATCHER_OMEGA_BOSS.name":  "Obserwator Omega",
     "WATCHER_OMEGA_BOSS.fasting":  "Omega aktywuje sie co druga ture.\nObrazenia od Punktow nacisku mozna blokowac.\nOstrzezenie: Omega zadaje obrazenia bez zrodla, Punkty nacisku obrazenia od oslabienia; sludzy nie przyjma tych obrazen za ciebie. Przywołania z „Lojalność Vapiego“ także nie przyjmą tych obrażeń za ciebie.\nOmega: Na koniec twojej tury zadaj 50 obrażeń WSZYSTKIM wrogom.",
-    "WATCHER_OMEGA_BOSS.fasting_dread":  "Omega aktywuje sie co druga ture.\nObrazenia od Punktow nacisku mozna blokowac.\nOstrzezenie: Omega zadaje obrazenia bez zrodla, Punkty nacisku obrazenia od oslabienia; sludzy nie przyjma tych obrazen za ciebie. Przywołania z „Lojalność Vapiego“ także nie przyjmą tych obrażeń za ciebie.\nOmega: Na koniec twojej tury zadaj 50 obrażeń WSZYSTKIM wrogom.",
+    "WATCHER_OMEGA_BOSS.fasting_dread":  "Omega aktywuje sie co ture.\nObrazenia od Punktow nacisku mozna blokowac.\nOstrzezenie: Omega zadaje obrazenia bez zrodla, Punkty nacisku obrazenia od oslabienia; sludzy nie przyjma tych obrazen za ciebie. Przywołania z „Lojalność Vapiego“ także nie przyjmą tych obrażeń za ciebie.\nOmega: Na koniec twojej tury zadaj 50 obrażeń WSZYSTKIM wrogom.",
     "WATCHER_CREATE_BOSS.name":  "Drukujący Obserwator",
     "WATCHER_CREATE_BOSS.title":  "Drukujący Obserwator",
     "WATCHER_CREATE_BOSS.moves.CHARBOSS_PLAY.title":  "Zagranie karty",
     "WATCHER_BOSS.create_reality":  "Za każdym razem, gdy tworzysz kartę w walce, zostaje ona [gold]obniżona[/gold]; jeśli nie jest żetonem, zyskuje też [gold]Wygaszenie[/gold].\nObserwator zdobył [gold]Arsenał[/gold], [gold]Filar Stworzenia[/gold] i [gold]Znaj swoje miejsce[/gold] dzięki Barwnemu Filozofowi.",
-    "WATCHER_BOSS.create_reality_dread":  "Za każdym razem, gdy tworzysz kartę w walce, zostaje ona [gold]obniżona[/gold]; jeśli nie jest żetonem, zyskuje też [gold]Wygaszenie[/gold].\nObserwator zdobył [gold]Arsenał[/gold], [gold]Filar Stworzenia[/gold] i [gold]Znaj swoje miejsce[/gold] dzięki Barwnemu Filozofowi."
+    "WATCHER_BOSS.create_reality_dread":  "Za każdym razem, gdy tworzysz kartę w walce, zostaje ona [gold]obniżona[/gold]; jeśli nie jest żetonem, zyskuje też [gold]Wygaszenie[/gold].\nObserwator zdobył [gold]Arsenał[/gold], [gold]Filar Stworzenia[/gold] i [gold]Znaj swoje miejsce[/gold] dzięki Barwnemu Filozofowi.",
+    "WATCHER_RETAIN_BOSS.name":  "Zachowujący Obserwator",
+    "WATCHER_RETAIN_BOSS.title":  "Zachowujący Obserwator",
+    "WATCHER_RETAIN_BOSS.moves.CHARBOSS_PLAY.title":  "Zagraj",
+    "WATCHER_RETAIN_BOSS.establishment":  "Na koniec twojej tury każda zachowana karta w twojej ręce o koszcie niższym niż 2 zwiększa swój koszt o 1 do końca tej walki, po czym Obserwatorka traci 1 Siły.\nTen efekt działa tylko na gracza namierzonego przez Obserwatorkę.",
+    "WATCHER_RETAIN_BOSS.establishment_dread":  "Na koniec twojej tury twoje zachowane karty zwiększają swój koszt o 1 do końca tej walki.\nTen efekt działa tylko na gracza namierzonego przez Obserwatorkę."
 }

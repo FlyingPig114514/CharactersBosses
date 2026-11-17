@@ -93,6 +93,8 @@ internal static class BossKeys
         new("WATCHER_OMEGA",            6, 2, 2, typeof(WatcherOmegaBoss)),
         // 二层 1 号：**印牌观**（用户 2026-11-16）—— 武器库/创世之柱 印牌流 + 特殊效果「操控现实」
         new("WATCHER_CREATE",            6, 1, 1, typeof(WatcherCreateBoss)),
+        // 二层 2 号：**保留观**（用户 2026-11-17）—— 保留牌流 + 特殊效果「确立基础」
+        new("WATCHER_RETAIN",            6, 1, 2, typeof(WatcherRetainBoss)),
 #endif
     };
 
@@ -227,6 +229,7 @@ internal static class BossKeys
     ["WATCHER_DIVINITY"] = "神格观",  // 三层 1 号（观者 mod）
     ["WATCHER_OMEGA"] = "Ω观",        // 三层 2 号（观者 mod，用户 2026-11-16）
     ["WATCHER_CREATE"] = "印牌观",      // 二层 1 号（观者 mod，用户 2026-11-16）
+    ["WATCHER_RETAIN"] = "保留观",      // 二层 2 号（观者 mod，用户 2026-11-17）
 #endif
 #endif
         ["REGENT_BOMBARD"] = "轰击储",
@@ -399,6 +402,7 @@ internal static class BossKeys
             case "WATCHER_DIVINITY": return ModelDb.Encounter<WatcherDivinityBossEncounter>();
             case "WATCHER_OMEGA": return ModelDb.Encounter<WatcherOmegaBossEncounter>();
             case "WATCHER_CREATE": return ModelDb.Encounter<WatcherCreateBossEncounter>();
+            case "WATCHER_RETAIN": return ModelDb.Encounter<WatcherRetainBossEncounter>();
 #endif
 #endif
             default: return null;
@@ -492,7 +496,7 @@ internal static class BossKeys
         try
         {
             if (Core.WatcherModPresence.Installed && Core.BossPicksSync.WatcherAllowedHere())
-                return new[] { "WATCHER_CREATE" };
+                return new[] { "WATCHER_CREATE", "WATCHER_RETAIN" };
         }
         catch { /* 探测失败就当没装 */ }
 #endif

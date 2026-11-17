@@ -127,11 +127,15 @@ public static class OstyKeeperScript
             //   `(8, typeof(Afterlife))`，升级**按类型** ⇒ 两张来生会一起变「来生+」。
             new()
             {
-                // ★ 2026-11-13（用户）：「第五回合的第一张来生替换为钙化+」⇒ 回到「钙化+ + 来生 + 死亡之舞」（能量账仍是 3）
-                Note = "5. 钙化+(1)、来生(1)、死亡之舞(1)",
+                // ★ v0.2.733（用户 2026-11-17）：「养手骨恐惧版修正（第 5 回合：普通模式恢复
+                //   『来生 + 来生 + 死亡之舞』，恐惧模式才是『钙化+ + 来生 + 死亡之舞』，其它不变）」
+                //   ⇒ 这张静态表是**普通模式**；恐惧模式那一版由下面的 `DreadTurn5Override` 运行期给出
+                //   （`Build()` 跑在静态初始化里，那时 `DreadMode.IsActive` 恒为 false，不能在这里判）。
+                //   能量账仍是 3。
+                Note = "5. 来生(1)、来生(1)、死亡之舞(1)",
                 Energy = 3,
                 Cards = Cards(
-                    Play<Calcify>(1, upgraded: true), Play<Afterlife>(1), Play<DanseMacabre>(1)),
+                    Play<Afterlife>(1), Play<Afterlife>(1), Play<DanseMacabre>(1)),
             },
 
             // 6：洗牌。护卫+ 1 + 出击+ 1 = 2；吸引仇恨+（2 费）没费、保留
@@ -182,6 +186,27 @@ public static class OstyKeeperScript
             Turns = turns,
             LoopFrom = 7,      // 用户：「之后 7～9 循环」
             LoopLength = 3,
+            // ★ v0.2.733（用户 2026-11-17）：恐惧模式第 5 回合才是「钙化+ + 来生 + 死亡之舞」。
+            //   为什么走 `Resolve` 而不在 `Build()` 里分支：`BossDefs` 是**静态初始化**，
+            //   那时 `DreadMode.IsActive` 恒为 false（同轰击储 / 辉星储的先例）。
+            Resolve = DreadTurn5Override,
+        };
+    }
+
+    /// <summary>
+    /// **恐惧模式第 5 回合**（用户 2026-11-17）：「钙化+ + 来生 + 死亡之舞」。
+    /// 返回 null ⇒ 交回静态回合表（普通模式的「来生 + 来生 + 死亡之舞」）。
+    /// </summary>
+    private static BossTurn? DreadTurn5Override(int turn)
+    {
+        if (turn != 5) return null;
+        if (!Core.DreadMode.IsActive) return null;
+        return new BossTurn
+        {
+            Note = "5.（恐惧）钙化+(1)、来生(1)、死亡之舞(1)",
+            Energy = 3,
+            Cards = Cards(
+                Play<Calcify>(1, upgraded: true), Play<Afterlife>(1), Play<DanseMacabre>(1)),
         };
     }
 

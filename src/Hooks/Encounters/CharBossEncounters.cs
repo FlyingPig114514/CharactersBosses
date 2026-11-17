@@ -157,6 +157,25 @@ public class WatcherCreateBossEncounter : CharBossEncounterBase<WatcherCreateBos
     /// <summary>地图节点图标（暂与神格观共用；`res://CharacterBosses/images/map/`）。</summary>
     public override string BossNodePath => "res://CharacterBosses/images/map/watcher_divinity";
 }
+
+/// <summary>调试用的「普通战斗」版：二层 2 号「保留观」。</summary>
+public sealed class WatcherRetainBossNormalEncounter : WatcherRetainBossEncounter
+{
+    public override RoomType RoomType => RoomType.Monster;
+}
+
+/// <summary>
+/// **二层 2 号「保留观」**（设计 Key `WATCHER_RETAIN`，用户 2026-11-17）：
+/// 观者角色 + 保留牌流（确立基础 / 时之沙 / 旋转打击 / 坚韧）+ 特殊效果「确立基础」。
+/// 控制台：`fight WATCHER_RETAIN_BOSS_ENCOUNTER`。
+/// </summary>
+public class WatcherRetainBossEncounter : CharBossEncounterBase<WatcherRetainBoss>
+{
+    public override int? TierAct => 1;      // 第二幕
+
+    /// <summary>地图节点图标（暂与神格观共用；`res://CharacterBosses/images/map/`）。</summary>
+    public override string BossNodePath => "res://CharacterBosses/images/map/watcher_divinity";
+}
 #endif
 // ── 调试专用的「普通战斗」版本 ──
 // 调试开关换进来的战斗如果仍是 RoomType.Boss，打赢后会走 Boss 结算（第一幕的 Boss 一死就直接进下一幕）。
@@ -579,6 +598,7 @@ public static class CharBossEncounters
         ModelDb.Encounter<WatcherDivinityBossEncounter>(),             // 三层 1 号：神格观（只有装了观者 mod 才会进候选表）
         ModelDb.Encounter<WatcherOmegaBossEncounter>(),                // 三层 2 号：Ω观（用户 2026-11-16）
         ModelDb.Encounter<WatcherCreateBossEncounter>(),                // 二层 1 号：印牌观（用户 2026-11-16）
+        ModelDb.Encounter<WatcherRetainBossEncounter>(),                // 二层 2 号：保留观（用户 2026-11-17）
 #endif
     });
 
@@ -668,6 +688,11 @@ public static class CharBossEncounters
 
             if (character == RegentCharacterIndex && actIndex == 1 && Core.BossLineups.KingActive())
                 return ModelDb.Encounter<RegentKingBossEncounter>();
+
+            // ★ v0.2.733（用户 2026-11-17）：二层观者有两套设计 —— 1 号印牌观（档位默认）/ 2 号保留观。
+            //   控制台点名 `WATCHER_RETAIN_BOSS_ENCOUNTER` 或读档回到保留观那场时，按遭遇认人。
+            if (character == WatcherCharacterIndex && actIndex == 1 && Core.BossLineups.WatcherRetainActive())
+                return ModelDb.Encounter<WatcherRetainBossEncounter>();
 
             return TierByCharacterAct.Value.TryGetValue((character, actIndex), out var encounter)
                 ? encounter
@@ -1123,6 +1148,9 @@ public static class CharBossEncounters
 
     /// <summary>储君在角色表里的下标。</summary>
     private const int RegentCharacterIndex = 4;
+
+    /// <summary>观者（别的 mod 的角色）在角色表里的下标 —— 见 <c>BossKeys.CharacterName(6)</c>。</summary>
+    private const int WatcherCharacterIndex = 6;
 
     /// <summary>静默猎手按幕分的遭遇（图标不同）；没设计的幕 → 用基础遭遇（占位图标）。</summary>
     private static EncounterModel? SilentEncounterForAct(int actIndex)

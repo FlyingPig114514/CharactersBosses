@@ -139,9 +139,12 @@
     "WATCHER_FASTING_POWER.title":  "Fast",
     "WATCHER_FEAR_NO_EVIL_AIM_POWER.description":  "Bu tur Gozcu [gold]Kotulukten Korkma[/gold] oynayacak.\nKilitledigi oyuncu saldiri karti oynarsa [gold]Sukunet[/gold]e girer.",
     "WATCHER_FASTING_POWER.description":  "Omega iki turda bir tetiklenir.\nBasinc Noktalari hasari bloklanabilir.\nUyari: Omega kaynaksiz hasar verir, Basinc Noktalari zayiflatma hasari verir; cagrilar bu hasari senin yerine almaz. «Vapi Sadakati» olan çağrılar da bu hasarı senin yerine almaz.\nOmega: Turunun sonunda TÜM düşmanlara 50 hasar ver.",
-    "WATCHER_FASTING_POWER.description_dread":  "Omega iki turda bir tetiklenir.\nBasinc Noktalari hasari bloklanabilir.\nUyari: Omega kaynaksiz hasar verir, Basinc Noktalari zayiflatma hasari verir; cagrilar bu hasari senin yerine almaz. «Vapi Sadakati» olan çağrılar da bu hasarı senin yerine almaz.\nOmega: Turunun sonunda TÜM düşmanlara 50 hasar ver.",
+    "WATCHER_FASTING_POWER.description_dread":  "Omega her turda tetiklenir.\nBasinc Noktalari hasari bloklanabilir.\nUyari: Omega kaynaksiz hasar verir, Basinc Noktalari zayiflatma hasari verir; cagrilar bu hasari senin yerine almaz. «Vapi Sadakati» olan çağrılar da bu hasarı senin yerine almaz.\nOmega: Turunun sonunda TÜM düşmanlara 50 hasar ver.",
     "WATCHER_FEAR_NO_EVIL_AIM_POWER.title":  "Oyna",
     "BOSS_MASTER_REALITY_POWER.title":  "Gerçekliğe Hükmetme",
     "BOSS_MASTER_REALITY_POWER.description":  "Savaşta bir kart oluşturduğunda o kart [gold]düşürülür[/gold]; jeton değilse ayrıca [gold]Tüketim[/gold] kazanır.\nGözcü, Renk Filozofu sayesinde [gold]Cephanelik[/gold], [gold]Yaratılış Sütunu[/gold] ve [gold]Yerini Bil[/gold] elde etti.",
-    "BOSS_MASTER_REALITY_POWER.description_dread":  "Savaşta bir kart oluşturduğunda o kart [gold]düşürülür[/gold]; jeton değilse ayrıca [gold]Tüketim[/gold] kazanır.\nGözcü, Renk Filozofu sayesinde [gold]Cephanelik[/gold], [gold]Yaratılış Sütunu[/gold] ve [gold]Yerini Bil[/gold] elde etti."
+    "BOSS_MASTER_REALITY_POWER.description_dread":  "Savaşta bir kart oluşturduğunda o kart [gold]düşürülür[/gold]; jeton değilse ayrıca [gold]Tüketim[/gold] kazanır.\nGözcü, Renk Filozofu sayesinde [gold]Cephanelik[/gold], [gold]Yaratılış Sütunu[/gold] ve [gold]Yerini Bil[/gold] elde etti.",
+    "BOSS_ESTABLISHMENT_POWER.title":  "Tesis",
+    "BOSS_ESTABLISHMENT_POWER.description":  "Sıranın sonunda, elinde maliyeti 2'nin altında olan saklanan her kartın maliyeti bu dövüş boyunca 1 artar, ardından Gözlemci 1 Güç kaybeder.\nBu etki yalnızca Gözlemci'nin kilitlendiği oyuncuya uygulanır.",
+    "BOSS_ESTABLISHMENT_POWER.description_dread":  "Sıranın sonunda, sakladığın kartların maliyeti bu dövüş boyunca 1 artar.\nBu etki yalnızca Gözlemci'nin kilitlendiği oyuncuya uygulanır."
 }

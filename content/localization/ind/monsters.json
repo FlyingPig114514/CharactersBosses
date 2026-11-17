@@ -204,10 +204,15 @@
     "WATCHER_OMEGA_BOSS.title":  "Pengamat Omega",
     "WATCHER_OMEGA_BOSS.name":  "Pengamat Omega",
     "WATCHER_OMEGA_BOSS.fasting":  "Omega dipicu setiap dua turn.\nDamage Titik Tekan dapat kamu blokir.\nPeringatan: Omega memberi damage tanpa sumber, Titik Tekan memberi damage debuff; minion tidak akan menahan damage itu untukmu. Minion dengan «Kesetiaan Vapi» juga tidak akan menahan damage itu untukmu.\nOmega: Di akhir turnmu, berikan 50 damage ke SEMUA musuh.",
-    "WATCHER_OMEGA_BOSS.fasting_dread":  "Omega dipicu setiap dua turn.\nDamage Titik Tekan dapat kamu blokir.\nPeringatan: Omega memberi damage tanpa sumber, Titik Tekan memberi damage debuff; minion tidak akan menahan damage itu untukmu. Minion dengan «Kesetiaan Vapi» juga tidak akan menahan damage itu untukmu.\nOmega: Di akhir turnmu, berikan 50 damage ke SEMUA musuh.",
+    "WATCHER_OMEGA_BOSS.fasting_dread":  "Omega dipicu setiap turn.\nDamage Titik Tekan dapat kamu blokir.\nPeringatan: Omega memberi damage tanpa sumber, Titik Tekan memberi damage debuff; minion tidak akan menahan damage itu untukmu. Minion dengan «Kesetiaan Vapi» juga tidak akan menahan damage itu untukmu.\nOmega: Di akhir turnmu, berikan 50 damage ke SEMUA musuh.",
     "WATCHER_CREATE_BOSS.name":  "Pengamat Pencetak",
     "WATCHER_CREATE_BOSS.title":  "Pengamat Pencetak",
     "WATCHER_CREATE_BOSS.moves.CHARBOSS_PLAY.title":  "Mainkan Kartu",
     "WATCHER_BOSS.create_reality":  "Setiap kali kamu membuat kartu dalam pertarungan, kartu itu [gold]diturunkan[/gold]; jika bukan token, kartu itu juga mendapat [gold]Habis[/gold].\nSang Pengamat memperoleh [gold]Gudang Senjata[/gold], [gold]Pilar Penciptaan[/gold], dan [gold]Kenali Tempatmu[/gold] melalui Filsuf Warna.",
-    "WATCHER_BOSS.create_reality_dread":  "Setiap kali kamu membuat kartu dalam pertarungan, kartu itu [gold]diturunkan[/gold]; jika bukan token, kartu itu juga mendapat [gold]Habis[/gold].\nSang Pengamat memperoleh [gold]Gudang Senjata[/gold], [gold]Pilar Penciptaan[/gold], dan [gold]Kenali Tempatmu[/gold] melalui Filsuf Warna."
+    "WATCHER_BOSS.create_reality_dread":  "Setiap kali kamu membuat kartu dalam pertarungan, kartu itu [gold]diturunkan[/gold]; jika bukan token, kartu itu juga mendapat [gold]Habis[/gold].\nSang Pengamat memperoleh [gold]Gudang Senjata[/gold], [gold]Pilar Penciptaan[/gold], dan [gold]Kenali Tempatmu[/gold] melalui Filsuf Warna.",
+    "WATCHER_RETAIN_BOSS.name":  "Pengamat Penyimpan",
+    "WATCHER_RETAIN_BOSS.title":  "Pengamat Penyimpan",
+    "WATCHER_RETAIN_BOSS.moves.CHARBOSS_PLAY.title":  "Mainkan",
+    "WATCHER_RETAIN_BOSS.establishment":  "Pada akhir giliranmu, setiap kartu tersimpan di tanganmu dengan biaya di bawah 2, biayanya bertambah 1 selama pertarungan ini, lalu Watcher kehilangan 1 Kekuatan.\nEfek ini hanya berlaku bagi pemain yang dikunci oleh Watcher.",
+    "WATCHER_RETAIN_BOSS.establishment_dread":  "Pada akhir giliranmu, kartu-kartu tersimpanmu bertambah biayanya 1 selama pertarungan ini.\nEfek ini hanya berlaku bagi pemain yang dikunci oleh Watcher."
 }

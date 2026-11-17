@@ -114,5 +114,7 @@
     "WATCHER_PRINT_BOSS_ENCOUNTER.title":  "觀者",
     "WATCHER_PRINT_BOSS_ENCOUNTER.loss":  "{character}被[gold]印牌觀[/gold]的操控現實碾碎。",
     "WATCHER_CREATE_BOSS_ENCOUNTER.title":  "觀者",
-    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character}被[gold]印牌觀[/gold]的操控現實碾碎。"
+    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character}被[gold]印牌觀[/gold]的操控現實碾碎。",
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "觀者",
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "{character}被[gold]保留觀[/gold]的確立基礎碾碎。"
 }

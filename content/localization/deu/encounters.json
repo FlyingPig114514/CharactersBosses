@@ -114,5 +114,7 @@
     "WATCHER_PRINT_BOSS_ENCOUNTER.title":  "Die Seherin",
     "WATCHER_PRINT_BOSS_ENCOUNTER.loss":  "{character} wurde vom [gold]Druckenden Wächter[/gold] zermalmt.",
     "WATCHER_CREATE_BOSS_ENCOUNTER.title":  "Die Seherin",
-    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character} wurde vom [gold]Druckenden Wächter[/gold] zermalmt."
+    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character} wurde vom [gold]Druckenden Wächter[/gold] zermalmt.",
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "Die Seherin",
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "{character} wurde von der [gold]Etablierung[/gold] des [gold]Bewahrenden Wächters[/gold] zermalmt."
 }

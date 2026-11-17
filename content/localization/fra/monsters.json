@@ -204,10 +204,15 @@
     "WATCHER_OMEGA_BOSS.title":  "Observateur Omega",
     "WATCHER_OMEGA_BOSS.name":  "Observateur Omega",
     "WATCHER_OMEGA_BOSS.fasting":  "Omega ne se declenche qu un tour sur deux.\nLes degats des Points de pression peuvent etre bloques.\nAvertissement : Omega inflige des degats sans source, les Points de pression des degats de malus ; les serviteurs ne prendront pas ces degats a ta place. Les serviteurs avec « Loyauté de Vapi » ne prendront pas non plus ces dégâts à ta place.\nOméga : À la fin de votre tour, infligez 50 dégâts à TOUS les ennemis.",
-    "WATCHER_OMEGA_BOSS.fasting_dread":  "Omega ne se declenche qu un tour sur deux.\nLes degats des Points de pression peuvent etre bloques.\nAvertissement : Omega inflige des degats sans source, les Points de pression des degats de malus ; les serviteurs ne prendront pas ces degats a ta place. Les serviteurs avec « Loyauté de Vapi » ne prendront pas non plus ces dégâts à ta place.\nOméga : À la fin de votre tour, infligez 50 dégâts à TOUS les ennemis.",
+    "WATCHER_OMEGA_BOSS.fasting_dread":  "Omega se declenche chaque tour.\nLes degats des Points de pression peuvent etre bloques.\nAvertissement : Omega inflige des degats sans source, les Points de pression des degats de malus ; les serviteurs ne prendront pas ces degats a ta place. Les serviteurs avec « Loyauté de Vapi » ne prendront pas non plus ces dégâts à ta place.\nOméga : À la fin de votre tour, infligez 50 dégâts à TOUS les ennemis.",
     "WATCHER_CREATE_BOSS.name":  "Veilleur Imprimeur",
     "WATCHER_CREATE_BOSS.title":  "Veilleur Imprimeur",
     "WATCHER_CREATE_BOSS.moves.CHARBOSS_PLAY.title":  "Jouer une carte",
     "WATCHER_BOSS.create_reality":  "Chaque fois que vous créez une carte en combat, elle est [gold]rétrogradée[/gold] ; si ce n\u0027est pas un jeton, elle gagne aussi [gold]Épuisement[/gold].\nLe Veilleur a obtenu [gold]Arsenal[/gold], [gold]Pilier de la Création[/gold] et [gold]Connais ta place[/gold] grâce au Philosophe des Couleurs.",
-    "WATCHER_BOSS.create_reality_dread":  "Chaque fois que vous créez une carte en combat, elle est [gold]rétrogradée[/gold] ; si ce n\u0027est pas un jeton, elle gagne aussi [gold]Épuisement[/gold].\nLe Veilleur a obtenu [gold]Arsenal[/gold], [gold]Pilier de la Création[/gold] et [gold]Connais ta place[/gold] grâce au Philosophe des Couleurs."
+    "WATCHER_BOSS.create_reality_dread":  "Chaque fois que vous créez une carte en combat, elle est [gold]rétrogradée[/gold] ; si ce n\u0027est pas un jeton, elle gagne aussi [gold]Épuisement[/gold].\nLe Veilleur a obtenu [gold]Arsenal[/gold], [gold]Pilier de la Création[/gold] et [gold]Connais ta place[/gold] grâce au Philosophe des Couleurs.",
+    "WATCHER_RETAIN_BOSS.name":  "Veilleur Conservateur",
+    "WATCHER_RETAIN_BOSS.title":  "Veilleur Conservateur",
+    "WATCHER_RETAIN_BOSS.moves.CHARBOSS_PLAY.title":  "Jouer",
+    "WATCHER_RETAIN_BOSS.establishment":  "À la fin de votre tour, chaque carte retenue dans votre main dont le coût est inférieur à 2 voit son coût augmenter de 1 pour le reste du combat ; ensuite, la gardienne perd 1 de Force.\nCet effet ne s'applique qu'au joueur verrouillé par la gardienne.",
+    "WATCHER_RETAIN_BOSS.establishment_dread":  "À la fin de votre tour, vos cartes retenues voient leur coût augmenter de 1 pour le reste du combat.\nCet effet ne s'applique qu'au joueur verrouillé par la gardienne."
 }

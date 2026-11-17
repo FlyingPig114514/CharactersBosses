@@ -102,4 +102,21 @@ public sealed class WatcherCreateBoss : WatcherBoss
 
     public override string? PinnedVariantKey => "WATCHER_CREATE";
 }
+
+/// <summary>
+/// **二层 2 号「保留观」**（设计 Key <c>WATCHER_RETAIN</c>，用户 2026-11-17）。
+///
+/// 同一个观者角色的第四套设计 ⇒ 走 `BossDefs.Watcher` 的 `ExtraVariants[1]`（与印牌观同层，
+/// 用 `BossLineups.WatcherRetainActive()` 决定谁上场）：剧本 `WatcherRetainScript`（9 回合，
+/// 6~9 循环）、遗物五件、特殊效果「确立基础」（`BossEstablishmentPower`）。
+/// 控制台：`fight WATCHER_RETAIN_BOSS_ENCOUNTER`。
+/// </summary>
+public sealed class WatcherRetainBoss : WatcherBoss
+{
+    public WatcherRetainBoss() { SpawnVariantKey = "WATCHER_RETAIN"; }
+
+    public override int? TierAct => 1;      // 第二幕
+
+    public override string? PinnedVariantKey => "WATCHER_RETAIN";
+}
 #endif

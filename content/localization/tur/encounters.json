@@ -114,5 +114,7 @@
     "WATCHER_PRINT_BOSS_ENCOUNTER.title":  "Gözlemci",
     "WATCHER_PRINT_BOSS_ENCOUNTER.loss":  "{character}, [gold]Baskı Gözcüsü[/gold] tarafından ezildi.",
     "WATCHER_CREATE_BOSS_ENCOUNTER.title":  "Gözlemci",
-    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character}, [gold]Baskı Gözcüsü[/gold] tarafından ezildi."
+    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character}, [gold]Baskı Gözcüsü[/gold] tarafından ezildi.",
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "Gözlemci",
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "{character}, [gold]Saklama Gözcüsü[/gold] tarafından [gold]Tesis[/gold] ile ezildi."
 }

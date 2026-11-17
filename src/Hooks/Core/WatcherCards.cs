@@ -247,6 +247,27 @@ internal static class WatcherCards
     /// <summary>何人僭越（本体 `KnowThyPlace`，**0 费** Skill）：给目标 易伤 + 虚弱。</summary>
     internal static Type? KnowThyPlace => typeof(MegaCrit.Sts2.Core.Models.Cards.KnowThyPlace);
 
+    // ── 二层 2 号「保留观」用到的 5 张（用户 2026-11-17）────────────────────────
+    //   这 5 张是**观者模组**独有的牌（本体没有）⇒ 两版类名都写进 `Card(...)`：
+    //   A 版 `WatcherMod.WatcherEstablishment` / B 版 `Watcher.Code.Cards.*.Establishment`。
+    //   确立基础已经在上面「Ω观」那一组定义过了（同一个类），这里不重复。
+
+    /// <summary>时之沙（`SandsOfTime`，4 费攻击，自带保留）：伤害 20（升级 +6），每被保留一次费用 −1（本场）。</summary>
+    internal static Type? SandsOfTime => Card("WatcherSandsOfTime", "SandsOfTime",
+        "WATCHER_SANDS_OF_TIME", "WATCHER-SANDS_OF_TIME");
+
+    /// <summary>旋转打击（`WindmillStrike`，自带保留）：伤害 7，**每被保留一次 +4**（本场）。</summary>
+    internal static Type? WindmillStrike => Card("WatcherWindmillStrike", "WindmillStrike",
+        "WATCHER_WINDMILL_STRIKE", "WATCHER-WINDMILL_STRIKE");
+
+    /// <summary>坚韧（`Perseverance`，自带保留）：格挡 5，**每被保留一次 +2**（本场）。</summary>
+    internal static Type? Perseverance => Card("WatcherPerseverance", "Perseverance",
+        "WATCHER_PERSEVERANCE", "WATCHER-PERSEVERANCE");
+
+    /// <summary>停顿（`Halt`，0 费技能）：获得格挡；若在愤怒中额外获得格挡。</summary>
+    internal static Type? Halt => Card("WatcherHalt", "Halt",
+        "WATCHER_HALT", "WATCHER-HALT");
+
     /// <summary>
     /// **B 版（lamali）她此刻的姿态倍率**：1（无/平静）/ 2（愤怒）/ 3（神格）。
     ///

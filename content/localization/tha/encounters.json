@@ -114,5 +114,7 @@
     "WATCHER_PRINT_BOSS_ENCOUNTER.title":  "นักพรตเฝ้าการณ์",
     "WATCHER_PRINT_BOSS_ENCOUNTER.loss":  "{character} ถูกบดขยี้โดย[gold]ผู้เฝ้ามองผู้พิมพ์[/gold]",
     "WATCHER_CREATE_BOSS_ENCOUNTER.title":  "นักพรตเฝ้าการณ์",
-    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character} ถูกบดขยี้โดย[gold]ผู้เฝ้ามองผู้พิมพ์[/gold]"
+    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character} ถูกบดขยี้โดย[gold]ผู้เฝ้ามองผู้พิมพ์[/gold]",
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "นักพรตเฝ้าการณ์",
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "{character} ถูกบดขยี้โดย[gold]การสถาปนา[/gold]ของผู้เฝ้ามองผู้เก็บรักษา"
 }

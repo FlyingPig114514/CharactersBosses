@@ -204,10 +204,15 @@
     "WATCHER_OMEGA_BOSS.title":  "Observador Omega",
     "WATCHER_OMEGA_BOSS.name":  "Observador Omega",
     "WATCHER_OMEGA_BOSS.fasting":  "Omega e ativado a cada dois turnos.\nO dano dos Pontos de pressao pode ser bloqueado.\nAviso: Omega causa dano sem fonte e Pontos de pressao dano de penalidade; lacaios nao receberao esse dano por voce. Lacaios com «Lealdade de Vapi» também não receberão esse dano por você.\nÔmega: No fim do seu turno, causa 50 de dano a TODOS os inimigos.",
-    "WATCHER_OMEGA_BOSS.fasting_dread":  "Omega e ativado a cada dois turnos.\nO dano dos Pontos de pressao pode ser bloqueado.\nAviso: Omega causa dano sem fonte e Pontos de pressao dano de penalidade; lacaios nao receberao esse dano por voce. Lacaios com «Lealdade de Vapi» também não receberão esse dano por você.\nÔmega: No fim do seu turno, causa 50 de dano a TODOS os inimigos.",
+    "WATCHER_OMEGA_BOSS.fasting_dread":  "Omega e ativado a cada turno.\nO dano dos Pontos de pressao pode ser bloqueado.\nAviso: Omega causa dano sem fonte e Pontos de pressao dano de penalidade; lacaios nao receberao esse dano por voce. Lacaios com «Lealdade de Vapi» também não receberão esse dano por você.\nÔmega: No fim do seu turno, causa 50 de dano a TODOS os inimigos.",
     "WATCHER_CREATE_BOSS.name":  "Observador Impressor",
     "WATCHER_CREATE_BOSS.title":  "Observador Impressor",
     "WATCHER_CREATE_BOSS.moves.CHARBOSS_PLAY.title":  "Jogar carta",
     "WATCHER_BOSS.create_reality":  "Sempre que você criar uma carta em combate, ela será [gold]rebaixada[/gold]; se não for uma ficha, também ganha [gold]Exaurir[/gold].\nO Observador obteve [gold]Arsenal[/gold], [gold]Pilar da Criação[/gold] e [gold]Conheça Seu Lugar[/gold] através do Filósofo das Cores.",
-    "WATCHER_BOSS.create_reality_dread":  "Sempre que você criar uma carta em combate, ela será [gold]rebaixada[/gold]; se não for uma ficha, também ganha [gold]Exaurir[/gold].\nO Observador obteve [gold]Arsenal[/gold], [gold]Pilar da Criação[/gold] e [gold]Conheça Seu Lugar[/gold] através do Filósofo das Cores."
+    "WATCHER_BOSS.create_reality_dread":  "Sempre que você criar uma carta em combate, ela será [gold]rebaixada[/gold]; se não for uma ficha, também ganha [gold]Exaurir[/gold].\nO Observador obteve [gold]Arsenal[/gold], [gold]Pilar da Criação[/gold] e [gold]Conheça Seu Lugar[/gold] através do Filósofo das Cores.",
+    "WATCHER_RETAIN_BOSS.name":  "Observador Retentor",
+    "WATCHER_RETAIN_BOSS.title":  "Observador Retentor",
+    "WATCHER_RETAIN_BOSS.moves.CHARBOSS_PLAY.title":  "Jogar",
+    "WATCHER_RETAIN_BOSS.establishment":  "No fim do seu turno, cada carta retida na sua mão com custo menor que 2 tem seu custo aumentado em 1 pelo resto do combate, e então a Observadora perde 1 de Força.\nEste efeito só se aplica ao jogador travado pela Observadora.",
+    "WATCHER_RETAIN_BOSS.establishment_dread":  "No fim do seu turno, suas cartas retidas têm seu custo aumentado em 1 pelo resto do combate.\nEste efeito só se aplica ao jogador travado pela Observadora."
 }

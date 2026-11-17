@@ -114,5 +114,7 @@
     "WATCHER_PRINT_BOSS_ENCOUNTER.title":  "ウォッチャー",
     "WATCHER_PRINT_BOSS_ENCOUNTER.loss":  "{character}は[gold]プリントウォッチャー[/gold]の現実操作に砕かれた。",
     "WATCHER_CREATE_BOSS_ENCOUNTER.title":  "ウォッチャー",
-    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character}は[gold]プリントウォッチャー[/gold]の現実操作に砕かれた。"
+    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character}は[gold]プリントウォッチャー[/gold]の現実操作に砕かれた。",
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "ウォッチャー",
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "{character}は[gold]保持ウォッチャー[/gold]の確立に砕かれた。"
 }

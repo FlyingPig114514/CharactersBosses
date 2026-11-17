@@ -114,5 +114,7 @@
     "WATCHER_PRINT_BOSS_ENCOUNTER.title":  "Obserwatorka",
     "WATCHER_PRINT_BOSS_ENCOUNTER.loss":  "{character} został zmiażdżony przez [gold]Drukującego Obserwatora[/gold].",
     "WATCHER_CREATE_BOSS_ENCOUNTER.title":  "Obserwatorka",
-    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character} został zmiażdżony przez [gold]Drukującego Obserwatora[/gold]."
+    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character} został zmiażdżony przez [gold]Drukującego Obserwatora[/gold].",
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "Obserwatorka",
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "{character} został zmiażdżony przez [gold]Ugruntowanie[/gold] [gold]Zachowującego Obserwatora[/gold]."
 }

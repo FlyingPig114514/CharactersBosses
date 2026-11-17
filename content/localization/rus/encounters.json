@@ -114,5 +114,7 @@
     "WATCHER_PRINT_BOSS_ENCOUNTER.title":  "Созерцающая",
     "WATCHER_PRINT_BOSS_ENCOUNTER.loss":  "{character} был раздавлен [gold]Печатным Наблюдателем[/gold].",
     "WATCHER_CREATE_BOSS_ENCOUNTER.title":  "Созерцающая",
-    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character} был раздавлен [gold]Печатным Наблюдателем[/gold]."
+    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character} был раздавлен [gold]Печатным Наблюдателем[/gold].",
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "Созерцающая",
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "{character} был раздавлен [gold]Утверждением[/gold] [gold]Удерживающего Наблюдателя[/gold]."
 }

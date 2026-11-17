@@ -204,10 +204,15 @@
     "WATCHER_OMEGA_BOSS.title":  "Observador Omega",
     "WATCHER_OMEGA_BOSS.name":  "Observador Omega",
     "WATCHER_OMEGA_BOSS.fasting":  "Omega se activa un turno si y otro no.\nEl dano de Puntos de presion se puede bloquear.\nAviso: Omega inflige dano sin fuente y Puntos de presion dano de malus; los esbirros no recibiran ese dano por ti. Los esbirros con «Lealtad de Vapi» tampoco recibirán ese daño por ti.\nOmega: Al final de tu turno, infliges 50 de daño a TODOS los enemigos.",
-    "WATCHER_OMEGA_BOSS.fasting_dread":  "Omega se activa un turno si y otro no.\nEl dano de Puntos de presion se puede bloquear.\nAviso: Omega inflige dano sin fuente y Puntos de presion dano de malus; los esbirros no recibiran ese dano por ti. Los esbirros con «Lealtad de Vapi» tampoco recibirán ese daño por ti.\nOmega: Al final de tu turno, infliges 50 de daño a TODOS los enemigos.",
+    "WATCHER_OMEGA_BOSS.fasting_dread":  "Omega se activa cada turno.\nEl dano de Puntos de presion se puede bloquear.\nAviso: Omega inflige dano sin fuente y Puntos de presion dano de malus; los esbirros no recibiran ese dano por ti. Los esbirros con «Lealtad de Vapi» tampoco recibirán ese daño por ti.\nOmega: Al final de tu turno, infliges 50 de daño a TODOS los enemigos.",
     "WATCHER_CREATE_BOSS.name":  "Vigía Impresor",
     "WATCHER_CREATE_BOSS.title":  "Vigía Impresor",
     "WATCHER_CREATE_BOSS.moves.CHARBOSS_PLAY.title":  "Jugar carta",
     "WATCHER_BOSS.create_reality":  "Siempre que crees una carta en combate, se [gold]degradará[/gold]; si no es una ficha, también obtiene [gold]Agotar[/gold].\nEl Vigía obtuvo [gold]Arsenal[/gold], [gold]Pilar de la Creación[/gold] y [gold]Conoce tu lugar[/gold] gracias al Filósofo de los Colores.",
-    "WATCHER_BOSS.create_reality_dread":  "Siempre que crees una carta en combate, se [gold]degradará[/gold]; si no es una ficha, también obtiene [gold]Agotar[/gold].\nEl Vigía obtuvo [gold]Arsenal[/gold], [gold]Pilar de la Creación[/gold] y [gold]Conoce tu lugar[/gold] gracias al Filósofo de los Colores."
+    "WATCHER_BOSS.create_reality_dread":  "Siempre que crees una carta en combate, se [gold]degradará[/gold]; si no es una ficha, también obtiene [gold]Agotar[/gold].\nEl Vigía obtuvo [gold]Arsenal[/gold], [gold]Pilar de la Creación[/gold] y [gold]Conoce tu lugar[/gold] gracias al Filósofo de los Colores.",
+    "WATCHER_RETAIN_BOSS.name":  "Vigía Retenedor",
+    "WATCHER_RETAIN_BOSS.title":  "Vigía Retenedor",
+    "WATCHER_RETAIN_BOSS.moves.CHARBOSS_PLAY.title":  "Jugar",
+    "WATCHER_RETAIN_BOSS.establishment":  "Al final de tu turno, cada carta retenida en tu mano con un coste inferior a 2 aumenta su coste en 1 durante el resto del combate; después, la Vigilante pierde 1 de Fuerza.\nEste efecto solo se aplica al jugador al que la Vigilante tiene fijado.",
+    "WATCHER_RETAIN_BOSS.establishment_dread":  "Al final de tu turno, tus cartas retenidas aumentan su coste en 1 durante el resto del combate.\nEste efecto solo se aplica al jugador al que la Vigilante tiene fijado."
 }

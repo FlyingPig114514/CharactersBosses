@@ -144,6 +144,15 @@ internal static class WatcherOmegaMechanics
             }
             catch { /* 拿不到阵营就照常处理 */ }
 
+            // ★ v0.2.733（用户 2026-11-17）：**恐惧版斋戒取消了「隔一回合触发一次」** ⇒ 每回合都结算。
+            //   这里直接放行、并且**不翻那一位**（万一中途关了恐惧模式，隔回合的节奏还接得上）。
+            if (Core.DreadMode.IsActive)
+            {
+                if (_logs++ < 8)
+                    Logger.Log("[CharBoss] 斋戒（恐惧版）：每回合都结算欧米伽（去掉隔回合限制）");
+                return true;
+            }
+
             bool fire = OmegaFireFlag(boss);
             OmegaFireNext[boss] = !fire;      // 下一回合反过来
 
@@ -160,10 +169,18 @@ internal static class WatcherOmegaMechanics
     /// <summary>
     /// 欧米伽**这一回合结束**会不会结算（给意图用）——
     /// 就是上面那一位（她自己的回合里 = 本回合；玩家回合里看的是她下一回合）。
+    ///
+    /// ★ v0.2.733（用户 2026-11-17）：**恐惧模式下每回合都触发**（不受「隔一回合」限制）。
     /// </summary>
     internal static bool OmegaTriggersOn(Monsters.CharBossMonster? boss)
     {
-        try { return boss != null && OmegaFireFlag(boss); } catch { return false; }
+        try
+        {
+            if (boss == null) return false;
+            if (Core.DreadMode.IsActive) return true;
+            return OmegaFireFlag(boss);
+        }
+        catch { return false; }
     }
 
     // ── ② 点穴：伤害可以被格挡 ────────────────────────────────────────────

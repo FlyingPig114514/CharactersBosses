@@ -114,5 +114,7 @@
     "WATCHER_PRINT_BOSS_ENCOUNTER.title":  "The Watcher",
     "WATCHER_PRINT_BOSS_ENCOUNTER.loss":  "{character} was crushed by the [gold]Printing Watcher[/gold]\u0027s Master Reality.",
     "WATCHER_CREATE_BOSS_ENCOUNTER.title":  "The Watcher",
-    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character} was crushed by the [gold]Printing Watcher[/gold]\u0027s Master Reality."
+    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character} was crushed by the [gold]Printing Watcher[/gold]\u0027s Master Reality.",
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "The Watcher",
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "{character} was crushed by the [gold]Retaining Watcher[/gold]'s Establishment."
 }

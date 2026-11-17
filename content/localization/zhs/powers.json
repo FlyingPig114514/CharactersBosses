@@ -139,9 +139,12 @@
     "WATCHER_FASTING_POWER.title":  "斋戒",
     "WATCHER_FEAR_NO_EVIL_AIM_POWER.description":  "本回合观者会打出[gold]不惧妖邪[/gold]。\n她锁定的玩家若在本回合打出攻击牌，她打出这张牌时将进入[gold]平静[/gold]；否则不改变姿态。",
     "WATCHER_FASTING_POWER.description":  "欧米伽改为隔一回合触发 1 次。\n点穴造成的伤害可以被你格挡。\n警告：欧米伽属于无来源伤害，点穴属于 debuff 伤害，带有“为你而死”和“瓦皮的忠诚”的召唤物不会替你承受该伤害。\n欧米伽：在你的回合结束时，对所有敌人造成50点伤害。",
-    "WATCHER_FASTING_POWER.description_dread":  "欧米伽改为隔一回合触发 1 次。\n点穴造成的伤害可以被你格挡。\n警告：欧米伽属于无来源伤害，点穴属于 debuff 伤害，带有“为你而死”和“瓦皮的忠诚”的召唤物不会替你承受该伤害。\n欧米伽：在你的回合结束时，对所有敌人造成50点伤害。",
+    "WATCHER_FASTING_POWER.description_dread":  "欧米伽每回合都会触发。\n点穴造成的伤害可以被你格挡。\n警告：欧米伽属于无来源伤害，点穴属于 debuff 伤害，带有“为你而死”和“瓦皮的忠诚”的召唤物不会替你承受该伤害。\n欧米伽：在你的回合结束时，对所有敌人造成50点伤害。",
     "WATCHER_FEAR_NO_EVIL_AIM_POWER.title":  "不惧妖邪",
     "BOSS_MASTER_REALITY_POWER.title":  "操控现实",
     "BOSS_MASTER_REALITY_POWER.description":  "每当你在战斗中生成卡牌时，该牌会被[gold]降级[/gold]；如果它不是衍生牌，还会获得[gold]消耗[/gold]。\n观者通过色彩哲学家获得了[gold]武器库[/gold]、[gold]创世之柱[/gold]和[gold]何人僭越[/gold]。",
-    "BOSS_MASTER_REALITY_POWER.description_dread":  "每当你在战斗中生成卡牌时，该牌会被[gold]降级[/gold]；如果它不是衍生牌，还会获得[gold]消耗[/gold]。\n观者通过色彩哲学家获得了[gold]武器库[/gold]、[gold]创世之柱[/gold]和[gold]何人僭越[/gold]。"
+    "BOSS_MASTER_REALITY_POWER.description_dread":  "每当你在战斗中生成卡牌时，该牌会被[gold]降级[/gold]；如果它不是衍生牌，还会获得[gold]消耗[/gold]。\n观者通过色彩哲学家获得了[gold]武器库[/gold]、[gold]创世之柱[/gold]和[gold]何人僭越[/gold]。",
+    "BOSS_ESTABLISHMENT_POWER.title":  "确立基础",
+    "BOSS_ESTABLISHMENT_POWER.description":  "在你的回合结束时，若你有耗能小于2的牌被保留，其在本场战斗中的耗能增加1，然后观者失去1点力量。\n此效果只对被观者锁定的玩家生效。",
+    "BOSS_ESTABLISHMENT_POWER.description_dread":  "在你的回合结束时，你保留的牌在本场战斗中的耗能增加1。\n此效果只对被观者锁定的玩家生效。"
 }
