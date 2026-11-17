@@ -191,6 +191,11 @@ public sealed class BossEstablishmentPower : PowerModel
                 {
                     if (card == null) continue;
                     if (settled.Contains(card)) continue;              // 这一回合结束已经算过
+                    // ★ v0.2.736（用户 2026-11-17）：「有一些会保留的卡牌没有耗能（不能被打出，
+                    //   例如悲伤和睡眠不佳）。保证它们留在手里不会让保留观减力量（因为它们没有耗能，
+                    //   所以自然也增加不了）。X 牌判定上是 10 亿-1 费，应该没有这个问题。」
+                    //   ⇒ 先摘掉「根本没法打出 / 没有耗能」的牌，再走后面的耗能判断。
+                    if (IsCostless(card)) continue;
                     if (!dread)
                     {
                         // 普通版：只对「耗能 < 2」的保留牌加费
@@ -227,6 +232,28 @@ public sealed class BossEstablishmentPower : PowerModel
         {
             Logger.Log("[CharBoss] 确立基础：结算异常（不影响战斗）: " + e.Message);
         }
+    }
+
+    /// <summary>
+    /// 这张牌**压根没有耗能**吗（打不出的状态牌 / 诅咒，例如「悲伤」「睡眠不佳」，以及 X 费牌）。
+    ///
+    /// 用户 2026-11-17：「有一些会保留的卡牌没有耗能（不能被打出，例如悲伤和睡眠不佳）。
+    /// 保证它们留在手里不会让保留观减力量（因为他们没有耗能，所以自然也增加不了）。
+    /// X 牌我记得判定上是 10 亿-1 费，应该没有这个问题。」
+    /// ⇒ 三条任意命中就跳过：① `Unplayable` 关键字；② `CostsX`（X 费，涨 1 点毫无意义）；
+    ///   ③ 解析出来的耗能是**负数**（引擎里「无耗能」用的就是负值哨兵，这种牌 `&lt; 2` 也成立，
+    ///   所以必须单独排掉，否则会白送她一个 −2 力量）。
+    /// </summary>
+    private static bool IsCostless(CardModel card)
+    {
+        try
+        {
+            if (card.Keywords != null && card.Keywords.Contains(CardKeyword.Unplayable)) return true;
+        }
+        catch { /* 忽略 */ }
+        try { if (card.EnergyCost.CostsX) return true; } catch { /* 忽略 */ }
+        try { if (card.EnergyCost.GetWithModifiers(CostModifiers.All) < 0) return true; } catch { /* 忽略 */ }
+        return false;
     }
 
     private static string SafeEntry(CardModel? card)

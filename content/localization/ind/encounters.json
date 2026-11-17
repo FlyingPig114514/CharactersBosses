@@ -108,13 +108,12 @@
     "FOOL_BOSS_ENCOUNTER.loss_tarot":  "{character} menjadi kartu baru [gold]{Card}[/gold] di dek [gold]Fool[/gold].",
     "FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot":  "{character} menjadi kartu baru [gold]{Card}[/gold] di dek [gold]Fool[/gold].",
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "Watcher",
-    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} dihancurkan oleh kekuatan ilahi [gold]Pengamat Ilahi[/gold].",
+    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} dihabisi tepat saat [gold]Watcher[/gold] melangkah ke Ketuhanan.",
     "WATCHER_OMEGA_BOSS_ENCOUNTER.title":  "Watcher",
-    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss":  "{character} dihancurkan oleh puasa [gold]Pengamat Omega[/gold].",
-    "WATCHER_PRINT_BOSS_ENCOUNTER.title":  "Watcher",
-    "WATCHER_PRINT_BOSS_ENCOUNTER.loss":  "{character} dihancurkan oleh [gold]Pengamat Pencetak[/gold].",
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss":  "{character} tak pernah lepas dari Alfa, Beta, dan Omega milik [gold]Watcher[/gold].",
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss_pressure":  "{character} dihancurkan titik demi titik oleh [gold]Titik Tekan[/gold] milik [gold]Watcher[/gold].",
     "WATCHER_CREATE_BOSS_ENCOUNTER.title":  "Watcher",
-    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character} dihancurkan oleh [gold]Pengamat Pencetak[/gold].",
+    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "Setiap kartu yang dihasilkan {character} ditulis ulang [gold]Watcher[/gold] menjadi senjata untuk melawannya.",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "Watcher",
-    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "{character} dihancurkan oleh [gold]Pendirian[/gold] [gold]Pengamat Penyimpan[/gold]."
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "[gold]Watcher[/gold] menahan kartu {character}, satu per satu, sampai akhir."
 }

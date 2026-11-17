@@ -184,6 +184,13 @@ internal static class WatcherOmegaMechanics
     }
 
     // ── ② 点穴：伤害可以被格挡 ────────────────────────────────────────────
+    /// <summary>
+    /// **玩家这一场是不是被「点穴」打死的**（用户 2026-11-17：Ω观的死亡提示要按死因特判）。
+    /// `null` = 不是被点穴打死的；否则 = 被点穴打死的那位玩家的角色模型
+    /// （死亡提示的 `GetLossMessageFor(character)` 拿这个做引用比对，多人时不会张冠李戴）。
+    /// </summary>
+    internal static MegaCrit.Sts2.Core.Models.CharacterModel? PressurePointsKillCharacter;
+
     private static bool InstallPressurePointsBlockable()
     {
         try
@@ -273,6 +280,18 @@ internal static class WatcherOmegaMechanics
                     if (stacks <= 0) continue;
                     await CreatureCmd.Damage(ctx, c, stacks, ValueProp.Unpowered, owner.Creature, card, play);
                     hitTargets++;
+
+                    // ★ v0.2.736（用户 2026-11-17）：如果是玩家、而且这一下把他打死了 ⇒ 记下死因
+                    //   （死亡提示 `WATCHER_OMEGA_BOSS_ENCOUNTER.loss_pressure` 会因此替换掉默认那句）
+                    try
+                    {
+                        if (c.Player != null && (!c.IsAlive || c.CurrentHp <= 0))
+                        {
+                            PressurePointsKillCharacter = c.Player.Character;
+                            Logger.Log($"[CharBoss] Ω观：{c.Name} 被点穴打死 ⇒ 死亡提示改用点穴专属文案");
+                        }
+                    }
+                    catch { /* 忽略 */ }
                 }
             }
         }

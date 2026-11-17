@@ -108,13 +108,12 @@
     "FOOL_BOSS_ENCOUNTER.loss_tarot":  "{character} stał się nową kartą [gold]{Card}[/gold] w talii [gold]Błazna[/gold].",
     "FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot":  "{character} stał się nową kartą [gold]{Card}[/gold] w talii [gold]Błazna[/gold].",
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "Obserwatorka",
-    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} został zmiażdżony boską mocą [gold]Boskiego Obserwatora[/gold].",
+    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} został odprawiony w chwili, gdy [gold]Obserwatorka[/gold] wkroczyła w Boskość.",
     "WATCHER_OMEGA_BOSS_ENCOUNTER.title":  "Obserwatorka",
-    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss":  "{character} zostal zmiazdzony przez post [gold]Obserwatora Omega[/gold].",
-    "WATCHER_PRINT_BOSS_ENCOUNTER.title":  "Obserwatorka",
-    "WATCHER_PRINT_BOSS_ENCOUNTER.loss":  "{character} został zmiażdżony przez [gold]Drukującego Obserwatora[/gold].",
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss":  "{character} nie wyszedł poza Alfę, Betę i Omegę [gold]Obserwatorki[/gold].",
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss_pressure":  "{character} został rozłożony punkt po punkcie przez [gold]Punkty Ucisku[/gold] [gold]Obserwatorki[/gold].",
     "WATCHER_CREATE_BOSS_ENCOUNTER.title":  "Obserwatorka",
-    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character} został zmiażdżony przez [gold]Drukującego Obserwatora[/gold].",
+    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "Każda karta wygenerowana przez {character} została przepisana przez [gold]Obserwatorkę[/gold] na broń przeciw niemu.",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "Obserwatorka",
-    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "{character} został zmiażdżony przez [gold]Ugruntowanie[/gold] [gold]Zachowującego Obserwatora[/gold]."
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "[gold]Obserwatorka[/gold] zatrzymywała rękę {character} karta po karcie aż do końca."
 }

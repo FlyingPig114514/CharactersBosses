@@ -108,13 +108,12 @@
     "FOOL_BOSS_ENCOUNTER.loss_tarot":  "{character} se convirtió en la nueva carta [gold]{Card}[/gold] del mazo del [gold]Juglar[/gold].",
     "FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot":  "{character} se convirtió en la nueva carta [gold]{Card}[/gold] del mazo del [gold]Juglar[/gold].",
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "La Vigilante",
-    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} fue aplastado por el poder divino del [gold]Observador Divino[/gold].",
+    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} fue despachado en el instante en que [gold]La Vigilante[/gold] entró en la Divinidad.",
     "WATCHER_OMEGA_BOSS_ENCOUNTER.title":  "La Vigilante",
-    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss":  "{character} fue aplastado por el ayuno del [gold]Observador Omega[/gold].",
-    "WATCHER_PRINT_BOSS_ENCOUNTER.title":  "La Vigilante",
-    "WATCHER_PRINT_BOSS_ENCOUNTER.loss":  "{character} fue aplastado por el [gold]Vigía Impresor[/gold].",
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss":  "{character} nunca pasó de Alfa, Beta y Omega de [gold]La Vigilante[/gold].",
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss_pressure":  "{character} fue desmontado punto por punto por los [gold]Puntos de Presión[/gold] de [gold]La Vigilante[/gold].",
     "WATCHER_CREATE_BOSS_ENCOUNTER.title":  "La Vigilante",
-    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character} fue aplastado por el [gold]Vigía Impresor[/gold].",
+    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "Cada carta que {character} generó fue reescrita por [gold]La Vigilante[/gold] en un arma en su contra.",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "La Vigilante",
-    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "{character} fue aplastado por el [gold]Establecimiento[/gold] del [gold]Vigía Retenedor[/gold]."
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "[gold]La Vigilante[/gold] retuvo la mano de {character} carta a carta hasta el final."
 }

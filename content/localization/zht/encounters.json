@@ -108,13 +108,12 @@
     "FOOL_BOSS_ENCOUNTER.loss_tarot":  "{character}成為了[gold]愚者[/gold]牌組中新的[gold]{Card}[/gold]。",
     "FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot":  "{character}成為了[gold]愚者[/gold]牌組中新的[gold]{Card}[/gold]。",
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "觀者",
-    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character}被[gold]神格觀[/gold]的神格之力碾碎。",
+    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} 在[gold]觀者[/gold]踏入神格的一瞬被一併超度。",
     "WATCHER_OMEGA_BOSS_ENCOUNTER.title":  "觀者",
-    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss":  "{character}被[gold]Ω觀[/gold]的齋戒碾碎。",
-    "WATCHER_PRINT_BOSS_ENCOUNTER.title":  "觀者",
-    "WATCHER_PRINT_BOSS_ENCOUNTER.loss":  "{character}被[gold]印牌觀[/gold]的操控現實碾碎。",
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss":  "{character} 未能走出[gold]觀者[/gold]的阿爾法、貝塔與歐米伽。",
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss_pressure":  "{character} 的每一寸都被[gold]觀者[/gold]的[gold]點穴[/gold]點得爆開。",
     "WATCHER_CREATE_BOSS_ENCOUNTER.title":  "觀者",
-    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character}被[gold]印牌觀[/gold]的操控現實碾碎。",
+    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character} 生成的每一張牌都被[gold]觀者[/gold]改寫成了對付自己的武器。",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "觀者",
-    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "{character}被[gold]保留觀[/gold]的確立基礎碾碎。"
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "{character} 的手牌被[gold]觀者[/gold]一張張留到了死。"
 }

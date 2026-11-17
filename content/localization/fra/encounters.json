@@ -108,13 +108,12 @@
     "FOOL_BOSS_ENCOUNTER.loss_tarot":  "{character} est devenu la nouvelle carte [gold]{Card}[/gold] du deck de [gold]l\u0027Insensé[/gold].",
     "FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot":  "{character} est devenu la nouvelle carte [gold]{Card}[/gold] du deck de [gold]l\u0027Insensé[/gold].",
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "La gardienne",
-    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} a été écrasé par la puissance divine de l\u0027[gold]Observateur Divin[/gold].",
+    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} a été emporté à l'instant où [gold]La gardienne[/gold] est entrée en Divinité.",
     "WATCHER_OMEGA_BOSS_ENCOUNTER.title":  "La gardienne",
-    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss":  "{character} a ete broye par le jeune de l [gold]Observateur Omega[/gold].",
-    "WATCHER_PRINT_BOSS_ENCOUNTER.title":  "La gardienne",
-    "WATCHER_PRINT_BOSS_ENCOUNTER.loss":  "{character} a été écrasé par le [gold]Veilleur Imprimeur[/gold].",
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss":  "{character} n'a jamais dépassé Alpha, Bêta et Oméga de [gold]La gardienne[/gold].",
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss_pressure":  "{character} a été démonté point par point par les [gold]Points de pression[/gold] de [gold]La gardienne[/gold].",
     "WATCHER_CREATE_BOSS_ENCOUNTER.title":  "La gardienne",
-    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character} a été écrasé par le [gold]Veilleur Imprimeur[/gold].",
+    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "Chaque carte générée par {character} a été réécrite par [gold]La gardienne[/gold] en arme contre lui.",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "La gardienne",
-    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "{character} a été écrasé par l'[gold]Établissement[/gold] du [gold]Veilleur Conservateur[/gold]."
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "[gold]La gardienne[/gold] a retenu la main de {character}, carte après carte, jusqu'à la fin."
 }

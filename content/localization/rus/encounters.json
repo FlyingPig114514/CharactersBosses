@@ -108,13 +108,12 @@
     "FOOL_BOSS_ENCOUNTER.loss_tarot":  "{character} стал новой картой [gold]{Card}[/gold] в колоде [gold]Шута[/gold].",
     "FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot":  "{character} стал новой картой [gold]{Card}[/gold] в колоде [gold]Шута[/gold].",
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "Созерцающая",
-    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} был раздавлен божественной мощью [gold]Божественного Наблюдателя[/gold].",
+    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} был препровождён в тот миг, когда [gold]Созерцающая[/gold] вошла в Божественность.",
     "WATCHER_OMEGA_BOSS_ENCOUNTER.title":  "Созерцающая",
-    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss":  "{character} раздавлен [gold]Омега-Наблюдателем[/gold].",
-    "WATCHER_PRINT_BOSS_ENCOUNTER.title":  "Созерцающая",
-    "WATCHER_PRINT_BOSS_ENCOUNTER.loss":  "{character} был раздавлен [gold]Печатным Наблюдателем[/gold].",
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss":  "{character} так и не прошёл Альфу, Бету и Омегу [gold]Созерцающей[/gold].",
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss_pressure":  "{character} был разобран по точкам [gold]Точками давления[/gold] [gold]Созерцающей[/gold].",
     "WATCHER_CREATE_BOSS_ENCOUNTER.title":  "Созерцающая",
-    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character} был раздавлен [gold]Печатным Наблюдателем[/gold].",
+    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "Каждая карта, созданная {character}, была переписана [gold]Созерцающей[/gold] в оружие против него.",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "Созерцающая",
-    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "{character} был раздавлен [gold]Утверждением[/gold] [gold]Удерживающего Наблюдателя[/gold]."
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "[gold]Созерцающая[/gold] удерживала руку {character} карту за картой до самого конца."
 }

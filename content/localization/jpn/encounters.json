@@ -108,13 +108,12 @@
     "FOOL_BOSS_ENCOUNTER.loss_tarot":  "{character}は[gold]フール[/gold]のデッキの新たな[gold]{Card}[/gold]となった。",
     "FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot":  "{character}は[gold]フール[/gold]のデッキの新たな[gold]{Card}[/gold]となった。",
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "ウォッチャー",
-    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character}は[gold]神格観[/gold]の神格の力に押し潰された。",
+    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character}は[gold]ウォッチャー[/gold]が神格に踏み入った瞬間に成仏した。",
     "WATCHER_OMEGA_BOSS_ENCOUNTER.title":  "ウォッチャー",
-    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss":  "{character}は[gold]オメガウォッチャー[/gold]の断食に砕かれた。",
-    "WATCHER_PRINT_BOSS_ENCOUNTER.title":  "ウォッチャー",
-    "WATCHER_PRINT_BOSS_ENCOUNTER.loss":  "{character}は[gold]プリントウォッチャー[/gold]の現実操作に砕かれた。",
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss":  "{character}は[gold]ウォッチャー[/gold]のアルファ、ベータ、オメガを越えられなかった。",
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss_pressure":  "{character}は[gold]ウォッチャー[/gold]の[gold]点穴[/gold]に一穴ずつ突き崩された。",
     "WATCHER_CREATE_BOSS_ENCOUNTER.title":  "ウォッチャー",
-    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character}は[gold]プリントウォッチャー[/gold]の現実操作に砕かれた。",
+    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character}が生成したカードはすべて、[gold]ウォッチャー[/gold]によって自分を討つ武器に書き換えられた。",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "ウォッチャー",
-    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "{character}は[gold]保持ウォッチャー[/gold]の確立に砕かれた。"
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "{character}の手札は[gold]ウォッチャー[/gold]に一枚ずつ抱えられたまま、終わりを迎えた。"
 }

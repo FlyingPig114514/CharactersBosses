@@ -108,13 +108,12 @@
     "FOOL_BOSS_ENCOUNTER.loss_tarot":  "{character} became the new [gold]{Card}[/gold] in the [gold]Fool[/gold]\u0027s deck.",
     "FOOL_TAROT_BOSS_ENCOUNTER.loss_tarot":  "{character} became the new [gold]{Card}[/gold] in the [gold]Fool[/gold]\u0027s deck.",
     "WATCHER_DIVINITY_BOSS_ENCOUNTER.title":  "The Watcher",
-    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} was crushed by the divine might of [gold]Divinity Watcher[/gold].",
+    "WATCHER_DIVINITY_BOSS_ENCOUNTER.loss":  "{character} was sent on the instant [gold]The Watcher[/gold] stepped into Divinity.",
     "WATCHER_OMEGA_BOSS_ENCOUNTER.title":  "The Watcher",
-    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss":  "{character} was crushed by the fast of the [gold]Omega Watcher[/gold].",
-    "WATCHER_PRINT_BOSS_ENCOUNTER.title":  "The Watcher",
-    "WATCHER_PRINT_BOSS_ENCOUNTER.loss":  "{character} was crushed by the [gold]Printing Watcher[/gold]\u0027s Master Reality.",
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss":  "{character} never made it past [gold]The Watcher[/gold]'s Alpha, Beta and Omega.",
+    "WATCHER_OMEGA_BOSS_ENCOUNTER.loss_pressure":  "{character} was picked apart, point by point, by [gold]The Watcher[/gold]'s [gold]Pressure Points[/gold].",
     "WATCHER_CREATE_BOSS_ENCOUNTER.title":  "The Watcher",
-    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character} was crushed by the [gold]Printing Watcher[/gold]\u0027s Master Reality.",
+    "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "Every card {character} generated was rewritten by [gold]The Watcher[/gold] into a weapon against them.",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "The Watcher",
-    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "{character} was crushed by the [gold]Retaining Watcher[/gold]'s Establishment."
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "[gold]The Watcher[/gold] kept {character}'s hand, card by card, until the very end."
 }
