@@ -45,8 +45,11 @@ if (-not $ExpectedVersion) {
     exit 1
 }
 
+# ★ v0.2.733（2026-11-17）：构建目标早就从「107 / 111」改成「111（正式）/ 113（测试）」，
+#   这里的白名单却还守着 Impl107 ⇒ 每次装机都误报「缺文件 ⇒ 部署版本不一致」。
+#   现在按 loader 真正会加载的那两份核。
 $bad = @()
-foreach ($name in @('CharacterBosses.Impl107.dll.bin', 'CharacterBosses.Impl111.dll.bin')) {
+foreach ($name in @('CharacterBosses.Impl111.dll.bin', 'CharacterBosses.Impl113.dll.bin')) {
     $p = Join-Path $ModDir $name
     if (-not (Test-Path $p)) {
         # 兼容旧安装方式（.dll）
