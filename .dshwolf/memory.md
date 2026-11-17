@@ -5840,3 +5840,4 @@ Chronological action log.
 | 2026-11-17 11:08 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/MultiplayerCardSwap.cs` | ok | 0 |
 | 2026-11-17 11:08 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/MultiplayerCardSwap.cs` | ok | 0 |
 | 2026-11-17 11:09 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/SilentScript.cs` | ok | 0 |
+| 2026-11-17 11:19 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/workshop/changenote.txt` | ok | 0 |
