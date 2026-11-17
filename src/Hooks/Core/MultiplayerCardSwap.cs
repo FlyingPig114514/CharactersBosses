@@ -94,6 +94,45 @@ public static class MultiplayerCardSwap
         (2, typeof(SilentBoss), typeof(CloakAndDagger), 9),
     };
 
+    /// <summary>
+    /// **恐惧模式专属换牌**（用户 2026-11-17）：
+    /// > 「刀猎在正常模式下的幻影之刃怎么被你换成精确切击了？应该只在恐惧模式下换成精准。
+    /// >   你不止换错了模式还换错了牌！」
+    ///
+    /// 事故复盘：v0.2.594 那批「恐惧批次」里我顺手把刀猎第 4 回合的剧本牌**直接**改成了
+    /// 「精确切击+」（`PreciseCut`）—— 两个错误叠在一起：
+    ///   ① **改错了作用域**：那是恐惧模式的改动，却写进了共用的 `SilentScript` ⇒ 普通模式也没了幻影之刃；
+    ///   ② **换错了牌**：「精准」= `Accuracy`（小刀额外造成 N 点伤害，1 费），
+    ///      而我填的 `PreciseCut`（精确切击）是**炼药猎**第 5 回合那张 —— 刀猎卡组里根本没有它。
+    /// 现在：剧本恢复成**幻影之刃**（`PhantomBlades`），恐惧模式下由这张表换成**精准**
+    /// （`Accuracy`），升级由 <see cref="ForcesUpgrade"/> 负责（设计口径是「精准+」）。
+    /// 两张都是 1 费 ⇒ 第 4 回合的能量账（4 费）不受影响。
+    /// </summary>
+    private static readonly (int Act, Type Boss, Type From, Type To)[] DreadTable =
+    {
+        // 刀猎（三层静默猎手·刀）：幻影之刃 → 精准（恐惧模式）
+        (2, typeof(SilentBoss), typeof(PhantomBlades), typeof(Accuracy)),
+    };
+
+    /// <summary>这张剧本牌在**恐惧模式**下会换成哪张（没有这条就返回 null）。</summary>
+    private static Type? DreadSwapOf(Type scripted, CharBossMonster boss)
+    {
+        try
+        {
+            if (scripted == null || boss == null) return null;
+            if (!Core.DreadMode.IsActive) return null;
+            int act = boss.ActIndex;
+            var bossType = boss.GetType();
+            foreach (var row in DreadTable)
+            {
+                if (row.Act != act || row.Boss != bossType || row.From != scripted) continue;
+                return row.To;
+            }
+        }
+        catch { /* 忽略 */ }
+        return null;
+    }
+
     /// <summary>这一档是不是**多人局**（≥2 名真人玩家）。单人恒 false ⇒ 一切原样。</summary>
     public static bool IsMultiplayer(CharBossMonster? boss = null)
     {
@@ -111,6 +150,10 @@ public static class MultiplayerCardSwap
         try
         {
             if (scripted == null || boss == null) return false;
+
+            // ★ 恐惧模式换上的牌**一律升级**（用户口径：刀猎第 4 回合恐惧版是「精准+」）
+            if (DreadSwapOf(scripted, boss) != null) return true;
+
             if (!IsMultiplayer(boss)) return false;
             int act = boss.ActIndex;
             var bossType = boss.GetType();
@@ -134,6 +177,17 @@ public static class MultiplayerCardSwap
         try
         {
             if (scripted == null || boss == null) return scripted;
+
+            // ① 恐惧模式换牌（与人数无关：单人也会换）
+            var dread = DreadSwapOf(scripted, boss);
+            if (dread != null)
+            {
+                Logger.Log($"[CharBoss] 恐惧模式换牌：{scripted.Name} → {dread.Name}" +
+                           $"（{boss.GetType().Name} 第 {boss.ActIndex + 1} 幕）");
+                return dread;
+            }
+
+            // ② 多人换牌
             if (!MultiBossPlan.WantsSecondBoss(out int players) || players < 2) return scripted;
 
             int act = boss.ActIndex;
@@ -164,6 +218,12 @@ public static class MultiplayerCardSwap
         try
         {
             if (scripted == null || boss == null) return null;
+
+            // ① 恐惧模式换牌
+            var dread = DreadSwapOf(scripted, boss);
+            if (dread != null) return dread;
+
+            // ② 多人换牌
             if (!MultiBossPlan.WantsSecondBoss(out int players) || players < 2) return null;
 
             int act = boss.ActIndex;
@@ -196,6 +256,10 @@ public static class MultiplayerCardSwap
     {
         if (card == null) return false;
         foreach (var row in Table)
+        {
+            if (row.To == card) return true;
+        }
+        foreach (var row in DreadTable)
         {
             if (row.To == card) return true;
         }

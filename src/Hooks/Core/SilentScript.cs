@@ -51,11 +51,16 @@ public static class SilentScript
             Turn("切割、打击、终结技（按本回合已打出的攻击次数结算）", 3,
                 C<Slice>(), C<StrikeSilent>(), C<Finisher>()),
 
-            // ★ 2026-11-13（用户）：「将第四回合的幻影之刃替换为精准+」
-            //   （幻影之刃在 0.113 被削到 8 点，用户索性把这回合改成精准切击+ —— 它 0 费、
-            //     伤害 = 13+? − 2 × 手里其它牌数，见 BossDamagePredictor.PreciseCutDamage）
-            Turn("精准+（0 费，按出手时手牌数结算）、尖啸、隐秘匕首（0 费给 2 刀，当回合就打出去）", 4,
-                C<PreciseCut>(true), C<PiercingWail>(), C<HiddenDaggers>()),
+            // ★ v0.2.730（用户 2026-11-17 纠正）：
+            //   > 「刀猎在正常模式下的幻影之刃怎么被你换成精确切击了？应该只在恐惧模式下换成精准。
+            //   >   你不止换错了模式还换错了牌！」
+            //   ⇒ **剧本恢复成幻影之刃**（`PhantomBlades`）。恐惧模式才换成「精准+」
+            //     （`Accuracy`，见 `MultiplayerCardSwap` 的 `DreadTable` + `ForcesUpgrade`）。
+            //   ⚠ 以前这里写的是 `PreciseCut`（精确切击）—— 那是**炼药猎**第 5 回合的牌，刀猎卡组里没有它；
+            //     而且那是「恐惧模式」的改动，却写进了共用剧本 ⇒ 普通模式也被换掉了。两个错都在这。
+            //   两张都是 1 费（幻影之刃 1 / 精准 1）⇒ 第 4 回合 4 费的能量账不变。
+            Turn("幻影之刃（恐惧模式换成精准+）、尖啸、隐秘匕首（0 费给 2 刀，当回合就打出去）", 4,
+                C<PhantomBlades>(), C<PiercingWail>(), C<HiddenDaggers>()),
 
             Turn("刀扇（2 费能力：给 4 刀，且小刀改打全体）；铃铛的诅咒/防御没费", 5,
                 C<FanOfKnives>(), C<CurseOfTheBell>(), C<DefendSilent>()),
