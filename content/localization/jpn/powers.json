@@ -145,6 +145,6 @@
     "BOSS_MASTER_REALITY_POWER.description":  "戦闘中にあなたがカードを生成するたび、そのカードは[gold]ダウングレード[/gold]される。トークンでない場合、さらに[gold]消滅[/gold]を得る。\nウォッチャーは色彩哲学者を通じて[gold]武器庫[/gold]、[gold]創世の柱[/gold]、[gold]何人僭越[/gold]を手に入れた。",
     "BOSS_MASTER_REALITY_POWER.description_dread":  "戦闘中にあなたがカードを生成するたび、そのカードは[gold]ダウングレード[/gold]される。トークンでない場合、さらに[gold]消滅[/gold]を得る。\nウォッチャーは色彩哲学者を通じて[gold]武器庫[/gold]、[gold]創世の柱[/gold]、[gold]何人僭越[/gold]を手に入れた。",
     "BOSS_ESTABLISHMENT_POWER.title":  "確立",
-    "BOSS_ESTABLISHMENT_POWER.description":  "あなたのターン終了時、手札のコストが2未満の保留されたカードのコストをこの戦闘中1増やす。コストが増えたカード1枚につき、ウォッチャーは筋力を2失う。\nこの効果はウォッチャーに狙われているプレイヤーにのみ作用する。",
-    "BOSS_ESTABLISHMENT_POWER.description_dread":  "あなたのターン終了時、あなたが保留したカードのコストをこの戦闘中1増やす。\nこの効果はウォッチャーに狙われているプレイヤーにのみ作用する。"
+    "BOSS_ESTABLISHMENT_POWER.description":  "あなたのターン終了時、手札のコストが2未満の保留されたカードのコストをこの戦闘中1増やす。コストが増えたカード1枚につき、ウォッチャーは筋力を2失う。",
+    "BOSS_ESTABLISHMENT_POWER.description_dread":  "あなたのターン終了時、あなたが保留したカードのコストをこの戦闘中1増やす。"
 }

@@ -145,6 +145,6 @@
     "BOSS_MASTER_REALITY_POWER.description":  "Siempre que crees una carta en combate, se [gold]degradará[/gold]; si no es una ficha, también obtiene [gold]Agotar[/gold].\nEl Vigía obtuvo [gold]Arsenal[/gold], [gold]Pilar de la Creación[/gold] y [gold]Conoce tu lugar[/gold] gracias al Filósofo de los Colores.",
     "BOSS_MASTER_REALITY_POWER.description_dread":  "Siempre que crees una carta en combate, se [gold]degradará[/gold]; si no es una ficha, también obtiene [gold]Agotar[/gold].\nEl Vigía obtuvo [gold]Arsenal[/gold], [gold]Pilar de la Creación[/gold] y [gold]Conoce tu lugar[/gold] gracias al Filósofo de los Colores.",
     "BOSS_ESTABLISHMENT_POWER.title":  "Establecimiento",
-    "BOSS_ESTABLISHMENT_POWER.description":  "Al final de tu turno, cada carta retenida en tu mano con un coste inferior a 2 aumenta su coste en 1 durante el resto del combate. Por cada carta cuyo coste aumente así, la Vigilante pierde 2 de Fuerza.\nEste efecto solo se aplica al jugador al que la Vigilante tiene fijado.",
-    "BOSS_ESTABLISHMENT_POWER.description_dread":  "Al final de tu turno, tus cartas retenidas aumentan su coste en 1 durante el resto del combate.\nEste efecto solo se aplica al jugador al que la Vigilante tiene fijado."
+    "BOSS_ESTABLISHMENT_POWER.description":  "Al final de tu turno, cada carta retenida en tu mano con un coste inferior a 2 aumenta su coste en 1 durante el resto del combate. Por cada carta cuyo coste aumente así, la Vigilante pierde 2 de Fuerza.",
+    "BOSS_ESTABLISHMENT_POWER.description_dread":  "Al final de tu turno, tus cartas retenidas aumentan su coste en 1 durante el resto del combate."
 }

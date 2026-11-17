@@ -213,6 +213,6 @@
     "WATCHER_RETAIN_BOSS.name":  "Bewahrender Wächter",
     "WATCHER_RETAIN_BOSS.title":  "Bewahrender Wächter",
     "WATCHER_RETAIN_BOSS.moves.CHARBOSS_PLAY.title":  "Ausspielen",
-    "WATCHER_RETAIN_BOSS.establishment":  "Am Ende deines Zuges wird für jede zurückbehaltene Karte auf deiner Hand mit Kosten unter 2 ihre Kosten für diesen Kampf um 1 erhöht. Für jede so erhöhte Karte verliert die Seherin 2 Stärke.\nDieser Effekt gilt nur für den Spieler, den die Seherin im Visier hat.",
-    "WATCHER_RETAIN_BOSS.establishment_dread":  "Am Ende deines Zuges werden die Kosten deiner zurückbehaltenen Karten für diesen Kampf um 1 erhöht.\nDieser Effekt gilt nur für den Spieler, den die Seherin im Visier hat."
+    "WATCHER_RETAIN_BOSS.establishment":  "Am Ende deines Zuges wird für jede zurückbehaltene Karte auf deiner Hand mit Kosten unter 2 ihre Kosten für diesen Kampf um 1 erhöht. Für jede so erhöhte Karte verliert die Seherin 2 Stärke.",
+    "WATCHER_RETAIN_BOSS.establishment_dread":  "Am Ende deines Zuges werden die Kosten deiner zurückbehaltenen Karten für diesen Kampf um 1 erhöht."
 }

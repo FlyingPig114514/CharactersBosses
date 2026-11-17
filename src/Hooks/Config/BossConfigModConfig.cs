@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using BaseLib.Config;
 using BaseLib.Config.UI;
@@ -646,6 +646,12 @@ public sealed class BossConfigModConfig : SimpleModConfig
             if (string.IsNullOrEmpty(body)) return;
 
             // 标题用她那只怪物的名字（原版框需要一个 LocString）；正文是用户给的字段表。
+            //
+            // ★ v0.2.735（用户 2026-11-17：「如图，为什么观者的能力面板顶部写的是静默猎手？」）：
+            //   这个 switch 的兜底是 `_ => SILENT_BOSS`，而观者（`WATCHER_*`）和愚者（`FOOL_*`）
+            //   两个前缀一直没登记 ⇒ 神格观 / Ω观 / 印牌观 / 保留观 / 塔罗愚的说明框标题全成了「静默猎手」。
+            //   现在补齐。⚠ 观者**不能**用 `WATCHER_BOSS.name`（那是设计名「神格观」），
+            //   角色名在观者遭遇的 `.title` 里（v0.2.730 按用户要求写成 观者 / The Watcher …）。
             string monsterKey = key switch
             {
                 var k when k.StartsWith("SILENT_") => "SILENT_BOSS",
@@ -653,8 +659,10 @@ public sealed class BossConfigModConfig : SimpleModConfig
                 var k when k.StartsWith("DEFECT_") => "DEFECT_BOSS",
                 var k when k.StartsWith("IRONCLAD_") => "IRONCLAD_BOSS",
                 var k when k.StartsWith("REGENT_") => "REGENT_BOSS",
+                var k when k.StartsWith("FOOL_") => "FOOL_BOSS",
                 _ => "SILENT_BOSS",
             };
+            bool watcherFamily = key.StartsWith("WATCHER_", StringComparison.Ordinal);
 
             bool shown = false;
             void Show()
@@ -662,7 +670,9 @@ public sealed class BossConfigModConfig : SimpleModConfig
                 try
                 {
                     if (shown) return;
-                    var title = new MegaCrit.Sts2.Core.Localization.LocString("monsters", monsterKey + ".name");
+                    var title = watcherFamily
+                        ? new MegaCrit.Sts2.Core.Localization.LocString("encounters", "WATCHER_DIVINITY_BOSS_ENCOUNTER.title")
+                        : new MegaCrit.Sts2.Core.Localization.LocString("monsters", monsterKey + ".name");
                     var tip = new MegaCrit.Sts2.Core.HoverTips.HoverTip(
                         title, BossKeys.DesignNameOf(key) + "\n" + body, null);
                     MegaCrit.Sts2.Core.Nodes.HoverTips.NHoverTipSet.CreateAndShow(

@@ -145,6 +145,6 @@
     "BOSS_MASTER_REALITY_POWER.description":  "Savaşta bir kart oluşturduğunda o kart [gold]düşürülür[/gold]; jeton değilse ayrıca [gold]Tüketim[/gold] kazanır.\nGözcü, Renk Filozofu sayesinde [gold]Cephanelik[/gold], [gold]Yaratılış Sütunu[/gold] ve [gold]Yerini Bil[/gold] elde etti.",
     "BOSS_MASTER_REALITY_POWER.description_dread":  "Savaşta bir kart oluşturduğunda o kart [gold]düşürülür[/gold]; jeton değilse ayrıca [gold]Tüketim[/gold] kazanır.\nGözcü, Renk Filozofu sayesinde [gold]Cephanelik[/gold], [gold]Yaratılış Sütunu[/gold] ve [gold]Yerini Bil[/gold] elde etti.",
     "BOSS_ESTABLISHMENT_POWER.title":  "Tesis",
-    "BOSS_ESTABLISHMENT_POWER.description":  "Sıranın sonunda, elinde maliyeti 2'nin altında olan saklanan her kartın maliyeti bu dövüş boyunca 1 artar. Maliyeti bu şekilde artan her kart için Gözlemci 2 Güç kaybeder.\nBu etki yalnızca Gözlemci'nin kilitlendiği oyuncuya uygulanır.",
-    "BOSS_ESTABLISHMENT_POWER.description_dread":  "Sıranın sonunda, sakladığın kartların maliyeti bu dövüş boyunca 1 artar.\nBu etki yalnızca Gözlemci'nin kilitlendiği oyuncuya uygulanır."
+    "BOSS_ESTABLISHMENT_POWER.description":  "Sıranın sonunda, elinde maliyeti 2'nin altında olan saklanan her kartın maliyeti bu dövüş boyunca 1 artar. Maliyeti bu şekilde artan her kart için Gözlemci 2 Güç kaybeder.",
+    "BOSS_ESTABLISHMENT_POWER.description_dread":  "Sıranın sonunda, sakladığın kartların maliyeti bu dövüş boyunca 1 artar."
 }

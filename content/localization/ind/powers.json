@@ -145,6 +145,6 @@
     "BOSS_MASTER_REALITY_POWER.description":  "Setiap kali kamu membuat kartu dalam pertarungan, kartu itu [gold]diturunkan[/gold]; jika bukan token, kartu itu juga mendapat [gold]Habis[/gold].\nSang Pengamat memperoleh [gold]Gudang Senjata[/gold], [gold]Pilar Penciptaan[/gold], dan [gold]Kenali Tempatmu[/gold] melalui Filsuf Warna.",
     "BOSS_MASTER_REALITY_POWER.description_dread":  "Setiap kali kamu membuat kartu dalam pertarungan, kartu itu [gold]diturunkan[/gold]; jika bukan token, kartu itu juga mendapat [gold]Habis[/gold].\nSang Pengamat memperoleh [gold]Gudang Senjata[/gold], [gold]Pilar Penciptaan[/gold], dan [gold]Kenali Tempatmu[/gold] melalui Filsuf Warna.",
     "BOSS_ESTABLISHMENT_POWER.title":  "Pendirian",
-    "BOSS_ESTABLISHMENT_POWER.description":  "Pada akhir giliranmu, setiap kartu tersimpan di tanganmu dengan biaya di bawah 2, biayanya bertambah 1 selama pertarungan ini. Untuk setiap kartu yang biayanya bertambah, Watcher kehilangan 2 Kekuatan.\nEfek ini hanya berlaku bagi pemain yang dikunci oleh Watcher.",
-    "BOSS_ESTABLISHMENT_POWER.description_dread":  "Pada akhir giliranmu, kartu-kartu tersimpanmu bertambah biayanya 1 selama pertarungan ini.\nEfek ini hanya berlaku bagi pemain yang dikunci oleh Watcher."
+    "BOSS_ESTABLISHMENT_POWER.description":  "Pada akhir giliranmu, setiap kartu tersimpan di tanganmu dengan biaya di bawah 2, biayanya bertambah 1 selama pertarungan ini. Untuk setiap kartu yang biayanya bertambah, Watcher kehilangan 2 Kekuatan.",
+    "BOSS_ESTABLISHMENT_POWER.description_dread":  "Pada akhir giliranmu, kartu-kartu tersimpanmu bertambah biayanya 1 selama pertarungan ini."
 }

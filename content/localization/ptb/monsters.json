@@ -213,6 +213,6 @@
     "WATCHER_RETAIN_BOSS.name":  "Observador Retentor",
     "WATCHER_RETAIN_BOSS.title":  "Observador Retentor",
     "WATCHER_RETAIN_BOSS.moves.CHARBOSS_PLAY.title":  "Jogar",
-    "WATCHER_RETAIN_BOSS.establishment":  "No fim do seu turno, cada carta retida na sua mão com custo menor que 2 tem seu custo aumentado em 1 pelo resto do combate. Para cada carta cujo custo aumente assim, a Observadora perde 2 de Força.\nEste efeito só se aplica ao jogador travado pela Observadora.",
-    "WATCHER_RETAIN_BOSS.establishment_dread":  "No fim do seu turno, suas cartas retidas têm seu custo aumentado em 1 pelo resto do combate.\nEste efeito só se aplica ao jogador travado pela Observadora."
+    "WATCHER_RETAIN_BOSS.establishment":  "No fim do seu turno, cada carta retida na sua mão com custo menor que 2 tem seu custo aumentado em 1 pelo resto do combate. Para cada carta cujo custo aumente assim, a Observadora perde 2 de Força.",
+    "WATCHER_RETAIN_BOSS.establishment_dread":  "No fim do seu turno, suas cartas retidas têm seu custo aumentado em 1 pelo resto do combate."
 }
