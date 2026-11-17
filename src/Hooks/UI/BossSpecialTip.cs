@@ -347,7 +347,12 @@ internal static class BossSpecialTip
             //   目前的位置有些偏高」）：印牌观（`WATCHER_CREATE`）是**同一个观者角色的第三套设计**，
             //   它的 `Def.Key` 也是 `WATCHER_DIVINITY` ⇒ 以前会白吃神格观那个 −120 偏移。
             //   但它那条说明只有两行 ⇒ 必须排除掉，用正常位置。
-            if (boss.Def.Key == "WATCHER_DIVINITY" && !Core.BossLineups.WatcherCreateActive()) return true;
+            //
+            // ★ v0.2.733（用户 2026-11-17）：**保留观**（`WATCHER_RETAIN`）同理 —— 同一个 `Def.Key`、
+            //   说明也只有两行 ⇒ 同样用正常位置。
+            if (boss.Def.Key == "WATCHER_DIVINITY"
+                && !Core.BossLineups.WatcherCreateActive()
+                && !Core.BossLineups.WatcherRetainActive()) return true;
             return boss.Def.SpecialPowerForAct(boss.ActIndex) == typeof(Powers.BrewModPower);
         }
         catch { return false; }
