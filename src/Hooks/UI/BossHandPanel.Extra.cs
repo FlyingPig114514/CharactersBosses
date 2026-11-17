@@ -99,6 +99,8 @@ public partial class BossHandPanel
         try
         {
             int blackHole = BlackHoleAtTurnStart(boss);
+            // ★ v0.2.731（用户 2026-11-17）：已经结算过的那一笔立刻撤掉（下一回合再出现）
+            if (boss.TurnNumber <= boss.BlackHoleFiredForTurn) blackHole = 0;
             if (blackHole > 0) leftDamages.Add((blackHole, "黑洞（下回合辉星到账）"));
         }
         catch (Exception e)
@@ -112,6 +114,8 @@ public partial class BossHandPanel
         try
         {
             int soot = Core.StatusBossMath.BigHugSootDamage(boss);
+            // ★ v0.2.731：已经结算过（她这回合洗牌已出煤灰）⇒ 撤掉
+            if (boss.TurnNumber <= boss.BigHugFiredForTurn) soot = 0;
             if (soot > 0) leftDamages.Add((soot, "大抱抱（煤灰，全体）"));
         }
         catch (Exception e) { Logger.Log("[CharBoss] 大抱抱意图绘制失败: " + e.Message); }
@@ -123,6 +127,8 @@ public partial class BossHandPanel
         try
         {
             int hourglass = MercuryHourglassDamage(boss);
+            // ★ v0.2.731：已经结算过 ⇒ 撤掉
+            if (boss.TurnNumber <= boss.HourglassFiredForTurn) hourglass = 0;
             if (hourglass > 0) leftDamages.Add((hourglass, "水银沙漏（全体）"));
         }
         catch (Exception e) { Logger.Log("[CharBoss] 水银沙漏意图绘制失败: " + e.Message); }

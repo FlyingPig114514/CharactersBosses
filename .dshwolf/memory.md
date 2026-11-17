@@ -5841,3 +5841,14 @@ Chronological action log.
 | 2026-11-17 11:08 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/MultiplayerCardSwap.cs` | ok | 0 |
 | 2026-11-17 11:09 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/SilentScript.cs` | ok | 0 |
 | 2026-11-17 11:19 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/workshop/changenote.txt` | ok | 0 |
+| 2026-11-17 12:14 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Monsters/CharBossMonster.cs` | ok | 0 |
+| 2026-11-17 12:15 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossHookBridge.cs` | ok | 0 |
+| 2026-11-17 12:15 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossHookBridge.cs` | error | 0 |
+| 2026-11-17 12:15 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossHookBridge.cs` | ok | 0 |
+| 2026-11-17 12:15 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Monsters/CharBossMonster.Turn.cs` | ok | 0 |
+| 2026-11-17 12:15 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Monsters/CharBossMonster.cs` | ok | 0 |
+| 2026-11-17 12:15 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/UI/BossHandPanel.Extra.cs` | ok | 0 |
+| 2026-11-17 12:15 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/UI/BossHandPanel.Extra.cs` | ok | 0 |
+| 2026-11-17 12:15 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/UI/BossHandPanel.Extra.cs` | ok | 0 |
+| 2026-11-17 12:15 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-17 12:15 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |

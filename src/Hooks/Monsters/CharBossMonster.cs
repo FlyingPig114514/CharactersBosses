@@ -129,6 +129,23 @@ public abstract partial class CharBossMonster : MonsterModel
     /// </summary>
     internal int MrStrugglesFiredForTurn;
 
+    // ★ v0.2.731（用户 2026-11-17）：
+    //   > 「能不能让哪些在 boss 回合开始时造成的伤害在结算后马上从伤害预览中移除，
+    //   >   就像是那些攻击牌一样打一张对应的意图就消失（回合开始的伤害意图有水银沙漏、抱抱先生、
+    //   >   黑洞+下回合辉星（辉星储）、大抱抱+烟囱（状态机）等）」
+    //   ⇒ 与上面 `MrStrugglesFiredForTurn` 同一套口径：每个来源记「最后一次结算是在第几回合」，
+    //     手牌栏最左列那条独立意图据此判断——`TurnNumber <= 记录值` 就说明这一手已经打过了，不再显示。
+    //     （`TurnNumber` 在 `PrepareTurn` 里 ++ ⇒ 下一回合自然又变成「未结算」，意图重新出现。）
+
+    /// <summary>「水银沙漏」这一笔（她回合开始对全体玩家的无来源伤害）最后结算于第几回合。</summary>
+    internal int HourglassFiredForTurn;
+
+    /// <summary>「黑洞」因**下回合辉星到账**触发的那一笔最后结算于第几回合。</summary>
+    internal int BlackHoleFiredForTurn;
+
+    /// <summary>「大抱抱」的煤灰经「烟囱」触发的那一笔最后结算于第几回合。</summary>
+    internal int BigHugFiredForTurn;
+
 
     /// <summary>
     /// 这张牌是不是「本回合计划里的**第一张攻击牌**」（给「致死性」用）。
@@ -2569,6 +2586,17 @@ public abstract partial class CharBossMonster : MonsterModel
         {
             await MegaCrit.Sts2.Core.Commands.CardPileCmd.Shuffle(ctx, shadow);
             Logger.Log("[CharBoss] 剧本洗牌：已洗她的抽牌堆（大抱抱会因此生成煤灰）");
+            // ★ v0.2.731（用户 2026-11-17）：洗牌 → 大抱抱生成 1 张煤灰 → 烟囱打一次全体。
+            //   这一笔已经结算 ⇒ 最左列那条「大抱抱（煤灰，全体）」意图当场撤掉（下一回合再出现）。
+            try
+            {
+                if (Core.BossHookBridge.HasRelicEntry(shadow, "BIIIG_HUG"))
+                {
+                    BigHugFiredForTurn = Math.Max(BigHugFiredForTurn, TurnNumber);
+                    Logger.Log($"[CharBoss] 大抱抱：她第 {TurnNumber} 回合洗牌已出煤灰 ⇒ 该意图从预览里撤掉");
+                }
+            }
+            catch { /* 记账失败不影响战斗 */ }
             // ★ 群蛇形态（用户 2026-11-08）：她洗牌 ⇒ 自己抽牌堆 +1 张蛇咬（不放动画）
             try
             {

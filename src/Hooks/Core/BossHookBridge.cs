@@ -36,6 +36,18 @@ public static partial class BossHookBridge
         try
         {
             await FirePlayerTurnStartPerModel(combat, context, shadow);
+            // ★ v0.2.731（用户 2026-11-17）：「水银沙漏」这一笔就在上面这条链里（她遗物的
+            //   `AfterPlayerTurnStart` → 对全体玩家造成无来源伤害）⇒ 结算完立刻记账，
+            //   手牌栏最左列那条意图当场消失（与抱抱先生同一套口径）。
+            try
+            {
+                if (HasRelicEntry(shadow, "MERCURY_HOURGLASS"))
+                {
+                    boss.HourglassFiredForTurn = Math.Max(boss.HourglassFiredForTurn, boss.TurnNumber);
+                    Logger.Log($"[CharBoss] 水银沙漏：她第 {boss.TurnNumber} 回合开始已结算 ⇒ 该意图从预览里撤掉");
+                }
+            }
+            catch { /* 记账失败不影响战斗 */ }
         }
         catch (Exception e)
         {
@@ -260,6 +272,26 @@ public static partial class BossHookBridge
             await RunModelHook(power, "能力", "AfterPlayerTurnStart", () => power.AfterPlayerTurnStart(ctx, shadow));
             await RunModelHook(power, "能力", "AfterPlayerTurnStartLate", () => power.AfterPlayerTurnStartLate(ctx, shadow));
         }
+    }
+
+    /// <summary>影子玩家身上有没有某个 entry 的遗物（`MERCURY_HOURGLASS` / `BIIIG_HUG` 这类判定用）。</summary>
+    internal static bool HasRelicEntry(Player? shadow, string entry)
+    {
+        try
+        {
+            var relics = shadow?.Relics;
+            if (relics == null) return false;
+            for (int i = 0; i < relics.Count; i++)
+            {
+                var r = relics[i];
+                if (r == null) continue;
+                string e;
+                try { e = r.Id.Entry ?? string.Empty; } catch { continue; }
+                if (string.Equals(e, entry, StringComparison.Ordinal)) return true;
+            }
+        }
+        catch { /* 忽略 */ }
+        return false;
     }
 
     /// <summary>跑一条 model 钩子；失败只记一行并继续（同一件+同一钩子每场只记一次，别刷屏）。</summary>

@@ -824,8 +824,16 @@ public static class BossIntentBuilder
                 int lo = Core.StatusBossMath.LetterOpenerDamage(syncBoss);
                 if (lo > 0 && Core.StatusBossMath.IsSkill(card))
                 {
-                    int before = CountSkillsBeforeInPlan(syncBoss, card, playsBeforeThisTurn);
-                    if ((before + 1) % Core.StatusBossMath.LetterOpenerSkillStep == 0) letterOpenerHit = lo;
+                    // ★ v0.2.731（用户 2026-11-17：「状态机第二回合的防御有的时候会错误的显示 5 的攻势，
+                    //   但它既没有触发开信刀也没有生成状态牌触发烟囱」）：
+                    //   旧代码读不到计划里的序号时会**退回 `playsBeforeThisTurn`**（本回合已经排了几张牌），
+                    //   而那个数在「重规划 / 牌已打出后 Plan 收缩」的时刻会把任意一张技能牌凑成第 3 张
+                    //   ⇒ 给一张根本没触发开信刀的「防御」挂上 5 点攻势（所以是「有的时候」）。
+                    //   现在 `CountSkillsBeforeInPlan` 找不到这张牌就返回 -1，这里**一律不猜**：
+                    //   只有真的在计划里数得出序号、且正好是第 3 的倍数时才画。
+                    int before = CountSkillsBeforeInPlan(syncBoss, card, -1);
+                    if (before >= 0 && (before + 1) % Core.StatusBossMath.LetterOpenerSkillStep == 0)
+                        letterOpenerHit = lo;
                 }
             }
             catch { /* 忽略 */ }
@@ -2833,7 +2841,8 @@ public static class BossIntentBuilder
     /// 出牌期 <see cref="Monsters.CharBossMonster.Plan"/> 是实时收缩的（打一张就 Remove 一张），
     /// 所以这个数天然就是「还差几张」。读不到就返回 0。
     /// </summary>
-    /// <summary>本回合排在 <paramref name="card"/> 之前**已经打出/已计划**的技能牌张数。</summary>
+    /// <summary>本回合排在 <paramref name="card"/> 之前**已经打出/已计划**的技能牌张数。
+    /// **找不到这张牌就返回 -1**（= 不知道），调用方应当"不猜"而不是拿别的数凑（见 v0.2.731 的注释）。</summary>
     private static int CountSkillsBeforeInPlan(Monsters.CharBossMonster? boss, CardModel card, int fallbackBefore)
     {
         try
@@ -2851,7 +2860,7 @@ public static class BossIntentBuilder
             }
         }
         catch { /* 忽略 */ }
-        return Math.Max(0, fallbackBefore);
+        return fallbackBefore < 0 ? -1 : Math.Max(0, fallbackBefore);
     }
     /// <summary>
     /// 把「致死性」的 +<paramref name="pct"/>% 乘到**已经跑完原版伤害管道**的单段伤害上。

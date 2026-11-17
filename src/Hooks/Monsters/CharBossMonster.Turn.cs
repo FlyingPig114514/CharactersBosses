@@ -1108,6 +1108,9 @@ public abstract partial class CharBossMonster
                                     _ = MegaCrit.Sts2.Core.Commands.CreatureCmd.Damage(
                                         new MegaCrit.Sts2.Core.GameActions.Multiplayer.BlockingPlayerChoiceContext(),
                                         victims, bh, MegaCrit.Sts2.Core.ValueProps.ValueProp.Unpowered, Creature);
+                                    // ★ v0.2.731（用户 2026-11-17）：这一笔已经结算 ⇒ 最左列那条
+                                    // 「黑洞（下回合辉星到账）」意图当场撤掉（下一回合再出现）。
+                                    BlackHoleFiredForTurn = Math.Max(BlackHoleFiredForTurn, TurnNumber);
                                     Logger.Log($"[CharBoss] 黑洞：下回合辉星 +{amount} 到账 → 对 {victims.Count} 名玩家各 {bh} 点（无来源）");
                                 }
                             }
