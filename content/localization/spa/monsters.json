@@ -213,6 +213,6 @@
     "WATCHER_RETAIN_BOSS.name":  "Vigía Retenedor",
     "WATCHER_RETAIN_BOSS.title":  "Vigía Retenedor",
     "WATCHER_RETAIN_BOSS.moves.CHARBOSS_PLAY.title":  "Jugar",
-    "WATCHER_RETAIN_BOSS.establishment":  "Al final de tu turno, cada carta retenida en tu mano con un coste inferior a 2 aumenta su coste en 1 durante el resto del combate; después, la Vigilante pierde 1 de Fuerza.\nEste efecto solo se aplica al jugador al que la Vigilante tiene fijado.",
+    "WATCHER_RETAIN_BOSS.establishment":  "Al final de tu turno, cada carta retenida en tu mano con un coste inferior a 2 aumenta su coste en 1 durante el resto del combate. Por cada carta cuyo coste aumente así, la Vigilante pierde 2 de Fuerza.\nEste efecto solo se aplica al jugador al que la Vigilante tiene fijado.",
     "WATCHER_RETAIN_BOSS.establishment_dread":  "Al final de tu turno, tus cartas retenidas aumentan su coste en 1 durante el resto del combate.\nEste efecto solo se aplica al jugador al que la Vigilante tiene fijado."
 }

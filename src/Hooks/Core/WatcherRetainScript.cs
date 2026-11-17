@@ -12,8 +12,8 @@ namespace CharacterBosses.Core;
 /// 用户原话（逐字）：
 /// <code>
 /// 1.确立基础+、打击、时之沙（保留不出）
-/// 2.警惕、坚韧（保留不出）、旋转打击（保留不出）、时之沙（2费，保留不出）
-/// 3.时之沙（0费）、欺瞒现实、改造现实、防御（没费）、平安（保留不出）、惩恶（保留不出）、
+/// 2.警惕、坚韧（保留不出）、旋转打击（保留不出）、时之沙（2费，保留不出）、奇迹（保留不出）
+/// 3.奇迹、时之沙（0费）、欺瞒现实、改造现实、防御、平安（保留不出）、惩恶（保留不出）、
 ///   坚韧（0费，保留不出）、旋转打击（0费，保留不出）
 /// 4.心灵堡垒、义愤填膺、惩恶（0费）、平安（0费）、坚韧（0费）、结末、旋转打击（0费，保留不出）
 /// 5.旋转打击（0费）、停顿、安宁
@@ -23,13 +23,15 @@ namespace CharacterBosses.Core;
 /// 9.旋转打击（0费）、停顿、警惕
 /// 之后6～9循环
 /// </code>
+/// ★ v0.2.734（用户 2026-11-17 订正）：「修改 2、3 回合（**奇迹被我漏掉了**）」⇒ 第 2 回合末尾补一张
+///   奇迹（保留不出）、第 3 回合开头补打一张奇迹（0 费、打出 +1 能量 ⇒ 防御这才付得起）。
 ///
 /// ## 能量（用户：「能量除了 4、8 回合都应该是 2，浪费也没关系。4、8 回合因为退出平静都是 4 费」）
 /// | 回合 | 打出的牌（费） | 合计 | 覆盖值 |
 /// |---|---|---|---|
 /// | 1 | 确立基础+ 1 + 打击 1 | 2 | **2** |
-/// | 2 | 警惕 2 | 2 | **2** |
-/// | 3 | 时之沙 0 + 欺瞒现实 1 + 改造现实 1（防御 1 打不出） | 2 | **2** |
+/// | 2 | 警惕 2（奇迹 0，保留不出 ⇒ 无能量） | 2 | **2** |
+/// | 3 | 奇迹 0（**+1 能量**）+ 时之沙 0 + 欺瞒现实 1 + 改造现实 1 + 防御 1 | 3 | **2**（2 + 奇迹 1 = 3） |
 /// | 4 | 心灵堡垒 1 + 义愤填膺 1 + 惩恶 0 + 平安 0 + 坚韧 0 + 结末 1 | 3 | **4**（义愤填膺进愤怒 ⇒ 退出平静 +2） |
 /// | 5 | 旋转打击 0 + 停顿 0 + 安宁 1 | 1 | **2**（浪费 1） |
 /// | 6 | 欺瞒现实 1 + 改造现实 1 + 时之沙 0 | 2 | **2** |
@@ -65,7 +67,8 @@ namespace CharacterBosses.Core;
 /// · **拦掉原版的印牌**：改造现实 ⇒ 惩恶、欺瞒现实 ⇒ 平安 的原版生成被
 ///   `CharBossMonster.BlocksGeneratedCardsEntries` 拦掉，这两张由剧本自己给
 ///   （和印牌观同一套；她那两只牌不触发创世之柱/武器库，因为她没有那两件遗物）。
-/// · 进阶 8：升级 心灵堡垒 / 停顿 / 警惕；进阶 9：升级 改造现实 / 旋转打击。
+/// · 进阶 8：升级 心灵堡垒 / **欺瞒现实**；进阶 9：只升级 **改造现实**
+///   （★ v0.2.734 用户 2026-11-17 订正：原来是「心灵堡垒/停顿/警惕」+「改造现实/旋转打击」）。
 /// </summary>
 public static class WatcherRetainScript
 {
@@ -88,17 +91,22 @@ public static class WatcherRetainScript
                 C(WatcherCards.Strike),
                 Hold(WatcherCards.SandsOfTime, cost: -1)),
 
-            // ── 2 ── 警惕 / 坚韧（保留不出）/ 旋转打击（保留不出）/ 时之沙（2费，保留不出）   （2 费）
-            Turn(2, 2, "2. 警惕、坚韧（保留不出）、旋转打击（保留不出）、时之沙（2费，保留不出）",
-                C(WatcherCards.Vigilance, upgradeMinAscension: 8),
+            // ── 2 ── 警惕 / 坚韧（保留不出）/ 旋转打击（保留不出）/ 时之沙（2费，保留不出）/ 奇迹（保留不出）   （2 费）
+            //   ★ v0.2.734（用户 2026-11-17 补：「奇迹被我漏掉了」）
+            Turn(2, 2, "2. 警惕、坚韧（保留不出）、旋转打击（保留不出）、时之沙（2费，保留不出）、奇迹（保留不出）",
+                C(WatcherCards.Vigilance),
                 Hold(WatcherCards.Perseverance, cost: -1, block: PerseveranceFor(2)),
                 Hold(WatcherCards.WindmillStrike, cost: -1, damage: WindmillFor(2)),
-                Hold(WatcherCards.SandsOfTime, cost: 2)),
+                Hold(WatcherCards.SandsOfTime, cost: 2),
+                Hold(WatcherCards.Miracle, cost: 0)),
 
-            // ── 3 ── 时之沙（0费）/ 欺瞒现实 / 改造现实 / 防御（没费）/ 平安·惩恶·坚韧·旋转打击（保留不出）   （2 费）
-            Turn(3, 2, "3. 时之沙（0费）、欺瞒现实、改造现实、防御（没费）、平安·惩恶·坚韧·旋转打击（保留不出）",
+            // ── 3 ── 奇迹 / 时之沙（0费）/ 欺瞒现实 / 改造现实 / 防御 / 平安·惩恶·坚韧·旋转打击（保留不出）   （2 费 + 奇迹 1 = 3）
+            //   ★ v0.2.734（用户 2026-11-17）：奇迹打出来给 +1 能量 ⇒ 3 费正好够
+            //   奇迹0 + 时之沙0 + 欺瞒现实1 + 改造现实1 + 防御1 = 3
+            Turn(3, 2, "3. 奇迹、时之沙（0费）、欺瞒现实、改造现实、防御、平安·惩恶·坚韧·旋转打击（保留不出）",
+                C(WatcherCards.Miracle, cost: 0),
                 C(WatcherCards.SandsOfTime, cost: 0),
-                C(WatcherCards.DeceiveReality),
+                C(WatcherCards.DeceiveReality, upgradeMinAscension: 8),
                 C(WatcherCards.CarveReality, upgradeMinAscension: 9),
                 C(WatcherCards.Defend),
                 Hold(WatcherCards.Safety, cost: -1),
@@ -109,7 +117,7 @@ public static class WatcherRetainScript
             // ── 4 ── 心灵堡垒 / 义愤填膺 / 惩恶(0) / 平安(0) / 坚韧(0) / 结末 / 旋转打击（0费，保留不出）   （4 费 = 退出平静）
             Turn(4, 4, "4. 心灵堡垒、义愤填膺、惩恶(0)、平安(0)、坚韧(0)、结末、旋转打击（0费，保留不出）",
                 C(WatcherCards.MentalFortress, upgradeMinAscension: 8),
-                C(WatcherCards.Indignation, upgradeMinAscension: 9),
+                C(WatcherCards.Indignation),
                 C(WatcherCards.Smite, cost: 0),
                 C(WatcherCards.Safety, cost: 0),
                 C(WatcherCards.Perseverance, cost: 0, block: PerseveranceFor(4)),
@@ -119,12 +127,12 @@ public static class WatcherRetainScript
             // ── 5 ── 旋转打击(0) / 停顿 / 安宁   （2 费）
             Turn(5, 2, "5. 旋转打击(0)、停顿、安宁",
                 C(WatcherCards.WindmillStrike, cost: 0, damage: WindmillFor(5)),
-                C(WatcherCards.Halt, upgradeMinAscension: 8),
+                C(WatcherCards.Halt),
                 C(WatcherCards.Tranquility)),
 
             // ── 6 ── 洗牌 / 欺瞒现实 / 改造现实 / 时之沙(0) / 惩恶·平安（保留不出）   ← 6～9 循环起点   （2 费）
             TurnEnergy(6, 2, "6. 洗牌。欺瞒现实、改造现实、时之沙(0)、惩恶（保留不出）、平安（保留不出）", true,
-                C(WatcherCards.DeceiveReality),
+                C(WatcherCards.DeceiveReality, upgradeMinAscension: 8),
                 C(WatcherCards.CarveReality, upgradeMinAscension: 9),
                 C(WatcherCards.SandsOfTime, cost: 0),
                 Hold(WatcherCards.Smite, cost: -1),
@@ -140,7 +148,7 @@ public static class WatcherRetainScript
 
             // ── 8 ── 义愤填膺 / 坚韧(0) / 防御 / 惩恶(0) / 平安(0) / 结末 / 旋转打击（0费，保留不出）   （4 费 = 退出平静）
             Turn(8, 4, "8. 义愤填膺、坚韧(0)、防御、惩恶(0)、平安(0)、结末、旋转打击（0费，保留不出）",
-                C(WatcherCards.Indignation, upgradeMinAscension: 9),
+                C(WatcherCards.Indignation),
                 C(WatcherCards.Perseverance, cost: 0, block: PerseveranceFor(8)),
                 C(WatcherCards.Defend),
                 C(WatcherCards.Smite, cost: 0),
@@ -151,8 +159,8 @@ public static class WatcherRetainScript
             // ── 9 ── 旋转打击(0) / 停顿 / 警惕   （2 费）
             Turn(9, 2, "9. 旋转打击(0)、停顿、警惕",
                 C(WatcherCards.WindmillStrike, cost: 0, damage: WindmillFor(9)),
-                C(WatcherCards.Halt, upgradeMinAscension: 8),
-                C(WatcherCards.Vigilance, upgradeMinAscension: 8)),
+                C(WatcherCards.Halt),
+                C(WatcherCards.Vigilance)),
         };
 
         return new BossScript

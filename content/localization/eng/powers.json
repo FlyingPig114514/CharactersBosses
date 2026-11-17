@@ -145,6 +145,6 @@
     "BOSS_MASTER_REALITY_POWER.description":  "Whenever you create a card during combat, it is [gold]downgraded[/gold]; if it is not a token, it also gains [gold]Exhaust[/gold].\nThe Watcher obtained [gold]Arsenal[/gold], [gold]Pillar of Creation[/gold] and [gold]Know Thy Place[/gold] through the Colour Philosopher.",
     "BOSS_MASTER_REALITY_POWER.description_dread":  "Whenever you create a card during combat, it is [gold]downgraded[/gold]; if it is not a token, it also gains [gold]Exhaust[/gold].\nThe Watcher obtained [gold]Arsenal[/gold], [gold]Pillar of Creation[/gold] and [gold]Know Thy Place[/gold] through the Colour Philosopher.",
     "BOSS_ESTABLISHMENT_POWER.title":  "Establishment",
-    "BOSS_ESTABLISHMENT_POWER.description":  "At the end of your turn, for each retained card in your hand with a cost below 2, its cost is increased by 1 for the rest of this combat, then the Watcher loses 1 Strength.\nThis effect only applies to the player locked onto by the Watcher.",
+    "BOSS_ESTABLISHMENT_POWER.description":  "At the end of your turn, for each retained card in your hand with a cost below 2, its cost is increased by 1 for the rest of this combat. Each time a card's cost is increased this way, the Watcher loses 2 Strength.\nThis effect only applies to the player locked onto by the Watcher.",
     "BOSS_ESTABLISHMENT_POWER.description_dread":  "At the end of your turn, your retained cards have their cost increased by 1 for the rest of this combat.\nThis effect only applies to the player locked onto by the Watcher."
 }

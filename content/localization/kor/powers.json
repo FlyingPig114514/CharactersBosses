@@ -145,6 +145,6 @@
     "BOSS_MASTER_REALITY_POWER.description":  "전투 중 당신이 카드를 생성할 때마다 그 카드는 [gold]하향[/gold]됩니다. 토큰이 아니면 [gold]소멸[/gold]도 얻습니다.\n왓처는 색채 철학자를 통해 [gold]무기고[/gold], [gold]창조의 기둥[/gold], [gold]네가 설 곳[/gold]을 얻었다.",
     "BOSS_MASTER_REALITY_POWER.description_dread":  "전투 중 당신이 카드를 생성할 때마다 그 카드는 [gold]하향[/gold]됩니다. 토큰이 아니면 [gold]소멸[/gold]도 얻습니다.\n왓처는 색채 철학자를 통해 [gold]무기고[/gold], [gold]창조의 기둥[/gold], [gold]네가 설 곳[/gold]을 얻었다.",
     "BOSS_ESTABLISHMENT_POWER.title":  "확립",
-    "BOSS_ESTABLISHMENT_POWER.description":  "당신의 턴이 끝날 때, 손에 있는 비용이 2 미만인 보존된 카드의 비용이 이번 전투 동안 1 증가하고, 그 후 와처가 힘을 1 잃습니다.\n이 효과는 와처에게 고정된 플레이어에게만 적용됩니다.",
+    "BOSS_ESTABLISHMENT_POWER.description":  "당신의 턴이 끝날 때, 손에 있는 비용이 2 미만인 보존된 카드의 비용이 이번 전투 동안 1 증가합니다. 이렇게 비용이 증가한 카드 1장마다 와처가 힘을 2 잃습니다.\n이 효과는 와처에게 고정된 플레이어에게만 적용됩니다.",
     "BOSS_ESTABLISHMENT_POWER.description_dread":  "당신의 턴이 끝날 때, 보존한 카드의 비용이 이번 전투 동안 1 증가합니다.\n이 효과는 와처에게 고정된 플레이어에게만 적용됩니다."
 }

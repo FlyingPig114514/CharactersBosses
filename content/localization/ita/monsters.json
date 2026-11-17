@@ -213,6 +213,6 @@
     "WATCHER_RETAIN_BOSS.name":  "Osservatore Trattenitore",
     "WATCHER_RETAIN_BOSS.title":  "Osservatore Trattenitore",
     "WATCHER_RETAIN_BOSS.moves.CHARBOSS_PLAY.title":  "Gioca",
-    "WATCHER_RETAIN_BOSS.establishment":  "Alla fine del tuo turno, ogni carta trattenuta nella tua mano con un costo inferiore a 2 aumenta il suo costo di 1 per il resto del combattimento, poi il Watcher perde 1 Forza.\nQuesto effetto si applica solo al giocatore su cui il Watcher è agganciato.",
+    "WATCHER_RETAIN_BOSS.establishment":  "Alla fine del tuo turno, ogni carta trattenuta nella tua mano con un costo inferiore a 2 aumenta il suo costo di 1 per il resto del combattimento. Per ogni carta il cui costo aumenta così, il Watcher perde 2 Forza.\nQuesto effetto si applica solo al giocatore su cui il Watcher è agganciato.",
     "WATCHER_RETAIN_BOSS.establishment_dread":  "Alla fine del tuo turno, le tue carte trattenute aumentano il loro costo di 1 per il resto del combattimento.\nQuesto effetto si applica solo al giocatore su cui il Watcher è agganciato."
 }

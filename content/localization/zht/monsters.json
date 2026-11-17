@@ -213,6 +213,6 @@
     "WATCHER_RETAIN_BOSS.name":  "保留觀",
     "WATCHER_RETAIN_BOSS.title":  "保留觀",
     "WATCHER_RETAIN_BOSS.moves.CHARBOSS_PLAY.title":  "出牌",
-    "WATCHER_RETAIN_BOSS.establishment":  "在你的回合結束時，若你有耗能小於2的牌被保留，其在本場戰鬥中的耗能增加1，然後觀者失去1點力量。\n此效果只對被觀者鎖定的玩家生效。",
+    "WATCHER_RETAIN_BOSS.establishment":  "在你的回合結束時，若你有耗能小於2的牌被保留，其在本場戰鬥中的耗能增加1。每有一張卡牌的耗能被增加，觀者就失去2點力量。\n此效果只對被觀者鎖定的玩家生效。",
     "WATCHER_RETAIN_BOSS.establishment_dread":  "在你的回合結束時，你保留的牌在本場戰鬥中的耗能增加1。\n此效果只對被觀者鎖定的玩家生效。"
 }

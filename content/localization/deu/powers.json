@@ -145,6 +145,6 @@
     "BOSS_MASTER_REALITY_POWER.description":  "Immer wenn du im Kampf eine Karte erzeugst, wird sie [gold]herabgestuft[/gold]; ist sie kein Token, erhält sie zusätzlich [gold]Erschöpfen[/gold].\nDer Wächter erlangte [gold]Arsenal[/gold], [gold]Säule der Schöpfung[/gold] und [gold]Kenne deinen Platz[/gold] durch den Farbphilosophen.",
     "BOSS_MASTER_REALITY_POWER.description_dread":  "Immer wenn du im Kampf eine Karte erzeugst, wird sie [gold]herabgestuft[/gold]; ist sie kein Token, erhält sie zusätzlich [gold]Erschöpfen[/gold].\nDer Wächter erlangte [gold]Arsenal[/gold], [gold]Säule der Schöpfung[/gold] und [gold]Kenne deinen Platz[/gold] durch den Farbphilosophen.",
     "BOSS_ESTABLISHMENT_POWER.title":  "Etablierung",
-    "BOSS_ESTABLISHMENT_POWER.description":  "Am Ende deines Zuges wird für jede zurückbehaltene Karte auf deiner Hand mit Kosten unter 2 ihre Kosten für diesen Kampf um 1 erhöht. Danach verliert die Seherin 1 Stärke.\nDieser Effekt gilt nur für den Spieler, den die Seherin im Visier hat.",
+    "BOSS_ESTABLISHMENT_POWER.description":  "Am Ende deines Zuges wird für jede zurückbehaltene Karte auf deiner Hand mit Kosten unter 2 ihre Kosten für diesen Kampf um 1 erhöht. Für jede so erhöhte Karte verliert die Seherin 2 Stärke.\nDieser Effekt gilt nur für den Spieler, den die Seherin im Visier hat.",
     "BOSS_ESTABLISHMENT_POWER.description_dread":  "Am Ende deines Zuges werden die Kosten deiner zurückbehaltenen Karten für diesen Kampf um 1 erhöht.\nDieser Effekt gilt nur für den Spieler, den die Seherin im Visier hat."
 }
