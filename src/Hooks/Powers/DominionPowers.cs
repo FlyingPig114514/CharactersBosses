@@ -41,6 +41,12 @@ public sealed class DefectDominionPower : PowerModel
     /// <summary>每名敌人让持有者掉多少血。</summary>
     private const int PerEnemy = 3;
 
+    /// <summary>
+    /// **N 名敌人时这一回合要挨多少**（单一真值来源：支配本体与「薄荷尖塔」兼容都调这里）。
+    /// 用户口径：每有一名敌人，玩家就在自己回合结束时受 3 点伤害。
+    /// </summary>
+    internal static int DamageFor(int enemies) => PerEnemy * Math.Max(0, enemies);
+
     public override PowerType Type => PowerType.Debuff;
 
     public override PowerStackType StackType => PowerStackType.Single;
@@ -70,7 +76,7 @@ public sealed class DefectDominionPower : PowerModel
             }
             if (enemies <= 0) return;
 
-            int amount = PerEnemy * enemies;
+            int amount = DamageFor(enemies);
             await CreatureCmd.Damage(choiceContext, me, amount, ValueProp.Unpowered, (Creature?)null);
             Logger.Log($"[CharBoss] 故障机器人的支配：{enemies} 名敌人 ⇒ {me.Name} 受到 {amount} 点伤害");
         }

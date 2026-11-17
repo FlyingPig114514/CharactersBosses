@@ -159,7 +159,12 @@ internal static class MintySpireDamagePreviewCompat
     {
         try
         {
-            int extra = PendingSourcelessDamage(creature);
+            // ★ v0.2.744（用户 2026-11-17：「故障机器人的支配造成的伤害不会被薄荷尖塔计算」）：
+            //   恐惧模式·故障机器人的支配 = 玩家**自己回合结束时**按敌人数量挨 `3 × 敌人` 点无来源伤害
+            //   （`DefectDominionPower`）。它既不在敌人的 `NextMove.Intents` 里，也不是原版那两层
+            //   power（薄荷尖塔只硬编码了 `DisintegrationPower` / `ConstrictPower` / TheInsatiable 的支配）
+            //   ⇒ 这里单独补一笔，数字与支配本体共用 `DefectDominionPower.DamageFor()`。
+            int extra = PendingSourcelessDamage(creature) + DreadDominionDamage(creature);
             if (extra <= 0) return;
             __result += extra;
 
@@ -187,6 +192,30 @@ internal static class MintySpireDamagePreviewCompat
     ///     （随从、奥斯提这些不是 CharBossMonster ⇒ 自动排除）；
     ///   · 三者相加，其中**充能球被动**在「本地玩家不是这只 Boss 锁定的人」时按 0 算。
     /// </summary>
+    /// <summary>
+    /// **恐惧模式「故障机器人的支配」**这一回合还会让这位玩家挨多少（用户 2026-11-17）。
+    /// 只对真人玩家、且身上真有 <see cref="CharacterBosses.Powers.DefectDominionPower"/> 时才算；
+    /// 数字 = `3 × 存活敌人数`（与支配本体同一函数）。
+    /// </summary>
+    internal static int DreadDominionDamage(Creature? player)
+    {
+        try
+        {
+            if (player == null || !player.IsAlive) return 0;
+            if (player.Monster != null) return 0;              // 只对真人玩家
+            var power = player.GetPower<CharacterBosses.Powers.DefectDominionPower>();
+            if (power == null) return 0;
+            var combat = player.CombatState;
+            if (combat == null) return 0;
+            int enemies = 0;
+            foreach (var e in combat.Enemies)
+            {
+                if (e != null && e.IsAlive) enemies++;
+            }
+            return CharacterBosses.Powers.DefectDominionPower.DamageFor(enemies);
+        }
+        catch { return 0; }
+    }
     internal static int PendingSourcelessDamage(Creature? player)
     {
         try
