@@ -576,13 +576,6 @@ public static class BossFrameTick
             // 她身上的**能力层数**变了（玩家的减力量/易伤/虚弱、模组的临时减力量…）→ 意图数字要重算。
             // 用户 2026-10-23：崩坠「哀嚎」减了她 11 点力量，意图还挂着 10×4。
             foreach (var each in everyBoss) RefreshIntentsIfPowersChanged(each);
-
-            // ★ v0.2.739（用户 2026-11-17：「打了一局神格观，发现进神格后她的意图不刷新」）：
-            //   观者的「神格 ×3 / 愤怒 ×2」**不是**普通能力（B 版那份挂在玩家模型上、
-            //   A 版那份就算在 `Creature.Powers` 里，进神格的时机也在**她自己**回合中
-            //   ⇒ `RefreshIntentsIfPowersChanged` 会因为「不在玩家侧」把这次变化吞掉）。
-            //   所以单独盯「姿态倍率」：一变就记一个待刷新标记，等玩家侧那一帧再打 `IntentsDirty`。
-            foreach (var each in everyBoss) RefreshIntentsIfStanceChanged(each);
         // ★ 2026-11-07 用户：「能力机被减力量/集中后，充能球被动的伤害没有及时更新」。
         //   充能球被动那条意图的数字来自面板重建，而面板只在若干事件里重建 ⇒
         //   她身上「力量 / 集中 / 球的构成」被**外部**改动时不刷新。这里按指纹兜底：一变就强制重画。
@@ -1192,102 +1185,6 @@ public static class BossFrameTick
 
     /// <summary>意图重算日志限流。</summary>
     private static int _ostyReprintLogs;
-
-    /// <summary>
-    /// **观者姿态倍率变了 → 重算意图**（用户 2026-11-17：「打了一局神格观，发现进神格后她的意图不刷新」）。
-    ///
-    /// 为什么上面那个「能力指纹」兜不住：
-    /// · B 版（lamali）的姿态根本不在 `Creature.Powers` 里，而是 `SpireField&lt;PlayerCombatState, WatcherStanceModel&gt;`；
-    /// · 就算 A 版把它算进 powers，**进神格的那一刻是在她自己回合里**，而
-    ///   `RefreshIntentsIfPowersChanged` 有一条「不在玩家侧就不打标（防止数字来回闪）」的闸门，
-    ///   并且它在打标**之前**就把新指纹写回去了 ⇒ 这次变化被彻底吞掉，玩家回合看到的还是旧数字。
-    ///
-    /// 做法：单独记一份「姿态倍率」，一变就挂一个 **待重规划** 标记：
-    /// · 变的那一刻她在出牌 ⇒ **只重算数字、不动计划**（那一刻 `boss.Plan` 就是她接下来的出牌队列，
-    ///   重规划会改掉她这回合后面要打的牌）；数字侧是准的 —— 计划里 `StanceMul` 是旧值（当时没姿态），
-    ///   渲染时 `ScaleToPlannedStance` 会退回 `PlannedStanceAt`（此刻姿态 + 剩余推演）= 新倍率，与「此刻」相等 ⇒ 原样显示。
-    /// · 玩家侧（玩家正在看那张手牌栏）⇒ 打 `IntentsDirty` **并**按当前姿态重规划一次
-    ///   （`PlannedPlay.StanceMul` 是 init-only，只有重规划才能把它换成新倍率；神格的 +3 能量也会顺带算进预算）。
-    /// </summary>
-    private static readonly Dictionary<CharBossMonster, (int Mul, bool NeedReplan, bool InTurnDone)> LastStanceMul = new();
-
-    private static int _stanceLogs;
-
-    private static void RefreshIntentsIfStanceChanged(CharBossMonster boss)
-    {
-        try
-        {
-            if (boss == null) return;
-            var creature = boss.Creature;
-            if (creature == null) return;
-
-            int mul = Math.Max(1, CharacterBosses.Core.BossIntentBuilder.StanceMultiplierOf(creature));
-
-            bool playerSide;
-            try { playerSide = boss.CombatState?.CurrentSide == MegaCrit.Sts2.Core.Combat.CombatSide.Player; }
-            catch { playerSide = false; }
-
-            if (!LastStanceMul.TryGetValue(boss, out var st))
-            {
-                LastStanceMul[boss] = (mul, false, false);      // 第一次见到这只：只记基线
-                return;
-            }
-
-            if (mul != st.Mul)
-            {
-                int before = st.Mul;
-                st = (mul, true, false);                        // 变了 ⇒ 记一个待重规划
-                LastStanceMul[boss] = st;
-                if (_stanceLogs++ < 20)
-                    Logger.Log($"[CharBoss] 观者姿态变化：×{before} → ×{mul}" +
-                               (playerSide ? "（玩家侧 ⇒ 当帧重算）" : "（她回合中 ⇒ 先只重算数字）"));
-            }
-
-            if (!st.NeedReplan) return;
-
-            if (!playerSide)
-            {
-                if (st.InTurnDone) return;                      // 她回合里每次变化只重算一次，别每帧刷
-                boss.IntentsDirty = true;
-                LastStanceMul[boss] = (st.Mul, true, true);
-                return;
-            }
-
-            LastStanceMul[boss] = (st.Mul, false, false);
-
-            if (boss.Plan.Count == 0) return;
-
-            // 光重算数字不够：计划里每张牌「打出那一刻的倍率」是**规划期**定死的
-            // （`PlannedPlay.StanceMul` 是 init-only，重算路径原样复用），
-            // 姿态变了以后必须**按当前姿态重新规划一次**，否则 `ScaleToPlannedStance` 还会按旧倍率折算。
-            bool replanned = false;
-            try
-            {
-                var pcs = boss.Shadow?.PlayerCombatState;
-                var turn = boss.Def?.ScriptForAct(boss.ActIndex)?.TurnAt(boss.TurnNumber);
-                if (pcs != null && turn != null)
-                {
-                    var fresh = CharacterBosses.Core.BossScriptPlanner.Plan(boss, pcs, turn, boss.TurnNumber);
-                    if (fresh != null && fresh.Count > 0)
-                    {
-                        boss.Plan.Clear();
-                        boss.Plan.AddRange(fresh);
-                        replanned = true;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Logger.Log("[CharBoss] 姿态变化后重规划失败（退回只重算数字）: " + e.Message);
-            }
-
-            boss.IntentsDirty = true;                    // 消费方见 RefreshIntentsIfDrawsChanged
-            if (_stanceLogs++ < 20)
-                Logger.Log($"[CharBoss] 意图重算（观者姿态变化）：现在按 ×{mul} 重算" +
-                           (replanned ? $"，并已按新姿态重规划 {boss.Plan.Count} 张" : "（未能重规划，仅重算数字）"));
-        }
-        catch { /* 忽略：绝不影响战斗 */ }
-    }
 
     /// <summary>取指纹末尾一段（奥斯提 + 最后一个玩家的能力）用于日志。</summary>
     private static string TailOf(string? s)
