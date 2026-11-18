@@ -6115,3 +6115,14 @@ Chronological action log.
 | 2026-11-18 15:38 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
 | 2026-11-18 15:39 | edit | `src/CharacterBosses.json` | ok | 0 |
 | 2026-11-18 15:49 | write | `workshop/changenote.txt` | ok | 0 |
+| 2026-11-18 17:31 | edit | `src/Hooks/Core/BossPicksSync.cs` | ok | 0 |
+| 2026-11-18 17:31 | edit | `src/Hooks/Core/BossPicksSync.cs` | ok | 0 |
+| 2026-11-18 17:32 | edit | `src/Hooks/Core/BossPicksSync.cs` | ok | 0 |
+| 2026-11-18 17:32 | edit | `src/Hooks/Core/BossPicksSync.cs` | ok | 0 |
+| 2026-11-18 17:32 | edit | `src/Hooks/Core/CharDominions.cs` | ok | 0 |
+| 2026-11-18 17:32 | edit | `src/Hooks/Core/BossPicksSync.cs` | ok | 0 |
+| 2026-11-18 17:32 | edit | `src/Hooks/Core/BossHookBridge.SideTurn.cs` | ok | 0 |
+| 2026-11-18 17:33 | edit | `src/Hooks/Core/BossHookBridge.SideTurn.cs` | ok | 0 |
+| 2026-11-18 17:33 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-18 17:33 | edit | `src/CharacterBosses.json` | ok | 0 |
+| 2026-11-18 17:36 | write | `workshop/changenote.txt` | ok | 0 |
