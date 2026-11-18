@@ -350,9 +350,20 @@ internal static class BossSpecialTip
             //
             // ★ v0.2.733（用户 2026-11-17）：**保留观**（`WATCHER_RETAIN`）同理 —— 同一个 `Def.Key`、
             //   说明也只有两行 ⇒ 同样用正常位置。
+            // ★ v0.2.754（用户 2026-11-18：「预见观的特殊效果描述框偏高了，它很短不用特意调高
+            //   （别动别的 boss）」）：预见观的「通晓万物」只有两行 ⇒ 用正常位置。
+            //   判据用**特殊效果类型**而不是阵容 latch —— 全模组只有预见观带 `BossOmnisciencePower`，
+            //   所以这条绝不会误伤别的 Boss（神格观的 −120 偏移照旧）。
+            try
+            {
+                if (boss.Def.SpecialPowerForAct(boss.ActIndex) == typeof(Powers.BossOmnisciencePower)) return false;
+            }
+            catch { /* 取不到就按原逻辑走 */ }
+
             if (boss.Def.Key == "WATCHER_DIVINITY"
                 && !Core.BossLineups.WatcherCreateActive()
-                && !Core.BossLineups.WatcherRetainActive()) return true;
+                && !Core.BossLineups.WatcherRetainActive()
+                && !Core.BossLineups.WatcherForesightActive()) return true;
             return boss.Def.SpecialPowerForAct(boss.ActIndex) == typeof(Powers.BrewModPower);
         }
         catch { return false; }
