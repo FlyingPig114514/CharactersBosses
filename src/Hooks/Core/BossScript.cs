@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using MegaCrit.Sts2.Core.Combat;
@@ -88,6 +88,20 @@ public sealed class ScriptCard
     /// （用户 2026-11-09 的算法：1+5+8+3+3 ⇒ 第 4 回合 20，其中 T3 只算 3 张）。
     /// </summary>
     public bool NotDrawn { get; init; }
+
+    /// <summary>
+    /// 这张牌是被她**「预见」从抽牌堆直接丢进弃牌堆**的（用户 2026-11-18）。
+    ///
+    /// 用户原话：「被预见丢弃的其它牌是**直接从抽牌堆到弃牌堆**，不需要展示在手牌里 ——
+    /// 这和猎人（静默猎手）从**手牌**中弃牌的逻辑不一样（别动猎人的逻辑，只动预见观的）」。
+    ///
+    /// ⇒ 造手牌时**根本不创建这张牌**（不进手牌），改为把她**抽牌堆里那张真实实例**
+    /// `RemoveInternal` 掉、`DiscardPile.AddInternal` 进去（见
+    /// <see cref="BossScriptRunner"/> 里 `ScriedFromDraw` 那条分支）。
+    /// 只给「预见观」用（<see cref="WatcherForesightScript.Scried"/>）；
+    /// 静默猎手那套 `DiscardInstead`（奇巧 / 杂技 / 必备工具 —— 从手牌弃）一个字都不改。
+    /// </summary>
+    public bool ScriedFromDraw { get; init; }
 
     /// <summary>
     /// 这张是**被「必备工具」在她回合开始时丢掉**的那一张（不是被别的牌丢的）。
@@ -784,6 +798,36 @@ public static class BossScriptRunner
             Logger.Log("[CharBoss] 完美打击接管失败（按原版算）: " + e.Message);
         }
     }
+    /// <summary>
+    /// 「预见」把**抽牌堆**里的这张牌直接丢进弃牌堆（用户 2026-11-18）。
+    /// 不新建实例、不进手牌 —— 动的是她抽牌堆里那张真实的牌（和猎人「从手牌弃牌」不是一回事）。
+    /// </summary>
+    private static void MoveScriedFromDrawToDiscard(PlayerCombatState pcs, Type cardType, ScriptCard entry)
+    {
+        try
+        {
+            CardModel? found = null;
+            foreach (var c in pcs.DrawPile.Cards)
+            {
+                if (c == null) continue;
+                if (c.GetType() != cardType) continue;
+                found = c;
+                break;
+            }
+            if (found == null)
+            {
+                Logger.Log($"[CharBoss] 预见弃牌：抽牌堆里的 {cardType.Name} 已经没了" +
+                           "（可能已被原版预见丢掉）⇒ 这次只记账，不显示在手牌");
+                return;
+            }
+            string id = SafeEntryOf(found);
+            pcs.DrawPile.RemoveInternal(found, true);
+            pcs.DiscardPile.AddInternal(found, -1, true);
+            Logger.Log($"[CharBoss] 预见弃牌：{id} 从抽牌堆直接进弃牌堆（不进手牌）");
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 预见弃牌失败: " + e.Message); }
+    }
+
     public static void BuildHand(ICombatState? combat, Player? shadow, PlayerCombatState pcs, BossTurn turn,
                                  Type[]? extraUpgrades = null)
     {
@@ -808,6 +852,17 @@ public static class BossScriptRunner
         foreach (var entry in turn.Cards)
         {
             var cardType = MultiplayerCardSwap.Resolve(entry.Card, cardBoss!);
+
+            // ★ v0.2.753（用户 2026-11-18）：「被预见丢弃的牌是**直接从抽牌堆到弃牌堆**，
+            //   不需要展示在手牌里 —— 这和猎人从手牌中弃牌的逻辑不一样」。
+            //   ⇒ 这类条目**不造牌、不进手牌**，只把她抽牌堆里那张真实实例挪进弃牌堆。
+            //   ⚠ 只有预见观会写 `ScriedFromDraw`；静默猎手那套 `DiscardInstead` 完全不受影响。
+            if (entry.ScriedFromDraw)
+            {
+                MoveScriedFromDrawToDiscard(pcs, cardType, entry);
+                continue;
+            }
+
             var canonical = ModelDb.GetById<CardModel>(ModelDb.GetId(cardType));
             if (canonical == null && !ReferenceEquals(cardType, entry.Card))
             {

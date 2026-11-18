@@ -294,6 +294,14 @@ public static class BossScriptPlanner
 
         foreach (var entry in turn.Cards)
         {
+            // ★ v0.2.753（用户 2026-11-18）：被「预见」丢掉的牌是**抽牌堆→弃牌堆**，
+            //   压根不在她手牌里 ⇒ 不进计划，也**不算**「不在手牌」那种异常。
+            if (entry.ScriedFromDraw)
+            {
+                skipped.Add(entry.Card.Name + "(被预见丢弃)");
+                continue;
+            }
+
             // ⚠ 多人换牌：手里那张是**换上的牌**（休眠 / 骸骨军团 / 刀刃交响曲），
             //   所以「这张剧本牌在不在手牌」必须按**换牌后的类型**比对 ——
             //   以前直接拿原牌类型比，于是日志写着 `PullAggro(不在手牌)`，

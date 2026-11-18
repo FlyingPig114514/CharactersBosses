@@ -189,9 +189,13 @@ public static class WatcherForesightScript
     }
 
     /// <summary>
-    /// **被她「预见」掉的牌**（天眼 / 先见之明 / 斩破命运 / 美琅脂）：从**抽牌堆**弃掉，
-    /// 用户明确要求「不用在她手牌中显示」⇒ `NotDrawn = true` + `DiscardInstead = true`，
-    /// 既不进手牌也不打出，只参与「这场战斗里她确实预见过这些牌」的记账。
+    /// **被她「预见」掉的牌**（天眼 / 先见之明 / 斩破命运 / 美琅脂）。
+    ///
+    /// 用户 2026-11-18 明确：「被预见丢弃的其它牌是**直接从抽牌堆到弃牌堆**，不需要展示在手牌里
+    /// （这和猎人从手牌中弃牌的逻辑不一样）」⇒ 用 <see cref="ScriptCard.ScriedFromDraw"/>：
+    /// 造手牌时**不创建这张牌、不进手牌**，只把她抽牌堆里那张真实实例挪进弃牌堆
+    /// （见 `BossScriptRunner.MoveScriedFromDrawToDiscard`）。
+    /// 同时保留 `DiscardInstead`（规划器不把它当本回合要打的牌）与 `NotDrawn`（谋杀加伤不数它）。
     /// </summary>
     private static ScriptCard? Scried(Type? card)
     {
@@ -200,6 +204,7 @@ public static class WatcherForesightScript
         {
             Card = card,
             From = "deck",
+            ScriedFromDraw = true,
             NotDrawn = true,
             DiscardInstead = true,
         };
