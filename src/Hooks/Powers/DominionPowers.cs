@@ -308,4 +308,172 @@ public sealed class FoolDominionPower : PowerModel
         }
     }
 }
+
+/// <summary>
+/// 恐惧模式「**观者的支配**」的**虔信**（挂在**敌人**身上）——用户 2026-11-19 定的口径：
+/// > 「就是给敌人挂虔信，积累 10 点真言后消耗 10 点真言进神格（本回合 3 倍伤害）一回合。
+/// >   这些敌人的虔信在**玩家回合开始时**触发，并且在进神格的当回合开始时不会退出神格，
+/// >   **执行完自己的意图才会退神格**（这些描述不影响 boss，尤其是与神格观的机制无关，
+/// >   别改这个的时候把神格观带偏了）（也就是怪物第四回合、第七回合等回合会进神格，
+/// >   当回合伤害翻三倍）」
+///
+/// ⇒ 三个 power 各管一段：
+///   · **本类（虔信）**：`Amount` = 每次给几层真言（支配给 3）；**玩家侧回合开始**时给持有者加真言，
+///     满 <see cref="Threshold"/> 就扣 10 并让他进神格；
+///   · **<see cref="DominionMantraPower"/>（真言）**：就是那个层数/计数，界面上看得见进度；
+///   · **<see cref="DominionDivinityPower"/>（神格）**：`ModifyDamageMultiplicative` 把他自己的
+///     攻击伤害 ×3，**它自己的回合结束（= 意图执行完）才摘掉**，回合开始不摘。
+///
+/// ⚠ 与「神格观」那条链（`BossDevotionPower` + `WatcherFaithPower`）**完全分开、互不影响**：
+///   那边是观者 Boss 自己的真言 / 姿态 / 进神格加力量加能量；这边是**普通怪物**的仿制版，
+///   持有者如果是我们自己的 `CharBossMonster`（她有自己的真神格）就**直接跳过**。
+///
+/// 数值对账（3 层/回合、满 10 进神格）：第 4 回合（3+3+3+3=12，扣 10 剩 2）、
+/// 第 7 回合（2+3+3+3=11，扣 10 剩 1）、第 10 回合（1+3+3+3=10，扣 10 剩 0）—— 与用户说的
+/// 「第四回合、第七回合等回合会进神格」完全一致。
+/// </summary>
+public sealed class WatcherDominionDevotionPower : PowerModel
+{
+    /// <summary>真言满多少层触发神格。</summary>
+    internal const int Threshold = 10;
+
+    public override PowerType Type => PowerType.Debuff;
+
+    public override PowerStackType StackType => PowerStackType.Counter;
+
+    /// <summary>层数不随人数放大：支配固定给 3 层，多一个人不该变成 12。</summary>
+    public override bool ShouldScaleInMultiplayer => false;
+
+    public override bool ShouldPlayVfx => false;
+
+    /// <summary>玩家（任意一位真人的）回合开始 ⇒ 这个敌人 +N 层真言，满了就进神格。</summary>
+    public override async Task AfterSideTurnStart(CombatSide side,
+                                                  IReadOnlyList<Creature> participants,
+                                                  ICombatState combatState)
+    {
+        try
+        {
+            if (side != CombatSide.Player) return;                 // ★ 玩家回合开始触发（不是它自己的回合）
+            var me = Owner;
+            if (me == null || !me.IsAlive) return;
+            if (me.Monster is Monsters.CharBossMonster) return;    // 我们自己的 Boss 走真神格，别串台
+
+            int gain = (int)Math.Round((double)Amount);
+            if (gain <= 0) return;
+
+            var ctx = new ThrowingPlayerChoiceContext();
+
+            var mantra = me.GetPower<DominionMantraPower>();
+            int now;
+            if (mantra == null)
+            {
+                var made = await PowerCmd.Apply<DominionMantraPower>(ctx, me, gain, me, null, false);
+                now = (int)Math.Round((double)(made?.Amount ?? gain));
+            }
+            else
+            {
+                now = await PowerCmd.ModifyAmount(ctx, mantra, gain, me, null, false);
+            }
+            Logger.Log($"[CharBoss] 观者的支配·虔信：{me.Name} 真言 +{gain} ⇒ {now}/{Threshold}");
+
+            // 满了就扣 10 进神格（正常一次只跨一次，guard 只防数据异常的死循环）
+            int guard = 0;
+            while (now >= Threshold && guard++ < 4)
+            {
+                var cur = me.GetPower<DominionMantraPower>();
+                if (cur == null) break;
+                now = await PowerCmd.ModifyAmount(ctx, cur, -Threshold, me, null, false);
+                await PowerCmd.Apply<DominionDivinityPower>(ctx, me, 1m, me, null, false);
+                Logger.Log($"[CharBoss] 观者的支配·虔信：{me.Name} 真言满 {Threshold} ⇒ 消耗 {Threshold} 层，" +
+                           $"进入神格（它这一回合的攻击三倍伤害，执行完意图后退出），剩余真言 {now}");
+            }
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 观者的支配·虔信结算失败: " + e.Message);
+        }
+    }
+}
+
+/// <summary>
+/// 「**真言**」计数（挂在拿了观者支配虔信的**敌人**身上）——纯计数，不含逻辑：
+/// 每玩家回合开始 +N（<see cref="WatcherDominionDevotionPower"/> 加），满 10 层被扣掉 10 进神格。
+/// </summary>
+public sealed class DominionMantraPower : PowerModel
+{
+    public override PowerType Type => PowerType.Buff;
+
+    public override PowerStackType StackType => PowerStackType.Counter;
+
+    public override bool ShouldScaleInMultiplayer => false;
+
+    public override bool ShouldPlayVfx => false;
+}
+
+/// <summary>
+/// 「**神格**」（挂在拿了观者支配虔信的**敌人**身上，只持续**它自己的一回合**）。
+///
+/// 用户口径：「积累 10 点真言后消耗 10 点真言进神格（**本回合 3 倍伤害**）一回合……
+/// 并且在进神格的**当回合开始时不会退出神格**，**执行完自己的意图才会退神格**」
+/// ⇒ ① 倍率走原版钩子 `ModifyDamageMultiplicative`（反编译确认 `Hook.ModifyDamageInternal`
+///      会遍历**全部** hook 监听者 ⇒ 挂在敌人身上的 power 也能改它自己打出来的伤害），
+///      只认「自己作为 dealer 的、有来源的攻击」（`props.IsPoweredAttack()`）；
+///   ② 退出时机放在 `AfterSideTurnEnd` 且**必须是自己那一侧、自己在参与者里**——
+///      这样「它的回合开始」不会摘、别的回合结束也不会误摘。
+/// </summary>
+public sealed class DominionDivinityPower : PowerModel
+{
+    /// <summary>这一回合的攻击伤害倍率。</summary>
+    private const decimal Multiplier = 3m;
+
+    public override PowerType Type => PowerType.Buff;
+
+    public override PowerStackType StackType => PowerStackType.Counter;
+
+    public override bool ShouldScaleInMultiplayer => false;
+
+    public override bool ShouldPlayVfx => false;
+
+    public override decimal ModifyDamageMultiplicative(Creature? target, decimal amount, ValueProp props,
+                                                      Creature? dealer, CardModel? cardSource, CardPlay? cardPlay)
+    {
+        try
+        {
+            if (dealer == null || Owner == null) return 1m;
+            if (!ReferenceEquals(dealer, Owner)) return 1m;      // 只放大它自己打出来的伤害
+            if (!props.IsPoweredAttack()) return 1m;             // 只认攻击（状态/毒这类不算）
+            return Multiplier;
+        }
+        catch { return 1m; }
+    }
+
+    /// <summary>它自己的回合结束（= 意图已经执行完）⇒ 退出神格。</summary>
+    public override async Task AfterSideTurnEnd(PlayerChoiceContext choiceContext, CombatSide side,
+                                               IEnumerable<Creature> participants)
+    {
+        try
+        {
+            if (side != CombatSide.Enemy) return;
+            var me = Owner;
+            if (me == null) return;
+
+            bool mine = false;
+            if (participants != null)
+            {
+                foreach (var c in participants)
+                {
+                    if (ReferenceEquals(c, me)) { mine = true; break; }
+                }
+            }
+            if (!mine) return;
+
+            Logger.Log($"[CharBoss] 观者的支配·神格：{me.Name} 的意图已执行完 ⇒ 退出神格");
+            await PowerCmd.Remove(this);
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 观者的支配·神格移除失败: " + e.Message);
+        }
+    }
+}
 #endif

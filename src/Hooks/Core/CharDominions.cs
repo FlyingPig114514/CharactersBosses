@@ -369,13 +369,19 @@ public sealed class FoolDominion : MegaCrit.Sts2.Core.Models.Dread.DominionModel
 ///   身上什么都没有；而且提示框显示的是原始 key（因为 powers.json 里从来没有
 ///   `WATCHER_FAITH_POWER.title/.description` 这两条，v0.2.781 一起补了 16 语言）。
 ///
-/// 现在按口径改成**只给敌人**挂。虔信本身的行为（<see cref="Powers.WatcherFaithPower"/>）不变：
-/// **谁身上有虔信，谁的回合开始就给观者 `Amount` 层真言**。
-/// （⚠ 普通房间里场上没有观者，所以这条在普通房间里不会真的产生真言 —— 见下方注释。）
+/// 现在按口径改成**只给敌人**挂，而且挂的是专门给这类怪物写的
+/// <see cref="Powers.WatcherDominionDevotionPower"/>（不是观者自己那层 `WatcherFaithPower`），
+/// 因为用户把效果说清楚了：
+///   > 「就是给敌人挂虔信，积累 10 点真言后消耗 10 点真言进神格（本回合 3 倍伤害）一回合。
+///   >   这些敌人的虔信在**玩家回合开始时**触发，并且在进神格的当回合开始时不会退出神格，
+///   >   **执行完自己的意图才会退神格**……（也就是怪物第四回合、第七回合等回合会进神格，
+///   >   当回合伤害翻三倍）」
+/// ⇒ 3 层/回合 ⇒ 第 4 / 7 / 10 回合各进一次神格。**与神格观那条链完全隔离**，
+///   她身上不会挂这个（持有者是我们自己的 `CharBossMonster` 时直接跳过）。
 /// </summary>
 public sealed class WatcherDevotionDominion : MegaCrit.Sts2.Core.Models.Dread.DominionModel
 {
-    /// <summary>每个敌人获得的虔信层数（= 它回合开始时观者获得的真言层数）。</summary>
+    /// <summary>每个敌人获得的虔信层数（= 每次「玩家回合开始」它获得的真言层数）。</summary>
     private const int FaithStacks = 3;
 
     public override async Task AfterRoomEntered(AbstractRoom room)
@@ -394,14 +400,21 @@ public sealed class WatcherDevotionDominion : MegaCrit.Sts2.Core.Models.Dread.Do
             foreach (var creature in enemies)
             {
                 if (creature == null || !creature.IsAlive) continue;
+                // ★ 我们自己的角色 Boss（比如神格观）有**真的**真言/神格，别给她套仿制版
+                if (creature.Monster is Monsters.CharBossMonster) continue;
+                // 幂等：同一场里已经挂过就不叠（重入/重连不该变成 6 层）
+                if (creature.GetPower<Powers.WatcherDominionDevotionPower>() != null) continue;
+
                 // ★ v0.2.781：挂到**敌人**身上（以前挂玩家 ⇒ 既不符合「所有敌人获得虔信」的口径，
-                //   也给玩家挂了一个莫名其妙的 debuff 图标）。
-                await MegaCrit.Sts2.Core.Commands.PowerCmd.Apply<Powers.WatcherFaithPower>(
+                //   也给玩家挂了一个莫名其妙的 debuff 图标）。虔信的实际结算在
+                //   `WatcherDominionDevotionPower`：**玩家回合开始**给这个敌人 +3 真言，
+                //   满 10 层扣 10 进神格（它那一回合攻击三倍伤害，意图执行完退出）。
+                await MegaCrit.Sts2.Core.Commands.PowerCmd.Apply<Powers.WatcherDominionDevotionPower>(
                     new ThrowingPlayerChoiceContext(), creature, (decimal)FaithStacks, null, null);
                 given++;
             }
             Logger.Log($"[CharBoss] 恐惧模式·观者的支配：{given} 个敌人各获得 {FaithStacks} 层虔信" +
-                       $"（它们的回合开始时观者获得 {FaithStacks} 层真言；本场没有观者时不会产生真言）");
+                       $"（玩家回合开始时它们各 +{FaithStacks} 真言，满 10 层扣 10 进神格：那一回合攻击三倍伤害）");
         }
         catch (Exception e) { Logger.Log("[CharBoss] 观者的支配失败: " + e.Message); }
     }
