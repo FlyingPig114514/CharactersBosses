@@ -4,6 +4,6 @@
     "DREAD.DEFECT.description":  "Defect\u0027s Dominion: at the end of your turn, take 3 damage for each enemy.",
     "DREAD.NECROBINDER.description":  "Necrobinder\u0027s Dominion: at the start of your turn, a random card in your hand costs 1 more this turn.",
     "DREAD.REGENT.description":  "Regent\u0027s Dominion: whenever an enemy attacks you, you lose 1 Strength this turn.",
-    "DREAD.WATCHER.description":  "Kekuasaan Pengamat: pada awal setiap pertarungan, semua pemain memperoleh 3 [gold]Kesalehan[/gold] (saat giliran pemegangnya dimulai, Pengamat memperoleh 3 [gold]Mantra[/gold]).",
+    "DREAD.WATCHER_DEVOTION.description":  "Kekuasaan Pengamat: pada awal setiap pertarungan, semua musuh memperoleh 2 [gold]Pengabdian[/gold] (pada awal giliranmu setiap musuh memperoleh 2 [gold]Mantra[/gold]; saat 10 [gold]Mantra[/gold] ia menghabiskan 10 dan memasuki [gold]Ketuhanan[/gold], memberikan tiga kali kerusakan pada giliran itu).",
     "DREAD.FOOL.description":  "Kekuasaan Si Bodoh: pada awal setiap pertarungan, 2 [gold]Kesedihan[/gold] ditambahkan ke tumpukan undianmu."
 }

@@ -6199,3 +6199,5 @@ Chronological action log.
 | 2026-11-18 18:43 | edit | `src/Hooks/Powers/DominionPowers.cs` | ok | 0 |
 | 2026-11-18 18:44 | edit | `src/Hooks/Core/BuildInfo.cs` | error | 0 |
 | 2026-11-18 18:44 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-18 18:57 | write | `src/Hooks/Patches/DominionDemonFormPatch.cs` | ok | 0 |
+| 2026-11-18 18:57 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |

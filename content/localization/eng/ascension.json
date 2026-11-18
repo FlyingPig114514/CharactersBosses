@@ -4,6 +4,6 @@
     "DREAD.DEFECT.description":  "Defect\u0027s Dominion: at the end of your turn, take 3 damage for each enemy.",
     "DREAD.NECROBINDER.description":  "Necrobinder\u0027s Dominion: at the start of your turn, a random card in your hand costs 1 more this turn.",
     "DREAD.REGENT.description":  "Regent\u0027s Dominion: whenever an enemy attacks you, you lose 1 Strength this turn.",
-    "DREAD.WATCHER.description":  "The Watcher\u0027s Dominion: at the start of every combat, all players gain 3 [gold]Devotion[/gold] (when its holder\u0027s turn begins, the Watcher gains 3 [gold]Mantra[/gold]).",
+    "DREAD.WATCHER_DEVOTION.description":  "The Watcher\u0027s Dominion: at the start of every combat, all enemies gain 2 [gold]Devotion[/gold] (at the start of your turn each enemy gains 2 [gold]Mantra[/gold]; at 10 [gold]Mantra[/gold] it spends 10 and enters [gold]Divinity[/gold], dealing triple attack damage that turn).",
     "DREAD.FOOL.description":  "The Fool's Dominion: at the start of every combat, add 2 [gold]Sadness[/gold] to your draw pile."
 }

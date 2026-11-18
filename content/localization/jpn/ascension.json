@@ -4,6 +4,6 @@
     "DREAD.DEFECT.description":  "Defect\u0027s Dominion: at the end of your turn, take 3 damage for each enemy.",
     "DREAD.NECROBINDER.description":  "Necrobinder\u0027s Dominion: at the start of your turn, a random card in your hand costs 1 more this turn.",
     "DREAD.REGENT.description":  "Regent\u0027s Dominion: whenever an enemy attacks you, you lose 1 Strength this turn.",
-    "DREAD.WATCHER.description":  "観者の支配：戦闘開始時、すべてのプレイヤーは[gold]敬虔[/gold]を3獲得する（保持者のターン開始時、観者は[gold]真言[/gold]を3獲得する）。",
+    "DREAD.WATCHER_DEVOTION.description":  "観者の支配：戦闘開始時、すべての敵は[gold]帰依[/gold]を2獲得する（あなたのターン開始時、各敵は[gold]真言[/gold]を2獲得する。真言が10になると10を消費して[gold]神格[/gold]に入り、そのターンの攻撃は3倍のダメージを与える）。",
     "DREAD.FOOL.description":  "愚者の支配：戦闘開始時、山札に[gold]悲しみ[/gold]を2枚加える。"
 }

@@ -4,6 +4,6 @@
     "DREAD.DEFECT.description":  "Defect\u0027s Dominion: at the end of your turn, take 3 damage for each enemy.",
     "DREAD.NECROBINDER.description":  "Necrobinder\u0027s Dominion: at the start of your turn, a random card in your hand costs 1 more this turn.",
     "DREAD.REGENT.description":  "Regent\u0027s Dominion: whenever an enemy attacks you, you lose 1 Strength this turn.",
-    "DREAD.WATCHER.description":  "Domination de l\u0027Observatrice : au début de chaque combat, tous les joueurs gagnent 3 [gold]Dévotion[/gold] (au début du tour du porteur, l\u0027Observatrice gagne 3 [gold]Mantra[/gold]).",
+    "DREAD.WATCHER_DEVOTION.description":  "Domination de l\u0027Observatrice : au début de chaque combat, tous les ennemis gagnent 2 [gold]Dévouement[/gold] (au début de ton tour, chaque ennemi gagne 2 [gold]Mantra[/gold] ; à 10 [gold]Mantra[/gold], il en dépense 10 et entre en [gold]Divinité[/gold], infligeant le triple des dégâts ce tour-là).",
     "DREAD.FOOL.description":  "Domination du Fou : au début de chaque combat, 2 [gold]Tristesse[/gold] sont ajoutées à ta pioche."
 }

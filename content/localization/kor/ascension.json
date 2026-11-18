@@ -4,6 +4,6 @@
     "DREAD.DEFECT.description":  "Defect\u0027s Dominion: at the end of your turn, take 3 damage for each enemy.",
     "DREAD.NECROBINDER.description":  "Necrobinder\u0027s Dominion: at the start of your turn, a random card in your hand costs 1 more this turn.",
     "DREAD.REGENT.description":  "Regent\u0027s Dominion: whenever an enemy attacks you, you lose 1 Strength this turn.",
-    "DREAD.WATCHER.description":  "관측자의 지배: 전투 시작 시 모든 플레이어가 [gold]경건[/gold]을 3 얻는다(보유자의 턴 시작 시 관측자가 [gold]진언[/gold]을 3 얻는다).",
+    "DREAD.WATCHER_DEVOTION.description":  "관측자의 지배: 전투 시작 시 모든 적이 [gold]경건[/gold]을 2 얻는다(당신의 턴 시작 시 각 적이 [gold]진언[/gold]을 2 얻는다. 진언이 10이 되면 10을 소모하고 [gold]신격[/gold]에 들어가 그 턴 공격이 세 배의 피해를 준다).",
     "DREAD.FOOL.description":  "광대의 지배: 전투 시작 시 뽑을 카드 더미에 [gold]슬픔[/gold]을 2장 추가한다."
 }

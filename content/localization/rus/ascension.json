@@ -4,6 +4,6 @@
     "DREAD.DEFECT.description":  "Defect\u0027s Dominion: at the end of your turn, take 3 damage for each enemy.",
     "DREAD.NECROBINDER.description":  "Necrobinder\u0027s Dominion: at the start of your turn, a random card in your hand costs 1 more this turn.",
     "DREAD.REGENT.description":  "Regent\u0027s Dominion: whenever an enemy attacks you, you lose 1 Strength this turn.",
-    "DREAD.WATCHER.description":  "Господство Наблюдателя: в начале каждого боя все игроки получают 3 [gold]Благочестия[/gold] (в начале хода владельца Наблюдатель получает 3 [gold]мантры[/gold]).",
+    "DREAD.WATCHER_DEVOTION.description":  "Господство Наблюдателя: в начале каждого боя все враги получают 2 [gold]Преданности[/gold] (в начале вашего хода каждый враг получает 2 [gold]мантры[/gold]; при 10 [gold]мантры[/gold] он тратит 10 и входит в [gold]Божественность[/gold], нанося в этот ход тройной урон).",
     "DREAD.FOOL.description":  "Господство Шута: в начале каждого боя в твою колоду добора добавляются 2 [gold]Грусти[/gold]."
 }
