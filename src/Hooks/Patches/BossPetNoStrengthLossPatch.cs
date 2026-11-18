@@ -12,18 +12,23 @@ using CharacterBosses.Monsters;
 namespace CharacterBosses.Patches;
 
 /// <summary>
-/// **群体减力量**（「尖啸」<c>PiercingWail</c>：所有敌人在本回合失去 N 点力量，升级 +2；
-/// 以及同类「黑暗镣铐」那种 `TemporaryStrengthPower`）**不作用于 Boss 的召唤物**（用户的奥斯提）。
+/// **随从（奥斯提）不吃任何负面效果**。
 ///
-/// 用户 2026-10-23 要求：「让尖啸这种群体减力量不会影响奥斯提」。
-/// 为什么要改：那些牌是「所有敌人」——而奥斯提是我们的 Boss 侧的随从，同样在敌人列表里，
-/// 于是玩家一张尖啸把奥斯提的力量也减了，奥斯提的伤害（以及它的意图预览）就平白变低，
-/// 而设计上奥斯提只该吃「它的主人」那套数值。
+/// 用户 2026-10-23：「让尖啸这种群体减力量不会影响奥斯提」——
+/// 那些牌是「所有敌人」，而奥斯提是 Boss 侧随从、同样在敌人列表里，
+/// 玩家一张尖啸就把奥斯提的力量也减了，它的伤害（以及意图预览）就平白变低。
+///
+/// 用户 2026-11-19（本轮）：「**奥斯提不应该被施加任何减益**」——
+/// 实测：带「储君的支配」（王之凝视）的普通小怪攻击亡灵契约师时，
+/// 奥斯提替主人挨了这一下 ⇒ `MonarchsGazeStrengthDownPower`（`TemporaryStrengthPower`，`IsPositive=false`
+/// ⇒ `Type == Debuff`）落到了**玩家自己那只**奥斯提身上。
+/// 以前这里只认 `IsBossPet`（我们 Boss 那侧的随从）⇒ 玩家那只完全没被管到。
+/// 现在两只都管（判据复用 `Core.BossOsty.IsAnyOsty`，与「奥斯提不吃毒」同一套）：
+///   · **Boss 侧随从**：任何来源的负面都不给；施加者是真人玩家时连正面也不给（2026-10-23 口径）。
+///   · **玩家的奥斯提**：**只拦减益**（正面效果照原版），避免扩大改动面。
 ///
 /// 做法：切 <c>PowerCmd.Apply(ctx, PowerModel, Creature, decimal, Creature, CardModel, bool)</c>
-/// 这个**非泛型**重载（泛型 <c>Apply&lt;T&gt;</c> 最终都走它）：
-/// 只要「施加的是减力量类的能力」+「目标是某只 CharacterBosses Boss 的随从」+「施加者是真人玩家」
-/// ⇒ 直接跳过。
+/// 这个**非泛型**重载（泛型 <c>Apply&lt;T&gt;</c> 最终都走它）。
 /// </summary>
 [HarmonyPatch(typeof(PowerCmd), nameof(PowerCmd.Apply),
               new[] { typeof(PlayerChoiceContext), typeof(PowerModel), typeof(Creature), typeof(decimal),
@@ -36,7 +41,15 @@ public static class BossPetNoStrengthLossPatch
     {
         try
         {
-            if (!IsBossPet(target)) return true;
+            bool bossPet = IsBossPet(target);
+
+            // ★ v0.2.790（用户 2026-11-19）：「奥斯提不应该被施加任何减益」——
+            //   以前这里只管**我们 Boss 那边**的随从（`IsBossPet`），于是玩家自己那只奥斯提
+            //   照样吃到「王之凝视」这类减益（实测：带储君的支配的小怪打亡灵契约师，
+            //   奥斯提替主人挨这一下 ⇒ `MonarchsGazeStrengthDownPower` 落到奥斯提身上）。
+            //   现在**两只奥斯提都免疫减益**（判据复用 `BossOsty.IsAnyOsty`，与「奥斯提不吃毒」同一个）。
+            bool anyOsty = !bossPet && Core.BossOsty.IsAnyOsty(target);
+            if (!bossPet && !anyOsty) return true;
 
             // ★ 2026-11-10（用户：「奥斯提不应该会获得负面效果」——实测王储的**临时减力量**能落到她那只
             //   奥斯提身上）：以前只在「施加者是真人玩家」时才拦，于是**她自己/她的牌**给的负面
@@ -49,10 +62,20 @@ public static class BossPetNoStrengthLossPatch
             bool debuff = false;
             try { if (power != null && amount != 0m) debuff = power.GetTypeForAmount(amount) == PowerType.Debuff; }
             catch { debuff = false; }
+            bool harmful = debuff || amount < 0m;         // 负数力量（直接扣力量）也算负面
 
-            if (!debuff && !fromPlayer) return true;      // 她自己给的正面效果 → 照常
+            if (bossPet)
+            {
+                if (!harmful && !fromPlayer) return true;  // 她自己给的正面效果 → 照常
+            }
+            else
+            {
+                // 玩家自己那只奥斯提：**只**拦减益，正面效果照原版走（不扩大改动面）
+                if (!harmful) return true;
+            }
 
-            Logger.Log($"[CharBoss] Boss 随从免疫{(debuff ? "负面" : "外部")}效果：跳过 {SafeEntry(power)} " +
+            Logger.Log($"[CharBoss] {(bossPet ? "Boss 随从" : "玩家的奥斯提")}免疫" +
+                       $"{(harmful ? "负面" : "外部")}效果：跳过 {SafeEntry(power)} " +
                        $"{amount:+0;-0} → {target.Name}（施加者 {(applier == null ? "null" : applier.Name)}）");
             __result = Task.CompletedTask;                  // ⚠ 返回 false 必须给 Task，否则 await null 崩
             return false;
