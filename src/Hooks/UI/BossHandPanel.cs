@@ -325,7 +325,16 @@ public partial class BossHandPanel : Control
         {
             Logger.Log("[CharBoss] 消耗特效（手牌栏）失败: " + e.Message);
         }
+        // ★ v0.2.778：以前这里静默返回 false，于是「三次净化+ 只有最后一次有特效」这种问题
+        //   在日志里一点痕迹都没有。现在打一行，直接能看出是「面板里没有这一格」。
+        Logger.Log($"[CharBoss] 消耗特效：手牌栏里没有 {SafeEntryOf(card)} 这一格" +
+                   " ⇒ 这次只有数据被消耗、没有烧牌动画");
         return false;
+    }
+
+    private static string SafeEntryOf(CardModel? card)
+    {
+        try { return card?.Id.Entry ?? "?"; } catch { return "?"; }
     }
 
     public void Reset()

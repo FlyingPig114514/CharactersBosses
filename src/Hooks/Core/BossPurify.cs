@@ -51,7 +51,28 @@ internal static class BossPurify
                 if (card != null) targets.Add(card);
             }
 
-            // 等净化本身结算完（约 0.3 秒）再消耗，不然会把还在场上的牌提前收走、看不到动画
+            // ★ v0.2.778（用户 2026-11-19：「能不能让三次净化+ 都有烧牌特效？现在只有最后一次有」）：
+            //   **特效必须当场播，不能等那 300ms。** 以前顺序是「等 300ms → 逐张 PlayExhaustFx + Exhaust」，
+            //   而第 6 / 第 8 回合的「净化+」正好是那一回合的**最后一张牌**：300ms 一过，回合已经收尾、
+            //   手牌栏跟着重建 ⇒ 那几张牌的格子早没了 ⇒ `PlayExhaustFx` 找不到格子、静默什么都不做
+            //   （所以只有第 11 回合那次看得到 —— 它后面还有一张「警惕」，300ms 落在回合中途）。
+            //   现在**先把卡面搬到 HUD 层、把烧牌特效点着**（`PlayExhaustFx` 会把 NCard 从面板里摘走 ⇒
+            //   之后再怎么重建手牌都拆不掉它），等 300ms 再走数据（`CardCmd.Exhaust`）。
+            try
+            {
+                var panel = CharacterBosses.UI.BossHandUi.PanelFor(boss);
+                int fx = 0;
+                foreach (var card in targets)
+                {
+                    try { if (panel != null && panel.PlayExhaustFx(card)) fx++; }
+                    catch (Exception e) { if (_logs++ < 10) Logger.Log("[CharBoss] 净化+：烧牌特效失败: " + e.Message); }
+                }
+                if (_logs++ < 20)
+                    Logger.Log($"[CharBoss] 净化+：烧牌特效 {fx}/{targets.Count} 张（当场播；之后才挪数据）");
+            }
+            catch { /* 纯表现 */ }
+
+            // 等净化本身结算完（约 0.3 秒）再挪数据，不然会把还在场上的牌提前收走
             try { await Task.Delay(300); } catch { /* 忽略 */ }
             var ctx = new MegaCrit.Sts2.Core.GameActions.Multiplayer.BlockingPlayerChoiceContext();
             int done = 0;
@@ -59,19 +80,15 @@ internal static class BossPurify
             {
                 try
                 {
-                    // ★ v0.2.773（用户 2026-11-19：「能不能让净化烧牌有特效？真的牌被消耗了的动画和音效」）：
-                    //   两处根因，一起修 ——
+                    // ★ v0.2.773（用户 2026-11-19：「真的牌被消耗了的动画和音效」）：
                     //   ① 以前先 `RemoveInternal(card, true)` 再 `CardPileCmd.Add`。反编译 `CardPileCmd.Add`
                     //      可见它自己会 `card.RemoveFromCurrentPile(skipVisuals)` + 播换堆动画；
                     //      我们先摘一次 ⇒ `oldPile == null` ⇒ 那条动画整段走不到，卡面节点也没了。
                     //   ② 就算不先摘，原版那条换堆动画对**非本机玩家**的牌是**整段跳过**的
                     //      （`GetTweenForCardsChangingPiles`：`if (!LocalContext.IsMe(card.Owner) && …) continue;`），
                     //      而她的牌属于**影子玩家** ⇒ 永远不会飞、也不会响烧牌音效。
-                    //   ⇒ 特效自己做（`BossHandUi.PanelFor(boss).PlayExhaustFx`，照原版
-                    //      `NCardExhaustQuickVfx` + `card_exhaust.mp3` 那三步），
+                    //   ⇒ 特效自己做（上面那段，照原版 `NCardExhaustQuickVfx` + `card_exhaust.mp3` 那三步），
                     //      数据走原版 `CardCmd.Exhaust`（含 History 记录 + `AfterCardExhausted` 钩子）。
-                    try { CharacterBosses.UI.BossHandUi.PanelFor(boss)?.PlayExhaustFx(card); }
-                    catch { /* 纯表现 */ }
                     await CardCmd.Exhaust(ctx, card, false, false);
                     done++;
                 }
