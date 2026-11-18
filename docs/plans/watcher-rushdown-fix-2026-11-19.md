@@ -194,6 +194,51 @@ TaskHelper.RunSafely(vfx.PlayAnimation());                     // 蓄力 → 吸
 + `BossHandPanel.PlayExhaustFx(card)`；数据改走原版 `CardCmd.Exhaust`（含 `History.CardExhausted`
 与 `AfterCardExhausted` 钩子）。
 
+### 5.3 第 12 回合**不打攻击牌**就变成「不惧妖邪无限」了（v0.2.774）
+
+用户截图 + 日志（15:03~15:07 那一场，v0.2.773）：
+
+```
+15:05:18 12 回合：玩家打出过攻击牌 ⇒ 切换成「不惧妖邪无限」计划   ← 这行出现在**她第 11 回合**里
+15:05:19 剧本第 12 回合: 打 [ERUPTION,CONSECRATE,FEAR_NO_EVIL, …]  ← 第 12 回合的手牌直接是切换段
+```
+
+`SwitchRequested` / `_switchLocked` **从来不按轮清零**（v0.2.769 当时怕「清早了」，只清了「她回合开始时」）。
+于是**第 11 回合**打过的攻击牌一路带进第 12 回合 ⇒ 一进第 12 回合 `PrepareTurn` 就按切换段造手牌。
+
+修法：`PrepareTurn`（玩家回合开始、`TurnAt` 之前）调 `BossScript.ResetSwitchForNewRound()`
+把两者一起清掉；这一轮**真的**打出攻击牌时再由 `RebuildForSwitch` 当场切过去（§5.1）。
+
+### 5.4 后面那些「暴怒」伤害翻倍、还少了强化/牺牲（v0.2.774）
+
+用户原话：「除了第一张暴怒以外后面暴怒的伤害不对，因为不惧妖邪进了平静，所以那些暴怒的伤害
+不应该翻倍，并且应该带有强化和牺牲，就像第一张那样」。
+
+日志铁证（15:05:19 / 15:06:09）：
+
+```
+意图 WATCHER-ERUPTION: [LiveSingleAttackIntent+BuffIntent+SacrificeIntent]   ← 第一张（在平静）
+意图 WATCHER-FEAR_NO_EVIL: [LiveSingleAttackIntent]
+意图 WATCHER-ERUPTION: [LiveSingleAttackIntent]                              ← 后面几张：强化/牺牲被摘掉
+```
+
+根因：剧本推演的「观者姿态」模型漏了**不惧妖邪**。它的判据就是「被锁玩家本回合打出过攻击牌 ⇒ 进平静」，
+而「不惧妖邪无限」那套计划**正因为**玩家打了攻击牌才会被切上来 ⇒ 推演时它必然把她带进**平静**。
+推演却以为她还在愤怒 ⇒ 后面的暴怒按 ×2 画、且 `ApplyWatcherStanceIntents` 按 `inWrath=true`
+把强化与牺牲摘掉。
+
+修法：四处一起补「不惧妖邪 ⇒ 平静（×1）」：
+`BossScriptPlanner.plannedStanceMul`、同一处的 `watcherCalm` 记账、
+`BossIntentBuilder.StanceAfterPlay`、`BossIntentBuilder.StanceAfterEntry`。
+
+### 5.5 顺带发现：第 8 回合的净化+ 只烧掉 1/5 张（v0.2.775）
+
+日志：`15:05:01 净化+：按剧本点名消耗了 1/5 张（StrikeWatcher×4,DefendWatcher）`
+（同一场的 T6 / T11 是 5/5 正常）。根因是**时序**：以前「等 300ms 再逐张 `Find`」，
+而这 300ms + 每张的换堆动画一旦跨过她的回合边界，下一回合的 `BuildHand` 会把旧手牌整批清掉
+（换成新实例）⇒ 后面几张再也找不到。现在**先把她点名的牌全部抓成实参**，等 300ms 之后逐张烧；
+顺带按「未被占用」去重（`Find` 每次只返回同类型第一张，写「防御×3」会拿到同一个实例三次）。
+
 ---
 
 ## 待实机验证（下一场打红蓝观时看这几行）
