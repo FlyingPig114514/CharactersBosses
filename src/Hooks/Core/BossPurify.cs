@@ -35,15 +35,28 @@ internal static class BossPurify
             if (entry == null || entry.ExhaustWith == null || entry.ExhaustWith.Length == 0) return;
 
             var pcs = boss.Shadow.PlayerCombatState;
+
+            // ★ v0.2.775（2026-11-19 日志实证：「第 8 回合的净化+ 只烧了 1/5 张」）：
+            //   **先把这 5 张抓成实参**，再等 0.3 秒去烧。以前是「等完 300ms 再逐张 Find」，
+            //   而这 300ms + 每张的换堆动画一旦跨过她的回合边界，下一回合的 `BuildHand`
+            //   会把旧手牌整批清掉（新实例顶上）⇒ 后面几张再也找不到，只烧掉 1 张。
+            //
+            //   同时按「未被占用」去重：`Find` 每次都返回同类型的**第一张**，直接连续调用
+            //   会拿到同一个实例三次（T6 的 防御×3 就是这种），现在跳过已经收过的那几张。
+            var targets = new List<CardModel>();
+            foreach (var type in entry.ExhaustWith)
+            {
+                if (type == null) continue;
+                var card = FindUnused(pcs, type, targets);
+                if (card != null) targets.Add(card);
+            }
+
             // 等净化本身结算完（约 0.3 秒）再消耗，不然会把还在场上的牌提前收走、看不到动画
             try { await Task.Delay(300); } catch { /* 忽略 */ }
             var ctx = new MegaCrit.Sts2.Core.GameActions.Multiplayer.BlockingPlayerChoiceContext();
             int done = 0;
-            foreach (var type in entry.ExhaustWith)
+            foreach (var card in targets)
             {
-                if (type == null) continue;
-                var card = Find(pcs, type);
-                if (card == null) continue;
                 try
                 {
                     // ★ v0.2.773（用户 2026-11-19：「能不能让净化烧牌有特效？真的牌被消耗了的动画和音效」）：
@@ -64,7 +77,7 @@ internal static class BossPurify
                 }
                 catch (Exception e)
                 {
-                    if (_logs++ < 10) Logger.Log($"[CharBoss] 净化+：消耗 {type.Name} 失败: {e.Message}");
+                    if (_logs++ < 10) Logger.Log($"[CharBoss] 净化+：消耗 {card.GetType().Name} 失败: {e.Message}");
                 }
             }
 
@@ -99,6 +112,21 @@ internal static class BossPurify
         foreach (var c in pcs.Hand.Cards) if (c != null && c.GetType() == type) return c;
         foreach (var c in pcs.DrawPile.Cards) if (c != null && c.GetType() == type) return c;
         foreach (var c in pcs.DiscardPile.Cards) if (c != null && c.GetType() == type) return c;
+        return null;
+    }
+
+    /// <summary>
+    /// 同 <see cref="Find"/>，但跳过 <paramref name="taken"/> 里已经收过的实例。
+    /// 剧本里写「防御×3」时三次调用必须拿到**三张不同的牌**（`Find` 每次只返回第一张）。
+    /// </summary>
+    private static CardModel? FindUnused(PlayerCombatState pcs, Type type, List<CardModel> taken)
+    {
+        foreach (var c in pcs.Hand.Cards)
+            if (c != null && c.GetType() == type && !taken.Contains(c)) return c;
+        foreach (var c in pcs.DrawPile.Cards)
+            if (c != null && c.GetType() == type && !taken.Contains(c)) return c;
+        foreach (var c in pcs.DiscardPile.Cards)
+            if (c != null && c.GetType() == type && !taken.Contains(c)) return c;
         return null;
     }
 }
