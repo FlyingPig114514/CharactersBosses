@@ -62,13 +62,15 @@ internal static class BossPurify
             {
                 var panel = CharacterBosses.UI.BossHandUi.PanelFor(boss);
                 int fx = 0;
-                foreach (var card in targets)
+                // ★ v0.2.779：多张错开 90ms 一张接一张地烧（同一帧一起烧看起来像「只烧了一张」）
+                for (int i = 0; i < targets.Count; i++)
                 {
-                    try { if (panel != null && panel.PlayExhaustFx(card)) fx++; }
+                    var card = targets[i];
+                    try { if (panel != null && panel.PlayExhaustFx(card, i * 90)) fx++; }
                     catch (Exception e) { if (_logs++ < 10) Logger.Log("[CharBoss] 净化+：烧牌特效失败: " + e.Message); }
                 }
                 if (_logs++ < 20)
-                    Logger.Log($"[CharBoss] 净化+：烧牌特效 {fx}/{targets.Count} 张（当场播；之后才挪数据）");
+                    Logger.Log($"[CharBoss] 净化+：烧牌特效 {fx}/{targets.Count} 张（当场搬出面板，按 90ms 逐张烧）");
             }
             catch { /* 纯表现 */ }
 

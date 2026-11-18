@@ -144,7 +144,12 @@ internal static class BossHandPlayFx
     ///
     /// 所有权：本方法接管 <paramref name="cell"/>（调用方不要再 QueueFree）。
     /// </summary>
-    public static void Exhaust(Control cell)
+    /// <param name="delayMs">
+    /// ★ v0.2.779（用户 2026-11-19：「第十一回合净化只烧掉了一张牌」）：多张牌同时烧时错开一点，
+    /// 否则 5 张特效在同一帧一起「瞬间烧完」，看起来就像只烧了一张。**卡面仍然是当场搬出面板的**
+    /// （这一步必须同步做，否则回合收尾重建手牌会把它拆掉），只是把**特效播放**延后。
+    /// </param>
+    public static void Exhaust(Control cell, int delayMs = 0)
     {
 #if STS2_111
         try
@@ -187,15 +192,14 @@ internal static class BossHandPlayFx
             cardNode.MouseFilter = Control.MouseFilterEnum.Ignore;
             if (GodotObject.IsInstanceValid(cell)) cell.QueueFree();   // 格子空了，直接收掉
 
-            var vfx = MegaCrit.Sts2.Core.Nodes.Vfx.Cards.NCardExhaustQuickVfx.Create(cardNode);
-            if (vfx == null)
+            if (delayMs > 0)
             {
-                cardNode.QueueFree();
+                // 卡面已经搬出面板了（面板重建拆不到它），只是晚一点再烧，让多张牌一张接一张地烧
+                var node = cardNode;
+                MegaCrit.Sts2.Core.Helpers.TaskHelper.RunSafely(BurnLater(node, delayMs));
                 return;
             }
-            try { MegaCrit.Sts2.Core.Audio.Debug.NDebugAudioManager.Instance?.Play("card_exhaust.mp3"); }
-            catch { /* 音效失败不影响动画 */ }
-            MegaCrit.Sts2.Core.Helpers.TaskHelper.RunSafely(vfx.PlayAnimation());
+            Burn(cardNode);
         }
         catch (Exception e)
         {
@@ -207,6 +211,38 @@ internal static class BossHandPlayFx
         FreeNow(cell);
 #endif
     }
+
+#if STS2_111
+    /// <summary>等 <paramref name="delayMs"/> 毫秒再烧（错开多张牌的特效）。</summary>
+    private static async Task BurnLater(MegaCrit.Sts2.Core.Nodes.Cards.NCard node, int delayMs)
+    {
+        try
+        {
+            await Task.Delay(delayMs);
+            Burn(node);
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 烧牌特效（延迟）失败: " + e.Message); }
+    }
+
+    /// <summary>照原版「手牌 ⇒ 消耗堆」那三步：`NCardExhaustQuickVfx.Create` + `card_exhaust.mp3` + `PlayAnimation`。</summary>
+    private static void Burn(MegaCrit.Sts2.Core.Nodes.Cards.NCard? cardNode)
+    {
+        try
+        {
+            if (cardNode == null || !GodotObject.IsInstanceValid(cardNode)) return;
+            var vfx = MegaCrit.Sts2.Core.Nodes.Vfx.Cards.NCardExhaustQuickVfx.Create(cardNode);
+            if (vfx == null)
+            {
+                cardNode.QueueFree();
+                return;
+            }
+            try { MegaCrit.Sts2.Core.Audio.Debug.NDebugAudioManager.Instance?.Play("card_exhaust.mp3"); }
+            catch { /* 音效失败不影响动画 */ }
+            MegaCrit.Sts2.Core.Helpers.TaskHelper.RunSafely(vfx.PlayAnimation());
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 烧牌特效播放失败: " + e.Message); }
+    }
+#endif
 
     /// <summary>出牌区中心：<c>PlayContainer</c> 能用就用它（原版就是这么算的），否则退到屏幕中央偏上。</summary>
     private static Vector2 PlayArea(Control cell)

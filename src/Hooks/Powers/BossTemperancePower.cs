@@ -72,6 +72,27 @@ public sealed class BossTemperancePower : PowerModel
     }
 
     /// <summary>
+    /// ★ v0.2.779（用户 2026-11-19：「我刚刚测完红蓝观去测预见观，结果预见观的特殊效果被换成了红蓝观的特殊效果」）：
+    ///   这个 power 只属于**特殊效果就是「节制」的那只 Boss**。以前 `PlayOne` 对**每一只** Boss 都会调
+    ///   <see cref="NoteCardPlayedAsync"/>，而它「她身上没有这层 buff 就自己补挂」⇒ **任何** Boss 打完第一张牌
+    ///   都会被塞上「节制」，于是预见观也跟着按 12 张牌结算。日志实证（15:32:49 / 15:34:20，预见观那一场）：
+    ///   <code>
+    ///   节制：她身上原来没有这层 buff ⇒ 已补挂
+    ///   节制：满 12 张 ⇒ 结束她的回合 + 她与友方 +2 力量
+    ///   </code>
+    /// </summary>
+    private static bool IsTemperanceBoss(Monsters.CharBossMonster? boss)
+    {
+        try
+        {
+            var def = boss?.Def;
+            if (def == null || boss == null) return false;
+            return def.SpecialPowerForAct(boss.ActIndex) == typeof(BossTemperancePower);
+        }
+        catch { return false; }
+    }
+
+    /// <summary>
     /// **由 `CharBossMonster.PlayOne` 直接调用**（用户 2026-11-18：「特殊效果没有正确的按她自己打牌计数」）。
     ///
     /// ⚠ v0.2.771 更正：v0.2.768 当时判断「`PowerModel.AfterCardPlayed` 在她这只 Boss 身上根本不派发」——
@@ -85,6 +106,8 @@ public sealed class BossTemperancePower : PowerModel
         try
         {
             if (boss?.Creature == null) return;
+            // ★ v0.2.779：不是「节制」那只 Boss（例如预见观 / Ω观）⇒ 不数、更不许补挂
+            if (!IsTemperanceBoss(boss)) return;
             var power = boss.Creature.GetPower<BossTemperancePower>();
             if (power == null)
             {
@@ -141,6 +164,7 @@ public sealed class BossTemperancePower : PowerModel
             if (shadow == null || cardPlay?.Card == null) return Task.CompletedTask;
 
             if (ReferenceEquals(cardPlay.Card.Owner, shadow)) return Task.CompletedTask;   // 她的牌：不在这里数
+            if (!IsTemperanceBoss(boss)) return Task.CompletedTask;   // 别的 Boss 不打「换不惧妖邪无限」这套
 
             bool attack = false;
             try { attack = cardPlay.Card.Type == CardType.Attack; } catch { /* 忽略 */ }

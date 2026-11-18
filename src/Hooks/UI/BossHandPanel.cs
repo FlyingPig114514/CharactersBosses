@@ -304,7 +304,7 @@ public partial class BossHandPanel : Control
     /// 交给 <see cref="BossHandPlayFx.Exhaust"/> 接管（它负责把卡面搬到 HUD 层上播烧牌特效）。
     /// 找不到格子（这张牌不在手牌里、在抽牌堆/弃牌堆）就只返回 false，由调用方照常挪数据。
     /// </summary>
-    public bool PlayExhaustFx(CardModel card)
+    public bool PlayExhaustFx(CardModel card, int delayMs = 0)
     {
         try
         {
@@ -314,7 +314,7 @@ public partial class BossHandPanel : Control
 
                 var cell = _cells[i];
                 _cells.RemoveAt(i);
-                if (IsInstanceValid(cell.Node)) BossHandPlayFx.Exhaust(cell.Node);
+                if (IsInstanceValid(cell.Node)) BossHandPlayFx.Exhaust(cell.Node, delayMs);
 
                 _layoutDirty = true;
                 LayoutCells();

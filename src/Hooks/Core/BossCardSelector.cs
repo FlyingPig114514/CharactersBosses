@@ -161,6 +161,60 @@ public sealed class BossCardSelector : ICardSelector
         catch { return null; }
     }
 
+    /// <summary>
+    /// **按剧本点名「捞回手牌」**（`ScriptCard.ReturnsToHand`，例如红蓝观第 3 回合的冥想捞暴怒+、
+    /// 第 10 回合的冥想捞内心宁静）。
+    ///
+    /// 只在「发起这次选择的那张牌」正好是剧本里点了 `ReturnsToHand` 的那张时生效；
+    /// 按 `SameCardType`（认多人换牌 / 升级版）在候选项里找，找到就放进 `picked`。
+    /// 返回捞到几张（0 = 剧本没点名或点名的牌不在候选项里 ⇒ 调用方继续走原有兜底）。
+    /// </summary>
+    private static int TakeReturnsToHand(Monsters.CharBossMonster? boss, int turn,
+                                         MegaCrit.Sts2.Core.Models.CardModel? actingCard,
+                                         List<CardModel> rest, List<CardModel> picked, int count)
+    {
+        try
+        {
+            if (boss == null || actingCard == null || rest == null || picked == null) return 0;
+            var scriptTurn = boss.Def?.ScriptForAct(boss.ActIndex)?.TurnAt(turn);
+            if (scriptTurn?.Cards == null) return 0;
+
+            foreach (var entry in scriptTurn.Cards)
+            {
+                if (entry?.Card == null) continue;
+                var wants = entry.ReturnsToHand;
+                if (wants == null || wants.Length == 0) continue;
+                if (!SameCardType(entry.Card, actingCard, boss)) continue;
+
+                int got = 0;
+                var names = new List<string>();
+                foreach (var want in wants)
+                {
+                    if (want == null || picked.Count >= count) break;
+                    for (int i = 0; i < rest.Count; i++)
+                    {
+                        if (!SameCardType(want, rest[i], boss)) continue;
+                        var card = rest[i];
+                        picked.Add(card);
+                        rest.RemoveAt(i);
+                        got++;
+                        try { names.Add(card.Id.Entry); } catch { names.Add("?"); }
+                        break;
+                    }
+                }
+                if (got > 0)
+                {
+                    Logger.Log($"[CharBoss] 冥想/捞牌：按剧本第 {turn} 回合的点名捞回 {got} 张" +
+                               $"（[{string.Join(",", names)}]）");
+                    return got;
+                }
+                return 0;      // 剧本点名了但候选里没有 → 交给调用方的兜底
+            }
+        }
+        catch { /* 忽略 */ }
+        return 0;
+    }
+
     /// <summary>把剧本第 <paramref name="turn"/> 回合点名（烧/丢）的牌补进该回合名单；返回是否补到了。</summary>
     private static bool SeededMark(Monsters.CharBossMonster boss, int turn, List<CardModel> options)
     {
@@ -580,12 +634,26 @@ public sealed class BossCardSelector : ICardSelector
         }
 
 
+        // ★ v0.2.779（用户 2026-11-19）：「冥想的捞牌没有具体点名，导致捞的牌错了
+        //   （第 3 回合该捞暴怒+、第 10 回合该捞内心宁静）」。
+        //   剧本里本来就写了 `Play(Meditate, returns: Eruption / InnerPeace)`（= `ScriptCard.ReturnsToHand`），
+        //   但选择器的「点名」只认 **烧 / 丢** 两种标记 ⇒ 冥想这次选择拿到的是**空名单**，
+        //   直接退化成兜底挑牌。日志实证（15:27:47、15:29:13）：
+        //     `自动选择: 候选 12 个（min=1 max=1）→ 选 [PURITY]
+        //      （第 3 回合，发起者=WATCHER_MEDITATE 的点名：0 张按实例 + 0 张按牌名 + 其余 1 张兜底；名单 0 条）`
+        //   ⇒ 捞到了「净化+」而不是暴怒+。现在先按剧本的「捞回手牌」点名捞，捞到了就不再走下面的兜底。
+        int namedReturns = count > 0
+            ? TakeReturnsToHand(bossNow, turnNow, actingCard, rest, picked, count)
+            : 0;
+
         // ★ v0.2.696（用户 2026-11-16：「更改冥想的捞牌，让它一定会捞到点穴」）：
         //   「冥想」是 `CardSelectCmd.FromCombatPile(弃牌堆)`（反编译 `Watcher.Code.Cards.Uncommon.Meditate`：
         //   `FromCombatPile(ctx, GetPile((PileType)3, owner), ...)` ⇒ 从**弃牌堆**捞 N 张回手，然后进平静、结束回合）。
         //   用户要的是「一定捞点穴」⇒ 这一条排在**所有**点名之前：只要候选（= 弃牌堆）里有「点穴」就先拿它。
+        //   ⚠ v0.2.779：剧本**明确点名**了的时候（`ReturnsToHand`，例如红蓝观的暴怒+ / 内心宁静）以剧本为准，
+        //   这条只当兜底 —— 否则红蓝观的冥想会去捞观者牌堆里根本不存在的「点穴」。
 #if STS2_111
-        if (count > 0 && actingCard != null)
+        if (count > 0 && actingCard != null && namedReturns == 0)
         {
             string actingEntry = string.Empty;
             try { actingEntry = actingCard.Id.Entry; } catch { /* 忽略 */ }
