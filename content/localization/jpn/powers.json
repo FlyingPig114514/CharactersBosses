@@ -137,6 +137,8 @@
     "BOSS_DEVOTION_POWER.description":  "あなたがカードをプレイするたび、観者は[gold]真言[/gold]を1獲得する。\n観者のターン開始時、彼女は[gold]真言[/gold]を5失う（最大で全て）。\n彼女が[gold]真言[/gold]を10獲得するたび、彼女は現在のスタンスを終了し、[gold]力[/gold]を2獲得してから[gold]神格[/gold]に入り、以降ターン開始時に[gold]神格[/gold]を終了しなくなる。\n[gold]神格[/gold]：このスタンスに入ると[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img][img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img][img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]。このスタンス中、あなたの攻撃は3倍のダメージを与える。",
     "BOSS_DEVOTION_POWER.description_dread":  "あなたがカードをプレイするたび、観者は[gold]真言[/gold]を1獲得する。\n観者のターン開始時、彼女は[gold]真言[/gold]を3失う（最大で全て）。\n彼女が[gold]真言[/gold]を10獲得するたび、彼女は現在のスタンスを終了し、[gold]力[/gold]を2獲得してから[gold]神格[/gold]に入り、以降ターン開始時に[gold]神格[/gold]を終了しなくなる。\n[gold]神格[/gold]：このスタンスに入ると[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img][img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img][img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]。このスタンス中、あなたの攻撃は3倍のダメージを与える。",
     "WATCHER_FASTING_POWER.title":  "Fast",
+    "WATCHER_FAITH_POWER.title":  "帰依",
+    "WATCHER_FAITH_POWER.description":  "この敵のターン開始時、観者は[gold]真言[/gold]を3獲得する。",
     "WATCHER_FEAR_NO_EVIL_AIM_POWER.description":  "このターン観者は[gold]妖邪を恐れず[/gold]をプレイする。\nロックされたプレイヤーが攻撃カードをプレイした場合、[gold]平穏[/gold]に入る。",
     "WATCHER_FASTING_POWER.description":  "オメガは1ターンおきに発動する。\n点穴によるダメージはブロックできる。\n警告：オメガは発生源なしのダメージ、点穴はデバフダメージ。サモンは身代わりにならない。 「ヴァピの忠誠」を持つ召喚物も身代わりにならない。\nオメガ：あなたのターンの終了時、すべての敵に50ダメージを与える。",
     "WATCHER_FASTING_POWER.description_dread":  "オメガは毎ターン発動する。\n点穴によるダメージはブロックできる。\n警告：オメガは発生源なしのダメージ、点穴はデバフダメージ。サモンは身代わりにならない。 「ヴァピの忠誠」を持つ召喚物も身代わりにならない。\nオメガ：あなたのターンの終了時、すべての敵に50ダメージを与える。",

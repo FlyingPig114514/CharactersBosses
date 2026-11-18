@@ -359,16 +359,23 @@ public sealed class FoolDominion : MegaCrit.Sts2.Core.Models.Dread.DominionModel
 #if STS2_113
 
 /// <summary>
-/// **观者的支配**（用户 2026-11-15；2026-11-17 增强）：恐惧模式下「所有敌人获得 **3** 层虔信」。
+/// **观者的支配**（用户 2026-11-15；2026-11-17 增强 2 → 3 层）：
+/// 恐惧模式下「**所有敌人**获得 **3** 层虔信」。
 ///
-/// 虔信 = 一个「**回合开始时给观者真言**」的 buff（见 <see cref="Powers.WatcherFaithPower"/>），
-/// 挂在每位玩家身上 ⇒ 他们每人回合开始，观者收 3 层真言（支配是给 Boss 加码的，
-/// 和愚者「开局塞 2 张悲伤」同向）。
-/// ★ v0.2.742（用户 2026-11-17）：「增强恐惧模式下观者的支配：所有敌人获得 3 层虔信」⇒ 2 → 3。
+/// ★ v0.2.781（用户 2026-11-19 截图 + 订正）：以前错在**挂给玩家**了 ——
+///   > 「观者的支配有 bug，并没有成功给予敌人 3 层虔信。并且按这个的实现方式，
+///   >   其实并不应该给玩家上 debuff，而是只给敌人上虔信」
+///   截图实证：3 层虔信挂在**玩家**身上（玩家血条下面那个带 3 的图标），敌人（7/16 那只）
+///   身上什么都没有；而且提示框显示的是原始 key（因为 powers.json 里从来没有
+///   `WATCHER_FAITH_POWER.title/.description` 这两条，v0.2.781 一起补了 16 语言）。
+///
+/// 现在按口径改成**只给敌人**挂。虔信本身的行为（<see cref="Powers.WatcherFaithPower"/>）不变：
+/// **谁身上有虔信，谁的回合开始就给观者 `Amount` 层真言**。
+/// （⚠ 普通房间里场上没有观者，所以这条在普通房间里不会真的产生真言 —— 见下方注释。）
 /// </summary>
 public sealed class WatcherDevotionDominion : MegaCrit.Sts2.Core.Models.Dread.DominionModel
 {
-    /// <summary>每位玩家获得的虔信层数（= 他们每回合开始给观者的真言层数）。</summary>
+    /// <summary>每个敌人获得的虔信层数（= 它回合开始时观者获得的真言层数）。</summary>
     private const int FaithStacks = 3;
 
     public override async Task AfterRoomEntered(AbstractRoom room)
@@ -376,25 +383,25 @@ public sealed class WatcherDevotionDominion : MegaCrit.Sts2.Core.Models.Dread.Do
         try
         {
             if (room is not CombatRoom cr) return;
-            var players = cr.CombatState?.Players;
-            if (players == null)
+            var enemies = cr.Enemies;
+            if (enemies == null)
             {
-                Logger.Log("[CharBoss] 恐惧模式·观者的支配：房间进入时拿不到玩家列表 ⇒ 这次的虔信没发出去（两端会不同步）");
+                Logger.Log("[CharBoss] 恐惧模式·观者的支配：房间进入时拿不到敌人列表 ⇒ 这次的虔信没发出去（两端会不同步）");
                 return;
             }
 
             int given = 0;
-            foreach (var p in players)
+            foreach (var creature in enemies)
             {
-                var creature = p?.Creature;
                 if (creature == null || !creature.IsAlive) continue;
-                if (creature.Monster != null) continue;      // 影子玩家 / 怪物不算
+                // ★ v0.2.781：挂到**敌人**身上（以前挂玩家 ⇒ 既不符合「所有敌人获得虔信」的口径，
+                //   也给玩家挂了一个莫名其妙的 debuff 图标）。
                 await MegaCrit.Sts2.Core.Commands.PowerCmd.Apply<Powers.WatcherFaithPower>(
                     new ThrowingPlayerChoiceContext(), creature, (decimal)FaithStacks, null, null);
                 given++;
             }
-            Logger.Log($"[CharBoss] 恐惧模式·观者的支配：{given} 名玩家各获得 {FaithStacks} 层虔信" +
-                       $"（他们回合开始时观者获得 {FaithStacks} 层真言）");
+            Logger.Log($"[CharBoss] 恐惧模式·观者的支配：{given} 个敌人各获得 {FaithStacks} 层虔信" +
+                       $"（它们的回合开始时观者获得 {FaithStacks} 层真言；本场没有观者时不会产生真言）");
         }
         catch (Exception e) { Logger.Log("[CharBoss] 观者的支配失败: " + e.Message); }
     }
