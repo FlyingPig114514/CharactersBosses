@@ -54,6 +54,50 @@ public partial class BossHandPanel : Control
     /// ——用户实测要求「不随打出卡牌向左移动」。
     /// </summary>
     private int _turnCards;
+
+    /// <summary>上一次自检时的「本回合手牌数」（只在这张数变化时再打一行）。</summary>
+    private static int _lastSelfCheckCount = -1;
+
+    /// <summary>自检日志上限（防刷屏；一局最多几十行足够定位）。</summary>
+    private static int _selfChecks;
+
+    /// <summary>
+    /// **手牌栏自检**（v0.2.791）：一行分清「面板没显示 / 格子没建 / 卡面没画出来」。
+    ///
+    /// 为什么需要它：工坊玩家反馈「装了卡厄斯皮肤会看不到 boss 手牌」，但作者本机装了同一个皮肤
+    /// 一切正常 ⇒ 需要玩家侧的一行数据来判断卡在哪一步：
+    ///   · `格子 0`         ⇒ `WantedCards` 没给牌（打法/手牌状态问题）；
+    ///   · `卡面节点 0`     ⇒ `NCard.Create` 阶段就废了（多半是皮肤模组改了 `NCard`）；
+    ///   · `可见卡面 0`     ⇒ 节点建了但没显示（`UpdateVisuals` 抛异常、或尺寸被清成 0）；
+    ///   · 三项都正常但看不见 ⇒ 看 `面板 visible/pos/size`，是布局/显隐问题。
+    /// </summary>
+    private void LogSelfCheck(int wanted)
+    {
+        try
+        {
+            if (wanted == _lastSelfCheckCount) return;      // 同一回合内不重复打
+            _lastSelfCheckCount = wanted;
+            if (_selfChecks++ > 40) return;
+
+            int cells = 0, cards = 0, visibleCards = 0;
+            foreach (var cell in _cells)
+            {
+                var node = cell?.Node;
+                if (node == null) continue;
+                cells++;
+                foreach (var child in node.GetChildren())
+                {
+                    if (child is not MegaCrit.Sts2.Core.Nodes.Cards.NCard nc) continue;
+                    cards++;
+                    if (nc.Visible && nc.Size.X > 1f) visibleCards++;
+                    break;
+                }
+            }
+            Logger.Log($"[CharBoss] 手牌栏自检：{wanted} 张待显示 ⇒ 格子 {cells}、卡面节点 {cards}、" +
+                       $"可见卡面 {visibleCards}（面板 visible={IsVisibleInTree()}, pos={Position}, size={Size}）");
+        }
+        catch { /* 纯诊断，绝不影响手牌栏本身 */ }
+    }
     /// <summary>本场战斗见过的最大手牌数：整块宽度按它算，出牌/多抽牌都不再变宽变窄（用户 2026-11-08 要求）。</summary>
     private int _widthCards;
 
@@ -210,6 +254,9 @@ public partial class BossHandPanel : Control
             //   面板仍按 5 张的宽度排版，牌就整排偏到左边。现在**每回合重置**：
             //   同一回合内出牌不会变窄（用户当初的要求），跨回合则跟着新手牌数走。
             _widthCards = wanted.Count;
+            // ★ v0.2.791 诊断：玩家反馈「装了卡图/皮肤类模组就看不到 boss 手牌」。
+            //   这一行能一次分清三种情况：面板本身没显示 / 格子没建出来 / 卡面节点没画出来。
+            LogSelfCheck(wanted.Count);
         }
         else
         {
