@@ -6218,3 +6218,4 @@ Chronological action log.
 | 2026-11-18 19:51 | edit | `src/Hooks/Core/CharDominions.cs` | ok | 0 |
 | 2026-11-18 19:51 | edit | `src/Hooks/Core/CharDominions.cs` | error | 0 |
 | 2026-11-18 19:52 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-18 19:54 | write | `workshop/changenote.txt` | ok | 0 |
