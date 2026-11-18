@@ -206,11 +206,77 @@ internal static class BossPicksSync
     /// <summary>客人：从房主消息里收到的每个 (幕, 场) 结论。</summary>
     private static readonly Dictionary<(int Act, int Fight), string> FromHostBosses = new();
 
-    /// <summary>客人端：房主对某个 (幕, 场) 的结论（null = 还没收到 / 房主还没算）。</summary>
+    /// <summary>
+    /// 客人端：房主对某个 (幕, 场) 的**主 Boss** 结论（null = 还没收到 / 房主还没算）。
+    /// ★ v0.2.802：广播值现在可能是「主 Boss,伙伴1,伙伴2…」整条阵容 ⇒ 这里只取逗号前那一段
+    ///   （`DreadDominionSync` / 遭遇槽位等老调用方要的是**单个 Key**）。
+    /// </summary>
     internal static string? HostBossOf(int act, int fight)
     {
-        try { return FromHostBosses.TryGetValue((act, fight), out var v) ? v : null; }
+        try
+        {
+            if (!FromHostBosses.TryGetValue((act, fight), out var v) || string.IsNullOrEmpty(v)) return null;
+            int comma = v.IndexOf(',');
+            return comma > 0 ? v.Substring(0, comma) : v;
+        }
         catch { return null; }
+    }
+
+    /// <summary>
+    /// 客人端：房主这一场的**整条阵容**（主 Boss 在 `[0]`，其余是伙伴）。
+    /// null = 还没收到 / 房主决定保持原版 / 里面有认不出的 Key（不敢照抄）。
+    ///
+    /// ★★ v0.2.802（用户 2026-11-19「这怎么就一个boss了」，`mod_log (41)`）：
+    ///   以前房主只广播**主 Boss**，客人得按**自己**的玩家数重算阵容 —— 而客人那一刻读到的玩家数
+    ///   可能是**过时的 1**（`HostPlayersPerFight` 来自房主某次早先的广播）：
+    ///   日志 23:19:44 `※阵容输入※ … 玩家=1`、阵容 `[储君 3 号]`，23:21 结算 `REGENT_BOSS 为主，共 1 只 Boss`，
+    ///   而同一张地图在 23:21:47 重算时是 `3 人局` 3 条 —— 3 人局场上只有 1 只 Boss。
+    ///   现在房主把整条阵容一起广播 ⇒ 客人直接照抄，条数不可能再和房主不一致。
+    /// </summary>
+    internal static string[]? HostLineupOf(int act, int fight)
+    {
+        try
+        {
+            if (!FromHostBosses.TryGetValue((act, fight), out var v) || string.IsNullOrEmpty(v)) return null;
+            if (v == VanillaMark) return null;                     // 房主决定这一场保持原版 Boss
+            var parts = v.Split(',');
+            var keys = new System.Collections.Generic.List<string>(parts.Length);
+            foreach (var p in parts)
+            {
+                string k = p.Trim();
+                if (k.Length == 0) continue;
+                if (k == VanillaMark) return null;
+                if (Core.BossKeys.MonsterTypeOf(k) == null) return null;   // 认不出的 Key ⇒ 不敢照抄
+                keys.Add(k);
+            }
+            return keys.Count > 0 ? keys.ToArray() : null;
+        }
+        catch { return null; }
+    }
+
+    /// <summary>房主端：本机算出的每个 (幕, 场) 的整条阵容（随「每场最终遭遇」一起广播）。</summary>
+    private static readonly Dictionary<(int Act, int Fight), string> HostLineups = new();
+
+    /// <summary>
+    /// 房主端：`BossLineups.For` 算完一条阵容就记下来。
+    /// ⚠ 这里**只记不发**（把 `_lastSent` 清空即可，真正的发送交给下一次 `BroadcastIfHost`）——
+    ///   否则会在 `BossLineups.For` 的锁里递归广播。
+    /// </summary>
+    internal static void NoteHostLineup(int act, int fight, string[]? lineup)
+    {
+        try
+        {
+            if (!NetRole.IsHostOrSolo) return;
+            if (lineup == null || lineup.Length == 0) return;
+            string value = string.Join(",", lineup);
+            var slot = (act, Math.Clamp(fight, 0, 1));
+            if (HostLineups.TryGetValue(slot, out var old) && old == value) return;
+            HostLineups[slot] = value;
+            _lastSent = string.Empty;                  // 让下一次 BroadcastIfHost 真的发出去
+            Logger.Log($"[CharBoss] 勾选同步：房主记下第 {act + 1} 层第 {fight + 1} 场的整条阵容 = [{value}]" +
+                       "（客人直接照抄，不再自己按人数重算）");
+        }
+        catch { /* 忽略 */ }
     }
 
     /// <summary>
@@ -276,7 +342,13 @@ internal static class BossPicksSync
             foreach (var kv in HostResolved)
             {
                 if (sb.Length > 0) sb.Append(';');
-                sb.Append(kv.Key.Act).Append(':').Append(kv.Key.Fight).Append('|').Append(kv.Value);
+                sb.Append(kv.Key.Act).Append(':').Append(kv.Key.Fight).Append('|');
+                // ★ v0.2.802：「保持原版」照旧；换了角色 Boss 的话，若整条阵容已知就一条不落地发出去
+                //   （`主Boss,伙伴1,伙伴2…`）。老调用方读 `HostBossOf`（取逗号前那段）→ 完全兼容。
+                if (kv.Value == VanillaMark) sb.Append(VanillaMark);
+                else if (HostLineups.TryGetValue(kv.Key, out var lineup) && !string.IsNullOrEmpty(lineup))
+                    sb.Append(lineup);
+                else sb.Append(kv.Value);
             }
             return sb.ToString();
         }
@@ -552,6 +624,18 @@ internal static class BossPicksSync
                 }
                 catch { /* 忽略 */ }
 
+                // ★★ v0.2.802：**每 5 秒无条件重播一次**（这条消息很小）。以前只在「有客人上报没到齐 /
+                //   去重标记空了」时才重播 ⇒ 客人只要**一次**没收到、或收到的是**早先的过时内容**
+                //   （例如玩家数还是开局那会儿的 1），它就会一直按那个数排阵容 ——
+                //   `mod_log (41)` 23:19:44 `玩家=1` 排出的 1 条阵容，就是 3 人局只出 1 只 Boss 的来源。
+                if (now - _lastHostRefreshAt >= 5000)
+                {
+                    _lastHostRefreshAt = now;
+                    _lastSent = string.Empty;
+                    BroadcastIfHost();
+                    return;
+                }
+
                 int expected = Math.Max(0, BossLineups.PlayerCount() - 1);
                 if (expected <= 0) return;
                 // 两种「还没发到位」的状态都要重播：
@@ -571,6 +655,7 @@ internal static class BossPicksSync
     private static long _lastAskAt;
     private static long _lastHostResendAt;
     private static long _lastHeartbeatAt;
+    private static long _lastHostRefreshAt;
     private static int _lastBroadcastPc = -1;
     private static bool _heartbeatQuiet;
     private static bool _forceHello;
@@ -790,7 +875,12 @@ internal static class BossPicksSync
                 if (value.Length > 0) FromHostBosses[(act, fight)] = value;
             }
 
-            BossLineups.InvalidateCache();
+            // ★★ v0.2.802：房主现在**每 5 秒重播一次**（防止客人拿到过时结论）⇒ 这里不能每收到一条就清阵容缓存，
+            //   否则客人整局都在反复重算阵容、日志刷屏。只在「内容真的变了」时才清。
+            string bossesRaw = bosses ?? string.Empty;
+            bool bossesChanged = !string.Equals(bossesRaw, _lastBossesRaw, StringComparison.Ordinal);
+            _lastBossesRaw = bossesRaw;
+            if (bossesChanged) BossLineups.InvalidateCache();
 
             // ★ v0.2.776（玩家 2026-11-19 联机日志）：恐惧模式里「本幕支配」是游戏按
             //   **本幕 Boss 遭遇**算的（`DreadRunModel.ApplyCurrentDominion`），而遭遇是各端本地替换的
@@ -818,6 +908,9 @@ internal static class BossPicksSync
             Logger.Log("[CharBoss] 勾选同步：应用房主勾选失败（继续用整张候补表）: " + e.Message);
         }
     }
+
+    /// <summary>客人端：上一次应用过的「每场最终遭遇」原文（v0.2.802，只在内容变了时才清阵容缓存）。</summary>
+    private static string _lastBossesRaw = string.Empty;
 
     private static IEnumerable<string> Describe(Dictionary<(int Act, int Fight), string> map)
     {

@@ -222,18 +222,40 @@ internal static class BossLineups
             try
             {
                 string[] result;
-                try { result = Build(act, fight); }
-                catch (Exception e)
+                // ★★ v0.2.802（用户 2026-11-19「这怎么就一个boss了」）：**客人直接照抄房主的整条阵容**。
+                //   以前客人按它自己的玩家数重算 —— 那个数可能是过时的 1 ⇒ 只排 1 条 ⇒ 3 人局场上 1 只 Boss
+                //   （`mod_log (41)` 23:19:44 `玩家=1`，23:21 结算「共 1 只 Boss」，而房主那边 3 只）。
+                //   房主每 5 秒重播一次结论，所以这里拿到的就是房主刚算完的那条。
+                string[]? hostLineup = null;
+                try { hostLineup = Core.BossPicksSync.HostLineupOf(act, fight); } catch { hostLineup = null; }
+                if (hostLineup != null && hostLineup.Length > 0)
                 {
-                    Logger.Log("[CharBoss] 阵容随机失败，退回固定表: " + e.Message);
-                    result = Fallback(act);
+                    result = hostLineup;
+                    Logger.Log($"[CharBoss] 第 {act + 1} 层第 {fight + 1} 场阵容：**按房主广播的整条阵容**" +
+                               $"（本机玩家数读到 {PlayerCount()}，不再自己重算）" +
+                               $"[{string.Join(" | ", System.Array.ConvertAll(result, k => BossKeys.LabelOf(k)))}]");
+                }
+                else
+                {
+                    try { result = Build(act, fight); }
+                    catch (Exception e)
+                    {
+                        Logger.Log("[CharBoss] 阵容随机失败，退回固定表: " + e.Message);
+                        result = Fallback(act);
+                    }
                 }
                 if (Cache.Count > 64) Cache.Clear();      // 长期在同一进程里反复开局别把字典撑爆
                 Cache[key] = result;
-                Logger.Log($"[CharBoss] 第 {act + 1} 层第 {fight + 1} 场阵容：" +
-                           $"（{PlayerCount()} 人局，进阶 {Ascension()}，种子 {CurrentSeed()}，指纹 {FingerprintOf(result)}）" +
-                           $"[{string.Join(" | ", System.Array.ConvertAll(result, k => BossKeys.LabelOf(k)))}]");
-                LogInputs(act, fight, result);
+                // ★ v0.2.802：房主把「算完的整条阵容」记下来，随「每场最终遭遇」一起广播（客人照抄）。
+                //   ⚠ 必须在 `Cache[key] = result` **之后**调：它会触发广播，而广播会回头读阵容（缓存已在）。
+                try { Core.BossPicksSync.NoteHostLineup(act, fight, result); } catch { /* 纯同步用 */ }
+                if (hostLineup == null)
+                {
+                    Logger.Log($"[CharBoss] 第 {act + 1} 层第 {fight + 1} 场阵容：" +
+                               $"（{PlayerCount()} 人局，进阶 {Ascension()}，种子 {CurrentSeed()}，指纹 {FingerprintOf(result)}）" +
+                               $"[{string.Join(" | ", System.Array.ConvertAll(result, k => BossKeys.LabelOf(k)))}]");
+                    LogInputs(act, fight, result);
+                }
                 return result;
             }
             finally { Computing.Remove((act, fight)); }

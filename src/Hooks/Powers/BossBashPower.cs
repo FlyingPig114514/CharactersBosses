@@ -38,10 +38,11 @@ public sealed class BossBashPower : PowerModel
     {
         try
         {
-            int per = Core.BossLineups.Ascension() >= 9 ? 3 : 2;
-            // 2026-11-13（恐惧模式「痛击」）：每张「打击」牌的加成 **+1**（2⇒3，进阶 9～10 的 3⇒4）
-            if (Core.DreadMode.IsActive) per += 1;
-            return per;
+            // ★★ v0.2.801（用户 2026-11-19：「『每张 +1』这个增强我从来没让实现过，删掉」）：
+            //   以前这里在恐惧模式下再 +1（2⇒3 / 3⇒4）—— 那是当年实现者自己加的，**不在用户设计里**
+            //   （用户当轮只要求「让痛击的伤害也和完美打击一样受到打击的加成」，见 BashBonusDamage）。
+            //   现在恐惧模式**不加这一项**：进阶 0～8 每张 +2、进阶 9～10 每张 +3，与正常模式完全相同。
+            return Core.BossLineups.Ascension() >= 9 ? 3 : 2;
         }
         catch { return 2; }
     }
@@ -60,7 +61,7 @@ public sealed class BossBashPower : PowerModel
         catch { return false; }
     }
 
-    /// <summary>**现在**一共有多少张：她自己 7 张 + 每位真人玩家四个牌堆里数到的。</summary>
+    /// <summary>**现在**一共有多少张：她自己 7 张 + **被这只 Boss 锁定的那位玩家**四个牌堆里数到的。</summary>
     internal static int CountNow(CharBossMonster? boss)
     {
         int count = OwnStrikeCards;
@@ -70,6 +71,13 @@ public sealed class BossBashPower : PowerModel
             if (combat == null) return count;
             foreach (var player in Core.BossLockOn.RealPlayers(combat))
             {
+                // ★★ v0.2.801（用户 2026-11-19：「多人模式是不是把所有玩家的打击都统计了？
+                //   有玩家说多人第三回合的完美打击打 100+」—— 是的，以前就是**所有真人玩家的牌堆全加一起**：
+                //   4 人局每人 10 张左右打击牌 ⇒ 7 + 40 = 47 张 × 每张 3 ⇒ 完美打击 147。
+                //   设计原文是「**你**的名字中包含打击的牌」⇒ 只该数**被她锁定的那一位**。
+                //   判据用 `SpecialEffectAppliesTo`（本仓库「对应型」特殊效果的统一口径）：
+                //   单人 ⇒ 恒 true（行为与以前完全一致，零回归）；多人 ⇒ 只有锁定这只 Boss 的玩家。
+                if (!Core.BossLockOn.SpecialEffectAppliesTo(boss, player)) continue;
                 var pcs = player?.PlayerCombatState;
                 if (pcs == null) continue;
                 CountCards(pcs.Hand?.Cards, ref count);
@@ -108,7 +116,7 @@ public sealed class BossBashPower : PowerModel
     /// </summary>
     private int PlayedStrikes;
 
-    /// <summary>真人玩家打出一张「名字含打击」的牌 ⇒ 计数 +1（她自己打的不算）。</summary>
+    /// <summary>被这只 Boss 锁定的玩家打出一张「名字含打击」的牌 ⇒ 计数 +1（她自己 / 别人打的不算）。</summary>
     public override Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
         try
@@ -117,6 +125,11 @@ public sealed class BossBashPower : PowerModel
             if (card == null || !IsStrike(card)) return Task.CompletedTask;
             var owner = card.Owner;
             if (owner != null && ReferenceEquals(owner, Owner?.Player)) return Task.CompletedTask;
+
+            // ★★ v0.2.801：和 `CountNow` 同一口径 —— 只认**被她锁定的那位真人玩家**的打击。
+            //   以前「谁打都算」（连别的 Boss 的影子玩家打出的打击也算）⇒ 多人局额度掉得莫名其妙。
+            if (!Core.BossLockOn.SpecialEffectAppliesTo(Owner?.Monster as CharBossMonster, owner))
+                return Task.CompletedTask;
 
             PlayedStrikes++;
             Logger.Log($"[CharBoss] 痛击：你打出 {card.Id.Entry} ⇒ 已打出打击 {PlayedStrikes} 张" +

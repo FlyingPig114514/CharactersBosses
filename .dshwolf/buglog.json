@@ -1619,6 +1619,13 @@
       "fix": "verify-deploy.ps1 的 Read-Utf16FirstVersion 把整份 dll 按 UTF-16 解一次再正则 —— #US 字符串堆里每串偏移不一定是偶数（实测 Impl113 的 Tag 落在第 1312443 字节 = 奇数）⇒ 整份解码错位 ⇒ 误报「读不到」，让人以为 copy 被文件占用。改成与 pack-dist.ps1 同一套：先按字节层找 UTF-16LE 的 'v<期望版本>'（Test-BytesContain），只有找不到才用「正反两个奇偶各解一次」尽力报出实际版本。另：用 edit 工具改 .ps1 会丢 UTF-8 BOM，本机 PS 5.1 会把无 BOM 的中文当 GBK ⇒ 解析器报「字符串缺少终止符」；改完记得用 [System.IO.File]::WriteAllBytes 补回 EF BB BF（src/CharacterBosses.json 同理）。",
       "file": "tools/verify-deploy.ps1",
       "at": "2026-11-18T14:48:39.372Z"
+    },
+    {
+      "id": "bug-248-mwm9ykt2",
+      "error_message": "3 人联机 Boss 房场上只有 1 只 Boss（用户 2026-11-19 截图 + mod_log (41)）：23:19:44 客人端 ※阵容输入※ 玩家=1 ⇒ 阵容只排出 [REGENT_MINION] 1 条，23:21 结算「REGENT_BOSS 为主，共 1 只 Boss」；同一局 23:21:47 重算时又是 3 人局 3 条",
+      "fix": "房主现在把**整条阵容**随「每场最终遭遇」一起广播（值从 `主Boss` 扩成 `主Boss,伙伴1,伙伴2…`；HostLineupOf 供客人照抄，HostBossOf 取逗号前那段保持老调用方兼容），客人 BossLineups.For 直接照抄房主阵容、不再按自己那份可能过时的玩家数重算；房主每 5 秒无条件重播结论（以前只在客人上报没到齐时重播 ⇒ 客人拿到一次过时就一直错），客人只在内容真变了时才清阵容缓存；MultiBossPlan.PartnersForWithKeys 的伙伴数量改由阵容条数决定（lineup.Length−1），不再问 WantsSecondBoss。v0.2.802。",
+      "file": "src/Hooks/Core/BossLineups.cs",
+      "at": "2026-11-18T15:27:10.550Z"
     }
   ]
 }

@@ -148,11 +148,12 @@ public static class MultiBossPlan
         var result = new List<(string, MonsterModel)>();
         try
         {
-            if (!WantsSecondBoss(out int playerCount)) return result;      // 单人：一只都不加
-            // 「只数 = 玩家数」⇒ 我之外还要几只。
-            // ★ v0.2.585：上限从 4 抬到 5（5 人联机），并且**必须**读 BossLineups 的同一个常量 ——
-            //   两边各写一个数时会出现「阵容按 5 只算、这里只造 4 只」的半截状态。
-            int wantPartners = Math.Max(0, Math.Min(playerCount, BossLineups.MaxPlayersPerFight) - 1);
+            // ★★ v0.2.802（用户 2026-11-19「这怎么就一个boss了」）：**伙伴数量改由阵容条数决定**，
+            //   不再问 `WantsSecondBoss`（那个数取自「玩家数」，可能过时）。
+            //   `mod_log (41)` 23:19:44 客人读到的玩家数是 1 ⇒ 以前这里直接 return ⇒ 3 人局只出 1 只 Boss，
+            //   而房主那边阵容是 3 条。阵容条数（房主广播、客人照抄）才是真正的单一真相。
+            int playerCount = 0;
+            bool multi = WantsSecondBoss(out playerCount);      // 只用于日志
 
             int act = 0;
             try { act = CurrentRunState()?.CurrentActIndex ?? 0; } catch { act = 0; }
@@ -174,6 +175,16 @@ public static class MultiBossPlan
 
             // 让「静默猎手用哪套设计」能按这一场的阵容判断（见 BossLineups.BrewerActive ②）
             BossLineups.NoteCurrentFight(act, fight);
+
+            // 阵容几条 ⇒ 我之外还要几只（单人的阵容就只有 1 条 ⇒ 0 只，与以前完全一致）
+            int wantPartners = Math.Max(0, Math.Min(lineup.Length, BossLineups.MaxPlayersPerFight) - 1);
+            if (wantPartners == 0)
+            {
+                Logger.Log($"[CharBoss] 伙伴 Boss 判定：第 {act + 1} 层第 {fight + 1} 场阵容只有 " +
+                           $"{lineup.Length} 条 [{string.Join(",", lineup)}] ⇒ **不加伙伴**" +
+                           $"（本机玩家数={playerCount}、多人={multi}；第 3 层第 1 场/第 2 场各自独立）");
+                return result;
+            }
 
             var parts = new List<string>();
 
