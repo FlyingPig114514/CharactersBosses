@@ -99,13 +99,34 @@ public static class FormVfxFacingPatch
         return null;
     }
 
-    /// <summary>把节点水平镜像（只动 scale.x，幂等）。返回 true = 这次真的翻了。</summary>
+    /// <summary>
+    /// 把节点水平镜像（只动 scale.x，幂等）。返回 true = 这次真的翻了。
+    ///
+    /// ★ v0.2.763（用户 2026-11-18：「群蛇形态等形态牌的特效在 boss 身上是反的，
+    ///   之前统一修过，新版本更新后好像就都坏了」）：
+    ///   以前只看**节点自己**的 `scale.x &lt; 0` 就认为「已经翻过」。可是新版本把
+    ///   `FormVfxHolder` 挪进了被她镜像过的 `Body` 子树里 ⇒ 特效**已经**被父级翻过一次，
+    ///   我们再翻一次就正好抵消 ⇒ 「反的」。
+    ///
+    ///   现在改成看**最终生效的方向**（`GlobalScale.X`，把父级镜像也算进去）：
+    ///   · 净方向已经是负（父级已经把它镜像朝左）⇒ 什么都不做；
+    ///   · 净方向是正 ⇒ 翻自己的 `scale.x`，让**净方向**变负。
+    ///   这样无论原版把 Holder 放在 Body 里还是放在 Body 外，结果都一致。
+    /// </summary>
     private static bool FaceLeft(Node2D node)
     {
         try
         {
+            if (!GodotObject.IsInstanceValid(node) || !node.IsInsideTree()) return false;
+
+            float net = 1f;
+            try { net = node.GlobalScale.X; }        // 含所有父级
+            catch { net = node.Scale.X; }
+
+            if (net < -0.001f) return false;         // 净方向已朝左 ⇒ 别重复翻
+            if (Math.Abs(net) < 0.001f) return false;
+
             var scale = node.Scale;
-            if (scale.X < 0f) return false;                          // 已经翻过
             float x = Math.Abs(scale.X) < 0.001f ? 1f : Math.Abs(scale.X);
             node.Scale = new Vector2(-x, scale.Y);
             return true;
