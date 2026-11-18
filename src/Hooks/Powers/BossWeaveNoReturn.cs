@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using HarmonyLib;
-using MegaCrit.Sts2.Core.Commands;
-using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Models;
 using CharacterBosses.Core;
@@ -32,17 +30,17 @@ namespace CharacterBosses.Powers;
 /// 而原版每预见一次就把弃牌堆里**所有**迂回塞回她手上 ⇒ 回合中凭空多出 0 费攻击牌，
 /// 手牌张数、能量账、玩家看到的「她这回合要打什么」全乱。
 ///
-/// ## 怎么拦（⚠ 这一版是**重写**，见下）
-/// v0.2.750 的第一版是「前缀挂 `WatcherCombatHelper.OnScry`，用反射把原方法调回来、再包一层 Task」——
-/// **实测她打「天眼」时游戏直接崩溃**（09:27:32，日志停在 `chose cards` 之后、没有任何异常信息 ⇒
-/// 反射回原方法落进了被 Harmony 替换过的入口，无限递归 → StackOverflow 直接杀进程）。
+/// ## 怎么拦（用户 2026-11-18 订正后的做法）
+/// 用户：「被预见丢弃的牌是直接从抽牌堆到弃牌堆，**不需要展示在手牌里**」
+/// ⇒ **不能**「先让它进手牌、再把它扔回去」（那样她的手牌栏会闪一下多一张，而且一进一出都是真实牌堆操作）。
+/// 现在改成**让它根本回不去**：
+/// · 前缀挂公开入口 `WatcherCombatHelper.Scry` / `ScryAutoDiscard`（都返回 `Task&lt;List&lt;CardModel&gt;&gt;`）——
+///   这次预见是**她**发起的时候，先把弃牌堆里的迂回**收起来**（`DiscardPile.RemoveInternal`），
+///   于是原版那半段的 `Where(c =&gt; c is WatcherWeave)` 扫到 0 张、一张都不会进手牌；
+/// · 后缀把返回的 Task 包一层：原版整段跑完（涅槃的格挡照旧保留）之后，再把这些迂回**放回弃牌堆**。
 ///
-/// 现在改成**绝不去调原方法**：前缀挂公开入口
-/// `WatcherCombatHelper.Scry` / `ScryAutoDiscard`（两者都返回 `Task&lt;List&lt;CardModel&gt;&gt;`），
-/// · 前缀：如果这次预见是她（影子玩家）发起的，记下此刻**弃牌堆里的迂回实例**；
-/// · 后缀：把返回的 Task 包一层 —— 原版整段跑完（涅槃的格挡照旧）之后，
-///   只把「刚被拉回手牌的那几个实例」用**正规牌堆命令** `CardPileCmd.Add(…, PileType.Discard, …)`
-///   放回弃牌堆。按实例判定 ⇒ 剧本自己放进手牌的那几张绝不会被误伤。
+/// ⚠ v0.2.750 的第一版用「前缀里反射调用原方法 + 包 Task」，反射拿到的仍是被 Harmony 替换过的入口
+/// ⇒ 无限递归 ⇒ 她打「天眼」时进程级 StackOverflow（v0.2.751 已重写，这里不再调用原方法）。
 ///
 /// 钩子由 <see cref="BossOmnisciencePower.TryInstall"/> 顺手装上（只有「预见观」会带迂回）。
 /// </summary>
@@ -54,13 +52,13 @@ internal static class BossWeaveNoReturn
     private static int _attempts;
     private static int _logs;
 
-    /// <summary>前缀拍下的「这次预见开始前，她弃牌堆里的迂回」，后缀用它来判定谁该退回去。</summary>
+    /// <summary>这次预见期间被临时收起来的迂回（跑完原版就放回弃牌堆）。</summary>
     private static readonly List<Frame> _frames = new();
 
     private sealed class Frame
     {
         public Player Owner = null!;
-        public HashSet<CardModel> DiscardWeaves = new();
+        public List<CardModel> Stashed = new();
     }
 
     /// <summary>幂等安装。</summary>
@@ -102,42 +100,56 @@ internal static class BossWeaveNoReturn
                 return;
             }
             _installed = true;
-            Logger.Log("[CharBoss] 迂回：已拦下「预见时从弃牌堆返回手牌」（她的剧本自己安排每一张迂回）");
+            Logger.Log("[CharBoss] 迂回：已拦下「预见时从弃牌堆返回手牌」（她的剧本自己安排每一张迂回，且不会进手牌）");
         }
         catch (Exception e) { Logger.Log("[CharBoss] 迂回：挂钩失败: " + e.Message); }
     }
 
-    // ── 前缀：拍下弃牌堆里现有的迂回 ──────────────────────────────────────
+    // ── 前缀：先把弃牌堆里的迂回收起来，让原版那张「扫 discard 找 Weave」扫到空 ──
     private static void ScryPrefix(Player owner)
     {
         try
         {
             if (!IsBossShadow(owner)) return;
-            var frame = new Frame { Owner = owner };
             var pcs = owner.PlayerCombatState;
-            if (pcs != null)
-                foreach (var card in pcs.DiscardPile.Cards)
-                    if (IsWeave(card)) frame.DiscardWeaves.Add(card);
-            if (frame.DiscardWeaves.Count == 0) return;      // 没迂回 ⇒ 什么都不用做（也不占栈）
-            _frames.Add(frame);
+            if (pcs == null) return;
+
+            var stash = new List<CardModel>();
+            foreach (var card in new List<CardModel>(pcs.DiscardPile.Cards))
+            {
+                if (!IsWeave(card)) continue;
+                pcs.DiscardPile.RemoveInternal(card, true);
+                stash.Add(card);
+            }
+            if (stash.Count == 0) return;
+            _frames.Add(new Frame { Owner = owner, Stashed = stash });
+            if (_logs++ < 12)
+                Logger.Log($"[CharBoss] 迂回：这次预见先把她弃牌堆里的 {stash.Count} 张迂回收起来" +
+                           "（预见本来就不该让它返到手牌）");
         }
-        catch { /* 绝不影响战斗 */ }
+        catch (Exception e)
+        {
+            if (_logs++ < 12) Logger.Log("[CharBoss] 迂回：收起来那一步失败（这次放行原版）: " + e.Message);
+        }
     }
 
-    // ── 后缀：把返回的 Task 包一层，跑完再清 ──────────────────────────────
+    // ── 后缀：原版跑完（涅槃格挡照旧）再把迂回放回弃牌堆 ──────────────────
     private static void ScryPostfix(Player owner, ref Task<List<CardModel>> __result)
     {
         try
         {
             var frame = TakeFrame(owner);
             if (frame == null || __result == null) return;
-            __result = StripAfter(__result, frame);
+            __result = RestoreAfter(__result, frame);
         }
         catch (Exception e)
         {
-            if (_logs++ < 6) Logger.Log("[CharBoss] 迂回：包 Task 失败（这次放行原版）: " + e.Message);
+            if (_logs++ < 6) Logger.Log("[CharBoss] 迂回：包 Task 失败（立刻放回）: " + e.Message);
+            RestoreFrame(_lastTakeForEmergency);
         }
     }
+
+    private static Frame? _lastTakeForEmergency;
 
     private static Frame? TakeFrame(Player? owner)
     {
@@ -146,32 +158,36 @@ internal static class BossWeaveNoReturn
             if (!ReferenceEquals(_frames[i].Owner, owner)) continue;
             var f = _frames[i];
             _frames.RemoveAt(i);
+            _lastTakeForEmergency = f;
             return f;
         }
         return null;
     }
 
-    /// <summary>等原版整段跑完（涅槃的格挡也在这段里），再把「被拉回手牌的迂回」用正规指令放回弃牌堆。</summary>
-    private static async Task<List<CardModel>> StripAfter(Task<List<CardModel>> original, Frame frame)
+    private static async Task<List<CardModel>> RestoreAfter(Task<List<CardModel>> original, Frame frame)
     {
-        var result = await original;
+        try { return await original; }
+        finally { RestoreFrame(frame); }
+    }
+
+    private static void RestoreFrame(Frame? frame)
+    {
+        if (frame == null) return;
         try
         {
-            var pcs = frame.Owner.PlayerCombatState;
-            if (pcs == null) return result;
-            foreach (var card in new List<CardModel>(pcs.Hand.Cards))
+            var pcs = frame.Owner?.PlayerCombatState;
+            if (pcs == null) return;
+            foreach (var card in frame.Stashed)
             {
-                if (card == null || !frame.DiscardWeaves.Contains(card)) continue;   // 剧本自己放进手牌的不动
-                await CardPileCmd.Add(card, PileType.Discard, CardPilePosition.Random, null, false);
-                if (_logs++ < 12)
-                    Logger.Log("[CharBoss] 迂回：预见把它从弃牌堆拉回了手牌 ⇒ 再丢回去（她的剧本自己安排）");
+                if (card == null) continue;
+                if (pcs.DiscardPile.Cards.Contains(card)) continue;   // 已经被别处放回去了
+                pcs.DiscardPile.AddInternal(card, -1, true);
             }
         }
         catch (Exception e)
         {
-            if (_logs++ < 12) Logger.Log("[CharBoss] 迂回：丢回弃牌堆失败（不影响战斗）: " + e.Message);
+            if (_logs++ < 12) Logger.Log("[CharBoss] 迂回：放回弃牌堆失败（不影响战斗）: " + e.Message);
         }
-        return result;
     }
 
     // ── 小工具 ─────────────────────────────────────────────────────────────
