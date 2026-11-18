@@ -87,6 +87,12 @@ internal static class BossSlotReplacer
         else act.SetSecondBossEncounter(replacement);
 
         Logger.Log($"[Hook] act {act.Index} {label}槽替换({reason}): {vanilla.Id} -> {replacement.Id}");
+
+        // ★ v0.2.776：恐惧模式的「本幕支配」是游戏按本幕 Boss 遭遇算的 ⇒ 我们刚改过遭遇，
+        //   立刻按新遭遇对齐一次（否则整幕普通战斗里敌人身上的 power 与房主不一致 ⇒ 联机不同步）。
+#if STS2_113
+        try { Core.DreadDominionSync.EnsureCurrentAct($"{label}槽替换({reason})"); } catch { /* 忽略 */ }
+#endif
     }
 
     /// <summary>「客人端不写同步状态」这条日志每 (幕, 是不是第二槽) 只打一次。</summary>

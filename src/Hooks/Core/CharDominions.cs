@@ -222,7 +222,15 @@ public sealed class RegentDominion : MegaCrit.Sts2.Core.Models.Dread.DominionMod
         {
             if (room is not CombatRoom cr) return;
             var enemies = cr.Enemies;
-            if (enemies == null) return;
+            if (enemies == null)
+            {
+                // ★ v0.2.776：这条以前是**静默** return —— 2026-11-19 玩家联机的不同步就是
+                //   「房主加了王之凝视、客人没加」（客人那一刻拿不到敌人列表）。以后有这行日志
+                //   就能一眼分清「没进这个方法」还是「进来了但敌人列表是空的」。
+                Logger.Log("[CharBoss] 恐惧模式·储君的支配：房间进入时拿不到敌人列表 ⇒ 这次没发王之凝视" +
+                           "（两端会不同步；见 DreadDominionSync 的对齐日志）");
+                return;
+            }
 
             var targets = new List<Creature>();
             foreach (var c in enemies)
@@ -230,7 +238,11 @@ public sealed class RegentDominion : MegaCrit.Sts2.Core.Models.Dread.DominionMod
                 if (c == null || !c.IsAlive) continue;
                 targets.Add(c);
             }
-            if (targets.Count == 0) return;
+            if (targets.Count == 0)
+            {
+                Logger.Log("[CharBoss] 恐惧模式·储君的支配：敌人列表为空 ⇒ 这次没发王之凝视（两端会不同步）");
+                return;
+            }
 
             await MegaCrit.Sts2.Core.Commands.PowerCmd.Apply<
                 MegaCrit.Sts2.Core.Models.Powers.MonarchsGazePower>(
@@ -365,7 +377,11 @@ public sealed class WatcherDevotionDominion : MegaCrit.Sts2.Core.Models.Dread.Do
         {
             if (room is not CombatRoom cr) return;
             var players = cr.CombatState?.Players;
-            if (players == null) return;
+            if (players == null)
+            {
+                Logger.Log("[CharBoss] 恐惧模式·观者的支配：房间进入时拿不到玩家列表 ⇒ 这次的虔信没发出去（两端会不同步）");
+                return;
+            }
 
             int given = 0;
             foreach (var p in players)
@@ -383,4 +399,72 @@ public sealed class WatcherDevotionDominion : MegaCrit.Sts2.Core.Models.Dread.Do
         catch (Exception e) { Logger.Log("[CharBoss] 观者的支配失败: " + e.Message); }
     }
 }
+
+/// <summary>
+/// **恐惧模式：把「本幕支配」对齐到「本幕最终 Boss 遭遇」**（2026-11-19 玩家联机日志实证）。
+///
+/// 现象（`godot (12).log` 14004/14005 与 14419/14420）：
+/// <code>
+/// [INFO] Applying dominion because act 0 entered
+/// [INFO] Setting dominion to DOMINION.CEREMONIAL_BEAST_DOMINION   ← 客人：还没收到房主的结论 ⇒ 用的是**原版** Boss 的支配
+/// …（不同步断线、重连之后）
+/// [INFO] Applying dominion because run loaded
+/// [INFO] Setting dominion to DOMINION.REGENT_DOMINION             ← 这时才对上房主（晚了）
+/// </code>
+/// 于是在同一场**普通**战斗里：客人那只 `SHRINKER_BEETLE` 只有原版的 `RITUAL_POWER`，
+/// 房主那只多了 `MONARCHS_GAZE_POWER`（我们的「储君的支配」）⇒ 第一个
+/// `After player turn start` 校验和就分叉（`Local: 864895115 / Remote: 1856624699`）。
+///
+/// 根因：游戏的 `DreadRunModel.ApplyCurrentDominion()` 取的是
+/// **`Act.BossEncounter ?? SecondBossEncounter` 的 `GetDominion()`**，而 `BossEncounter`
+/// 是**各端本地替换**的（客人要等房主广播）⇒ 广播晚到（或像旧版那样根本发不出去）时，
+/// 客人这一幕拿到的是**原版 Boss 的支配**，之后整幕每一场普通战斗的敌人身上都会多/少一层 power。
+///
+/// 做法：在**我们改完 / 收到**本幕最终遭遇之后各调一次 —— 若 `RunState.Dominion` 与
+/// 「按最终遭遇算出来的那个」类型不同，就按游戏同一个出口 `RunState.SetDominion(...)` 重设一遍。
+/// 反编译确认 `SetDominion` 只是 `dominion.MutableClone()` + 赋值 `RunState`，**不触发任何钩子**
+/// ⇒ 重复调用安全（本轮战斗已经发出去的 power 收不回来，但从下一场起两端就一致了）。
+/// </summary>
+internal static class DreadDominionSync
+{
+    private static string _lastLogged = string.Empty;
+
+    /// <summary>对齐一次（幂等）。<paramref name="why"/> 只用于日志。</summary>
+    internal static void EnsureCurrentAct(string why)
+    {
+        try
+        {
+            if (!DreadMode.IsActive) return;
+            var run = MegaCrit.Sts2.Core.Runs.RunManager.Instance?.DebugOnlyGetState();
+            if (run == null || run.Acts == null) return;
+            if (run.CurrentActIndex < 0 || run.CurrentActIndex >= run.Acts.Count) return;
+
+            var act = run.Acts[run.CurrentActIndex];
+            if (act == null) return;
+
+            var encounter = act.SecondBossEncounter ?? act.BossEncounter;
+            var want = encounter?.GetDominion();
+            if (want == null) return;                       // 不是我们的遭遇 / 没有支配
+
+            var have = run.Dominion;
+            if (have != null && have.GetType() == want.GetType()) return;   // 已经一致
+
+            run.SetDominion(want);
+            string line = $"{EntryOf(have)} → {EntryOf(want)}（{why}）";
+            if (line != _lastLogged)
+            {
+                _lastLogged = line;
+                Logger.Log($"[CharBoss] 恐惧模式·支配对齐：本幕支配 {line}" +
+                           "（否则两端普通战斗里敌人身上会多/少一层 power ⇒ 联机不同步）");
+            }
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 恐惧模式·支配对齐失败: " + e.Message); }
+    }
+
+    private static string EntryOf(MegaCrit.Sts2.Core.Models.Dread.DominionModel? d)
+    {
+        try { return d?.Id?.Entry ?? "无"; } catch { return "?"; }
+    }
+}
 #endif
+

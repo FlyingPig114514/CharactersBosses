@@ -622,6 +622,15 @@ internal static class BossPicksSync
 
             BossLineups.InvalidateCache();
 
+            // ★ v0.2.776（玩家 2026-11-19 联机日志）：恐惧模式里「本幕支配」是游戏按
+            //   **本幕 Boss 遭遇**算的（`DreadRunModel.ApplyCurrentDominion`），而遭遇是各端本地替换的
+            //   ⇒ 房主结论晚到时客人这一幕拿到的是**原版** Boss 的支配，整幕普通战斗里敌人身上
+            //   就会多/少一层 power（日志实证：客人那只 SHRINKER_BEETLE 只有 RITUAL，房主那只还有
+            //   MONARCHS_GAZE）⇒ 第一个回合开始校验和就分叉。收到结论立刻对齐一次。
+#if STS2_113
+            try { DreadDominionSync.EnsureCurrentAct("收到房主的每场最终遭遇"); } catch { /* 忽略 */ }
+#endif
+
             if (!_appliedLogged || before != FromHostBosses.Count)
             {
                 _appliedLogged = true;
