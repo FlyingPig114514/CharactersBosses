@@ -215,7 +215,7 @@
     "WATCHER_RETAIN_BOSS.moves.CHARBOSS_PLAY.title":  "Jugar",
     "WATCHER_RETAIN_BOSS.establishment":  "Al final de tu turno, cada carta retenida en tu mano con un coste inferior a 2 aumenta su coste en 1 durante el resto del combate. Por cada carta cuyo coste aumente así, la Vigilante pierde 1 de Fuerza.",
     "WATCHER_RETAIN_BOSS.establishment_dread":  "Al final de tu turno, tus cartas retenidas aumentan su coste en 1 durante el resto del combate.",
-    "WATCHER_FORESIGHT_BOSS.name":  "Vigía de la Previsión",     "WATCHER_FORESIGHT_BOSS.title":  "Vigía de la Previsión",     "WATCHER_FORESIGHT_BOSS.moves.CHARBOSS_PLAY.title":  "Jugar",     "WATCHER_FORESIGHT_BOSS.omniscience":  "Siempre que se active [gold]Previsión[/gold], descartas una carta aleatoria de tu pila de robo.",     "WATCHER_FORESIGHT_BOSS.omniscience_dread":  "Siempre que [gold]presagies[/gold], descartas una carta aleatoria de tu pila de robo.",
+    "WATCHER_FORESIGHT_BOSS.name":  "Vigía de la Previsión",     "WATCHER_FORESIGHT_BOSS.title":  "Vigía de la Previsión",     "WATCHER_FORESIGHT_BOSS.moves.CHARBOSS_PLAY.title":  "Jugar",     "WATCHER_FORESIGHT_BOSS.omniscience": "Whenever the Watcher triggers [gold]Foresight[/gold], you Scry 2.",     "WATCHER_FORESIGHT_BOSS.omniscience_dread": "Whenever the Watcher triggers [gold]Foresight[/gold], discard a random card from your draw pile.",
 "WATCHER_RUSHDOWN_BOSS.name": "Red-Blue Watcher",
 "WATCHER_RUSHDOWN_BOSS.title": "Red-Blue Watcher",
 "WATCHER_RUSHDOWN_BOSS.moves.CHARBOSS_PLAY.title": "Play",

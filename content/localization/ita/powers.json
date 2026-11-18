@@ -147,7 +147,7 @@
     "BOSS_ESTABLISHMENT_POWER.title":  "Stabilimento",
     "BOSS_ESTABLISHMENT_POWER.description":  "Alla fine del tuo turno, ogni carta trattenuta nella tua mano con un costo inferiore a 2 aumenta il suo costo di 1 per il resto del combattimento. Per ogni carta il cui costo aumenta così, il Watcher perde 1 Forza.",
     "BOSS_ESTABLISHMENT_POWER.description_dread":  "Alla fine del tuo turno, le tue carte trattenute aumentano il loro costo di 1 per il resto del combattimento.",
-    "BOSS_OMNISCIENCE_POWER.title":  "Onniscienza",     "BOSS_OMNISCIENCE_POWER.description":  "Ogni volta che [gold]Preveggenza[/gold] si attiva, scarta una carta casuale dal tuo mazzo di pesca.",     "BOSS_OMNISCIENCE_POWER.description_dread":  "Ogni volta che [gold]presagisci[/gold], scarta una carta casuale dal tuo mazzo di pesca.",
+    "BOSS_OMNISCIENCE_POWER.title":  "Onniscienza",     "BOSS_OMNISCIENCE_POWER.description": "Whenever the Watcher triggers [gold]Foresight[/gold], you Scry 2.",     "BOSS_OMNISCIENCE_POWER.description_dread": "Whenever the Watcher triggers [gold]Foresight[/gold], discard a random card from your draw pile.",
 "BOSS_TEMPERANCE_POWER.title": "Temperance",
 "BOSS_TEMPERANCE_POWER.description": "Whenever the Watcher plays 12 cards, she forcibly ends her own turn and she and her other allies gain 2 Strength.\nWarning: the Watcher starts her infinite loop on turn 12.",
 "BOSS_TEMPERANCE_POWER.description_dread": "Whenever the Watcher plays 12 cards, she forcibly ends her own turn and she and her other allies gain 2 Strength. In addition, [gold]Time Warp[/gold] counts your cards: every 12 cards you play, the Watcher forcibly ends your turn.\nWarning: the Watcher starts her infinite loop on turn 12."

@@ -43,33 +43,6 @@ public static partial class BossHookBridge
     private static void FireSideTurnStart(CharBossMonster boss, PlayerChoiceContext context)
     {
         if (boss.Creature == null) return;
-        // ★ v0.2.759（用户 2026-11-18：「泪滴吊坠盒似乎没有正常触发」）：
-        //   观者遗物「泪滴吊坠盒」=「每场战斗开始时处于平静」。它的钩子是挂在**玩家**的身位上的，
-        //   而我们的影子玩家收不到原版的战斗开始广播 ⇒ 她的第 1 个回合开始时自己补一次「进入平静」。
-        //   （`WatcherCards.T("TeardropLocket")` 按当前 provider 解析，A/B 两版都认。）
-        try
-        {
-            if (boss.TurnNumber <= 1 && boss.Shadow?.PlayerCombatState != null)
-            {
-                var locketType = WatcherCards.T("TeardropLocket");
-                bool has = false;
-                if (locketType != null)
-                {
-                    var relics = boss.Shadow.Relics;
-                    for (int i = 0; i < (relics?.Count ?? 0); i++)
-                    {
-                        var r = relics![i];
-                        if (r != null && r.GetType() == locketType) { has = true; break; }
-                    }
-                }
-                if (has && !WatcherCards.InCalm(boss.Shadow))
-                {
-                    _ = WatcherCards.EnterCalmAsync(boss.Shadow);
-                    Logger.Log("[CharBoss] 泪滴吊坠盒：她第 1 个回合开始 ⇒ 进入「平静」");
-                }
-            }
-        }
-        catch (Exception e) { Logger.Log("[CharBoss] 泪滴吊坠盒结算失败（不影响战斗）: " + e.Message); }
         // 「开心小花」按**她自己的回合号**结算（3n 回合 +1 能量），原版那条对她已拦掉
         // （见 Patches/HappyFlowerNoDoublePatch 与本文件的 HappyFlowerPlays）。
         try { HappyFlowerPlays.OnBossTurnStart(boss, context); } catch { /* 忽略 */ }
@@ -1184,6 +1157,35 @@ public static partial class BossHookBridge
         if (combat == null || shadow == null) return;
 
         var ctx = new BlockingPlayerChoiceContext();
+
+        // ★ v0.2.761（用户 2026-11-18：「泪滴吊坠盒触发时机错误，应当在玩家进战斗的那一刻就触发
+        //   （类似锚、击剑指南等遗物）」）：观者遗物「泪滴吊坠盒」=「每场战斗开始时处于平静」。
+        //   它的钩子挂在**玩家**身位上，而我们的影子玩家收不到原版的战斗开始广播 ⇒ 在这里**进战斗那一刻**
+        //   自己补一次「进入平静」（以前放在她第 1 个回合开始，用户指出时机不对）。
+        //   `WatcherCards.T("TeardropLocket")` 按当前 provider 解析，A/B 两版都认。
+        try
+        {
+            if (shadow != null && shadow.PlayerCombatState != null)
+            {
+                var locketType = WatcherCards.T("TeardropLocket");
+                bool has = false;
+                if (locketType != null)
+                {
+                    var locketRelics = shadow.Relics;
+                    for (int i = 0; i < (locketRelics?.Count ?? 0); i++)
+                    {
+                        var r = locketRelics![i];
+                        if (r != null && r.GetType() == locketType) { has = true; break; }
+                    }
+                }
+                if (has && !WatcherCards.InCalm(shadow))
+                {
+                    _ = WatcherCards.EnterCalmAsync(shadow);
+                    Logger.Log("[CharBoss] 泪滴吊坠盒：进战斗那一刻 ⇒ 她进入「平静」");
+                }
+            }
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 泪滴吊坠盒结算失败（不影响战斗）: " + e.Message); }
 
         // ★ 2026-11-15（用户：「让所有 boss 的特殊效果始终在 buff 栏的第一个」）：
         //   特殊效果原本是这套「战斗开始」流程的**最后一步**才施加的（见下面的原位置���，

@@ -147,7 +147,7 @@
     "BOSS_ESTABLISHMENT_POWER.title":  "確立基礎",
     "BOSS_ESTABLISHMENT_POWER.description":  "在你的回合結束時，若你有耗能小於2的牌被保留，其在本場戰鬥中的耗能增加1。每有一張卡牌的耗能被增加，觀者就失去1點力量。",
     "BOSS_ESTABLISHMENT_POWER.description_dread":  "在你的回合結束時，你保留的牌在本場戰鬥中的耗能增加1。",
-    "BOSS_OMNISCIENCE_POWER.title":  "通曉萬物",     "BOSS_OMNISCIENCE_POWER.description":  "每當你觸發[gold]先見之明[/gold]時，將你抽牌堆中的一張隨機牌丟棄。",     "BOSS_OMNISCIENCE_POWER.description_dread":  "每當你[gold]預見[/gold]時，將你抽牌堆中的一張隨機牌丟棄。",
+    "BOSS_OMNISCIENCE_POWER.title":  "通曉萬物",     "BOSS_OMNISCIENCE_POWER.description": "每当观者触发[gold]先见之明[/gold]时，你预见 2 张牌。",     "BOSS_OMNISCIENCE_POWER.description_dread": "每当观者触发[gold]先见之明[/gold]时，将你抽牌堆中的一张随机牌丢弃。",
 "BOSS_TEMPERANCE_POWER.title": "节制",
 "BOSS_TEMPERANCE_POWER.description": "每当观者打出 12 张牌，她就会强制结束自己的回合并使她和她的其他友方获得 2 点力量。\n警告：观者会在第12回合开始无限。",
 "BOSS_TEMPERANCE_POWER.description_dread": "每当观者打出 12 张牌，她就会强制结束自己的回合并使她和她的其他友方获得 2 点力量。此外，[gold]时间扭曲[/gold]会记录你的出牌：你每打出 12 张牌，观者就会强制结束你的回合。\n警告：观者会在第12回合开始无限。"

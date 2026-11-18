@@ -147,7 +147,7 @@
     "BOSS_ESTABLISHMENT_POWER.title":  "Pendirian",
     "BOSS_ESTABLISHMENT_POWER.description":  "Pada akhir giliranmu, setiap kartu tersimpan di tanganmu dengan biaya di bawah 2, biayanya bertambah 1 selama pertarungan ini. Untuk setiap kartu yang biayanya bertambah, Watcher kehilangan 1 Kekuatan.",
     "BOSS_ESTABLISHMENT_POWER.description_dread":  "Pada akhir giliranmu, kartu-kartu tersimpanmu bertambah biayanya 1 selama pertarungan ini.",
-    "BOSS_OMNISCIENCE_POWER.title":  "Mahatahu",     "BOSS_OMNISCIENCE_POWER.description":  "Setiap kali [gold]Tinjauan[/gold] terpicu, buang satu kartu acak dari tumpukan undianmu.",     "BOSS_OMNISCIENCE_POWER.description_dread":  "Setiap kali kamu [gold]berprasangka[/gold], buang satu kartu acak dari tumpukan undianmu.",
+    "BOSS_OMNISCIENCE_POWER.title":  "Mahatahu",     "BOSS_OMNISCIENCE_POWER.description": "Whenever the Watcher triggers [gold]Foresight[/gold], you Scry 2.",     "BOSS_OMNISCIENCE_POWER.description_dread": "Whenever the Watcher triggers [gold]Foresight[/gold], discard a random card from your draw pile.",
 "BOSS_TEMPERANCE_POWER.title": "Temperance",
 "BOSS_TEMPERANCE_POWER.description": "Whenever the Watcher plays 12 cards, she forcibly ends her own turn and she and her other allies gain 2 Strength.\nWarning: the Watcher starts her infinite loop on turn 12.",
 "BOSS_TEMPERANCE_POWER.description_dread": "Whenever the Watcher plays 12 cards, she forcibly ends her own turn and she and her other allies gain 2 Strength. In addition, [gold]Time Warp[/gold] counts your cards: every 12 cards you play, the Watcher forcibly ends your turn.\nWarning: the Watcher starts her infinite loop on turn 12."

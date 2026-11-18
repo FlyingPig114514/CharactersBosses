@@ -76,9 +76,15 @@ public sealed class BossTemperancePower : PowerModel
     {
         try
         {
-            if (Owner?.Player == null || cardPlay?.Card == null) return;
-            if (!ReferenceEquals(cardPlay.Card.Owner, Owner.Player)) return;   // 只数她自己的牌
-            if (Owner.CombatState == null) return;
+            // ★ v0.2.761（用户 2026-11-18：「特殊效果没有正确计数」）：
+            //   以前用 `Owner.Player` 判「这是不是她的牌」—— 但 Boss 生物身上**没有** Player
+            //   （她的影子玩家是另外挂上去的）⇒ `Owner.Player == null` 直接 return，**一次都没数过**。
+            //   现在改成拿 `Shadow` 比。
+            var boss = Owner?.Monster as Monsters.CharBossMonster;
+            var shadow = boss?.Shadow;
+            if (shadow == null || cardPlay?.Card == null) return;
+            if (!ReferenceEquals(cardPlay.Card.Owner, shadow)) return;        // 只数她自己的牌
+            if (Owner!.CombatState == null) return;
 
             _played++;
             if (_played < Threshold) return;
@@ -144,9 +150,11 @@ public sealed class BossTimeWarpPower : PowerModel
     {
         try
         {
-            if (Owner?.Player == null || cardPlay?.Card == null) return;
+            if (Owner == null || cardPlay?.Card == null) return;
             var shooter = cardPlay.Card.Owner;
-            if (shooter == null || ReferenceEquals(shooter, Owner.Player)) return;   // 只数玩家那边的牌
+            var myShadow = (Owner.Monster as Monsters.CharBossMonster)?.Shadow;
+            if (shooter == null) return;
+            if (myShadow != null && ReferenceEquals(shooter, myShadow)) return;     // 只数玩家那边的牌
             // 只数**被这只 Boss 锁定**的那位玩家（多人时其余玩家不受影响）
             var boss = Owner.Monster as Monsters.CharBossMonster;
             var victim = Core.BossLockOn.PureVictim(boss, Owner.CombatState);

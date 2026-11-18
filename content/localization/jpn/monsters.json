@@ -215,7 +215,7 @@
     "WATCHER_RETAIN_BOSS.moves.CHARBOSS_PLAY.title":  "カードプレイ",
     "WATCHER_RETAIN_BOSS.establishment":  "あなたのターン終了時、手札のコストが2未満の保留されたカードのコストをこの戦闘中1増やす。コストが増えたカード1枚につき、ウォッチャーは筋力を1失う。",
     "WATCHER_RETAIN_BOSS.establishment_dread":  "あなたのターン終了時、あなたが保留したカードのコストをこの戦闘中1増やす。",
-    "WATCHER_FORESIGHT_BOSS.name":  "予見ウォッチャー",     "WATCHER_FORESIGHT_BOSS.title":  "予見ウォッチャー",     "WATCHER_FORESIGHT_BOSS.moves.CHARBOSS_PLAY.title":  "カードプレイ",     "WATCHER_FORESIGHT_BOSS.omniscience":  "[gold]先見の明[/gold]が発動するたび、山札からランダムなカード1枚を捨てる。",     "WATCHER_FORESIGHT_BOSS.omniscience_dread":  "あなたが[gold]予見[/gold]するたび、山札からランダムなカード1枚を捨てる。",
+    "WATCHER_FORESIGHT_BOSS.name":  "予見ウォッチャー",     "WATCHER_FORESIGHT_BOSS.title":  "予見ウォッチャー",     "WATCHER_FORESIGHT_BOSS.moves.CHARBOSS_PLAY.title":  "カードプレイ",     "WATCHER_FORESIGHT_BOSS.omniscience": "Whenever the Watcher triggers [gold]Foresight[/gold], you Scry 2.",     "WATCHER_FORESIGHT_BOSS.omniscience_dread": "Whenever the Watcher triggers [gold]Foresight[/gold], discard a random card from your draw pile.",
 "WATCHER_RUSHDOWN_BOSS.name": "Red-Blue Watcher",
 "WATCHER_RUSHDOWN_BOSS.title": "Red-Blue Watcher",
 "WATCHER_RUSHDOWN_BOSS.moves.CHARBOSS_PLAY.title": "Play",

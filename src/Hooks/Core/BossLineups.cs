@@ -857,17 +857,31 @@ internal static class BossLineups
 
     private static (bool Value, bool Decisive) ComputeWatcherRushdown()
     {
+        // ① **先看场上那只怪钉死的变体 key**（最可靠：造怪时 `WatcherRushdownBoss` 就把
+        //    `PinnedVariantKey` 钉成 `WATCHER_RUSHDOWN`）。以前这条排在最后，而且兜底返回
+        //    `(false, true)`（= 决断为「不是」）⇒ 第一次太早判定就把 false **锁死**，
+        //    于是特殊效果「节制」根本没被挂到她身上（用户 2026-11-18：「特殊效果没有正确计数」
+        //    以及「不惧妖邪不进平静」——那条闸门也要看身上有没有「节制」）。
+        try
+        {
+            foreach (var c in MegaCrit.Sts2.Core.Combat.CombatManager.Instance?.DebugOnlyGetState()?.Enemies
+                                ?? (IEnumerable<MegaCrit.Sts2.Core.Entities.Creatures.Creature>)Array.Empty<MegaCrit.Sts2.Core.Entities.Creatures.Creature>())
+            {
+                if (c?.Monster is not Monsters.CharBossMonster boss) continue;
+                string? pinned = boss.PinnedVariantKey ?? boss.SpawnVariantKey;
+                if (string.Equals(pinned, "WATCHER_RUSHDOWN", StringComparison.Ordinal)) return (true, true);
+                if (!string.IsNullOrEmpty(pinned) && pinned.StartsWith("WATCHER", StringComparison.Ordinal)) return (false, true);
+            }
+        }
+        catch { /* 继续往下 */ }
+
         try
         {
             string? entry = CurrentEncounterEntry();
             if (!string.IsNullOrEmpty(entry))
             {
                 if (entry == "WATCHER_RUSHDOWN_BOSS_ENCOUNTER") return (true, true);
-                if (entry == "WATCHER_DIVINITY_BOSS_ENCOUNTER"
-                    || entry == "WATCHER_OMEGA_BOSS_ENCOUNTER"
-                    || entry == "WATCHER_CREATE_BOSS_ENCOUNTER"
-                    || entry == "WATCHER_RETAIN_BOSS_ENCOUNTER"
-                    || entry == "WATCHER_FORESIGHT_BOSS_ENCOUNTER") return (false, true);
+                if (entry.StartsWith("WATCHER_", StringComparison.Ordinal)) return (false, true);
             }
         }
         catch { /* 继续往下 */ }
@@ -880,25 +894,14 @@ internal static class BossLineups
                 foreach (var k in lineup)
                 {
                     if (k == "WATCHER_RUSHDOWN") return (true, true);
-                    if (k == "WATCHER_DIVINITY" || k == "WATCHER_OMEGA" || k == "WATCHER_CREATE"
-                        || k == "WATCHER_RETAIN" || k == "WATCHER_FORESIGHT") return (false, true);
+                    if (k.StartsWith("WATCHER", StringComparison.Ordinal)) return (false, true);
                 }
             }
         }
         catch { /* 继续 */ }
-        try
-        {
-            foreach (var c in MegaCrit.Sts2.Core.Combat.CombatManager.Instance?.DebugOnlyGetState()?.Enemies
-                                ?? (IEnumerable<MegaCrit.Sts2.Core.Entities.Creatures.Creature>)Array.Empty<MegaCrit.Sts2.Core.Entities.Creatures.Creature>())
-            {
-                if (c?.Monster is not Monsters.CharBossMonster boss) continue;
-                string? pinned = boss.PinnedVariantKey ?? boss.SpawnVariantKey;
-                if (string.Equals(pinned, "WATCHER_RUSHDOWN", StringComparison.Ordinal)) return (true, true);
-                if (!string.IsNullOrEmpty(pinned)) return (false, true);
-            }
-        }
-        catch { /* 忽略 */ }
-        return (false, true);   // 默认不是红蓝观
+
+        // ⚠ 什么都不知道 ⇒ **不决断**（别把 false 锁死）
+        return (false, false);
     }
 
     internal static bool WatcherForesightActive() => Latched("WATCHER_FORESIGHT", ComputeWatcherForesight);

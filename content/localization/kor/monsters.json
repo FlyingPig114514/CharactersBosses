@@ -215,7 +215,7 @@
     "WATCHER_RETAIN_BOSS.moves.CHARBOSS_PLAY.title":  "카드 사용",
     "WATCHER_RETAIN_BOSS.establishment":  "당신의 턴이 끝날 때, 손에 있는 비용이 2 미만인 보존된 카드의 비용이 이번 전투 동안 1 증가합니다. 이렇게 비용이 증가한 카드 1장마다 와처가 힘을 1 잃습니다.",
     "WATCHER_RETAIN_BOSS.establishment_dread":  "당신의 턴이 끝날 때, 보존한 카드의 비용이 이번 전투 동안 1 증가합니다.",
-    "WATCHER_FORESIGHT_BOSS.name":  "예지 왓처",     "WATCHER_FORESIGHT_BOSS.title":  "예지 왓처",     "WATCHER_FORESIGHT_BOSS.moves.CHARBOSS_PLAY.title":  "카드 사용",     "WATCHER_FORESIGHT_BOSS.omniscience":  "[gold]선견지명[/gold]이 발동할 때마다 뽑을 카드 더미에서 무작위 카드 1장을 버린다.",     "WATCHER_FORESIGHT_BOSS.omniscience_dread":  "당신이 [gold]예지[/gold]할 때마다 뽑을 카드 더미에서 무작위 카드 1장을 버린다.",
+    "WATCHER_FORESIGHT_BOSS.name":  "예지 왓처",     "WATCHER_FORESIGHT_BOSS.title":  "예지 왓처",     "WATCHER_FORESIGHT_BOSS.moves.CHARBOSS_PLAY.title":  "카드 사용",     "WATCHER_FORESIGHT_BOSS.omniscience": "Whenever the Watcher triggers [gold]Foresight[/gold], you Scry 2.",     "WATCHER_FORESIGHT_BOSS.omniscience_dread": "Whenever the Watcher triggers [gold]Foresight[/gold], discard a random card from your draw pile.",
 "WATCHER_RUSHDOWN_BOSS.name": "Red-Blue Watcher",
 "WATCHER_RUSHDOWN_BOSS.title": "Red-Blue Watcher",
 "WATCHER_RUSHDOWN_BOSS.moves.CHARBOSS_PLAY.title": "Play",

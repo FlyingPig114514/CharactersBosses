@@ -157,7 +157,7 @@ public static class WatcherRushdownScript
                 Hold(WatcherCards.FearNoEvil)),
 
             // ── 11 ── 洗牌；内心宁静 / 暴怒+ / 净化+（消耗 5 张）/ 警惕（触发节制结束回合）/ 不惧妖邪（没费不弃）   （3 费）
-            Turn(3, "11. 洗牌；内心宁静、暴怒+、净化+（消耗 粉碎关节·碰撞连击·当头棒喝·冥想·义愤填膺）、警惕（触发节制结束回合）、不惧妖邪（没费不弃）",
+            Turn(5, "11. 洗牌；内心宁静、暴怒+、净化+（消耗 粉碎关节·碰撞连击·当头棒喝·冥想·义愤填膺）、警惕（触发节制结束回合）、不惧妖邪（没费不弃）",
                 shuffle: true,
                 cards: new[]
                 {
@@ -184,7 +184,6 @@ public static class WatcherRushdownScript
                     Play(WatcherCards.Eruption, upgraded: true), Play(WatcherCards.Consecrate, upgradeMinAscension: 9),
                     Play(WatcherCards.InnerPeace),
                     Play(WatcherCards.Eruption, upgraded: true), Play(WatcherCards.Consecrate, upgradeMinAscension: 9),
-                    Play(WatcherCards.InnerPeace),
                     Play(WatcherCards.Vigilance, upgradeMinAscension: 8),
                     Play(WatcherCards.Eruption, upgraded: true), Play(WatcherCards.Consecrate, upgradeMinAscension: 9),
                     Play(WatcherCards.Vigilance, upgradeMinAscension: 8),

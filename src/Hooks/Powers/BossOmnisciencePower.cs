@@ -72,21 +72,19 @@ public sealed class BossOmnisciencePower : PowerModel
             var combatHelper = WatcherCards.T("WatcherCombatHelper");
             var scry = combatHelper?.GetMethod("Scry",
                 BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-            if (scry != null)
-            {
-                var fix2 = new HarmonyMethod(typeof(BossOmnisciencePower)
-                    .GetMethod(nameof(ScryScopePostfix), BindingFlags.Static | BindingFlags.NonPublic)!);
-                PatchSafe("CharacterBosses.watcher.omniscience.scry", scry, fix2);
-                okAny = true;
-            }
+            // ★ v0.2.762：恐惧模式**不再**挂「任何预见都算」这条（改成沿用旧普通模式的效果）。
+            if (scry != null) { okAny = true; }
+            // ② 顺手装上「迂回不自动返手」（预见观的牌里只有她会带迂回）。
+            //   ⚠ 必须放在「找不到 WatcherCombatHelper 就 return」**之前**：B 版观者根本没有这个类
+            //   ⇒ 以前直接从上面 return，这条永远装不上（用户 2026-11-18：「迂回返手还是没拦住」，
+            //   日志里 0.2.756~0.2.760 一次「迂回：…」都没有，就是证据）。
+            try { BossWeaveNoReturn.TryInstall(); } catch { /* 忽略 */ }
+
             if (combatHelper == null)
             {
-                if (_installAttempts <= 3) Logger.Log("[CharBoss] 通晓万物：暂时没找到观者的 WatcherCombatHelper ⇒ 稍后重试");
+                if (_installAttempts <= 3) Logger.Log("[CharBoss] 通晓万物：暂时没找到观者的 WatcherCombatHelper（B 版没有这个类，正常）");
                 return;
             }
-
-            // ② 顺手装上「迂回不自动返手」（预见观的牌里只有她会带迂回）
-            try { BossWeaveNoReturn.TryInstall(); } catch { /* 忽略 */ }
 
             _installed = true;
             Logger.Log("[CharBoss] 通晓万物：已挂上恐惧模式的「预见」钩子；普通模式改由她的回合开始触发" +
@@ -116,7 +114,8 @@ public sealed class BossOmnisciencePower : PowerModel
         try
         {
             if (boss?.Creature == null) return;
-            if (DreadMode.IsActive) return;
+            // ★ v0.2.762（用户 2026-11-18）：普通 / 恐惧**都**在「她回合开始 + 身上有先见之明」时触发；
+            //   恐惧模式不再走「任何预见都算」那条（改成沿用之前普通模式的效果）。
             if (boss.Creature.GetPower<BossOmnisciencePower>() == null) return;
             if (!HasForesight(boss.Creature)) return;
 
@@ -184,6 +183,15 @@ public sealed class BossOmnisciencePower : PowerModel
                 return;
             }
 
+            if (!DreadMode.IsActive)
+            {
+                // ★ 普通模式（用户 2026-11-18 的削弱）：改成「**你预见 2**」——对那位玩家跑一次预见 2。
+                int scried = await ScryPlayerAsync(ctx, target, 2);
+                if (_logs++ < 12)
+                    Logger.Log($"[CharBoss] 通晓万物（{source}）：{(target.Creature?.Name ?? "该玩家")} 预见 {scried}/2 张");
+                return;
+            }
+
             int index = MegaCrit.Sts2.Core.Random.Rng.Chaotic.NextInt(draw.Count);
             var card = draw[Math.Max(0, Math.Min(index, draw.Count - 1))];
             if (card == null) return;
@@ -196,6 +204,38 @@ public sealed class BossOmnisciencePower : PowerModel
         catch (Exception e) { Logger.Log("[CharBoss] 通晓万物结算失败（不影响战斗）: " + e.Message); }
     }
 
+    /// <summary>
+    /// 对某位玩家跑一次「**预见 N**」（走观者 mod 自己的 `WatcherCombatHelper.Scry`，
+    /// 弃牌 / 触发「被预见」相关钩子的行为与卡牌完全一致）。返回实际预见的张数。
+    /// 用户 2026-11-18 的削弱：普通模式的「通晓万物」= 每当她触发先见之明时，**你预见 2**。
+    /// </summary>
+    private static async Task<int> ScryPlayerAsync(PlayerChoiceContext? ctx, Player? player, int amount)
+    {
+        try
+        {
+            if (player == null || amount <= 0) return 0;
+            var helper = WatcherCards.T("WatcherCombatHelper");
+            var m = helper?.GetMethod("Scry", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+            if (m == null)
+            {
+                Logger.Log("[CharBoss] 通晓万物：找不到观者的 Scry 入口 ⇒ 这次不预见");
+                return 0;
+            }
+            var useCtx = ctx ?? new BlockingPlayerChoiceContext();
+            object? task = m.Invoke(null, new object?[] { useCtx, player, amount, null });
+            if (task is Task<List<CardModel>> t)
+            {
+                var list = await t;
+                return list?.Count ?? 0;
+            }
+            return 0;
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 通晓万物：让玩家预见失败（不影响战斗）: " + e.Message);
+            return 0;
+        }
+    }
     private static string SafeEntry(CardModel? card)
     {
         try { return card?.Id.Entry ?? "?"; } catch { return "?"; }

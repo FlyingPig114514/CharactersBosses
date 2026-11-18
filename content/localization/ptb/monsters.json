@@ -215,7 +215,7 @@
     "WATCHER_RETAIN_BOSS.moves.CHARBOSS_PLAY.title":  "Jogar",
     "WATCHER_RETAIN_BOSS.establishment":  "No fim do seu turno, cada carta retida na sua mão com custo menor que 2 tem seu custo aumentado em 1 pelo resto do combate. Para cada carta cujo custo aumente assim, a Observadora perde 1 de Força.",
     "WATCHER_RETAIN_BOSS.establishment_dread":  "No fim do seu turno, suas cartas retidas têm seu custo aumentado em 1 pelo resto do combate.",
-    "WATCHER_FORESIGHT_BOSS.name":  "Observador da Presciência",     "WATCHER_FORESIGHT_BOSS.title":  "Observador da Presciência",     "WATCHER_FORESIGHT_BOSS.moves.CHARBOSS_PLAY.title":  "Jogar",     "WATCHER_FORESIGHT_BOSS.omniscience":  "Sempre que [gold]Presciência[/gold] for acionada, descarte uma carta aleatória do seu monte de compra.",     "WATCHER_FORESIGHT_BOSS.omniscience_dread":  "Sempre que você [gold]pressentir[/gold], descarte uma carta aleatória do seu monte de compra.",
+    "WATCHER_FORESIGHT_BOSS.name":  "Observador da Presciência",     "WATCHER_FORESIGHT_BOSS.title":  "Observador da Presciência",     "WATCHER_FORESIGHT_BOSS.moves.CHARBOSS_PLAY.title":  "Jogar",     "WATCHER_FORESIGHT_BOSS.omniscience": "Whenever the Watcher triggers [gold]Foresight[/gold], you Scry 2.",     "WATCHER_FORESIGHT_BOSS.omniscience_dread": "Whenever the Watcher triggers [gold]Foresight[/gold], discard a random card from your draw pile.",
 "WATCHER_RUSHDOWN_BOSS.name": "Red-Blue Watcher",
 "WATCHER_RUSHDOWN_BOSS.title": "Red-Blue Watcher",
 "WATCHER_RUSHDOWN_BOSS.moves.CHARBOSS_PLAY.title": "Play",

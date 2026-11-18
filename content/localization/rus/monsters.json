@@ -215,7 +215,7 @@
     "WATCHER_RETAIN_BOSS.moves.CHARBOSS_PLAY.title":  "Разыграть",
     "WATCHER_RETAIN_BOSS.establishment":  "В конце твоего хода стоимость каждой удерживаемой карты в твоей руке со стоимостью меньше 2 увеличивается на 1 до конца боя. За каждую такую карту Созерцающая теряет 1 силы.",
     "WATCHER_RETAIN_BOSS.establishment_dread":  "В конце твоего хода стоимость удерживаемых тобой карт увеличивается на 1 до конца боя.",
-    "WATCHER_FORESIGHT_BOSS.name":  "Наблюдатель Предвидения",     "WATCHER_FORESIGHT_BOSS.title":  "Наблюдатель Предвидения",     "WATCHER_FORESIGHT_BOSS.moves.CHARBOSS_PLAY.title":  "Разыграть",     "WATCHER_FORESIGHT_BOSS.omniscience":  "Каждый раз, когда срабатывает [gold]Предвидение[/gold], сбросьте случайную карту из колоды добора.",     "WATCHER_FORESIGHT_BOSS.omniscience_dread":  "Каждый раз, когда вы [gold]провидите[/gold], сбросьте случайную карту из колоды добора.",
+    "WATCHER_FORESIGHT_BOSS.name":  "Наблюдатель Предвидения",     "WATCHER_FORESIGHT_BOSS.title":  "Наблюдатель Предвидения",     "WATCHER_FORESIGHT_BOSS.moves.CHARBOSS_PLAY.title":  "Разыграть",     "WATCHER_FORESIGHT_BOSS.omniscience": "Whenever the Watcher triggers [gold]Foresight[/gold], you Scry 2.",     "WATCHER_FORESIGHT_BOSS.omniscience_dread": "Whenever the Watcher triggers [gold]Foresight[/gold], discard a random card from your draw pile.",
 "WATCHER_RUSHDOWN_BOSS.name": "Red-Blue Watcher",
 "WATCHER_RUSHDOWN_BOSS.title": "Red-Blue Watcher",
 "WATCHER_RUSHDOWN_BOSS.moves.CHARBOSS_PLAY.title": "Play",
