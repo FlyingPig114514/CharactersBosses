@@ -321,6 +321,10 @@ internal static class WatcherCards
     internal static Type? LoomingFruit => typeof(MegaCrit.Sts2.Core.Models.Relics.LoomingFruit);
     /// <summary>坚固钳子（本体遗物 `STURDY_CLAMP`）。</summary>
     internal static Type? SturdyClamp => typeof(MegaCrit.Sts2.Core.Models.Relics.SturdyClamp);
+    /// <summary>腰带抽打（`SashWhip`，1 费攻击）：造成伤害；若上一张是技能牌则施加虚弱。</summary>
+    internal static Type? SashWhip => Card("WatcherSashWhip", "SashWhip",
+        "WATCHER_SASH_WHIP", "WATCHER-SASH_WHIP");
+
     /// <summary>当头棒喝（`Wallop`，2 费攻击）：造成伤害并获得等量格挡。</summary>
     internal static Type? Wallop => Card("WatcherWallop", "Wallop",
         "WATCHER_WALLOP", "WATCHER-WALLOP");

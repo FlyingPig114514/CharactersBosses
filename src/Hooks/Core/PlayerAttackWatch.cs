@@ -30,10 +30,19 @@ public static class PlayerAttackWatch
         => GameCompat.DeclaredMethod(typeof(MegaCrit.Sts2.Core.Commands.CardCmd), "AutoPlay");
 
     [HarmonyPostfix]
-    public static void Postfix(CardModel? card)
+    public static void Postfix(object[] __args)
     {
         try
         {
+            // ★ v0.2.769：不再靠参数名绑定（绑定不上就永远收不到 ⇒ 第 4 回合不惧妖邪 / 第 12 回合换计划全失效）
+            CardModel? card = null;
+            if (__args != null)
+                foreach (var a in __args)
+                {
+                    if (a is CardModel cm) { card = cm; break; }
+                    if (a is System.Collections.IEnumerable en)
+                        foreach (var b in en) if (b is CardModel c2) { card = c2; break; }
+                }
             if (card?.Owner == null) return;
             // 只看**真人玩家**的牌：影子玩家的牌 Owner 是她的 Shadow（`Creature.Monster != null`）
             if (card.Owner.Creature?.Monster != null) return;

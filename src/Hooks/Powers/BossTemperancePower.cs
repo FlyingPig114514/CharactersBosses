@@ -80,8 +80,17 @@ public sealed class BossTemperancePower : PowerModel
     {
         try
         {
-            var power = boss?.Creature?.GetPower<BossTemperancePower>();
-            if (power == null) return;
+            if (boss?.Creature == null) return;
+            var power = boss.Creature.GetPower<BossTemperancePower>();
+            if (power == null)
+            {
+                // ★ v0.2.769（用户 2026-11-18：「特殊效果还是没有给他计数」）：她身上可能压根没挂上
+                //   「节制」（变体判定/施加时机一旦错过就再也没有）⇒ 第一次记账时自己补挂一次。
+                await PowerCmd.Apply<BossTemperancePower>(ctx, boss.Creature, 1m, boss.Creature, null);
+                power = boss.Creature.GetPower<BossTemperancePower>();
+                if (power == null) return;
+                Logger.Log("[CharBoss] 节制：她身上原来没有这层 buff ⇒ 已补挂");
+            }
             power._played++;
             if (power._played < Threshold) return;
             power._played = 0;

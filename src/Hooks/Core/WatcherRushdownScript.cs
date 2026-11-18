@@ -54,7 +54,7 @@ public static class WatcherRushdownScript
             // ── 1 ── 猛虎下山 / 暴怒+ / 警惕 / 打击（没费不弃）/ 防御（没费不弃）   （5 费）
             Turn(5, "1. 猛虎下山、暴怒+、警惕、打击（没费不弃）、防御（没费不弃）",
                 Play(WatcherCards.Rushdown),
-                Play(WatcherCards.Eruption, upgraded: true),
+                Play(WatcherCards.Crescendo),
                 Play(WatcherCards.Vigilance, upgradeMinAscension: 8),
                 Hold(WatcherCards.Strike),
                 Hold(WatcherCards.Defend)),
@@ -62,8 +62,8 @@ public static class WatcherRushdownScript
             // ── 2 ── 心灵堡垒 / 渐强 / 粉碎关节 / 安宁 / 净化+（保留不出）/ 打击·防御（没费）/ 奇迹（保留不出）   （4 费）
             Turn(4, "2. 心灵堡垒、渐强、粉碎关节、安宁、净化+（保留不出）、打击（没费）、防御（没费）、奇迹（保留不出）",
                 Play(WatcherCards.MentalFortress, upgradeMinAscension: 8),
-                Play(WatcherCards.Crescendo),
-                Play(WatcherCards.CrushJoints),
+                Play(WatcherCards.Eruption, upgraded: true),
+                Play(WatcherCards.SashWhip),
                 Play(WatcherCards.Tranquility),
                 HoldPurify(),
                 Hold(WatcherCards.Strike),
@@ -116,7 +116,7 @@ public static class WatcherRushdownScript
 
             // ── 7 ── 碰撞连击 / 猛虎下山 / 腾越（没费不弃）/ 奇迹（保留不出）   （2 费）
             Turn(2, "7. 碰撞连击、猛虎下山、腾越（没费不弃）、奇迹（保留不出）",
-                Play(WatcherCards.BowlingBash),
+                Play(WatcherCards.SashWhip),
                 Play(WatcherCards.Rushdown),
                 Hold(WatcherCards.Vault, 3),
                 Hold(WatcherCards.Miracle, cost: 0)),
@@ -129,7 +129,7 @@ public static class WatcherRushdownScript
                     Play(WatcherCards.Miracle, cost: 0),
                     Play(WatcherCards.Vault),
                     Play(WatcherCards.InnerPeace),
-                    Play(WatcherCards.BowlingBash),
+                    Play(WatcherCards.SashWhip),
                     PlayPurify(WatcherCards.Strike, WatcherCards.Strike, WatcherCards.Strike,
                                WatcherCards.Strike, WatcherCards.Defend),
                     Exhausted(WatcherCards.Strike),
@@ -152,7 +152,7 @@ public static class WatcherRushdownScript
             Turn(1, "10. 供奉、冥想（捞内心宁静）、粉碎关节（不出）、警惕（不出）、不惧妖邪（不出）",
                 Play(WatcherCards.Consecrate, upgradeMinAscension: 9),
                 Play(WatcherCards.Meditate, returns: WatcherCards.InnerPeace),
-                Hold(WatcherCards.CrushJoints),
+                Hold(WatcherCards.SashWhip),
                 Hold(WatcherCards.Vigilance, 2),
                 Hold(WatcherCards.FearNoEvil)),
 
@@ -163,9 +163,9 @@ public static class WatcherRushdownScript
                 {
                     Play(WatcherCards.InnerPeace),
                     Play(WatcherCards.Eruption, upgraded: true),
-                    PlayPurify(WatcherCards.CrushJoints, WatcherCards.BowlingBash, WatcherCards.Wallop,
+                    PlayPurify(WatcherCards.SashWhip, WatcherCards.BowlingBash, WatcherCards.Wallop,
                                WatcherCards.Meditate, WatcherCards.Indignation),
-                    Exhausted(WatcherCards.CrushJoints),
+                    Exhausted(WatcherCards.SashWhip),
                     Exhausted(WatcherCards.BowlingBash),
                     Exhausted(WatcherCards.Wallop),
                     Exhausted(WatcherCards.Meditate),
@@ -330,7 +330,7 @@ public static class WatcherRushdownScript
         Add(WatcherCards.Defend, 10);
         Add(WatcherCards.MentalFortress);
         Add(WatcherCards.Crescendo);
-        Add(WatcherCards.CrushJoints, 2);
+        Add(WatcherCards.SashWhip, 2);
         Add(WatcherCards.Tranquility);
         Add(WatcherCards.Miracle, 4);
         Add(WatcherCards.Indignation, 3);
