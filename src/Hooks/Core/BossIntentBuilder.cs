@@ -909,11 +909,20 @@ public static class BossIntentBuilder
         {
             try
             {
+                // ★ v0.2.758（用户 2026-11-18）：段数只数**存活**的真人玩家（死了的不算）。
                 int players = 1;
                 try
                 {
                     var real = CharacterBosses.Core.BossLockOn.RealPlayers(card?.CombatState);
-                    if (real != null && real.Count > 0) players = real.Count;
+                    int alive = 0;
+                    if (real != null)
+                    {
+                        foreach (var rp in real)
+                        {
+                            try { if (rp?.Creature != null && rp.Creature.IsAlive) alive++; } catch { /* 忽略 */ }
+                        }
+                    }
+                    if (alive > 0) players = alive;
                 }
                 catch { players = 1; }
 

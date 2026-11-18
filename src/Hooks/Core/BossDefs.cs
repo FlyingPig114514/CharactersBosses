@@ -1181,7 +1181,7 @@ public static class BossDefs
                     SpecialPowerDread = typeof(Powers.BossOmnisciencePower),
                     DreadUpgrades = WatcherForesightScript.DreadUpgradeTypes(),
                     // 观者模组初始生命 72（这四件遗物里没有布质果实 ⇒ 主定义的 103 要减掉那 31）
-                    HpBonus = -31,
+                    HpBonus = 0,
                     BlocksVanillaDraw = true,
                 },
             },
@@ -1219,7 +1219,7 @@ public static class BossDefs
                     SpecialPower = typeof(Powers.BossEstablishmentPower),
                     SpecialPowerDread = typeof(Powers.BossEstablishmentPower),
                     // 观者模组初始生命 72（她这五件遗物里没有布质果实 ⇒ 主定义的 103 减掉 31）
-                    HpBonus = -31,
+                    HpBonus = 0,
                     BlocksVanillaDraw = true,
                     // 进阶 8 / 9 的升级写在剧本里（心灵堡垒 / 停顿 / 警惕；改造现实 / 旋转打击）
                 },
@@ -1240,7 +1240,7 @@ public static class BossDefs
                     SpecialPower = typeof(Powers.WatcherFastingPower),
                     SpecialPowerDread = typeof(Powers.WatcherFastingPower),
                     // 观者模组初始生命 72（用户给的遗物里没有布质果实 ⇒ 主定义的 103 要减掉那 31）
-                    HpBonus = -31,
+                    HpBonus = 0,
                     BlocksVanillaDraw = true,
                     // 进阶 8 / 9 的升级写在剧本里（如水、心灵堡垒；第 6、11 回合的点穴）
                 },
@@ -1260,7 +1260,7 @@ public static class BossDefs
                     SpecialPower = typeof(Powers.BossTemperancePower),
                     SpecialPowerDread = typeof(Powers.BossTemperancePower),
                     // 布质果实已经在遗物里 ⇒ 血量沿用主定义（观者 72 + 布质果实 31 = 103）
-                    HpBonus = 0,
+                    HpBonus = 31,
                     BlocksVanillaDraw = true,
                     DreadUpgrades = WatcherRushdownScript.DreadUpgradeTypes(),
                 },

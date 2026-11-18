@@ -94,9 +94,28 @@ internal static class BossWeaveNoReturn
                 catch (Exception e) { Logger.Log($"[CharBoss] 迂回：{name} 挂载失败: {e.Message}"); }
             }
 
+            // ② **B 版（lamali）**：它把「预见就回手」写在**卡片自己**身上 ——
+            //   `Watcher.Code.Cards.Uncommon.Weave.AfterScryed(ctx, player, scryAmount, discardAmount, seen, discarded)`。
+            //   Scry 那条入口拦不到它（用户 2026-11-18 实测：「B 版观者的迂回回手没有拦住」），
+            //   所以这里直接把这个方法前缀掉：是她（影子玩家）就整条跳过。
+            try
+            {
+                var weave = WatcherCards.Weave;
+                var after = weave?.GetMethod("AfterScryed",
+                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                if (after != null)
+                {
+                    var pre = new HarmonyMethod(typeof(BossWeaveNoReturn)
+                        .GetMethod(nameof(WeaveAfterScryedPrefix), BindingFlags.Static | BindingFlags.NonPublic)!);
+                    new Harmony("CharacterBosses.watcher.weave.noreturn.afterscryed").Patch(after, prefix: pre);
+                    any = true;
+                }
+            }
+            catch (Exception e) { Logger.Log("[CharBoss] 迂回：B 版 AfterScryed 挂载失败: " + e.Message); }
+
             if (!any)
             {
-                if (_attempts <= 3) Logger.Log("[CharBoss] 迂回：观者的 Scry / ScryAutoDiscard 都还没找到 ⇒ 稍后重试");
+                if (_attempts <= 3) Logger.Log("[CharBoss] 迂回：观者的 Scry / ScryAutoDiscard / Weave.AfterScryed 都还没找到 ⇒ 稍后重试");
                 return;
             }
             _installed = true;
@@ -105,6 +124,18 @@ internal static class BossWeaveNoReturn
         catch (Exception e) { Logger.Log("[CharBoss] 迂回：挂钩失败: " + e.Message); }
     }
 
+    /// <summary>**B 版的迂回**（`Weave.AfterScryed`）：是她打出去的这张就不回手（A 版走下面的 Scry 那条）。</summary>
+    private static bool WeaveAfterScryedPrefix(Player player)
+    {
+        try
+        {
+            if (!IsBossShadow(player)) return true;      // 真人玩家的观者 ⇒ 原版行为
+            if (_logs++ < 12)
+                Logger.Log("[CharBoss] 迂回（B 版）：她的 Weave.AfterScryed 已拦下 ⇒ 不返手");
+            return false;
+        }
+        catch { return true; }
+    }
     // ── 前缀：先把弃牌堆里的迂回收起来，让原版那张「扫 discard 找 Weave」扫到空 ──
     private static void ScryPrefix(Player owner)
     {
@@ -193,7 +224,16 @@ internal static class BossWeaveNoReturn
     // ── 小工具 ─────────────────────────────────────────────────────────────
     private static bool IsWeave(CardModel? card)
     {
-        try { return card != null && card.GetType().Name == WeaveTypeName; }
+        try
+        {
+            if (card == null) return false;
+            // A 版类名 `WatcherMod.WatcherWeave`、B 版 `Watcher.Code.Cards.Uncommon.Weave`
+            // ⇒ 优先按「观者 mod 当前 provider 解析出来的那个类型」比，再退回类名兜底。
+            var resolved = WatcherCards.Weave;
+            if (resolved != null && card.GetType() == resolved) return true;
+            string name = card.GetType().Name;
+            return name == WeaveTypeName || name.EndsWith("Weave", StringComparison.Ordinal);
+        }
         catch { return false; }
     }
 
