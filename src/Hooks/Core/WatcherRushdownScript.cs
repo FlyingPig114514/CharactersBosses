@@ -21,7 +21,7 @@ namespace CharacterBosses.Core;
 ///
 /// ## 逐回合能量（= 本回合**真的要打出去**的牌费之和；标了「没费、不弃」的牌不算）
 /// 1 = 猛虎下山1 + 暴怒+2 + 警惕2 → **5**
-/// 2 = 心灵堡垒1 + 渐强1 + 粉碎关节1 + 安宁1 → **4**
+/// 2 = 心灵堡垒1 + 渐强1 + 腰带抽打1 + 安宁1 → **4**
 /// 3 = 义愤填膺1 + 供奉0 + 碰撞连击1 + 打击1 + 冥想1 → **4**（之后「节制」满 12 张 ⇒ 她的回合当场结束）
 /// 4 = 暴怒+2 + 打击1 + 防御1 + 不惧妖邪1 → **5**
 /// 5 = 当头棒喝2 → **2**
@@ -37,7 +37,7 @@ namespace CharacterBosses.Core;
 ///
 /// ## 进阶
 /// · 进阶 8：升级 **心灵堡垒 / 警惕**
-/// · 进阶 9：升级 **义愤填膺 / 粉碎关节 / 当头棒喝 / 供奉**
+/// · 进阶 9：升级 **义愤填膺 / 腰带抽打 / 当头棒喝 / 供奉**（腰带抽打 = 原「粉碎关节」那格，v0.2.769 换的）
 /// · 恐惧模式：特殊效果换成「时间扭曲」（另计被锁定玩家的出牌并终止其回合）——
 ///   见 `Powers.BossTemperancePower`
 ///
@@ -59,8 +59,8 @@ public static class WatcherRushdownScript
                 Hold(WatcherCards.Strike),
                 Hold(WatcherCards.Defend)),
 
-            // ── 2 ── 心灵堡垒 / 渐强 / 粉碎关节 / 安宁 / 净化+（保留不出）/ 打击·防御（没费）/ 奇迹（保留不出）   （4 费）
-            Turn(4, "2. 心灵堡垒、渐强、粉碎关节、安宁、净化+（保留不出）、打击（没费）、防御（没费）、奇迹（保留不出）",
+            // ── 2 ── 心灵堡垒 / 渐强 / 腰带抽打 / 安宁 / 净化+（保留不出）/ 打击·防御（没费）/ 奇迹（保留不出）   （4 费）
+            Turn(4, "2. 心灵堡垒、渐强、腰带抽打、安宁、净化+（保留不出）、打击（没费）、防御（没费）、奇迹（保留不出）",
                 Play(WatcherCards.MentalFortress, upgradeMinAscension: 8),
                 Play(WatcherCards.Eruption, upgraded: true),
                 Play(WatcherCards.SashWhip),
@@ -115,13 +115,17 @@ public static class WatcherRushdownScript
                 Hold(WatcherCards.Miracle, cost: 0)),
 
             // ── 7 ── 碰撞连击 / 猛虎下山 / 腾越（没费不弃）/ 奇迹（保留不出）   （2 费）
+            // ★ v0.2.771（用户 2026-11-19：「第七和第八回合打腰带抽打干什么？那两张都应该是碰撞连击」）：
+            //   v0.2.769 那次「所有粉碎关节 → 腰带抽打」的全局替换把这两张**碰撞连击**也换掉了，
+            //   现在改回来（T2 的腰带抽打保留，T3 的碰撞连击位置不动）。
             Turn(2, "7. 碰撞连击、猛虎下山、腾越（没费不弃）、奇迹（保留不出）",
-                Play(WatcherCards.SashWhip),
+                Play(WatcherCards.BowlingBash),
                 Play(WatcherCards.Rushdown),
                 Hold(WatcherCards.Vault, 3),
                 Hold(WatcherCards.Miracle, cost: 0)),
 
             // ── 8 ── 洗牌；奇迹(+1) / 腾越 ⇒ 节制第二次满 12 张结束回合，但腾越给额外回合   （3 费）
+            //   ★ v0.2.771：额外回合里的那张是**碰撞连击**（用户 2026-11-19），不是腰带抽打。
             Turn(5, "8. 洗牌；奇迹、腾越（节制第二次满 12 张 ⇒ 结束回合，腾越给出额外回合）",
                 shuffle: true,
                 cards: new[]
@@ -129,7 +133,7 @@ public static class WatcherRushdownScript
                     Play(WatcherCards.Miracle, cost: 0),
                     Play(WatcherCards.Vault),
                     Play(WatcherCards.InnerPeace),
-                    Play(WatcherCards.SashWhip),
+                    Play(WatcherCards.BowlingBash),
                     PlayPurify(WatcherCards.Strike, WatcherCards.Strike, WatcherCards.Strike,
                                WatcherCards.Strike, WatcherCards.Defend),
                     Exhausted(WatcherCards.Strike),
@@ -148,8 +152,8 @@ public static class WatcherRushdownScript
                 Hold(WatcherCards.FearNoEvil),
                 Hold(WatcherCards.Meditate)),
 
-            // ── 10 ── 供奉 / 冥想（捞内心宁静）/ 粉碎关节·警惕·不惧妖邪（不出）   （1 费）
-            Turn(1, "10. 供奉、冥想（捞内心宁静）、粉碎关节（不出）、警惕（不出）、不惧妖邪（不出）",
+            // ── 10 ── 供奉 / 冥想（捞内心宁静）/ 腰带抽打·警惕·不惧妖邪（不出）   （1 费）
+            Turn(1, "10. 供奉、冥想（捞内心宁静）、腰带抽打（不出）、警惕（不出）、不惧妖邪（不出）",
                 Play(WatcherCards.Consecrate, upgradeMinAscension: 9),
                 Play(WatcherCards.Meditate, returns: WatcherCards.InnerPeace),
                 Hold(WatcherCards.SashWhip),
@@ -157,7 +161,7 @@ public static class WatcherRushdownScript
                 Hold(WatcherCards.FearNoEvil)),
 
             // ── 11 ── 洗牌；内心宁静 / 暴怒+ / 净化+（消耗 5 张）/ 警惕（触发节制结束回合）/ 不惧妖邪（没费不弃）   （3 费）
-            Turn(5, "11. 洗牌；内心宁静、暴怒+、净化+（消耗 粉碎关节·碰撞连击·当头棒喝·冥想·义愤填膺）、警惕（触发节制结束回合）、不惧妖邪（没费不弃）",
+            Turn(5, "11. 洗牌；内心宁静、暴怒+、净化+（消耗 腰带抽打·碰撞连击·当头棒喝·冥想·义愤填膺）、警惕（触发节制结束回合）、不惧妖邪（没费不弃）",
                 shuffle: true,
                 cards: new[]
                 {

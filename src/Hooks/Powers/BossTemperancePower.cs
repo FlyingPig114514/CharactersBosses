@@ -76,7 +76,8 @@ public sealed class BossTemperancePower : PowerModel
     /// 实测 `PowerModel.AfterCardPlayed` 在她这只 Boss 身上**根本不派发** ⇒ 以前一次都没数过。
     /// 现在改成由她自己的出牌循环显式记账。
     /// </summary>
-    internal static async Task NoteCardPlayedAsync(PlayerChoiceContext ctx, Monsters.CharBossMonster? boss)
+    internal static async Task NoteCardPlayedAsync(PlayerChoiceContext ctx, Monsters.CharBossMonster? boss,
+                                                   CardModel? card = null)
     {
         try
         {
@@ -91,46 +92,68 @@ public sealed class BossTemperancePower : PowerModel
                 if (power == null) return;
                 Logger.Log("[CharBoss] 节制：她身上原来没有这层 buff ⇒ 已补挂");
             }
+            int before = power._played;
             power._played++;
+            // ★ v0.2.771：`NPower.RefreshAmount` 只在 `StackType == Counter` 时把 **`DisplayAmount`**
+            //   画到图标上（反编译实证），而且只在**收到 `DisplayAmountChanged` 事件**时重画
+            //   ⇒ 不调这一句，图标永远停在挂载那一刻的数字（用户 2026-11-19：「还是没有计数」）。
+            //   同款写法见 `IroncladRagePower` / `KnowThyPlacePower`。
+            try { power.InvokeDisplayAmountChanged(); } catch { /* 只是图标 */ }
+            if (_countLogs++ < 48)
+                Logger.Log($"[CharBoss] 节制：计数 {before} → {power._played}/{Threshold}（{EntryOf(card)}）");
             if (power._played < Threshold) return;
             power._played = 0;
+            try { power.InvokeDisplayAmountChanged(); } catch { /* 只是图标 */ }
             await TriggerAsync(ctx, boss!.Creature);
         }
         catch (Exception e) { Logger.Log("[CharBoss] 节制：计数失败（不影响战斗）: " + e.Message); }
     }
 
-    /// <summary>（保留旧的 Power 钩子作兜底，正常不会被派发到。）</summary>
-    public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
+    private static int _countLogs;
+
+    private static string EntryOf(CardModel? card)
+    {
+        try { return card?.Id.Entry ?? "?"; } catch { return "?"; }
+    }
+
+    /// <summary>
+    /// **只做一件事**：把「真人玩家（被她锁定的那位）打出攻击牌」记下来（第 12 回合起换计划用）。
+    ///
+    /// ⚠ v0.2.771（用户 2026-11-19：「第二回合 6 张牌就给自己加力量（明明是 12 张）」）：
+    ///   这里以前**还会 `_played++`** —— 而日志实证这条 `PowerModel.AfterCardPlayed` 在她身上
+    ///   **是会派发的**（同一个根因反过来证明它：她这 3 个回合一共只打了 7 张牌就触发了一次，
+    ///   只有「`PlayOne` 记一次 + 这里再记一次」才对得上 12 ⇒ 每张牌数两遍）。
+    ///   现在计数**只走** <see cref="NoteCardPlayedAsync"/> 一条路，这里不再数。
+    ///
+    /// 顺带把同一个信号也给 `Core.PlayerAttackWatch.Flag`（`PlayOne` 里那记「不惧妖邪 ⇒ 平静」
+    /// 的兜底分支读它；那条 Harmony 挂在 `CardCmd.AutoPlay` 上，而真人从手里出牌并不走那个入口，
+    /// 所以这里补一份更可靠的来源）。
+    /// </summary>
+    public override Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
         try
         {
-            // ★ v0.2.761（用户 2026-11-18：「特殊效果没有正确计数」）：
-            //   以前用 `Owner.Player` 判「这是不是她的牌」—— 但 Boss 生物身上**没有** Player
-            //   （她的影子玩家是另外挂上去的）⇒ `Owner.Player == null` 直接 return，**一次都没数过**。
-            //   现在改成拿 `Shadow` 比。
             var boss = Owner?.Monster as Monsters.CharBossMonster;
             var shadow = boss?.Shadow;
-            if (shadow == null || cardPlay?.Card == null) return;
+            if (shadow == null || cardPlay?.Card == null) return Task.CompletedTask;
 
-            // ★ v0.2.766：**被锁定的玩家**打出攻击牌 ⇒ 下一回合（第 12 回合起）换成「不惧妖邪」那套计划
-            if (!ReferenceEquals(cardPlay.Card.Owner, shadow))
-            {
-                try
-                {
-                    if (cardPlay.Card.Type == CardType.Attack) Core.BossScript.SwitchRequested = true;
-                }
-                catch { /* 忽略 */ }
-                return;                                                       // 玩家那边只做这一件事
-            }
-            if (Owner!.CombatState == null) return;
+            if (ReferenceEquals(cardPlay.Card.Owner, shadow)) return Task.CompletedTask;   // 她的牌：不在这里数
 
-            _played++;
-            if (_played < Threshold) return;
-            _played = 0;
-            await TriggerAsync(choiceContext, Owner);
+            bool attack = false;
+            try { attack = cardPlay.Card.Type == CardType.Attack; } catch { /* 忽略 */ }
+            if (!attack) return Task.CompletedTask;
+
+            Core.BossScript.SwitchRequested = true;
+            Core.PlayerAttackWatch.Flag = true;
+            if (_hookLogs++ < 12)
+                Logger.Log($"[CharBoss] 节制钩子：真人玩家打出了攻击牌「{EntryOf(cardPlay.Card)}」" +
+                           "⇒ 已记下（第 12 回合起本回合换成「不惧妖邪无限」）");
         }
-        catch (Exception e) { Logger.Log("[CharBoss] 节制：计数失败（不影响战斗）: " + e.Message); }
+        catch (Exception e) { Logger.Log("[CharBoss] 节制钩子记账失败（不影响战斗）: " + e.Message); }
+        return Task.CompletedTask;
     }
+
+    private static int _hookLogs;
 
     /// <summary>触发一次：她与所有友方 +2 力量，然后**强制结束她自己的回合**。</summary>
     internal static async Task TriggerAsync(PlayerChoiceContext ctx, Creature? self)
@@ -199,8 +222,11 @@ public sealed class BossTimeWarpPower : PowerModel
             if (victim == null || !ReferenceEquals(victim, shooter)) return;
 
             _warped++;
+            // 同「节制」：不调这一句图标上的数字永远不刷新（`NPower.RefreshAmount` 只听这个事件）
+            try { InvokeDisplayAmountChanged(); } catch { /* 只是图标 */ }
             if (_warped < BossTemperancePower.Threshold) return;
             _warped = 0;
+            try { InvokeDisplayAmountChanged(); } catch { /* 只是图标 */ }
             Logger.Log($"[CharBoss] 时间扭曲：{shooter.Creature?.Name} 满 12 张 ⇒ 终止他的回合" +
                        "（塔1 时间扭曲的时钟特效/音效待接）");
             PlayerCmd.EndTurn(shooter, false, null);

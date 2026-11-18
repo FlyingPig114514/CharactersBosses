@@ -2027,16 +2027,30 @@ public abstract partial class CharBossMonster : MonsterModel
             try
             {
                 var temperCtx = ctx;
-                MegaCrit.Sts2.Core.Helpers.TaskHelper.RunSafely(
-                    Powers.BossTemperancePower.NoteCardPlayedAsync(temperCtx, this));
                 string entryNow = string.Empty;
                 try { entryNow = play.Card?.Id.Entry ?? string.Empty; } catch { /* 忽略 */ }
-                if (Core.PlayerAttackWatch.Flag
-                    && Monsters.CharBossMonster.WatcherIdIs(entryNow, "FEAR_NO_EVIL")
-                    && Shadow != null && !Core.WatcherCards.InCalm(Shadow))
+                MegaCrit.Sts2.Core.Helpers.TaskHelper.RunSafely(
+                    Powers.BossTemperancePower.NoteCardPlayedAsync(temperCtx, this, play.Card));
+                if (Monsters.CharBossMonster.WatcherIdIs(entryNow, "FEAR_NO_EVIL") && Shadow != null
+                    && !Core.WatcherCards.InCalm(Shadow))
                 {
-                    _ = Core.WatcherCards.EnterCalmAsync(Shadow);
-                    Logger.Log("[CharBoss] 不惧妖邪：玩家本回合打过攻击牌 ⇒ 她进入「平静」");
+                    if (Core.PlayerAttackWatch.Flag)
+                    {
+                        _ = Core.WatcherCards.EnterCalmAsync(Shadow);
+                        Logger.Log("[CharBoss] 不惧妖邪：玩家本回合打过攻击牌 ⇒ 她进入「平静」");
+                    }
+                    else if (Creature?.GetPower<Powers.WatcherFearNoEvilAimPower>()?.PlayerAttacked == true)
+                    {
+                        // 主路径走 `WatcherOmegaMechanics` 的 OnPlay 后缀（它读 buff 上的 `PlayerAttacked`），
+                        // 这里只补一条日志让「到底是谁没触发」一眼可查（用户 2026-11-19 第 2 条）。
+                        Logger.Log("[CharBoss] 不惧妖邪：buff 上记着「被锁玩家打过攻击牌」" +
+                                   "⇒ 平静交给 OnPlay 后缀结算（这条路径没有 PlayerAttackWatch 标记）");
+                    }
+                    else
+                    {
+                        Logger.Log("[CharBoss] 不惧妖邪：本回合没有检测到「被锁玩家打出攻击牌」" +
+                                   "（PlayerAttackWatch 标记=False、buff 上的 PlayerAttacked=False）⇒ 不进平静");
+                    }
                 }
             }
             catch { /* 忽略 */ }

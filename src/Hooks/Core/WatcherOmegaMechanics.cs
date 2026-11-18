@@ -77,8 +77,19 @@ internal static class WatcherOmegaMechanics
         catch { /* 忽略 */ }
         return null;
     }
-    /// <summary>这个 power 挂在哪只 Ω观身上（没有就 null）。给 `WatcherFearNoEvilAimPower` 用。</summary>
-    internal static Monsters.CharBossMonster? OmegaOwnerOf(PowerModel? power) => OurOmegaBossOfPower(power);
+    /// <summary>
+    /// 这个 power 挂在哪只「会用不惧妖邪进平静」的观者 Boss 身上（没有就 null）。
+    /// 给 `WatcherFearNoEvilAimPower` 用。
+    ///
+    /// ⚠ v0.2.771（用户 2026-11-19：「第 4 回合玩家打了攻击牌，她那记不惧妖邪还是不让她进平静」）：
+    ///   这里以前走的是 **Ω观专用**那个窄闸门（`OurOmegaBossOfPower` = 身上必须有「斋戒」）
+    ///   ⇒ 三层 3 号「红蓝观」（身上是「节制」）永远在这里就 return，`PlayerAttacked` 一辈子是 false，
+    ///   而且**一行日志都不打**（静默失效）。现在换成放宽后的 <see cref="FearNoEvilBoss"/>（斋戒**或**节制）。
+    /// </summary>
+    internal static Monsters.CharBossMonster? OmegaOwnerOf(PowerModel? power)
+    {
+        try { return FearNoEvilBoss(power?.Owner); } catch { return null; }
+    }
 
     private static Monsters.CharBossMonster? OurOmegaBossOfPower(PowerModel? power)
     {

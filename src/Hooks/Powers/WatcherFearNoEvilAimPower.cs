@@ -40,6 +40,9 @@ public sealed class WatcherFearNoEvilAimPower : PowerModel
     /// <summary>本回合被她锁定的玩家**打出过攻击牌**（打「不惧妖邪」时据此决定进不进平静）。</summary>
     internal bool PlayerAttacked;
 
+    private static int _gateMissLogs;
+    private static int _notLockedLogs;
+
     /// <summary>记下「谁在这个 buff 生效期间打了攻击牌」——只认**被她锁定的那位真人玩家**。</summary>
     public override Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
@@ -55,8 +58,21 @@ public sealed class WatcherFearNoEvilAimPower : PowerModel
             if (!attack) return Task.CompletedTask;
 
             var boss = Core.WatcherOmegaMechanics.OmegaOwnerOf(this);
-            if (boss == null) return Task.CompletedTask;
-            if (!Core.BossLockOn.IsLocked(boss, owner)) return Task.CompletedTask;
+            if (boss == null)
+            {
+                // ★ v0.2.771：这条路以前**静默** return，红蓝观整场都没有这一行 ⇒ 两边都以为是「没打出攻击牌」。
+                if (_gateMissLogs++ < 3)
+                    Logger.Log("[CharBoss] 不惧妖邪 buff：这只 Boss 不在「会用不惧妖邪进平静」的名单里" +
+                               "（既没有「斋戒」也没有「节制」）⇒ 这一手不记「玩家打过攻击牌」");
+                return Task.CompletedTask;
+            }
+            if (!Core.BossLockOn.IsLocked(boss, owner))
+            {
+                if (_notLockedLogs++ < 3)
+                    Logger.Log($"[CharBoss] 不惧妖邪 buff：打出攻击牌的是 {owner.Creature?.Name}，" +
+                               "但她不是这只 Boss 锁定的玩家 ⇒ 不记");
+                return Task.CompletedTask;
+            }
 
             PlayerAttacked = true;
             Logger.Log($"[CharBoss] 不惧妖邪 buff：被锁定的 {owner.Creature?.Name} 打出了攻击牌 " +

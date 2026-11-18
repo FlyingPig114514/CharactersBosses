@@ -517,7 +517,6 @@ public sealed class BossScript
     /// </summary>
     public Func<int, BossTurn?>? Resolve { get; init; }
 
-    /// <summary>取第 <paramref name="turn"/>（1 起）回合的剧本，含循环。</summary>
     /// <summary>
     /// **第 12 回合起「玩家打出攻击牌就切换」那一段**（用户 2026-11-18，三层 3 号「红蓝观」）。
     /// 只有 `WATCHER_RUSHDOWN` 会填；`SwitchRequested` 由 `BossTemperancePower` 在
@@ -528,17 +527,46 @@ public sealed class BossScript
     /// <summary>从第几回合开始允许切换（含）。默认 `int.MaxValue` = 永不切换。</summary>
     public int SwitchFromTurn { get; init; } = int.MaxValue;
 
-    /// <summary>「玩家刚打出攻击牌」⇒ 下一次取回合计划时换成 <see cref="SwitchTurn"/>（取一次就清掉）。</summary>
+    /// <summary>「玩家刚打出攻击牌」⇒ 下一次取回合计划时换成 <see cref="SwitchTurn"/>。</summary>
     public static bool SwitchRequested;
 
+    /// <summary>
+    /// 本次战斗**已经切换过**了（黏住，不再回落成默认那套）。
+    ///
+    /// ★ v0.2.771（用户 2026-11-19：「第 12 回合玩家打了攻击牌，还是不会切换成『不惧妖邪无限』那套」）：
+    ///   日志铁证（14:05 / 14:10 那两场）：`12 回合：玩家打出过攻击牌 ⇒ 切换成…` 打了，
+    ///   可紧接着 `剧本第 12 回合: 打 [暴怒+,供奉,内心宁静 ×…,警惕,警惕]` 仍是**默认**那 12 张，
+    ///   她整回合一张不惧妖邪都没打 ⇒ 计划不是切换段。
+    ///   根因：`SwitchRequested` 以前是「**取一次就清掉**」，而 `TurnAt` 在整局里被 ~25 处调用
+    ///   （PrepareTurn 取能量/药水 → 规划器造手牌 → 意图 → 点名名单 …）⇒ **第一个调用者**把标记吃掉了，
+    ///   真正拿去造手牌的那一次（`BossScriptPlanner`）读到的已经是 false，于是手牌永远是默认那套。
+    ///   现在「切换」对一个回合是**黏的**：一旦切换，之后所有 `TurnAt(该回合)` 都返回切换段；
+    ///   回合号掉回 <see cref="SwitchFromTurn"/> 之前（新的一场战斗）才解锁。
+    /// </summary>
+    private bool _switchLocked;
+
+    /// <summary>取第 <paramref name="turn"/>（1 起）回合的剧本，含循环。</summary>
     public BossTurn? TurnAt(int turn)
     {
-        // ★ v0.2.766：「玩家打出攻击牌 ⇒ 本回合换成切换段」（红蓝观第 12 回合起）
-        if (SwitchTurn != null && turn >= SwitchFromTurn && SwitchRequested)
+        // ★ v0.2.766 / v0.2.771：「玩家打出攻击牌 ⇒ 本回合换成切换段」（红蓝观第 12 回合起）
+        if (SwitchTurn != null)
         {
-            SwitchRequested = false;
-            Logger.Log($"[CharBoss] {turn} 回合：玩家打出过攻击牌 ⇒ 切换成「不惧妖邪无限」计划");
-            return SwitchTurn;
+            if (turn < SwitchFromTurn)
+            {
+                // 新的一场战斗（回合号从头数）：解锁，下次打出攻击牌可以再切
+                _switchLocked = false;
+            }
+            else
+            {
+                if (!_switchLocked && SwitchRequested)
+                {
+                    _switchLocked = true;
+                    SwitchRequested = false;
+                    Logger.Log($"[CharBoss] {turn} 回合：玩家打出过攻击牌 ⇒ 切换成「不惧妖邪无限」计划" +
+                               "（这个回合从此黏住，所有取计划的地方都拿到同一套）");
+                }
+                if (_switchLocked) return SwitchTurn;
+            }
         }
         if (Resolve != null)
         {
