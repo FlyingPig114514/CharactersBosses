@@ -6206,3 +6206,6 @@ Chronological action log.
 | 2026-11-18 19:02 | edit | `src/Hooks/Core/CharDominions.cs` | ok | 0 |
 | 2026-11-18 19:02 | edit | `src/Hooks/Core/CharDominions.cs` | ok | 0 |
 | 2026-11-18 19:02 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-18 19:23 | edit | `src/Hooks/Core/CardBehaviorScan.cs` | ok | 0 |
+| 2026-11-18 19:23 | edit | `src/Hooks/Core/CardBehaviorScan.cs` | ok | 0 |
+| 2026-11-18 19:24 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |

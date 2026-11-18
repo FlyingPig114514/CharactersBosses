@@ -35,6 +35,18 @@ namespace CharacterBosses.Core;
 /// ⚠ 结果按**卡牌类型**缓存（一张牌一辈子只扫一次 IL）；扫描失败就当没有（绝不影响战斗）。
 /// ⚠ 本类只在「牌面数据本身判不出强化」时才会被问到（见 `BossIntentBuilder` 的 `selfBenefit`），
 ///   所以扫错了最坏结果也只是多/少一个蓝色上箭头，不会影响任何结算。
+///
+/// ★ v0.2.787（用户 2026-11-19：「小刀的意图错误的包含了强化」）：
+///   日志实证 `牌面识别（自动）：SHIV ⇒ 强化来源 [印牌]`。
+///   根因：反编译 0.113 的 `Shiv` 除了 `OnPlay`（纯一刀 4/6 伤 + `NShivThrowVfx.Create` 特效）之外，
+///   还带**静态工厂** `Shiv.CreateInHand(Player, ICombatState, Player?)` —— 它里面是
+///   `combatState.CreateCard&lt;Shiv&gt;(owner)` + `CardPileCmd.AddGeneratedCardsToCombat(...)`。
+///   静态方法本身扫不到（`BindingFlags` 里没有 `Static`），但**它编译出来的状态机
+///   `<CreateInHand>d__11` / `<CreateInHand>d__12` 是嵌套类型**，而这里会遍历所有嵌套类型的
+///   实例方法（`MoveNext`）⇒ 把「别的牌调用这个工厂时才会发生的事」记成了「这张牌自己打出去会做的事」
+///   ⇒ 小刀多了一条蓝色强化箭头。
+///   ⇒ 现在**跳过名字以 `Create` 开头的嵌套类型**（= 静态工厂的状态机），只认这张牌自己的出牌路径。
+///   顺带把「是哪个方法看出来的」写进日志，下次一眼定位。
 /// </summary>
 internal static class CardBehaviorScan
 {
@@ -55,18 +67,23 @@ internal static class CardBehaviorScan
 
             var reasons = new List<string>();
             var seen = new HashSet<string>(StringComparer.Ordinal);
+            var where = new Dictionary<string, string>(StringComparer.Ordinal);
 
             foreach (var m in type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
-                ScanMethod(m, reasons, seen);
-            // 编译器生成的异步状态机是**嵌套类型**，OnPlay 的真正内容在它的 MoveNext 里
+                ScanMethod(m, reasons, seen, where);
+            // 编译器生成的异步状态机是**嵌套类型**，OnPlay 的真正内容在它的 MoveNext 里。
+            // ⚠ 但静态工厂（如 `Shiv.CreateInHand`）的状态机也在这里，它描述的是「别的牌调用它时会发生什么」，
+            //   不是这张牌自己打出去会做什么 ⇒ 按名字跳过 `<Create...>d__N`（v0.2.787）。
             foreach (var nested in type.GetNestedTypes(BindingFlags.Public | BindingFlags.NonPublic))
             {
+                if (IsStaticFactoryStateMachine(nested)) continue;
                 foreach (var m in nested.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
-                    ScanMethod(m, reasons, seen);
+                    ScanMethod(m, reasons, seen, where);
                 foreach (var deeper in nested.GetNestedTypes(BindingFlags.Public | BindingFlags.NonPublic))
                 {
+                    if (IsStaticFactoryStateMachine(deeper)) continue;
                     foreach (var m in deeper.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
-                        ScanMethod(m, reasons, seen);
+                        ScanMethod(m, reasons, seen, where);
                 }
             }
 
@@ -75,7 +92,18 @@ internal static class CardBehaviorScan
             {
                 string entry = "?";
                 try { entry = card!.Id.Entry; } catch { /* 忽略 */ }
-                Logger.Log($"[CharBoss] 牌面识别（自动）：{entry} ⇒ 强化来源 [{string.Join(",", reasons)}]");
+                string srcs = string.Empty;
+                try
+                {
+                    if (where.Count > 0)
+                    {
+                        var parts = new List<string>();
+                        foreach (var kv in where) parts.Add(kv.Key + "←" + kv.Value);
+                        srcs = "（来源方法：" + string.Join(" / ", parts) + "）";
+                    }
+                }
+                catch { /* 纯诊断 */ }
+                Logger.Log($"[CharBoss] 牌面识别（自动）：{entry} ⇒ 强化来源 [{string.Join(",", reasons)}]{srcs}");
             }
             return reasons;
         }
@@ -92,13 +120,47 @@ internal static class CardBehaviorScan
 
     private static readonly List<string> Empty = new();
 
-    private static void Add(List<string> reasons, HashSet<string> seen, string reason)
+    private static void Add(List<string> reasons, HashSet<string> seen, string reason,
+                            MethodBase? src = null, Dictionary<string, string>? where = null)
     {
-        if (seen.Add(reason)) reasons.Add(reason);
+        if (!seen.Add(reason)) return;
+        reasons.Add(reason);
+        // 记一下「是哪一层方法里看出来的」—— 纯诊断（v0.2.787）
+        try
+        {
+            if (where != null && src != null)
+            {
+                string t = src.DeclaringType?.Name ?? "?";
+                where[reason] = t + "." + src.Name;
+            }
+        }
+        catch { /* 纯诊断 */ }
+    }
+
+    /// <summary>
+    /// 这个嵌套类型是不是**静态工厂**编译出来的状态机（名字形如 `&lt;CreateInHand&gt;d__11`）。
+    ///
+    /// 为什么必须跳过（v0.2.787，用户 2026-11-19「小刀的意图错误的包含了强化」）：
+    /// `Shiv` 的静态工厂 `CreateInHand` 里是 `CreateCard&lt;Shiv&gt;` + `AddGeneratedCardsToCombat`，
+    /// 那是**别的牌**（刀刃之舞等）调用它时才发生的事；把它算进「小刀自己打出去做了什么」
+    /// ⇒ 小刀被认成「印牌」⇒ 多一条蓝色强化箭头（日志实证 `SHIV ⇒ 强化来源 [印牌]`）。
+    /// </summary>
+    private static bool IsStaticFactoryStateMachine(Type nested)
+    {
+        try
+        {
+            string n = nested?.Name ?? string.Empty;
+            int a = n.IndexOf('<');
+            int b = n.IndexOf('>');
+            if (a < 0 || b <= a) return false;
+            string method = n.Substring(a + 1, b - a - 1);
+            return method.StartsWith("Create", StringComparison.Ordinal);
+        }
+        catch { return false; }
     }
 
     // ── IL 扫描 ────────────────────────────────────────────────────────────
-    private static void ScanMethod(MethodInfo m, List<string> reasons, HashSet<string> seen)
+    private static void ScanMethod(MethodInfo m, List<string> reasons, HashSet<string> seen, Dictionary<string, string> where)
     {
         try
         {
@@ -176,7 +238,7 @@ internal static class CardBehaviorScan
                         MethodBase? mb = null;
                         try { mb = module.ResolveMethod(token, typeArgs, methodArgs); }
                         catch { try { mb = module.ResolveMethod(token); } catch { mb = null; } }
-                        if (mb != null) Classify(mb, recentInts, reasons, seen);
+                        if (mb != null) Classify(mb, recentInts, reasons, seen, where);
                     }
                     recentInts.Clear();
                     break;
@@ -228,7 +290,7 @@ internal static class CardBehaviorScan
     }
 
     /// <summary>把一条 `call/callvirt` 的目标方法归类。</summary>
-    private static void Classify(MethodBase mb, List<int> recentInts, List<string> reasons, HashSet<string> seen)
+    private static void Classify(MethodBase mb, List<int> recentInts, List<string> reasons, HashSet<string> seen, Dictionary<string, string> where)
     {
         string name;
         string typeName;
@@ -243,31 +305,31 @@ internal static class CardBehaviorScan
 
         // 抽牌
         if (name == "Draw" || name == "DrawInternal" || name == "DrawWithoutBlockingOnOtherPlayers")
-        { Add(reasons, seen, "抽牌"); return; }
+        { Add(reasons, seen, "抽牌", mb, where); return; }
 
         // 印牌
         if (name == "AddGeneratedCardToCombat" || name.StartsWith("CreateCard", StringComparison.Ordinal))
-        { Add(reasons, seen, "印牌"); return; }
+        { Add(reasons, seen, "印牌", mb, where); return; }
 
         // 烧牌
         if (name == "Exhaust" || name == "ExhaustInternal" || name.StartsWith("Exhaust", StringComparison.Ordinal))
-        { Add(reasons, seen, "烧牌"); return; }
+        { Add(reasons, seen, "烧牌", mb, where); return; }
 
         // 变牌
         if (name.StartsWith("Transform", StringComparison.Ordinal) || name.StartsWith("Transmute", StringComparison.Ordinal))
-        { Add(reasons, seen, "变牌"); return; }
+        { Add(reasons, seen, "变牌", mb, where); return; }
 
         // 返顶（抽牌堆顶 / 洗牌）
         if (name.StartsWith("MoveToTop", StringComparison.Ordinal) || name.StartsWith("MoveToBottom", StringComparison.Ordinal)
             || name == "Shuffle" || name == "ShuffleIfNecessary")
-        { Add(reasons, seen, "返顶"); return; }
+        { Add(reasons, seen, "返顶", mb, where); return; }
 
         // 进入姿态（观者）
         if (name.IndexOf("Stance", StringComparison.Ordinal) >= 0
             || name.StartsWith("EnterCalm", StringComparison.Ordinal)
             || name.StartsWith("EnterWrath", StringComparison.Ordinal)
             || name.StartsWith("EnterDivinity", StringComparison.Ordinal))
-        { Add(reasons, seen, "进入姿态"); return; }
+        { Add(reasons, seen, "进入姿态", mb, where); return; }
 
         // 捞牌 / 返顶：`CardPileCmd.Add(card, PileType, position, …)` —— 第二个参数是目标堆，
         // 枚举值 None 0 / Draw 1 / Hand 2 / Discard 3 / Exhaust 4（`ldc.i4.x` 会留在 recentInts 里，
@@ -276,8 +338,8 @@ internal static class CardBehaviorScan
         {
             int pile = recentInts.Count >= 2 ? recentInts[recentInts.Count - 2]
                      : recentInts.Count == 1 ? recentInts[0] : -1;
-            if (pile == 2) { Add(reasons, seen, "捞牌"); return; }
-            if (pile == 1) { Add(reasons, seen, "返顶"); return; }
+            if (pile == 2) { Add(reasons, seen, "捞牌", mb, where); return; }
+            if (pile == 1) { Add(reasons, seen, "返顶", mb, where); return; }
         }
     }
 
