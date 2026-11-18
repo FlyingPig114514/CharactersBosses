@@ -42,12 +42,14 @@ public class SilentEnvenomBossEncounter : SilentBossEncounter
 
 /// <summary>
 /// 第一幕「奇巧猎」（用户 2026-10-26 设计，静默猎手 · 奇巧/弃牌轴）。
-/// 地图图标沿用崩坠里静默猎手小刀流那套（和刀猎同一批资源，别去新建贴图 —— 缺图会导致
-/// 地图上 Boss 节点不显示，见 <see cref="CharBossEncounterBase{TMonster}.BossNodePath"/> 的注释）。
+/// 地图图标（用户 2026-11-18 指定）：用**塔1崩坠第二幕 Boss「镜像猎」**那张
+/// （`downfallResources/images/ui/map/icon/silent_mirror_image.png` + `outline/`），
+/// 从崩坠 jar 取出后经 `tools\art\import_proj` 导入、由 `tools\art\pck_extras.txt` 打进 PCK。
+/// ⚠ 一个图标只对应一个 Boss：刀猎用 `silent_shiv`，奇巧猎用 `silent_mirror_image`，别共用。
 /// </summary>
 public class SilentSlyBossEncounter : SilentBossEncounter
 {
-    public override string BossNodePath => "res://CharacterBosses/images/map/silent_shiv";
+    public override string BossNodePath => "res://CharacterBosses/images/map/silent_mirror_image";
 
     /// <summary>奇巧猎 = 第一幕档位（控制台 `fight SILENT_SLY_BOSS_ENCOUNTER` 永远打这一套）。</summary>
     public override int? TierAct => 0;
@@ -67,12 +69,10 @@ public class SilentShivBossEncounter : SilentBossEncounter
 
 public class DefectBossEncounter : CharBossEncounterBase<DefectBoss>
 {
-    /// <summary>
-    /// 地图 Boss 节点图标：用塔 1 崩坠（Downfall）里「专注流 / 能力机」的地图图标
-    /// （`defect_focus.png` + `defect_focus_outline.png`），从崩坠的 jar 里取出后随 mod 的 pck 打包。
-    /// 名称成对：<c>X.png</c> 是图标、<c>X_outline.png</c> 是轮廓，游戏两样都会去加载。
-    /// </summary>
-    public override string BossNodePath => "res://CharacterBosses/images/map/defect_focus";
+    // 地图图标（用户 2026-11-18 规则：**一个图标只对应唯一一个 Boss**）：
+    // 这里**故意不覆写** ⇒ 走基类兜底的 TheKinBoss 剪影。
+    // 三套故障机器人各自覆写自己那颗：黑球机 `defect_void`（一层）、物理机 `defect_bronze_orbs`、
+    // 能力机 `defect_focus`；其余（状态机 / 事件机 / 调试遭遇）继续用剪影。
 }
 
 public class NecrobinderBossEncounter : CharBossEncounterBase<NecrobinderBoss>
@@ -135,8 +135,8 @@ public class WatcherOmegaBossEncounter : CharBossEncounterBase<WatcherOmegaBoss>
 {
     public override int? TierAct => 2;
 
-    /// <summary>地图节点图标（暂与神格观共用一代崩坠那张；`res://CharacterBosses/images/map/`）。</summary>
-    public override string BossNodePath => "res://CharacterBosses/images/map/watcher_divinity";
+    // 地图图标（用户 2026-11-18 规则：一个图标只对应唯一一个 Boss）：
+    // Ω观**不覆写** ⇒ 走基类兜底的剪影；`watcher_divinity` 只留给神格观自己用。
 }
 
 /// <summary>调试用的「普通战斗」版：二层 1 号「印牌观」。</summary>
@@ -154,8 +154,8 @@ public class WatcherCreateBossEncounter : CharBossEncounterBase<WatcherCreateBos
 {
     public override int? TierAct => 1;      // 第二幕
 
-    /// <summary>地图节点图标（暂与神格观共用；`res://CharacterBosses/images/map/`）。</summary>
-    public override string BossNodePath => "res://CharacterBosses/images/map/watcher_divinity";
+    // 地图图标（用户 2026-11-18 规则：一个图标只对应唯一一个 Boss）：
+    // **不覆写** ⇒ 走基类兜底的剪影；`watcher_divinity` 只留给神格观自己用。
 }
 
 /// <summary>调试用的「普通战斗」版：二层 2 号「保留观」。</summary>
@@ -173,8 +173,8 @@ public class WatcherRetainBossEncounter : CharBossEncounterBase<WatcherRetainBos
 {
     public override int? TierAct => 1;      // 第二幕
 
-    /// <summary>地图节点图标（暂与神格观共用；`res://CharacterBosses/images/map/`）。</summary>
-    public override string BossNodePath => "res://CharacterBosses/images/map/watcher_divinity";
+    // 地图图标（用户 2026-11-18 规则：一个图标只对应唯一一个 Boss）：
+    // **不覆写** ⇒ 走基类兜底的剪影；`watcher_divinity` 只留给神格观自己用。
 }
 
 /// <summary>调试用的「普通战斗」版：一层 1 号「预见观」。</summary>
@@ -192,8 +192,8 @@ public class WatcherForesightBossEncounter : CharBossEncounterBase<WatcherForesi
 {
     public override int? TierAct => 0;      // 第一幕
 
-    /// <summary>地图节点图标（暂与神格观共用；`res://CharacterBosses/images/map/`）。</summary>
-    public override string BossNodePath => "res://CharacterBosses/images/map/watcher_divinity";
+    // 地图图标（用户 2026-11-18 规则：一个图标只对应唯一一个 Boss）：
+    // **不覆写** ⇒ 走基类兜底的剪影；`watcher_divinity` 只留给神格观自己用。
 }
 #endif
 // ── 调试专用的「普通战斗」版本 ──

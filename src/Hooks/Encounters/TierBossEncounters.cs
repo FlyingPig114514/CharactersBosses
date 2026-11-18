@@ -88,6 +88,12 @@ public sealed class DefectDarkBossEncounter : DefectBossEncounter
 public sealed class DefectAiBossEncounter : DefectBossEncounter
 {
     public override int? TierAct => 2;
+
+    /// <summary>
+    /// 地图图标（用户 2026-11-18 指定）：**塔1崩坠**里「三层故障机器人」那张
+    /// `defect_focus`（专注 / 能力轴，正好对上能力机）。基类不再覆写 ⇒ 只有这一套用它。
+    /// </summary>
+    public override string BossNodePath => "res://CharacterBosses/images/map/defect_focus";
 }
 
 /// <summary>第二幕「物理机」的固定档位版（爪击 / 0 费牌轴，剧本 <c>Core/ClawDefectScript.cs</c>）。</summary>
@@ -308,14 +314,10 @@ public sealed class SilentBrewerBossEncounter : SilentBossEncounter
 {
     public override int? TierAct => 2;
 
-    // 地图图标（用户 2026-10-29 修正）：用**涂毒/药剂**那张 `silent_poison`。
-    // 历史：
-    //   · 最初借「刀猎」的 `silent_shiv` —— 地图上分不出刀猎和炼药猎（用户 2026-10-27 指出）；
-    //   · 之后改成**占位图标**（= 基类兜底的 TheKinBoss 剪影）—— 但那张是披甲武士，
-    //     用户 2026-10-29 实机看到「提示写静默猎手、图标却是战士的头像」，更糟；
-    //   · 现在用同角色、同主题的 `silent_poison`（炼药/涂毒都是药剂轴），既不是别人的脸，
-    //     也和同幕的刀猎（`silent_shiv`）区分得开 —— 第三幕静默猎手 50/50 才会二选一。
-    public override string BossNodePath => "res://CharacterBosses/images/map/silent_poison";
+    // 地图图标（用户 2026-11-18 规则：**一个图标只对应唯一一个 Boss**）：
+    // 这里**不覆写** ⇒ 走基类兜底的 TheKinBoss 剪影。
+    // 历史：曾经借刀猎的 `silent_shiv`（分不出来）→ 改回剪影 → 又借涂毒猎的 `silent_poison`
+    // （用户 2026-11-18 定为「一个图标一个 Boss」，涂毒猎专用 `silent_poison`）⇒ 炼药猎回到剪影。
 }
 
 /// <summary>
@@ -323,15 +325,13 @@ public sealed class SilentBrewerBossEncounter : SilentBossEncounter
 /// 前两套是「刀猎」/「炼药猎」）。剧本 <c>Core/GrandFinaleSilentScript.cs</c>，
 /// 特殊效果「压制」= <c>Powers/BossSuppressionPower.cs</c>（她打出华丽收场 ⇒ 所有玩家抽牌堆顶塞虚空）。
 ///
-/// 地图徽章：沿用同角色的 <c>silent_shiv</c>（刀猎那张）—— 本档位没有专属美术，
-/// 与炼药猎（<c>silent_poison</c>）区分开即可。
+/// 地图徽章：**不覆写** ⇒ 走基类兜底的剪影（用户 2026-11-18：一个图标只对应唯一一个 Boss，
+/// `silent_shiv` 只留给刀猎）。
 /// 控制台：<c>fight SILENT_GRAND_FINALE_BOSS_ENCOUNTER</c>。
 /// </summary>
 public sealed class SilentGrandFinaleBossEncounter : SilentBossEncounter
 {
     public override int? TierAct => 2;
-
-    public override string BossNodePath => "res://CharacterBosses/images/map/silent_shiv";
 }
 
 /// <summary>
@@ -349,10 +349,8 @@ public sealed class SilentSneckoBossEncounter : SilentBossEncounter
 /// 剧本 <c>Core/EventMachineScript.cs</c>，特殊效果「一心化万」= <c>Powers/BossAllForOnePower</c>
 /// （判定落在 <c>Core/EventMachineMechanics</c> 与 <c>Patches/BossAllForOneFilterPatch</c>）。
 ///
-/// 地图徽章**不覆写** ⇒ 与「能力机」一样走 <c>defect_focus</c>。
-/// 三层正常流程一场只有一个 Boss；进阶 10 的两场由 <c>BossKeys.ComplementVariant</c>
-/// 保证是**不同的变体**（能力机 / 事件机），而这两只本来就同角色同主题，
-/// 复用同一张图标不会出现「名字写 A、画的是别人的脸」那种错配。
+/// 地图徽章**不覆写** ⇒ 走基类兜底的剪影（用户 2026-11-18 规则：一个图标只对应唯一一个 Boss；
+/// <c>defect_focus</c> 只留给能力机）。
 /// </summary>
 public sealed class DefectEventBossEncounter : DefectBossEncounter
 {
