@@ -119,4 +119,21 @@ public sealed class WatcherRetainBoss : WatcherBoss
 
     public override string? PinnedVariantKey => "WATCHER_RETAIN";
 }
+
+/// <summary>
+/// **一层 1 号「预见观」**（设计 Key <c>WATCHER_FORESIGHT</c>，用户 2026-11-17）。
+///
+/// 同一个观者角色的**第五套设计** ⇒ 走 `BossDefs.Watcher` 的 `ExtraVariants[0]`（第一幕）：
+/// 剧本 `WatcherForesightScript`（8 回合，6~8 循环）、遗物 至纯之水/涅奥的祝福/美琅脂/手里剑、
+/// 特殊效果「通晓万物」（`Powers.BossOmnisciencePower`）。
+/// 控制台：`fight WATCHER_FORESIGHT_BOSS_ENCOUNTER`。
+/// </summary>
+public sealed class WatcherForesightBoss : WatcherBoss
+{
+    public WatcherForesightBoss() { SpawnVariantKey = "WATCHER_FORESIGHT"; }
+
+    public override int? TierAct => 0;      // 第一幕
+
+    public override string? PinnedVariantKey => "WATCHER_FORESIGHT";
+}
 #endif

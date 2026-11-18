@@ -264,6 +264,30 @@ internal static class WatcherCards
     internal static Type? Perseverance => Card("WatcherPerseverance", "Perseverance",
         "WATCHER_PERSEVERANCE", "WATCHER-PERSEVERANCE");
 
+    // ── 一层 1 号「预见观」用到的牌/遗物（用户 2026-11-17）────────────────────
+    //   卡名 → 观者 mod 的 id 全部是从观者 pck 的 zhs `cards.json` / `relics.json` 里查出来的：
+    //   涅槃 `WATCHER_NIRVANA`、迂回 `WATCHER_WEAVE`、先见之明 `WATCHER_FORESIGHT`、
+    //   天眼 `WATCHER_THIRD_EYE`、斩破命运 `WATCHER_CUT_THROUGH_FATE`、
+    //   碰撞连击 `WATCHER_BOWLING_BASH`、通晓万物 `WATCHER_OMNISCIENCE`（藏品）、
+    //   美琅脂 = 观者遗物 `MELANGE`（「每次洗抽牌堆时预见 3」）。
+    //   受伤 / 贪婪 / 笨拙 是本体牌（`INJURY` / `GREED` / `CLUMSY`）。
+    internal static Type? Nirvana => Card("WatcherNirvana", "Nirvana", "WATCHER_NIRVANA", "WATCHER-NIRVANA");
+    internal static Type? Weave => Card("WatcherWeave", "Weave", "WATCHER_WEAVE", "WATCHER-WEAVE");
+    internal static Type? Foresight => Card("WatcherForesight", "Foresight", "WATCHER_FORESIGHT", "WATCHER-FORESIGHT");
+    internal static Type? ThirdEye => Card("WatcherThirdEye", "ThirdEye", "WATCHER_THIRD_EYE", "WATCHER-THIRD_EYE");
+    internal static Type? CutThroughFate => Card("WatcherCutThroughFate", "CutThroughFate",
+        "WATCHER_CUT_THROUGH_FATE", "WATCHER-CUT_THROUGH_FATE");
+    internal static Type? BowlingBash => Card("WatcherBowlingBash", "BowlingBash",
+        "WATCHER_BOWLING_BASH", "WATCHER-BOWLING_BASH");
+    /// <summary>通晓万物（`Omniscience`，4 费技能）：这一只 Boss 的**藏品**。</summary>
+    internal static Type? Omniscience => Card("WatcherOmniscience", "Omniscience",
+        "WATCHER_OMNISCIENCE", "WATCHER-OMNISCIENCE");
+    /// <summary>受伤（本体诅咒 `INJURY`）：剧本里被她预见丢掉的那张。</summary>
+    internal static Type? Injury => typeof(MegaCrit.Sts2.Core.Models.Cards.Injury);
+    /// <summary>美琅脂（观者遗物 `MELANGE`）：「每次洗抽牌堆时预见 3」。</summary>
+    internal static Type? Melange => T("Melange");
+    /// <summary>手里剑（本体遗物 `Shuriken`）：每打出 3 张攻击牌 +1 力量。</summary>
+    internal static Type? Shuriken => typeof(MegaCrit.Sts2.Core.Models.Relics.Shuriken);
     /// <summary>停顿（`Halt`，0 费技能）：获得格挡；若在愤怒中额外获得格挡。</summary>
     internal static Type? Halt => Card("WatcherHalt", "Halt",
         "WATCHER_HALT", "WATCHER-HALT");

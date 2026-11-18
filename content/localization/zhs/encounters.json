@@ -115,5 +115,6 @@
     "WATCHER_CREATE_BOSS_ENCOUNTER.title":  "观者",
     "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character} 生成的每一张牌都被[gold]观者[/gold]改写成了对付自己的武器。",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "观者",
-    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "{character} 的手牌被[gold]观者[/gold]一张张留到了死。"
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "{character} 的手牌被[gold]观者[/gold]一张张留到了死。",
+    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "观者",     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "{character} 被[gold]观者[/gold]的[gold]通晓万物[/gold]碾碎。"
 }

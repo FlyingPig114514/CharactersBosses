@@ -841,6 +841,40 @@ internal static class BossLineups
         return (false, false);
     }
 
+    /// <summary>
+    /// **一层 1 号「预见观」这套设计**（设计 Key `WATCHER_FORESIGHT`，用户 2026-11-17）。
+    ///
+    /// 判据与其它观者设计同一套：只看「本场遭遇是谁」—— 预见观有自己专属的遭遇
+    /// （`WATCHER_FORESIGHT_BOSS_ENCOUNTER`），造怪时 `WatcherForesightBoss` 会把
+    /// `SpawnVariantKey` / `PinnedVariantKey` 钉成 `WATCHER_FORESIGHT`；认不出就明确「不是预见观」。
+    /// </summary>
+    internal static bool WatcherForesightActive() => Latched("WATCHER_FORESIGHT", ComputeWatcherForesight);
+
+    private static (bool Value, bool Decisive) ComputeWatcherForesight()
+    {
+        try
+        {
+            string? entry = CurrentEncounterEntry();
+            if (!string.IsNullOrEmpty(entry))
+            {
+                if (entry == "WATCHER_FORESIGHT_BOSS_ENCOUNTER") return (true, true);
+                if (entry.StartsWith("WATCHER_", StringComparison.Ordinal)) return (false, true);
+            }
+        }
+        catch { /* 往下走 */ }
+        try
+        {
+            foreach (var c in MegaCrit.Sts2.Core.Combat.CombatManager.Instance?.DebugOnlyGetState()?.Enemies
+                                ?? (IEnumerable<MegaCrit.Sts2.Core.Entities.Creatures.Creature>)Array.Empty<MegaCrit.Sts2.Core.Entities.Creatures.Creature>())
+            {
+                if (c?.Monster is not Monsters.CharBossMonster boss) continue;
+                string? pinned = boss.PinnedVariantKey ?? boss.SpawnVariantKey;
+                if (string.Equals(pinned, "WATCHER_FORESIGHT", StringComparison.Ordinal)) return (true, true);
+            }
+        }
+        catch { /* 忽略 */ }
+        return (false, false);
+    }
     private static (bool Value, bool Decisive) ComputeWatcherOmega()
     {
         try

@@ -115,5 +115,6 @@
     "WATCHER_CREATE_BOSS_ENCOUNTER.title":  "Die Seherin",
     "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "Jede von {character} erzeugte Karte wurde von [gold]Die Seherin[/gold] in eine Waffe verwandelt.",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "Die Seherin",
-    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "[gold]Die Seherin[/gold] behielt {character}s Hand Karte für Karte bis zum Ende."
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "[gold]Die Seherin[/gold] behielt {character}s Hand Karte für Karte bis zum Ende.",
+    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "Die Seherin",     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "{character} wurde von der [gold]Allwissenheit[/gold] der [gold]Seherin[/gold] zermalmt."
 }

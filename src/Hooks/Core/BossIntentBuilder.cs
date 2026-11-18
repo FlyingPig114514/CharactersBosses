@@ -901,6 +901,30 @@ public static class BossIntentBuilder
         }
         catch { /* 纯预览 */ }
 
+        // ── 碰撞连击（`WATCHER_BOWLING_BASH`）：段数 = **真人玩家数**（用户 2026-11-17）──
+        //   反编译观者 A 版：伤害 7（升级 10），「对所有敌人各打一次」。她的「敌人」其实是玩家 ⇒
+        //   用户口径：**只数真人玩家**，不算瓦皮 / 奥斯提 / 异鸟宝宝 / 佩尔的士兵这些召唤物
+        //   （`BossLockOn.RealPlayers` 本来就只数真人）。
+        if (string.Equals(entry, "WATCHER_BOWLING_BASH", StringComparison.Ordinal))
+        {
+            try
+            {
+                int players = 1;
+                try
+                {
+                    var real = CharacterBosses.Core.BossLockOn.RealPlayers(card?.CombatState);
+                    if (real != null && real.Count > 0) players = real.Count;
+                }
+                catch { players = 1; }
+
+                int perHit = Math.Max(1, damage);
+                intents.RemoveAll(i => i is SingleAttackIntent || i is RawAttackIntent || i is RawMultiAttackIntent);
+                intents.Add(new RawMultiAttackIntent(perHit, Math.Max(1, players)));
+                Logger.Log($"[CharBoss] 碰撞连击：段数按真人玩家数 {players} ⇒ {perHit}×{players}（召唤物不算）");
+            }
+            catch { /* 纯预览，失败就保留原来的意图 */ }
+        }
+
         if (intents.Count == 0)
         {
             intents.Add(card.Type switch

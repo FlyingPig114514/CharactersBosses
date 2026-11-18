@@ -214,5 +214,6 @@
     "WATCHER_RETAIN_BOSS.title":  "Veilleur Conservateur",
     "WATCHER_RETAIN_BOSS.moves.CHARBOSS_PLAY.title":  "Jouer",
     "WATCHER_RETAIN_BOSS.establishment":  "À la fin de votre tour, chaque carte retenue dans votre main dont le coût est inférieur à 2 voit son coût augmenter de 1 pour le reste du combat. Pour chaque carte dont le coût augmente ainsi, la gardienne perd 1 de Force.",
-    "WATCHER_RETAIN_BOSS.establishment_dread":  "À la fin de votre tour, vos cartes retenues voient leur coût augmenter de 1 pour le reste du combat."
+    "WATCHER_RETAIN_BOSS.establishment_dread":  "À la fin de votre tour, vos cartes retenues voient leur coût augmenter de 1 pour le reste du combat.",
+    "WATCHER_FORESIGHT_BOSS.name":  "Veilleur de la Prévoyance",     "WATCHER_FORESIGHT_BOSS.title":  "Veilleur de la Prévoyance",     "WATCHER_FORESIGHT_BOSS.moves.CHARBOSS_PLAY.title":  "Jouer",     "WATCHER_FORESIGHT_BOSS.omniscience":  "Chaque fois que [gold]Prévoyance[/gold] se déclenche, défausse une carte aléatoire de ta pioche.",     "WATCHER_FORESIGHT_BOSS.omniscience_dread":  "Chaque fois que tu [gold]pressens[/gold], défausse une carte aléatoire de ta pioche."
 }

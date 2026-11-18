@@ -115,5 +115,6 @@
     "WATCHER_CREATE_BOSS_ENCOUNTER.title":  "ウォッチャー",
     "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character}が生成したカードはすべて、[gold]ウォッチャー[/gold]によって自分を討つ武器に書き換えられた。",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "ウォッチャー",
-    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "{character}の手札は[gold]ウォッチャー[/gold]に一枚ずつ抱えられたまま、終わりを迎えた。"
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "{character}の手札は[gold]ウォッチャー[/gold]に一枚ずつ抱えられたまま、終わりを迎えた。",
+    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "ウォッチャー",     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "{character}は[gold]ウォッチャー[/gold]の[gold]全知[/gold]に砕かれた。"
 }

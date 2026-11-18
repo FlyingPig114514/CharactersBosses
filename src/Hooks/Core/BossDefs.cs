@@ -1161,6 +1161,31 @@ public static class BossDefs
             //   （见 `Powers/BossMasterRealityPower.cs`）：玩家在战斗中生成的牌被降级、非衍生牌再加消耗。
             //   她自己的两张印牌（改造现实⇒惩恶 / 欺瞒现实⇒平安）的原版生成被拦掉，
             //   改由 `CharBossMonster` 在出牌后手动触发「创世之柱 / 武器库」。
+            // ★ v0.2.746（用户 2026-11-17）：**一层 1 号「预见观」** —— 同一个观者角色的第五套设计，
+            //   挂在**第一幕**（`ExtraVariants[0]`）。特殊效果「通晓万物」：她每次触发先见之明
+            //   （恐惧模式 = 任何预见）就从被锁定玩家的**抽牌堆**随手弃 1 张。
+            //   剧本 8 回合 + 6~8 循环；遗物 至纯之水 / 涅奥的祝福 / 美琅脂 / 手里剑；
+            //   进阶 8 升 涅槃·心灵堡垒，进阶 9 升 碰撞连击·斩破命运；恐惧模式升级「迂回」。
+            [0] = new List<BossVariant>
+            {
+                new BossVariant
+                {
+                    Key = "WATCHER_FORESIGHT",
+                    Enabled = Core.BossLineups.WatcherForesightActive,
+                    Deck = WatcherForesightScript.Deck(),
+                    Relics = WatcherForesightScript.Relics(),
+                    Script = WatcherForesightScript.Build(),
+                    SpecialLoc = "WATCHER_FORESIGHT_BOSS.omniscience",
+                    SpecialLocDread = "WATCHER_FORESIGHT_BOSS.omniscience_dread",
+                    SpecialPower = typeof(Powers.BossOmnisciencePower),
+                    SpecialPowerDread = typeof(Powers.BossOmnisciencePower),
+                    DreadUpgrades = WatcherForesightScript.DreadUpgradeTypes(),
+                    // 观者模组初始生命 72（这四件遗物里没有布质果实 ⇒ 主定义的 103 要减掉那 31）
+                    HpBonus = -31,
+                    BlocksVanillaDraw = true,
+                },
+            },
+
             [1] = new List<BossVariant>
             {
                 new BossVariant

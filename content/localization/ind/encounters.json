@@ -115,5 +115,6 @@
     "WATCHER_CREATE_BOSS_ENCOUNTER.title":  "Watcher",
     "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "Setiap kartu yang dihasilkan {character} ditulis ulang [gold]Watcher[/gold] menjadi senjata untuk melawannya.",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "Watcher",
-    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "[gold]Watcher[/gold] menahan kartu {character}, satu per satu, sampai akhir."
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "[gold]Watcher[/gold] menahan kartu {character}, satu per satu, sampai akhir.",
+    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "Watcher",     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "{character} dihancurkan oleh [gold]Mahatahu[/gold] milik [gold]Watcher[/gold]."
 }

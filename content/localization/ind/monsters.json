@@ -214,5 +214,6 @@
     "WATCHER_RETAIN_BOSS.title":  "Pengamat Penyimpan",
     "WATCHER_RETAIN_BOSS.moves.CHARBOSS_PLAY.title":  "Mainkan",
     "WATCHER_RETAIN_BOSS.establishment":  "Pada akhir giliranmu, setiap kartu tersimpan di tanganmu dengan biaya di bawah 2, biayanya bertambah 1 selama pertarungan ini. Untuk setiap kartu yang biayanya bertambah, Watcher kehilangan 1 Kekuatan.",
-    "WATCHER_RETAIN_BOSS.establishment_dread":  "Pada akhir giliranmu, kartu-kartu tersimpanmu bertambah biayanya 1 selama pertarungan ini."
+    "WATCHER_RETAIN_BOSS.establishment_dread":  "Pada akhir giliranmu, kartu-kartu tersimpanmu bertambah biayanya 1 selama pertarungan ini.",
+    "WATCHER_FORESIGHT_BOSS.name":  "Pengamat Tinjauan",     "WATCHER_FORESIGHT_BOSS.title":  "Pengamat Tinjauan",     "WATCHER_FORESIGHT_BOSS.moves.CHARBOSS_PLAY.title":  "Mainkan",     "WATCHER_FORESIGHT_BOSS.omniscience":  "Setiap kali [gold]Tinjauan[/gold] terpicu, buang satu kartu acak dari tumpukan undianmu.",     "WATCHER_FORESIGHT_BOSS.omniscience_dread":  "Setiap kali kamu [gold]berprasangka[/gold], buang satu kartu acak dari tumpukan undianmu."
 }

@@ -95,6 +95,8 @@ internal static class BossKeys
         new("WATCHER_CREATE",            6, 1, 1, typeof(WatcherCreateBoss)),
         // 二层 2 号：**保留观**（用户 2026-11-17）—— 保留牌流 + 特殊效果「确立基础」
         new("WATCHER_RETAIN",            6, 1, 2, typeof(WatcherRetainBoss)),
+        // 一层 1 号：**预见观**（用户 2026-11-17）—— 预见/先见之明流 + 特殊效果「通晓万物」
+        new("WATCHER_FORESIGHT",         6, 0, 1, typeof(WatcherForesightBoss)),
 #endif
     };
 
@@ -173,7 +175,8 @@ internal static class BossKeys
             "IRONCLAD_ANGER",           // 一层 铁甲 1 号：愤怒战
             "IRONCLAD_STRIKE",          // 一层 铁甲 2 号：打击战（用户 2026-11-07）
             "SILENT_SNAKEBITE",         // 一层 猎人 2 号：蛇咬猎（用户 2026-11-08）
-        };
+            // ★ v0.2.746（用户 2026-11-17）：一层追加**预见观**（观者 mod，装了才进表）
+        }.Concat(WatcherRosterAct1()).ToArray();
     }
 
     internal static bool TryGet(string? key, out BossInfo info)
@@ -230,6 +233,7 @@ internal static class BossKeys
     ["WATCHER_OMEGA"] = "Ω观",        // 三层 2 号（观者 mod，用户 2026-11-16）
     ["WATCHER_CREATE"] = "印牌观",      // 二层 1 号（观者 mod，用户 2026-11-16）
     ["WATCHER_RETAIN"] = "保留观",      // 二层 2 号（观者 mod，用户 2026-11-17）
+    ["WATCHER_FORESIGHT"] = "预见观",   // 一层 1 号（观者 mod，用户 2026-11-17）
 #endif
 #endif
         ["REGENT_BOMBARD"] = "轰击储",
@@ -403,6 +407,7 @@ internal static class BossKeys
             case "WATCHER_OMEGA": return ModelDb.Encounter<WatcherOmegaBossEncounter>();
             case "WATCHER_CREATE": return ModelDb.Encounter<WatcherCreateBossEncounter>();
             case "WATCHER_RETAIN": return ModelDb.Encounter<WatcherRetainBossEncounter>();
+            case "WATCHER_FORESIGHT": return ModelDb.Encounter<WatcherForesightBossEncounter>();
 #endif
 #endif
             default: return null;
@@ -490,6 +495,23 @@ internal static class BossKeys
     /// `BossPicksSync.WatcherAllowedHere()` 认为「全端同一实现」才进候补表 ——
     /// 候补表条数一变阵容就会分叉，所以这条判断不能只写在本机。
     /// </summary>
+    /// <summary>
+    /// **第一幕**的观者候补（用户 2026-11-17：一层 1 号「预见观」）。
+    /// 闸门与另外两幕完全相同（装了观者 mod + 全端同一实现）。
+    /// </summary>
+    private static string[] WatcherRosterAct1()
+    {
+#if STS2_111
+        try
+        {
+            if (Core.WatcherModPresence.Installed && Core.BossPicksSync.WatcherAllowedHere())
+                return new[] { "WATCHER_FORESIGHT" };
+        }
+        catch { /* 探测失败就当没装 */ }
+#endif
+        return Array.Empty<string>();
+    }
+
     private static string[] WatcherRosterAct2()
     {
 #if STS2_111

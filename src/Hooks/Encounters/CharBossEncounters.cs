@@ -176,6 +176,25 @@ public class WatcherRetainBossEncounter : CharBossEncounterBase<WatcherRetainBos
     /// <summary>地图节点图标（暂与神格观共用；`res://CharacterBosses/images/map/`）。</summary>
     public override string BossNodePath => "res://CharacterBosses/images/map/watcher_divinity";
 }
+
+/// <summary>调试用的「普通战斗」版：一层 1 号「预见观」。</summary>
+public sealed class WatcherForesightBossNormalEncounter : WatcherForesightBossEncounter
+{
+    public override RoomType RoomType => RoomType.Monster;
+}
+
+/// <summary>
+/// **一层 1 号「预见观」**（设计 Key `WATCHER_FORESIGHT`，用户 2026-11-17）：
+/// 观者角色 + 预见/先见之明流（涅槃 / 天眼 / 斩破命运 / 美琅脂）+ 特殊效果「通晓万物」。
+/// 控制台：`fight WATCHER_FORESIGHT_BOSS_ENCOUNTER`。
+/// </summary>
+public class WatcherForesightBossEncounter : CharBossEncounterBase<WatcherForesightBoss>
+{
+    public override int? TierAct => 0;      // 第一幕
+
+    /// <summary>地图节点图标（暂与神格观共用；`res://CharacterBosses/images/map/`）。</summary>
+    public override string BossNodePath => "res://CharacterBosses/images/map/watcher_divinity";
+}
 #endif
 // ── 调试专用的「普通战斗」版本 ──
 // 调试开关换进来的战斗如果仍是 RoomType.Boss，打赢后会走 Boss 结算（第一幕的 Boss 一死就直接进下一幕）。
@@ -599,6 +618,7 @@ public static class CharBossEncounters
         ModelDb.Encounter<WatcherOmegaBossEncounter>(),                // 三层 2 号：Ω观（用户 2026-11-16）
         ModelDb.Encounter<WatcherCreateBossEncounter>(),                // 二层 1 号：印牌观（用户 2026-11-16）
         ModelDb.Encounter<WatcherRetainBossEncounter>(),                // 二层 2 号：保留观（用户 2026-11-17）
+        ModelDb.Encounter<WatcherForesightBossEncounter>(),             // 一层 1 号：预见观（用户 2026-11-17）
 #endif
     });
 
@@ -639,6 +659,7 @@ public static class CharBossEncounters
             Add(5, 2, ModelDb.Encounter<FoolTarotBossEncounter>());              // 三层 塔罗愚（愚者，用户 2026-11-14）
 #endif
             // 观者（角色下标 6）：她的每套设计各自一幕 ⇒ 二层＝印牌观、三层＝神格观（主）/Ω观（变体）
+            Add(6, 0, ModelDb.Encounter<WatcherForesightBossEncounter>());        // 一层 1 号 预见观（用户 2026-11-17）
             Add(6, 1, ModelDb.Encounter<WatcherCreateBossEncounter>());           // 二层 1 号 印牌观（用户 2026-11-16）
             Add(6, 2, ModelDb.Encounter<WatcherDivinityBossEncounter>());        // 三层 1 号 神格观
 #endif

@@ -115,5 +115,6 @@
     "WATCHER_CREATE_BOSS_ENCOUNTER.title":  "Gözlemci",
     "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character}'in ürettiği her kart [gold]Gözlemci[/gold] tarafından kendisine karşı bir silaha dönüştürüldü.",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "Gözlemci",
-    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "[gold]Gözlemci[/gold], {character}'in elini kart kart sonuna kadar tuttu."
+    "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "[gold]Gözlemci[/gold], {character}'in elini kart kart sonuna kadar tuttu.",
+    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "Gözlemci",     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "{character}, [gold]Gözlemci[/gold]'nin [gold]Herşeyi Bilme[/gold] yeteneğiyle ezildi."
 }

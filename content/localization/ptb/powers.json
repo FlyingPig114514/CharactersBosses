@@ -146,5 +146,6 @@
     "BOSS_MASTER_REALITY_POWER.description_dread":  "Sempre que você criar uma carta em combate, ela será [gold]rebaixada[/gold]; se não for uma ficha, também ganha [gold]Exaurir[/gold].\nO Observador obteve [gold]Arsenal[/gold], [gold]Pilar da Criação[/gold] e [gold]Conheça Seu Lugar[/gold] através do Filósofo das Cores.",
     "BOSS_ESTABLISHMENT_POWER.title":  "Estabelecimento",
     "BOSS_ESTABLISHMENT_POWER.description":  "No fim do seu turno, cada carta retida na sua mão com custo menor que 2 tem seu custo aumentado em 1 pelo resto do combate. Para cada carta cujo custo aumente assim, a Observadora perde 1 de Força.",
-    "BOSS_ESTABLISHMENT_POWER.description_dread":  "No fim do seu turno, suas cartas retidas têm seu custo aumentado em 1 pelo resto do combate."
+    "BOSS_ESTABLISHMENT_POWER.description_dread":  "No fim do seu turno, suas cartas retidas têm seu custo aumentado em 1 pelo resto do combate.",
+    "BOSS_OMNISCIENCE_POWER.title":  "Onisciência",     "BOSS_OMNISCIENCE_POWER.description":  "Sempre que [gold]Presciência[/gold] for acionada, descarte uma carta aleatória do seu monte de compra.",     "BOSS_OMNISCIENCE_POWER.description_dread":  "Sempre que você [gold]pressentir[/gold], descarte uma carta aleatória do seu monte de compra."
 }

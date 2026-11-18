@@ -146,5 +146,6 @@
     "BOSS_MASTER_REALITY_POWER.description_dread":  "Immer wenn du im Kampf eine Karte erzeugst, wird sie [gold]herabgestuft[/gold]; ist sie kein Token, erhält sie zusätzlich [gold]Erschöpfen[/gold].\nDer Wächter erlangte [gold]Arsenal[/gold], [gold]Säule der Schöpfung[/gold] und [gold]Kenne deinen Platz[/gold] durch den Farbphilosophen.",
     "BOSS_ESTABLISHMENT_POWER.title":  "Etablierung",
     "BOSS_ESTABLISHMENT_POWER.description":  "Am Ende deines Zuges wird für jede zurückbehaltene Karte auf deiner Hand mit Kosten unter 2 ihre Kosten für diesen Kampf um 1 erhöht. Für jede so erhöhte Karte verliert die Seherin 1 Stärke.",
-    "BOSS_ESTABLISHMENT_POWER.description_dread":  "Am Ende deines Zuges werden die Kosten deiner zurückbehaltenen Karten für diesen Kampf um 1 erhöht."
+    "BOSS_ESTABLISHMENT_POWER.description_dread":  "Am Ende deines Zuges werden die Kosten deiner zurückbehaltenen Karten für diesen Kampf um 1 erhöht.",
+    "BOSS_OMNISCIENCE_POWER.title":  "Allwissenheit",     "BOSS_OMNISCIENCE_POWER.description":  "Immer wenn [gold]Voraussicht[/gold] ausgelöst wird, wird eine zufällige Karte aus deinem Nachziehstapel abgeworfen.",     "BOSS_OMNISCIENCE_POWER.description_dread":  "Immer wenn du [gold]voraussiehst[/gold], wird eine zufällige Karte aus deinem Nachziehstapel abgeworfen."
 }

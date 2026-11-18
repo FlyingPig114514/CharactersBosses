@@ -852,6 +852,12 @@ public static class DownfallCollectibleCompat
                     upgraded = false;
                     Logger.Log("[CharBoss] 收藏家藏品：保留观 → 确立基础");
                     return cardType != null;
+                // 一层 1 号 预见观（用户 2026-11-17）：藏品 = **通晓万物**
+                case "WATCHER_FORESIGHT":
+                    cardType = Core.WatcherCards.Omniscience;
+                    upgraded = false;
+                    Logger.Log("[CharBoss] 收藏家藏品：预见观 → 通晓万物");
+                    return cardType != null;
 #endif
                 case "SILENT_SNAKEBITE":     // 一层 蛇咬猎（用户 2026-11-11：藏品 = 群蛇形态）
                     // 她和同层「奇巧猎」落在同一格（掉落表按「角色 + 幕」索引 ⇒ 会掉余像）⇒ 必须点名。

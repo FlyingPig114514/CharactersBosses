@@ -214,5 +214,6 @@
     "WATCHER_RETAIN_BOSS.title":  "Bewahrender Wächter",
     "WATCHER_RETAIN_BOSS.moves.CHARBOSS_PLAY.title":  "Ausspielen",
     "WATCHER_RETAIN_BOSS.establishment":  "Am Ende deines Zuges wird für jede zurückbehaltene Karte auf deiner Hand mit Kosten unter 2 ihre Kosten für diesen Kampf um 1 erhöht. Für jede so erhöhte Karte verliert die Seherin 1 Stärke.",
-    "WATCHER_RETAIN_BOSS.establishment_dread":  "Am Ende deines Zuges werden die Kosten deiner zurückbehaltenen Karten für diesen Kampf um 1 erhöht."
+    "WATCHER_RETAIN_BOSS.establishment_dread":  "Am Ende deines Zuges werden die Kosten deiner zurückbehaltenen Karten für diesen Kampf um 1 erhöht.",
+    "WATCHER_FORESIGHT_BOSS.name":  "Vorausschauender Wächter",     "WATCHER_FORESIGHT_BOSS.title":  "Vorausschauender Wächter",     "WATCHER_FORESIGHT_BOSS.moves.CHARBOSS_PLAY.title":  "Ausspielen",     "WATCHER_FORESIGHT_BOSS.omniscience":  "Immer wenn [gold]Voraussicht[/gold] ausgelöst wird, wird eine zufällige Karte aus deinem Nachziehstapel abgeworfen.",     "WATCHER_FORESIGHT_BOSS.omniscience_dread":  "Immer wenn du [gold]voraussiehst[/gold], wird eine zufällige Karte aus deinem Nachziehstapel abgeworfen."
 }

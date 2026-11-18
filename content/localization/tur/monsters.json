@@ -214,5 +214,6 @@
     "WATCHER_RETAIN_BOSS.title":  "Saklama Gözcüsü",
     "WATCHER_RETAIN_BOSS.moves.CHARBOSS_PLAY.title":  "Oyna",
     "WATCHER_RETAIN_BOSS.establishment":  "Sıranın sonunda, elinde maliyeti 2'nin altında olan saklanan her kartın maliyeti bu dövüş boyunca 1 artar. Maliyeti bu şekilde artan her kart için Gözlemci 1 Güç kaybeder.",
-    "WATCHER_RETAIN_BOSS.establishment_dread":  "Sıranın sonunda, sakladığın kartların maliyeti bu dövüş boyunca 1 artar."
+    "WATCHER_RETAIN_BOSS.establishment_dread":  "Sıranın sonunda, sakladığın kartların maliyeti bu dövüş boyunca 1 artar.",
+    "WATCHER_FORESIGHT_BOSS.name":  "Öngörü Gözcüsü",     "WATCHER_FORESIGHT_BOSS.title":  "Öngörü Gözcüsü",     "WATCHER_FORESIGHT_BOSS.moves.CHARBOSS_PLAY.title":  "Oyna",     "WATCHER_FORESIGHT_BOSS.omniscience":  "[gold]Öngörü[/gold] tetiklendiğinde çekme destenden rastgele bir kart at.",     "WATCHER_FORESIGHT_BOSS.omniscience_dread":  "Her [gold]sezdiğinde[/gold] çekme destenden rastgele bir kart at."
 }
