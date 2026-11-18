@@ -107,6 +107,25 @@ internal static class DreadMode
         catch { /* 纯日志 */ }
         return true;
     }
+
+    /// <summary>
+    /// 这批生物所在战斗的**当前房间**（用于 `AfterEnemiesEnteredCombat` 这种拿不到 room 参数的钩子里判 Boss 房）。
+    /// </summary>
+    internal static MegaCrit.Sts2.Core.Rooms.AbstractRoom? FirstRoomOf(IEnumerable<Creature>? creatures)
+    {
+        try
+        {
+            if (creatures == null) return null;
+            foreach (var c in creatures)
+            {
+                if (c == null) continue;
+                var room = c.CombatState?.RunState?.CurrentRoom;
+                if (room != null) return room;
+            }
+        }
+        catch { /* 忽略 */ }
+        return null;
+    }
 }
 
 /// <summary>玩家角色的下标（与 `BossKeys` 的 Character 字段一致）。</summary>
@@ -133,6 +152,17 @@ internal static class DreadCharacters
 ///   （`Monsters.CharBossMonster`）。她只在本幕 Boss 房上场，而 Boss 房会先把支配清掉
 ///   （`RemoveDominionIfRoomIsBoss`），所以这条跳过主要是防「调试/普通战斗版遭遇里她上场」
 ///   这种情形 —— 那时支配还在，不能把恶魔形态白送给一个有自己机制的 Boss。
+///
+/// ★ v0.2.793（玩家反馈 2026-11-19：「三层战士的支配里，活体盾和机枪手的组合，活体盾有恶魔形态、
+///   机枪手没有」）：以前只在 `AfterRoomEntered` 那一刻给 `cr.Enemies` 里**当时已经在列表里**的敌人挂。
+///   而原版 `DominionModel` 的设计是两条路：
+///   <code>
+///   AfterRoomEntered(room)          → AfterEnemiesEnteredCombat(所有敌人)
+///   AfterCreatureAddedToCombat(cr)  → AfterEnemiesEnteredCombat(这一个)
+///   </code>
+///   也就是说「进房之后才加入战斗的敌人」（编队里后生成的那只、召唤物…）要走第二条。
+///   我们以前没实现第二条 ⇒ 晚进列表的那只（机枪手）一条霸符都拿不到。
+///   现在补上 `AfterEnemiesEnteredCombat` 这条，并且两侧都做**幂等**（身上已经有就不再叠）。
 /// </summary>
 public sealed class IroncladDominion : MegaCrit.Sts2.Core.Models.Dread.DominionModel
 {
@@ -143,27 +173,61 @@ public sealed class IroncladDominion : MegaCrit.Sts2.Core.Models.Dread.DominionM
             if (room is not CombatRoom cr) return;
             // ★ v0.2.789：本幕 Boss 房 ⇒ 这个支配不生效（游戏要求 Boss 战里没有支配）
             if (DreadMode.SkipBecauseActBossRoom(room, GetType().Name)) return;
-            var enemies = cr.Enemies;
+            await GiveDemonFormAsync(cr.Enemies, "进房时");
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 铁甲战士的支配失败: " + e.Message); }
+    }
+
+    /// <summary>
+    /// 原版在「有新敌人加入战斗」时会派发这个（`DominionModel.AfterCreatureAddedToCombat`
+    /// → `AfterEnemiesEnteredCombat`）⇒ 晚进列表的那只也能吃到恶魔形态（v0.2.793）。
+    /// </summary>
+    protected override async Task AfterEnemiesEnteredCombat(IEnumerable<Creature> creatures)
+    {
+        try
+        {
+            var room = DreadMode.FirstRoomOf(creatures);
+            if (room != null && DreadMode.SkipBecauseActBossRoom(room, GetType().Name)) return;
+            await GiveDemonFormAsync(creatures, "后加入战斗");
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 铁甲战士的支配（后加入的敌人）失败: " + e.Message); }
+    }
+
+    /// <summary>把恶魔形态发给这批敌人（幂等：身上已经有就跳过；角色 Boss 跳过）。</summary>
+    private static async Task GiveDemonFormAsync(IEnumerable<Creature>? enemies, string why)
+    {
+        try
+        {
             if (enemies == null) return;
 
             var targets = new List<Creature>();
-            int skippedBosses = 0;
+            int skippedBosses = 0, already = 0;
             foreach (var c in enemies)
             {
                 if (c == null || !c.IsAlive) continue;
+                if (c.Side != CombatSide.Enemy) continue;
                 // ★ 用户 2026-11-19：Boss 不吃支配
                 if (c.Monster is Monsters.CharBossMonster) { skippedBosses++; continue; }
+                // 幂等：进房那条路与「后加入」那条路都覆盖到同一只时不叠成 2 层
+                if (c.GetPower<MegaCrit.Sts2.Core.Models.Powers.DemonFormPower>() != null) { already++; continue; }
                 targets.Add(c);
             }
+
             if (skippedBosses > 0)
                 Logger.Log($"[CharBoss] 恐惧模式·铁甲战士的支配：跳过 {skippedBosses} 只角色 Boss（Boss 不受支配影响）");
-            if (targets.Count == 0) return;
+            if (targets.Count == 0)
+            {
+                if (already > 0)
+                    Logger.Log($"[CharBoss] 恐惧模式·铁甲战士的支配（{why}）：{already} 个敌人已有恶魔形态 ⇒ 不重复挂");
+                return;
+            }
 
             await MegaCrit.Sts2.Core.Commands.PowerCmd.Apply<MegaCrit.Sts2.Core.Models.Powers.DemonFormPower>(
                 new ThrowingPlayerChoiceContext(), targets, 1m, null, null);
-            Logger.Log($"[CharBoss] 恐惧模式·铁甲战士的支配：{targets.Count} 个敌人各获得 1 层恶魔形态");
+            Logger.Log($"[CharBoss] 恐惧模式·铁甲战士的支配（{why}）：{targets.Count} 个敌人各获得 1 层恶魔形态" +
+                       (already > 0 ? $"（另有 {already} 个原本就有，未叠加）" : string.Empty));
         }
-        catch (Exception e) { Logger.Log("[CharBoss] 铁甲战士的支配失败: " + e.Message); }
+        catch (Exception e) { Logger.Log("[CharBoss] 铁甲战士的支配（施放恶魔形态）失败: " + e.Message); }
     }
 }
 
@@ -311,41 +375,73 @@ public sealed class RegentDominion : MegaCrit.Sts2.Core.Models.Dread.DominionMod
             if (room is not CombatRoom cr) return;
             // ★ v0.2.789：本幕 Boss 房 ⇒ 这个支配不生效（游戏要求 Boss 战里没有支配）
             if (DreadMode.SkipBecauseActBossRoom(room, GetType().Name)) return;
-            var enemies = cr.Enemies;
+            await GiveMonarchsGazeAsync(cr.Enemies, "进房时");
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 储君的支配失败: " + e.Message); }
+    }
+
+    /// <summary>
+    /// ★ v0.2.793：进房之后才加入战斗的敌人也要吃「王之凝视」
+    /// （原版 `AfterCreatureAddedToCombat` → `AfterEnemiesEnteredCombat` 这条派发，
+    ///  与铁甲战士的支配同一个洞：活体盾+机枪手那种编队里晚进列表的那只以前拿不到）。
+    /// </summary>
+    protected override async Task AfterEnemiesEnteredCombat(IEnumerable<Creature> creatures)
+    {
+        try
+        {
+            var room = DreadMode.FirstRoomOf(creatures);
+            if (room != null && DreadMode.SkipBecauseActBossRoom(room, GetType().Name)) return;
+            await GiveMonarchsGazeAsync(creatures, "后加入战斗");
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 储君的支配（后加入的敌人）失败: " + e.Message); }
+    }
+
+    /// <summary>给这批敌人挂「王之凝视」（幂等：身上已经有就跳过；角色 Boss 跳过）。</summary>
+    private static async Task GiveMonarchsGazeAsync(IEnumerable<Creature>? enemies, string why)
+    {
+        try
+        {
             if (enemies == null)
             {
                 // ★ v0.2.776：这条以前是**静默** return —— 2026-11-19 玩家联机的不同步就是
                 //   「房主加了王之凝视、客人没加」（客人那一刻拿不到敌人列表）。以后有这行日志
                 //   就能一眼分清「没进这个方法」还是「进来了但敌人列表是空的」。
-                Logger.Log("[CharBoss] 恐惧模式·储君的支配：房间进入时拿不到敌人列表 ⇒ 这次没发王之凝视" +
+                Logger.Log("[CharBoss] 恐惧模式·储君的支配：拿不到敌人列表 ⇒ 这次没发王之凝视" +
                            "（两端会不同步；见 DreadDominionSync 的对齐日志）");
                 return;
             }
 
             var targets = new List<Creature>();
-            int skippedBosses = 0;
+            int skippedBosses = 0, already = 0;
             foreach (var c in enemies)
             {
                 if (c == null || !c.IsAlive) continue;
+                if (c.Side != CombatSide.Enemy) continue;
                 // ★ 用户 2026-11-19：「boss 不应该受支配影响」⇒ 不给角色 Boss 挂「王之凝视」
                 if (c.Monster is Monsters.CharBossMonster) { skippedBosses++; continue; }
+                // 幂等：两条路都覆盖到同一只时不叠成 2 层
+                if (c.GetPower<MegaCrit.Sts2.Core.Models.Powers.MonarchsGazePower>() != null) { already++; continue; }
                 targets.Add(c);
             }
             if (skippedBosses > 0)
                 Logger.Log($"[CharBoss] 恐惧模式·储君的支配：跳过 {skippedBosses} 只角色 Boss（Boss 不受支配影响）");
             if (targets.Count == 0)
             {
-                Logger.Log("[CharBoss] 恐惧模式·储君的支配：敌人列表为空 ⇒ 这次没发王之凝视（两端会不同步）");
+                if (already > 0)
+                    Logger.Log($"[CharBoss] 恐惧模式·储君的支配（{why}）：{already} 个敌人已有王之凝视 ⇒ 不重复挂");
+                else
+                    Logger.Log("[CharBoss] 恐惧模式·储君的支配：敌人列表为空 ⇒ 这次没发王之凝视（两端会不同步）");
                 return;
             }
 
             await MegaCrit.Sts2.Core.Commands.PowerCmd.Apply<
                 MegaCrit.Sts2.Core.Models.Powers.MonarchsGazePower>(
                 new ThrowingPlayerChoiceContext(), targets, 1m, null, null);
-            Logger.Log($"[CharBoss] 恐惧模式·储君的支配：{targets.Count} 个敌人各获得 1 层「王之凝视」" +
-                       "（它们用攻击打你时，你本回合 −1 力量）");
+            Logger.Log($"[CharBoss] 恐惧模式·储君的支配（{why}）：{targets.Count} 个敌人各获得 1 层「王之凝视」" +
+                       "（它们用攻击打你时，你本回合 −1 力量）" +
+                       (already > 0 ? $"（另有 {already} 个原本就有，未叠加）" : string.Empty));
         }
-        catch (Exception e) { Logger.Log("[CharBoss] 储君的支配失败: " + e.Message); }
+        catch (Exception e) { Logger.Log("[CharBoss] 储君的支配（施放王之凝视）失败: " + e.Message); }
     }
 }
 
@@ -499,23 +595,48 @@ public sealed class WatcherDevotionDominion : MegaCrit.Sts2.Core.Models.Dread.Do
             if (room is not CombatRoom cr) return;
             // ★ v0.2.789：本幕 Boss 房 ⇒ 这个支配不生效（游戏要求 Boss 战里没有支配）
             if (DreadMode.SkipBecauseActBossRoom(room, GetType().Name)) return;
-            var enemies = cr.Enemies;
+            await GiveFaithAsync(cr.Enemies, "进房时");
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 观者的支配失败: " + e.Message); }
+    }
+
+    /// <summary>
+    /// ★ v0.2.793：进房之后才加入战斗的敌人也要吃虔信
+    /// （原版 `AfterCreatureAddedToCombat` → `AfterEnemiesEnteredCombat`；与铁甲战士/储君的支配同一个洞）。
+    /// </summary>
+    protected override async Task AfterEnemiesEnteredCombat(IEnumerable<Creature> creatures)
+    {
+        try
+        {
+            var room = DreadMode.FirstRoomOf(creatures);
+            if (room != null && DreadMode.SkipBecauseActBossRoom(room, GetType().Name)) return;
+            await GiveFaithAsync(creatures, "后加入战斗");
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 观者的支配（后加入的敌人）失败: " + e.Message); }
+    }
+
+    /// <summary>给这批敌人挂「虔信」（幂等：已经有就不再叠；角色 Boss 跳过）。</summary>
+    private static async Task GiveFaithAsync(IEnumerable<Creature>? enemies, string why)
+    {
+        try
+        {
             if (enemies == null)
             {
-                Logger.Log("[CharBoss] 恐惧模式·观者的支配：房间进入时拿不到敌人列表 ⇒ 这次的虔信没发出去（两端会不同步）");
+                Logger.Log("[CharBoss] 恐惧模式·观者的支配：拿不到敌人列表 ⇒ 这次的虔信没发出去（两端会不同步）");
                 return;
             }
 
             int given = 0;
-            int skippedBosses = 0;
+            int skippedBosses = 0, already = 0;
             foreach (var creature in enemies)
             {
                 if (creature == null || !creature.IsAlive) continue;
+                if (creature.Side != CombatSide.Enemy) continue;
                 // ★ 用户 2026-11-19：「boss 不应该受支配影响」⇒ 我们自己的角色 Boss（比如神格观）
                 //   有**真的**真言/神格，一层虔信都不给她（她上场那场支配本来也已被游戏清掉）
                 if (creature.Monster is Monsters.CharBossMonster) { skippedBosses++; continue; }
-                // 幂等：同一场里已经挂过就不叠（重入/重连不该变成 6 层）
-                if (creature.GetPower<Powers.WatcherDominionDevotionPower>() != null) continue;
+                // 幂等：同一场里已经挂过就不叠（重入/重连/两条路都覆盖 都不该变成 4 层）
+                if (creature.GetPower<Powers.WatcherDominionDevotionPower>() != null) { already++; continue; }
 
                 // ★ v0.2.781：挂到**敌人**身上（以前挂玩家 ⇒ 既不符合「所有敌人获得虔信」的口径，
                 //   也给玩家挂了一个莫名其妙的 debuff 图标）。虔信的实际结算在
@@ -527,10 +648,16 @@ public sealed class WatcherDevotionDominion : MegaCrit.Sts2.Core.Models.Dread.Do
             }
             if (skippedBosses > 0)
                 Logger.Log($"[CharBoss] 恐惧模式·观者的支配：跳过 {skippedBosses} 只角色 Boss（Boss 不受支配影响）");
-            Logger.Log($"[CharBoss] 恐惧模式·观者的支配：{given} 个敌人各获得 {FaithStacks} 层虔信" +
-                       $"（玩家回合开始时它们各 +{FaithStacks} 真言，满 10 层扣 10 进神格：那一回合攻击三倍伤害）");
+            if (given == 0 && already > 0)
+            {
+                Logger.Log($"[CharBoss] 恐惧模式·观者的支配（{why}）：{already} 个敌人已有虔信 ⇒ 不重复挂");
+                return;
+            }
+            Logger.Log($"[CharBoss] 恐惧模式·观者的支配（{why}）：{given} 个敌人各获得 {FaithStacks} 层虔信" +
+                       $"（玩家回合开始时它们各 +{FaithStacks} 真言，满 10 层扣 10 进神格：那一回合攻击三倍伤害）" +
+                       (already > 0 ? $"（另有 {already} 个原本就有，未叠加）" : string.Empty));
         }
-        catch (Exception e) { Logger.Log("[CharBoss] 观者的支配失败: " + e.Message); }
+        catch (Exception e) { Logger.Log("[CharBoss] 观者的支配（施放虔信）失败: " + e.Message); }
     }
 }
 
