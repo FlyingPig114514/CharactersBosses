@@ -83,7 +83,17 @@ public sealed class BossTemperancePower : PowerModel
             var boss = Owner?.Monster as Monsters.CharBossMonster;
             var shadow = boss?.Shadow;
             if (shadow == null || cardPlay?.Card == null) return;
-            if (!ReferenceEquals(cardPlay.Card.Owner, shadow)) return;        // 只数她自己的牌
+
+            // ★ v0.2.766：**被锁定的玩家**打出攻击牌 ⇒ 下一回合（第 12 回合起）换成「不惧妖邪」那套计划
+            if (!ReferenceEquals(cardPlay.Card.Owner, shadow))
+            {
+                try
+                {
+                    if (cardPlay.Card.Type == CardType.Attack) Core.BossScript.SwitchRequested = true;
+                }
+                catch { /* 忽略 */ }
+                return;                                                       // 玩家那边只做这一件事
+            }
             if (Owner!.CombatState == null) return;
 
             _played++;

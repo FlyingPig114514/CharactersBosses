@@ -201,6 +201,9 @@ public static class WatcherRushdownScript
             // `BossTemperancePower` / 计划切换把本回合的计划换成第 13 回合那一段。
             LoopFrom = 12,
             LoopLength = 1,
+            // 第 12 回合起：玩家打出攻击牌 ⇒ 换成「不惧妖邪」那一套无限（见 SwitchPlan）
+            SwitchTurn = SwitchPlan(),
+            SwitchFromTurn = 12,
         };
     }
 

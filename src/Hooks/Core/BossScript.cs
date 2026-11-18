@@ -518,8 +518,28 @@ public sealed class BossScript
     public Func<int, BossTurn?>? Resolve { get; init; }
 
     /// <summary>取第 <paramref name="turn"/>（1 起）回合的剧本，含循环。</summary>
+    /// <summary>
+    /// **第 12 回合起「玩家打出攻击牌就切换」那一段**（用户 2026-11-18，三层 3 号「红蓝观」）。
+    /// 只有 `WATCHER_RUSHDOWN` 会填；`SwitchRequested` 由 `BossTemperancePower` 在
+    /// 「被锁定的玩家打出攻击牌」那一刻置位，`TurnAt` 取到它就把这一回合换成这一段。
+    /// </summary>
+    public BossTurn? SwitchTurn { get; init; }
+
+    /// <summary>从第几回合开始允许切换（含）。默认 `int.MaxValue` = 永不切换。</summary>
+    public int SwitchFromTurn { get; init; } = int.MaxValue;
+
+    /// <summary>「玩家刚打出攻击牌」⇒ 下一次取回合计划时换成 <see cref="SwitchTurn"/>（取一次就清掉）。</summary>
+    public static bool SwitchRequested;
+
     public BossTurn? TurnAt(int turn)
     {
+        // ★ v0.2.766：「玩家打出攻击牌 ⇒ 本回合换成切换段」（红蓝观第 12 回合起）
+        if (SwitchTurn != null && turn >= SwitchFromTurn && SwitchRequested)
+        {
+            SwitchRequested = false;
+            Logger.Log($"[CharBoss] {turn} 回合：玩家打出过攻击牌 ⇒ 切换成「不惧妖邪无限」计划");
+            return SwitchTurn;
+        }
         if (Resolve != null)
         {
             try
