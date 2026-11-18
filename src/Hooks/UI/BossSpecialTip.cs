@@ -305,10 +305,9 @@ internal static class BossSpecialTip
         // 所以再右移一个说明框宽度 —— 这个宽度直接问原版节点要（组合最小尺寸，不用等排版帧）。
         target.X += BoxWidth();
 
-        // 「炼药猎」的「调制」描述最长（5 行 + 警告），整块往上移一些才不顶到画面底部；
-        // **其它 Boss 一律不动**（偏移 0）。用户 2026-10-26 要求。数值可热调：charbosses_ui.txt 的 brewSpecialY。
+        // **默认全部正常位置**（偏移 0）；只有说明真的长的（炼药猎「调制」/ 神格观「虔信」/ Ω观「斋戒」）
+        // 才整块往上移，见 UsesLongSpecialText。数值可热调：charbosses_ui.txt 的 brewSpecialY（默认 −120 = 往上）。
         if (UsesLongSpecialText(boss)) target.Y += BossUiTuning.BrewSpecialY;
-
         // ★ 2026-11-15（用户第三次订正：「用原版的框啊」）——
         //   撤回自绘面板，**塔罗愚也用原版 `NHoverTipSet`**；只做一件事：
         //   原公式算出来 `target.X = 立绘右缘 + 框宽 = 1982` 会顶出 1920 的屏幕 ⇒ 把它收到屏内。
@@ -333,40 +332,25 @@ internal static class BossSpecialTip
         _anchor.Position = target;
     }
 
-    /// <summary>这只 Boss 的特殊效果说明是不是「炼药猎」那条长文本（目前只有调制）。</summary>
+    /// <summary>
+    /// 说明框要不要上移（`BossUiTuning.BrewSpecialY`，默认 **−120 = 往上**；`charbosses_ui.txt` 可热调）。
+    ///
+    /// 口径反过来写（用户 2026-11-18：「让预见观之类的是默认，欧米伽观和神格观是特殊需要偏移的」）：
+    /// **默认一律正常位置**，只有说明真的长到会顶到其它 UI 的这几只才上移 ——
+    /// 按**特殊效果类型**点名，不再靠 `Def.Key` + 一堆排除（观者五套设计共用同一个
+    /// `WATCHER_DIVINITY`，以前每加一套就得再加一行排除，v0.2.713 印牌观、v0.2.733 保留观、
+    /// v0.2.754 预见观都是这么补的）。
+    /// </summary>
     private static bool UsesLongSpecialText(CharBossMonster boss)
     {
         try
         {
-            // ★ 2026-11-15（用户：「由于这个特殊效果太长了，往上移动一些，其它boss说明框的位置不改变」）：
-            //   神格观（塔罗牌之后第二长的说明：虔信 4 行 + 空行 + 神格 2 行）和炼药猎的「调制」一样，
-            //   套用同一个偏移（`BossUiTuning.BrewSpecialY`，默认 −120，`charbosses_ui.txt` 可热调）。
-            //   **只加这一只，其它 Boss 的说明框位置一个像素都不动。**
-            //
-            // ★ v0.2.713（用户 2026-11-16：「这个特殊效果的描述并不长，你描述框用正常的位置就行，
-            //   目前的位置有些偏高」）：印牌观（`WATCHER_CREATE`）是**同一个观者角色的第三套设计**，
-            //   它的 `Def.Key` 也是 `WATCHER_DIVINITY` ⇒ 以前会白吃神格观那个 −120 偏移。
-            //   但它那条说明只有两行 ⇒ 必须排除掉，用正常位置。
-            //
-            // ★ v0.2.733（用户 2026-11-17）：**保留观**（`WATCHER_RETAIN`）同理 —— 同一个 `Def.Key`、
-            //   说明也只有两行 ⇒ 同样用正常位置。
-            // ★ v0.2.754（用户 2026-11-18：「预见观的特殊效果描述框偏高了，它很短不用特意调高
-            //   （别动别的 boss）」）：预见观的「通晓万物」只有两行 ⇒ 用正常位置。
-            //   判据用**特殊效果类型**而不是阵容 latch —— 全模组只有预见观带 `BossOmnisciencePower`，
-            //   所以这条绝不会误伤别的 Boss（神格观的 −120 偏移照旧）。
-            try
-            {
-                if (boss.Def.SpecialPowerForAct(boss.ActIndex) == typeof(Powers.BossOmnisciencePower)) return false;
-            }
-            catch { /* 取不到就按原逻辑走 */ }
-
-            if (boss.Def.Key == "WATCHER_DIVINITY"
-                && !Core.BossLineups.WatcherCreateActive()
-                && !Core.BossLineups.WatcherRetainActive()
-                && !Core.BossLineups.WatcherForesightActive()) return true;
-            return boss.Def.SpecialPowerForAct(boss.ActIndex) == typeof(Powers.BrewModPower);
+            var power = boss.Def.SpecialPowerForAct(boss.ActIndex);
+            return power == typeof(Powers.BrewModPower)          // 炼药猎「调制」——最长（最初就是为它加的偏移）
+                || power == typeof(Powers.BossDevotionPower)     // 神格观「虔信」4 行 + 空行 + 神格 2 行
+                || power == typeof(Powers.WatcherFastingPower);  // Ω观「斋戒」
         }
-        catch { return false; }
+        catch { return false; }   // 量不到 = 正常位置
     }
 
     /// <summary>说明框宽度（量不到就给个经验值，下一次刷新会按真实宽度再对一次）。</summary>
