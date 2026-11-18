@@ -29,7 +29,13 @@ public sealed class WatcherFearNoEvilAimPower : PowerModel
 
     public override PowerStackType StackType => PowerStackType.Single;
 
-    public override bool ShouldPlayVfx => false;
+    /// <summary>
+    /// ★ v0.2.759（用户 2026-11-18：「让『不惧妖邪』、『眼部攻击』buff 在获得时会有她获得增益的
+    /// 特效和音效」）：以前这里恒为 false（当它是「内部记账 buff」），于是玩家看不到任何获得提示。
+    /// 现在只对**我们的 Boss**（她本人）放行 —— 真人玩家身上的这一层照旧静音。
+    /// </summary>
+    public override bool ShouldPlayVfx
+        => Owner?.Monster is Monsters.CharBossMonster;
 
     /// <summary>本回合被她锁定的玩家**打出过攻击牌**（打「不惧妖邪」时据此决定进不进平静）。</summary>
     internal bool PlayerAttacked;

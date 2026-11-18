@@ -54,7 +54,7 @@ public static class WatcherRushdownScript
             // ── 1 ── 猛虎下山 / 暴怒+ / 警惕 / 打击（没费不弃）/ 防御（没费不弃）   （5 费）
             Turn(5, "1. 猛虎下山、暴怒+、警惕、打击（没费不弃）、防御（没费不弃）",
                 Play(WatcherCards.Rushdown),
-                Play(WatcherCards.Eruption),
+                Play(WatcherCards.Eruption, upgraded: true),
                 Play(WatcherCards.Vigilance, upgradeMinAscension: 8),
                 Hold(WatcherCards.Strike),
                 Hold(WatcherCards.Defend)),
@@ -63,7 +63,7 @@ public static class WatcherRushdownScript
             Turn(4, "2. 心灵堡垒、渐强、粉碎关节、安宁、净化+（保留不出）、打击（没费）、防御（没费）、奇迹（保留不出）",
                 Play(WatcherCards.MentalFortress, upgradeMinAscension: 8),
                 Play(WatcherCards.Crescendo),
-                Play(WatcherCards.CrushJoints, upgradeMinAscension: 9),
+                Play(WatcherCards.CrushJoints),
                 Play(WatcherCards.Tranquility),
                 HoldPurify(),
                 Hold(WatcherCards.Strike),
@@ -83,7 +83,7 @@ public static class WatcherRushdownScript
 
             // ── 4 ── 暴怒+ / 打击 / 防御 / 不惧妖邪 / 净化+（保留不出）/ 防御×2（没费）/ 奇迹（保留不出）   （5 费）
             Turn(5, "4. 暴怒+、打击、防御、不惧妖邪、净化+（保留不出）、防御×2（没费）、奇迹（保留不出）",
-                Play(WatcherCards.Eruption),
+                Play(WatcherCards.Eruption, upgraded: true),
                 Play(WatcherCards.Strike),
                 Play(WatcherCards.Defend),
                 Play(WatcherCards.FearNoEvil),
@@ -122,30 +122,27 @@ public static class WatcherRushdownScript
                 Hold(WatcherCards.Miracle, cost: 0)),
 
             // ── 8 ── 洗牌；奇迹(+1) / 腾越 ⇒ 节制第二次满 12 张结束回合，但腾越给额外回合   （3 费）
-            Turn(3, "8. 洗牌；奇迹、腾越（节制第二次满 12 张 ⇒ 结束回合，腾越给出额外回合）",
+            Turn(5, "8. 洗牌；奇迹、腾越（节制第二次满 12 张 ⇒ 结束回合，腾越给出额外回合）",
                 shuffle: true,
                 cards: new[]
                 {
                     Play(WatcherCards.Miracle, cost: 0),
                     Play(WatcherCards.Vault),
+                    Play(WatcherCards.InnerPeace),
+                    Play(WatcherCards.BowlingBash),
+                    PlayPurify(WatcherCards.Strike, WatcherCards.Strike, WatcherCards.Strike,
+                               WatcherCards.Strike, WatcherCards.Defend),
+                    Exhausted(WatcherCards.Strike),
+                    Exhausted(WatcherCards.Strike),
+                    Exhausted(WatcherCards.Strike),
+                    Exhausted(WatcherCards.Strike),
+                    Exhausted(WatcherCards.Defend),
+                    Hold(WatcherCards.FearNoEvil),
                 }),
-
-            // ── 8 的额外回合 ── 内心宁静 / 碰撞连击 / 净化+（消耗 打击×4·防御）/ 不惧妖邪（没费不弃）   （2 费）
-            Turn(2, "额外回合：内心宁静、碰撞连击、净化+（消耗 打击×4·防御）、不惧妖邪（没费不弃）",
-                Play(WatcherCards.InnerPeace),
-                Play(WatcherCards.BowlingBash),
-                PlayPurify(WatcherCards.Strike, WatcherCards.Strike, WatcherCards.Strike,
-                           WatcherCards.Strike, WatcherCards.Defend),
-                Exhausted(WatcherCards.Strike),
-                Exhausted(WatcherCards.Strike),
-                Exhausted(WatcherCards.Strike),
-                Exhausted(WatcherCards.Strike),
-                Exhausted(WatcherCards.Defend),
-                Hold(WatcherCards.FearNoEvil)),
 
             // ── 9 ── 暴怒+ / 当头棒喝 / 义愤填膺 / 不惧妖邪（没费不弃）/ 冥想（没费不弃）   （5 费）
             Turn(5, "9. 暴怒+、当头棒喝、义愤填膺、不惧妖邪（没费不弃）、冥想（没费不弃）",
-                Play(WatcherCards.Eruption),
+                Play(WatcherCards.Eruption, upgraded: true),
                 Play(WatcherCards.Wallop, upgradeMinAscension: 9),
                 Play(WatcherCards.Indignation, upgradeMinAscension: 9),
                 Hold(WatcherCards.FearNoEvil),
@@ -165,7 +162,7 @@ public static class WatcherRushdownScript
                 cards: new[]
                 {
                     Play(WatcherCards.InnerPeace),
-                    Play(WatcherCards.Eruption),
+                    Play(WatcherCards.Eruption, upgraded: true),
                     PlayPurify(WatcherCards.CrushJoints, WatcherCards.BowlingBash, WatcherCards.Wallop,
                                WatcherCards.Meditate, WatcherCards.Indignation),
                     Exhausted(WatcherCards.CrushJoints),
@@ -182,36 +179,19 @@ public static class WatcherRushdownScript
                 shuffle: true,
                 cards: new[]
                 {
-                    Play(WatcherCards.Eruption), Play(WatcherCards.Consecrate, upgradeMinAscension: 9),
+                    Play(WatcherCards.Eruption, upgraded: true), Play(WatcherCards.Consecrate, upgradeMinAscension: 9),
                     Play(WatcherCards.InnerPeace),
-                    Play(WatcherCards.Eruption), Play(WatcherCards.Consecrate, upgradeMinAscension: 9),
+                    Play(WatcherCards.Eruption, upgraded: true), Play(WatcherCards.Consecrate, upgradeMinAscension: 9),
                     Play(WatcherCards.InnerPeace),
-                    Play(WatcherCards.Eruption), Play(WatcherCards.Consecrate, upgradeMinAscension: 9),
+                    Play(WatcherCards.Eruption, upgraded: true), Play(WatcherCards.Consecrate, upgradeMinAscension: 9),
                     Play(WatcherCards.InnerPeace),
                     Play(WatcherCards.Vigilance, upgradeMinAscension: 8),
-                    Play(WatcherCards.Eruption), Play(WatcherCards.Consecrate, upgradeMinAscension: 9),
+                    Play(WatcherCards.Eruption, upgraded: true), Play(WatcherCards.Consecrate, upgradeMinAscension: 9),
                     Play(WatcherCards.Vigilance, upgradeMinAscension: 8),
                     Hold(WatcherCards.FearNoEvil),
                     HoldPurify(),
                 }),
 
-            // ── 12+ 切换（玩家打出攻击牌）──（12 费）洗牌；暴怒+/供奉/不惧妖邪 ×3 组、暴怒+/供奉/不惧妖邪（触发节制）、警惕（不出）/内心宁静（不出）/净化+（不出）
-            Turn(12, "12+（玩家打出攻击牌后切换）：洗牌；暴怒+、供奉、不惧妖邪 ×3 组、暴怒+、供奉、不惧妖邪（触发节制结束回合）、警惕（不出）、内心宁静（不出）、净化+（不出）",
-                shuffle: true,
-                cards: new[]
-                {
-                    Play(WatcherCards.Eruption), Play(WatcherCards.Consecrate, upgradeMinAscension: 9),
-                    Play(WatcherCards.FearNoEvil),
-                    Play(WatcherCards.Eruption), Play(WatcherCards.Consecrate, upgradeMinAscension: 9),
-                    Play(WatcherCards.FearNoEvil),
-                    Play(WatcherCards.Eruption), Play(WatcherCards.Consecrate, upgradeMinAscension: 9),
-                    Play(WatcherCards.FearNoEvil),
-                    Play(WatcherCards.Eruption), Play(WatcherCards.Consecrate, upgradeMinAscension: 9),
-                    Play(WatcherCards.FearNoEvil),
-                    Hold(WatcherCards.Vigilance, 2),
-                    Hold(WatcherCards.InnerPeace),
-                    HoldPurify(),
-                }),
         };
 
         return new BossScript
@@ -225,6 +205,31 @@ public static class WatcherRushdownScript
         };
     }
 
+    /// <summary>
+    /// **第 12 回合起「玩家打出攻击牌」时切换成的那一套**（用户 2026-11-18）：
+    /// 洗牌；暴怒+、供奉、不惧妖邪 ×3 组、暴怒+、供奉、不惧妖邪（触发节制结束回合）、
+    /// 警惕（不出）、内心宁静（不出）、净化+（不出）。（12 费）
+    ///
+    /// ⚠ 它**不在** `Turns` 里（否则会把循环编号顶错一格 —— 用户 2026-11-18 实测「复读的回合错误」），
+    /// 由 `BossTemperancePower` / 回合内切换补丁取用。
+    /// </summary>
+    public static BossTurn SwitchPlan() => Turn(12,
+        "12+（玩家打出攻击牌后切换）：洗牌；暴怒+、供奉、不惧妖邪 ×3 组、暴怒+、供奉、不惧妖邪（触发节制结束回合）、警惕（不出）、内心宁静（不出）、净化+（不出）",
+        shuffle: true,
+        cards: new[]
+        {
+            Play(WatcherCards.Eruption, upgraded: true), Play(WatcherCards.Consecrate, upgradeMinAscension: 9),
+            Play(WatcherCards.FearNoEvil),
+            Play(WatcherCards.Eruption, upgraded: true), Play(WatcherCards.Consecrate, upgradeMinAscension: 9),
+            Play(WatcherCards.FearNoEvil),
+            Play(WatcherCards.Eruption, upgraded: true), Play(WatcherCards.Consecrate, upgradeMinAscension: 9),
+            Play(WatcherCards.FearNoEvil),
+            Play(WatcherCards.Eruption, upgraded: true), Play(WatcherCards.Consecrate, upgradeMinAscension: 9),
+            Play(WatcherCards.FearNoEvil),
+            Hold(WatcherCards.Vigilance, 2),
+            Hold(WatcherCards.InnerPeace),
+            HoldPurify(),
+        });
     // ── 剧本小工具 ─────────────────────────────────────────────────────────
     private static BossTurn Turn(int energy, string note, params ScriptCard?[] cards)
         => Turn(energy, note, shuffle: false, cards);
@@ -243,7 +248,8 @@ public static class WatcherRushdownScript
     }
 
     /// <summary>真要打出去的那张（`cost` &gt;= 0 时覆盖本回合费用）。</summary>
-    private static ScriptCard? Play(Type? card, int cost = -1, int upgradeMinAscension = 0, Type? returns = null)
+    private static ScriptCard? Play(Type? card, int cost = -1, int upgradeMinAscension = 0, Type? returns = null,
+                                   bool upgraded = false)
     {
         if (card == null) return null;
         return new ScriptCard
@@ -251,13 +257,14 @@ public static class WatcherRushdownScript
             Card = card,
             CostThisTurn = cost,
             UpgradeMinAscension = upgradeMinAscension,
+            Upgraded = upgraded,
             From = "deck",
             ReturnsToHand = returns == null ? Array.Empty<Type>() : new[] { returns },
         };
     }
 
     /// <summary>「（没费、不弃）」「（保留不出）」这类留在手里的牌。</summary>
-    private static ScriptCard? Hold(Type? card, int cost = 1)
+    private static ScriptCard? Hold(Type? card, int cost = 1, bool upgraded = false)
     {
         if (card == null) return null;
         return new ScriptCard
@@ -265,6 +272,7 @@ public static class WatcherRushdownScript
             Card = card,
             CostThisTurn = cost,
             HoldInstead = true,
+            Upgraded = upgraded,
             From = "deck",
         };
     }
@@ -278,6 +286,7 @@ public static class WatcherRushdownScript
             Card = purity,
             CostThisTurn = 0,
             HoldInstead = true,
+            Upgraded = true,
             From = "deck",
             EnchantSouls = true,
         };
@@ -293,6 +302,7 @@ public static class WatcherRushdownScript
         {
             Card = purity,
             CostThisTurn = 0,
+            Upgraded = true,
             From = "deck",
             EnchantSouls = true,
             ExhaustWith = list.ToArray(),

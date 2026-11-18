@@ -37,13 +37,20 @@ public sealed class BossTemperancePower : PowerModel
 
     public override PowerType Type => PowerType.Buff;
 
-    /// <summary>计数型：`Amount` 就是「已经打出几张」，满 12 归零。</summary>
+    /// <summary>计数型显示（真正的数字走 `DisplayAmount`）。</summary>
     public override PowerStackType StackType => PowerStackType.Counter;
 
     public override bool ShouldPlayVfx => false;
 
-    /// <summary>buff 栏上显示的数字 = 已打出张数（不是层数语义，但玩家要看到计数）。</summary>
-    public override int DisplayAmount => Math.Clamp(Amount, 0, Threshold);
+    /// <summary>
+    /// 本场已打出的牌数。⚠ **不能用 `Amount` 存计数**（v0.2.760 用户实测「她身上没有特殊效果节制」）：
+    /// `PowerCmd.ModifyAmount` 把数量改成 0 时，原版 `ShouldRemoveDueToAmount()` 会把**整条 power 移除**
+    /// （v0.2.541 在「引雷针」上踩过同一个坑）⇒ 第一次满 12 清零后她就永久没有「节制」了。
+    /// </summary>
+    private int _played;
+
+    /// <summary>buff 栏上显示的数字 = 已打出张数（0..12）。</summary>
+    public override int DisplayAmount => Math.Clamp(_played, 0, Threshold);
 
     private static int _logs;
 
@@ -58,7 +65,7 @@ public sealed class BossTemperancePower : PowerModel
             if (Owner == null) return;
             if (!Core.DreadMode.IsActive) return;
             var ctx = new BlockingPlayerChoiceContext();
-            await PowerCmd.Apply<BossTimeWarpPower>(ctx, Owner, 0m, Owner, null);
+            await PowerCmd.Apply<BossTimeWarpPower>(ctx, Owner, 1m, Owner, null);
             Logger.Log("[CharBoss] 时间扭曲（恐惧模式）：已挂在她身上，单独计被锁定玩家的出牌");
         }
         catch (Exception e) { Logger.Log("[CharBoss] 时间扭曲：挂载失败: " + e.Message); }
@@ -73,12 +80,9 @@ public sealed class BossTemperancePower : PowerModel
             if (!ReferenceEquals(cardPlay.Card.Owner, Owner.Player)) return;   // 只数她自己的牌
             if (Owner.CombatState == null) return;
 
-            int now = Math.Min(Threshold, Amount + 1);
-            await PowerCmd.ModifyAmount(choiceContext, this, now - Amount, Owner, null);
-            if (now < Threshold) return;
-
-            // ── 满 12：先清零，再结算 ──────────────────────────────────
-            await PowerCmd.ModifyAmount(choiceContext, this, -now, Owner, null);
+            _played++;
+            if (_played < Threshold) return;
+            _played = 0;
             await TriggerAsync(choiceContext, Owner);
         }
         catch (Exception e) { Logger.Log("[CharBoss] 节制：计数失败（不影响战斗）: " + e.Message); }
@@ -131,7 +135,10 @@ public sealed class BossTimeWarpPower : PowerModel
 
     public override bool ShouldPlayVfx => false;
 
-    public override int DisplayAmount => Math.Clamp(Amount, 0, BossTemperancePower.Threshold);
+    /// <summary>⚠ 同样不能用 `Amount` 存计数（会被整条移除），见 <see cref="BossTemperancePower"/>。</summary>
+    private int _warped;
+
+    public override int DisplayAmount => Math.Clamp(_warped, 0, BossTemperancePower.Threshold);
 
     public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
@@ -145,11 +152,9 @@ public sealed class BossTimeWarpPower : PowerModel
             var victim = Core.BossLockOn.PureVictim(boss, Owner.CombatState);
             if (victim == null || !ReferenceEquals(victim, shooter)) return;
 
-            int now = Math.Min(BossTemperancePower.Threshold, Amount + 1);
-            await PowerCmd.ModifyAmount(choiceContext, this, now - Amount, Owner, null);
-            if (now < BossTemperancePower.Threshold) return;
-
-            await PowerCmd.ModifyAmount(choiceContext, this, -now, Owner, null);
+            _warped++;
+            if (_warped < BossTemperancePower.Threshold) return;
+            _warped = 0;
             Logger.Log($"[CharBoss] 时间扭曲：{shooter.Creature?.Name} 满 12 张 ⇒ 终止他的回合" +
                        "（塔1 时间扭曲的时钟特效/音效待接）");
             PlayerCmd.EndTurn(shooter, false, null);

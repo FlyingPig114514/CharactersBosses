@@ -43,6 +43,33 @@ public static partial class BossHookBridge
     private static void FireSideTurnStart(CharBossMonster boss, PlayerChoiceContext context)
     {
         if (boss.Creature == null) return;
+        // ★ v0.2.759（用户 2026-11-18：「泪滴吊坠盒似乎没有正常触发」）：
+        //   观者遗物「泪滴吊坠盒」=「每场战斗开始时处于平静」。它的钩子是挂在**玩家**的身位上的，
+        //   而我们的影子玩家收不到原版的战斗开始广播 ⇒ 她的第 1 个回合开始时自己补一次「进入平静」。
+        //   （`WatcherCards.T("TeardropLocket")` 按当前 provider 解析，A/B 两版都认。）
+        try
+        {
+            if (boss.TurnNumber <= 1 && boss.Shadow?.PlayerCombatState != null)
+            {
+                var locketType = WatcherCards.T("TeardropLocket");
+                bool has = false;
+                if (locketType != null)
+                {
+                    var relics = boss.Shadow.Relics;
+                    for (int i = 0; i < (relics?.Count ?? 0); i++)
+                    {
+                        var r = relics![i];
+                        if (r != null && r.GetType() == locketType) { has = true; break; }
+                    }
+                }
+                if (has && !WatcherCards.InCalm(boss.Shadow))
+                {
+                    _ = WatcherCards.EnterCalmAsync(boss.Shadow);
+                    Logger.Log("[CharBoss] 泪滴吊坠盒：她第 1 个回合开始 ⇒ 进入「平静」");
+                }
+            }
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 泪滴吊坠盒结算失败（不影响战斗）: " + e.Message); }
         // 「开心小花」按**她自己的回合号**结算（3n 回合 +1 能量），原版那条对她已拦掉
         // （见 Patches/HappyFlowerNoDoublePatch 与本文件的 HappyFlowerPlays）。
         try { HappyFlowerPlays.OnBossTurnStart(boss, context); } catch { /* 忽略 */ }

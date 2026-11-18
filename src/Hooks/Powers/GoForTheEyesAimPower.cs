@@ -35,7 +35,13 @@ public sealed class GoForTheEyesAimPower : PowerModel
 
     public override PowerStackType StackType => PowerStackType.Single;
 
-    public override bool ShouldPlayVfx => false;
+    /// <summary>
+    /// ★ v0.2.759（用户 2026-11-18：「让『不惧妖邪』、『眼部攻击』buff 在获得时会有她获得增益的
+    /// 特效和音效」）：以前这里恒为 false（当它是「内部记账 buff」），于是玩家看不到任何获得提示。
+    /// 现在只对**我们的 Boss**（她本人）放行 —— 真人玩家身上的这一层照旧静音。
+    /// </summary>
+    public override bool ShouldPlayVfx
+        => Owner?.Monster is Monsters.CharBossMonster;
 
     /// <summary>本回合是否有真人玩家**用攻击牌真的打到了她**。</summary>
     private bool _playerAttacked;

@@ -58,6 +58,25 @@ internal static class WatcherOmegaMechanics
         catch { return null; }
     }
 
+    /// <summary>
+    /// 「**会用不惧妖邪进平静**」的观者 Boss：Ω观（斋戒）**或** 三层 3 号「红蓝观」（节制）。
+    /// 两份设计都要「被锁玩家本回合打过攻击牌 ⇒ 她那记不惧妖邪让她进平静」，所以闸门从
+    /// 「只认 Ω观」放宽成这两只（用户 2026-11-18）。
+    ///
+    /// ⚠ 只放宽**这一条**（不惧妖邪 → 平静）。Ω观 专属的欧米伽 / 点穴那套仍然只认 `OurOmegaBoss`，
+    /// 别把红蓝观也算成 Ω观（否则她的意图里会凭空多出欧米伽伤害）。
+    /// </summary>
+    internal static Monsters.CharBossMonster? FearNoEvilBoss(Creature? creature)
+    {
+        try
+        {
+            if (creature?.Monster is not Monsters.CharBossMonster boss) return null;
+            if (OurOmegaBoss(creature) != null) return boss;
+            if (boss.Creature?.GetPower<Powers.BossTemperancePower>() != null) return boss;
+        }
+        catch { /* 忽略 */ }
+        return null;
+    }
     /// <summary>这个 power 挂在哪只 Ω观身上（没有就 null）。给 `WatcherFearNoEvilAimPower` 用。</summary>
     internal static Monsters.CharBossMonster? OmegaOwnerOf(PowerModel? power) => OurOmegaBossOfPower(power);
 
@@ -365,7 +384,10 @@ internal static class WatcherOmegaMechanics
         try
         {
             var owner = __instance?.Owner;
-            var boss = OurOmegaBoss(owner?.Creature);
+            // ★ v0.2.759（用户 2026-11-18：「即使打出攻击牌，不惧妖邪也没有使她进入平静」）：
+            //   原来只认 Ω观（`OurOmegaBoss` = 身上有「斋戒」那只）⇒ 三层 3 号「红蓝观」永远走不进这里。
+            //   现在改成「**会用不惧妖邪进平静的观者 Boss**」：Ω观 或 红蓝观（身上有「节制」）。
+            var boss = FearNoEvilBoss(owner?.Creature);
             if (boss == null) return;
 
             var aim = boss.Creature?.GetPower<WatcherFearNoEvilAimPower>();

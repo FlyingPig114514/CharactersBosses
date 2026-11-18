@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Helpers;
 using MegaCrit.Sts2.Core.Models;
@@ -50,6 +50,23 @@ internal static class BossPowerIcons
     /// `tools/art/extract_card_icon.gd` 从游戏 PCK 里抽出来缩成 **128×128** 再随 PCK 打包
     /// （见 `tools/art/pck_extras.txt`）。
     /// </summary>
+    /// <summary>这个 Power 是不是本模组自己造的（按程序集判，子类也算）。</summary>
+    internal static bool IsOurType(Type? type)
+    {
+        try
+        {
+            var ours = typeof(BossPowerIcons).Assembly;
+            for (var cur = type; cur != null; cur = cur.BaseType)
+            {
+                if (cur.Assembly == ours) return true;
+            }
+        }
+        catch { /* 忽略 */ }
+        return false;
+    }
+
+    internal static bool IsOurPower(PowerModel? power) => power != null && IsOurType(power.GetType());
+
     internal static string? DirectPathOf(PowerModel? power)
     {
         try
@@ -76,6 +93,30 @@ public static class BossPowerSmallIconPatch
         {
             string? direct = BossPowerIcons.DirectPathOf(__instance);
             if (direct != null) { __result = direct; return; }
+
+            // ★ v0.2.759（用户 2026-11-18：「所有本模组的 buff 触发时的特效图标应该与 buff 图标相同，
+            //   现在所有触发时会在角色身上显现出一个红色的 NOPE（= 没有图标）」）：
+            //   原版 `ResolvedBigIconPath` 是 `powers/<id>.png` → `powers/beta/<id>.png` → `powers/missing_power.png`，
+            //   我们的 Power 前两条都不存在 ⇒ 触发特效拿到「缺失」图（红色 NOPE）。
+            //   这里给**本模组全部 Power** 兜一个底：用「好奇」（= 特殊效果面板上那张灯泡图）的大图。
+            if (BossPowerIcons.IsOurPower(__instance))
+            {
+                try
+                {
+                    var curious = ModelDb.Power<MegaCrit.Sts2.Core.Models.Powers.CuriousPower>();
+                    if (curious != null)
+                    {
+                        string missOur = ImageHelper.GetImagePath("powers/missing_power.png");
+                        string ownOur = ImageHelper.GetImagePath("powers/" + __instance.Id.Entry.ToLowerInvariant() + ".png");
+                        bool untouched = string.IsNullOrEmpty(__result)
+                                         || string.Equals(__result, missOur, StringComparison.Ordinal)
+                                         || string.Equals(__result, ownOur, StringComparison.Ordinal);
+                        if (untouched) __result = curious.ResolvedBigIconPath;
+                    }
+                }
+                catch { /* 忽略 */ }
+                return;
+            }
 
             string? entry = BossPowerIcons.VanillaEntryOf(__instance);
             if (entry == null) return;
@@ -106,6 +147,30 @@ public static class BossPowerBigIconPatch
         {
             string? direct = BossPowerIcons.DirectPathOf(__instance);
             if (direct != null) { __result = direct; return; }
+
+            // ★ v0.2.759（用户 2026-11-18：「所有本模组的 buff 触发时的特效图标应该与 buff 图标相同，
+            //   现在所有触发时会在角色身上显现出一个红色的 NOPE（= 没有图标）」）：
+            //   原版 `ResolvedBigIconPath` 是 `powers/<id>.png` → `powers/beta/<id>.png` → `powers/missing_power.png`，
+            //   我们的 Power 前两条都不存在 ⇒ 触发特效拿到「缺失」图（红色 NOPE）。
+            //   这里给**本模组全部 Power** 兜一个底：用「好奇」（= 特殊效果面板上那张灯泡图）的大图。
+            if (BossPowerIcons.IsOurPower(__instance))
+            {
+                try
+                {
+                    var curious = ModelDb.Power<MegaCrit.Sts2.Core.Models.Powers.CuriousPower>();
+                    if (curious != null)
+                    {
+                        string missOur = ImageHelper.GetImagePath("powers/missing_power.png");
+                        string ownOur = ImageHelper.GetImagePath("powers/" + __instance.Id.Entry.ToLowerInvariant() + ".png");
+                        bool untouched = string.IsNullOrEmpty(__result)
+                                         || string.Equals(__result, missOur, StringComparison.Ordinal)
+                                         || string.Equals(__result, ownOur, StringComparison.Ordinal);
+                        if (untouched) __result = curious.ResolvedBigIconPath;
+                    }
+                }
+                catch { /* 忽略 */ }
+                return;
+            }
 
             string? entry = BossPowerIcons.VanillaEntryOf(__instance);
             if (entry == null) return;
