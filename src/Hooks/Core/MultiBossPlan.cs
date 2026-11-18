@@ -27,34 +27,30 @@ public static class MultiBossPlan
     /// <summary>本场战斗该不该上第二只（= 玩家数 ≥ 2）。</summary>
     public static bool WantsSecondBoss(out int playerCount)
     {
+        // ★★ v0.2.800（用户 2026-11-19 的两份 `mod_log (38)/(39)` 22:26）：
+        //   **口径必须与 `BossLineups.PlayerCount()` 完全一致**（阵容条数就是它算出来的 need）。
+        //   以前这里优先读 `RunState.Players.Count`，而 `PlayerCount()` 还会再修正一次
+        //   （房主端按「还在说话的人数」、客人端认房主广播的 `pc=`）⇒ 两边能差 1～2：
+        //     · 阵容按 **1 人** 排（1 条）⇒ 只有主 Boss 一个候选；
+        //     · 这里却按 **3 人** 判 ⇒ 还想要 2 只伙伴 ⇒ 旧版「补重复」兜底把**主 Boss 自己**补上
+        //       ⇒ 场上两只亡灵契约师（22:26 的证据）。
+        //   现在一律先问 `PlayerCount()`（它自己会处理房主/客人/读不到时的兜底），只有它彻底算不出来
+        //   才退回 `RunState`。这样「阵容几条」与「伙伴几只」天然相同，`PartnersForWithKeys` 不再需要兜底。
         playerCount = 1;
-        try
+        int byLineups = 0;
+        try { byLineups = BossLineups.PlayerCount(); } catch { byLineups = 0; }
+        if (byLineups > 0)
         {
-            // ⚠ 必须优先读 `RunManager.Instance.State`（private，走反射）：
-            //   `_runState` 是在 `GenerateMonstersWithSlots` 时抓的，**在「拉 Boss 房间」那一刻还是 null**
-            //   （拉房间发生在遭遇生成之前）。只在 late 阶段才有值的它会让 `ForVanillaBoss` 的多人分支
-            //   误判成单人 ⇒ 多人第三幕第一场又变回根除骨（用户实测）。
-            var state = CurrentRunState();
-            playerCount = state?.Players?.Count ?? 0;
+            playerCount = byLineups;
+            return playerCount >= 2;
         }
-        catch { playerCount = 0; }
 
-        // ★★ v0.2.710（自检「第三幕第二只 Boss 多人不同步」时发现的不一致）：
-        //   这里以前**读不到就按 1 个人算**，而 `BossLineups.PlayerCount()` 早有「记住上一次读到的人数」的兜底
-        //   （2026-11-05 修「房主 2 只 / 客人 1 只」时加的）。两边判据不一样 ⇒ 只要有一瞬间
-        //   `RunManager.Instance` 还拿不到（拉房间 / 换幕那一刻），就会出现：
-        //     · `BossLineups.Build` 按记住的人数排了 2 只的阵容；
-        //     · 而 `PartnersForWithKeys` 走 `WantsSecondBoss` 判成「单人」⇒ **一只伙伴都不加**
-        //   ⇒ 阵容说有 2 只、场上只有 1 只（正是「房主两只、客人一只」那种形态）。
-        //   现在两边用同一个数：读不到就用 `BossLineups.PlayerCount()` 记住的那个。
-        if (playerCount <= 0)
+        try { playerCount = CurrentRunState()?.Players?.Count ?? 0; } catch { playerCount = 0; }
+        if (playerCount <= 0) playerCount = 1;
+        if (playerCount >= 2 && _fallbackLogged++ < 6)
         {
-            try { playerCount = BossLineups.PlayerCount(); } catch { playerCount = 1; }
-            if (playerCount >= 2 && _fallbackLogged++ < 6)
-            {
-                Logger.Log($"[CharBoss] 多人判定：这一刻读不到 RunState 的玩家数 ⇒ 沿用记住的 {playerCount} 人" +
-                           "（与 `BossLineups.PlayerCount()` 同一口径，避免「阵容按 2 只算、只造 1 只」）");
-            }
+            Logger.Log($"[CharBoss] 多人判定：`BossLineups.PlayerCount()` 算不出来 ⇒ 退回 RunState 的 {playerCount} 人" +
+                       "（注意：阵容条数走的是前者，两边可能又不一致）");
         }
         return playerCount >= 2;
     }
@@ -120,9 +116,18 @@ public static class MultiBossPlan
     /// <summary>
     /// 这一场除了「我」之外还要同时上场的那些 Boss（**Boss 标识**由 <see cref="BossLineups"/> 决定）。
     ///
-    /// 用户 2026-10-26：只数 = 玩家数（1～3）⇒ 我 + 伙伴数 = 玩家数；
-    /// 伙伴可能是**同一角色的另一个变体**（例如主 Boss 是能力机，伙伴是炼药猎），
-    /// 所以这里按 Key 取怪物类型，而不是按「与我不一样的角色下标」。
+    /// 用户 2026-10-26：只数 = 玩家数（1～3）⇒ 我 + 伙伴数 = 玩家数。
+    ///
+    /// ★★ v0.2.799（用户 2026-11-19，`mod_log (37)` 里「场上两只亡灵契约师」）：
+    ///   **硬约束 —— 伙伴不得与主 Boss 或已有伙伴同角色**（同角色按 `BossKeys.CharacterOf(key)` 判），
+    ///   **凑不满就少出**。以前这里允许「同一角色的另一个变体」（旧注释原话：「主 Boss 是能力机，
+    ///   伙伴是炼药猎」），而且 v0.2.526 又加了「先要不同的、不够就把重复的那只也上」的兜底
+    ///   ⇒ 阵容里只剩主 Boss 一个条目时（候补表被勾选裁到只剩一只 / 第二场 `usedInThisAct` 清空），
+    ///   兜底会把**主 Boss 自己**当成自己的伙伴再上一只。用户给的证据：
+    ///     · `mod_log (36)` 22:26 阵容=[NECROBINDER_FLESH,SILENT_SNAKEBITE,IRONCLAD_STRIKE]
+    ///     · `mod_log (37)` 22:26 阵容=[NECROBINDER_FLESH]，伙伴=[NECROBINDER_FLESH] ⇒ 两只亡灵契约师
+    ///   现在同角色一律不出（宁可这一场只有一只 Boss），并打一行「伙伴角色去重自检」。
+    ///
     /// 单人或取不到阵容时返回空列表（遭遇仍然只造一只，行为与改动前一致）。
     /// </summary>
     public static List<MonsterModel> PartnersFor(string? myKey)
@@ -172,29 +177,49 @@ public static class MultiBossPlan
 
             var parts = new List<string>();
 
-            // ★ v0.2.526（`mod_log (25).txt` 的 2 人局只出 1 只 Boss）：
-            //   这里以前是「跳过所有与 `myKey` 相同的条目」。正常情况下阵容里每只都不一样，
-            //   跳过「我」正好剩下 `玩家数 − 1` 只；但旧版阵容会排出**同一只两次**
-            //   （`[DEFECT_RAINBOW, DEFECT_RAINBOW]`）⇒ 两个条目都被跳过 ⇒ **一只伙伴都不加**
-            //   ⇒ 2 人局只有 1 只 Boss、一名玩家连锁定图标都没有。
-            //   现在按「先要不同的、不够就把重复的那只也上」的顺序取，且**夹到 玩家数 − 1**。
+            // ★★ v0.2.799：**硬约束 —— 伙伴不得与主 Boss 或已有伙伴同角色**（用户 2026-11-19）。
+            //   同角色按 `BossKeys.CharacterOf(key)` 判（这是「角色下标」，同一角色的不同变体
+            //   例如 NECROBINDER_DOOM / NECROBINDER_FLESH 用的是**同一个** Character）；
+            //   **凑不满就少出**，绝不为了让「只数 = 玩家数」而把同角色再上一只。
+            //
+            //   历史（v0.2.526，`mod_log (25).txt`：2 人局只出 1 只 Boss）那段「跳过与我同 Key 的条目
+            //   ⇒ 一只伙伴都不加」的问题，当初是靠「不够就把重复的那只也补上」兜底解决的；
+            //   但那个兜底正是 v0.2.799 要根治的 bug：阵容只剩主 Boss 一个条目时，它补出来的
+            //   **就是主 Boss 自己**（`mod_log (37)`：阵容=[NECROBINDER_FLESH]、伙伴=[NECROBINDER_FLESH]）。
+            //   ⇒ 兜底已删除；少一只 Boss 好过场上一模一样的两个。
+            int mainChar = BossKeys.CharacterOf(myKey);
+            var usedChars = new HashSet<int>();
+            if (mainChar >= 0) usedChars.Add(mainChar);
+            var usedKeys = new HashSet<string>(StringComparer.Ordinal);
+            if (!string.IsNullOrEmpty(myKey)) usedKeys.Add(myKey!);
+            var rejected = new List<string>();
+
             var order = new List<string>();
             foreach (var key in lineup)
             {
                 if (order.Count >= wantPartners) break;
-                if (myKey != null && key == myKey) continue;
+                if (string.IsNullOrEmpty(key)) continue;
+                if (usedKeys.Contains(key))
+                {
+                    rejected.Add($"{key}（与主 Boss 是同一个 Key）");
+                    continue;
+                }
+                int ch = BossKeys.CharacterOf(key);
+                if (ch >= 0 && usedChars.Contains(ch))
+                {
+                    rejected.Add($"{key}（角色「{BossKeys.CharacterName(ch)}」已经有 Boss 上场）");
+                    continue;
+                }
                 order.Add(key);
+                usedKeys.Add(key);
+                if (ch >= 0) usedChars.Add(ch);
             }
+
             if (order.Count < wantPartners)
             {
-                foreach (var key in lineup)
-                {
-                    if (order.Count >= wantPartners) break;
-                    if (myKey == null || key != myKey) continue;    // 只补「与我是同一只」的那些
-                    order.Add(key);
-                    Logger.Log($"[CharBoss] ⚠ 阵容里出现了两只同一款 Boss（{key}）⇒ 为了「只数 = 玩家数」仍然上第二只" +
-                               "（阵容重复本身是 bug，见 BossLineups.Build ⑥ 的注释）");
-                }
+                Logger.Log($"[CharBoss] 伙伴名额 {wantPartners} 只、实际只凑到 {order.Count} 只 ⇒ **少出**" +
+                           "（硬约束：伙伴不得与主 Boss 或已有伙伴同角色；宁可少一只，也不要场上一模一样的两个）" +
+                           (rejected.Count > 0 ? $"；被挡下的候选=[{string.Join(" | ", rejected)}]" : ""));
             }
 
             foreach (var key in order)
@@ -223,6 +248,26 @@ public static class MultiBossPlan
             Logger.Log($"[CharBoss] ※多 Boss 生成指纹※ 第 {act + 1} 层第 {fight + 1} 场 · " +
                        $"玩家={CurrentRunState()?.Players?.Count} · 阵容=[{string.Join(",", lineup)}] · " +
                        $"我={myKey} · 伙伴=[{string.Join(",", parts)}]（两端这一行必须一致）");
+
+            // ★★ v0.2.799 自检（用户 2026-11-19 要的）：**场上绝不能出现同一角色的两只 Boss**。
+            //   判据只看「主 Boss 的角色 + 每个伙伴的角色」有没有重复；判据全是 Key 派生的
+            //   ⇒ 两端确定性一致（这一行在多人局也应该逐字相同）。
+            var charsInPlay = new List<int>();
+            if (mainChar >= 0) charsInPlay.Add(mainChar);
+            foreach (var key in order)
+            {
+                int ch = BossKeys.CharacterOf(key);
+                if (ch >= 0) charsInPlay.Add(ch);
+            }
+            int distinctChars = charsInPlay.Distinct().Count();
+            bool dedupOk = distinctChars == charsInPlay.Count;
+            Logger.Log($"[CharBoss] ※伙伴角色去重自检※ 我={myKey}（角色「{BossKeys.CharacterName(mainChar)}」）· " +
+                       $"要 {wantPartners} 只伙伴 · 实得 {result.Count} 只（模型取到 {parts.Count} 只）· " +
+                       $"场上角色=[{string.Join(",", charsInPlay.Select(c => BossKeys.CharacterName(c)))}]" +
+                       $"（{distinctChars} 个不同 / 共 {charsInPlay.Count} 只）⇒ " +
+                       (dedupOk ? "通过（无同角色）" : "⚠ **失败：场上有同角色的两只 Boss**") +
+                       (mainChar < 0 ? " · ⚠ 认不出主 Boss 的角色 ⇒ 只能按 Key 去重" : "") +
+                       (rejected.Count > 0 ? $" · 被挡=[{string.Join(" | ", rejected)}]" : ""));
         }
         catch (Exception e)
         {

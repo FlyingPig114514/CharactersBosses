@@ -114,10 +114,18 @@ internal static class BossPicksSync
     /// **真正还在场的玩家数**（v0.2.797，用户 2026-11-19：中途有人离开游戏后，Boss 房变成 4v4，
     /// 多出来那只面对一个没人操控的角色 ⇒ 剩下的人结束不了回合）。
     ///
-    /// 规则：`RunState.Players` 里逐个看 —— 本机自己算 1；其它玩家要求**最近 30 秒内说过话**
-    /// （`BossPicksMessage` 每秒心跳，房主广播 / 客人上报都会走到 <see cref="NoteHeard"/>）。
-    /// 从未听到过任何对端时（开局第一次 / 刚装上本模组）**不做判断**，原样返回 <paramref name="fallback"/>，
-    /// 免得开局把 4 人算成 1 人。
+    /// 规则：`RunState.Players` 里逐个看 —— 本机自己算 1；其它玩家**只有「听到过、然后安静超过 30 秒」
+    /// 才算已离开**（`BossPicksMessage` 的心跳会走到 <see cref="NoteHeard"/>）。
+    ///
+    /// ★★ v0.2.800（用户 2026-11-19 的两份 `mod_log (38)/(39)` 22:36，实证这条判据在乱跳）：
+    ///   以前是「**从没听到过 = 已离开**」—— 只要房里有一个对端说过话，剩下那些还没说话的全被判死；
+    ///   而客人收到房主结论之后**就不再发消息**（`Tick` 里 `if (Received) return`）⇒ 房主听不到客人
+    ///   ⇒ 人数一路塌：同一台房主 22:36:25 数出「2 人」、22:36:55 数出「1 人」（其实 3 个人都在玩）。
+    ///   阵容条数 = 人数 ⇒ 阵容一会儿 3 条一会儿 1 条，两端就必然对不上（还会触发 v0.2.799 那个
+    ///   「主 Boss 当自己的伙伴」）。
+    ///   现在改成：**没听到过的人按「还在」算**（不敢剔除），只有「听过之后又不说话了」才剔除；
+    ///   配合 `Tick` 里新增的每 5 秒心跳，正常情况下这个数不会再塌。
+    ///   日志只在「数**变了**」时打一行（以前同一秒能刷几十行）。
     /// </summary>
     internal static int LivePlayerCount(int fallback)
     {
@@ -133,6 +141,7 @@ internal static class BossPicksSync
 
             var now = DateTime.UtcNow;
             int live = 0;
+            int silent = 0;                                   // 「听过、但现在安静着」的人数（诊断用）
             foreach (var p in players)
             {
                 if (p == null) continue;
@@ -145,19 +154,25 @@ internal static class BossPicksSync
                 try { id = p.NetId; } catch { id = 0; }
                 if (id == 0) { live++; continue; }           // 拿不到 NetId ⇒ 不敢剔除
 
-                if (_lastHeard.TryGetValue(id, out var when) && (now - when).TotalSeconds <= 30) live++;
+                if (!_lastHeard.TryGetValue(id, out var when)) { live++; continue; }   // ★ 从没听过 ⇒ 按活着算
+                if ((now - when).TotalSeconds <= 30) { live++; continue; }
+                silent++;
             }
 
             if (live <= 0) return fallback;
-            if (live != players.Count && _logSparse++ < 20)
-                Logger.Log($"[CharBoss] 阵容人数：RunState 有 {players.Count} 人，但只有 {live} 人还在说话" +
-                           "（其余已离开 / 掉线）⇒ 这一场按 " + live + " 只 Boss 出场（避免 4v4 里多一只面对空位）");
+            if (live != _lastLive && _logSparse++ < 30)
+            {
+                _lastLive = live;
+                Logger.Log($"[CharBoss] 阵容人数：RunState 有 {players.Count} 人，其中 {silent} 人已经 30 秒没说话" +
+                           $"（其余已离开 / 掉线）⇒ 这一场按 {live} 只 Boss 出场（避免多一只面对空位）");
+            }
             return live;
         }
         catch { return fallback; }
     }
 
     private static int _logSparse;
+    private static int _lastLive = -1;
 
     /// <summary>房主的 A4 子项「进阶 10 第三幕一场原本一场角色」。</summary>
     internal static bool? HostAsc10Act3OneEach { get; private set; }
@@ -496,16 +511,47 @@ internal static class BossPicksSync
             var role = NetRole.Type;
             if (role == MegaCrit.Sts2.Core.Multiplayer.Game.NetGameType.Client)
             {
-                if (Received) return;
-                if (now - _lastAskAt < 3000) return;
-                _lastAskAt = now;
-                _lastCapsSent = string.Empty;           // 允许重发
-                _forceHello = true;
-                BroadcastIfHost();                      // 客人这条路上会走 SendCaps
-                _forceHello = false;
+                if (!Received)
+                {
+                    if (now - _lastAskAt < 3000) return;
+                    _lastAskAt = now;
+                    _lastCapsSent = string.Empty;           // 允许重发
+                    _forceHello = true;
+                    BroadcastIfHost();                      // 客人这条路上会走 SendCaps
+                    _forceHello = false;
+                    return;
+                }
+
+                // ★★ v0.2.800（用户 2026-11-19 的两份 `mod_log (38)/(39)`）：**收到结论之后也要继续说话**。
+                //   以前这里一句 `if (Received) return;` ⇒ 客人拿到房主结论就彻底闭嘴 ⇒ 房主的
+                //   「最近 30 秒说过话」判活（`LivePlayerCount`）把还在玩的客人判成「已离开」
+                //   ⇒ 房主 22:36:25 数出 2 人、22:36:55 数出 1 人（3 人局）⇒ 阵容条数跟着塌 ⇒ 两端 Boss 对不上。
+                //   现在每 5 秒发一次**无副作用的心跳**（内容照旧是本机观者实现，`hello` 不带⇒房主不会重播）。
+                if (now - _lastHeartbeatAt < 5000) return;
+                _lastHeartbeatAt = now;
+                _lastCapsSent = string.Empty;               // 绕过「内容没变就不重发」
+                _heartbeatQuiet = true;                     // 心跳不刷日志（每 5 秒一条会淹掉真日志）
+                try { BroadcastIfHost(); } finally { _heartbeatQuiet = false; }
             }
             else if (role == MegaCrit.Sts2.Core.Multiplayer.Game.NetGameType.Host)
             {
+                // ★★ v0.2.800：房主这边「本场几个人」一旦变了（有人离开 / 回来）⇒ 立刻把结论重播一次，
+                //   客人拿到的 `pc=` 才不会停在旧值（阵容条数 = 这个数，差一条就是两只 Boss 对不上）。
+                try
+                {
+                    int pcNow = BossLineups.PlayersPerFight();
+                    if (pcNow != _lastBroadcastPc)
+                    {
+                        bool first = _lastBroadcastPc < 0;
+                        _lastBroadcastPc = pcNow;
+                        _lastSent = string.Empty;
+                        if (!first)
+                            Logger.Log($"[CharBoss] 阵容人数变成 {pcNow} 人 ⇒ 房主立即重播勾选 / 玩法设置（含 pc={pcNow}）" +
+                                       "，客人按同一个数排阵容");
+                    }
+                }
+                catch { /* 忽略 */ }
+
                 int expected = Math.Max(0, BossLineups.PlayerCount() - 1);
                 if (expected <= 0) return;
                 // 两种「还没发到位」的状态都要重播：
@@ -524,6 +570,9 @@ internal static class BossPicksSync
 
     private static long _lastAskAt;
     private static long _lastHostResendAt;
+    private static long _lastHeartbeatAt;
+    private static int _lastBroadcastPc = -1;
+    private static bool _heartbeatQuiet;
     private static bool _forceHello;
     /// <summary>客人 → 房主：上报本机观者身份（内容没变就不重发）。</summary>
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
@@ -549,7 +598,8 @@ internal static class BossPicksSync
                 Caps = caps,
             }, net);
             _lastCapsSent = caps;
-            Logger.Log($"[CharBoss] 观者 Boss：客人已上报本机观者实现（{caps}）⇒ 房主据此判断观者能否出现");
+            if (!_heartbeatQuiet)
+                Logger.Log($"[CharBoss] 观者 Boss：客人已上报本机观者实现（{caps}）⇒ 房主据此判断观者能否出现");
         }
         catch (Exception e)
         {

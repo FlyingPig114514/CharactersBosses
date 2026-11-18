@@ -1598,6 +1598,27 @@
       "fix": "BaseLib 的 ReflectionHelper.GetSubtypesInMods&lt;ICustomMessage&gt;() 看不见我们「外壳 + Impl111.dll.bin」的实现程序集 ⇒ CustomMessageToId / IdToCustomMessage 两张表里永远没有 BossPicksMessage ⇒ Send/Deserialize 抛 KeyNotFound。v0.2.749 的「清 _customMessages 再 Initialize」无效（重扫还是扫不到）。v0.2.772 改为按 BaseLib 自己的算法直接登记：id = ComputeBasicHash(FullName)（MD5→FNV-1a，种子 0x811C9DC5），撞车 +1 避让，只写两张字典、不往 _customMessages 里加（否则以后 Initialize 会把我们改登记到 hash+1）。全程反射。",
       "file": "src/Hooks/Core/BaseLibMessageRegistration.cs",
       "at": "2026-11-18T06:44:39.457Z"
+    },
+    {
+      "id": "bug-245-mwm81ilx",
+      "error_message": "多人局场上出现两只同角色 Boss（两只亡灵契约师）：mod_log (36) 22:26 阵容=[NECROBINDER_FLESH,SILENT_SNAKEBITE,IRONCLAD_STRIKE]，(37) 22:26 阵容=[NECROBINDER_FLESH] 伙伴=[NECROBINDER_FLESH] —— 主 Boss 被当成自己的伙伴",
+      "fix": "PartnersForWithKeys 加硬约束：伙伴不得与主 Boss 或已有伙伴同角色（BossKeys.CharacterOf(key) 判），凑不满就少出；删掉 v0.2.526 那条「不够就把重复的那只也补上」兜底（阵容只剩主 Boss 一个条目时它补出来的就是主 Boss 自己）。新增日志：「伙伴名额 N 只、实际只凑到 M 只 ⇒ **少出**（列出被挡下的候选）」+ `※伙伴角色去重自检※`（场上角色列表 / 不同角色数 / 通过或失败）。v0.2.799。",
+      "file": "src/Hooks/Core/MultiBossPlan.cs",
+      "at": "2026-11-18T14:33:28.437Z"
+    },
+    {
+      "id": "bug-246-mwm8kzij",
+      "error_message": "联机被游戏踢出：[RunLobby] Disconnected. Reason: StateDivergence（客人 godot (22).log 22:37:41，checksum 56）；两份 mod_log 对表后不同步字段是 E:NECROBINDER_BOSS 的格挡 +6 vs +0",
+      "fix": "根因是 v0.2.815 给「吞噬生命」加的那道 `if (!NetRole.IsHostOrSolo) return;`（只让房主结算）：房主 22:37:39 记 `她给 Skyphantom 上了 VULNERABLE_POWER（2）⇒ 获得 6 点格挡 + 血肉戏法 13 点无来源伤害`，客人同一秒只有 `本机是客人 ⇒ 只记录、不改状态` ⇒ 房主 Boss 多 6 格挡、玩家少 13 血，客人一个数都没动 ⇒ 40 秒后 checksum 56 分叉被踢。战况（格挡/掉血）不是网络同步项，游戏靠「两端各跑一遍同样的命令」保持一致（同仓库 DominateWeakPower / BossStellarGatheringPower 同样在 AfterPowerAmountChanged 里改战况、两端都跑，从没这问题）⇒ 删掉那道闸，两端都结算。v0.2.800。顺手修：LivePlayerCount 不再把「从没听到过」的玩家当已离开（客人收到房主结论后不再发消息 ⇒ 房主把还在玩的客人判死 ⇒ 人数 3→2→1 ⇒ 阵容条数乱跳）；客人收到结论后每 5 秒发一次静默心跳；房主 pc= 一变立刻重播；MultiBossPlan.WantsSecondBoss 改成只认 BossLineups.PlayerCount()（阵容几条 = 伙伴几只）。",
+      "file": "src/Hooks/Powers/BossDevourLifePower.cs",
+      "at": "2026-11-18T14:48:36.811Z"
+    },
+    {
+      "id": "bug-247-mwm8l1ho",
+      "error_message": "install-mod.bat 报 [verify] ✗ 部署版本不一致：CharacterBosses.Impl113.dll.bin=v读不到（明明两份都刚编出 v0.2.800）",
+      "fix": "verify-deploy.ps1 的 Read-Utf16FirstVersion 把整份 dll 按 UTF-16 解一次再正则 —— #US 字符串堆里每串偏移不一定是偶数（实测 Impl113 的 Tag 落在第 1312443 字节 = 奇数）⇒ 整份解码错位 ⇒ 误报「读不到」，让人以为 copy 被文件占用。改成与 pack-dist.ps1 同一套：先按字节层找 UTF-16LE 的 'v<期望版本>'（Test-BytesContain），只有找不到才用「正反两个奇偶各解一次」尽力报出实际版本。另：用 edit 工具改 .ps1 会丢 UTF-8 BOM，本机 PS 5.1 会把无 BOM 的中文当 GBK ⇒ 解析器报「字符串缺少终止符」；改完记得用 [System.IO.File]::WriteAllBytes 补回 EF BB BF（src/CharacterBosses.json 同理）。",
+      "file": "tools/verify-deploy.ps1",
+      "at": "2026-11-18T14:48:39.372Z"
     }
   ]
 }

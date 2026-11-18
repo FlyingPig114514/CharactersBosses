@@ -6252,3 +6252,23 @@ Chronological action log.
 | 2026-11-18 22:11 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
 | 2026-11-18 22:14 | edit | `src/Hooks/Powers/BossDevourLifePower.cs` | ok | 0 |
 | 2026-11-18 22:14 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-18 22:32 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/MultiBossPlan.cs` | ok | 0 |
+| 2026-11-18 22:32 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/MultiBossPlan.cs` | ok | 0 |
+| 2026-11-18 22:32 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/MultiBossPlan.cs` | ok | 0 |
+| 2026-11-18 22:32 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/CharacterBosses.json` | ok | 0 |
+| 2026-11-18 22:32 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-18 22:44 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Powers/BossDevourLifePower.cs` | ok | 0 |
+| 2026-11-18 22:44 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Powers/BossDevourLifePower.cs` | ok | 0 |
+| 2026-11-18 22:44 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Powers/BossDevourLifePower.cs` | ok | 0 |
+| 2026-11-18 22:44 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossPicksSync.cs` | ok | 0 |
+| 2026-11-18 22:44 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossPicksSync.cs` | ok | 0 |
+| 2026-11-18 22:45 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/MultiBossPlan.cs` | ok | 0 |
+| 2026-11-18 22:45 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/CharacterBosses.json` | ok | 0 |
+| 2026-11-18 22:45 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-18 22:46 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/verify-deploy.ps1` | ok | 0 |
+| 2026-11-18 22:46 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/verify-deploy.ps1` | ok | 0 |
+| 2026-11-18 22:47 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossPicksSync.cs` | ok | 0 |
+| 2026-11-18 22:47 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossPicksSync.cs` | ok | 0 |
+| 2026-11-18 22:47 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossPicksSync.cs` | ok | 0 |
+| 2026-11-18 23:01 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/workshop/changenote.txt` | error | 0 |
+| 2026-11-18 23:01 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/workshop/changenote.txt` | ok | 0 |

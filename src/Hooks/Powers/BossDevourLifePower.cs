@@ -41,7 +41,6 @@ public sealed class BossDevourLifePower : PowerModel
     public override bool ShouldPlayVfx => false;
 
     private int _logs;
-    private int _guestLogs;
 
     private static string SafeEntry(PowerModel? power)
     {
@@ -106,18 +105,21 @@ public sealed class BossDevourLifePower : PowerModel
                               && amount > 0m);                                  // 只认「加层」，衰减（−1）不算
             if (!fromHer) return;
 
-            // ★★ 2026-11-15（玩家反馈：「联机给血肉骨上 debuff 会不同步」，日志 mod_log(26) 22:23:12）：
-            //   这个钩子**每台机器都会跑一遍**，而下面直接改战斗状态（她自己 +格挡、被上负面的玩家补血肉戏法伤害）。
-            //   两端各算一遍 —— 一侧跑、另一侧没跑，或者先后顺序不同 —— 就会让 Boss 的格挡 / 玩家血量分叉
-            //   （日志里 `⚠ 不同步状态摘要（轮次 2）` 正是在玩家给她上易伤 / 魔力灼烧那两行之后出现的）。
-            //   处理原则与本仓库既有的「战斗状态只在**一个确定的地方**改」一致：
-            //   **只有房主（或单人）真正结算**，客人只打一行日志，数值由房主的战况同步过来。
-            if (!NetRole.IsHostOrSolo)
-            {
-                if (_guestLogs++ < 3)
-                    Logger.Log("[CharBoss] 吞噬生命：本机是客人 ⇒ 只记录、不改状态（避免联机不同步）");
-                return;
-            }
+            // ★ 2026-11-15（**已被 v0.2.800 推翻**，留作历史）：当时玩家反馈「联机给血肉骨上 debuff 会不同步」
+            //   （`mod_log(26)` 22:23:12），猜的是「两端各算一遍顺序不同」⇒ 改成只让房主结算。
+            //   结论：猜错了 —— 只让房主结算才是必炸的不同步（见下）。
+            // ★★ v0.2.800（用户 2026-11-19「似乎没修好」的两份 `mod_log (38)/(39)` + `godot (22).log`）：
+            //   这里以前是「**只有房主真正结算**，客人只打一行日志」（v0.2.815 那次为了躲不同步加的）。
+            //   那份日志实证它才是**不同步的源头**，而且是必炸的：
+            //     · 房主 22:37:39 `吞噬生命：她给 Skyphantom 上了 VULNERABLE_POWER（2）⇒ 获得 6 点格挡 + 血肉戏法 13 点无来源伤害`
+            //     · 客人 22:37:38 `吞噬生命：本机是客人 ⇒ 只记录、不改状态（避免联机不同步）`
+            //     · 客人 `godot (22).log` 22:37:41 `[RunLobby] Disconnected. Reason: StateDivergence`（checksum 56）
+            //   ⇒ 房主那只 Boss 多 6 点格挡、那位玩家少 13 点血，客人这边**一个数都没动**。
+            //   这类战况改动（格挡 / 掉血）**不是**网络同步项：游戏靠「两端各跑一遍同样的命令」保持一致
+            //   （本仓库其它同类钩子 —— `DominateWeakPower` / `BossStellarGatheringPower` —— 都是两端都跑，
+            //   从来没有这个问题）。所以这里**两端都跑**：两端输入相同（下面那行 `吞噬生命钩子` 日志两端逐字一致，
+            //   连 `amount` / `applier` 都一样）⇒ 结果必然相同。
+            //   ⚠ 绝不要再用「只让房主改战况」来躲不同步 —— 那是**制造**不同步。
             await CreatureCmd.GainBlock(owner, FleshBone.DevourBlockNow, ValueProp.Unpowered, null);
 
             // ★ 2026-11-10 第二轮（用户：「命运同担还是不对玩家造成伤害」）：

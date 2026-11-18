@@ -19,10 +19,36 @@ $ErrorActionPreference = 'Stop'
 
 # 从程序集里读「构建版本」：`BuildInfo.Tag` 的那条字符串以 `v<版本> / <日期>` 开头，
 # 后面还串着一整串历史（「另含 v0.2.591 / …」）⇒ **只认第一处**，否则旧版本号会误判成通过。
+#
+# ★★ v0.2.800（2026-11-19 装机时踩到）：**绝不要把整份文件按 UTF-16 解一次再正则**。
+#   `#US` 字符串堆里每串的偏移**不一定是偶数**（实测 `CharacterBosses.Impl113.dll.bin` 的
+#   Tag 落在第 1312443 字节 = 奇数）⇒ 整份解码错位 ⇒ 明明有 `v0.2.800` 却报「读不到」
+#   ⇒ 白白怀疑「部署版本不一致」，害得人去重装。`tools\pack-dist.ps1` 早就改成字节层查找了，
+#   这里同步改成同一套：**先按字节层找「期望版本」**（这才是本脚本真正要回答的问题），
+#   只有找不到时才尽力把「实际读到的版本」报出来（正反两个奇偶各解一次）。
+function Test-BytesContain([byte[]]$hay, [string]$text) {
+    $needle = [System.Text.Encoding]::Unicode.GetBytes($text)
+    if ($needle.Length -eq 0 -or $hay.Length -lt $needle.Length) { return $false }
+    for ($i = 0; $i -le $hay.Length - $needle.Length; $i++) {
+        if ($hay[$i] -ne $needle[0]) { continue }
+        $ok = $true
+        for ($j = 1; $j -lt $needle.Length; $j++) {
+            if ($hay[$i + $j] -ne $needle[$j]) { $ok = $false; break }
+        }
+        if ($ok) { return $true }
+    }
+    return $false
+}
+
 function Read-Utf16FirstVersion([byte[]]$hay) {
-    $decoded = [System.Text.Encoding]::Unicode.GetString($hay)
-    $m = [regex]::Match($decoded, 'v(\d+\.\d+\.\d+) / ')
-    if ($m.Success) { return $m.Groups[1].Value }
+    for ($skip = 0; $skip -lt 2; $skip++) {
+        if ($hay.Length -le ($skip + 8)) { continue }
+        $len = $hay.Length - $skip
+        $len = $len - ($len % 2)
+        $decoded = [System.Text.Encoding]::Unicode.GetString($hay, $skip, $len)
+        $m = [regex]::Match($decoded, 'v(\d+\.\d+\.\d+) / ')
+        if ($m.Success) { return $m.Groups[1].Value }
+    }
     return ''
 }
 
@@ -58,6 +84,8 @@ foreach ($name in @('CharacterBosses.Impl111.dll.bin', 'CharacterBosses.Impl113.
         else { $bad += ($name + '=缺文件'); continue }
     }
     $bytes = [System.IO.File]::ReadAllBytes($p)
+    # ★ 判据 = 「字节层里有 `v<期望版本>`」（不受字符串堆奇偶偏移影响，见文件头的说明）
+    if (Test-BytesContain $bytes ('v' + $ExpectedVersion)) { continue }
     $found = Read-Utf16FirstVersion $bytes
     if ($found -eq $ExpectedVersion) { continue }
     if (-not $found) { $found = '读不到' }
