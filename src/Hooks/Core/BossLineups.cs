@@ -1936,6 +1936,22 @@ internal static class BossLineups
     /// </summary>
     internal static int PlayerCount()
     {
+        // ★ v0.2.795（两端日志对表实证：第 3 层第 2 场 房主 `玩家=2 阵容=[FOOL_TAROT,REGENT_CHOICE]`、
+        //   客人 `玩家=3 阵容=[SILENT_SHIV,IRONCLAD_BOULDER,REGENT_STAR]` ⇒ 整场 Boss 都不一样）：
+        //   阵容条数 = 玩家数，而玩家掉线/重连那一刻两端 `RunState.Players.Count` 会短时间不一致。
+        //   ⇒ **客人端只认房主广播的人数**（`BossPicksSync.HostPlayersPerFight`，随玩法设置一起下发），
+        //   与「勾选 / 共用匹配池 / 每场最终遭遇都以房主为准」同一条原则。
+        //   房主自己、单人、以及还没收到房主数据时，行为与以前完全一致。
+        try
+        {
+            if (Core.NetRole.IsGuest && Core.BossPicksSync.HostPlayersPerFight is int hostPc && hostPc > 0)
+            {
+                _lastKnownPlayers = hostPc;
+                return hostPc;
+            }
+        }
+        catch { /* 忽略：拿不到就按本机数 */ }
+
         int n = 0;
         try { n = MultiBossPlan.RunStateOrNull()?.Players?.Count ?? 0; } catch { n = 0; }
         if (n > 0)

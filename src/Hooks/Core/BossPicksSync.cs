@@ -92,6 +92,15 @@ internal static class BossPicksSync
     /// <summary>房主的 A4「与原本 Boss 共用匹配池」。</summary>
     internal static bool? HostSharePool { get; private set; }
 
+    /// <summary>
+    /// **房主那一场用了几个人**（v0.2.795）。阵容（Boss 数 = 玩家数）是按这个数确定性推导的 ——
+    /// 玩家掉线/重连时两端 `RunState.Players.Count` 会短暂不一致（本机日志实证：
+    /// 第 3 层第 2 场 房主 `玩家=2 阵容=[FOOL_TAROT,REGENT_CHOICE]`，客人 `玩家=3
+    /// 阵容=[SILENT_SHIV,IRONCLAD_BOULDER,REGENT_STAR]`）⇒ 整场 Boss 都不一样。
+    /// 现在客人端**只认房主广播的这个数**，与「勾选/玩法设置以房主为准」同一原则。
+    /// </summary>
+    internal static int? HostPlayersPerFight { get; private set; }
+
     /// <summary>房主的 A4 子项「进阶 10 第三幕一场原本一场角色」。</summary>
     internal static bool? HostAsc10Act3OneEach { get; private set; }
 
@@ -501,6 +510,8 @@ internal static class BossPicksSync
             sb.Append("sp=").Append(BossConfig.SharePool ? '1' : '0');
             sb.Append(";asc10=").Append(BossConfig.Asc10Act3OneEach ? '1' : '0');
             sb.Append(";wok=").Append(WatcherAllowedHere() ? '1' : '0');
+            // ★ v0.2.795：把「本场用几个人」一起广播（阵容条数 = 这个数）
+            try { sb.Append(";pc=").Append(Core.BossLineups.PlayersPerFight()); } catch { /* 取不到就不发 */ }
             sb.Append(";maps=");
             bool first = true;
             foreach (var kv in BossConfig.AllMapSwitches())
@@ -616,6 +627,7 @@ internal static class BossPicksSync
             {
                 HostSharePool = null;
                 HostAsc10Act3OneEach = null;
+                HostPlayersPerFight = null;
                 HostMaps.Clear();
             }
             foreach (var part in (settings ?? string.Empty).Split(';'))
@@ -628,6 +640,10 @@ internal static class BossPicksSync
                 switch (name)
                 {
                     case "sp": HostSharePool = value == "1"; break;
+                    case "pc":
+                        // ★ v0.2.795：房主的人数（阵容按它推导；玩家掉线/重连时两端可能不一致）
+                        if (int.TryParse(value, out int hostPc) && hostPc > 0) HostPlayersPerFight = hostPc;
+                        break;
                     case "asc10": HostAsc10Act3OneEach = value == "1"; break;
                     case "maps":
                         foreach (var kv in value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))

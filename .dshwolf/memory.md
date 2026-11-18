@@ -6241,3 +6241,5 @@ Chronological action log.
 | 2026-11-18 20:29 | edit | `src/Hooks/Patches/BossMultiplayerHpPatch.cs` | ok | 0 |
 | 2026-11-18 20:29 | edit | `src/Hooks/Patches/BossMultiplayerHpPatch.cs` | ok | 0 |
 | 2026-11-18 20:29 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-18 20:31 | edit | `src/Hooks/Core/BossLineups.cs` | ok | 0 |
+| 2026-11-18 20:31 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
