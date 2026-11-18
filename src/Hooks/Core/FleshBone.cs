@@ -62,10 +62,21 @@ public static class FleshBone
     /// <summary>「吞噬生命」这一次实际给多少格挡（按当前模式取）。</summary>
     public static int DevourBlockNow => Core.DreadMode.IsActive ? DevourBlockDread : DevourBlock;
 
-    /// <summary>恐惧模式：她的「血肉戏法」按**升级版**算（9 → 13，`SleightOfFlesh.OnUpgrade` +4）。</summary>
+    /// <summary>
+    /// 恐惧模式下「血肉戏法」的升级加成（9 → 13，`SleightOfFlesh.OnUpgrade` +4）。
+    ///
+    /// ⚠ v0.2.798（用户 2026-11-19「恐惧模式下血肉骨的血肉戏法没有升级」）：
+    ///   以前是靠 <see cref="SleightNow"/> 在**伤害计算**里手动 +4 来"模拟"升级，而牌本身没升级
+    ///   ⇒ 卡面还是未升级、能力层数也还是 9。现在改成真正升级那张牌
+    ///   （`BossDefs` 的 `BossVariant.DreadUpgrades = { SleightOfFlesh }`）⇒ 这里**不再参与结算**
+    ///   （否则会变成 17，双算），仅留作记录。
+    /// </summary>
     public const int SleightUpgradeBonus = 4;
 
-    /// <summary>她这层血肉戏法在这一模式下实际的「每次伤害」。</summary>
+    /// <summary>
+    /// 她这层血肉戏法在这一模式下实际的「每次伤害」。
+    /// ⚠ v0.2.798 起**没有调用方**（改为真正升级牌面后不再需要手动补差），保留以免别处引用。
+    /// </summary>
     public static int SleightNow(int baseAmount)
     {
         try

@@ -131,8 +131,12 @@ public sealed class BossDevourLifePower : PowerModel
             try { sleight = Math.Max(0, owner.GetPowerAmount<SleightOfFleshPower>()); }
             catch { sleight = 0; }
 
-            // 2026-11-13（恐惧模式「吞噬生命」）：她的「血肉戏法」按**升级版**算（9 → 13）
-            if (sleight > 0) sleight = FleshBone.SleightNow(sleight);
+            // ★ v0.2.798（用户 2026-11-19：「恐惧模式下血肉骨的血肉戏法没有升级」）：
+            //   以前这里对恐惧模式**手动 +4**（`FleshBone.SleightNow`）来模拟升级，但**牌本身没升级**
+            //   ⇒ 卡面显示未升级、而她身上那层 `SleightOfFleshPower` 仍是 9 ⇒ 用户看到的「没升级」。
+            //   现在改成真正升级那张牌（`BossDefs` 的 `BossVariant.DreadUpgrades = { SleightOfFlesh }`）
+            //   ⇒ 牌面/能力层数都已经是 13，**这里不能再补 +4**，否则会变成 17（双算）。
+            //   所以：直接读她身上那层 power 的层数（已含升级加成）。
 
             if (sleight > 0)
             {

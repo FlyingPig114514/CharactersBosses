@@ -6250,3 +6250,5 @@ Chronological action log.
 | 2026-11-18 22:11 | edit | `src/Hooks/Core/BossLineups.cs` | ok | 0 |
 | 2026-11-18 22:11 | edit | `src/Hooks/Core/BossPicksSync.cs` | error | 0 |
 | 2026-11-18 22:11 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-18 22:14 | edit | `src/Hooks/Powers/BossDevourLifePower.cs` | ok | 0 |
+| 2026-11-18 22:14 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |

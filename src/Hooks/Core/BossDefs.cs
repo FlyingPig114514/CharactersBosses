@@ -765,6 +765,12 @@ public static class BossDefs
                     (8, typeof(PullAggro)),
                     (9, typeof(Debilitate)),
                 },
+                // ★ v0.2.798（用户 2026-11-19：「恐惧模式下血肉骨的血肉戏法没有升级」）：
+                //   血肉骨是第一幕（act 0），恐惧模式要**升级「血肉戏法」**（9 → 13，`OnUpgrade` +4）。
+                //   以前只有 `FleshBone.SleightNow` 在**意图/伤害计算**里 +4，而牌本身没升级 ⇒
+                //   她身上那层 `SleightOfFleshPower` 还是按牌面 9 点结算（用户看到的就是「没升级」）。
+                //   走 `DreadUpgradesByAct` 通道（卡组与剧本手牌里同名那张都会升级）。
+                DreadUpgrades = new List<Type> { typeof(SleightOfFlesh) },   // 恐惧模式：血肉戏法升到 13
             },
             new BossVariant
             {
