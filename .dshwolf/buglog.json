@@ -1632,6 +1632,12 @@
       "error_message": "tools\\upload-workshop.ps1 报 Error occurred while uploading to the workshop! Result: k_EResultFileNotFound（同一份内容上一次刚报 UPLOAD OK）",
       "fix": "紧跟着上一次成功提交再跑一次上传时，Steam 还没提交/清理完上一轮的 staging 内容 ⇒ SubmitItemUpdate 返回 k_EResultFileNotFound。等几秒/直接重跑一次即可成功；不要因此怀疑打包或 workshop.json。判「到底成功没有」只看上传器那行 `Successfully uploaded`（源码 src/UploadCommand.cs:301-320 里**只有** SubmitItemUpdateResult_t.m_eResult == k_EResultOK 才会打印它）；`k_EItemUpdateStatusInvalid` 只是进度状态的终止值，不代表失败。⚠ `steamapps\\workshop\\appworkshop_2868840.acf` 的 timeupdated 与 `workshop\\content\\2868840\\<id>` 里的版本号是**本机订阅缓存**，发布者上传后不会立即变（2026-11-19 实测：0.2.802/0.2.803 都已 UPLOAD OK，acf 仍停在 0.2.800 那次的时间），不能用它验证。",
       "at": "2026-11-18T15:44:39.335Z"
+    },
+    {
+      "id": "bug-250-mwmas96f",
+      "error_message": "3 玩家却只出 2 只 Boss（用户 2026-11-19 截图 + mod_log (42)/(43)）：房主日志同一局来回跳 [23:42:23] RunState 有 3 人、其中 1 人已经 30 秒没说话 ⇒ 按 2 只；[23:42:41] 0 人没说话 ⇒ 按 3 只；[23:43:11] 又变回 2 只（那位玩家 23:44 才因别的原因掉线）",
+      "fix": "LivePlayerCount 不再靠心跳猜活人：优先用游戏自己维护的大厅玩家列表 RunManager.RunLobby.Players（RunLobby.HandlePlayerLeftMessage / PlayerRejoined 会更新它），只有不在大厅列表里的玩家才算离开；拿不到列表才退回心跳判活且阈值 30 秒→120 秒。配合 v0.2.802（伙伴数量 = 阵容条数）双保险。v0.2.804。",
+      "at": "2026-11-18T15:50:15.159Z"
     }
   ]
 }

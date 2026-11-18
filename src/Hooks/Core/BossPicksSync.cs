@@ -111,21 +111,44 @@ internal static class BossPicksSync
     }
 
     /// <summary>
+    /// **真正还在场的大厅玩家**（NetId 集合）。拿不到返回 null。
+    ///
+    /// ★★ v0.2.804（用户 2026-11-19「3 玩家 2 boss」+ `mod_log (42)/(43)`）：
+    ///   `RunManager.RunLobby.Players` 是游戏**自己维护**的大厅玩家列表 —— 有人离开 / 重连它都会更新
+    ///   （`RunLobby.HandlePlayerLeftMessage` / `PlayerRejoined`），比我们猜心跳可靠得多。
+    /// </summary>
+    private static HashSet<ulong>? TryLobbyPlayerIds()
+    {
+        try
+        {
+            var lobby = MegaCrit.Sts2.Core.Runs.RunManager.Instance?.RunLobby;
+            var list = lobby?.Players;
+            if (list == null || list.Count == 0) return null;
+            var ids = new HashSet<ulong>();
+            foreach (var entry in list)
+            {
+                try { if (entry.id != 0) ids.Add(entry.id); } catch { /* 忽略 */ }
+            }
+            return ids.Count > 0 ? ids : null;
+        }
+        catch { return null; }
+    }
+
+    /// <summary>
     /// **真正还在场的玩家数**（v0.2.797，用户 2026-11-19：中途有人离开游戏后，Boss 房变成 4v4，
     /// 多出来那只面对一个没人操控的角色 ⇒ 剩下的人结束不了回合）。
     ///
-    /// 规则：`RunState.Players` 里逐个看 —— 本机自己算 1；其它玩家**只有「听到过、然后安静超过 30 秒」
-    /// 才算已离开**（`BossPicksMessage` 的心跳会走到 <see cref="NoteHeard"/>）。
+    /// ★★ v0.2.804（用户 2026-11-19「3 玩家却只有 2 只 Boss」，`mod_log (43)` 房主侧）：
+    ///   以前这里靠「最近 N 秒说过话」猜活人，实测**会把活人判死**（日志同一局里来回跳）：
+    ///     `[23:42:23] 阵容人数：RunState 有 3 人，其中 1 人已经 30 秒没说话 ⇒ 这一场按 2 只 Boss 出场`
+    ///     `[23:42:41] 阵容人数：RunState 有 3 人，其中 0 人已经 30 秒没说话 ⇒ 这一场按 3 只 Boss 出场`
+    ///   而那位「30 秒没说话」的玩家 23:44 才因为别的原因掉线，当时明明在打。
+    ///   人数一塌 ⇒ 阵容条数一塌 ⇒ 3 人局场上只剩 2 只 Boss。
     ///
-    /// ★★ v0.2.800（用户 2026-11-19 的两份 `mod_log (38)/(39)` 22:36，实证这条判据在乱跳）：
-    ///   以前是「**从没听到过 = 已离开**」—— 只要房里有一个对端说过话，剩下那些还没说话的全被判死；
-    ///   而客人收到房主结论之后**就不再发消息**（`Tick` 里 `if (Received) return`）⇒ 房主听不到客人
-    ///   ⇒ 人数一路塌：同一台房主 22:36:25 数出「2 人」、22:36:55 数出「1 人」（其实 3 个人都在玩）。
-    ///   阵容条数 = 人数 ⇒ 阵容一会儿 3 条一会儿 1 条，两端就必然对不上（还会触发 v0.2.799 那个
-    ///   「主 Boss 当自己的伙伴」）。
-    ///   现在改成：**没听到过的人按「还在」算**（不敢剔除），只有「听过之后又不说话了」才剔除；
-    ///   配合 `Tick` 里新增的每 5 秒心跳，正常情况下这个数不会再塌。
-    ///   日志只在「数**变了**」时打一行（以前同一秒能刷几十行）。
+    ///   现在**优先用权威数据**：大厅自己的玩家列表（`RunManager.RunLobby.Players`）。
+    ///   · 拿到大厅列表 ⇒ 按它数（本机自己恒算 1）；
+    ///   · 拿不到（单人 / 还没建大厅 / 反射失败）⇒ 退回心跳判活，阈值放宽到 **120 秒**
+    ///     （以前 30 秒太短：客人每 5 秒才发一次心跳，中间断一会儿就误判）。
     /// </summary>
     internal static int LivePlayerCount(int fallback)
     {
@@ -134,39 +157,76 @@ internal static class BossPicksSync
             var run = MegaCrit.Sts2.Core.Runs.RunManager.Instance?.DebugOnlyGetState();
             var players = run?.Players;
             if (players == null || players.Count == 0) return fallback;
-            if (_lastHeard.Count == 0) return fallback;      // 还什么消息都没收到 ⇒ 不猜
 
             MegaCrit.Sts2.Core.Entities.Players.Player? me = null;
             try { me = MegaCrit.Sts2.Core.Context.LocalContext.GetMe((MegaCrit.Sts2.Core.Runs.IPlayerCollection?)run); } catch { me = null; }
 
+            // ── ① 权威：大厅玩家列表 ────────────────────────────────────────────
+            var lobbyIds = TryLobbyPlayerIds();
+            if (lobbyIds != null)
+            {
+                int live = 0, gone = 0;
+                foreach (var p in players)
+                {
+                    if (p == null) continue;
+
+                    bool self = false;
+                    try { self = me != null && ReferenceEquals(p, me); } catch { self = false; }
+                    if (self) { live++; continue; }
+
+                    ulong id = 0;
+                    try { id = p.NetId; } catch { id = 0; }
+                    if (id == 0) { live++; continue; }        // 拿不到 NetId ⇒ 不敢剔除
+                    if (lobbyIds.Contains(id)) { live++; continue; }
+                    gone++;
+                }
+
+                if (live > 0)
+                {
+                    if (gone > 0 && live != _lastLive && _logSparse++ < 30)
+                    {
+                        _lastLive = live;
+                        Logger.Log($"[CharBoss] 阵容人数：RunState 有 {players.Count} 人，但大厅里只剩 {live} 人" +
+                                   $"（{gone} 人已不在大厅）⇒ 这一场按 {live} 只 Boss 出场" +
+                                   "（判据 = RunManager.RunLobby.Players，不再靠心跳猜）");
+                    }
+                    return live;
+                }
+            }
+
+            // ── ② 兜底：心跳判活（阈值 120 秒）────────────────────────────────────
+            if (_lastHeard.Count == 0) return fallback;      // 还什么消息都没收到 ⇒ 不猜
+
+            const double SilentSeconds = 120;
             var now = DateTime.UtcNow;
-            int live = 0;
-            int silent = 0;                                   // 「听过、但现在安静着」的人数（诊断用）
+            int liveH = 0;
+            int silent = 0;
             foreach (var p in players)
             {
                 if (p == null) continue;
 
                 bool self = false;
                 try { self = me != null && ReferenceEquals(p, me); } catch { self = false; }
-                if (self) { live++; continue; }
+                if (self) { liveH++; continue; }
 
                 ulong id = 0;
                 try { id = p.NetId; } catch { id = 0; }
-                if (id == 0) { live++; continue; }           // 拿不到 NetId ⇒ 不敢剔除
+                if (id == 0) { liveH++; continue; }
 
-                if (!_lastHeard.TryGetValue(id, out var when)) { live++; continue; }   // ★ 从没听过 ⇒ 按活着算
-                if ((now - when).TotalSeconds <= 30) { live++; continue; }
+                if (!_lastHeard.TryGetValue(id, out var when)) { liveH++; continue; }   // 从没听过 ⇒ 按活着算
+                if ((now - when).TotalSeconds <= SilentSeconds) { liveH++; continue; }
                 silent++;
             }
 
-            if (live <= 0) return fallback;
-            if (live != _lastLive && _logSparse++ < 30)
+            if (liveH <= 0) return fallback;
+            if (liveH != _lastLive && _logSparse++ < 30)
             {
-                _lastLive = live;
-                Logger.Log($"[CharBoss] 阵容人数：RunState 有 {players.Count} 人，其中 {silent} 人已经 30 秒没说话" +
-                           $"（其余已离开 / 掉线）⇒ 这一场按 {live} 只 Boss 出场（避免多一只面对空位）");
+                _lastLive = liveH;
+                Logger.Log($"[CharBoss] 阵容人数：RunState 有 {players.Count} 人，其中 {silent} 人已经 " +
+                           $"{(int)SilentSeconds} 秒没说话（其余已离开 / 掉线）⇒ 这一场按 {liveH} 只 Boss 出场" +
+                           "（拿不到大厅玩家列表，退回心跳判活）");
             }
-            return live;
+            return liveH;
         }
         catch { return fallback; }
     }
