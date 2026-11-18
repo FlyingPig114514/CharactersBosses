@@ -1638,6 +1638,12 @@
       "error_message": "3 玩家却只出 2 只 Boss（用户 2026-11-19 截图 + mod_log (42)/(43)）：房主日志同一局来回跳 [23:42:23] RunState 有 3 人、其中 1 人已经 30 秒没说话 ⇒ 按 2 只；[23:42:41] 0 人没说话 ⇒ 按 3 只；[23:43:11] 又变回 2 只（那位玩家 23:44 才因别的原因掉线）",
       "fix": "LivePlayerCount 不再靠心跳猜活人：优先用游戏自己维护的大厅玩家列表 RunManager.RunLobby.Players（RunLobby.HandlePlayerLeftMessage / PlayerRejoined 会更新它），只有不在大厅列表里的玩家才算离开；拿不到列表才退回心跳判活且阈值 30 秒→120 秒。配合 v0.2.802（伙伴数量 = 阵容条数）双保险。v0.2.804。",
       "at": "2026-11-18T15:50:15.159Z"
+    },
+    {
+      "id": "bug-251-mwmavo7o",
+      "error_message": "tools\\upload-workshop.ps1 报 Error occurred while uploading to the workshop! Result: k_EResultFail（本次是 0.2.804 第一次尝试）",
+      "fix": "跟 k_EResultFileNotFound 同一类：紧接着上一次上传后再跑、或 Steam 刚提交完没缓过来时的瞬时失败。**等 8~10 秒再跑同一条命令即可成功**（2026-11-19 实测：0.2.804 第一次 k_EResultFail ⇒ sleep 8s 重跑 ⇒ Successfully uploaded / UPLOAD OK）。判成功仍只看 `Successfully uploaded`（UploadCommand.cs:301-320，只有 m_eResult==k_EResultOK 才打印）。不要因一次失败去改 workshop.json 或重新打包。",
+      "at": "2026-11-18T15:52:54.612Z"
     }
   ]
 }
