@@ -551,12 +551,15 @@ public sealed class BossScript
         // ★ v0.2.766 / v0.2.771：「玩家打出攻击牌 ⇒ 本回合换成切换段」（红蓝观第 12 回合起）
         if (SwitchTurn != null)
         {
-            if (turn < SwitchFromTurn)
-            {
-                // 新的一场战斗（回合号从头数）：解锁，下次打出攻击牌可以再切
-                _switchLocked = false;
-            }
-            else
+            // 解锁条件**只能是「新的一场战斗」**（`PrepareTurn` 每场都把回合号从 1 数起）。
+            //
+            // ⚠ 绝不能再写成「`turn < SwitchFromTurn` 就解锁」（v0.2.771 的写法）：
+            //   同一帧里既会有人问第 12 回合（造手牌 / 出意图），也会有人问第 11 回合
+            //   （点名名单、自动选择器、`BossPurify`…）⇒ 刚锁上就被下一个 `TurnAt(11)` 清掉。
+            //   2026-11-18 的日志把这件事钉死了：`14:50:53` 打出「已锁」之后 `14:50:55` 的规划
+            //   仍是默认那套，`14:51:00` 又打了一遍**同样的**「已锁」日志（能打第二次 ⇒ 中间被清过）。
+            if (turn <= 1) _switchLocked = false;
+            if (turn >= SwitchFromTurn)
             {
                 if (!_switchLocked && SwitchRequested)
                 {

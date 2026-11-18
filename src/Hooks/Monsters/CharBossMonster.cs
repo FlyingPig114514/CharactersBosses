@@ -393,6 +393,20 @@ public abstract partial class CharBossMonster : MonsterModel
     internal bool PlanReady;
 
     /// <summary>
+    /// **红蓝观：玩家刚打出攻击牌 ⇒ 请帧回调把「这一回合」的手牌/计划/意图当场换成切换段**
+    /// （用户 2026-11-19：「第12回合及以后，玩家打出攻击牌不会替换当回合的意图，而是会替换下回合的意图」）。
+    ///
+    /// 为什么必须**中途重建**：她那一回合的计划/手牌是由 `PrepareTurn`（挂 `MonsterModel.RollMove`，
+    /// 也就是**玩家回合开始**那一刻）一次性算死的；玩家在**这之后**才打攻击牌 ⇒ 不重建的话
+    /// 切换只能等到下个回合的 `PrepareTurn` 才生效（正是用户看到的一回合延迟）。
+    /// 由 `Patches.BossFrameTickPatch` 消费（4Hz，最多晚 250ms），不在出牌钩子里直接动 UI。
+    /// </summary>
+    internal bool SwitchReplanPending;
+
+    /// <summary>已经为哪个回合号重建过切换段（同一个回合里连打多张攻击牌只重建一次）。</summary>
+    internal int SwitchRebuiltForTurn = -1;
+
+    /// <summary>
     /// 她此刻是否处于**击晕**状态（用户 2026-11-04：「被吹哨等牌击晕时立刻压暗所有牌、撤掉所有意图、
     /// 本回合不行动；下回合补打上回合没完成的那份计划」）。
     ///

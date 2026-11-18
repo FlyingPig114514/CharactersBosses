@@ -296,6 +296,38 @@ public partial class BossHandPanel : Control
         }
     }
 
+    /// <summary>
+    /// 这张牌**被消耗掉了**（红蓝观「净化+」按剧本点名烧牌）⇒ 播原版「手牌 ⇒ 消耗堆」那套
+    /// （`NCardExhaustQuickVfx` + `card_exhaust.mp3`，用户 2026-11-19 第 2 条）。
+    ///
+    /// 和 <see cref="PlayCardFx"/> 同一套格子查找逻辑：找到这张牌所在的格子 → 从 `_cells` 里摘掉 →
+    /// 交给 <see cref="BossHandPlayFx.Exhaust"/> 接管（它负责把卡面搬到 HUD 层上播烧牌特效）。
+    /// 找不到格子（这张牌不在手牌里、在抽牌堆/弃牌堆）就只返回 false，由调用方照常挪数据。
+    /// </summary>
+    public bool PlayExhaustFx(CardModel card)
+    {
+        try
+        {
+            for (int i = _cells.Count - 1; i >= 0; i--)
+            {
+                if (!ReferenceEquals(_cells[i].Card, card)) continue;
+
+                var cell = _cells[i];
+                _cells.RemoveAt(i);
+                if (IsInstanceValid(cell.Node)) BossHandPlayFx.Exhaust(cell.Node);
+
+                _layoutDirty = true;
+                LayoutCells();
+                return true;
+            }
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 消耗特效（手牌栏）失败: " + e.Message);
+        }
+        return false;
+    }
+
     public void Reset()
     {
         ClearCells();

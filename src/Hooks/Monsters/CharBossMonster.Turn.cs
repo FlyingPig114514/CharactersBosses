@@ -902,6 +902,54 @@ public abstract partial class CharBossMonster
         }
     }
 
+    /// <summary>
+    /// **第 12 回合起「玩家打出攻击牌 ⇒ 当回合立刻换成『不惧妖邪无限』」**（用户 2026-11-19）。
+    ///
+    /// 把这一回合的**手牌 + 计划 + 意图 + 手牌栏**当场按切换段重建一遍。
+    ///
+    /// 为什么必须连手牌一起重建（只换 `Plan` 不够）：
+    /// `PrepareTurn` 是在**玩家回合开始**那一刻由 `MonsterModel.RollMove` 触发的，它已经按
+    /// **默认段**把第 12 回合的手牌造好了（暴怒+/供奉/内心宁静…）。而切换段打的是
+    /// 「暴怒+ / 供奉 / **不惧妖邪**」⇒ 手里根本没有不惧妖邪，只换计划的话
+    /// `BossScriptPlanner.Matches` 会把它们全判成「不在手牌」，等于一张都打不出来。
+    ///
+    /// 走的是 `PrepareTurn` 里**同一条**造手牌的路（循环进阶 + 进阶加成 + 已被能量汲取升级的），
+    /// 所以升级状态、附魔、`HoldInstead` 这些都和正常回合完全一致。
+    /// </summary>
+    internal void RebuildForSwitch(string why)
+    {
+        try
+        {
+            var pcs = Shadow?.PlayerCombatState;
+            var script = Def?.ScriptForAct(ActIndex);
+            if (pcs == null || script == null || Shadow == null) return;
+
+            var turn = script.TurnAt(TurnNumber);
+            if (turn == null) { try { RefreshPlannedIntents(); } catch { /* 忽略 */ } return; }
+
+            // ① 手牌按切换段重建（与 PrepareTurn 第 259~269 行同一套合并规则）
+            var merged = new List<Type>(script.UpgradeSetFor(script.CycleAt(TurnNumber)));
+            foreach (var t in AscensionUpgradeTypes()) if (!merged.Contains(t)) merged.Add(t);
+            foreach (var t in PersistentlyUpgradedTypes()) if (!merged.Contains(t)) merged.Add(t);
+            BossScriptRunner.BuildHand(CombatState, Shadow, pcs, turn, merged.ToArray());
+
+            // ② 计划重排（`BossScriptPlanner` 自己会把「打不起 / 不在手牌」的剔掉并打日志）
+            Plan.Clear();
+            Plan.AddRange(BossScriptPlanner.Plan(this, pcs, turn, TurnNumber));
+
+            // ③ 意图 + 手牌栏
+            try { BladesGrowth.RecomputeAll(this, Plan); } catch { /* 纯显示 */ }
+            PublishVanillaIntents();
+            try { CharacterBosses.UI.BossHandUi.RefreshForce(this); } catch { /* 纯显示 */ }
+
+            SwitchRebuiltForTurn = TurnNumber;
+            Logger.Log($"[CharBoss] {why} ⇒ 第 {TurnNumber} 回合当场换成切换段：" +
+                       $"{Plan.Count} 张 [{string.Join(",", Plan.ConvertAll(p => p.Card.Id.Entry))}]" +
+                       $"（手牌 {pcs.Hand.Cards.Count} 张）");
+        }
+        catch (Exception e) { Logger.Log($"[CharBoss] {why} 重建失败: {e.Message}"); }
+    }
+
     /// <summary>这张牌是不是「充电」（下回合 +1 能量，需要自己记账）。</summary>
     private static bool IsChargeBattery(CardModel card){
         try { return card.Id.Entry == "CHARGE_BATTERY"; }

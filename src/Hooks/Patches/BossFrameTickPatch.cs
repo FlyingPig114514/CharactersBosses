@@ -577,6 +577,10 @@ public static class BossFrameTick
             // 放在帧驱动里做（不在抽牌回调里直接重排 UI），并且只在真的有变化时跑一次。
             foreach (var each in everyBoss) RefreshIntentsIfDrawsChanged(each);
 
+            // ★ v0.2.773（红蓝观）：第 12 回合起玩家打出攻击牌 ⇒ **当回合**就把手牌/计划/意图换成
+            //   「不惧妖邪无限」那套（用户 2026-11-19：以前要等下一回合才换）。同样放在帧驱动里做。
+            foreach (var each in everyBoss) ApplyPendingSwitchReplan(each);
+
             // 她身上的**能力层数**变了（玩家的减力量/易伤/虚弱、模组的临时减力量…）→ 意图数字要重算。
             // 用户 2026-10-23：崩坠「哀嚎」减了她 11 点力量，意图还挂着 10×4。
             foreach (var each in everyBoss) RefreshIntentsIfPowersChanged(each);
@@ -1286,6 +1290,42 @@ public static class BossFrameTick
             return string.Join("|", parts);
         }
         catch { return string.Empty; }
+    }
+
+    /// <summary>
+    /// **红蓝观：第 12 回合起玩家打出攻击牌 ⇒ 当回合就换计划**（用户 2026-11-19）。
+    ///
+    /// 由 `BossTemperancePower.AfterCardPlayed`（真人玩家打出**攻击牌**那一刻，日志实证它会派发）
+    /// 置 <see cref="CharBossMonster.SwitchReplanPending"/>，这里消费一次：
+    /// 把这一回合的**手牌**按切换段重建、`Plan` 重排、意图与手牌栏重画。
+    ///
+    /// 只在**玩家回合**里做 —— 她自己回合里手牌已经摆好，换计划只会变成「不在手牌」的空打
+    /// （`剧本第 N 回合: 打 [] 跳过 [… 不在手牌]` 那种）。同一个回合号只重建一次。
+    /// </summary>
+    private static void ApplyPendingSwitchReplan(CharBossMonster boss)
+    {
+        try
+        {
+            if (boss == null || !boss.SwitchReplanPending) return;
+            boss.SwitchReplanPending = false;
+
+            if (boss.SwitchRebuiltForTurn == boss.TurnNumber) return;   // 这一回合已经换过了
+
+            bool playerTurn;
+            try { playerTurn = boss.CombatState?.CurrentSide == MegaCrit.Sts2.Core.Combat.CombatSide.Player; }
+            catch { playerTurn = true; }
+            if (!playerTurn)
+            {
+                Logger.Log("[CharBoss] 12 回合起换计划：她已经在出牌了 ⇒ 这次不重建（留到下一回合）");
+                return;
+            }
+
+            boss.RebuildForSwitch("12 回合起玩家打出攻击牌");
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 12 回合起换计划失败: " + e.Message);
+        }
     }
 
     /// <summary>

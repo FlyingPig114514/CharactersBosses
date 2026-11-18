@@ -37,6 +37,7 @@ internal static class BossPurify
             var pcs = boss.Shadow.PlayerCombatState;
             // 等净化本身结算完（约 0.3 秒）再消耗，不然会把还在场上的牌提前收走、看不到动画
             try { await Task.Delay(300); } catch { /* 忽略 */ }
+            var ctx = new MegaCrit.Sts2.Core.GameActions.Multiplayer.BlockingPlayerChoiceContext();
             int done = 0;
             foreach (var type in entry.ExhaustWith)
             {
@@ -45,14 +46,20 @@ internal static class BossPurify
                 if (card == null) continue;
                 try
                 {
-                    // 从它现在所在的牌堆里摘掉，再塞进消耗堆（和原版「消耗」同一个落点）
-                    if (pcs.Hand.Cards.Contains(card)) pcs.Hand.RemoveInternal(card, true);
-                    else if (pcs.DrawPile.Cards.Contains(card)) pcs.DrawPile.RemoveInternal(card, true);
-                    else if (pcs.DiscardPile.Cards.Contains(card)) pcs.DiscardPile.RemoveInternal(card, true);
-                    // ★ v0.2.768（用户 2026-11-18：「净化+ 还是没有真的烧牌（没有烧牌的特效）」）：
-                    //   以前直接 `ExhaustPile.AddInternal` —— 只是把数据挪过去，**没有任何消耗动画**。
-                    //   现在走原版指令 `CardPileCmd.Add(…, PileType.Exhaust, …)`（卡面飞进消耗堆 + 烧掉特效）。
-                    await CardPileCmd.Add(card, PileType.Exhaust, CardPilePosition.Bottom, null, false);
+                    // ★ v0.2.773（用户 2026-11-19：「能不能让净化烧牌有特效？真的牌被消耗了的动画和音效」）：
+                    //   两处根因，一起修 ——
+                    //   ① 以前先 `RemoveInternal(card, true)` 再 `CardPileCmd.Add`。反编译 `CardPileCmd.Add`
+                    //      可见它自己会 `card.RemoveFromCurrentPile(skipVisuals)` + 播换堆动画；
+                    //      我们先摘一次 ⇒ `oldPile == null` ⇒ 那条动画整段走不到，卡面节点也没了。
+                    //   ② 就算不先摘，原版那条换堆动画对**非本机玩家**的牌是**整段跳过**的
+                    //      （`GetTweenForCardsChangingPiles`：`if (!LocalContext.IsMe(card.Owner) && …) continue;`），
+                    //      而她的牌属于**影子玩家** ⇒ 永远不会飞、也不会响烧牌音效。
+                    //   ⇒ 特效自己做（`BossHandUi.PanelFor(boss).PlayExhaustFx`，照原版
+                    //      `NCardExhaustQuickVfx` + `card_exhaust.mp3` 那三步），
+                    //      数据走原版 `CardCmd.Exhaust`（含 History 记录 + `AfterCardExhausted` 钩子）。
+                    try { CharacterBosses.UI.BossHandUi.PanelFor(boss)?.PlayExhaustFx(card); }
+                    catch { /* 纯表现 */ }
+                    await CardCmd.Exhaust(ctx, card, false, false);
                     done++;
                 }
                 catch (Exception e)

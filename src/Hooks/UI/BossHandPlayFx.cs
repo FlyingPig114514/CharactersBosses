@@ -127,6 +127,87 @@ internal static class BossHandPlayFx
         }
     }
 
+    /// <summary>
+    /// **「这张牌被消耗掉了」的原版观感**（用户 2026-11-19：「能不能让净化烧牌有特效？真的牌被消耗了的动画和音效」）。
+    ///
+    /// 反编译 `CardPileCmd.GetTweenForCardsChangingPiles`（`PileType.Exhaust` 分支）拿到原版做法：
+    /// 牌从**手牌**进消耗堆时是
+    /// <code>
+    /// var vfx = NCardExhaustQuickVfx.Create(cardNode);   // ← 自己在卡面的 CardVfxContainer 里挂上去
+    /// NDebugAudioManager.Instance?.Play("card_exhaust.mp3");
+    /// TaskHelper.RunSafely(vfx.PlayAnimation());          // 先「蓄力」，再把卡面吸进消耗堆、放烧毁粒子
+    /// </code>
+    /// 而我们从她（**影子玩家**）的手里挪牌时，原版那条链**整段被跳过**：
+    /// `if (!LocalContext.IsMe(card.Owner) &amp;&amp; …) continue;` —— 她的牌不是「本机玩家的牌」
+    /// ⇒ 既没有飞行动画、也没有烧牌音效（以前 `BossPurify` 还先 `RemoveInternal` 把节点拆了，
+    /// 连卡面都没有了）。所以这里自己按原版那三步做一遍。
+    ///
+    /// 所有权：本方法接管 <paramref name="cell"/>（调用方不要再 QueueFree）。
+    /// </summary>
+    public static void Exhaust(Control cell)
+    {
+#if STS2_111
+        try
+        {
+            if (cell == null || !GodotObject.IsInstanceValid(cell) || !cell.IsInsideTree())
+            {
+                FreeNow(cell);
+                return;
+            }
+
+            // 卡面节点：Quick 版特效会把它「吸」进消耗堆再销毁
+            MegaCrit.Sts2.Core.Nodes.Cards.NCard? cardNode = null;
+            foreach (var child in cell.GetChildren())
+                if (child is MegaCrit.Sts2.Core.Nodes.Cards.NCard nc) { cardNode = nc; break; }
+
+            if (cardNode == null)
+            {
+                FreeNow(cell);
+                return;
+            }
+
+            var parent = BossHudLayer.Resolve(out string why);
+            if (parent == null)
+            {
+                Logger.Log("[CharBoss] 烧牌特效：拿不到 HUD 层（" + why + "）⇒ 直接收走卡面");
+                FreeNow(cell);
+                return;
+            }
+
+            // 把卡面从格子里搬到一个**不会被面板重建拆掉**的层（面板每帧可能重排/清格），
+            // 位置/缩放要原样搬过去，否则烧牌特效会从屏幕左上角开始播。
+            Vector2 globalPos = cardNode.GlobalPosition;
+            Vector2 scale = cardNode.Scale;
+            float rotation = cardNode.Rotation;
+            cardNode.GetParent()?.RemoveChild(cardNode);
+            parent.AddChild(cardNode);
+            cardNode.GlobalPosition = globalPos;
+            cardNode.Scale = scale;
+            cardNode.Rotation = rotation;
+            cardNode.MouseFilter = Control.MouseFilterEnum.Ignore;
+            if (GodotObject.IsInstanceValid(cell)) cell.QueueFree();   // 格子空了，直接收掉
+
+            var vfx = MegaCrit.Sts2.Core.Nodes.Vfx.Cards.NCardExhaustQuickVfx.Create(cardNode);
+            if (vfx == null)
+            {
+                cardNode.QueueFree();
+                return;
+            }
+            try { MegaCrit.Sts2.Core.Audio.Debug.NDebugAudioManager.Instance?.Play("card_exhaust.mp3"); }
+            catch { /* 音效失败不影响动画 */ }
+            MegaCrit.Sts2.Core.Helpers.TaskHelper.RunSafely(vfx.PlayAnimation());
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 烧牌特效失败: " + e.Message);
+            FreeNow(cell);
+        }
+#else
+        // 107：没有 NCardExhaustQuickVfx（那套是 0.113 的表现层）⇒ 直接收走
+        FreeNow(cell);
+#endif
+    }
+
     /// <summary>出牌区中心：<c>PlayContainer</c> 能用就用它（原版就是这么算的），否则退到屏幕中央偏上。</summary>
     private static Vector2 PlayArea(Control cell)
     {

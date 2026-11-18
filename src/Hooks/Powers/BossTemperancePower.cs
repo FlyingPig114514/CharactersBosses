@@ -148,6 +148,17 @@ public sealed class BossTemperancePower : PowerModel
 
             Core.BossScript.SwitchRequested = true;
             Core.PlayerAttackWatch.Flag = true;
+            // ★ v0.2.773（用户 2026-11-19：「打了攻击牌要**立刻**替换**当回合**的意图，
+            //   现在替换的是下回合的」）：她的计划/手牌是 `PrepareTurn`（玩家回合**开始**那一刻）
+            //   就算死的 ⇒ 只置标记的话切换要等下一个 `PrepareTurn` 才生效。
+            //   这里再喊帧回调把**这一回合**的手牌/计划/意图当场重建（见 `CharBossMonster.RebuildForSwitch`）。
+            try
+            {
+                var script = boss.Def?.ScriptForAct(boss.ActIndex);
+                if (script?.SwitchTurn != null && boss.TurnNumber >= script.SwitchFromTurn)
+                    boss.SwitchReplanPending = true;
+            }
+            catch { /* 忽略：只影响「立刻换」这半拍 */ }
             if (_hookLogs++ < 12)
                 Logger.Log($"[CharBoss] 节制钩子：真人玩家打出了攻击牌「{EntryOf(cardPlay.Card)}」" +
                            "⇒ 已记下（第 12 回合起本回合换成「不惧妖邪无限」）");
