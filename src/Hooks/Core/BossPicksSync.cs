@@ -417,7 +417,11 @@ internal static class BossPicksSync
             {
                 int expected = Math.Max(0, BossLineups.PlayerCount() - 1);
                 if (expected <= 0) return;
-                if (PeerCaps.Count >= expected) return;
+                // 两种「还没发到位」的状态都要重播：
+                //   ① 客人上报没到齐（说明还有端没连上 / 没收到）；
+                //   ② 去重标记是空的（有新客人刚上报、或上次广播失败 ⇒ 内容等着发出去）。
+                bool pending = PeerCaps.Count < expected || string.IsNullOrEmpty(_lastSent);
+                if (!pending) return;
                 if (now - _lastHostResendAt < 5000) return;
                 _lastHostResendAt = now;
                 _lastSent = string.Empty;
