@@ -46,12 +46,54 @@ public static partial class BossHandCard
     }
 
     /// <summary>卡面本体。悬停放大（WireHover）在 BossHandCard.Hover.cs 里。</summary>
+    ///
+    /// ★ v0.2.791（玩家反馈 2026-11-19：「装了卡厄斯皮肤会看不到 boss 手牌」）：
+    ///   卡面完全依赖 `NCard.Create` + `UpdateVisuals`，而**卡图/皮肤类模组**（例如工坊的
+    ///   「亡灵契约者卡图 卡厄斯修女奥尔莱亚」）正是接管这两步去换贴图的 —— 一旦它在我们的
+    ///   语境里抛异常，这里以前只打一行 `NCard.Create failed: …` 然后**什么都不画**
+    ///   ⇒ 玩家看到的就是「看不到 boss 手牌」。
+    ///   现在三层兜底：
+    ///     ① 原版路径（Create + UpdateVisuals）；
+    ///     ② 换一张新节点、**跳过 UpdateVisuals**（皮肤换图那步不做，至少卡牌本体还在）；
+    ///     ③ 还不行 ⇒ 画一块**纯文本占位**（卡牌 id），保证玩家总能看见她手里有什么牌。
+    ///   每次都把「哪一步、什么异常」记一行日志，下次反馈一眼能定位是哪个模组掐的。
     private static void BuildCardFace(Control cell, CardModel card, PlannedPlay? planned, bool bright)
+    {
+        string entry = SafeEntry(card);
+
+        string? why = null;
+        if (TryBuildCardNode(cell, card, planned, bright, skipVisuals: false, ref why))
+        {
+            FaceFailedEntries.Remove(entry);
+            return;
+        }
+
+        if (TryBuildCardNode(cell, card, planned, bright, skipVisuals: true, ref why))
+        {
+            if (FaceFailedEntries.Add(entry))
+                Logger.Log($"[CharBoss] 手牌卡面：{entry} 的「刷新视觉」这一步被别的模组掐了" +
+                           $"（{why}）⇒ 已退回「只放卡牌本体、不刷新贴图」的画法" +
+                           "（多半是卡图/皮肤类模组改了 NCard）");
+            return;
+        }
+
+        if (FaceFailedEntries.Add(entry))
+            Logger.Log($"[CharBoss] 手牌卡面渲染失败：{entry}（{why}）⇒ 改成文本占位" +
+                       "（多半是卡图/皮肤类模组改了 NCard；把这行发我就能定位）");
+        BuildTextFallback(cell, entry);
+    }
+
+    /// <summary>已经退到「备用画法」的卡（每个 id 只打一行日志）。</summary>
+    private static readonly HashSet<string> FaceFailedEntries = new(StringComparer.Ordinal);
+
+    /// <summary>建一张卡面并刷新视觉；成功返回 true。失败时 <paramref name="why"/> 里是原因。</summary>
+    private static bool TryBuildCardNode(Control cell, CardModel card, PlannedPlay? planned, bool bright,
+                                         bool skipVisuals, ref string? why)
     {
         try
         {
             var cardNode = NCard.Create(card, ModelVisibility.Visible);
-            if (cardNode == null) return;
+            if (cardNode == null) { why = "NCard.Create 返回 null"; return false; }
 
             cell.AddChild(cardNode);
             WireHover(cell, cardNode);
@@ -73,16 +115,58 @@ public static partial class BossHandCard
             // 注意 CardModel.CurrentTarget 是只读的，得走 NCard.SetPreviewTarget。
             if (planned != null)
             {
-                cardNode.SetPreviewTarget(planned.Target);
+                try { cardNode.SetPreviewTarget(planned.Target); }
+                catch (Exception e) { why = "SetPreviewTarget: " + e.Message; }
             }
 
             // Create 只从池子里取节点并设 Model，不会刷视觉，必须显式刷一次
-            cardNode.UpdateVisuals(PileType.Hand, CardPreviewMode.Normal);
+            //（这一步正是「卡图/皮肤模组」接管的地方 ⇒ 单独兜一层，它炸了也别把整张卡丢掉）
+            if (!skipVisuals)
+            {
+                try { cardNode.UpdateVisuals(PileType.Hand, CardPreviewMode.Normal); }
+                catch (Exception e)
+                {
+                    why = (why == null ? string.Empty : why + " / ") +
+                          "UpdateVisuals: " + e.GetType().Name + ": " + e.Message;
+                    return false;
+                }
+            }
+            return true;
         }
         catch (Exception e)
         {
-            Logger.Log("[CharBoss] NCard.Create failed: " + e.Message);
+            why = (why == null ? string.Empty : why + " / ") + e.GetType().Name + ": " + e.Message;
+            return false;
         }
+    }
+
+    /// <summary>最后的兜底：一块纯文本占位（卡牌 id），保证手牌栏不是空的。</summary>
+    private static void BuildTextFallback(Control cell, string entry)
+    {
+        try
+        {
+            var panel = new PanelContainer { MouseFilter = Control.MouseFilterEnum.Ignore };
+            cell.AddChild(panel);
+            panel.Size = new Vector2(NativeWidth * CardScale, NativeHeight * CardScale);
+            panel.Position = Vector2.Zero;
+
+            var label = new Label
+            {
+                Text = entry,
+                MouseFilter = Control.MouseFilterEnum.Ignore,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                AutowrapMode = TextServer.AutowrapMode.WordSmart,
+            };
+            label.AddThemeFontSizeOverride("font_size", 18);
+            panel.AddChild(label);
+        }
+        catch { /* 连占位都建不出来就算了，绝不影响战斗 */ }
+    }
+
+    private static string SafeEntry(CardModel? card)
+    {
+        try { return card?.Id.Entry ?? "?"; } catch { return "?"; }
     }
 
     /// <summary>
