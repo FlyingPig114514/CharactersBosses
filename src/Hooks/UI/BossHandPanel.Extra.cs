@@ -133,6 +133,29 @@ public partial class BossHandPanel
         }
         catch (Exception e) { Logger.Log("[CharBoss] 水银沙漏意图绘制失败: " + e.Message); }
 
+        // ★ v0.2.770（用户 2026-11-19：「塔罗愚第 12 回合开始，他应该显示滚石的伤害，
+        //   在水银沙漏那个位置」）：他每回合滚一次的「滚石」（`RollingBoulder`）不在任何一张牌的
+        //   意图里（它是「回合开始/循环」那类效果）⇒ 和水银沙漏一样画在**最左列**。
+        try
+        {
+            bool fool = false;
+            try { fool = boss.Def?.Key == "FOOL_BOSS"; } catch { fool = false; }
+            if (fool && boss.TurnNumber >= 12)
+            {
+                int boulder = 0;
+                try
+                {
+                    var canon = MegaCrit.Sts2.Core.Models.ModelDb
+                        .Card<MegaCrit.Sts2.Core.Models.Cards.RollingBoulder>();
+                    if (canon != null) boulder = (int)Math.Round(canon.DynamicVars.Damage.BaseValue);
+                }
+                catch { boulder = 0; }
+                if (boulder <= 0) boulder = 20;      // 兜底：卡面读不到就按原版巨石 20 点
+                leftDamages.Add((boulder, "滚石（全体）"));
+                Logger.Log($"[CharBoss] 塔罗愚：第 {boss.TurnNumber} 回合（≥12）⇒ 左侧多画一条滚石意图 {boulder}");
+            }
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 塔罗愚滚石意图绘制失败: " + e.Message); }
         // ★ 2026-11-05（用户：「在他打出轰击后晕的那几个回合要把轰击的伤害显示出来
         //   （类似抱抱先生那个位置，但轰击算**攻击伤害**、受力量等加成）」）：
         //   轰击（`Bombardment`）躺在她的**消耗牌堆**里，每个回合开始自动复燃一次 18 点。
