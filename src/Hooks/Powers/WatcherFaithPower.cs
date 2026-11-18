@@ -26,7 +26,11 @@ namespace CharacterBosses.Powers;
 /// </summary>
 public sealed class WatcherFaithPower : PowerModel
 {
-    public override PowerType Type => PowerType.Debuff;
+    /// <summary>
+    /// ★ 2026-11-19（用户）：「这里的虔信不应该是 debuff，不应该显示成红的框」
+    ///   ⇒ 与恐惧模式支配那层仿制版（`DominionPowers.WatcherDominionDevotionPower`）保持一致，改成 `Buff`。
+    /// </summary>
+    public override PowerType Type => PowerType.Buff;
 
     public override PowerStackType StackType => PowerStackType.Counter;
 

@@ -6183,3 +6183,10 @@ Chronological action log.
 | 2026-11-18 18:18 | edit | `content/localization/ind/powers.json` | ok | 0 |
 | 2026-11-18 18:18 | edit | `src/Hooks/Core/CharDominions.cs` | ok | 0 |
 | 2026-11-18 18:18 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-18 18:23 | edit | `src/Hooks/Patches/BossSpecialPowerIconPatch.cs` | ok | 0 |
+| 2026-11-18 18:23 | edit | `src/Hooks/Patches/BossSpecialPowerIconPatch.cs` | ok | 0 |
+| 2026-11-18 18:23 | edit | `src/Hooks/Powers/DominionPowers.cs` | ok | 0 |
+| 2026-11-18 18:23 | edit | `src/Hooks/Powers/DominionPowers.cs` | ok | 0 |
+| 2026-11-18 18:23 | edit | `src/Hooks/Powers/WatcherFaithPower.cs` | ok | 0 |
+| 2026-11-18 18:23 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-18 18:24 | edit | `src/Hooks/Patches/BossSpecialPowerIconPatch.cs` | ok | 0 |

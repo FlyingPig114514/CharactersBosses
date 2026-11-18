@@ -337,7 +337,11 @@ public sealed class WatcherDominionDevotionPower : PowerModel
     /// <summary>真言满多少层触发神格。</summary>
     internal const int Threshold = 10;
 
-    public override PowerType Type => PowerType.Debuff;
+    /// <summary>
+    /// ★ 2026-11-19（用户）：「这里的虔信不应该是 debuff，不应该显示成红的框」
+    ///   ⇒ 从 `Debuff` 改成 `Buff`（虔信是给这个敌人加码的祝福，红框看着像玩家给他上的减益）。
+    /// </summary>
+    public override PowerType Type => PowerType.Buff;
 
     public override PowerStackType StackType => PowerStackType.Counter;
 

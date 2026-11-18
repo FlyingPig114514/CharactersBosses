@@ -65,6 +65,18 @@ public static class BossSpecialPowerIconPatch
             return false;
         }
 
+        // ★ 2026-11-19（用户）：「虔信和真言的图标用观者 mod 中的同名 buff 的图标」——
+        //   「虔信」= 观者 mod 的 `devotion_power.png`（合十的双手），「真言」= `mantra.png`（紫色带光芒的眼睛）。
+        //   两张图都是从 **B 版观者 mod**（`.tools\phone-stage\mods\Watcher.pck`）里
+        //   `res://Watcher/_imported/*.ctex` 用 `tools/art/dump_texture_png.gd` 解出来的真图，
+        //   已随我们的 PCK 发布（`tools\art\pck_extras.txt`，`res://CharacterBosses/images/powers/watcher_*.png`）。
+        var watcherConceptIcon = WatcherConceptIconOf(__instance);
+        if (!string.IsNullOrEmpty(watcherConceptIcon))
+        {
+            __result = watcherConceptIcon!;
+            return false;
+        }
+
         // ★ 2026-11-14（用户「塔罗愚」）：「从观者和亡命之徒那里新加的几个 buff 图标都用他们原本自己的」——
         //   这 5 层能力是我们从**观者 mod**（`Watcher.pck`）和**崩坠 Hermit**（`Hermit.pck`）搬过来的牌给的，
         //   图标就用它们原版那一张（已导出成 PNG 随我们的 PCK 发布，见 tools\art\pck_extras.txt）。
@@ -101,6 +113,40 @@ public static class BossSpecialPowerIconPatch
             // 拿不到就交给原版
         }
         return true;
+    }
+
+    /// <summary>
+    /// 「虔信 / 真言」这两个概念在**观者 mod 里本来就有同名的 buff**，图标直接用它们那张
+    /// （用户 2026-11-19：「虔信和真言的图标用观者 mod 中的同名 buff 的图标」）。
+    ///
+    /// 来源：B 版观者 mod 的 `res://Watcher/_imported/devotion_power.png-*.ctex` 与
+    /// `res://Watcher/_imported/mantra.png-*.ctex`，用 `tools/art/dump_texture_png.gd` 解成 PNG，
+    /// 再经 `tools/art/import_proj` 导入、`tools/art/pck_extras.txt` 打进我们的 PCK。
+    /// 资源不存在时返回 null ⇒ 继续走后面的规则（最终落到好奇灯泡），绝不会出现空白图标。
+    /// </summary>
+    private static string? WatcherConceptIconOf(PowerModel? power)
+    {
+        try
+        {
+            if (power == null) return null;
+
+            string? file = null;
+
+            // 虔信：`WatcherFaithPower`（斗蛐蛐：挂在观者自己身上）
+            if (power is Powers.WatcherFaithPower) file = "watcher_devotion";
+
+#if STS2_113
+            // 恐惧模式「观者的支配」的两层仿制版（只在 113 构建里存在）
+            else if (power is Powers.WatcherDominionDevotionPower) file = "watcher_devotion";   // 虔信
+            else if (power is Powers.DominionMantraPower) file = "watcher_mantra";              // 真言
+#endif
+
+            if (file == null) return null;
+            string path = "res://CharacterBosses/images/powers/" + file + ".png";
+            try { if (!Godot.ResourceLoader.Exists(path)) return null; } catch { return null; }
+            return path;
+        }
+        catch { return null; }
     }
 
     /// <summary>
