@@ -141,6 +141,8 @@
     "WATCHER_FASTING_POWER.description":  "Omega triggers only every other turn.\nDamage dealt by Pressure Points can be blocked by you.\nWarning: Omega deals sourceless damage and Pressure Points deals debuff damage; minions with Die for You or Vapi Loyalty will not take that damage for you.\nOmega: At the end of your turn, deal 50 damage to ALL enemies.",
     "WATCHER_FASTING_POWER.description_dread":  "Omega triggers every turn.\nDamage dealt by Pressure Points can be blocked by you.\nWarning: Omega deals sourceless damage and Pressure Points deals debuff damage; minions with Die for You or Vapi Loyalty will not take that damage for you.\nOmega: At the end of your turn, deal 50 damage to ALL enemies.",
     "WATCHER_FEAR_NO_EVIL_AIM_POWER.title":  "Play",
+    "WATCHER_FEAR_NO_EVIL_HINT_POWER.description":  "If you play an Attack card this turn, the Watcher switches to her [gold]Fear No Evil[/gold] infinite.",
+    "WATCHER_FEAR_NO_EVIL_HINT_POWER.title":  "Fear No Evil",
     "BOSS_MASTER_REALITY_POWER.title":  "Master Reality",
     "BOSS_MASTER_REALITY_POWER.description":  "Whenever you create a card during combat, it is [gold]downgraded[/gold]; if it is not a token, it also gains [gold]Exhaust[/gold].\nThe Watcher obtained [gold]Arsenal[/gold], [gold]Pillar of Creation[/gold] and [gold]Know Thy Place[/gold] through the Colour Philosopher.",
     "BOSS_MASTER_REALITY_POWER.description_dread":  "Whenever you create a card during combat, it is [gold]downgraded[/gold]; if it is not a token, it also gains [gold]Exhaust[/gold].\nThe Watcher obtained [gold]Arsenal[/gold], [gold]Pillar of Creation[/gold] and [gold]Know Thy Place[/gold] through the Colour Philosopher.",

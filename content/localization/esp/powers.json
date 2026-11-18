@@ -141,6 +141,8 @@
     "WATCHER_FASTING_POWER.description":  "Omega se activa un turno si y otro no.\nEl dano de Puntos de presion se puede bloquear.\nAviso: Omega inflige dano sin fuente y Puntos de presion dano de malus; los esbirros no recibiran ese dano por ti. Los esbirros con «Lealtad de Vapi» tampoco recibirán ese daño por ti.\nOmega: Al final de tu turno, infliges 50 de daño a TODOS los enemigos.",
     "WATCHER_FASTING_POWER.description_dread":  "Omega se activa cada turno.\nEl dano de Puntos de presion se puede bloquear.\nAviso: Omega inflige dano sin fuente y Puntos de presion dano de malus; los esbirros no recibiran ese dano por ti. Los esbirros con «Lealtad de Vapi» tampoco recibirán ese daño por ti.\nOmega: Al final de tu turno, infliges 50 de daño a TODOS los enemigos.",
     "WATCHER_FEAR_NO_EVIL_AIM_POWER.title":  "Jugar",
+    "WATCHER_FEAR_NO_EVIL_HINT_POWER.description":  "Si juegas una carta de ataque este turno, el Observador pasa a su bucle infinito de [gold]No temas al mal[/gold].",
+    "WATCHER_FEAR_NO_EVIL_HINT_POWER.title":  "No temas al mal",
     "BOSS_MASTER_REALITY_POWER.title":  "Dominio de la realidad",
     "BOSS_MASTER_REALITY_POWER.description":  "Siempre que crees una carta en combate, se [gold]degradará[/gold]; si no es una ficha, también obtiene [gold]Agotar[/gold].\nEl Vigía obtuvo [gold]Arsenal[/gold], [gold]Pilar de la Creación[/gold] y [gold]Conoce tu lugar[/gold] gracias al Filósofo de los Colores.",
     "BOSS_MASTER_REALITY_POWER.description_dread":  "Siempre que crees una carta en combate, se [gold]degradará[/gold]; si no es una ficha, también obtiene [gold]Agotar[/gold].\nEl Vigía obtuvo [gold]Arsenal[/gold], [gold]Pilar de la Creación[/gold] y [gold]Conoce tu lugar[/gold] gracias al Filósofo de los Colores.",

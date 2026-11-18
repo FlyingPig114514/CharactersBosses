@@ -141,6 +141,8 @@
     "WATCHER_FASTING_POWER.description":  "오메가가 한 턴 걸러 발동한다.\n경혈로 주는 피해는 방어할 수 있다.\n경고: 오메가는 출처 없는 피해이고 경혈은 디버프 피해다. 소환물은 대신 받지 않는다. «바피의 충성» 소환물도 대신 받지 않는다.\n오메가: 당신의 턴 종료 시 모든 적에게 50의 피해를 준다.",
     "WATCHER_FASTING_POWER.description_dread":  "오메가가 매 턴 발동한다.\n경혈로 주는 피해는 방어할 수 있다.\n경고: 오메가는 출처 없는 피해이고 경혈은 디버프 피해다. 소환물은 대신 받지 않는다. «바피의 충성» 소환물도 대신 받지 않는다.\n오메가: 당신의 턴 종료 시 모든 적에게 50의 피해를 준다.",
     "WATCHER_FEAR_NO_EVIL_AIM_POWER.title":  "카드 사용",
+    "WATCHER_FEAR_NO_EVIL_HINT_POWER.description":  "이번 턴 당신이 공격 카드를 내면, 관측자는 [gold]요사 불구[/gold] 무한으로 전환한다.",
+    "WATCHER_FEAR_NO_EVIL_HINT_POWER.title":  "요사 불구",
     "BOSS_MASTER_REALITY_POWER.title":  "현실 조작",
     "BOSS_MASTER_REALITY_POWER.description":  "전투 중 당신이 카드를 생성할 때마다 그 카드는 [gold]하향[/gold]됩니다. 토큰이 아니면 [gold]소멸[/gold]도 얻습니다.\n왓처는 색채 철학자를 통해 [gold]무기고[/gold], [gold]창조의 기둥[/gold], [gold]네가 설 곳[/gold]을 얻었다.",
     "BOSS_MASTER_REALITY_POWER.description_dread":  "전투 중 당신이 카드를 생성할 때마다 그 카드는 [gold]하향[/gold]됩니다. 토큰이 아니면 [gold]소멸[/gold]도 얻습니다.\n왓처는 색채 철학자를 통해 [gold]무기고[/gold], [gold]창조의 기둥[/gold], [gold]네가 설 곳[/gold]을 얻었다.",

@@ -82,6 +82,28 @@ public sealed class WatcherFearNoEvilAimPower : PowerModel
         return Task.CompletedTask;
     }
 
+    /// <summary>
+    /// ★ v0.2.777（用户 2026-11-19）：第 12 回合起的**循环回合**里把这个旧 buff **藏起来** ——
+    /// 那几轮由 <see cref="WatcherFearNoEvilHintPower"/>（同名同图标、纯提示）顶替显示，
+    /// 否则状态栏上会并排两个一模一样的图标。
+    ///
+    /// ⚠ **只是不显示，power 本身照旧挂着**：平静判定要读它的 `PlayerAttacked`。
+    /// </summary>
+    protected override bool IsVisibleInternal
+    {
+        get
+        {
+            try
+            {
+                if (Owner?.Monster is not Monsters.CharBossMonster boss) return true;
+                var script = boss.Def?.ScriptForAct(boss.ActIndex);
+                if (script?.SwitchTurn == null) return true;            // 不是红蓝观
+                return boss.TurnNumber < script.SwitchFromTurn;         // 第 12 回合起不显示
+            }
+            catch { return true; }
+        }
+    }
+
     /// <summary>她这一手打完就摘掉（只对本回合有效）。</summary>
     public override async Task AfterSideTurnEnd(PlayerChoiceContext choiceContext,
                                                 MegaCrit.Sts2.Core.Combat.CombatSide side,

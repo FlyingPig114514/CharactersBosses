@@ -141,6 +141,8 @@
     "WATCHER_FASTING_POWER.description":  "Omega iki turda bir tetiklenir.\nBasinc Noktalari hasari bloklanabilir.\nUyari: Omega kaynaksiz hasar verir, Basinc Noktalari zayiflatma hasari verir; cagrilar bu hasari senin yerine almaz. «Vapi Sadakati» olan çağrılar da bu hasarı senin yerine almaz.\nOmega: Turunun sonunda TÜM düşmanlara 50 hasar ver.",
     "WATCHER_FASTING_POWER.description_dread":  "Omega her turda tetiklenir.\nBasinc Noktalari hasari bloklanabilir.\nUyari: Omega kaynaksiz hasar verir, Basinc Noktalari zayiflatma hasari verir; cagrilar bu hasari senin yerine almaz. «Vapi Sadakati» olan çağrılar da bu hasarı senin yerine almaz.\nOmega: Turunun sonunda TÜM düşmanlara 50 hasar ver.",
     "WATCHER_FEAR_NO_EVIL_AIM_POWER.title":  "Oyna",
+    "WATCHER_FEAR_NO_EVIL_HINT_POWER.description":  "Bu tur bir saldiri karti oynarsan, Gozcu [gold]Kotulukten Korkma[/gold] sonsuz dongusune gecer.",
+    "WATCHER_FEAR_NO_EVIL_HINT_POWER.title":  "Kotulukten Korkma",
     "BOSS_MASTER_REALITY_POWER.title":  "Gerçekliğe Hükmetme",
     "BOSS_MASTER_REALITY_POWER.description":  "Savaşta bir kart oluşturduğunda o kart [gold]düşürülür[/gold]; jeton değilse ayrıca [gold]Tüketim[/gold] kazanır.\nGözcü, Renk Filozofu sayesinde [gold]Cephanelik[/gold], [gold]Yaratılış Sütunu[/gold] ve [gold]Yerini Bil[/gold] elde etti.",
     "BOSS_MASTER_REALITY_POWER.description_dread":  "Savaşta bir kart oluşturduğunda o kart [gold]düşürülür[/gold]; jeton değilse ayrıca [gold]Tüketim[/gold] kazanır.\nGözcü, Renk Filozofu sayesinde [gold]Cephanelik[/gold], [gold]Yaratılış Sütunu[/gold] ve [gold]Yerini Bil[/gold] elde etti.",

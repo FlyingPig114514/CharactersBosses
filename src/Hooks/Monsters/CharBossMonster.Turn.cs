@@ -423,6 +423,28 @@ public abstract partial class CharBossMonster
                 }
             }
             catch (Exception e) { Logger.Log("[CharBoss] 挂「不惧妖邪」buff 失败: " + e.Message); }
+
+            // ★ v0.2.777（用户 2026-11-19）：「新增一个 buff，也叫不惧妖邪，也用不惧妖邪的图标，
+            //   在且只在红蓝观 12 及之后的**重复回合**出现，描述为：如果你在本回合打出攻击牌，
+            //   观者会改为使用不惧妖邪进行无限。」
+            //   与上面那个**不是同一个 buff**：上面那个有实际作用（记「被锁玩家打过攻击牌」⇒ 决定进不进平静），
+            //   这一个纯提示；第 12 回合起上面那个会被置为**不显示**（`WatcherFearNoEvilAimPower.IsVisibleInternal`），
+            //   所以状态栏上永远只有一个同图标同名字的 buff。
+            try
+            {
+                var switchScript = Def?.ScriptForAct(ActIndex);
+                if (switchScript?.SwitchTurn != null && TurnNumber >= switchScript.SwitchFromTurn
+                    && Creature != null
+                    && Creature.GetPower<Powers.WatcherFearNoEvilHintPower>() == null)
+                {
+                    _ = MegaCrit.Sts2.Core.Commands.PowerCmd.Apply<Powers.WatcherFearNoEvilHintPower>(
+                        new MegaCrit.Sts2.Core.GameActions.Multiplayer.BlockingPlayerChoiceContext(),
+                        Creature, 1m, Creature, null, false);
+                    Logger.Log($"[CharBoss] 第 {TurnNumber} 回合（{switchScript.SwitchFromTurn} 起的循环段）" +
+                               "⇒ 挂上提示 buff「不惧妖邪」（你打攻击牌 ⇒ 她切成不惧妖邪无限）");
+                }
+            }
+            catch (Exception e) { Logger.Log("[CharBoss] 挂「不惧妖邪」提示 buff 失败: " + e.Message); }
 #endif
             // 新回合：冷却剂的「本回合黑球不打被动」清掉（上一回合用过就算了）
             DarkPassiveSuppressed = false;

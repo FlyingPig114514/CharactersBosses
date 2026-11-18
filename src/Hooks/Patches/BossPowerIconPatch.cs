@@ -75,6 +75,8 @@ internal static class BossPowerIcons
 #if STS2_111
         // Ω观「不惧妖邪」的预示 buff（用户 2026-11-16：用 1 代崩坠那个 buff 的图标）
         if (power is Powers.WatcherFearNoEvilAimPower) return "res://CharacterBosses/images/powers/watcher_fear_no_evil.png";
+        // 红蓝观第 12 回合起那个**同名同图标**的提示 buff（用户 2026-11-19）
+        if (power is Powers.WatcherFearNoEvilHintPower) return "res://CharacterBosses/images/powers/watcher_fear_no_evil.png";
 #endif
             return null;
         }
