@@ -68,10 +68,67 @@ internal static class BossWeaveNoReturn
         _attempts++;
         try
         {
+            bool any = false;
+
+            // ① **B 版（lamali）**：它把「预见就回手」写在**卡片自己**身上 ——
+            //   `Watcher.Code.Cards.Uncommon.Weave.AfterScryed(...)`，而且 B 版**根本没有**
+            //   `WatcherCombatHelper`（所以以前先在这里 early-return，这条永远没装上 ——
+            //   用户 2026-11-18「B 版迂回的返手依然没拦住」）。⇒ 放在最前面、不依赖 helper。
+            try
+            {
+                var weaveType = WatcherCards.Weave;
+                var flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+                var after = weaveType?.GetMethod("AfterScryed", flags);
+                if (after == null)
+                {
+                    // 兜底：`WatcherCards.Weave` 万一没解析出来（B 版类名是 `Watcher.Code.Cards.Uncommon.Weave`），
+                    // 就直接在已加载的观者程序集里找「名字以 Weave 结尾、带 AfterScryed 的卡片类型」。
+                    foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+                    {
+                        try
+                        {
+                            string? an = asm.GetName().Name;
+                            if (an == null || !an.StartsWith("Watcher", StringComparison.OrdinalIgnoreCase)) continue;
+                            foreach (var ty in asm.GetTypes())
+                            {
+                                if (ty == null || !ty.Name.EndsWith("Weave", StringComparison.Ordinal)) continue;
+                                var m = ty.GetMethod("AfterScryed", flags);
+                                if (m == null) continue;
+                                after = m;
+                                weaveType = ty;
+                                break;
+                            }
+                        }
+                        catch { /* 忽略单个程序集 */ }
+                        if (after != null) break;
+                    }
+                }
+                if (after != null)
+                {
+                    var pre = new HarmonyMethod(typeof(BossWeaveNoReturn)
+                        .GetMethod(nameof(WeaveAfterScryedPrefix), BindingFlags.Static | BindingFlags.NonPublic)!);
+                    new Harmony("CharacterBosses.watcher.weave.noreturn.afterscryed").Patch(after, prefix: pre);
+                    any = true;
+                }
+                else if (_attempts <= 3)
+                {
+                    Logger.Log($"[CharBoss] 迂回：Weave 类型 {(weaveType == null ? "未解析" : weaveType.FullName)} 上没有 AfterScryed（A 版正常，B 版才有）");
+                }
+            }
+            catch (Exception e) { Logger.Log("[CharBoss] 迂回：B 版 AfterScryed 挂载失败: " + e.Message); }
+
             var helper = WatcherCards.T("WatcherCombatHelper");
             if (helper == null)
             {
-                if (_attempts <= 3) Logger.Log("[CharBoss] 迂回：暂时没找到观者的 WatcherCombatHelper ⇒ 稍后重试");
+                if (any)
+                {
+                    _installed = true;
+                    Logger.Log("[CharBoss] 迂回：B 版（卡片自己的 AfterScryed）已拦下 —— 她的剧本自己安排每一张迂回");
+                }
+                else if (_attempts <= 3)
+                {
+                    Logger.Log("[CharBoss] 迂回：暂时没找到观者的 WatcherCombatHelper / Weave.AfterScryed ⇒ 稍后重试");
+                }
                 return;
             }
 
@@ -80,7 +137,6 @@ internal static class BossWeaveNoReturn
             var postfix = new HarmonyMethod(typeof(BossWeaveNoReturn)
                 .GetMethod(nameof(ScryPostfix), BindingFlags.Static | BindingFlags.NonPublic)!);
 
-            bool any = false;
             foreach (var name in new[] { "Scry", "ScryAutoDiscard" })
             {
                 var m = helper.GetMethod(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
@@ -94,24 +150,6 @@ internal static class BossWeaveNoReturn
                 catch (Exception e) { Logger.Log($"[CharBoss] 迂回：{name} 挂载失败: {e.Message}"); }
             }
 
-            // ② **B 版（lamali）**：它把「预见就回手」写在**卡片自己**身上 ——
-            //   `Watcher.Code.Cards.Uncommon.Weave.AfterScryed(ctx, player, scryAmount, discardAmount, seen, discarded)`。
-            //   Scry 那条入口拦不到它（用户 2026-11-18 实测：「B 版观者的迂回回手没有拦住」），
-            //   所以这里直接把这个方法前缀掉：是她（影子玩家）就整条跳过。
-            try
-            {
-                var weave = WatcherCards.Weave;
-                var after = weave?.GetMethod("AfterScryed",
-                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                if (after != null)
-                {
-                    var pre = new HarmonyMethod(typeof(BossWeaveNoReturn)
-                        .GetMethod(nameof(WeaveAfterScryedPrefix), BindingFlags.Static | BindingFlags.NonPublic)!);
-                    new Harmony("CharacterBosses.watcher.weave.noreturn.afterscryed").Patch(after, prefix: pre);
-                    any = true;
-                }
-            }
-            catch (Exception e) { Logger.Log("[CharBoss] 迂回：B 版 AfterScryed 挂载失败: " + e.Message); }
 
             if (!any)
             {

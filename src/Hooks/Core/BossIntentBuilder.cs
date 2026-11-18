@@ -1809,6 +1809,11 @@ public static class BossIntentBuilder
     private static readonly HashSet<string> NoBuffIntentCards = new(StringComparer.Ordinal)
     {
         "MAKE_IT_SO",
+        // ★ v0.2.760（用户 2026-11-18：「（B 版）迂回的意图错误的包含了强化」）：
+        //   迂回（`WATCHER_WEAVE` / B 版 `WATCHER-WEAVE`）是 0 费攻击，卡面只有「造成伤害 + 预见时回手」，
+        //   但它身上的某个变量被 `ClassifyPowers` 认成了增益 ⇒ 多一条「强化」。它是纯攻击牌，点名排除。
+        "WATCHER_WEAVE",
+        "WATCHER-WEAVE",
         // ★ 2026-11-10（用户：「第四回合女妖之嚎的意图应该是攻势+策略，而不是攻势+强化；
         //   第七回合的就只有攻势（没有策略也没有强化）」）：
         //   女妖之嚎（`BansheesCry`）只造成伤害、卡面上没有任何「给自己上能力」的变量，
