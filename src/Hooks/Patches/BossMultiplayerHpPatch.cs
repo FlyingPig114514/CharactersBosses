@@ -36,6 +36,18 @@ public static class BossNoMultiplayerHpScalePatch
                 Logger.Log($"[CharBoss] 多人({playerCount} 人)：跳过 {__instance.Monster.Id.Entry} 的血量缩放");
                 return false;
             }
+
+            // ★ v0.2.794（玩家反馈 2026-11-19：「仆从储的仆从血量会在多人模式时翻倍。
+            //   让他和 boss 血量一样不翻倍」）：
+            //   我们自己的**仆从**（`Monsters.BossMinionMonster`）也要跳过 ——
+            //   它们的血量同样是按单人设计好的固定值（仆从打击 22/25、仆从俯冲 12/14、仆从捐躯 15/17），
+            //   被原版乘人数就直接翻倍了。原版怪物照旧缩放。
+            if (__instance?.Monster is BossMinionMonster)
+            {
+                Logger.Log($"[CharBoss] 多人({playerCount} 人)：跳过仆从 {__instance.Monster.Id.Entry} 的血量缩放" +
+                           "（与 Boss 一样用单人设计值）");
+                return false;
+            }
         }
         catch
         {
@@ -72,7 +84,11 @@ public static class BossNoMultiplayerBlockScalePatch
         try
         {
             if (__result == 1m) return;                       // 原版没缩放：不动
-            if (target?.Monster is not CharBossMonster) return;   // 原版怪物：不动
+
+            bool ours = target?.Monster is CharBossMonster
+                        // ★ v0.2.794：我们自己的仆从（仆从储那三只）同样保持单人设计值
+                        || target?.Monster is BossMinionMonster;
+            if (!ours) return;                                // 原版怪物：不动
 
             if (_logged++ < 20)
             {

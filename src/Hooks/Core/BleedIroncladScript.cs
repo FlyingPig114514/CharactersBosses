@@ -25,7 +25,8 @@ namespace CharacterBosses.Core;
 /// ## 剧本 7 回合，之后 **5～7 循环**（用户 2026-10-28 第二次削弱改稿）
 /// 撕裂、血墙、全身撞击+ / 时候未到、烙印、打击（被烧） / 打击、打击、防御 /
 /// 御血术、突破、防御 / 打击、打击、防御 / 血墙、全身撞击+、烙印 / 御血术、突破、防御。
-/// 全身撞击+（单人）在多人时换成恶魔护盾+，见 <see cref="MultiplayerCardSwap"/>。
+/// 全身撞击+ **不再换牌**（2026-11-19 用户：「不再将全身撞击替换为恶魔护盾」）；
+/// 多人换的是**第 2 回合那张「时候未到」→「肉盾」**，见 <see cref="MultiplayerCardSwap"/>。
 ///
 /// ⚠ 2026-10-28 第二次削弱：**绯红披风 / 坚毅 / 岩石铠甲 全下线**
 ///   —— 绯红披风原来让他每回合白拿 7 格挡（全身撞击跟着变大），拔掉才是真正的削弱。
@@ -44,21 +45,23 @@ public static class BleedIroncladScript
         var turns = new List<BossTurn>
         {
             // 1（灯笼 +1 ⇒ 3 费：撕裂 1 + 血墙 2 + 全身撞击+ 0）
-            //   多人：全身撞击+ 会被 MultiplayerCardSwap **换成**恶魔护盾+（0 费，给已行动的友方 Boss 起甲）
-            //   ⚠ 换牌是「替换」不是「追加」——单人绝不能在剧本里另写一张恶魔护盾，
-            //     否则单人意图里会多出一条打不出去的恶魔护盾（用户 2026-10-28 实测报的就是这个）。
+            //   ⚠ 2026-11-19（用户「不再将全身撞击替换为恶魔护盾」）：这张**不再换牌**，
+            //     单人/多人都是全身撞击+。
             new()
             {
-                Note = "1. 撕裂、血墙、全身撞击+（多人：换成恶魔护盾+，给已行动、格挡最少的友方）",
+                Note = "1. 撕裂、血墙、全身撞击+",
                 Energy = 3,
                 Cards = Cards(
                     C<Rupture>(), C<BloodWall>(),
-                    C<BodySlam>(true)),         // 全身撞击+ 是 0 费 ⇒ 能量刚好；多人换成恶魔护盾+
+                    C<BodySlam>(true)),         // 全身撞击+ 是 0 费 ⇒ 能量刚好
             },
             // 2（2 费：时候未到 2 + 烙印 0；打击被烙印消耗，不出）
+            //   ★ 2026-11-19（用户）：「多人时将第二回合的时候未到替换为肉盾，保证他能正常给其它 boss 减伤」
+            //   ⇒ 多人换牌表里是 `NotYet → Tank`（`MultiplayerCardSwap` 负责替换，这里仍写「时候未到」；
+            //     换牌是「替换」不是「追加」，单人剧本里绝不能另写一张肉盾）。
             new()
             {
-                Note = "2. 时候未到、烙印；打击被烙印消耗（不出）",
+                Note = "2. 时候未到（多人：换成肉盾）、烙印；打击被烙印消耗（不出）",
                 Energy = 2,
                 Cards = Cards(
                     C<NotYet>(), C<Brand>(), Burn<StrikeIronclad>()),
@@ -87,7 +90,7 @@ public static class BleedIroncladScript
             // 6（3 费：血墙 2 + 全身撞击+ 0 + 烙印 0）
             new()
             {
-                Note = "6. 血墙、全身撞击+（多人：换成恶魔护盾+）、烙印",
+                Note = "6. 血墙、全身撞击+、烙印",
                 Energy = TurnEnergy,
                 Cards = Cards(
                     C<BloodWall>(), C<BodySlam>(true), C<Brand>()),
@@ -115,12 +118,13 @@ public static class BleedIroncladScript
         //   —— 绯红披风就是他原来每回合白拿 7 格挡的来源，拿掉之后「全身撞击」也跟着变小。
         typeof(BloodWall), typeof(BloodWall),        // 血墙（设计稿写作「血盾」）
         typeof(BodySlam),            // 全身撞击（剧本里是升级版，0 费）
-        typeof(DemonicShield),       // 恶魔护盾（多人换上的那张）
+        // ⚠ 2026-11-19（用户「不再将全身撞击替换为恶魔护盾」）：`DemonicShield` 已从卡组移除。
         typeof(Rupture),             // 撕裂
         typeof(Brand), typeof(Brand),                // 烙印
         typeof(IronWave), typeof(IronWave),          // 铁斩波（用户 2026-10-28 削弱：替换御血术）
         typeof(Breakthrough), typeof(Breakthrough),  // 突破
-        typeof(NotYet),              // 时候未到
+        typeof(NotYet),              // 时候未到（单人第 2 回合打这张）
+        typeof(Tank),                // 肉盾（**多人**第 2 回合换上的那张，见 MultiplayerCardSwap）
         typeof(StrikeIronclad), typeof(StrikeIronclad),
         typeof(StrikeIronclad), typeof(StrikeIronclad),   // 打击 ×4
         typeof(DefendIronclad), typeof(DefendIronclad), typeof(DefendIronclad),

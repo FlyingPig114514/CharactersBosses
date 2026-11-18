@@ -62,11 +62,16 @@ public static class MultiplayerCardSwap
         //     `ScriptCard.DiscardInsteadWhenMultiplayer` 声明。
         (0, typeof(SilentBoss), typeof(Afterimage), typeof(Sneaky)),
 
-        // A7. 放血战（第二幕铁甲战士，用户 2026-10-27 设计）：
-        //     剧本第 1／7 回合那张「全身撞击+」在**多人**时换成「恶魔护盾+」
-        //     （0 费，把她当前的格挡给一位已行动、格挡最少的友方 Boss）。
-        //     换上的那张**必须升级**（设计稿写的就是「恶魔护盾+」）见下面的 UpgradeRows。
-        (1, typeof(IroncladBoss), typeof(BodySlam), typeof(DemonicShield)),
+        // A7. 放血战（第二幕铁甲战士，用户 2026-10-27 设计；2026-11-19 **改口径**）：
+        //     > 「多人时将第二回合的时候未到替换为肉盾，保证他能正常给其它 boss 减伤。
+        //     >   不再将全身撞击替换为恶魔护盾」
+        //     ⇒ ① 第 2 回合那张「时候未到」（`NotYet`，2 费，只回自己 10 血）在多人换成
+        //          「肉盾」（`Tank`，1 费能力牌：自己受到的伤害 ×1.5、**同阵营队友受到的伤害 ×0.5**）；
+        //       ② 原来的「全身撞击+ → 恶魔护盾+」整条**删除**（剧本第 1／6 回合恢复成全身撞击+）。
+        //     ⚠ 原版 `TankPower.AfterApplied` 只把 `GuardedPower` 发给 `IsPlayer` 的队友，
+        //       而我们的**其它 Boss 不是玩家生物** ⇒ 还需要 `TankPowerGuardsBossAlliesPatch` 补发，
+        //       否则「给其它 boss 减伤」这一半效果一条都落不到（见那个补丁）。
+        (1, typeof(IroncladBoss), typeof(NotYet), typeof(Tank)),
         // A6. 黑球机（第一幕故障机器人·暗黑球轴，用户 2026-10-27）：冰川 → **休眠**。
         //     两张都是 2 费技能、都生成 2 个冰霜球 ⇒ 能量账不变；
         //     区别是休眠的「本回合冰球给所有队友格挡」在我方阵营 = 给**所有 Boss** 格挡（不给玩家）。
@@ -88,7 +93,8 @@ public static class MultiplayerCardSwap
     private static readonly (int Act, Type Boss, Type From, int MinAscension)[] UpgradeRows =
     {
         (0, typeof(SilentBoss), typeof(Afterimage), 0),
-        (1, typeof(IroncladBoss), typeof(BodySlam), 0),   // 放血战：换上的「恶魔护盾」是升级版
+        // ⚠ 2026-11-19（用户「不再将全身撞击替换为恶魔护盾」）：放血战那条
+        //   `(1, IroncladBoss, BodySlam, 0)` 已删除 —— 全身撞击不再被换牌，也就不需要强制升级。
         // 用户 2026-10-31：**多人 + 进阶 9 及以上**时，刀猎的「斗篷与匕首 → 刀刃交响曲」那张要升级
         // （2 费 → 1 费）。配合第 1 回合 3 费（灯笼），第 1 回合因此打得出一张防御。
         (2, typeof(SilentBoss), typeof(CloakAndDagger), 9),
