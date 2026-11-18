@@ -51,6 +51,9 @@ internal static class EnemyDemonFormPlayerTurnStartPatch
             var owner = __instance?.Owner;
             if (owner == null) return;
             if (owner.Side != CombatSide.Enemy) return;        // 玩家自己的恶魔形态：原版
+            // ★ 用户 2026-11-19：「boss 不应该受支配影响」⇒ 我们自己的角色 Boss 一律不碰
+            //   （她要是自己打出了恶魔形态，就照原版「她自己的回合开始」加力量）
+            if (owner.Monster is Monsters.CharBossMonster) return;
             if (!Core.DreadMode.IsActive) return;              // 非恐惧模式：原版
 
             if (side == CombatSide.Player)

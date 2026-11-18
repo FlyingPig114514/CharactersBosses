@@ -61,6 +61,11 @@ internal static class DreadCharacters
 //   只在 111 构建里存在；107（正式版）没有恐惧模式，自然也不需要。
 /// <summary>
 /// **铁甲战士的支配**（用户 2026-11-13）：每场战斗开始时，所有敌人获得 1 层恶魔形态。
+///
+/// ★ 2026-11-19（用户）：「**boss 不应该受支配影响**」⇒ **跳过我们自己的角色 Boss**
+///   （`Monsters.CharBossMonster`）。她只在本幕 Boss 房上场，而 Boss 房会先把支配清掉
+///   （`RemoveDominionIfRoomIsBoss`），所以这条跳过主要是防「调试/普通战斗版遭遇里她上场」
+///   这种情形 —— 那时支配还在，不能把恶魔形态白送给一个有自己机制的 Boss。
 /// </summary>
 public sealed class IroncladDominion : MegaCrit.Sts2.Core.Models.Dread.DominionModel
 {
@@ -73,11 +78,16 @@ public sealed class IroncladDominion : MegaCrit.Sts2.Core.Models.Dread.DominionM
             if (enemies == null) return;
 
             var targets = new List<Creature>();
+            int skippedBosses = 0;
             foreach (var c in enemies)
             {
                 if (c == null || !c.IsAlive) continue;
+                // ★ 用户 2026-11-19：Boss 不吃支配
+                if (c.Monster is Monsters.CharBossMonster) { skippedBosses++; continue; }
                 targets.Add(c);
             }
+            if (skippedBosses > 0)
+                Logger.Log($"[CharBoss] 恐惧模式·铁甲战士的支配：跳过 {skippedBosses} 只角色 Boss（Boss 不受支配影响）");
             if (targets.Count == 0) return;
 
             await MegaCrit.Sts2.Core.Commands.PowerCmd.Apply<MegaCrit.Sts2.Core.Models.Powers.DemonFormPower>(
@@ -233,11 +243,16 @@ public sealed class RegentDominion : MegaCrit.Sts2.Core.Models.Dread.DominionMod
             }
 
             var targets = new List<Creature>();
+            int skippedBosses = 0;
             foreach (var c in enemies)
             {
                 if (c == null || !c.IsAlive) continue;
+                // ★ 用户 2026-11-19：「boss 不应该受支配影响」⇒ 不给角色 Boss 挂「王之凝视」
+                if (c.Monster is Monsters.CharBossMonster) { skippedBosses++; continue; }
                 targets.Add(c);
             }
+            if (skippedBosses > 0)
+                Logger.Log($"[CharBoss] 恐惧模式·储君的支配：跳过 {skippedBosses} 只角色 Boss（Boss 不受支配影响）");
             if (targets.Count == 0)
             {
                 Logger.Log("[CharBoss] 恐惧模式·储君的支配：敌人列表为空 ⇒ 这次没发王之凝视（两端会不同步）");
@@ -404,22 +419,26 @@ public sealed class WatcherDevotionDominion : MegaCrit.Sts2.Core.Models.Dread.Do
             }
 
             int given = 0;
+            int skippedBosses = 0;
             foreach (var creature in enemies)
             {
                 if (creature == null || !creature.IsAlive) continue;
-                // ★ 我们自己的角色 Boss（比如神格观）有**真的**真言/神格，别给她套仿制版
-                if (creature.Monster is Monsters.CharBossMonster) continue;
+                // ★ 用户 2026-11-19：「boss 不应该受支配影响」⇒ 我们自己的角色 Boss（比如神格观）
+                //   有**真的**真言/神格，一层虔信都不给她（她上场那场支配本来也已被游戏清掉）
+                if (creature.Monster is Monsters.CharBossMonster) { skippedBosses++; continue; }
                 // 幂等：同一场里已经挂过就不叠（重入/重连不该变成 6 层）
                 if (creature.GetPower<Powers.WatcherDominionDevotionPower>() != null) continue;
 
                 // ★ v0.2.781：挂到**敌人**身上（以前挂玩家 ⇒ 既不符合「所有敌人获得虔信」的口径，
                 //   也给玩家挂了一个莫名其妙的 debuff 图标）。虔信的实际结算在
-                //   `WatcherDominionDevotionPower`：**玩家回合开始**给这个敌人 +3 真言，
+                //   `WatcherDominionDevotionPower`：**玩家回合开始**给这个敌人 +2 真言，
                 //   满 10 层扣 10 进神格（它那一回合攻击三倍伤害，意图执行完退出）。
                 await MegaCrit.Sts2.Core.Commands.PowerCmd.Apply<Powers.WatcherDominionDevotionPower>(
                     new ThrowingPlayerChoiceContext(), creature, (decimal)FaithStacks, null, null);
                 given++;
             }
+            if (skippedBosses > 0)
+                Logger.Log($"[CharBoss] 恐惧模式·观者的支配：跳过 {skippedBosses} 只角色 Boss（Boss 不受支配影响）");
             Logger.Log($"[CharBoss] 恐惧模式·观者的支配：{given} 个敌人各获得 {FaithStacks} 层虔信" +
                        $"（玩家回合开始时它们各 +{FaithStacks} 真言，满 10 层扣 10 进神格：那一回合攻击三倍伤害）");
         }
