@@ -6289,3 +6289,10 @@ Chronological action log.
 | 2026-11-18 23:26 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/MultiBossPlan.cs` | ok | 0 |
 | 2026-11-18 23:26 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BuildInfo.cs` | ok | 0 |
 | 2026-11-18 23:28 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/workshop/changenote.txt` | ok | 0 |
+| 2026-11-18 23:32 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/CharDominions.cs` | ok | 0 |
+| 2026-11-18 23:32 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Encounters/CharBossEncounters.cs` | ok | 0 |
+| 2026-11-18 23:32 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Encounters/CharBossEncounters.cs` | ok | 0 |
+| 2026-11-18 23:32 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/CharDominions.cs` | ok | 0 |
+| 2026-11-18 23:32 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/CharDominions.cs` | ok | 0 |
+| 2026-11-18 23:33 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-18 23:40 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/workshop/changenote.txt` | ok | 0 |

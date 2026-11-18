@@ -745,6 +745,10 @@ internal static class DreadDominionSync
                 Logger.Log($"[CharBoss] 恐惧模式·支配对齐：本幕支配 {line}" +
                            "（否则两端普通战斗里敌人身上会多/少一层 power ⇒ 联机不同步）");
             }
+
+            // ★★ v0.2.803：`RunState` 对齐了但 `CombatState` 里那份还是旧的（房主结论晚于进房间那一刻的拷贝）
+            //   ⇒ 战斗里挂 power 用的是 CombatState 那一份，客人会整场吃不到支配。这里顺手补一次。
+            try { AlignCombatState(run.CurrentRoom, "本幕支配对齐后同步战斗状态"); } catch { /* 忽略 */ }
         }
         catch (Exception e) { Logger.Log("[CharBoss] 恐惧模式·支配对齐失败: " + e.Message); }
     }
@@ -812,6 +816,72 @@ internal static class DreadDominionSync
     private static string EntryOf(MegaCrit.Sts2.Core.Models.Dread.DominionModel? d)
     {
         try { return d?.Id?.Entry ?? "无"; } catch { return "?"; }
+    }
+
+    /// <summary>
+    /// ★★ v0.2.803（玩家反馈「恐惧模式，联机，好友吃不到支配效果而导致不同步」）：
+    ///   反编译 `DreadRunModel.BeforeRoomEntered` 是**支配进战斗状态的唯一一处**：
+    ///     · 普通战斗房：`combatRoom.CombatState.SetDominion(base.RunState.Dominion)`；
+    ///     · Boss 房：`RunState.SetDominion(null)` + `CombatState.SetDominion(null)`。
+    ///   而战斗里派发 `AfterEnemiesEnteredCombat` / `AfterPlayersEnteredCombat`（挂 power 的那两个钩子）
+    ///   用的是 **CombatState 上那一份**，不是 `RunState` 那一份。
+    ///   客人的「本幕支配以房主为准」经常**晚于**这次拷贝（房主结论还没到）⇒ 我们事后只对齐了
+    ///   `RunState.Dominion`，`CombatState.Dominion` 还是旧的 / 空的 ⇒ **客人这一场根本没有支配效果**
+    ///   （＝「好友吃不到支配效果」），房主那边有 ⇒ 第一个回合开始校验和就分叉。
+    ///   所以在拷贝之后补一次：两者类型不一致就把 CombatState 也改成一致的（此时战斗还没开始，power 会正常挂上）。
+    /// </summary>
+    internal static void AlignCombatState(AbstractRoom? room, string why)
+    {
+        try
+        {
+            if (!DreadMode.IsActive) return;
+            var run = MegaCrit.Sts2.Core.Runs.RunManager.Instance?.DebugOnlyGetState();
+            if (run == null) return;
+
+            var combat = (room as MegaCrit.Sts2.Core.Rooms.CombatRoom)?.CombatState;
+            if (combat == null) return;
+
+            var want = run.Dominion;
+            var have = combat.Dominion;
+            if (want == null && have == null) return;
+            if (want != null && have != null && want.GetType() == have.GetType()) return;
+
+            combat.SetDominion(want);
+            Logger.Log($"[CharBoss] 恐惧模式·支配对齐：**战斗状态**里的支配 {EntryOf(have)} → {EntryOf(want)}（{why}）" +
+                       "—— 战斗里挂 power 用的是 CombatState 那一份，以前只改 RunState ⇒ 客人整场吃不到支配、与房主不同步");
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 恐惧模式·支配对齐（战斗状态）失败: " + e.Message); }
+    }
+}
+
+/// <summary>
+/// ★★ v0.2.803：在 `DreadRunModel.BeforeRoomEntered` **前后各挂一次**（见 <see cref="DreadDominionSync.AlignCombatState"/>）。
+///   · 前缀：先把 `RunState.Dominion` 对齐到房主那一套 ⇒ 游戏随后拷进 CombatState 的就是正确的；
+///   · 后缀：再核对 CombatState —— 房主结论是「拷贝之后」才到的那些场次也补上。
+/// ⚠ 不要只保留后缀：`AfterEnemiesEnteredCombat` 是在战斗开始时派的，越早对齐越安全。
+/// </summary>
+[HarmonyLib.HarmonyPatch(typeof(MegaCrit.Sts2.Core.Models.Dread.DreadRunModel),
+                          nameof(MegaCrit.Sts2.Core.Models.Dread.DreadRunModel.BeforeRoomEntered),
+                          new[] { typeof(AbstractRoom) })]
+internal static class DreadDominionBeforeRoomPatch
+{
+    [HarmonyLib.HarmonyPrefix]
+    public static void Prefix()
+    {
+        try { DreadDominionSync.EnsureCurrentAct("进房间之前"); } catch { /* 绝不影响主流程 */ }
+    }
+
+    [HarmonyLib.HarmonyPostfix]
+    public static void Postfix(AbstractRoom room)
+    {
+        try
+        {
+            // ⚠ 顺序很重要：原版方法体里会先 `ApplyCurrentDominion()`（按**本机**槽位重设 RunState.Dominion），
+            //   所以前缀那次对齐会被它盖掉 ⇒ 这里必须**先重新对齐 RunState，再把 CombatState 同步过去**。
+            DreadDominionSync.EnsureCurrentAct("进房间之后（游戏已按本机槽位设过支配）");
+            DreadDominionSync.AlignCombatState(room, "进房间之后核对战斗状态");
+        }
+        catch { /* 绝不影响主流程 */ }
     }
 }
 

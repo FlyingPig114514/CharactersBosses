@@ -1626,6 +1626,12 @@
       "fix": "房主现在把**整条阵容**随「每场最终遭遇」一起广播（值从 `主Boss` 扩成 `主Boss,伙伴1,伙伴2…`；HostLineupOf 供客人照抄，HostBossOf 取逗号前那段保持老调用方兼容），客人 BossLineups.For 直接照抄房主阵容、不再按自己那份可能过时的玩家数重算；房主每 5 秒无条件重播结论（以前只在客人上报没到齐时重播 ⇒ 客人拿到一次过时就一直错），客人只在内容真变了时才清阵容缓存；MultiBossPlan.PartnersForWithKeys 的伙伴数量改由阵容条数决定（lineup.Length−1），不再问 WantsSecondBoss。v0.2.802。",
       "file": "src/Hooks/Core/BossLineups.cs",
       "at": "2026-11-18T15:27:10.550Z"
+    },
+    {
+      "id": "bug-249-mwmal21y",
+      "error_message": "tools\\upload-workshop.ps1 报 Error occurred while uploading to the workshop! Result: k_EResultFileNotFound（同一份内容上一次刚报 UPLOAD OK）",
+      "fix": "紧跟着上一次成功提交再跑一次上传时，Steam 还没提交/清理完上一轮的 staging 内容 ⇒ SubmitItemUpdate 返回 k_EResultFileNotFound。等几秒/直接重跑一次即可成功；不要因此怀疑打包或 workshop.json。判「到底成功没有」只看上传器那行 `Successfully uploaded`（源码 src/UploadCommand.cs:301-320 里**只有** SubmitItemUpdateResult_t.m_eResult == k_EResultOK 才会打印它）；`k_EItemUpdateStatusInvalid` 只是进度状态的终止值，不代表失败。⚠ `steamapps\\workshop\\appworkshop_2868840.acf` 的 timeupdated 与 `workshop\\content\\2868840\\<id>` 里的版本号是**本机订阅缓存**，发布者上传后不会立即变（2026-11-19 实测：0.2.802/0.2.803 都已 UPLOAD OK，acf 仍停在 0.2.800 那次的时间），不能用它验证。",
+      "at": "2026-11-18T15:44:39.335Z"
     }
   ]
 }

@@ -891,12 +891,14 @@ public static class CharBossEncounters
         //     · 房主说 `VANILLA` ⇒ 本机也保持原版；
         //     · 房主给了 Key ⇒ 直接用那只；
         //     · 还没收到 ⇒ 才退回原来的确定性规则。
+        // ★ v0.2.803：房主结论（客人端用；日志/诊断也要用 ⇒ 提到外面）
+        string? hostValue = null;
         try
         {
             if (Core.NetRole.IsGuest)
             {
                 int fightIdx = secondBoss ? 1 : 0;
-                string? hostValue = Core.BossPicksSync.HostBossOf(act?.Index ?? -1, fightIdx);
+                hostValue = Core.BossPicksSync.HostBossOf(act?.Index ?? -1, fightIdx);
                 if (!string.IsNullOrEmpty(hostValue))
                 {
                     if (hostValue == Core.BossPicksSync.VanillaMark)
@@ -928,12 +930,52 @@ public static class CharBossEncounters
 
         var resolved = ForVanillaBossCore(act, vanilla, secondBoss);
 
-        // 房主：把这一场的结论记下来（会触发广播给客人）。
+        // ★ 房主：把这一场的结论记下来（会触发广播给客人）。
         try { Core.BossPicksSync.NoteHostBoss(act, secondBoss ? 1 : 0, resolved); }
         catch { /* 纯同步，失败不影响本机 */ }
 
+        // ★★ v0.2.803（玩家反馈「极速模式联机远端 boss 未替换而导致不同步」）：
+        //   「到底换不换、为什么」以前只在各个分支里零散地打，非标准模式（极速 / 每日 / 自定义）出问题
+        //   时一份日志看不出是哪一判决把人挡掉了。这里每个 (幕, 场, 模式) 固定打一行总结。
+        try { LogDecision(act, vanilla, secondBoss, resolved, hostValue); } catch { /* 纯诊断 */ }
+
         return resolved;
     }
+
+    /// <summary>「这一场到底换不换、为什么」—— 每个 (幕, 场, 模式) 只打一行（v0.2.803）。</summary>
+    private static void LogDecision(ActModel? act, EncounterModel? vanilla, bool secondBoss,
+                                    EncounterModel? resolved, string? hostValue)
+    {
+        try
+        {
+            string mode = "?";
+            try
+            {
+                mode = MegaCrit.Sts2.Core.Runs.RunManager.Instance?.DebugOnlyGetState()?.GameMode.ToString() ?? "?";
+            }
+            catch { mode = "?"; }
+
+            var key = (act?.Index ?? -1, secondBoss, mode);
+            if (!DecisionLogged.Add(key)) return;
+
+            string map = "?";
+            bool on = false;
+            bool ourSlot = false;
+            try { map = Core.BossSelection.MapEntryOfAct(act?.Index ?? 0) ?? "?"; } catch { map = "?"; }
+            try { on = Core.BossConfig.IsMapEnabledForGameplay(act); } catch { on = false; }
+            try { ourSlot = IsOurs(vanilla); } catch { ourSlot = false; }
+
+            Logger.Log($"[CharBoss] Boss 替换判定：模式={mode} · 第 {(act?.Index ?? -1) + 1} 幕{(secondBoss ? "第二场" : "")} · " +
+                       $"本机={Core.NetRole.Type} · 结果={(resolved == null ? "**不替换（保持原版）**" : resolved.Id.Entry)} · " +
+                       $"地图={map}（这张图的替换开关={on}）· 存档槽={(vanilla?.Id.Entry ?? "<空>")}（是我们={ourSlot}）· " +
+                       $"房主结论={hostValue ?? "<未收到 / 不适用>"}" +
+                       "（模式不是 Standard 时这行尤其重要：极速/恐惧/每日可能走不同路径）");
+        }
+        catch { /* 纯诊断 */ }
+    }
+
+    /// <summary>「Boss 替换判定」日志每个 (幕, 场, 模式) 只打一次。</summary>
+    private static readonly HashSet<(int Act, bool Second, string Mode)> DecisionLogged = new();
 
     /// <summary>客人端「按房主结论替换」的日志每个 (幕, 是不是第二场) 只打一次。</summary>
     private static readonly HashSet<(int Act, bool Second)> GuestHostBossLogged = new();
