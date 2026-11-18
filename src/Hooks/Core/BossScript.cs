@@ -545,6 +545,22 @@ public sealed class BossScript
     /// </summary>
     private bool _switchLocked;
 
+    /// <summary>
+    /// **新的一轮开始**（`CharBossMonster.PrepareTurn`，也就是玩家回合开始那一刻）⇒ 清掉
+    /// 「玩家打出过攻击牌」与「本回合已经切换」两个状态。
+    ///
+    /// 用户 2026-11-19 的截图实证：第 12 回合**一张攻击牌都没打**就已经是「不惧妖邪无限」那套
+    /// —— 因为这两个状态从来不按轮清零，第 11 回合打过的攻击牌一路带进了第 12 回合。
+    /// 清零之后：这一轮里真的打出攻击牌时，`BossTemperancePower` 立刻置位并由
+    /// <c>CharBossMonster.RebuildForSwitch</c> 当场切过去（这就是「打了攻击牌立刻换当回合」）。
+    /// </summary>
+    public void ResetSwitchForNewRound()
+    {
+        if (SwitchTurn == null) return;
+        _switchLocked = false;
+        SwitchRequested = false;
+    }
+
     /// <summary>取第 <paramref name="turn"/>（1 起）回合的剧本，含循环。</summary>
     public BossTurn? TurnAt(int turn)
     {

@@ -2207,6 +2207,9 @@ public static class BossIntentBuilder
                 || Monsters.CharBossMonster.WatcherIdIs(e, "VIGILANCE")) return 1;
             // 内心宁静：不在平静时进入平静（平静不加伤）⇒ 之后按 ×1
             if (Monsters.CharBossMonster.WatcherIdIs(e, "INNER_PEACE")) return 1;
+            // ★ v0.2.774：不惧妖邪 ⇒ 进入平静（用户 2026-11-19：「不惧妖邪进了平静，
+            //   后面那些暴怒的伤害不应该翻倍，并且应该带有强化和牺牲」）
+            if (Monsters.CharBossMonster.WatcherIdIs(e, "FEAR_NO_EVIL")) return 1;
             if (Monsters.CharBossMonster.WatcherIdIs(e, "EMPTY_BODY")
                 || Monsters.CharBossMonster.WatcherIdIs(e, "EMPTY_FIST")) return 1;
         }
@@ -2327,6 +2330,9 @@ public static class BossIntentBuilder
                 || Monsters.CharBossMonster.WatcherIdIs(entryName, "MEDITATE")
                 || Monsters.CharBossMonster.WatcherIdIs(entryName, "VIGILANCE")) return 1;
             if (Monsters.CharBossMonster.WatcherIdIs(entryName, "INNER_PEACE")) return 1;
+            // ★ v0.2.774：不惧妖邪 ⇒ 进入平静（与 `BossScriptPlanner` 的推演口径一致；
+            //   用户 2026-11-19 截图：「不惧妖邪进了平静，后面那些暴怒的伤害不应该翻倍」）
+            if (Monsters.CharBossMonster.WatcherIdIs(entryName, "FEAR_NO_EVIL")) return 1;
             if (Monsters.CharBossMonster.WatcherIdIs(entryName, "EMPTY_BODY")
                 || Monsters.CharBossMonster.WatcherIdIs(entryName, "EMPTY_FIST")) return 1;
         }

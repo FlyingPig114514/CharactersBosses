@@ -712,6 +712,14 @@ public static class BossScriptPlanner
                 else if (CharBossMonster.WatcherIdIs(entryNow, "TRANQUILITY") || CharBossMonster.WatcherIdIs(entryNow, "MEDITATE")
                          || CharBossMonster.WatcherIdIs(entryNow, "VIGILANCE"))
                     plannedStanceMul = 1;                       // 安宁 / 冥想 / 警惕 ⇒ 进入平静（平静不加伤）
+                // ★ v0.2.774（用户 2026-11-19 截图）：「除了第一张暴怒以外后面暴怒的伤害不对 ——
+                //   不惧妖邪进了平静，所以那些暴怒的伤害不应该翻倍」。
+                //   她那条「不惧妖邪」的判据就是「被锁玩家本回合打出过攻击牌 ⇒ 进平静」，
+                //   而「不惧妖邪无限」那套计划**正是**因为玩家打了攻击牌才会被切换上来 ⇒
+                //   推演时它必然把她带进平静。以前这里漏了它 ⇒ 推演一直以为她还在愤怒 ⇒
+                //   后面的暴怒全被按 ×2 画（42），强化/牺牲也被当成「已经在愤怒」摘掉。
+                else if (CharBossMonster.WatcherIdIs(entryNow, "FEAR_NO_EVIL"))
+                    plannedStanceMul = 1;                       // 不惧妖邪 ⇒ 进入平静（平静不加伤）
                 else if (CharBossMonster.WatcherIdIs(entryNow, "INNER_PEACE"))
                     plannedStanceMul = 1;                       // 内心宁静 ⇒ 不在平静时进入平静（不加伤）
                 else if (CharBossMonster.WatcherIdIs(entryNow, "EMPTY_BODY") || CharBossMonster.WatcherIdIs(entryNow, "EMPTY_FIST"))
@@ -834,7 +842,9 @@ public static class BossScriptPlanner
                 else if (CharBossMonster.WatcherIdIs(entryNow, "VIGILANCE")
                          || CharBossMonster.WatcherIdIs(entryNow, "INNER_PEACE")
                          || CharBossMonster.WatcherIdIs(entryNow, "MEDITATE")
-                         || CharBossMonster.WatcherIdIs(entryNow, "TRANQUILITY"))
+                         || CharBossMonster.WatcherIdIs(entryNow, "TRANQUILITY")
+                         // ★ v0.2.774：不惧妖邪同样把她带进平静（同上一条的推演口径）
+                         || CharBossMonster.WatcherIdIs(entryNow, "FEAR_NO_EVIL"))
                 {
                     watcherCalm = true;
                     Logger.Log($"[CharBoss] 观者姿态：{SafeEntry(card)} ⇒ 进入「平静」" +
