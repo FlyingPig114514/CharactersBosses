@@ -390,6 +390,46 @@ internal static class BossPicksSync
         }
     }
 
+    /// <summary>
+    /// **心跳 / 重发**（v0.2.747，用户 2026-11-17）。由帧驱动每秒调一次（很便宜）：
+    /// · 客人：还没收到房主结论 ⇒ 每 3 秒带 `hello` 重发一次上报，房主收到就重播；
+    /// · 房主：多人局里还没收齐客人上报 ⇒ 每 5 秒强制重播一次（晚进的客人也能拿到）。
+    /// 目的：把「第一幕必须重开房间才同步」这种**开局丢包一次就永久错**的情况收紧成「几秒内自愈」。
+    /// </summary>
+    internal static void Tick()
+    {
+        try
+        {
+            if (!BaseLibPresence.Available) return;
+            long now = Environment.TickCount64;
+            var role = NetRole.Type;
+            if (role == MegaCrit.Sts2.Core.Multiplayer.Game.NetGameType.Client)
+            {
+                if (Received) return;
+                if (now - _lastAskAt < 3000) return;
+                _lastAskAt = now;
+                _lastCapsSent = string.Empty;           // 允许重发
+                _forceHello = true;
+                BroadcastIfHost();                      // 客人这条路上会走 SendCaps
+                _forceHello = false;
+            }
+            else if (role == MegaCrit.Sts2.Core.Multiplayer.Game.NetGameType.Host)
+            {
+                int expected = Math.Max(0, BossLineups.PlayerCount() - 1);
+                if (expected <= 0) return;
+                if (PeerCaps.Count >= expected) return;
+                if (now - _lastHostResendAt < 5000) return;
+                _lastHostResendAt = now;
+                _lastSent = string.Empty;
+                BroadcastIfHost();
+            }
+        }
+        catch { /* 绝不影响战斗 */ }
+    }
+
+    private static long _lastAskAt;
+    private static long _lastHostResendAt;
+    private static bool _forceHello;
     /// <summary>客人 → 房主：上报本机观者身份（内容没变就不重发）。</summary>
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
     private static void SendCaps(MegaCrit.Sts2.Core.Multiplayer.Game.INetGameService net)
@@ -403,6 +443,7 @@ internal static class BossPicksSync
             caps = "";
 #endif
             caps = "w=" + caps;                 // 前缀让它以后好扩展（w= 观者实现）
+            if (_forceHello) caps += ";hello";  // v0.2.747：客人请求房主重播结论
             if (string.Equals(caps, _lastCapsSent, StringComparison.Ordinal)) return;
             try { BaseLibMessageRegistration.TryFix(); } catch { /* 忽略 */ }
             CustomMessageWrapper.Send(new BossPicksMessage
@@ -475,6 +516,21 @@ internal static class BossPicksSync
             bool isNewPeer = !PeerCaps.ContainsKey(senderId);
             if (!isNewPeer && PeersEqual(senderId, value)) return;
             PeerCaps[senderId] = value;
+
+            // ★ v0.2.747（用户 2026-11-17：工坊玩家「第一幕得重开房间才能同步，好像和联机大厅 mod 兼容性不好」）：
+            //   那个联机 mod 会自己重建大厅 / 提前拉房间，我们这条 BaseLib 自定义消息有可能**在它连上之前就发过一次**，
+            //   而 `_lastSent` / `_lastCapsSent` 的「内容没变就不重发」会把它**永久钉死在丢包状态**。
+            //   客人上报里带 `hello` 就是「我没收到结论，请重发」；房主收到就把去重标记清掉、立刻重播一遍。
+            try
+            {
+                if (value != null && value.IndexOf("hello", StringComparison.Ordinal) >= 0)
+                {
+                    _lastSent = string.Empty;
+                    Logger.Log("[CharBoss] 勾选同步：客人请求重发 ⇒ 房主立即重播（勾选/设置/每场最终遭遇）");
+                    BroadcastIfHost();
+                }
+            }
+            catch { /* 忽略 */ }
             Logger.Log($"[CharBoss] 观者 Boss：收到客人（NetId={senderId}）的观者实现 = " +
                        $"{(string.IsNullOrEmpty(value) ? "未装" : value)}（共 {PeerCaps.Count} 份上报）");
 

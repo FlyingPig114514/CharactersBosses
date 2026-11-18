@@ -567,6 +567,10 @@ public static class BossFrameTick
 
             // 集中变了 → 激发意图要重算（力量与集中在本 mod 里恒等，球数值会跟着动）
             // 多 Boss：每只各查一次（每帧遍历 2 只、只读一个 Power 数字，开销可忽略）
+            // ★ v0.2.747：联机「每场最终遭遇」的心跳/重发（每秒一次、很便宜）——
+            //   玩家反馈「第一幕要重开房间才同步」，根因是开局那条自定义消息丢一次就被去重标记钉死。
+            try { CharacterBosses.Core.BossPicksSync.Tick(); } catch { /* 绝不影响战斗 */ }
+
             foreach (var each in everyBoss) RefreshIntentsIfFocusChanged(each);
 
             // 灵魂绑定：玩家回合内抽了牌（或她自己又额外抽了牌）→ 死亡行军的伤害预览要跟着变。
