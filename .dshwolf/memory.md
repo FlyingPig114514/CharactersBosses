@@ -5991,3 +5991,5 @@ Chronological action log.
 | 2026-11-18 09:46 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/UI/BossSpecialTip.cs` | ok | 0 |
 | 2026-11-18 09:46 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/UI/BossSpecialTip.cs` | ok | 0 |
 | 2026-11-18 09:46 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/UI/BossSpecialTip.cs` | ok | 0 |
+| 2026-11-18 12:50 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherCards.cs` | ok | 0 |
+| 2026-11-18 12:51 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/boss-watcher-rushdown.md` | ok | 0 |

@@ -292,6 +292,36 @@ internal static class WatcherCards
     internal static Type? Halt => Card("WatcherHalt", "Halt",
         "WATCHER_HALT", "WATCHER-HALT");
 
+    // ── 三层 3 号「红蓝观」（内部 Key `WATCHER_RUSHDOWN` = 猛虎下山，用户 2026-11-18）─────
+    //   卡名 → id 依旧是从观者 pck 的 zhs `cards.json` / `relics.json` 查出来的：
+    //   猛虎下山 `WATCHER_RUSHDOWN`、粉碎关节 `WATCHER_CRUSH_JOINTS`、
+    //   腾越 `WATCHER_VAULT`（模组中译「腾跃」，用户口中是「腾越」，同一张）。
+    //   净化 / 腐朽 是**本体**牌（无色 `PURITY` / 诅咒 `DECAY`）。
+    /// <summary>猛虎下山（`Rushdown`，观者能力）：进入愤怒时抽牌。</summary>
+    internal static Type? Rushdown => Card("WatcherRushdown", "Rushdown",
+        "WATCHER_RUSHDOWN", "WATCHER-RUSHDOWN");
+    /// <summary>粉碎关节（`CrushJoints`，1 费攻击）：造成伤害；若本回合打出过技能牌则施加易伤。</summary>
+    internal static Type? CrushJoints => Card("WatcherCrushJoints", "CrushJoints",
+        "WATCHER_CRUSH_JOINTS", "WATCHER-CRUSH_JOINTS");
+    /// <summary>腾越（`Vault`，3 费技能）：结束本回合并获得一个额外回合。</summary>
+    internal static Type? Vault => Card("WatcherVault", "Vault",
+        "WATCHER_VAULT", "WATCHER-VAULT");
+    /// <summary>净化（本体无色 `Purity`，0 费技能）：消耗手中任意张牌。</summary>
+    internal static Type? Purity => typeof(MegaCrit.Sts2.Core.Models.Cards.Purity);
+    /// <summary>腐朽（本体诅咒 `Decay`）：回合结束时若在手牌则受伤害。</summary>
+    internal static Type? Decay => typeof(MegaCrit.Sts2.Core.Models.Cards.Decay);
+
+    /// <summary>泪滴吊坠盒（观者遗物 `TEARDROP_LOCKET`）：每场战斗开始时处于平静。</summary>
+    internal static Type? TeardropLocket => T("TeardropLocket");
+    /// <summary>符文金字塔（本体遗物 `RUNIC_PYRAMID`）：回合结束不再弃牌。</summary>
+    internal static Type? RunicPyramid => typeof(MegaCrit.Sts2.Core.Models.Relics.RunicPyramid);
+    /// <summary>音叉（本体遗物 `TUNING_FORK`）。</summary>
+    internal static Type? TuningFork => typeof(MegaCrit.Sts2.Core.Models.Relics.TuningFork);
+    /// <summary>布质果实（本体遗物 `LOOMING_FRUIT`，+31 最大生命 —— 她的血量要算上它）。</summary>
+    internal static Type? LoomingFruit => typeof(MegaCrit.Sts2.Core.Models.Relics.LoomingFruit);
+    /// <summary>坚固钳子（本体遗物 `STURDY_CLAMP`）。</summary>
+    internal static Type? SturdyClamp => typeof(MegaCrit.Sts2.Core.Models.Relics.SturdyClamp);
+
     /// <summary>
     /// **B 版（lamali）她此刻的姿态倍率**：1（无/平静）/ 2（愤怒）/ 3（神格）。
     ///
