@@ -318,7 +318,7 @@ public sealed class FoolDominionPower : PowerModel
 /// >   当回合伤害翻三倍）」
 ///
 /// ⇒ 三个 power 各管一段：
-///   · **本类（虔信）**：`Amount` = 每次给几层真言（支配给 3）；**玩家侧回合开始**时给持有者加真言，
+///   · **本类（虔信）**：`Amount` = 每次给几层真言（支配给 2）；**玩家侧回合开始**时给持有者加真言，
 ///     满 <see cref="Threshold"/> 就扣 10 并让他进神格；
 ///   · **<see cref="DominionMantraPower"/>（真言）**：就是那个层数/计数，界面上看得见进度；
 ///   · **<see cref="DominionDivinityPower"/>（神格）**：`ModifyDamageMultiplicative` 把他自己的
@@ -328,9 +328,10 @@ public sealed class FoolDominionPower : PowerModel
 ///   那边是观者 Boss 自己的真言 / 姿态 / 进神格加力量加能量；这边是**普通怪物**的仿制版，
 ///   持有者如果是我们自己的 `CharBossMonster`（她有自己的真神格）就**直接跳过**。
 ///
-/// 数值对账（3 层/回合、满 10 进神格）：第 4 回合（3+3+3+3=12，扣 10 剩 2）、
-/// 第 7 回合（2+3+3+3=11，扣 10 剩 1）、第 10 回合（1+3+3+3=10，扣 10 剩 0）—— 与用户说的
-/// 「第四回合、第七回合等回合会进神格」完全一致。
+/// 数值对账（**2 层/回合**、满 10 进神格，用户 2026-11-19 订正为 2）：
+/// 第 5 回合（2+2+2+2+2=10，扣 10 剩 0）、第 10 回合（又是 5 个回合各 2 ⇒ 10，扣 10 剩 0）、
+/// 第 15 回合……—— 与用户说的「怪物第 5、10、15 等回合会进神格」完全一致。
+/// （曾经按 3 层/回合做过一版，那时是第 4 / 7 / 10 回合；用户要求回调成 2 层。）
 /// </summary>
 public sealed class WatcherDominionDevotionPower : PowerModel
 {
@@ -345,7 +346,7 @@ public sealed class WatcherDominionDevotionPower : PowerModel
 
     public override PowerStackType StackType => PowerStackType.Counter;
 
-    /// <summary>层数不随人数放大：支配固定给 3 层，多一个人不该变成 12。</summary>
+    /// <summary>层数不随人数放大：支配固定给 2 层，多一个人不该变成 4。</summary>
     public override bool ShouldScaleInMultiplayer => false;
 
     public override bool ShouldPlayVfx => false;

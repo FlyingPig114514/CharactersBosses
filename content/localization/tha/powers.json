@@ -140,7 +140,7 @@
     "WATCHER_FAITH_POWER.title":  "ความศรัทธา",
     "WATCHER_FAITH_POWER.description":  "เมื่อเริ่มเทิร์นของศัตรูตัวนี้ ผู้เฝ้ามองจะได้รับ[gold]มนตรา[/gold] 3 ชั้น",
     "WATCHER_DOMINION_DEVOTION_POWER.title":  "ความศรัทธา",
-    "WATCHER_DOMINION_DEVOTION_POWER.description":  "เมื่อเริ่มเทิร์นของคุณ ศัตรูตัวนี้จะได้รับ[gold]มนตรา[/gold] 3 ชั้น\nเมื่อศัตรูตัวนี้มี[gold]มนตรา[/gold] 10 ชั้น จะใช้ 10 ชั้นและเข้าสู่[gold]สภาวะเทพ[/gold]: ในเทิร์นนั้นการโจมตีของมันสร้างความเสียหาย[gold]สามเท่า[/gold] และจะออกจากสภาวะเทพหลังจบการกระทำของมัน",
+    "WATCHER_DOMINION_DEVOTION_POWER.description":  "เมื่อเริ่มเทิร์นของคุณ ศัตรูตัวนี้จะได้รับ[gold]มนตรา[/gold] 2 ชั้น\nเมื่อศัตรูตัวนี้มี[gold]มนตรา[/gold] 10 ชั้น จะใช้ 10 ชั้นและเข้าสู่[gold]สภาวะเทพ[/gold]: ในเทิร์นนั้นการโจมตีของมันสร้างความเสียหาย[gold]สามเท่า[/gold] และจะออกจากสภาวะเทพหลังจบการกระทำของมัน",
     "DOMINION_MANTRA_POWER.title":  "มนตรา",
     "DOMINION_MANTRA_POWER.description":  "[gold]มนตรา[/gold] ที่ศัตรูตัวนี้สะสม เมื่อครบ 10 ชั้นจะใช้ 10 ชั้นและเข้าสู่สภาวะเทพในเทิร์นนั้น",
     "DOMINION_DIVINITY_POWER.title":  "สภาวะเทพ",

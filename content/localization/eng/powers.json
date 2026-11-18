@@ -140,7 +140,7 @@
     "WATCHER_FAITH_POWER.title":  "Devotion",
     "WATCHER_FAITH_POWER.description":  "At the start of this enemy\u0027s turn, the Watcher gains 3 [gold]Mantra[/gold].",
     "WATCHER_DOMINION_DEVOTION_POWER.title":  "Devotion",
-    "WATCHER_DOMINION_DEVOTION_POWER.description":  "At the start of your turn, this enemy gains 3 [gold]Mantra[/gold].\nWhen this enemy has 10 [gold]Mantra[/gold], it spends 10 and enters [gold]Divinity[/gold]: that turn its attacks deal [gold]triple[/gold] damage, and it leaves Divinity after its intent is executed.",
+    "WATCHER_DOMINION_DEVOTION_POWER.description":  "At the start of your turn, this enemy gains 2 [gold]Mantra[/gold].\nWhen this enemy has 10 [gold]Mantra[/gold], it spends 10 and enters [gold]Divinity[/gold]: that turn its attacks deal [gold]triple[/gold] damage, and it leaves Divinity after its intent is executed.",
     "DOMINION_MANTRA_POWER.title":  "Mantra",
     "DOMINION_MANTRA_POWER.description":  "The [gold]Mantra[/gold] this enemy has accumulated. At 10 [gold]Mantra[/gold] it spends 10 and enters Divinity for that turn.",
     "DOMINION_DIVINITY_POWER.title":  "Divinity",

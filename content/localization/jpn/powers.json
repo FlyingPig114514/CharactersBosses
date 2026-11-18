@@ -140,7 +140,7 @@
     "WATCHER_FAITH_POWER.title":  "帰依",
     "WATCHER_FAITH_POWER.description":  "この敵のターン開始時、観者は[gold]真言[/gold]を3獲得する。",
     "WATCHER_DOMINION_DEVOTION_POWER.title":  "帰依",
-    "WATCHER_DOMINION_DEVOTION_POWER.description":  "あなたのターン開始時、この敵は[gold]真言[/gold]を3獲得する。\nこの敵の[gold]真言[/gold]が10になると、10を消費して[gold]神格[/gold]に入る：そのターン、この敵の攻撃は[gold]3倍[/gold]のダメージを与え、意図を実行した後に神格を抜ける。",
+    "WATCHER_DOMINION_DEVOTION_POWER.description":  "あなたのターン開始時、この敵は[gold]真言[/gold]を2獲得する。\nこの敵の[gold]真言[/gold]が10になると、10を消費して[gold]神格[/gold]に入る：そのターン、この敵の攻撃は[gold]2倍[/gold]のダメージを与え、意図を実行した後に神格を抜ける。",
     "DOMINION_MANTRA_POWER.title":  "真言",
     "DOMINION_MANTRA_POWER.description":  "この敵が蓄積した[gold]真言[/gold]。10になると10を消費し、そのターンのあいだ神格に入る。",
     "DOMINION_DIVINITY_POWER.title":  "神格",

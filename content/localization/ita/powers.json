@@ -140,7 +140,7 @@
     "WATCHER_FAITH_POWER.title":  "Devozione",
     "WATCHER_FAITH_POWER.description":  "All\u0027inizio del turno di questo nemico, l\u0027Osservatrice ottiene 3 [gold]Mantra[/gold].",
     "WATCHER_DOMINION_DEVOTION_POWER.title":  "Devozione",
-    "WATCHER_DOMINION_DEVOTION_POWER.description":  "All\u0027inizio del tuo turno, questo nemico ottiene 3 [gold]Mantra[/gold].\nQuando questo nemico ha 10 [gold]Mantra[/gold], ne spende 10 ed entra in [gold]Divinità[/gold]: in quel turno i suoi attacchi infliggono [gold]il triplo[/gold] dei danni e esce dalla Divinità dopo aver eseguito la sua intenzione.",
+    "WATCHER_DOMINION_DEVOTION_POWER.description":  "All\u0027inizio del tuo turno, questo nemico ottiene 2 [gold]Mantra[/gold].\nQuando questo nemico ha 10 [gold]Mantra[/gold], ne spende 10 ed entra in [gold]Divinità[/gold]: in quel turno i suoi attacchi infliggono [gold]il triplo[/gold] dei danni e esce dalla Divinità dopo aver eseguito la sua intenzione.",
     "DOMINION_MANTRA_POWER.title":  "Mantra",
     "DOMINION_MANTRA_POWER.description":  "Il [gold]Mantra[/gold] accumulato da questo nemico. A 10 [gold]Mantra[/gold] ne spende 10 ed entra in Divinità per quel turno.",
     "DOMINION_DIVINITY_POWER.title":  "Divinità",

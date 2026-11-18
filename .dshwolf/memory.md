@@ -6190,3 +6190,12 @@ Chronological action log.
 | 2026-11-18 18:23 | edit | `src/Hooks/Powers/WatcherFaithPower.cs` | ok | 0 |
 | 2026-11-18 18:23 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
 | 2026-11-18 18:24 | edit | `src/Hooks/Patches/BossSpecialPowerIconPatch.cs` | ok | 0 |
+| 2026-11-18 18:43 | edit | `src/Hooks/Patches/TopBarBossIconFallbackPatch.cs` | ok | 0 |
+| 2026-11-18 18:43 | edit | `src/Hooks/Patches/BossMapPointCharacterIconPatch.cs` | ok | 0 |
+| 2026-11-18 18:43 | edit | `src/Hooks/Patches/BossMapPointCharacterIconPatch.cs` | ok | 0 |
+| 2026-11-18 18:43 | edit | `src/Hooks/Core/CharDominions.cs` | ok | 0 |
+| 2026-11-18 18:43 | edit | `src/Hooks/Core/CharDominions.cs` | ok | 0 |
+| 2026-11-18 18:43 | edit | `src/Hooks/Core/CharDominions.cs` | ok | 0 |
+| 2026-11-18 18:43 | edit | `src/Hooks/Powers/DominionPowers.cs` | ok | 0 |
+| 2026-11-18 18:44 | edit | `src/Hooks/Core/BuildInfo.cs` | error | 0 |
+| 2026-11-18 18:44 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |

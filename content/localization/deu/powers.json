@@ -140,7 +140,7 @@
     "WATCHER_FAITH_POWER.title":  "Hingabe",
     "WATCHER_FAITH_POWER.description":  "Zu Beginn des Zuges dieses Gegners erhält der Beobachter 3 [gold]Mantra[/gold].",
     "WATCHER_DOMINION_DEVOTION_POWER.title":  "Hingabe",
-    "WATCHER_DOMINION_DEVOTION_POWER.description":  "Zu Beginn deines Zuges erhält dieser Gegner 3 [gold]Mantra[/gold].\nHat dieser Gegner 10 [gold]Mantra[/gold], gibt er 10 aus und betritt die [gold]Göttlichkeit[/gold]: In diesem Zug verursachen seine Angriffe [gold]dreifachen[/gold] Schaden; nach dem Ausführen seiner Absicht verlässt er die Göttlichkeit.",
+    "WATCHER_DOMINION_DEVOTION_POWER.description":  "Zu Beginn deines Zuges erhält dieser Gegner 2 [gold]Mantra[/gold].\nHat dieser Gegner 10 [gold]Mantra[/gold], gibt er 10 aus und betritt die [gold]Göttlichkeit[/gold]: In diesem Zug verursachen seine Angriffe [gold]dreifachen[/gold] Schaden; nach dem Ausführen seiner Absicht verlässt er die Göttlichkeit.",
     "DOMINION_MANTRA_POWER.title":  "Mantra",
     "DOMINION_MANTRA_POWER.description":  "Das angesammelte [gold]Mantra[/gold] dieses Gegners. Bei 10 [gold]Mantra[/gold] gibt er 10 aus und betritt für diesen Zug die Göttlichkeit.",
     "DOMINION_DIVINITY_POWER.title":  "Göttlichkeit",

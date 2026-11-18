@@ -140,7 +140,7 @@
     "WATCHER_FAITH_POWER.title":  "Dewocja",
     "WATCHER_FAITH_POWER.description":  "Na początku tury tego wroga Obserwatorka zyskuje 3 [gold]Mantry[/gold].",
     "WATCHER_DOMINION_DEVOTION_POWER.title":  "Dewocja",
-    "WATCHER_DOMINION_DEVOTION_POWER.description":  "Na początku twojej tury ten wróg zyskuje 3 [gold]Mantry[/gold].\nGdy ten wróg ma 10 [gold]Mantry[/gold], wydaje 10 i wchodzi w [gold]Boskość[/gold]: w tej turze jego ataki zadają [gold]potrójne[/gold] obrażenia, a po wykonaniu swojej intencji wychodzi z Boskości.",
+    "WATCHER_DOMINION_DEVOTION_POWER.description":  "Na początku twojej tury ten wróg zyskuje 2 [gold]Mantry[/gold].\nGdy ten wróg ma 10 [gold]Mantry[/gold], wydaje 10 i wchodzi w [gold]Boskość[/gold]: w tej turze jego ataki zadają [gold]potrójne[/gold] obrażenia, a po wykonaniu swojej intencji wychodzi z Boskości.",
     "DOMINION_MANTRA_POWER.title":  "Mantra",
     "DOMINION_MANTRA_POWER.description":  "Zgromadzona [gold]Mantra[/gold] tego wroga. Przy 10 [gold]Mantry[/gold] wydaje 10 i wchodzi w Boskość na tę turę.",
     "DOMINION_DIVINITY_POWER.title":  "Boskość",

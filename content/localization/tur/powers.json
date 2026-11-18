@@ -140,7 +140,7 @@
     "WATCHER_FAITH_POWER.title":  "Bağlılık",
     "WATCHER_FAITH_POWER.description":  "Bu düşmanın turu başladığında Gözcü 3 [gold]Mantra[/gold] kazanır.",
     "WATCHER_DOMINION_DEVOTION_POWER.title":  "Bağlılık",
-    "WATCHER_DOMINION_DEVOTION_POWER.description":  "Turunun başında bu düşman 3 [gold]Mantra[/gold] kazanır.\nBu düşmanın 10 [gold]Mantra[/gold] olunca 10 harcar ve [gold]Kutsallık[/gold] duruşuna girer: o tur saldırıları [gold]üç kat[/gold] hasar verir ve niyetini uyguladıktan sonra Kutsallıktan çıkar.",
+    "WATCHER_DOMINION_DEVOTION_POWER.description":  "Turunun başında bu düşman 2 [gold]Mantra[/gold] kazanır.\nBu düşmanın 10 [gold]Mantra[/gold] olunca 10 harcar ve [gold]Kutsallık[/gold] duruşuna girer: o tur saldırıları [gold]üç kat[/gold] hasar verir ve niyetini uyguladıktan sonra Kutsallıktan çıkar.",
     "DOMINION_MANTRA_POWER.title":  "Mantra",
     "DOMINION_MANTRA_POWER.description":  "Bu düşmanın biriktirdiği [gold]Mantra[/gold]. 10 olunca 10 harcar ve o tur Kutsallık duruşuna girer.",
     "DOMINION_DIVINITY_POWER.title":  "Kutsallık",

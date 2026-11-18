@@ -217,20 +217,66 @@ public static class TopBarBossIconFallbackPatch
     /// <summary>
     /// 这个遭遇是哪只「角色 Boss」（我们的遭遇才会命中）——通过它的怪物 id 反查 <see cref="BossDefs"/>。
     /// 例如 <c>IRONCLAD_BOSS</c> → <c>Models.Characters.Ironclad</c>。
+    ///
+    /// ★ 2026-11-19（用户：「观者 boss 图标应该用她头像的剪影（对于没有专属头像的 boss 来说）」，
+    ///   实测截图里地图那颗还是**同族小队（TheKin）的乌鸦占位图**）：
+    ///   以前这里只有「按怪物 id 查 `BossDefs`」一条链，而**观者是别的模组的角色**：
+    ///     · 她的 `CharacterType` 初值是**愚者占位**（运行期才被 `RefreshWatcherCharacterType` 换掉），
+    ///       地图页这一刻通常还没换 ⇒ 这条链要么拿到愚者、要么直接 null；
+    ///     · 于是 <see cref="BossMapPointCharacterIconPatch"/> 里 `CharacterEmblem.Silhouette(null)`
+    ///       返回 null ⇒ 那位 patch 直接 return ⇒ 地图上留着原版占位图（乌鸦）。
+    ///   现在加一条**观者兜底**（和结算/历史图标那条 `OurEncounterIconPaths.WatcherCharacterFallback` 同一套判据）：
+    ///   遭遇 id 以 `WATCHER_` 开头就问 `WatcherModPresence.CharacterType()`，拿到真观者角色 ⇒
+    ///   地图徽章、顶栏、结算三处都会用**她头像的剪影**。
     /// </summary>
     internal static CharacterModel? CharacterFor(EncounterModel encounter)
     {
+        CharacterModel? viaDef = null;
         try
         {
             var monster = encounter?.AllPossibleMonsters?.FirstOrDefault();
-            if (monster == null) return null;
+            if (monster != null)
+            {
+                string key;
+                try { key = monster.Id.Entry; } catch { key = string.Empty; }
 
-            string key;
-            try { key = monster.Id.Entry; } catch { return null; }
+                if (!string.IsNullOrEmpty(key)
+                    && BossDefs.All.TryGetValue(key, out var def) && def?.CharacterType != null)
+                {
+                    // 愚者占位 = 「观者还没解析出来」⇒ 当成没解析到，交给下面的观者兜底
+                    // （宁可留着原版占位图，也不能把愚者的头像安到观者头上）
+                    if (def.CharacterType != BossDefs.PlaceholderCharacterType)
+                        viaDef = ModelDb.GetById<CharacterModel>(ModelDb.GetId(def.CharacterType));
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 顶栏 Boss 图标：按怪物 id 解析角色失败: " + e.Message);
+        }
 
-            if (!BossDefs.All.TryGetValue(key, out var def) || def?.CharacterType == null) return null;
-            return ModelDb.GetById<CharacterModel>(ModelDb.GetId(def.CharacterType));
+        if (viaDef != null) return viaDef;
+        return WatcherCharacterFor(encounter);
+    }
+
+    /// <summary>观者遭遇的角色兜底（`WATCHER_*` ⇒ 观者 mod 的角色；拿不准就返回 null）。</summary>
+    private static CharacterModel? WatcherCharacterFor(EncounterModel? encounter)
+    {
+#if STS2_111
+        try
+        {
+            string? entry = encounter?.Id.Entry;
+            if (string.IsNullOrEmpty(entry)) return null;
+            if (!entry!.StartsWith("WATCHER_", StringComparison.Ordinal)) return null;
+
+            var type = Core.WatcherModPresence.CharacterType() ?? BossDefs.Watcher?.CharacterType;
+            if (type == null) return null;
+            if (type == BossDefs.PlaceholderCharacterType) return null;
+            return ModelDb.GetById<CharacterModel>(ModelDb.GetId(type));
         }
         catch { return null; }
+#else
+        return null;
+#endif
     }
 }

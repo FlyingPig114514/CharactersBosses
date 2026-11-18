@@ -140,7 +140,7 @@
     "WATCHER_FAITH_POWER.title":  "虔信",
     "WATCHER_FAITH_POWER.description":  "这个敌人的回合开始时，观者获得 3 层[gold]真言[/gold]。",
     "WATCHER_DOMINION_DEVOTION_POWER.title":  "虔信",
-    "WATCHER_DOMINION_DEVOTION_POWER.description":  "你的回合开始时，这个敌人获得[gold]3[/gold]层真言。\n这个敌人的真言满[gold]10[/gold]层时，消耗10层并进入神格：该回合它的攻击造成[gold]三倍[/gold]伤害，执行完意图后退出神格。",
+    "WATCHER_DOMINION_DEVOTION_POWER.description":  "你的回合开始时，这个敌人获得[gold]2[/gold]层真言。\n这个敌人的真言满[gold]10[/gold]层时，消耗10层并进入神格：该回合它的攻击造成[gold]三倍[/gold]伤害，执行完意图后退出神格。",
     "DOMINION_MANTRA_POWER.title":  "真言",
     "DOMINION_MANTRA_POWER.description":  "这个敌人积累的真言。满[gold]10[/gold]层时消耗10层，并在那一回合进入神格。",
     "DOMINION_DIVINITY_POWER.title":  "神格",

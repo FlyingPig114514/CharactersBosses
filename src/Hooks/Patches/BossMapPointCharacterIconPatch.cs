@@ -118,7 +118,17 @@ internal static class BossMapPointCharacterIconPatch
 
             var character = TopBarBossIconFallbackPatch.CharacterFor(encounter);
             var emblem = CharacterEmblem.Silhouette(character);
-            if (emblem == null) return;
+            if (emblem == null)
+            {
+                // ★ 2026-11-19 诊断：用户实测「地图上还是原版乌鸦占位图」。这一行能直接看出
+                //   是「角色没解析出来」还是「解析到了但没有头像贴图」。
+                string cid;
+                try { cid = character?.Id.Entry ?? "null"; } catch { cid = "?"; }
+                if (_noEmblemLogs.Add(encounter.Id.Entry))
+                    Logger.Log($"[CharBoss] 地图徽章：{encounter.Id.Entry} 生成角色剪影失败" +
+                               $"（角色={cid}）⇒ 保持原版占位图");
+                return;
+            }
 
             image.Texture = emblem;
             image.StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered;
@@ -176,6 +186,9 @@ internal static class BossMapPointCharacterIconPatch
     }
 
     private static readonly HashSet<string> _pickLogs = new(StringComparer.Ordinal);
+
+    /// <summary>「剪影生成失败」每个遭遇只打一行（2026-11-19 诊断用）。</summary>
+    private static readonly HashSet<string> _noEmblemLogs = new(StringComparer.Ordinal);
 
     /// <summary>诊断：这颗节点被判成哪一格、遭遇是谁、是不是靠贴图判出来的（每组合只报一次）。</summary>
     private static bool PickedOnce(EncounterModel encounter, bool isSecond, bool byArt)

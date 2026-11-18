@@ -140,7 +140,7 @@
     "WATCHER_FAITH_POWER.title":  "Преданность",
     "WATCHER_FAITH_POWER.description":  "В начале хода этого врага Наблюдатель получает 3 [gold]мантры[/gold].",
     "WATCHER_DOMINION_DEVOTION_POWER.title":  "Преданность",
-    "WATCHER_DOMINION_DEVOTION_POWER.description":  "В начале вашего хода этот враг получает 3 [gold]мантры[/gold].\nКогда у этого врага 10 [gold]мантры[/gold], он тратит 10 и входит в [gold]Божественность[/gold]: в этот ход его атаки наносят [gold]тройной[/gold] урон, а после выполнения намерения он выходит из Божественности.",
+    "WATCHER_DOMINION_DEVOTION_POWER.description":  "В начале вашего хода этот враг получает 2 [gold]мантры[/gold].\nКогда у этого врага 10 [gold]мантры[/gold], он тратит 10 и входит в [gold]Божественность[/gold]: в этот ход его атаки наносят [gold]тройной[/gold] урон, а после выполнения намерения он выходит из Божественности.",
     "DOMINION_MANTRA_POWER.title":  "Мантра",
     "DOMINION_MANTRA_POWER.description":  "Накопленная [gold]мантра[/gold] этого врага. При 10 [gold]мантры[/gold] он тратит 10 и на этот ход входит в Божественность.",
     "DOMINION_DIVINITY_POWER.title":  "Божественность",

@@ -140,7 +140,7 @@
     "WATCHER_FAITH_POWER.title":  "Devoción",
     "WATCHER_FAITH_POWER.description":  "Al inicio del turno de este enemigo, la Observadora gana 3 de [gold]Mantra[/gold].",
     "WATCHER_DOMINION_DEVOTION_POWER.title":  "Devoción",
-    "WATCHER_DOMINION_DEVOTION_POWER.description":  "Al inicio de tu turno, este enemigo gana 3 de [gold]Mantra[/gold].\nCuando este enemigo tiene 10 de [gold]Mantra[/gold], gasta 10 y entra en [gold]Divinidad[/gold]: ese turno sus ataques infligen [gold]el triple[/gold] de daño, y sale de la Divinidad tras ejecutar su intención.",
+    "WATCHER_DOMINION_DEVOTION_POWER.description":  "Al inicio de tu turno, este enemigo gana 2 de [gold]Mantra[/gold].\nCuando este enemigo tiene 10 de [gold]Mantra[/gold], gasta 10 y entra en [gold]Divinidad[/gold]: ese turno sus ataques infligen [gold]el triple[/gold] de daño, y sale de la Divinidad tras ejecutar su intención.",
     "DOMINION_MANTRA_POWER.title":  "Mantra",
     "DOMINION_MANTRA_POWER.description":  "El [gold]Mantra[/gold] acumulado por este enemigo. Con 10 de [gold]Mantra[/gold] gasta 10 y entra en Divinidad durante ese turno.",
     "DOMINION_DIVINITY_POWER.title":  "Divinidad",

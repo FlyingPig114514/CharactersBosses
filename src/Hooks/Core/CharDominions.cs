@@ -359,8 +359,8 @@ public sealed class FoolDominion : MegaCrit.Sts2.Core.Models.Dread.DominionModel
 #if STS2_113
 
 /// <summary>
-/// **观者的支配**（用户 2026-11-15；2026-11-17 增强 2 → 3 层）：
-/// 恐惧模式下「**所有敌人**获得 **3** 层虔信」。
+/// **观者的支配**（用户 2026-11-15；2026-11-17 增强 2 → 3 层；2026-11-19 **回调成 2 层**）：
+/// 恐惧模式下「**所有敌人**获得 **2** 层虔信」。
 ///
 /// ★ v0.2.781（用户 2026-11-19 截图 + 订正）：以前错在**挂给玩家**了 ——
 ///   > 「观者的支配有 bug，并没有成功给予敌人 3 层虔信。并且按这个的实现方式，
@@ -376,13 +376,20 @@ public sealed class FoolDominion : MegaCrit.Sts2.Core.Models.Dread.DominionModel
 ///   >   这些敌人的虔信在**玩家回合开始时**触发，并且在进神格的当回合开始时不会退出神格，
 ///   >   **执行完自己的意图才会退神格**……（也就是怪物第四回合、第七回合等回合会进神格，
 ///   >   当回合伤害翻三倍）」
-/// ⇒ 3 层/回合 ⇒ 第 4 / 7 / 10 回合各进一次神格。**与神格观那条链完全隔离**，
+/// ⇒ 2 层/回合 ⇒ 第 5 / 10 / 15 回合各进一次神格。**与神格观那条链完全隔离**，
 ///   她身上不会挂这个（持有者是我们自己的 `CharBossMonster` 时直接跳过）。
 /// </summary>
 public sealed class WatcherDevotionDominion : MegaCrit.Sts2.Core.Models.Dread.DominionModel
 {
-    /// <summary>每个敌人获得的虔信层数（= 每次「玩家回合开始」它获得的真言层数）。</summary>
-    private const int FaithStacks = 3;
+    /// <summary>
+    /// 每个敌人获得的虔信层数（= 每次「玩家回合开始」它获得的真言层数）。
+    ///
+    /// ★ 2026-11-19（用户）：「回调观者的支配，改回给敌人 2 虔信（第 5、10、15 等回合进神格）」
+    ///   ⇒ 3 → **2**。对账：2/回合 ⇒ 第 1 回合 2、第 2 回合 4、第 3 回合 6、第 4 回合 8、
+    ///   第 5 回合 10（扣 10 进神格）、第 10 回合再满 10（2/回合正好 5 回合一轮）、第 15 回合……
+    ///   —— 与用户说的「第 5、10、15」一致。
+    /// </summary>
+    private const int FaithStacks = 2;
 
     public override async Task AfterRoomEntered(AbstractRoom room)
     {
