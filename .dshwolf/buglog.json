@@ -1584,6 +1584,13 @@
       "fix": "让房主把**结论**直接广播：`BossPicksMessage` 加 `Bosses`（`幕:场|KEY` 或 `幕:场|VANILLA`）与 `Caps`（客人观者实现身份），消息改成双向；`CharBossEncounters.ForVanillaBoss` 拆成薄壳 + `ForVanillaBossCore`，客人先问 `BossPicksSync.HostBossOf(幕,场)` —— `VANILLA` 就不替换、给 Key 就直接用、没收到才退回确定性规则；房主每次算完 `NoteHostBoss` 并重播（结论变化才发；新客人首次上报时强制清 `_lastSent` 重播一次）。**教训：跨机器「各自用同一套算法重算」永远不如「房主算一次、把结论广播出去」——前者要求所有输入完全一致，后者只需要一条消息到达。**",
       "file": "src/Hooks/Core/BossPicksSync.cs",
       "at": "2026-11-16T10:08:29.642Z"
+    },
+    {
+      "id": "bug-243-mwlg1imt",
+      "error_message": "她打「天眼」(WATCHER_THIRD_EYE) 时游戏直接崩溃，mod_log 停在 `Player … chose cards [...]` 之后、godot.log 无任何异常信息（进程级 StackOverflow）",
+      "fix": "绝不要在 Harmony 前缀里用 `MethodBase __originalMethod.Invoke(...)` 去调原方法再包 Task —— 反射拿到的入口仍是被 Harmony 替换过的，会无限递归杀进程。改成：前缀只做快照，**后缀**拿 `ref Task<T> __result` 包一层（原方法已经跑过，不重复调用）。v0.2.751 用这个写法重写了「迂回不自动返手」。",
+      "file": "src/Hooks/Powers/BossWeaveNoReturn.cs",
+      "at": "2026-11-18T01:29:39.221Z"
     }
   ]
 }
