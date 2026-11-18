@@ -147,5 +147,8 @@
     "BOSS_ESTABLISHMENT_POWER.title":  "Ugruntowanie",
     "BOSS_ESTABLISHMENT_POWER.description":  "Na koniec twojej tury każda zachowana karta w twojej ręce o koszcie niższym niż 2 zwiększa swój koszt o 1 do końca tej walki. Za każdą kartę, której koszt w ten sposób wzrośnie, Obserwatorka traci 1 Siły.",
     "BOSS_ESTABLISHMENT_POWER.description_dread":  "Na koniec twojej tury twoje zachowane karty zwiększają swój koszt o 1 do końca tej walki.",
-    "BOSS_OMNISCIENCE_POWER.title":  "Wszechwiedza",     "BOSS_OMNISCIENCE_POWER.description":  "Za każdym razem, gdy [gold]Przeczucie[/gold] się aktywuje, odrzuć losową kartę ze swojego stosu doboru.",     "BOSS_OMNISCIENCE_POWER.description_dread":  "Za każdym razem, gdy [gold]przewidujesz[/gold], odrzuć losową kartę ze swojego stosu doboru."
+    "BOSS_OMNISCIENCE_POWER.title":  "Wszechwiedza",     "BOSS_OMNISCIENCE_POWER.description":  "Za każdym razem, gdy [gold]Przeczucie[/gold] się aktywuje, odrzuć losową kartę ze swojego stosu doboru.",     "BOSS_OMNISCIENCE_POWER.description_dread":  "Za każdym razem, gdy [gold]przewidujesz[/gold], odrzuć losową kartę ze swojego stosu doboru.",
+"BOSS_TEMPERANCE_POWER.title": "Temperance",
+"BOSS_TEMPERANCE_POWER.description": "Whenever the Watcher plays 12 cards, she forcibly ends her own turn and she and her other allies gain 2 Strength.\nWarning: the Watcher starts her infinite loop on turn 12.",
+"BOSS_TEMPERANCE_POWER.description_dread": "Whenever the Watcher plays 12 cards, she forcibly ends her own turn and she and her other allies gain 2 Strength. In addition, [gold]Time Warp[/gold] counts your cards: every 12 cards you play, the Watcher forcibly ends your turn.\nWarning: the Watcher starts her infinite loop on turn 12."
 }

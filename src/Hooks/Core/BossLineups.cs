@@ -848,6 +848,59 @@ internal static class BossLineups
     /// （`WATCHER_FORESIGHT_BOSS_ENCOUNTER`），造怪时 `WatcherForesightBoss` 会把
     /// `SpawnVariantKey` / `PinnedVariantKey` 钉成 `WATCHER_FORESIGHT`；认不出就明确「不是预见观」。
     /// </summary>
+    /// <summary>
+    /// **三层 3 号「红蓝观」这套设计**（设计 Key `WATCHER_RUSHDOWN` = 猛虎下山，用户 2026-11-18）。
+    /// 与神格观 / Ω观同一个 `Def.Key` ⇒ 只能用「本场遭遇 / 钉死的变体 key」判定，
+    /// 认不出就明确「不是红蓝观」（别抢别人的特殊效果与说明框位置）。
+    /// </summary>
+    internal static bool WatcherRushdownActive() => Latched("WATCHER_RUSHDOWN", ComputeWatcherRushdown);
+
+    private static (bool Value, bool Decisive) ComputeWatcherRushdown()
+    {
+        try
+        {
+            string? entry = CurrentEncounterEntry();
+            if (!string.IsNullOrEmpty(entry))
+            {
+                if (entry == "WATCHER_RUSHDOWN_BOSS_ENCOUNTER") return (true, true);
+                if (entry == "WATCHER_DIVINITY_BOSS_ENCOUNTER"
+                    || entry == "WATCHER_OMEGA_BOSS_ENCOUNTER"
+                    || entry == "WATCHER_CREATE_BOSS_ENCOUNTER"
+                    || entry == "WATCHER_RETAIN_BOSS_ENCOUNTER"
+                    || entry == "WATCHER_FORESIGHT_BOSS_ENCOUNTER") return (false, true);
+            }
+        }
+        catch { /* 继续往下 */ }
+
+        try
+        {
+            var lineup = CurrentFightLineup();
+            if (lineup != null)
+            {
+                foreach (var k in lineup)
+                {
+                    if (k == "WATCHER_RUSHDOWN") return (true, true);
+                    if (k == "WATCHER_DIVINITY" || k == "WATCHER_OMEGA" || k == "WATCHER_CREATE"
+                        || k == "WATCHER_RETAIN" || k == "WATCHER_FORESIGHT") return (false, true);
+                }
+            }
+        }
+        catch { /* 继续 */ }
+        try
+        {
+            foreach (var c in MegaCrit.Sts2.Core.Combat.CombatManager.Instance?.DebugOnlyGetState()?.Enemies
+                                ?? (IEnumerable<MegaCrit.Sts2.Core.Entities.Creatures.Creature>)Array.Empty<MegaCrit.Sts2.Core.Entities.Creatures.Creature>())
+            {
+                if (c?.Monster is not Monsters.CharBossMonster boss) continue;
+                string? pinned = boss.PinnedVariantKey ?? boss.SpawnVariantKey;
+                if (string.Equals(pinned, "WATCHER_RUSHDOWN", StringComparison.Ordinal)) return (true, true);
+                if (!string.IsNullOrEmpty(pinned)) return (false, true);
+            }
+        }
+        catch { /* 忽略 */ }
+        return (false, true);   // 默认不是红蓝观
+    }
+
     internal static bool WatcherForesightActive() => Latched("WATCHER_FORESIGHT", ComputeWatcherForesight);
 
     private static (bool Value, bool Decisive) ComputeWatcherForesight()

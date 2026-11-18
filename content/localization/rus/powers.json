@@ -147,5 +147,8 @@
     "BOSS_ESTABLISHMENT_POWER.title":  "Утверждение",
     "BOSS_ESTABLISHMENT_POWER.description":  "В конце твоего хода стоимость каждой удерживаемой карты в твоей руке со стоимостью меньше 2 увеличивается на 1 до конца боя. За каждую такую карту Созерцающая теряет 1 силы.",
     "BOSS_ESTABLISHMENT_POWER.description_dread":  "В конце твоего хода стоимость удерживаемых тобой карт увеличивается на 1 до конца боя.",
-    "BOSS_OMNISCIENCE_POWER.title":  "Всеведение",     "BOSS_OMNISCIENCE_POWER.description":  "Каждый раз, когда срабатывает [gold]Предвидение[/gold], сбросьте случайную карту из колоды добора.",     "BOSS_OMNISCIENCE_POWER.description_dread":  "Каждый раз, когда вы [gold]провидите[/gold], сбросьте случайную карту из колоды добора."
+    "BOSS_OMNISCIENCE_POWER.title":  "Всеведение",     "BOSS_OMNISCIENCE_POWER.description":  "Каждый раз, когда срабатывает [gold]Предвидение[/gold], сбросьте случайную карту из колоды добора.",     "BOSS_OMNISCIENCE_POWER.description_dread":  "Каждый раз, когда вы [gold]провидите[/gold], сбросьте случайную карту из колоды добора.",
+"BOSS_TEMPERANCE_POWER.title": "Temperance",
+"BOSS_TEMPERANCE_POWER.description": "Whenever the Watcher plays 12 cards, she forcibly ends her own turn and she and her other allies gain 2 Strength.\nWarning: the Watcher starts her infinite loop on turn 12.",
+"BOSS_TEMPERANCE_POWER.description_dread": "Whenever the Watcher plays 12 cards, she forcibly ends her own turn and she and her other allies gain 2 Strength. In addition, [gold]Time Warp[/gold] counts your cards: every 12 cards you play, the Watcher forcibly ends your turn.\nWarning: the Watcher starts her infinite loop on turn 12."
 }

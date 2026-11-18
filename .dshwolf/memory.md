@@ -5993,3 +5993,9 @@ Chronological action log.
 | 2026-11-18 09:46 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/UI/BossSpecialTip.cs` | ok | 0 |
 | 2026-11-18 12:50 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherCards.cs` | ok | 0 |
 | 2026-11-18 12:51 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/boss-watcher-rushdown.md` | ok | 0 |
+| 2026-11-18 12:52 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherRushdownScript.cs` | ok | 0 |
+| 2026-11-18 12:53 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherCards.cs` | ok | 0 |
+| 2026-11-18 12:53 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherRushdownScript.cs` | ok | 0 |
+| 2026-11-18 12:53 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossScript.cs` | ok | 0 |
+| 2026-11-18 12:54 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Powers/BossTemperancePower.cs` | ok | 0 |
+| 2026-11-18 12:57 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Powers/BossTemperancePower.cs` | error | 0 |

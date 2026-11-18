@@ -97,6 +97,8 @@ internal static class BossKeys
         new("WATCHER_RETAIN",            6, 1, 2, typeof(WatcherRetainBoss)),
         // 一层 1 号：**预见观**（用户 2026-11-17）—— 预见/先见之明流 + 特殊效果「通晓万物」
         new("WATCHER_FORESIGHT",         6, 0, 1, typeof(WatcherForesightBoss)),
+        // 三层 3 号：**红蓝观**（用户 2026-11-18）—— 红蓝姿态无限流 + 特殊效果「节制」。
+        new("WATCHER_RUSHDOWN",          6, 2, 3, typeof(WatcherRushdownBoss)),
 #endif
     };
 
@@ -233,6 +235,7 @@ internal static class BossKeys
     ["WATCHER_OMEGA"] = "Ω观",        // 三层 2 号（观者 mod，用户 2026-11-16）
     ["WATCHER_CREATE"] = "印牌观",      // 二层 1 号（观者 mod，用户 2026-11-16）
     ["WATCHER_RETAIN"] = "保留观",      // 二层 2 号（观者 mod，用户 2026-11-17）
+        ["WATCHER_RUSHDOWN"] = "红蓝观",   // 三层 3 号（观者 mod，用户 2026-11-18）
     ["WATCHER_FORESIGHT"] = "预见观",   // 一层 1 号（观者 mod，用户 2026-11-17）
 #endif
 #endif
@@ -406,6 +409,7 @@ internal static class BossKeys
             case "WATCHER_DIVINITY": return ModelDb.Encounter<WatcherDivinityBossEncounter>();
             case "WATCHER_OMEGA": return ModelDb.Encounter<WatcherOmegaBossEncounter>();
             case "WATCHER_CREATE": return ModelDb.Encounter<WatcherCreateBossEncounter>();
+            case "WATCHER_RUSHDOWN": return ModelDb.Encounter<WatcherRushdownBossEncounter>();
             case "WATCHER_RETAIN": return ModelDb.Encounter<WatcherRetainBossEncounter>();
             case "WATCHER_FORESIGHT": return ModelDb.Encounter<WatcherForesightBossEncounter>();
 #endif

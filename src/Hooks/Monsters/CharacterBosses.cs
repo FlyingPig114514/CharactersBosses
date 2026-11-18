@@ -136,4 +136,22 @@ public sealed class WatcherForesightBoss : WatcherBoss
 
     public override string? PinnedVariantKey => "WATCHER_FORESIGHT";
 }
+
+/// <summary>
+/// **三层 3 号「红蓝观」**（设计 Key <c>WATCHER_RUSHDOWN</c> = 猛虎下山，用户 2026-11-18）。
+///
+/// 同一个观者角色的**第六套设计** ⇒ 走 `BossDefs.Watcher` 的 `ExtraVariants[2]`（第三幕）。
+/// 剧本 `WatcherRushdownScript`（11 回合 + 第 12 回合起无限）、
+/// 遗物 至纯之水 / 涅奥的祝福 / 泪滴吊坠盒 / 符文金字塔 / 音叉 / 布质果实 / 坚固钳子、
+/// 特殊效果「节制」（`Powers.BossTemperancePower`）。
+/// 控制台：`fight WATCHER_RUSHDOWN_BOSS_ENCOUNTER`。
+/// </summary>
+public sealed class WatcherRushdownBoss : WatcherBoss
+{
+    public WatcherRushdownBoss() { SpawnVariantKey = "WATCHER_RUSHDOWN"; }
+
+    public override int? TierAct => 2;      // 三层
+
+    public override string? PinnedVariantKey => "WATCHER_RUSHDOWN";
+}
 #endif

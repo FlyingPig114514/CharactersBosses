@@ -178,6 +178,25 @@ public class WatcherRetainBossEncounter : CharBossEncounterBase<WatcherRetainBos
 }
 
 /// <summary>调试用的「普通战斗」版：一层 1 号「预见观」。</summary>
+/// <summary>调试用的「普通战斗」版：三层 3 号「红蓝观」。</summary>
+public sealed class WatcherRushdownBossNormalEncounter : WatcherRushdownBossEncounter
+{
+    public override RoomType RoomType => RoomType.Monster;
+}
+
+/// <summary>
+/// **三层 3 号「红蓝观」**（设计 Key `WATCHER_RUSHDOWN` = 猛虎下山，用户 2026-11-18）：
+/// 观者角色 + 红蓝姿态无限流 + 特殊效果「节制」（`Powers.BossTemperancePower`）。
+/// 控制台：`fight WATCHER_RUSHDOWN_BOSS_ENCOUNTER`。
+///
+/// 地图图标：**先走剪影占位** —— 用户指定的 `watcher_wrath`（一代愤怒观）图已从崩坠 jar 取出，
+/// 但还没打进 PCK（见 `tools/art/downfall/watcher_wrath*.png`）⇒ 等打进后再覆写 `BossNodePath`。
+/// </summary>
+public class WatcherRushdownBossEncounter : CharBossEncounterBase<WatcherRushdownBoss>
+{
+    public override int? TierAct => 2;      // 三层
+}
+
 public sealed class WatcherForesightBossNormalEncounter : WatcherForesightBossEncounter
 {
     public override RoomType RoomType => RoomType.Monster;
@@ -619,6 +638,7 @@ public static class CharBossEncounters
         ModelDb.Encounter<WatcherCreateBossEncounter>(),                // 二层 1 号：印牌观（用户 2026-11-16）
         ModelDb.Encounter<WatcherRetainBossEncounter>(),                // 二层 2 号：保留观（用户 2026-11-17）
         ModelDb.Encounter<WatcherForesightBossEncounter>(),             // 一层 1 号：预见观（用户 2026-11-17）
+        ModelDb.Encounter<WatcherRushdownBossEncounter>(),              // 三层 3 号：红蓝观（用户 2026-11-18）
 #endif
     });
 
@@ -660,6 +680,7 @@ public static class CharBossEncounters
 #endif
             // 观者（角色下标 6）：她的每套设计各自一幕 ⇒ 二层＝印牌观、三层＝神格观（主）/Ω观（变体）
             Add(6, 0, ModelDb.Encounter<WatcherForesightBossEncounter>());        // 一层 1 号 预见观（用户 2026-11-17）
+            Add(6, 2, ModelDb.Encounter<WatcherRushdownBossEncounter>());         // 三层 3 号 红蓝观（用户 2026-11-18）
             Add(6, 1, ModelDb.Encounter<WatcherCreateBossEncounter>());           // 二层 1 号 印牌观（用户 2026-11-16）
             Add(6, 2, ModelDb.Encounter<WatcherDivinityBossEncounter>());        // 三层 1 号 神格观
 #endif

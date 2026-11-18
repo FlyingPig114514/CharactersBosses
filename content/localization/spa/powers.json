@@ -147,5 +147,8 @@
     "BOSS_ESTABLISHMENT_POWER.title":  "Establecimiento",
     "BOSS_ESTABLISHMENT_POWER.description":  "Al final de tu turno, cada carta retenida en tu mano con un coste inferior a 2 aumenta su coste en 1 durante el resto del combate. Por cada carta cuyo coste aumente así, la Vigilante pierde 1 de Fuerza.",
     "BOSS_ESTABLISHMENT_POWER.description_dread":  "Al final de tu turno, tus cartas retenidas aumentan su coste en 1 durante el resto del combate.",
-    "BOSS_OMNISCIENCE_POWER.title":  "Omnisciencia",     "BOSS_OMNISCIENCE_POWER.description":  "Siempre que se active [gold]Previsión[/gold], descartas una carta aleatoria de tu pila de robo.",     "BOSS_OMNISCIENCE_POWER.description_dread":  "Siempre que [gold]presagies[/gold], descartas una carta aleatoria de tu pila de robo."
+    "BOSS_OMNISCIENCE_POWER.title":  "Omnisciencia",     "BOSS_OMNISCIENCE_POWER.description":  "Siempre que se active [gold]Previsión[/gold], descartas una carta aleatoria de tu pila de robo.",     "BOSS_OMNISCIENCE_POWER.description_dread":  "Siempre que [gold]presagies[/gold], descartas una carta aleatoria de tu pila de robo.",
+"BOSS_TEMPERANCE_POWER.title": "Temperance",
+"BOSS_TEMPERANCE_POWER.description": "Whenever the Watcher plays 12 cards, she forcibly ends her own turn and she and her other allies gain 2 Strength.\nWarning: the Watcher starts her infinite loop on turn 12.",
+"BOSS_TEMPERANCE_POWER.description_dread": "Whenever the Watcher plays 12 cards, she forcibly ends her own turn and she and her other allies gain 2 Strength. In addition, [gold]Time Warp[/gold] counts your cards: every 12 cards you play, the Watcher forcibly ends your turn.\nWarning: the Watcher starts her infinite loop on turn 12."
 }

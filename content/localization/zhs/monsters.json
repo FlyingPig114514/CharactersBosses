@@ -215,5 +215,10 @@
     "WATCHER_RETAIN_BOSS.moves.CHARBOSS_PLAY.title":  "出牌",
     "WATCHER_RETAIN_BOSS.establishment":  "在你的回合结束时，若你有耗能小于2的牌被保留，其在本场战斗中的耗能增加1。每有一张卡牌的耗能被增加，观者就失去1点力量。",
     "WATCHER_RETAIN_BOSS.establishment_dread":  "在你的回合结束时，你保留的牌在本场战斗中的耗能增加1。",
-    "WATCHER_FORESIGHT_BOSS.name":  "预见观",     "WATCHER_FORESIGHT_BOSS.title":  "预见观",     "WATCHER_FORESIGHT_BOSS.moves.CHARBOSS_PLAY.title":  "出牌",     "WATCHER_FORESIGHT_BOSS.omniscience":  "每当你触发[gold]先见之明[/gold]时，将你抽牌堆中的一张随机牌丢弃。",     "WATCHER_FORESIGHT_BOSS.omniscience_dread":  "每当你[gold]预见[/gold]时，将你抽牌堆中的一张随机牌丢弃。"
+    "WATCHER_FORESIGHT_BOSS.name":  "预见观",     "WATCHER_FORESIGHT_BOSS.title":  "预见观",     "WATCHER_FORESIGHT_BOSS.moves.CHARBOSS_PLAY.title":  "出牌",     "WATCHER_FORESIGHT_BOSS.omniscience":  "每当你触发[gold]先见之明[/gold]时，将你抽牌堆中的一张随机牌丢弃。",     "WATCHER_FORESIGHT_BOSS.omniscience_dread":  "每当你[gold]预见[/gold]时，将你抽牌堆中的一张随机牌丢弃。",
+"WATCHER_RUSHDOWN_BOSS.name": "红蓝观",
+"WATCHER_RUSHDOWN_BOSS.title": "红蓝观",
+"WATCHER_RUSHDOWN_BOSS.moves.CHARBOSS_PLAY.title": "出牌",
+"WATCHER_RUSHDOWN_BOSS.temperance": "每当观者打出 12 张牌，她就会强制结束自己的回合并使她和她的其他友方获得 2 点力量。\n警告：观者会在第12回合开始无限。",
+"WATCHER_RUSHDOWN_BOSS.temperance_dread": "每当观者打出 12 张牌，她就会强制结束自己的回合并使她和她的其他友方获得 2 点力量。此外，[gold]时间扭曲[/gold]会记录你的出牌：你每打出 12 张牌，观者就会强制结束你的回合。\n警告：观者会在第12回合开始无限。"
 }

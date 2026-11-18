@@ -116,5 +116,7 @@
     "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "Cada carta gerada por {character} foi reescrita por [gold]A Observadora[/gold] como uma arma contra ele.",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "A Observadora",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "[gold]A Observadora[/gold] segurou a mão de {character}, carta por carta, até o fim.",
-    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "A Observadora",     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "{character} foi esmagado pela [gold]Onisciência[/gold] de [gold]A Observadora[/gold]."
+    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "A Observadora",     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "{character} foi esmagado pela [gold]Onisciência[/gold] de [gold]A Observadora[/gold].",
+"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.title": "Watcher",
+"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} was flattened by the Watcher's red and blue palms."
 }

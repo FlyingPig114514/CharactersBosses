@@ -215,5 +215,10 @@
     "WATCHER_RETAIN_BOSS.moves.CHARBOSS_PLAY.title":  "Zagraj",
     "WATCHER_RETAIN_BOSS.establishment":  "Na koniec twojej tury każda zachowana karta w twojej ręce o koszcie niższym niż 2 zwiększa swój koszt o 1 do końca tej walki. Za każdą kartę, której koszt w ten sposób wzrośnie, Obserwatorka traci 1 Siły.",
     "WATCHER_RETAIN_BOSS.establishment_dread":  "Na koniec twojej tury twoje zachowane karty zwiększają swój koszt o 1 do końca tej walki.",
-    "WATCHER_FORESIGHT_BOSS.name":  "Obserwator Przeczucia",     "WATCHER_FORESIGHT_BOSS.title":  "Obserwator Przeczucia",     "WATCHER_FORESIGHT_BOSS.moves.CHARBOSS_PLAY.title":  "Zagraj",     "WATCHER_FORESIGHT_BOSS.omniscience":  "Za każdym razem, gdy [gold]Przeczucie[/gold] się aktywuje, odrzuć losową kartę ze swojego stosu doboru.",     "WATCHER_FORESIGHT_BOSS.omniscience_dread":  "Za każdym razem, gdy [gold]przewidujesz[/gold], odrzuć losową kartę ze swojego stosu doboru."
+    "WATCHER_FORESIGHT_BOSS.name":  "Obserwator Przeczucia",     "WATCHER_FORESIGHT_BOSS.title":  "Obserwator Przeczucia",     "WATCHER_FORESIGHT_BOSS.moves.CHARBOSS_PLAY.title":  "Zagraj",     "WATCHER_FORESIGHT_BOSS.omniscience":  "Za każdym razem, gdy [gold]Przeczucie[/gold] się aktywuje, odrzuć losową kartę ze swojego stosu doboru.",     "WATCHER_FORESIGHT_BOSS.omniscience_dread":  "Za każdym razem, gdy [gold]przewidujesz[/gold], odrzuć losową kartę ze swojego stosu doboru.",
+"WATCHER_RUSHDOWN_BOSS.name": "Red-Blue Watcher",
+"WATCHER_RUSHDOWN_BOSS.title": "Red-Blue Watcher",
+"WATCHER_RUSHDOWN_BOSS.moves.CHARBOSS_PLAY.title": "Play",
+"WATCHER_RUSHDOWN_BOSS.temperance": "Whenever the Watcher plays 12 cards, she forcibly ends her own turn and she and her other allies gain 2 Strength.\nWarning: the Watcher starts her infinite loop on turn 12.",
+"WATCHER_RUSHDOWN_BOSS.temperance_dread": "Whenever the Watcher plays 12 cards, she forcibly ends her own turn and she and her other allies gain 2 Strength. In addition, [gold]Time Warp[/gold] counts your cards: every 12 cards you play, the Watcher forcibly ends your turn.\nWarning: the Watcher starts her infinite loop on turn 12."
 }

@@ -116,5 +116,7 @@
     "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character}이(가) 생성한 모든 카드는 [gold]와쳐[/gold]에 의해 자신을 치는 무기로 다시 쓰였다.",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "와쳐",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "{character}의 패는 [gold]와쳐[/gold]에게 한 장씩 붙잡힌 채 끝을 맞았다.",
-    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "와쳐",     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "{character}은(는) [gold]와쳐[/gold]의 [gold]전지[/gold]에 짓밟혔다."
+    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "와쳐",     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "{character}은(는) [gold]와쳐[/gold]의 [gold]전지[/gold]에 짓밟혔다.",
+"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.title": "Watcher",
+"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} was flattened by the Watcher's red and blue palms."
 }

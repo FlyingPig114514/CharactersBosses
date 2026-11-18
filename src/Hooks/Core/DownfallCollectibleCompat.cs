@@ -858,6 +858,12 @@ public static class DownfallCollectibleCompat
                     upgraded = false;
                     Logger.Log("[CharBoss] 收藏家藏品：预见观 → 通晓万物");
                     return cardType != null;
+                // 三层 3 号 红蓝观（用户 2026-11-18）：藏品 = **腾越**（和 Ω观落在同一格 ⇒ 必须按变体 key 点名）
+                case "WATCHER_RUSHDOWN":
+                    cardType = Core.WatcherCards.Vault;
+                    upgraded = false;
+                    Logger.Log("[CharBoss] 收藏家藏品：红蓝观 → 腾越");
+                    return cardType != null;
 #endif
                 case "SILENT_SNAKEBITE":     // 一层 蛇咬猎（用户 2026-11-11：藏品 = 群蛇形态）
                     // 她和同层「奇巧猎」落在同一格（掉落表按「角色 + 幕」索引 ⇒ 会掉余像）⇒ 必须点名。

@@ -1244,6 +1244,26 @@ public static class BossDefs
                     BlocksVanillaDraw = true,
                     // 进阶 8 / 9 的升级写在剧本里（如水、心灵堡垒；第 6、11 回合的点穴）
                 },
+                // ★ v0.2.757（用户 2026-11-18）：**三层 3 号「红蓝观」**（设计 Key `WATCHER_RUSHDOWN` = 猛虎下山）。
+                //   剧本 11 回合 + 第 12 回合起无限（`WatcherRushdownScript`）；遗物 至纯之水 / 涅奥的祝福 /
+                //   泪滴吊坠盒 / 符文金字塔 / 音叉 / 布质果实 / 坚固钳子（布质果实 +31 最大生命 ⇒ 沿用主定义的 103）；
+                //   特殊效果「节制」：每打出 12 张牌强制结束自己的回合并给她与友方 +2 力量。
+                new BossVariant
+                {
+                    Key = "WATCHER_RUSHDOWN",
+                    Enabled = Core.BossLineups.WatcherRushdownActive,
+                    Deck = WatcherRushdownScript.Deck(),
+                    Relics = WatcherRushdownScript.Relics(),
+                    Script = WatcherRushdownScript.Build(),
+                    SpecialLoc = "WATCHER_RUSHDOWN_BOSS.temperance",
+                    SpecialLocDread = "WATCHER_RUSHDOWN_BOSS.temperance_dread",
+                    SpecialPower = typeof(Powers.BossTemperancePower),
+                    SpecialPowerDread = typeof(Powers.BossTemperancePower),
+                    // 布质果实已经在遗物里 ⇒ 血量沿用主定义（观者 72 + 布质果实 31 = 103）
+                    HpBonus = 0,
+                    BlocksVanillaDraw = true,
+                    DreadUpgrades = WatcherRushdownScript.DreadUpgradeTypes(),
+                },
             },
         }
     };

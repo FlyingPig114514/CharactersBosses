@@ -147,5 +147,8 @@
     "BOSS_ESTABLISHMENT_POWER.title":  "Tesis",
     "BOSS_ESTABLISHMENT_POWER.description":  "Sıranın sonunda, elinde maliyeti 2'nin altında olan saklanan her kartın maliyeti bu dövüş boyunca 1 artar. Maliyeti bu şekilde artan her kart için Gözlemci 1 Güç kaybeder.",
     "BOSS_ESTABLISHMENT_POWER.description_dread":  "Sıranın sonunda, sakladığın kartların maliyeti bu dövüş boyunca 1 artar.",
-    "BOSS_OMNISCIENCE_POWER.title":  "Herşeyi Bilme",     "BOSS_OMNISCIENCE_POWER.description":  "[gold]Öngörü[/gold] tetiklendiğinde çekme destenden rastgele bir kart at.",     "BOSS_OMNISCIENCE_POWER.description_dread":  "Her [gold]sezdiğinde[/gold] çekme destenden rastgele bir kart at."
+    "BOSS_OMNISCIENCE_POWER.title":  "Herşeyi Bilme",     "BOSS_OMNISCIENCE_POWER.description":  "[gold]Öngörü[/gold] tetiklendiğinde çekme destenden rastgele bir kart at.",     "BOSS_OMNISCIENCE_POWER.description_dread":  "Her [gold]sezdiğinde[/gold] çekme destenden rastgele bir kart at.",
+"BOSS_TEMPERANCE_POWER.title": "Temperance",
+"BOSS_TEMPERANCE_POWER.description": "Whenever the Watcher plays 12 cards, she forcibly ends her own turn and she and her other allies gain 2 Strength.\nWarning: the Watcher starts her infinite loop on turn 12.",
+"BOSS_TEMPERANCE_POWER.description_dread": "Whenever the Watcher plays 12 cards, she forcibly ends her own turn and she and her other allies gain 2 Strength. In addition, [gold]Time Warp[/gold] counts your cards: every 12 cards you play, the Watcher forcibly ends your turn.\nWarning: the Watcher starts her infinite loop on turn 12."
 }

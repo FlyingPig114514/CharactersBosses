@@ -147,5 +147,8 @@
     "BOSS_ESTABLISHMENT_POWER.title":  "確立",
     "BOSS_ESTABLISHMENT_POWER.description":  "あなたのターン終了時、手札のコストが2未満の保留されたカードのコストをこの戦闘中1増やす。コストが増えたカード1枚につき、ウォッチャーは筋力を1失う。",
     "BOSS_ESTABLISHMENT_POWER.description_dread":  "あなたのターン終了時、あなたが保留したカードのコストをこの戦闘中1増やす。",
-    "BOSS_OMNISCIENCE_POWER.title":  "全知",     "BOSS_OMNISCIENCE_POWER.description":  "[gold]先見の明[/gold]が発動するたび、山札からランダムなカード1枚を捨てる。",     "BOSS_OMNISCIENCE_POWER.description_dread":  "あなたが[gold]予見[/gold]するたび、山札からランダムなカード1枚を捨てる。"
+    "BOSS_OMNISCIENCE_POWER.title":  "全知",     "BOSS_OMNISCIENCE_POWER.description":  "[gold]先見の明[/gold]が発動するたび、山札からランダムなカード1枚を捨てる。",     "BOSS_OMNISCIENCE_POWER.description_dread":  "あなたが[gold]予見[/gold]するたび、山札からランダムなカード1枚を捨てる。",
+"BOSS_TEMPERANCE_POWER.title": "Temperance",
+"BOSS_TEMPERANCE_POWER.description": "Whenever the Watcher plays 12 cards, she forcibly ends her own turn and she and her other allies gain 2 Strength.\nWarning: the Watcher starts her infinite loop on turn 12.",
+"BOSS_TEMPERANCE_POWER.description_dread": "Whenever the Watcher plays 12 cards, she forcibly ends her own turn and she and her other allies gain 2 Strength. In addition, [gold]Time Warp[/gold] counts your cards: every 12 cards you play, the Watcher forcibly ends your turn.\nWarning: the Watcher starts her infinite loop on turn 12."
 }
