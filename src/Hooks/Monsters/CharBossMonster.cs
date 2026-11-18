@@ -2015,7 +2015,9 @@ public abstract partial class CharBossMonster : MonsterModel
             //   现在不管它在哪个堆都找出来：先记段数（后面几回合的剧本牌要用），再亮给玩家看。
             try { NoteWatcherConjuredBlade(play.Card); } catch (Exception e) { Logger.Log("[CharBoss] 灭除之刃展示失败: " + e.Message); }
             // Ω观：打完「阿尔法」/「贝塔」⇒ 把生成的贝塔 / 欧米伽用原版预览界面亮一下（用户 2026-11-16）
-            try { Core.WatcherOmegaMechanics.NoteGeneratedAsync(this, play.Card); } catch { /* 纯展示 */ }
+                        try { Core.WatcherOmegaMechanics.NoteGeneratedAsync(this, play.Card); } catch { /* 纯展示 */ }
+            // ★ v0.2.764（用户 2026-11-18）：「净化+」打完就把它点名的那些牌**真的消耗掉**。
+            try { Core.BossPurify.Handle(this, play.Card); } catch { /* 纯记账 */ }
 #endif
             try { Patches.StrayBossCardQueuePatch.Reap(); } catch { /* 忽略 */ }
         }
