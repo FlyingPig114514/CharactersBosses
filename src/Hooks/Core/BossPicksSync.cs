@@ -101,6 +101,64 @@ internal static class BossPicksSync
     /// </summary>
     internal static int? HostPlayersPerFight { get; private set; }
 
+    /// <summary>每个对端最后说话的时刻（活着吗）。v0.2.797。</summary>
+    private static readonly Dictionary<ulong, DateTime> _lastHeard = new();
+
+    /// <summary>记一笔「这个对端刚说过话」（任何一条 BossPicksMessage 都算）。</summary>
+    internal static void NoteHeard(ulong senderId)
+    {
+        try { if (senderId != 0) _lastHeard[senderId] = DateTime.UtcNow; } catch { /* 忽略 */ }
+    }
+
+    /// <summary>
+    /// **真正还在场的玩家数**（v0.2.797，用户 2026-11-19：中途有人离开游戏后，Boss 房变成 4v4，
+    /// 多出来那只面对一个没人操控的角色 ⇒ 剩下的人结束不了回合）。
+    ///
+    /// 规则：`RunState.Players` 里逐个看 —— 本机自己算 1；其它玩家要求**最近 30 秒内说过话**
+    /// （`BossPicksMessage` 每秒心跳，房主广播 / 客人上报都会走到 <see cref="NoteHeard"/>）。
+    /// 从未听到过任何对端时（开局第一次 / 刚装上本模组）**不做判断**，原样返回 <paramref name="fallback"/>，
+    /// 免得开局把 4 人算成 1 人。
+    /// </summary>
+    internal static int LivePlayerCount(int fallback)
+    {
+        try
+        {
+            var run = MegaCrit.Sts2.Core.Runs.RunManager.Instance?.DebugOnlyGetState();
+            var players = run?.Players;
+            if (players == null || players.Count == 0) return fallback;
+            if (_lastHeard.Count == 0) return fallback;      // 还什么消息都没收到 ⇒ 不猜
+
+            MegaCrit.Sts2.Core.Entities.Players.Player? me = null;
+            try { me = MegaCrit.Sts2.Core.Context.LocalContext.GetMe((MegaCrit.Sts2.Core.Runs.IPlayerCollection?)run); } catch { me = null; }
+
+            var now = DateTime.UtcNow;
+            int live = 0;
+            foreach (var p in players)
+            {
+                if (p == null) continue;
+
+                bool self = false;
+                try { self = me != null && ReferenceEquals(p, me); } catch { self = false; }
+                if (self) { live++; continue; }
+
+                ulong id = 0;
+                try { id = p.NetId; } catch { id = 0; }
+                if (id == 0) { live++; continue; }           // 拿不到 NetId ⇒ 不敢剔除
+
+                if (_lastHeard.TryGetValue(id, out var when) && (now - when).TotalSeconds <= 30) live++;
+            }
+
+            if (live <= 0) return fallback;
+            if (live != players.Count && _logSparse++ < 20)
+                Logger.Log($"[CharBoss] 阵容人数：RunState 有 {players.Count} 人，但只有 {live} 人还在说话" +
+                           "（其余已离开 / 掉线）⇒ 这一场按 " + live + " 只 Boss 出场（避免 4v4 里多一只面对空位）");
+            return live;
+        }
+        catch { return fallback; }
+    }
+
+    private static int _logSparse;
+
     /// <summary>房主的 A4 子项「进阶 10 第三幕一场原本一场角色」。</summary>
     internal static bool? HostAsc10Act3OneEach { get; private set; }
 
@@ -531,6 +589,7 @@ internal static class BossPicksSync
     {
         try
         {
+            NoteHeard(senderId);        // ★ v0.2.797：记活着的对端（阵容人数要用）
             if (NetRole.Type == MegaCrit.Sts2.Core.Multiplayer.Game.NetGameType.Client)
             {
                 ApplyFromHost(payload, settings, bosses, senderId);

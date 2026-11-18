@@ -1954,6 +1954,23 @@ internal static class BossLineups
 
         int n = 0;
         try { n = MultiBossPlan.RunStateOrNull()?.Players?.Count ?? 0; } catch { n = 0; }
+
+        // ★ v0.2.797（用户 2026-11-19：「中途有人离开游戏后，Boss 房变成 4v4，
+        //   多出来那只面对一个没人操控的角色 ⇒ 剩下的人结束不了回合」）：
+        //   `RunState.Players` 会把**已经离开/掉线的人**留在里面 ⇒ 我们照着造了 4 只 Boss。
+        //   ⇒ **房主端**按「最近 30 秒内说过话」重新数（`BossPicksSync.LivePlayerCount`），
+        //   客人端仍然只认房主广播的人数（下面那一段），两端一起就是 3v3。
+        //   单人 / 还什么消息都没收到 / 全都活着 ⇒ 与以前完全一致。
+        try
+        {
+            if (!Core.NetRole.IsGuest && n > 1)
+            {
+                int live = Core.BossPicksSync.LivePlayerCount(n);
+                if (live > 0 && live < n) n = live;
+            }
+        }
+        catch { /* 忽略：算不出来就用原值 */ }
+
         if (n > 0)
         {
             _lastKnownPlayers = n;
