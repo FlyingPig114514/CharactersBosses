@@ -58,6 +58,15 @@ public static class TopBarBossIconFallbackPatch
             var enc = onlySecond ? act.SecondBossEncounter : act.BossEncounter;
             if (enc == null) return;
 
+            // ★ v0.2.796（用户 2026-11-19：「客机一层最上方那一栏 boss 会显示为原版 boss」）：
+            //   客人端 `Act.BossEncounter` 槽位还是**原版 Boss**（客人日志实证
+            //   `本幕存档 Boss 槽=LAGAVULIN_MATRIARCH_BOSS`，实际打的却是我们的
+            //   `NECROBINDER_DOOM_BOSS_ENCOUNTER`）⇒ 顶栏按槽位取图就成了原版 Boss。
+            //   这里只换**用来取图的那个遭遇对象**（不动任何存档状态）：
+            //   槽位不是我们的、而本幕本场阵容（确定性推导）是我们的 ⇒ 用我们的遭遇。
+            var sub = SubstituteWithOurLineup(enc, act);
+            if (sub != null) enc = sub;
+
             var icon = traverse.Field("_bossIcon").GetValue<TextureRect>();
             var outline = traverse.Field("_bossIconOutline").GetValue<TextureRect>();
             ApplyIcon(icon, outline, enc);
@@ -98,6 +107,48 @@ public static class TopBarBossIconFallbackPatch
         {
             Logger.Log("[CharBoss] 顶栏 Boss 图标兜底失败: " + e.Message);
         }
+    }
+
+    /// <summary>
+    /// 客人端槽位还是原版 Boss 时，改用**本幕本场阵容**里那只（只用于取图标）。
+    /// 返回 null = 不替换（槽位本来就是我们的 / 阵容推不出来）。
+    /// </summary>
+    private static MegaCrit.Sts2.Core.Models.EncounterModel? SubstituteWithOurLineup(
+        MegaCrit.Sts2.Core.Models.EncounterModel enc, MegaCrit.Sts2.Core.Models.ActModel? act)
+    {
+        try
+        {
+            bool alreadyOurs;
+            try { alreadyOurs = OurEncounterIconPaths.IsOurEncounter(enc?.Id); } catch { alreadyOurs = false; }
+            if (alreadyOurs) return null;
+
+            string? key = null;
+            try
+            {
+                var now = BossLineups.LineupNow();          // 本场阵容（多人 / 单人都有）
+                if (now != null && now.Length > 0) key = now[0];
+            }
+            catch { /* 继续用槽位阵容 */ }
+            if (string.IsNullOrEmpty(key))
+            {
+                try
+                {
+                    var slots = BossLineups.For(act?.Index ?? 0, 0);
+                    if (slots != null && slots.Length > 0) key = slots[0];
+                }
+                catch { /* 忽略 */ }
+            }
+            if (string.IsNullOrEmpty(key)) return null;
+
+            MegaCrit.Sts2.Core.Models.EncounterModel? our = null;
+            try { our = BossKeys.EncounterOf(key!); } catch { our = null; }
+            if (our == null) return null;
+
+            Logger.Log($"[CharBoss] 顶栏 Boss 图标：本幕存档槽位还是原版（{enc?.Id.Entry}）⇒ " +
+                       $"改用本场阵容的 {key}（{our.Id.Entry}）取图");
+            return our;
+        }
+        catch { return null; }
     }
 
     /// <summary>
