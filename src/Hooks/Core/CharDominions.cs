@@ -22,6 +22,9 @@ namespace CharacterBosses.Core;
 /// </summary>
 internal static class DreadMode
 {
+    /// <summary>「Boss 房跳过」的日志每个支配只打一行。</summary>
+    private static readonly HashSet<string> _bossRoomLogged = new(StringComparer.Ordinal);
+
     /// <summary>当前是否处于恐惧模式。</summary>
     public static bool IsActive
     {
@@ -39,6 +42,70 @@ internal static class DreadMode
             return false;
 #endif
         }
+    }
+
+    /// <summary>
+    /// 这个房间是不是「**本幕的 Boss 遭遇**」——也就是游戏要求**没有支配**的房间。
+    ///
+    /// 反编译 `DreadRunModel.RemoveDominionIfRoomIsBoss`：
+    /// <code>
+    /// if (combatRoom.Encounter.RoomType != RoomType.Boss) return false;
+    /// if (combatRoom.Encounter.Id == RunState.Act.BossEncounter.Id
+    ///     || combatRoom.Encounter.Id == RunState.Act.SecondBossEncounter?.Id)
+    /// {
+    ///     Log.Info("Removing dominion because we are entering the boss encounter");
+    ///     RunState.SetDominion(null);
+    ///     combatRoom.CombatState.SetDominion(null);
+    ///     return true;
+    /// }
+    /// </code>
+    /// 我们这条判据与游戏**逐字同源**（同一幕的 `BossEncounter` / `SecondBossEncounter` 对比遭遇 id）。
+    ///
+    /// ★ v0.2.789（玩家反馈「boss 战里也触发了亡灵契约师的支配」+ 日志实证）：
+    ///   以前 `DreadDominionSetPatch`（`RunState.SetDominion` 的后缀）会在游戏刚把支配清成 null
+    ///   **之后立刻把它塞回去**，于是支配在 Boss 战里照样生效。现在 Boss 房一律不碰支配、也不挂 power。
+    /// </summary>
+    internal static bool IsActBossRoom(MegaCrit.Sts2.Core.Rooms.AbstractRoom? room)
+    {
+#if STS2_113
+        try
+        {
+            if (room is not MegaCrit.Sts2.Core.Rooms.CombatRoom cr) return false;
+            var id = cr.Encounter?.Id;
+            if (id == null) return false;
+
+            var run = MegaCrit.Sts2.Core.Runs.RunManager.Instance?.DebugOnlyGetState();
+            var acts = run?.Acts;
+            int idx = run?.CurrentActIndex ?? -1;
+            if (acts == null || idx < 0 || idx >= acts.Count) return false;
+
+            var act = acts[idx];
+            if (act == null) return false;
+
+            var first = act.BossEncounter?.Id;
+            var second = act.SecondBossEncounter?.Id;
+            return (first != null && Equals(id, first)) || (second != null && Equals(id, second));
+        }
+        catch { return false; }
+#else
+        return false;
+#endif
+    }
+
+    /// <summary>
+    /// 「本幕 Boss 房 ⇒ 这个支配不该生效」的**统一闸门**：是 Boss 房就返回 true（调用方直接 return），
+    /// 并给每个支配各打一行日志，方便核对。
+    /// </summary>
+    internal static bool SkipBecauseActBossRoom(MegaCrit.Sts2.Core.Rooms.AbstractRoom? room, string who)
+    {
+        if (!IsActBossRoom(room)) return false;
+        try
+        {
+            if (_bossRoomLogged.Add(who))
+                Logger.Log($"[CharBoss] 恐惧模式·{who}：本幕 Boss 房 ⇒ 不生效（Boss 战里不该有支配）");
+        }
+        catch { /* 纯日志 */ }
+        return true;
     }
 }
 
@@ -74,6 +141,8 @@ public sealed class IroncladDominion : MegaCrit.Sts2.Core.Models.Dread.DominionM
         try
         {
             if (room is not CombatRoom cr) return;
+            // ★ v0.2.789：本幕 Boss 房 ⇒ 这个支配不生效（游戏要求 Boss 战里没有支配）
+            if (DreadMode.SkipBecauseActBossRoom(room, GetType().Name)) return;
             var enemies = cr.Enemies;
             if (enemies == null) return;
 
@@ -117,6 +186,8 @@ public sealed class SilentDominion : MegaCrit.Sts2.Core.Models.Dread.DominionMod
         try
         {
             if (room is not CombatRoom cr) return;
+            // ★ v0.2.789：本幕 Boss 房 ⇒ 这个支配不生效（游戏要求 Boss 战里没有支配）
+            if (DreadMode.SkipBecauseActBossRoom(room, GetType().Name)) return;
             await ApplyAsync(cr.CombatState, cr.RoomType == MegaCrit.Sts2.Core.Rooms.RoomType.Elite);
         }
         catch (Exception e) { Logger.Log("[CharBoss] 静默猎手的支配失败: " + e.Message); }
@@ -134,6 +205,13 @@ public sealed class SilentDominion : MegaCrit.Sts2.Core.Models.Dread.DominionMod
         try
         {
             if (side != CombatSide.Player) return;
+            // ★ v0.2.789：本幕 Boss 房 ⇒ 这条兜底也不许生效（否则 Boss 战里照样 −力量 +虚弱）
+            try
+            {
+                if (DreadMode.SkipBecauseActBossRoom(combatState?.RunState?.CurrentRoom, "静默猎手的支配（兜底）"))
+                    return;
+            }
+            catch { /* 判不出来就按原样走 */ }
             bool elite = false;
             try { elite = combatState?.RunState?.CurrentRoom?.RoomType == MegaCrit.Sts2.Core.Rooms.RoomType.Elite; } catch { elite = false; }
             await ApplyAsync(combatState, elite);
@@ -231,6 +309,8 @@ public sealed class RegentDominion : MegaCrit.Sts2.Core.Models.Dread.DominionMod
         try
         {
             if (room is not CombatRoom cr) return;
+            // ★ v0.2.789：本幕 Boss 房 ⇒ 这个支配不生效（游戏要求 Boss 战里没有支配）
+            if (DreadMode.SkipBecauseActBossRoom(room, GetType().Name)) return;
             var enemies = cr.Enemies;
             if (enemies == null)
             {
@@ -282,6 +362,8 @@ public sealed class NecrobinderDominion : MegaCrit.Sts2.Core.Models.Dread.Domini
         try
         {
             if (room is not CombatRoom cr) return;
+            // ★ v0.2.789：本幕 Boss 房 ⇒ 这个支配不生效（游戏要求 Boss 战里没有支配）
+            if (DreadMode.SkipBecauseActBossRoom(room, GetType().Name)) return;
             var players = cr.CombatState?.Players;
             if (players == null) return;
 
@@ -316,6 +398,8 @@ public sealed class DefectDominion : MegaCrit.Sts2.Core.Models.Dread.DominionMod
         try
         {
             if (room is not CombatRoom cr) return;
+            // ★ v0.2.789：本幕 Boss 房 ⇒ 这个支配不生效（游戏要求 Boss 战里没有支配）
+            if (DreadMode.SkipBecauseActBossRoom(room, GetType().Name)) return;
             var players = cr.CombatState?.Players;
             if (players == null) return;
 
@@ -350,6 +434,8 @@ public sealed class FoolDominion : MegaCrit.Sts2.Core.Models.Dread.DominionModel
         try
         {
             if (room is not CombatRoom cr) return;
+            // ★ v0.2.789：本幕 Boss 房 ⇒ 这个支配不生效（游戏要求 Boss 战里没有支配）
+            if (DreadMode.SkipBecauseActBossRoom(room, GetType().Name)) return;
             var players = cr.CombatState?.Players;
             if (players == null) return;
 
@@ -411,6 +497,8 @@ public sealed class WatcherDevotionDominion : MegaCrit.Sts2.Core.Models.Dread.Do
         try
         {
             if (room is not CombatRoom cr) return;
+            // ★ v0.2.789：本幕 Boss 房 ⇒ 这个支配不生效（游戏要求 Boss 战里没有支配）
+            if (DreadMode.SkipBecauseActBossRoom(room, GetType().Name)) return;
             var enemies = cr.Enemies;
             if (enemies == null)
             {
@@ -488,6 +576,22 @@ internal static class DreadDominionSync
 
             var act = run.Acts[run.CurrentActIndex];
             if (act == null) return;
+
+            // ★ v0.2.789（玩家反馈「boss 战里也触发了亡灵契约师的支配」）：
+            //   日志实证 `本幕支配 无 → NECROBINDER_DOMINION（游戏设完支配后立刻核对）`，
+            //   紧跟着 boss 战里就出现「亡灵契约师的支配…本回合费用 +1」。
+            //   也就是游戏刚在进 Boss 房时把支配清成 null（`RemoveDominionIfRoomIsBoss`），
+            //   我们这条后缀又把它塞了回去 ⇒ **Boss 房一律不碰**（游戏要求 Boss 战里没有支配）。
+            if (DreadMode.IsActBossRoom(run.CurrentRoom) || DreadMode.IsActBossRoom(run.BaseRoom))
+            {
+                if (_lastLogged != "boss-room")
+                {
+                    _lastLogged = "boss-room";
+                    Logger.Log("[CharBoss] 恐惧模式·支配对齐：本幕 Boss 房 ⇒ 不动支配" +
+                               "（游戏要求 Boss 战里没有支配；" + why + "）");
+                }
+                return;
+            }
 
             var want = ResolveWant(act, out string source);
             if (want == null)
@@ -594,9 +698,19 @@ internal static class DreadDominionSync
 internal static class DreadDominionSetPatch
 {
     [HarmonyLib.HarmonyPostfix]
-    public static void Postfix()
+    public static void Postfix(object[] __args)
     {
-        try { DreadDominionSync.AfterGameSetDominion(); } catch { /* 绝不影响主流程 */ }
+        try
+        {
+            // ★ v0.2.789：游戏把支配设成 **null** 的唯一场合就是「正在进本幕 Boss 遭遇」
+            //   （`RemoveDominionIfRoomIsBoss`）⇒ 尊重它，**绝不**再塞回去。
+            //   以前这里不看实参，于是刚被清掉就立刻被改回本幕的支配 ⇒ Boss 战里支配照样生效
+            //   （玩家反馈 + 日志实证：`本幕支配 无 → NECROBINDER_DOMINION（游戏设完支配后立刻核对）`）。
+            if (__args != null && __args.Length > 0 && __args[0] == null) return;
+
+            DreadDominionSync.AfterGameSetDominion();
+        }
+        catch { /* 绝不影响主流程 */ }
     }
 }
 #endif

@@ -49,6 +49,10 @@ public static class BossLossMessageKillerPatch
         {
             var boss = BossKillerTracker.KillerOf(character);
             if (boss == null) return;
+            // ★ v0.2.788（用户 2026-11-19）：只有「这一格提示对应的就是记录凶手那一场战斗」才按凶手改。
+            //   结算/历史界面会给本局**每一场**战斗各问一次，以前会把它们全部改写成同一个凶手
+            //   ⇒ 「不同的几局都显示灵魂被亡灵契约师收走了」。
+            if (!BossKillerTracker.IsDeathCombat(__instance?.Id)) return;
 
             var encounter = CharBossEncounters.EncounterForBoss(boss);
             if (encounter == null) return;
@@ -87,6 +91,8 @@ public static class BossLossMessageKillerPatch
         string entry;
         try { entry = encounter.Id.Entry ?? string.Empty; } catch { return; }
         if (!entry.StartsWith("FOOL_", StringComparison.Ordinal)) return;   // 只认愚者的遭遇
+        // ★ v0.2.788：同上 —— 只有「死亡那一场」才换文案，历史里别的格子保持原版
+        if (!BossKillerTracker.IsDeathCombat(encounter.Id)) return;
 
 #if STS2_111
         string? card = Core.FoolTarotDeaths.CardEntryFor(character);
