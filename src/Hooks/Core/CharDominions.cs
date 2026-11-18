@@ -428,6 +428,7 @@ public sealed class WatcherDevotionDominion : MegaCrit.Sts2.Core.Models.Dread.Do
 internal static class DreadDominionSync
 {
     private static string _lastLogged = string.Empty;
+    private static bool _inHook;
 
     /// <summary>对齐一次（幂等）。<paramref name="why"/> 只用于日志。</summary>
     internal static void EnsureCurrentAct(string why)
@@ -442,15 +443,25 @@ internal static class DreadDominionSync
             var act = run.Acts[run.CurrentActIndex];
             if (act == null) return;
 
-            var encounter = act.SecondBossEncounter ?? act.BossEncounter;
-            var want = encounter?.GetDominion();
-            if (want == null) return;                       // 不是我们的遭遇 / 没有支配
+            var want = ResolveWant(act, out string source);
+            if (want == null)
+            {
+                // ★ v0.2.780：**客人拿不到房主结论时什么都不做**（宁可等，也不要用本机还没同步的槽位去猜）。
+                //   以前这里会退回本机槽位 ⇒ 拿到原版 Boss 的支配 ⇒ 与房主不同 ⇒ 整幕普通战斗不同步。
+                if (source != _lastLogged)
+                {
+                    _lastLogged = source;
+                    Logger.Log($"[CharBoss] 恐惧模式·支配对齐：**先不动**（{source}；{why}）" +
+                               "—— 等房主结论到了再对齐，避免拿原版 Boss 的支配去和房主对齐");
+                }
+                return;
+            }
 
             var have = run.Dominion;
             if (have != null && have.GetType() == want.GetType()) return;   // 已经一致
 
             run.SetDominion(want);
-            string line = $"{EntryOf(have)} → {EntryOf(want)}（{why}）";
+            string line = $"{EntryOf(have)} → {EntryOf(want)}（{why}；来源={source}）";
             if (line != _lastLogged)
             {
                 _lastLogged = line;
@@ -461,9 +472,85 @@ internal static class DreadDominionSync
         catch (Exception e) { Logger.Log("[CharBoss] 恐惧模式·支配对齐失败: " + e.Message); }
     }
 
+    /// <summary>
+    /// 本幕该用哪个支配。
+    ///
+    /// · **房主 / 单人**：按本机本幕的 Boss 槽位（那上面就是我们刚替换进去的遭遇），与游戏的
+    ///   `DreadRunModel.ApplyCurrentDominion()`（`act.SecondBossEncounter ?? act.BossEncounter`）同一口径。
+    /// · **客人**：**只认房主下发的「每场最终遭遇」**（`BossPicksSync.HostSaysVanilla / HostBossOf`）。
+    ///   本机槽位这时可能还是原版 Boss（房主的数据还没落到本机）⇒ 拿它解析就会得到**原版 Boss 的支配**
+    ///   （玩家日志实证：客人是 `CEREMONIAL_BEAST_DOMINION` → 仪式兽的 `RITUAL_POWER`，
+    ///   房主是 `REGENT_DOMINION` → `MONARCHS_GAZE_POWER`，同一个甲虫两个 power ⇒ ID 1 就分叉）。
+    ///   房主结论还没到 ⇒ 返回 null（= 等，不猜）。
+    /// </summary>
+    private static MegaCrit.Sts2.Core.Models.Dread.DominionModel? ResolveWant(
+        MegaCrit.Sts2.Core.Models.ActModel act, out string source)
+    {
+        source = "本机槽位";
+        var localSlot = act.SecondBossEncounter ?? act.BossEncounter;
+
+        bool guest;
+        try { guest = Core.NetRole.IsGuest; } catch { guest = false; }
+        if (!guest) return localSlot?.GetDominion();
+
+        // 客人：第 2 场优先（与游戏 `Second ?? First` 同序）
+        for (int fight = 1; fight >= 0; fight--)
+        {
+            bool? vanilla;
+            try { vanilla = Core.BossPicksSync.HostSaysVanilla(act.Index, fight); } catch { vanilla = null; }
+            if (vanilla == null) continue;                       // 这一场房主还没算出来
+            if (vanilla == true)
+            {
+                source = $"房主结论(第 {fight + 1} 场=保持原版)";
+                return localSlot?.GetDominion();                  // 房主也没换 ⇒ 用原版那只的支配
+            }
+            string? key;
+            try { key = Core.BossPicksSync.HostBossOf(act.Index, fight); } catch { key = null; }
+            if (string.IsNullOrEmpty(key)) continue;
+            MegaCrit.Sts2.Core.Models.EncounterModel? enc = null;
+            try { enc = Core.BossKeys.EncounterOf(key!); } catch { enc = null; }
+            if (enc == null) continue;
+            source = $"房主结论(第 {fight + 1} 场={key})";
+            return enc.GetDominion();
+        }
+
+        source = "房主的「每场最终遭遇」还没收到";
+        return null;
+    }
+
+    /// <summary>
+    /// 游戏自己设完支配（`RunState.SetDominion`，Boss 房/进幕/读档都会走）之后立刻纠正一次 ——
+    /// 这样**第一场普通战斗开始之前**两端就已经是同一个支配（支配的 power 是在房间进入时挂的，
+    /// 等到第一个 `After player turn start` 校验和才发现就晚了）。
+    /// </summary>
+    internal static void AfterGameSetDominion()
+    {
+        if (_inHook) return;          // 防重入（我们自己在 EnsureCurrentAct 里也会调 SetDominion）
+        _inHook = true;
+        try { EnsureCurrentAct("游戏设完支配后立刻核对"); }
+        catch { /* 忽略 */ }
+        finally { _inHook = false; }
+    }
+
     private static string EntryOf(MegaCrit.Sts2.Core.Models.Dread.DominionModel? d)
     {
         try { return d?.Id?.Entry ?? "无"; } catch { return "?"; }
+    }
+}
+
+/// <summary>
+/// ★ v0.2.780：`RunState.SetDominion` 是游戏设置「本幕支配」的**唯一出口**
+/// （`DreadRunModel.ApplyCurrentDominion()` / 读档，反编译确认它只是 `MutableClone()` + 赋值、不触发钩子）。
+/// 在这里挂一个后缀，客人端一旦已经有房主结论就立刻把支配改成房主那一套 ——
+/// 早于「本幕第一场战斗开始」⇒ 敌人身上的 power 两端一致。
+/// </summary>
+[HarmonyLib.HarmonyPatch(typeof(MegaCrit.Sts2.Core.Runs.RunState), nameof(MegaCrit.Sts2.Core.Runs.RunState.SetDominion))]
+internal static class DreadDominionSetPatch
+{
+    [HarmonyLib.HarmonyPostfix]
+    public static void Postfix()
+    {
+        try { DreadDominionSync.AfterGameSetDominion(); } catch { /* 绝不影响主流程 */ }
     }
 }
 #endif

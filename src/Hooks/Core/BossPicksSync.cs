@@ -132,6 +132,25 @@ internal static class BossPicksSync
     }
 
     /// <summary>
+    /// 客人端：房主对某个 (幕, 场) 的结论**是不是「保持原版」**。
+    /// `null` = 这一场房主还没算出来（**不要**当成「保持原版」）。
+    ///
+    /// ★ v0.2.780：`Core.DreadDominionSync` 用它决定「本幕支配」用哪只 Boss 解析 ——
+    ///   以前客人是拿**本机槽位**解析的，而本机槽位这时往往还是原版 Boss ⇒
+    ///   拿到的是**原版 Boss 的支配**，与房主（按我们替换后的 Boss 解析）不同 ⇒ 整幕普通战斗不同步。
+    /// </summary>
+    internal static bool? HostSaysVanilla(int act, int fight)
+    {
+        try
+        {
+            var v = HostBossOf(act, fight);
+            if (v == null) return null;
+            return v == VanillaMark;
+        }
+        catch { return null; }
+    }
+
+    /// <summary>
     /// 房主端：记下「本幕这一场最终是哪一只」（由 `CharBossEncounters.ForVanillaBoss` 每次算完调）。
     /// `resolved == null` 记成 <see cref="VanillaMark"/>（= 这一场保持原版）。
     /// 结论变了就重播一次给客人。
@@ -400,6 +419,11 @@ internal static class BossPicksSync
     {
         try
         {
+            // ★ v0.2.780：恐惧模式下「本幕支配」要对齐到房主结论 —— 客人收到结论可能晚于进幕，
+            //   这里每秒顺带重试一次（`EnsureCurrentAct` 自己幂等、只在真的不一致时才动手）。
+#if STS2_113
+            try { Core.DreadDominionSync.EnsureCurrentAct("心跳重试"); } catch { /* 忽略 */ }
+#endif
             if (!BaseLibPresence.Available) return;
             long now = Environment.TickCount64;
             var role = NetRole.Type;
@@ -558,7 +582,23 @@ internal static class BossPicksSync
         {
             if (NetRole.Type != MegaCrit.Sts2.Core.Multiplayer.Game.NetGameType.Client) return;   // 只客人吃这条
 
-            FromHost.Clear();
+            // ★ v0.2.780（玩家 2026-11-18 三机联机日志）：**只认带结论的消息**。
+            //   客人给客人发的上报里这三样都是空的，而以前它照样走一遍完整流程 ⇒
+            //   `FromHost.Clear()` / `FromHostBosses.Clear()` 把房主刚发来的列表清空，
+            //   并把「0 条」当成房主的结论（日志实证：`勾选同步：已收到房主(NetId=76561198830124068)`
+            //   —— 那个 NetId 其实是**另一位客人**，房主是 …246781）。
+            bool hostish = !string.IsNullOrEmpty(payload) || !string.IsNullOrEmpty(settings)
+                           || !string.IsNullOrEmpty(bosses);
+            if (!hostish)
+            {
+                Logger.Log($"[CharBoss] 勾选同步：忽略来自 NetId={senderId} 的空消息" +
+                           "（房主结论里勾选/设置/每场遭遇不可能同时为空 ⇒ 这是另一位客人的上报，不能当成房主结论）");
+                return;
+            }
+
+            // ⚠ 三个字段各自「有内容才覆盖」：房主是**逐步**广播的（每场最终遭遇 0 条 → 1 条 → 2 条 → 3 条），
+            //   以前一次空载荷就把已知结论清掉 ⇒ 客人永远解析不到 ⇒ 退回原版 Boss 的支配/阵容。
+            if (!string.IsNullOrEmpty(payload)) FromHost.Clear();
             foreach (var entry in (payload ?? string.Empty).Split(';'))
             {
                 if (entry.Length == 0) continue;
@@ -572,9 +612,12 @@ internal static class BossPicksSync
             Received = true;
 
             // ── 玩法设置（v0.2.586）──
-            HostSharePool = null;
-            HostAsc10Act3OneEach = null;
-            HostMaps.Clear();
+            if (!string.IsNullOrEmpty(settings))
+            {
+                HostSharePool = null;
+                HostAsc10Act3OneEach = null;
+                HostMaps.Clear();
+            }
             foreach (var part in (settings ?? string.Empty).Split(';'))
             {
                 if (part.Length == 0) continue;
@@ -604,8 +647,10 @@ internal static class BossPicksSync
             ApplyHostWatcherOk(settings ?? string.Empty);
 
             // ── 每个 (幕, 场) 的最终遭遇（v0.2.711）──
+            // ⚠ v0.2.780：**合并，不再 Clear**。房主是逐步广播的（0 条 → 1 条 → 2 条 → 3 条），
+            //   以前每来一条就先 `Clear()` 再填 ⇒ 只要收到过一条空/不全的，已知结论就被抹掉
+            //   （玩家日志：`每场最终遭遇 0 条` 之后支配按**原版 Boss** 解析 ⇒ RITUAL_POWER vs MONARCHS_GAZE_POWER）。
             int before = FromHostBosses.Count;
-            FromHostBosses.Clear();
             foreach (var entry in (bosses ?? string.Empty).Split(';'))
             {
                 if (entry.Length == 0) continue;

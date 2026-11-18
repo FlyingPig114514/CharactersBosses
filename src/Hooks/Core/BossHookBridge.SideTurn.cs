@@ -1157,6 +1157,13 @@ public static partial class BossHookBridge
         var shadow = boss.Shadow;
         if (combat == null || shadow == null) return;
 
+        // ★ v0.2.780（三机联机不同步）：**战斗开始前**再核对一次「本幕支配」。
+        //   支配的 power 是「进入房间」那一刻挂到敌人身上的，而客人拿房主结论可能晚于进幕
+        //   ⇒ 只要在**这场战斗开始前**补上，两端敌人身上的 power 就一致（晚于这个点就只能等断线重连了）。
+#if STS2_113
+        try { Core.DreadDominionSync.EnsureCurrentAct("战斗开始前核对（她上场时）"); } catch { /* 忽略 */ }
+#endif
+
         var ctx = new BlockingPlayerChoiceContext();
 
         // ★ v0.2.761（用户 2026-11-18：「泪滴吊坠盒触发时机错误，应当在玩家进战斗的那一刻就触发
