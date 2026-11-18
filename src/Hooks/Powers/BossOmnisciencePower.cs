@@ -214,20 +214,54 @@ public sealed class BossOmnisciencePower : PowerModel
         try
         {
             if (player == null || amount <= 0) return 0;
-            var helper = WatcherCards.T("WatcherCombatHelper");
-            var m = helper?.GetMethod("Scry", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-            if (m == null)
-            {
-                Logger.Log("[CharBoss] 通晓万物：找不到观者的 Scry 入口 ⇒ 这次不预见");
-                return 0;
-            }
             var useCtx = ctx ?? new BlockingPlayerChoiceContext();
-            object? task = m.Invoke(null, new object?[] { useCtx, player, amount, null });
-            if (task is Task<List<CardModel>> t)
+
+            // ★ v0.2.765（用户 2026-11-18：「预见观现在的特殊效果不触发了」）：
+            //   上一版只认 A 版的 `WatcherMod.WatcherCombatHelper.Scry(ctx, player, amount, source)`，
+            //   而 **B 版（lamali）根本没有这个类** —— 它的预见入口是
+            //   `Watcher.Code.Commands.MultiplayerCmd.Scry(ctx, source, players, amount)`。
+            //   B 版玩家因此拿不到入口 ⇒ 普通模式的「你预见 2」什么都不做，看起来就是「不触发」。
+            //   现在两版按**参数形状**自动认：p2 是 Player ⇒ A 版；p3 是 IEnumerable<Player> ⇒ B 版。
+            foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
             {
-                var list = await t;
-                return list?.Count ?? 0;
+                try
+                {
+                    string? an = asm.GetName().Name;
+                    if (an == null) continue;
+                    if (!an.StartsWith("Watcher", StringComparison.OrdinalIgnoreCase)) continue;
+                    foreach (var ty in asm.GetTypes())
+                    {
+                        if (ty == null) continue;
+                        System.Reflection.MethodInfo[] methods;
+                        try { methods = ty.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static); }
+                        catch { continue; }
+                        foreach (var m in methods)
+                        {
+                            if (m == null || m.Name != "Scry") continue;
+                            var ps = m.GetParameters();
+                            if (ps.Length != 4) continue;
+                            object?[]? args = null;
+                            if (ps[1].ParameterType == typeof(Player) && ps[2].ParameterType == typeof(int))
+                            {
+                                object? source = ps[3].ParameterType.IsValueType ? Activator.CreateInstance(ps[3].ParameterType) : null;
+                                args = new object?[] { useCtx, player, amount, source };
+                            }
+                            else if (ps[3].ParameterType == typeof(int))
+                            {
+                                args = new object?[] { useCtx, null, new List<Player> { player }, amount };
+                            }
+                            if (args == null) continue;
+                            object? r = m.Invoke(null, args);
+                            if (r is Task task) await task;
+                            if (_logs++ < 12)
+                                Logger.Log($"[CharBoss] 通晓万物：让玩家预见 {amount}（{ty.FullName}.{m.Name}，{an}）");
+                            return amount;
+                        }
+                    }
+                }
+                catch { /* 单个程序集失败继续 */ }
             }
+            Logger.Log("[CharBoss] 通晓万物：没找到任何观者的 Scry 入口 ⇒ 这次不预见");
             return 0;
         }
         catch (Exception e)
