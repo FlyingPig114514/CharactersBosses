@@ -43,6 +43,8 @@ public static partial class BossHookBridge
     private static void FireSideTurnStart(CharBossMonster boss, PlayerChoiceContext context)
     {
         if (boss.Creature == null) return;
+        // 她自己的回合开始 ⇒ 清掉「玩家本回合打过攻击牌」的标记（红蓝观的不惧妖邪 / 第 12 回合切换用）
+        try { Core.PlayerAttackWatch.Reset(); } catch { /* 忽略 */ }
         // 「开心小花」按**她自己的回合号**结算（3n 回合 +1 能量），原版那条对她已拦掉
         // （见 Patches/HappyFlowerNoDoublePatch 与本文件的 HappyFlowerPlays）。
         try { HappyFlowerPlays.OnBossTurnStart(boss, context); } catch { /* 忽略 */ }

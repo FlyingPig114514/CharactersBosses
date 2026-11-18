@@ -1550,6 +1550,10 @@ public abstract partial class CharBossMonster : MonsterModel
 
     private async Task PlayOne(PlayerChoiceContext ctx, PlayerCombatState pcs, PlannedPlay play)
     {
+        // ★ v0.2.767：预见观让玩家「预见 2」期间，**她**和同场的其它 Boss 都停在这里，
+        //   直到玩家选完、预见界面关掉（闸门由 Core.ScryGate 控制）。单人时它恒为「已放行」。
+        try { await Core.ScryGate.WaitAsync(); } catch { /* 忽略 */ }
+
         // 告诉自动选择器「现在是谁的回合」——它按 (Boss, 回合号) 取「点名要丢的牌」，
         // 否则规划下一回合时那次清空会把本回合的点名抹掉（用户 2026-10-29：杂技丢了触不可及）。
         // ★ v0.2.525：连「**是哪一张牌**在选牌」一起告诉它 —— 同一回合里两个丢弃者
@@ -2018,6 +2022,24 @@ public abstract partial class CharBossMonster : MonsterModel
                         try { Core.WatcherOmegaMechanics.NoteGeneratedAsync(this, play.Card); } catch { /* 纯展示 */ }
             // ★ v0.2.764（用户 2026-11-18）：「净化+」打完就把它点名的那些牌**真的消耗掉**。
             try { Core.BossPurify.Handle(this, play.Card); } catch { /* 纯记账 */ }
+            // ★ v0.2.768（用户 2026-11-18）：①「节制」按她自己打出的牌计数（Power 钩子在她身上不派发）；
+            //   ② 玩家本回合打过攻击牌 ⇒ 她这记「不惧妖邪」让她进入平静（第 4 回合那条）。
+            try
+            {
+                var temperCtx = ctx;
+                MegaCrit.Sts2.Core.Helpers.TaskHelper.RunSafely(
+                    Powers.BossTemperancePower.NoteCardPlayedAsync(temperCtx, this));
+                string entryNow = string.Empty;
+                try { entryNow = play.Card?.Id.Entry ?? string.Empty; } catch { /* 忽略 */ }
+                if (Core.PlayerAttackWatch.Flag
+                    && Monsters.CharBossMonster.WatcherIdIs(entryNow, "FEAR_NO_EVIL")
+                    && Shadow != null && !Core.WatcherCards.InCalm(Shadow))
+                {
+                    _ = Core.WatcherCards.EnterCalmAsync(Shadow);
+                    Logger.Log("[CharBoss] 不惧妖邪：玩家本回合打过攻击牌 ⇒ 她进入「平静」");
+                }
+            }
+            catch { /* 忽略 */ }
 #endif
             try { Patches.StrayBossCardQueuePatch.Reap(); } catch { /* 忽略 */ }
         }

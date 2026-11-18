@@ -71,7 +71,26 @@ public sealed class BossTemperancePower : PowerModel
         catch (Exception e) { Logger.Log("[CharBoss] 时间扭曲：挂载失败: " + e.Message); }
     }
 
-    /// <summary>她每打出一张牌 +1；满 12 就触发。</summary>
+    /// <summary>
+    /// **由 `CharBossMonster.PlayOne` 直接调用**（用户 2026-11-18：「特殊效果没有正确的按她自己打牌计数」）。
+    /// 实测 `PowerModel.AfterCardPlayed` 在她这只 Boss 身上**根本不派发** ⇒ 以前一次都没数过。
+    /// 现在改成由她自己的出牌循环显式记账。
+    /// </summary>
+    internal static async Task NoteCardPlayedAsync(PlayerChoiceContext ctx, Monsters.CharBossMonster? boss)
+    {
+        try
+        {
+            var power = boss?.Creature?.GetPower<BossTemperancePower>();
+            if (power == null) return;
+            power._played++;
+            if (power._played < Threshold) return;
+            power._played = 0;
+            await TriggerAsync(ctx, boss!.Creature);
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 节制：计数失败（不影响战斗）: " + e.Message); }
+    }
+
+    /// <summary>（保留旧的 Power 钩子作兜底，正常不会被派发到。）</summary>
     public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
         try

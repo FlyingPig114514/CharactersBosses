@@ -127,6 +127,10 @@ public sealed class BossOmnisciencePower : PowerModel
             _lastTurnNumber = turn;
 
             var context = ctx ?? new BlockingPlayerChoiceContext();
+            // ★ v0.2.767（用户 2026-11-18）：普通模式会让玩家「预见 2」⇒ 先把闸门**同步**占住
+            //   （她这一回合一张牌都还没打出去），等玩家选完牌 `TriggerAsync` 里再放行。
+            //   恐惧模式玩家不预见 ⇒ 不占。
+            if (!DreadMode.IsActive) Core.ScryGate.Hold();
             MegaCrit.Sts2.Core.Helpers.TaskHelper.RunSafely(TriggerAsync(boss, context, "先见之明（她回合开始）"));
         }
         catch (Exception e) { Logger.Log("[CharBoss] 通晓万物：回合开始触发失败（不影响战斗）: " + e.Message); }
@@ -186,7 +190,9 @@ public sealed class BossOmnisciencePower : PowerModel
             if (!DreadMode.IsActive)
             {
                 // ★ 普通模式（用户 2026-11-18 的削弱）：改成「**你预见 2**」——对那位玩家跑一次预见 2。
-                int scried = await ScryPlayerAsync(ctx, target, 2);
+                int scried;
+                try { scried = await ScryPlayerAsync(ctx, target, 2); }
+                finally { Core.ScryGate.Release(); }
                 if (_logs++ < 12)
                     Logger.Log($"[CharBoss] 通晓万物（{source}）：{(target.Creature?.Name ?? "该玩家")} 预见 {scried}/2 张");
                 return;

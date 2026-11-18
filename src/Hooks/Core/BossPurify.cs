@@ -1,6 +1,8 @@
 #if STS2_111   // 观者 Boss 只在这个构建里
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Models;
@@ -23,7 +25,7 @@ internal static class BossPurify
     private static int _logs;
 
     /// <summary>她刚打出 <paramref name="played"/> ⇒ 如果剧本给它点了「消耗名单」，就照名单消耗。</summary>
-    internal static void Handle(Monsters.CharBossMonster? boss, CardModel? played)
+    internal static async void Handle(Monsters.CharBossMonster? boss, CardModel? played)
     {
         try
         {
@@ -33,6 +35,8 @@ internal static class BossPurify
             if (entry == null || entry.ExhaustWith == null || entry.ExhaustWith.Length == 0) return;
 
             var pcs = boss.Shadow.PlayerCombatState;
+            // 等净化本身结算完（约 0.3 秒）再消耗，不然会把还在场上的牌提前收走、看不到动画
+            try { await Task.Delay(300); } catch { /* 忽略 */ }
             int done = 0;
             foreach (var type in entry.ExhaustWith)
             {
@@ -45,7 +49,10 @@ internal static class BossPurify
                     if (pcs.Hand.Cards.Contains(card)) pcs.Hand.RemoveInternal(card, true);
                     else if (pcs.DrawPile.Cards.Contains(card)) pcs.DrawPile.RemoveInternal(card, true);
                     else if (pcs.DiscardPile.Cards.Contains(card)) pcs.DiscardPile.RemoveInternal(card, true);
-                    pcs.ExhaustPile.AddInternal(card, -1, true);
+                    // ★ v0.2.768（用户 2026-11-18：「净化+ 还是没有真的烧牌（没有烧牌的特效）」）：
+                    //   以前直接 `ExhaustPile.AddInternal` —— 只是把数据挪过去，**没有任何消耗动画**。
+                    //   现在走原版指令 `CardPileCmd.Add(…, PileType.Exhaust, …)`（卡面飞进消耗堆 + 烧掉特效）。
+                    await CardPileCmd.Add(card, PileType.Exhaust, CardPilePosition.Bottom, null, false);
                     done++;
                 }
                 catch (Exception e)
