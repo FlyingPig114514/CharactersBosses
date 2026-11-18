@@ -46,6 +46,13 @@ public static partial class BossHookBridge
         // 「开心小花」按**她自己的回合号**结算（3n 回合 +1 能量），原版那条对她已拦掉
         // （见 Patches/HappyFlowerNoDoublePatch 与本文件的 HappyFlowerPlays）。
         try { HappyFlowerPlays.OnBossTurnStart(boss, context); } catch { /* 忽略 */ }
+        // ★ v0.2.750（用户 2026-11-18）：「通晓万物」应该在**她的**回合开始触发。
+        //   以前挂的是观者 mod 的 `ForesightPower.BeforeHandDrawCompat`，那条钩子每次抽牌都会广播给
+        //   所有 Power，而原版 power 自己会判「是不是她的抽牌」、我们的 postfix 没判 ⇒ 真人玩家回合
+        //   刚开始抽牌时也会丢他一张牌。现在改在这里（她自己的回合开始）显式触发一次。
+#if STS2_111
+        try { Powers.BossOmnisciencePower.OnBossTurnStart(boss, context); } catch { /* 忽略 */ }
+#endif
         // ⚠ 这里**不再**补破损核心的球：改成战斗开始时引导（见 ChannelCrackedCoreOrbAtCombatStart），
         // 否则他第 1 回合会和原版遗物那条叠成两个（用户实测）。
 

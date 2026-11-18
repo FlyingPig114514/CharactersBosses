@@ -24,8 +24,12 @@ namespace CharacterBosses.Powers;
 /// > PS：预见是从抽牌堆里弃牌的，所以被弃的牌不用在她手牌中显示。
 ///
 /// ## 触发点（反编译 A 版 `Watcher.dll` 取到的两个钩子）
-/// · **普通模式**：`WatcherMod.ForesightPower.BeforeHandDrawCompat` —— 她的「先见之明」
-///   （`FORESIGHT_POWER`，「每回合开始预见 3」）每次触发时都会走这里。
+/// · **普通模式**：**观者自己的回合开始时**，只要她身上带着「先见之明」（`ForesightPower`）就触发一次
+///   —— 由 `BossHookBridge.FireSideTurnStart`（她每个回合开始时调一次）驱动。
+///   ⚠ 以前挂的是 `ForesightPower.BeforeHandDrawCompat`，但那条钩子是**每次都广播给所有 Power** 的：
+///   原版 power 自己会判 `player == Owner.Player`（不是她的抽牌就什么都不做），我们那条 postfix 没判
+///   ⇒ **真人玩家回合开始抽牌时**也会触发一次，玩家看到的就是「我的回合刚开始她就丢我一张牌」
+///   （用户 2026-11-18 反馈）。现在改由她自己的回合开始显式触发，时机与卡面「每回合开始预见 3」一致。
 /// · **恐惧模式**：改成 `WatcherMod.WatcherCombatHelper.Scry` —— 任何「预见」
 ///   （天眼 / 斩破命运 / 美琅脂洗牌 / 先见之明…）都算，正好对应用户那句「每当观者**预见**时」。
 ///
@@ -64,19 +68,7 @@ public sealed class BossOmnisciencePower : PowerModel
         {
             bool okAny = false;
 
-            // ① 普通模式：先见之明的回合开始触发
-            var foresightPower = WatcherCards.T("ForesightPower");
-            var hook = foresightPower?.GetMethod("BeforeHandDrawCompat",
-                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            if (hook != null)
-            {
-                var fix = new HarmonyMethod(typeof(BossOmnisciencePower)
-                    .GetMethod(nameof(ForesightScopePostfix), BindingFlags.Static | BindingFlags.NonPublic)!);
-                PatchSafe("CharacterBosses.watcher.omniscience.foresight", hook, fix);
-                okAny = true;
-            }
-
-            // ② 恐惧模式：任何「预见」（Scry）都算
+            // ① 恐惧模式：任何「预见」（Scry）都算
             var combatHelper = WatcherCards.T("WatcherCombatHelper");
             var scry = combatHelper?.GetMethod("Scry",
                 BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
@@ -87,16 +79,18 @@ public sealed class BossOmnisciencePower : PowerModel
                 PatchSafe("CharacterBosses.watcher.omniscience.scry", scry, fix2);
                 okAny = true;
             }
+            if (combatHelper == null)
+            {
+                if (_installAttempts <= 3) Logger.Log("[CharBoss] 通晓万物：暂时没找到观者的 WatcherCombatHelper ⇒ 稍后重试");
+                return;
+            }
 
-            if (okAny)
-            {
-                _installed = true;
-                Logger.Log("[CharBoss] 通晓万物：已挂上触发钩子（先见之明 / 恐惧模式下的任意预见）");
-            }
-            else if (_installAttempts <= 3)
-            {
-                Logger.Log("[CharBoss] 通晓万物：暂时没找到观者的 ForesightPower / Scry 入口 ⇒ 稍后重试");
-            }
+            // ② 顺手装上「迂回不自动返手」（预见观的牌里只有她会带迂回）
+            try { BossWeaveNoReturn.TryInstall(); } catch { /* 忽略 */ }
+
+            _installed = true;
+            Logger.Log("[CharBoss] 通晓万物：已挂上恐惧模式的「预见」钩子；普通模式改由她的回合开始触发" +
+                       (okAny ? "" : "（Scry 入口没找到，恐惧模式可能不触发）"));
         }
         catch (Exception e) { Logger.Log("[CharBoss] 通晓万物：挂钩失败: " + e.Message); }
     }
@@ -107,19 +101,54 @@ public sealed class BossOmnisciencePower : PowerModel
         catch (Exception e) { Logger.Log($"[CharBoss] 通晓万物：{id} 挂载失败: {e.Message}"); }
     }
 
-    /// <summary>`ForesightPower.BeforeHandDrawCompat(...)` 之后：她这次「先见之明」结算了 ⇒ 触发。</summary>
-    private static void ForesightScopePostfix(object __instance)
+    /// <summary>
+    /// **她自己的回合开始**（用户 2026-11-18：「先见之明应该在她回合开始触发，而不是玩家回合开始」）。
+    /// 由 <see cref="Core.BossHookBridge"/> 的 `FireSideTurnStart` 每个 Boss 回合调一次。
+    ///
+    /// 触发条件三条缺一不可：
+    /// ① 不是恐惧模式（恐惧走 Scry 那条：每次预见都算）；
+    /// ② 她身上挂着「通晓万物」（= 这一场真的是预见观）；
+    /// ③ 她已经打出过「先见之明」（`ForesightPower`）—— 它自己就是「每回合开始预见 3」，
+    ///    所以没打出来之前不该有任何弃牌（她第 3 回合才打出它）。
+    /// </summary>
+    internal static void OnBossTurnStart(Monsters.CharBossMonster boss, PlayerChoiceContext? ctx)
     {
         try
         {
-            if (DreadMode.IsActive) return;                  // 恐惧模式统一走 Scry 那条（避免双份）
-            var power = __instance as PowerModel;
-            var boss = BossOf(power?.Owner);
-            if (boss == null) return;
-            var ctx = new BlockingPlayerChoiceContext();
-            MegaCrit.Sts2.Core.Helpers.TaskHelper.RunSafely(TriggerAsync(boss, ctx, "先见之明"));
+            if (boss?.Creature == null) return;
+            if (DreadMode.IsActive) return;
+            if (boss.Creature.GetPower<BossOmnisciencePower>() == null) return;
+            if (!HasForesight(boss.Creature)) return;
+
+            // 同一个 Boss 回合只结算一次（FireSideTurnStart 理论上只调一次，这里再兜一层）
+            int turn = 0;
+            try { turn = boss.Shadow?.PlayerCombatState?.TurnNumber ?? 0; } catch { turn = 0; }
+            if (ReferenceEquals(boss, _lastTurnBoss) && turn == _lastTurnNumber) return;
+            _lastTurnBoss = boss;
+            _lastTurnNumber = turn;
+
+            var context = ctx ?? new BlockingPlayerChoiceContext();
+            MegaCrit.Sts2.Core.Helpers.TaskHelper.RunSafely(TriggerAsync(boss, context, "先见之明（她回合开始）"));
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 通晓万物：回合开始触发失败（不影响战斗）: " + e.Message); }
+    }
+
+    private static Monsters.CharBossMonster? _lastTurnBoss;
+    private static int _lastTurnNumber = int.MinValue;
+
+    /// <summary>她身上有没有「先见之明」（`WatcherMod.ForesightPower`，用类型名判，不硬引用观者 mod）。</summary>
+    private static bool HasForesight(Creature? creature)
+    {
+        try
+        {
+            if (creature == null) return false;
+            var type = WatcherCards.T("ForesightPower");
+            if (type == null) return false;
+            foreach (var power in creature.Powers)
+                if (power != null && power.GetType() == type) return true;
         }
         catch { /* 忽略 */ }
+        return false;
     }
 
     /// <summary>`WatcherCombatHelper.Scry(...)` 之后：恐惧模式下任何预见都触发。</summary>

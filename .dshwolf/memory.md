@@ -5970,3 +5970,11 @@ Chronological action log.
 | 2026-11-18 09:15 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Encounters/TierBossEncounters.cs` | error | 0 |
 | 2026-11-18 09:15 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Encounters/TierBossEncounters.cs` | ok | 0 |
 | 2026-11-18 09:16 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/map-icons-policy.md` | ok | 0 |
+| 2026-11-18 09:22 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossIntentBuilder.cs` | ok | 0 |
+| 2026-11-18 09:22 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Powers/BossWeaveNoReturn.cs` | ok | 0 |
+| 2026-11-18 09:22 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Powers/BossOmnisciencePower.cs` | ok | 0 |
+| 2026-11-18 09:22 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Powers/BossOmnisciencePower.cs` | ok | 0 |
+| 2026-11-18 09:22 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Powers/BossOmnisciencePower.cs` | ok | 0 |
+| 2026-11-18 09:23 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossHookBridge.SideTurn.cs` | ok | 0 |
+| 2026-11-18 09:23 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossHookBridge.SideTurn.cs` | ok | 0 |
+| 2026-11-18 09:23 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Powers/BossWeaveNoReturn.cs` | ok | 0 |

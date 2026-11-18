@@ -918,9 +918,20 @@ public static class BossIntentBuilder
                 catch { players = 1; }
 
                 int perHit = Math.Max(1, damage);
+                int bashHits = Math.Max(1, players);
                 intents.RemoveAll(i => i is SingleAttackIntent || i is RawAttackIntent || i is RawMultiAttackIntent);
-                intents.Add(new RawMultiAttackIntent(perHit, Math.Max(1, players)));
-                Logger.Log($"[CharBoss] 碰撞连击：段数按真人玩家数 {players} ⇒ {perHit}×{players}（召唤物不算）");
+                // ★ v0.2.750（用户实测：卡面 11 点、预览却显示 10）：
+                //   以前这里发的是 **Raw** 意图 ⇒ 用的是牌面基础值（升级后 10），
+                //   完全没过原版伤害管道，于是**力量（手里剑每 3 张攻击 +1）/ 虚弱 / 易伤**全丢了。
+                //   现在改成 `LiveMultiAttackIntent`：渲染那一刻按「看她这位玩家」跑一遍
+                //   `BossDamagePredictor.FinalDamage`（和普通攻击牌同一条路径），段数仍是真人玩家数。
+                intents.Add(new LiveMultiAttackIntent((targets, owner) =>
+                {
+                    var victim = FirstPlayerTarget(targets) ?? owner;
+                    int live = BossDamagePredictor.FinalDamage(card, perHit, victim);
+                    return (Math.Max(0, live), bashHits);
+                }));
+                Logger.Log($"[CharBoss] 碰撞连击：段数按真人玩家数 {players} ⇒ 牌面 {perHit}×{bashHits}（召唤物不算；数字按力量/虚弱/易伤实时算）");
             }
             catch { /* 纯预览，失败就保留原来的意图 */ }
         }
