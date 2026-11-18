@@ -1591,6 +1591,13 @@
       "fix": "绝不要在 Harmony 前缀里用 `MethodBase __originalMethod.Invoke(...)` 去调原方法再包 Task —— 反射拿到的入口仍是被 Harmony 替换过的，会无限递归杀进程。改成：前缀只做快照，**后缀**拿 `ref Task<T> __result` 包一层（原方法已经跑过，不重复调用）。v0.2.751 用这个写法重写了「迂回不自动返手」。",
       "file": "src/Hooks/Powers/BossWeaveNoReturn.cs",
       "at": "2026-11-18T01:29:39.221Z"
+    },
+    {
+      "id": "bug-244-mwlram5d",
+      "error_message": "多人联机不同步：mod_log 里 `勾选同步：广播失败（客人将退回整张候补表）: The given key 'CharacterBosses.Core.BossPicksMessage' was not present in the dictionary.` 刷上百次；godot.log `State divergence detected! Checksum with ID 238 ... Context: After player turn start. Local: 2020120666. Remote: 2700723302.`",
+      "fix": "BaseLib 的 ReflectionHelper.GetSubtypesInMods&lt;ICustomMessage&gt;() 看不见我们「外壳 + Impl111.dll.bin」的实现程序集 ⇒ CustomMessageToId / IdToCustomMessage 两张表里永远没有 BossPicksMessage ⇒ Send/Deserialize 抛 KeyNotFound。v0.2.749 的「清 _customMessages 再 Initialize」无效（重扫还是扫不到）。v0.2.772 改为按 BaseLib 自己的算法直接登记：id = ComputeBasicHash(FullName)（MD5→FNV-1a，种子 0x811C9DC5），撞车 +1 避让，只写两张字典、不往 _customMessages 里加（否则以后 Initialize 会把我们改登记到 hash+1）。全程反射。",
+      "file": "src/Hooks/Core/BaseLibMessageRegistration.cs",
+      "at": "2026-11-18T06:44:39.457Z"
     }
   ]
 }

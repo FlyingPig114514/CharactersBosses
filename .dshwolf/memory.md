@@ -6003,3 +6003,36 @@ Chronological action log.
 | 2026-11-18 13:38 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossPurify.cs` | ok | 0 |
 | 2026-11-18 13:44 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/TimeWarpFx.cs` | ok | 0 |
 | 2026-11-18 14:19 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/handover-2026-11-19-rushdown.md` | ok | 0 |
+| 2026-11-18 14:32 | edit | `src/Hooks/Powers/BossTemperancePower.cs` | ok | 0 |
+| 2026-11-18 14:32 | edit | `src/Hooks/Powers/BossTemperancePower.cs` | ok | 0 |
+| 2026-11-18 14:32 | edit | `src/Hooks/Monsters/CharBossMonster.cs` | ok | 0 |
+| 2026-11-18 14:32 | edit | `src/Hooks/Monsters/CharBossMonster.cs` | ok | 0 |
+| 2026-11-18 14:32 | edit | `src/Hooks/Core/WatcherOmegaMechanics.cs` | ok | 0 |
+| 2026-11-18 14:32 | edit | `src/Hooks/Powers/WatcherFearNoEvilAimPower.cs` | ok | 0 |
+| 2026-11-18 14:32 | edit | `src/Hooks/Powers/WatcherFearNoEvilAimPower.cs` | ok | 0 |
+| 2026-11-18 14:32 | edit | `src/Hooks/Core/BossScript.cs` | ok | 0 |
+| 2026-11-18 14:32 | edit | `src/Hooks/Core/BossScript.cs` | ok | 0 |
+| 2026-11-18 14:32 | edit | `src/Hooks/Core/BossScript.cs` | ok | 0 |
+| 2026-11-18 14:32 | edit | `src/Hooks/Core/WatcherRushdownScript.cs` | ok | 0 |
+| 2026-11-18 14:32 | edit | `src/Hooks/Core/WatcherRushdownScript.cs` | ok | 0 |
+| 2026-11-18 14:33 | edit | `src/Hooks/Core/WatcherRushdownScript.cs` | ok | 0 |
+| 2026-11-18 14:33 | edit | `src/Hooks/Core/WatcherRushdownScript.cs` | ok | 0 |
+| 2026-11-18 14:33 | edit | `src/Hooks/Core/WatcherRushdownScript.cs` | ok | 0 |
+| 2026-11-18 14:33 | edit | `src/Hooks/Core/WatcherRushdownScript.cs` | ok | 0 |
+| 2026-11-18 14:33 | edit | `src/Hooks/Core/WatcherRushdownScript.cs` | ok | 0 |
+| 2026-11-18 14:33 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-18 14:33 | edit | `src/CharacterBosses.json` | ok | 0 |
+| 2026-11-18 14:37 | write | `docs/plans/watcher-rushdown-fix-2026-11-19.md` | ok | 0 |
+| 2026-11-18 14:37 | edit | `src/Hooks/Powers/BossTemperancePower.cs` | ok | 0 |
+| 2026-11-18 14:42 | write | `src/Hooks/Core/BaseLibMessageRegistration.cs` | ok | 0 |
+| 2026-11-18 14:42 | edit | `src/Hooks/Core/BaseLibMessageRegistration.cs` | ok | 0 |
+| 2026-11-18 14:42 | edit | `src/Hooks/Core/BaseLibMessageRegistration.cs` | ok | 0 |
+| 2026-11-18 14:42 | edit | `src/Hooks/Core/BaseLibMessageRegistration.cs` | ok | 0 |
+| 2026-11-18 14:42 | edit | `src/Hooks/Core/BaseLibMessageRegistration.cs` | ok | 0 |
+| 2026-11-18 14:43 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-18 14:43 | edit | `src/CharacterBosses.json` | error | 0 |
+| 2026-11-18 14:43 | edit | `src/CharacterBosses.json` | ok | 0 |
+| 2026-11-18 14:46 | write | `tools/compare-mp-logs.ps1` | ok | 0 |
+| 2026-11-18 14:47 | edit | `tools/compare-mp-logs.ps1` | error | 0 |
+| 2026-11-18 14:47 | edit | `tools/compare-mp-logs.ps1` | ok | 0 |
+| 2026-11-18 14:47 | edit | `docs/plans/handover-multiplayer.md` | ok | 0 |

@@ -118,6 +118,32 @@
 - 多人行为**只有用户能实机验证**（他用「傀儡玩家」mod 一人控两人）；我们只能保证构建通过 + 日志取证。
 - `src/Hooks/Core/BossOsty.cs` 里有约 210 个 U+FFFD（历史遗留的乱码注释，**不影响编译**）——改这个文件时别大面积重写。
 
+## 3.5 排查「不同步」的工具（2026-11-19 新增）
+
+有玩家反馈联机不同步时，先要**两端的 `mod_log.txt`**（房主 + 客人各一份），然后：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tools\compare-mp-logs.ps1 `
+    -LogA "房主的 mod_log.txt" -LogB "客人的 mod_log.txt"
+```
+
+它把这三块「两端必须逐字相同」的日志配成对并逐条比（去掉时间戳与 `本机=Host/Client` 之后再比）：
+
+- `※阵容输入※`（种子 / 地图 / 替换开关 / 候补表 / 勾选 / 共用匹配池 ⇒ 决定 Boss 是哪只）；
+- `※多 Boss 生成指纹※`（这一行不同 ⇒ 场上 Boss 就不同）；
+- `⚠ 不同步状态摘要` 里的 `#N 轮次 M …` 回合快照（**按回合号排序**，第一处不同就是分叉点）。
+
+外加两端的构建版本、以及 `勾选同步：房主已广播 / 广播失败` 的条数（判断房主→客人那条通道通不通）。
+报告默认写到工作区的 `mp-compare-report.md`。
+
+> ⚠ 这个 `.ps1` **必须存成 UTF-8 带 BOM**：`powershell.exe`（5.1）读无 BOM 的脚本会按 ANSI(GBK) 解码，
+> 中文正则全部炸成 `Unexpected token`。改完脚本记得补 BOM（同 `.dshwolf/cerebrum.md` 里那条铁律）。
+
+另外，RitsuLib 检测到不同步时会在**收到分叉校验和的那台机**上落一个诊断包
+（`%APPDATA%\SlayTheSpire2\logs\ritsulib_state_divergence_<时间>_checksum_<id>_*.zip`），
+配合 `godot.log` 里那行 `State divergence detected! Checksum with ID <n> … Context: <上下文>` 一起看，
+能直接定位到「哪一个动作之后」开始分叉（例：`After player turn start` ⇒ 战斗建立阶段就不同了）。
+
 ## 4. 实机验证清单（用户下次测时看）
 
 1. 双人局第三幕：日志出现 `多人(2 人)：这一幕同时上两只 Boss`、两行 `跟踪锁定：… → …（多人=2 人）`、`多人换牌（2 人）：…`；
