@@ -73,8 +73,11 @@ public sealed class BossTemperancePower : PowerModel
 
     /// <summary>
     /// **由 `CharBossMonster.PlayOne` 直接调用**（用户 2026-11-18：「特殊效果没有正确的按她自己打牌计数」）。
-    /// 实测 `PowerModel.AfterCardPlayed` 在她这只 Boss 身上**根本不派发** ⇒ 以前一次都没数过。
-    /// 现在改成由她自己的出牌循环显式记账。
+    ///
+    /// ⚠ v0.2.771 更正：v0.2.768 当时判断「`PowerModel.AfterCardPlayed` 在她这只 Boss 身上根本不派发」——
+    ///   **那个判断是错的**，它其实会派发（证据：一度「每张牌被数两次」，见
+    ///   `docs/plans/watcher-rushdown-fix-2026-11-19.md` §1）。现在保留这条显式记账作为**唯一**计数路径，
+    ///   并把 `AfterCardPlayed` 里那半段计数删掉。
     /// </summary>
     internal static async Task NoteCardPlayedAsync(PlayerChoiceContext ctx, Monsters.CharBossMonster? boss,
                                                    CardModel? card = null)
