@@ -517,7 +517,7 @@ public static class BossIntentBuilder
                 //   B 版的点穴带 `PowerVar<MarkPower>` ⇒ `ClassifyPowers` 自己也会补一条「策略」，
                 //   和我们这条重复。这里挂一个开关，让后面的通用减益意图本节跳过（A 版无影响）。
                 if (pressureDamage > 0)
-                    intents.Add(new RawAttackIntent(pressureDamage));
+                    intents.Add(new RawAttackIntent(BossDamagePredictor.ExtraRowDamage(card, pressureDamage)));
                 intents.Add(new MegaCrit.Sts2.Core.MonsterMoves.Intents.DebuffIntent(false));
                 suppressGenericDebuff = true;
             }
@@ -668,7 +668,7 @@ public static class BossIntentBuilder
                     intents.Add(new LiveMultiAttackIntent((targets, owner) =>
                     {
                         var victim = FirstPlayerTarget(targets) ?? owner;
-                        int perHit = BossDamagePredictor.FinalDamage(card, planBase, victim);
+                        int perHit = ViewDamage(card, planBase, victim);
                         return (Math.Max(0, perHit), times);
                     }));
                 }
@@ -707,7 +707,7 @@ public static class BossIntentBuilder
                         var victim = FirstPlayerTarget(liveTargets) ?? liveOwner;
                         int pending = goldInPlan ? PlannedCardsBefore(goldBoss, card) : fallbackPlays;
                         int liveBase = BossDamagePredictor.GoldAxeDamage(card, pending);
-                        return BossDamagePredictor.FinalDamage(card, liveBase, victim);
+                        return ViewDamage(card, liveBase, victim);
                     }));
                 }
                 // ⚠ 下面两条都走「渲染时用原版伤害管道算**一次**」的 Live 意图（2026-10-27 根治）：
@@ -724,7 +724,7 @@ public static class BossIntentBuilder
                     intents.Add(new LiveMultiAttackIntent((liveTargets, owner) =>
                     {
                         var victim = FirstPlayerTarget(liveTargets) ?? owner;
-                        int perHit = BossDamagePredictor.FinalDamage(card, echoBase, victim);
+                        int perHit = ViewDamage(card, echoBase, victim);
                         int times = BossDamagePredictor.EchoingSlashHits(card, echoBase, victim) * plays;
                         return (Math.Max(0, perHit), Math.Max(1, times));
                     }));
@@ -742,7 +742,7 @@ public static class BossIntentBuilder
                         intents.Add(new LiveMultiAttackIntent((targets, owner) =>
                         {
                             var victim = FirstPlayerTarget(targets) ?? owner;
-                            int perHit = BossDamagePredictor.FinalDamage(card, lethalBase, victim);
+                            int perHit = ViewDamage(card, lethalBase, victim);
                             return (Math.Max(0, ApplyPct(perHit, lethalPct)), totalHits);
                         }));
                     }
@@ -751,7 +751,7 @@ public static class BossIntentBuilder
                         intents.Add(new LiveDelegateSingleAttackIntent((targets, owner) =>
                         {
                             var victim = FirstPlayerTarget(targets) ?? owner;
-                            return ApplyPct(BossDamagePredictor.FinalDamage(card, lethalBase, victim), lethalPct);
+                            return ApplyPct(ViewDamage(card, lethalBase, victim), lethalPct);
                         }));
                     }
                 }
@@ -767,7 +767,7 @@ public static class BossIntentBuilder
                     intents.Add(new LiveDelegateSingleAttackIntent((liveTargets, liveOwner) =>
                     {
                         var viewer = FirstPlayerTarget(liveTargets) ?? liveOwner;
-                        int total = BossDamagePredictor.FinalDamage(card, miseryBase, viewer);
+                        int total = ViewDamage(card, miseryBase, viewer);
                         try
                         {
                             var boss = card.Owner?.Creature?.Monster as Monsters.CharBossMonster;
@@ -786,7 +786,7 @@ public static class BossIntentBuilder
                     ? new LiveMultiAttackIntent((targets, owner) =>
                     {
                         var victim = FirstPlayerTarget(targets) ?? owner;
-                        int perHit = BossDamagePredictor.FinalDamage(card, damage, victim);
+                        int perHit = ViewDamage(card, damage, victim);
                         return (Math.Max(0, perHit), totalHits);
                     })
                     : new LiveSingleAttackIntent(card, damage));
@@ -846,16 +846,19 @@ public static class BossIntentBuilder
         //   以前把「5 × 2 张」压成一个 10 点的单段意图，和实际挨的两下对不上；现在按段数画成「5×2」。
         if (smokePerHit > 0 && smokeHits > 0)
         {
+            // ★ v0.2.812：附加行不吃原版管道 ⇒ 自己跑一遍「上限」阶段（无实体 = 1）
+            int smokeShown = BossDamagePredictor.ExtraRowDamage(card, smokePerHit);
             intents.Add(smokeHits > 1
-                ? new RawMultiAttackIntent(smokePerHit, smokeHits)
-                : new RawAttackIntent(smokePerHit));
-            Logger.Log($"[CharBoss] 牌底下挂全体伤害：{entry} → {smokePerHit}×{smokeHits} 点" +
+                ? new RawMultiAttackIntent(smokeShown, smokeHits)
+                : new RawAttackIntent(smokeShown));
+            Logger.Log($"[CharBoss] 牌底下挂全体伤害：{entry} → {smokeShown}×{smokeHits} 点" +
                        $"（烟囱：本牌生成 {smokeHits} 张状态牌）");
         }
         if (letterOpenerHit > 0)
         {
-            intents.Add(new RawAttackIntent(letterOpenerHit));
-            Logger.Log($"[CharBoss] 牌底下挂全体伤害：{entry} → {letterOpenerHit} 点（开信刀）");
+            int letterShown = BossDamagePredictor.ExtraRowDamage(card, letterOpenerHit);
+            intents.Add(new RawAttackIntent(letterShown));
+            Logger.Log($"[CharBoss] 牌底下挂全体伤害：{entry} → {letterShown} 点（开信刀）");
         }
         // ★ 2026-11-15（用户：「群蛇形态的伤害怎么把这些卡原本的意图给替换掉了？群蛇形态给这些牌是
         //   **额外**添加一个伤害意图，不会替换卡牌原本的意图，而且应该排在这张牌自己的意图**后面**」）：
@@ -937,7 +940,7 @@ public static class BossIntentBuilder
                 intents.Add(new LiveMultiAttackIntent((targets, owner) =>
                 {
                     var victim = FirstPlayerTarget(targets) ?? owner;
-                    int live = BossDamagePredictor.FinalDamage(card, perHit, victim);
+                    int live = ViewDamage(card, perHit, victim);
                     return (Math.Max(0, live), bashHits);
                 }));
                 Logger.Log($"[CharBoss] 碰撞连击：段数按真人玩家数 {players} ⇒ 牌面 {perHit}×{bashHits}（召唤物不算；数字按力量/虚弱/易伤实时算）");
@@ -962,7 +965,7 @@ public static class BossIntentBuilder
             //   于是**每个玩家的手牌栏都显示自己会挨这一下**，看起来像群攻（用户 2026-10-27 反馈）。
             //   现在改成按「她锁的是不是本地玩家」判断：非锁定玩家显示 0，和单体攻击同一套规则。
             bool serpentElsewhere = serpentDamage > 0 && RandomAimIsElsewhere(card);
-            int serpent = serpentElsewhere ? 0 : serpentDamage;
+            int serpent = serpentElsewhere ? 0 : BossDamagePredictor.ExtraRowDamage(card, serpentDamage);
             // 被打两遍的牌会让群蛇形态**也触发两次** ⇒ 画成「4×2」
             intents.Add(plays > 1 ? new RawMultiAttackIntent(serpent, plays) : new RawAttackIntent(serpent));
             if (serpentElsewhere)
@@ -975,14 +978,14 @@ public static class BossIntentBuilder
         // 烙印 / 坚毅 打出时会「消耗 1 张牌」⇒ 在它们下面补一条「群攻 3」的攻势意图
         //（用户 2026-10-23 要求）。伤害是 `ValueProp.Unpowered`（不吃力量）⇒ 用 Raw 意图显示原样数字。
         int ashesDamage = CharonsAshesDamageOf(card);
-        if (ashesDamage > 0) intents.Add(new RawAttackIntent(ashesDamage));
+        if (ashesDamage > 0) intents.Add(new RawAttackIntent(BossDamagePredictor.ExtraRowDamage(card, ashesDamage)));
 
         // ── 「黑洞」（BlackHolePower）──
         // 用户 2026-10-28：跟群蛇形态一样，**凡是会花/得辉星的牌**下面都画一条黑洞的群伤意图。
         // 反编译：`BlackHolePower` 每次「花费或获得辉星」都对 `HittableEnemies` 造成 `Amount` 点
         // `Unpowered` 伤害 ⇒ 不吃力量/虚弱，用 Raw 意图显示原样数字。
         int blackHole = BlackHoleDamageOf(card);
-        if (blackHole > 0) intents.Add(new RawAttackIntent(blackHole));
+        if (blackHole > 0) intents.Add(new RawAttackIntent(BossDamagePredictor.ExtraRowDamage(card, blackHole)));
 
         // ── 速行者（`SpeedsterPower`）：每抽 1 张牌 → 对所有敌人造成 `Amount` 点伤害 ──
         // 用户 2026-10-26（一层「奇巧猎」）：「给所有抽牌卡加上抽牌数 × 2 的群伤（速行者的伤害），
@@ -1003,8 +1006,8 @@ public static class BossIntentBuilder
             if (perDraw > 0)
             {
                 intents.Add(drawCount > 1
-                    ? new RawMultiAttackIntent(perDraw, drawCount)
-                    : new RawAttackIntent(perDraw));
+                    ? new RawMultiAttackIntent(BossDamagePredictor.ExtraRowDamage(card, perDraw), drawCount)
+                    : new RawAttackIntent(BossDamagePredictor.ExtraRowDamage(card, perDraw)));
                 Logger.Log($"[CharBoss] 速行者：{entry} 会抽 {drawCount} 张 → 补 {perDraw}×{drawCount} 的群伤意图" +
                            "（真实伤害由原版 SpeedsterPower 结算，这里只是显示）");
             }
@@ -1410,6 +1413,15 @@ public static class BossIntentBuilder
         //   ⇒ 最后再收一道：攻势（可能有多条：本体一击 + 附带的群蛇/开信刀/黑洞/速行者/灾厄…）不参与去重，
         //     其它每种**只留第一条**（保留最初插入的位置 = 屏幕上图标顺序不变）。
         DedupeNonAttackIntents(intents);
+
+        // ★ 2026-11-19（用户）：「被拦截者就所有伤害预览全部归 0」——
+        //   叠在最后收一道，只把**攻击意图**换成 0 伤害的同类节点（强化/策略/牺牲等一条都不动，
+        //   条数也不变 ⇒ 薄荷尖塔那边统计到的意图数量一如既往）。没人在拦截时这一步是纯 no-op。
+        try
+        {
+            intents = Core.InterceptPreview.ZeroAttacks(intents, card?.Owner?.Creature?.CombatState);
+        }
+        catch { /* 判不出来就原样 */ }
 
         return intents;
     }
@@ -2591,6 +2603,16 @@ public static class BossIntentBuilder
     }
 
     /// <summary>
+    /// 拦截（联机无色牌「拦截」）在意图上的换算：本地玩家**实际会看到/吃到**的这一段伤害。
+    ///
+    /// 口径见 <see cref="Core.InterceptPreview"/>：被保护者一律 0；拦截者按**他自己**的易伤/力量算，
+    /// 群攻再 ×(护着的人数 + 1)（护 1 人 = 双倍），单体 1 倍（伤害转到他身上）。
+    /// 没人在拦截时这个函数就是原样返回 `FinalDamage` 的结果（零回归）。
+    /// </summary>
+    private static int ViewDamage(CardModel? card, int baseDamage, Creature? victim)
+        => Core.InterceptPreview.ViewDamage(card, baseDamage, victim, card != null && IsAoE(card));
+
+    /// <summary>
     /// 「铭记死亡」（0.113.0 重做版）对**本地观看者**来说是不是「打到别人身上」。
     ///
     /// 新规则：它打的是**生命值最低的玩家**（忽略召唤物），与「被她锁定」无关。
@@ -2680,7 +2702,11 @@ public static class BossIntentBuilder
 
             var local = MegaCrit.Sts2.Core.Context.LocalContext.GetMe(combat);
             if (local?.Creature == null) return false;
-            return !ReferenceEquals(locked, local);
+
+            // ★ 拦截：本地被保护着 ⇒ 这一下落在拦截者身上（对本地是 0）；
+            //   本地是拦截者且护着这位被锁的玩家 ⇒ 这一下转到他身上（要显示真实伤害）。
+            var effective = Core.InterceptPreview.EffectiveTarget(locked.Creature, combat);
+            return !ReferenceEquals(effective, local.Creature);
         }
         catch { return false; }
     }
@@ -2702,7 +2728,12 @@ public static class BossIntentBuilder
                 var locked = Core.BossLockOn.PeekLock(boss);
                 var local = MegaCrit.Sts2.Core.Context.LocalContext.GetMe(combat);
                 if (locked?.Creature != null && local?.Creature != null)
-                    return !ReferenceEquals(locked, local);
+                {
+                    // ★ 拦截（联机无色牌）：本地被保护 ⇒ 「打我」不成立（伤害转到拦截者）；
+                    //   本地就是护着被锁玩家的拦截者 ⇒ 这一手确实会落到我身上 ⇒ 显示真实伤害。
+                    var effective = Core.InterceptPreview.EffectiveTarget(locked.Creature, combat);
+                    return !ReferenceEquals(effective, local.Creature);
+                }
             }
         }
         catch { /* 忽略：退回旧判据 */ }
@@ -2730,7 +2761,10 @@ public static class BossIntentBuilder
 
             var local = MegaCrit.Sts2.Core.Context.LocalContext.GetMe(combat)?.Creature;
             if (local == null) return false;
-            return !ReferenceEquals(target, local);
+
+            // ★ 拦截：被保护者看不到伤害（落到拦截者身上）；拦截者看得到「转过来的那一手」。
+            var effective = Core.InterceptPreview.EffectiveTarget(target, combat);
+            return !ReferenceEquals(effective, local);
         }
         catch { return false; }
     }

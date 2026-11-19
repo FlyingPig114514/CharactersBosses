@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using MegaCrit.Sts2.Core.Entities.Creatures;
@@ -170,6 +170,8 @@ internal sealed class LiveSingleAttackIntent : SingleAttackIntent
                 _card, _card?.Owner?.Creature,
                 Math.Max(0, BossDamagePredictor.FinalDamage(_card, _base, victim)),
                 _plannedStance);
+            // 拦截：本地玩家被保护着 ⇒ 这一条攻势预览归 0（玩家 2026-11-19）
+            if (Core.InterceptPreview.LocalIsCovered(owner?.CombatState ?? victim?.CombatState)) _cache = 0;
         }
         catch (Exception e)
         {
@@ -231,6 +233,8 @@ internal sealed class LiveDelegateSingleAttackIntent : SingleAttackIntent
         {
             _cache = BossDamagePredictor.ScaleToPlannedStance(
                 null, owner, Math.Max(0, _calc(targets, owner)), _plannedStance);
+            // 拦截：本地玩家被保护着 ⇒ 这一条攻势预览归 0（玩家 2026-11-19）
+            if (Core.InterceptPreview.LocalIsCovered(owner?.CombatState)) _cache = 0;
         }
         catch (Exception e) { Logger.Log("[CharBoss] 动态单段（委托）意图重算失败（保留上一次的数）: " + e.Message); }
         _cacheFrame = frame;
@@ -303,6 +307,8 @@ internal sealed class LiveMultiAttackIntent : MultiAttackIntent
             var (perHit, times) = _calc(targets, owner);
             _cachePerHit = BossDamagePredictor.ScaleToPlannedStance(null, owner, Math.Max(0, perHit), _plannedStance);
             _cacheTimes = Math.Max(1, times);
+            // 拦截：本地玩家被保护着 ⇒ 这一条攻势预览归 0（玩家 2026-11-19）
+            if (Core.InterceptPreview.LocalIsCovered(owner?.CombatState)) _cachePerHit = 0;
         }
         catch (Exception e)
         {

@@ -486,11 +486,13 @@ public static class BossDefs
     {
         null, typeof(Powers.SynthesisDreadPower), null, null,
     },
-    // ★ 2026-11-13（恐惧模式）：第一幕「黑球机」**升级眼部攻击**（用户原话
-    //   「黑球机：升级眼部攻击 …」）。走 DreadUpgradesByAct 通道 ⇒ 卡组与剧本手牌里同名的那张都升级。
+    // ★★ v0.2.814（用户 2026-11-19：**削弱** —— 「恐惧模式下不再升级黑球机的眼部攻击。
+    //   把特殊效果的相关描述『它的眼部攻击已经升级』删除」）
+    //   ⇒ 第一幕「黑球机」的恐惧版不再把「眼部攻击」升级（`DreadUpgradesByAct[0]` 置空）。
+    //   第二幕「能力机」的恐惧版特殊效果（人工合成 3→5）不受影响。
     DreadUpgradesByAct = new List<Type>?[]
     {
-        new List<Type> { typeof(GoForTheEyes) }, null, null, null,
+        null, null, null, null,
     },
         // 进阶加成（用户设计）：
         //   · 第一幕（黑球机，用户 2026-10-26）：进阶 8 升级「飞跃」+ 获得遗物「不安油灯」；
@@ -854,7 +856,9 @@ public static class BossDefs
             "REGENT_BOSS.comet", "REGENT_BOSS.special", "REGENT_BOSS.resonance", null,
         },
         // ★ 2026-11-13（恐惧模式）：按幕的恐惧版特殊效果。
-        //   · 第一幕「碎屑储·彗星」：碎屑放到玩家**抽牌堆顶部**（正常是随机洗入）
+        //   · 第一幕「碎屑储·彗星」：**改由用户 2026-11-19 定稿** —— 恐惧版只保留
+        //     「打出碎屑时清除所有玩家的虚弱/易伤」（不再给 10 点格挡、也不再让敌方各失去 10 点生命），
+        //     见 `CometBossPower.AfterCardPlayed` 里的 `dread` 分支。
         //   · 第二幕「铸剑储·何人僭越」：不再扣她的铸造，且每回合可多次触发
         //   · 第三幕「无色储·共鸣」：留空（还没做）⇒ 自动退回正常模式那一份
         SpecialLocDreadByAct = new string?[]

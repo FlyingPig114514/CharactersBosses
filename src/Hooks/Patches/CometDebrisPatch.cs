@@ -71,12 +71,12 @@ public static class CometDebrisRedirect
                         // 和原版怪物塞状态牌一样不该触发玩家的创世之柱（用户 2026-10-24）。
                         // 牌归谁看 `copy.Owner`（= victim），与 creator 无关。
                         //
-                        // ★ 2026-11-13（用户订正）：**碎屑就塞进抽牌堆（Random）**。
-                        //   v0.2.620 我擅自把恐惧版改成「抽牌堆顶部」，用户原文只是「加入你的抽牌堆」
-                        //   ⇒ 已回退。恐惧模式的强化在于「碎屑本身对玩家没有正面效果」，
-                        //   不需要再动放置位置。
+                        // ★★ v0.2.811（用户 2026-11-19：「削弱，普通模式和恐惧模式都改成：每当储君生成碎屑时，
+                        //   反而将其加入你的**弃牌堆**……后面不变」）：
+                        //   以前是 `PileType.Draw`（随机洗进抽牌堆）—— 等于玩家下一回合就能抽到、马上打掉换 10 格挡。
+                        //   现在改塞**弃牌堆**：要等这一轮洗牌才会回到手里，节奏明显变慢。
                         await MegaCrit.Sts2.Core.Commands.CardPileCmd.AddGeneratedCardToCombat(
-                            copy, PileType.Draw, null, CardPilePosition.Random);
+                            copy, PileType.Discard, null, CardPilePosition.Random);
 
                         // 原版「塞牌给玩家」就是这么展示的（照抄 BiiigHug/大～抱抱塞煤灰那一段）：
                         //   AddGeneratedCardToCombat(...) → CardCmd.Preview(card, 0.75f) → Cmd.Wait(1f)
@@ -84,7 +84,7 @@ public static class CometDebrisRedirect
                         await MegaCrit.Sts2.Core.Commands.Cmd.Wait(1f);
 
                         moved.Add(copy);
-                        Logger.Log($"[CharBoss] 彗星：碎屑（玩家所有）洗进 {victim.Character?.GetType().Name} 的抽牌堆" +
+                        Logger.Log($"[CharBoss] 彗星：碎屑（玩家所有）塞进 {victim.Character?.GetType().Name} 的弃牌堆" +
                                    $"（原是她{pile.Type}里的那张）");
                     }
                     catch (Exception e)

@@ -426,6 +426,26 @@ public static class BossLockOn
         {
             if (boss?.Creature == null || player == null) return false;
             if (player.Creature?.Monster != null) return false;      // Boss 影子 Player 不算玩家
+
+            // ⚠ 多人局：唯一权威是纯函数（`PureVictim`），**不看**本地 `Locks`。
+            //
+            // 实机诊断包（2026-11-19 四人局，checksum #733，RitsuLib 分歧报告）：
+            //   两台机器上各有一份 `LOCK_ON_POWER`，但**挂在不同玩家身上**
+            //   （local：1 号位身上有；remote：1 号位没有、2 号位有），
+            //   而同一份报告里 HP / 格挡 / 牌堆 / 遗物 / RNG / 意图**全部一致**
+            //   ⇒ 联机校验判「不同步」的唯一原因就是这一个图标挂错了人。
+            //
+            // 根因：图标对账（`ReconcilePowers`）拿 `Locks` 当判定源，而 `Locks` 是**各端本地记账**。
+            //   一旦某次挂载发生在「人数/Boss 花名册还没对齐」的瞬间，那个答案就被
+            //   `NoteLocked` 记进 `Locks`，之后对账每次都拿它自证清白 ⇒ 错挂的那份**永远纠正不回来**。
+            //   改成纯函数（只依赖 NetId 顺序 + 怪物 id 顺序 + 本局种子）之后，
+            //   各端必然算出同一个答案 ⇒ 错挂的会被摘掉、该挂的会被补上。
+            if (IsMultiplayerRun(boss))
+            {
+                var pure = PureVictim(boss, boss.CombatState);
+                return pure != null && ReferenceEquals(pure, player);
+            }
+
             if (Locks.TryGetValue(boss.Creature, out var p) && ReferenceEquals(p, player)) return true;
             // 单人：没有注册过也认为锁定他（保证单人不依赖注册顺序）
             return RealPlayerCount(boss.CombatState) == 1 &&
@@ -672,6 +692,28 @@ public static class BossLockOn
         try
         {
             if (playerCreature == null || bossCreature == null) return;
+
+            // ⚠ 多人局：谁锁谁**只由纯函数决定**，挂载不许反过来改判定。
+            //
+            // 「图标已经挂上去了」不等于「这个人是纯函数算出来的那位」—— 挂载可能发生在
+            // 人数/Boss 花名册尚未对齐的瞬间。以前这里直接 `Locks[boss] = 他`，等于让
+            // 一次错挂永久生效（见 `IsLocked` 里 2026-11-19 诊断包的注释）。
+            // 现在只在对不上时打一行日志，判定一律走纯函数。
+            if (IsMultiplayerRun(null))
+            {
+                if (bossCreature.Monster is CharBossMonster boss)
+                {
+                    var pure = PureVictim(boss, playerCreature.CombatState);
+                    if (pure != null && !ReferenceEquals(pure, playerCreature.Player))
+                    {
+                        Logger.Log($"[CharBoss] 跟踪锁定图标：{DescribeTarget(playerCreature.Player)} 身上的" +
+                                   $"「{SafeCreatureEntry(bossCreature)}」图标与纯函数结论" +
+                                   $"（应为 {DescribeTarget(pure)}）不一致 ⇒ 交给 4Hz 对账摘掉");
+                    }
+                }
+                return;
+            }
+
             Locks[bossCreature] = playerCreature.Player!;
         }
         catch { /* 忽略 */ }
@@ -737,6 +779,12 @@ public static class BossLockOn
         {
             if (combat == null) return;
             if (!IsMultiplayerRun(null)) return;          // 单人：不挂图标（零回归）
+
+            // ⚠ 纯函数此刻算不出答案（开局几帧 `combat.Players` 还没填满、或 Boss 花名册还没齐）
+            //   ⇒ 这一帧**既不补也不摘**。以前照旧对账会在这段时间把图标全摘掉、
+            //   人齐了再一份份补回来（既费 `MaxIconAppliesPerPlayer` 的次数，也会让两端
+            //   在「谁身上有几份」上短暂错开）。等纯函数有答案了再动。
+            if (AssignmentOf(combat) == null) return;
 
             var state = new List<string>();
 

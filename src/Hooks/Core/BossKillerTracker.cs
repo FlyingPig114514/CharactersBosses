@@ -147,7 +147,7 @@ public static class BossKillerTracker
     }
 
     /// <summary>「这个出手方属于哪只 Boss」——她自己 / 她的随从 / 她的影子玩家。</summary>
-    private static CharBossMonster? BossOf(Creature? creature)
+    public static CharBossMonster? BossOf(Creature? creature)
     {
         try
         {

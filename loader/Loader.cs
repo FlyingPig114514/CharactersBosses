@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -30,6 +30,9 @@ namespace CharacterBosses;
 [ModInitializer("Initialize")]
 public static class LoaderEntry
 {
+    /// <summary>清单里的模组 id（登记程序集归属要用它）。</summary>
+    private const string ModId = "CharacterBosses";
+
     private const string ImplBeta = "CharacterBosses.Impl113.dll";
     private const string ImplRelease = "CharacterBosses.Impl111.dll";
 
@@ -72,6 +75,21 @@ public static class LoaderEntry
             }
             Log($"双版本外壳：已载入 {asm.GetName().Name} {asm.GetName().Version}");
 
+            // ★★ v0.2.817（玩家 2026-11-19「联机进不去房间」实证）：
+            //   实现程序集是我们自己的 ALC 载入的，游戏**不知道它属于本模组** ⇒ 多人大厅初始化时
+            //   把每个模型都判成「不属于任何 mod」：
+            //     [ERROR] Attempting to register type CharacterBosses.Powers.X in assembly CharacterBosses.Impl113,
+            //             ... but it is not associated with any mod
+            //     at Multiplayer.Serialization.ContentSorter`1.Sort
+            //     at Multiplayer.Serialization.ModelIdSerializationCache.Init
+            //     at Multiplayer.Transport.Steam.SteamCallResult`1.OnCallResult
+            //   这段正好跑在**大厅回调里** ⇒ 建房/加入直接失败（k_EChatRoomEnterResponseError、
+            //   或卡在「正在加载…」）。官方接口 AssociatAssemblyWithMod(modId, assembly) 一行就能补上。
+            // ⚠ v0.2.817 试过在这里登记归属，但游戏的 ModelDb **会因此自己再注册一遍我们的模型**
+            //   ⇒ DuplicateModelException（RELIC.NEOW_BLESSING 重复），启动直接致命错误。
+            //   所以先关掉；正确做法见 Loader.cs 里 AssociateImplAssembly 的注释（要配合「放弃手动注册」）。
+            bool associated = AssociateImplAssembly(asm);
+
             var entry = asm.GetType("CharacterBosses.ModEntry", throwOnError: false);
             if (entry == null)
             {
@@ -98,7 +116,18 @@ public static class LoaderEntry
             //   `The given key 'ENCOUNTER.XXX_BOSS_ENCOUNTER' was not present in the dictionary`。
             //   这里手动补登记：对实现里每个具体的 `AbstractModel` 子类调 `ModelDb.Inject`，
             //   再 `InitIds()` 让每个模型拿到自己的 id。
-            RegisterModels(asm);
+            // ★★ v0.2.819：**二选一** ——
+            //   登记归属成功 ⇒ 游戏自己会扫描并注册实现里的模型（ModelDb 把它当本模组的程序集），
+            //   这时再走外壳的手动 `ModelDb.Inject + InitIds` 就会 DuplicateModelException（v0.2.817 的崩溃）；
+            //   没有这个 API（老版本）⇒ 仍走外壳的手动注册。
+            if (associated)
+            {
+                Log("双版本外壳：归属登记已生效 ⇒ 跳过外壳的手动模型注册（交给游戏自己扫）");
+            }
+            else
+            {
+                RegisterModels(asm);
+            }
 
             var init = entry.GetMethod("Initialize", BindingFlags.Public | BindingFlags.Static);
             if (init == null) { Log("双版本外壳：ModEntry 里没有静态 Initialize ⇒ 放弃"); return; }
@@ -116,6 +145,35 @@ public static class LoaderEntry
     /// 按「.dll → .dll.bin」的顺序找实现文件（v0.2.588 起默认是后者）。
     /// `LoadFromAssemblyPath` 不看扩展名，所以 `.bin` 照样能加载。
     /// </summary>
+    /// <summary>
+    /// 把「实现程序集」登记到本模组名下 —— 走官方的 `ModManager.AssociateAssemblyWithMod(modId, assembly)`。
+    /// 用反射调用：107 那份引用里未必有这个 API，缺了也只是跳过（单机不受影响）。
+    /// </summary>
+    private static bool AssociateImplAssembly(Assembly asm)
+    {
+        try
+        {
+            var m = typeof(ModManager).GetMethod(
+                "AssociateAssemblyWithMod",
+                BindingFlags.Public | BindingFlags.Static,
+                binder: null,
+                types: new[] { typeof(string), typeof(Assembly) },
+                modifiers: null);
+            if (m == null)
+            {
+                Log("双版本外壳：本游戏版本没有 ModManager.AssociateAssemblyWithMod ⇒ 跳过归属登记（联机可能不正常）");
+                return false;
+            }
+            m.Invoke(null, new object[] { ModId, asm });
+            Log($"双版本外壳：已把 {asm.GetName().Name} 登记到模组 {ModId} 名下（联机序列化需要）");
+            return true;
+        }
+        catch (Exception e)
+        {
+            Log("双版本外壳：登记实现程序集归属失败: " + e.GetType().Name + ": " + e.Message);
+            return false;
+        }
+    }
     private static string? FindImpl(string dir, string fileName)
     {
         try

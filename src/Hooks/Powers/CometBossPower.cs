@@ -49,10 +49,20 @@ public sealed class CometBossPower : PowerModel
             var combat = Owner.CombatState;
             var players = combat?.Players;
 
-            // ① 所有玩家获得 10 点格挡（用户 2026-10-24 新增）
+            // ★★ v0.2.809（用户 2026-11-19）：**恐惧模式**的「彗星」改成另一套效果 ——
+            //   用户原文：「碎屑储没有在恐惧模式下增强。增强：修改特殊效果：
+            //     每当储君生成碎屑时，反而将其加入你的抽牌堆。
+            //     每当你打出碎屑时，清除所有玩家的所有虚弱和易伤。」
+            //   ⇒ 恐惧版**只保留**「清掉所有玩家的虚弱/易伤」这一条；
+            //     不再给 10 点格挡、也不再让敌方各失去 10 点生命（进阶版文案同步改了）。
+            //   （第一句「碎屑进抽牌堆」两种模式一样，由 `CometDebrisRedirect` 负责，与这里无关。）
+            bool dread = false;
+            try { dread = Core.DreadMode.IsActive; } catch { dread = false; }
+
+            // ① 所有玩家获得 10 点格挡（用户 2026-10-24 新增；**恐惧模式不再给**）
             try
             {
-                if (players != null)
+                if (!dread && players != null)
                 {
                     foreach (var p in players)
                     {
@@ -91,8 +101,11 @@ public sealed class CometBossPower : PowerModel
             if (cleared > 0)
             {
                 Flash();
-                Logger.Log($"[CharBoss] 彗星：玩家打出碎屑 → 清掉 {cleared} 名玩家的虚弱/易伤");
+                Logger.Log($"[CharBoss] 彗星{(dread ? "（恐惧）" : "")}：玩家打出碎屑 → 清掉 {cleared} 名玩家的虚弱/易伤");
             }
+
+            // 恐惧模式到此为止（只清负面，不给格挡、不打敌方血）。
+            if (dread) return;
 
             // ③ 所有敌方（所有 Boss）各失去 10 点生命。
             //

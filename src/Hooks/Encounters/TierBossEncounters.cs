@@ -1,4 +1,4 @@
-using CharacterBosses.Core;
+﻿using CharacterBosses.Core;
 
 namespace CharacterBosses.Encounters;
 
@@ -27,6 +27,12 @@ namespace CharacterBosses.Encounters;
 public sealed class IroncladAngerBossEncounter : IroncladBossEncounter
 {
     public override int? TierAct => 0;
+
+    /// <summary>
+    /// 地图图标（用户 2026-11-19）：战士头像居中 + 观者卡「火焰纹」（`WATCHER_WREATH_OF_FLAME`）那圈火焰。
+    /// 两张图随 pck 打包（见 tools/art/pck_extras.txt）。
+    /// </summary>
+    public override string BossNodePath => "res://CharacterBosses/images/map/ironclad_anger";
 }
 
 /// <summary>
@@ -122,6 +128,11 @@ public sealed class DefectStatusBossEncounter : DefectBossEncounter
 public sealed class IroncladStrikeBossEncounter : IroncladBossEncounter
 {
     public override int? TierAct => 0;
+
+    /// <summary>
+    /// 地图图标（用户 2026-11-19）：战士头像居中 + 地狱狂徒卡图那圈刀（中间战士已扣掉、刀加粗填白）。
+    /// </summary>
+    public override string BossNodePath => "res://CharacterBosses/images/map/ironclad_strike";
 }
 /// <summary>
 /// 第一幕故障机器人的**第二套设计「电球机」**（Key `DEFECT_THUNDER`，用户 2026-11-05）。
@@ -130,6 +141,11 @@ public sealed class IroncladStrikeBossEncounter : IroncladBossEncounter
 public sealed class DefectThunderBossEncounter : DefectBossEncounter
 {
     public override int? TierAct => 0;
+
+    /// <summary>
+    /// 地图图标（用户 2026-11-19）：故障机器人头像居中 + 雷霆卡图那圈电光。
+    /// </summary>
+    public override string BossNodePath => "res://CharacterBosses/images/map/defect_thunder";
 }
 
 /// <summary>

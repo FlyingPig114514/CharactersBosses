@@ -1115,6 +1115,33 @@ public static class BossDamagePredictor
     }
 
     /// <summary>
+    /// **「附加伤害行」的预览数字**（群蛇形态 / 烟囱 / 开信刀 / 灰烬 …）。
+    ///
+    /// ★★ v0.2.812（用户 2026-11-19：「有的伤害的伤害预览不会因玩家的无实体把伤害降低至 1（如群蛇形态）」）：
+    ///   这些行是 `RawAttackIntent`（不吃原版伤害管道，只画图）⇒ **「无实体」那类上限不会自己生效**，
+    ///   玩家身上有无实体时预览还显示 4 / 5 / 8，实际只掉 1。
+    ///   这里补跑 Cap 阶段，目标取「被这只 Boss 锁定的那位玩家」（随机攻击在跟踪锁定下也只打他）；
+    ///   拿不到锁定关系时 `CapDamage` 会退回本地玩家。
+    /// </summary>
+    public static int ExtraRowDamage(CardModel? card, int amount)
+    {
+        if (amount <= 0) return 0;
+        try
+        {
+            MegaCrit.Sts2.Core.Entities.Creatures.Creature? victim = null;
+            try
+            {
+                if (card?.Owner?.Creature?.Monster is Monsters.CharBossMonster boss)
+                    victim = Core.BossLockOn.TargetFor(boss)?.Creature;
+            }
+            catch { victim = null; }
+            if (card == null) return amount;
+            return CapDamage(card, amount, victim);
+        }
+        catch { return amount; }
+    }
+
+    /// <summary>
     /// **只跑原版伤害管道的「上限」阶段**（<c>ModifyDamageHookType.Cap</c>），也就是
     /// <c>min(牌面/已估算的每段伤害, 所有 ModifyDamageCap)</c>。
     ///

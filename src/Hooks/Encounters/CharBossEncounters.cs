@@ -96,6 +96,19 @@ public class FoolBossEncounter : CharBossEncounterBase<FoolBoss>
 public class FoolTarotBossEncounter : FoolBossEncounter
 {
     public override int? TierAct => 2;
+
+    /// <summary>
+    /// 地图节点图标 = **愚者自己的剪影**（用户 2026-11-19：「地图图标不是他的剪影」，截图里是个狼头）。
+    ///
+    /// 成因：基类 `CharBossEncounterBase&lt;TMonster&gt;.BossNodePath` 在没有专属贴图时会
+    /// **借用原版 TheKinBoss 的占位图**，而塔罗愚一直没做过图标 ⇒ 地图上显示的是那只狼。
+    ///
+    /// 贴图来源（愚者是原版 ST2 角色，Downfall 里没有他的 `avatar_*.png`）：
+    /// `res://images/ui/top_panel/character_icon_fool.png`（88×88，尖帽 + 两个尖角 + 绒球 + 遮面），
+    /// 用 `tools\art\make-fool-icon.ps1` 化成 512×512 纯白剪影（眼睛挖成两个洞）+ `_outline`，
+    /// 再按 `tools\art\import_proj` 那套导入流程生成 ctex 并进 PCK。
+    /// </summary>
+    public override string BossNodePath => "res://CharacterBosses/images/map/fool_tarot";
 }
 
 /// <summary>调试用的「普通战斗」版：三层塔罗愚。</summary>

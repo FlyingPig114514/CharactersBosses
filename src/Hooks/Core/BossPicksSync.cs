@@ -134,6 +134,90 @@ internal static class BossPicksSync
         catch { return null; }
     }
 
+    // ─────────────────────────────────────────────────────────────────────
+    // ★★ v0.2.816（用户 2026-11-19「有玩家联机不同步了」，`mod_log (44)` 最后一局 v0.2.804）：
+    //
+    //   `RunLobby.Players` **会来回抖**。日志实证同一局里跳了五次：
+    //     `[16:35:18] 阵容人数：RunState 有 2 人，但大厅里只剩 1 人 ⇒ 按 1 只 Boss`
+    //     `[16:35:18] 阵容人数变成 1 人 ⇒ 房主立即重播…（含 pc=1）`
+    //     `[16:35:31] 阵容人数变成 2 人 ⇒ …（含 pc=2）`
+    //     `[16:37:40] 变成 1 / [16:38:05] 变成 2 / [16:39:59] 变成 1`
+    //   而 `RunState.Players` 一直就是 2 人（那 1 人从没真的离开）。
+    //   直接把这个数当权威 ⇒ `PlayersPerFight()` 跟着抖 ⇒ 房主反复重播 `pc=1/pc=2`、
+    //   客人反复重排阵容 ⇒ **战斗中两端阵容条数对不上**：
+    //     `场上我方 Boss=2 只` 紧跟着 `阵容人数变成 1 人`，下一次快照就报不同步。
+    //
+    //   两道闸门，只加在这里（`PlayersPerFight()` 和重播循环都会经过它）：
+    //     ① **战斗中一律锁定人数**：这一场的阵容早造好了，中途改人数只可能两端分叉；
+    //        真要有人退了，下 **一场** 再按新人数排（那一场还没开始，改了不会分叉）。
+    //     ② **去抖**：新数值要连续稳定 ≥ {@link LiveStableSeconds} 秒才认，读取瞬间拿到了
+    //        不完整的大厅列表不会被当真。
+    // ─────────────────────────────────────────────────────────────────────
+
+    /// <summary>已经确认过的稳定人数（-1 = 还没算过）。</summary>
+    private static int _stableLive = -1;
+
+    /// <summary>正在观察的候选人数。</summary>
+    private static int _pendingLive = -1;
+
+    /// <summary>候选人数从什么时候开始保持不变的。</summary>
+    private static DateTime _pendingSince = DateTime.MinValue;
+
+    /// <summary>候选人数要连续稳定多少秒才认。</summary>
+    private const double LiveStableSeconds = 5.0;
+
+    /// <summary>「新的分数才认得」这条闸门（见上面那段注释）。</summary>
+    private static int GateLive(int raw)
+    {
+        try
+        {
+            if (raw <= 0) return _stableLive > 0 ? _stableLive : raw;
+
+            // 第一次拿到数 ⇒ 直接认（不拖延开局）
+            if (_stableLive <= 0)
+            {
+                _stableLive = raw;
+                _pendingLive = raw;
+                _pendingSince = DateTime.UtcNow;
+                return raw;
+            }
+
+            if (raw == _stableLive)
+            {
+                _pendingLive = raw;
+                _pendingSince = DateTime.UtcNow;
+                return _stableLive;
+            }
+
+            // 和稳定值不一样 ⇒ 先记候选，等它稳够 5 秒
+            if (raw != _pendingLive)
+            {
+                _pendingLive = raw;
+                _pendingSince = DateTime.UtcNow;
+                return _stableLive;
+            }
+            if ((DateTime.UtcNow - _pendingSince).TotalSeconds < LiveStableSeconds) return _stableLive;
+
+            // ★ 战斗中不改（阵容已经造好，改人数只会两端分叉）
+            bool inCombat = false;
+            try { inCombat = MegaCrit.Sts2.Core.Combat.CombatManager.Instance?.IsInProgress ?? false; }
+            catch { inCombat = false; }
+            if (inCombat) return _stableLive;
+
+            int before = _stableLive;
+            _stableLive = raw;
+            Logger.Log($"[CharBoss] 阵容人数：{raw} 人已连续稳定 {LiveStableSeconds:0} 秒 ⇒ 确认为 {raw} 人" +
+                       $"（此前 {before} 人；战斗中锁定的那几次不算）");
+            return _stableLive;
+        }
+        catch { return raw; }
+    }
+
+    /// <summary>
+    /// 对外入口：原始判定 + 上面那两道闸门（**战斗中锁定 / 稳定 5 秒才认**）。
+    /// </summary>
+    internal static int LivePlayerCount(int fallback) => GateLive(LivePlayerCountRaw(fallback));
+
     /// <summary>
     /// **真正还在场的玩家数**（v0.2.797，用户 2026-11-19：中途有人离开游戏后，Boss 房变成 4v4，
     /// 多出来那只面对一个没人操控的角色 ⇒ 剩下的人结束不了回合）。
@@ -150,7 +234,7 @@ internal static class BossPicksSync
     ///   · 拿不到（单人 / 还没建大厅 / 反射失败）⇒ 退回心跳判活，阈值放宽到 **120 秒**
     ///     （以前 30 秒太短：客人每 5 秒才发一次心跳，中间断一会儿就误判）。
     /// </summary>
-    internal static int LivePlayerCount(int fallback)
+    private static int LivePlayerCountRaw(int fallback)
     {
         try
         {
@@ -524,6 +608,10 @@ internal static class BossPicksSync
             _lastSent = string.Empty;
             _lastCapsSent = string.Empty;
             _appliedLogged = false;
+            // ★ v0.2.816：新的一局 ⇒ 「稳定人数」重新算（否则会拿上一局的数去锁这一局的阵容）
+            _stableLive = -1;
+            _pendingLive = -1;
+            _pendingSince = DateTime.MinValue;
         }
         catch { /* 忽略 */ }
     }

@@ -77,12 +77,72 @@ internal static class BossOrbTargeting
     {
         try
         {
-            var owner = orb?.Owner?.Creature;
-            if (owner?.Monster is not CharBossMonster boss) return given;
+            var boss = BossOf(orb);
+            if (boss == null)
+            {
+                // v0.2.808 诊断：在 PC 上留一行（限流），用来确认「球的 Owner 到底有没有」
+                if (DiagCount++ < 30)
+                    Core.LogLoudness.Diag($"[CharBoss] 球目标：{Name(orb)} 主人=**不是我们的 Boss**" +
+                                          $"（Owner={OwnerName(orb)}）⇒ 不改写（沿用原版随机）");
+                return given;
+            }
             var want = Preferred(boss);
+            if (DiagCount++ < 30)
+                Core.LogLoudness.Diag($"[CharBoss] 球目标：{Name(orb)} 主人={SafeName(boss.Creature)} " +
+                                      $"传入={SafeName(given)} ⇒ 改成 {SafeName(want)}" +
+                                      (want == null ? "（算不出，沿用原版）" : ""));
             return want ?? given;
         }
         catch { return given; }
+    }
+
+    private static int DiagCount;
+
+    /// <summary>这颗球属于哪只我们的 Boss（`Owner` 为空时退回「场上只有一只我们的 Boss」这一常见情形）。</summary>
+    private static CharBossMonster? BossOf(OrbModel? orb)
+    {
+        try
+        {
+            var owner = orb?.Owner?.Creature;
+            if (owner?.Monster is CharBossMonster boss) return boss;
+
+            // ★ v0.2.808：影子玩家的球在个别时机 `Owner` 会是 null（球刚生成、或队列被换过），
+            //   此时只要场上**只有一只**我们的 Boss，指向它就是确定的（多 Boss 时不猜，避免打错人）。
+            var combat = orb?.Owner?.Creature?.CombatState;
+            if (combat == null)
+            {
+                try { combat = MegaCrit.Sts2.Core.Combat.CombatManager.Instance?.DebugOnlyGetState(); }
+                catch { combat = null; }
+            }
+            if (combat == null) return null;
+            CharBossMonster? only = null;
+            int count = 0;
+            foreach (var c in combat.Enemies)
+            {
+                if (c?.Monster is not CharBossMonster b) continue;
+                if (!c.IsAlive || c.IsDead) continue;
+                count++;
+                only = b;
+                if (count > 1) return null;
+            }
+            return count == 1 ? only : null;
+        }
+        catch { return null; }
+    }
+
+    private static string Name(OrbModel? orb)
+    {
+        try { return orb?.GetType().Name ?? "?"; } catch { return "?"; }
+    }
+
+    private static string OwnerName(OrbModel? orb)
+    {
+        try { return orb?.Owner == null ? "<null>" : SafeName(orb.Owner.Creature); } catch { return "?"; }
+    }
+
+    private static string SafeName(Creature? c)
+    {
+        try { return c == null ? "<null>" : (c.Name ?? "?"); } catch { return "?"; }
     }
 }
 

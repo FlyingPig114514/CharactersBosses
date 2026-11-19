@@ -318,7 +318,8 @@ public sealed class FoolDominionPower : PowerModel
 /// >   当回合伤害翻三倍）」
 ///
 /// ⇒ 三个 power 各管一段：
-///   · **本类（虔信）**：`Amount` = 每次给几层真言（支配给 2）；**玩家侧回合开始**时给持有者加真言，
+///   · **本类（虔信）**：`Amount` = 每次给几层真言（支配给 2）；**玩家侧回合开始**时给持有者加真言
+///     （★ v0.2.815：**玩家额外回合不算**，见 `Core/ExtraTurnWatch`），
 ///     满 <see cref="Threshold"/> 就扣 10 并让他进神格；
 ///   · **<see cref="DominionMantraPower"/>（真言）**：就是那个层数/计数，界面上看得见进度；
 ///   · **<see cref="DominionDivinityPower"/>（神格）**：`ModifyDamageMultiplicative` 把他自己的
@@ -362,6 +363,15 @@ public sealed class WatcherDominionDevotionPower : PowerModel
             var me = Owner;
             if (me == null || !me.IsAlive) return;
             if (me.Monster is Monsters.CharBossMonster) return;    // 我们自己的 Boss 走真神格，别串台
+
+            // ★ v0.2.815（用户 2026-11-19 同一类问题）：额外回合（佩尔之眼 / 龙涎香 / 腾跃 / 倒吊人 …）
+            //   不是真回合 ⇒ 不叠真言，否则怪物会提前一轮进神格（第 5/10/15 回合那个节奏被打破）。
+            //   判据见 Core/ExtraTurnWatch.cs（读 `CombatManager.PlayersTakingExtraTurn`）。
+            if (Core.ExtraTurnWatch.IsExtraPlayerTurn)
+            {
+                Logger.Log($"[CharBoss] 观者的支配·虔信：{me.Name} **跳过本次（额外回合）**，不叠真言");
+                return;
+            }
 
             int gain = (int)Math.Round((double)Amount);
             if (gain <= 0) return;
