@@ -1,4 +1,4 @@
-﻿#if STS2_111   // 「观者」角色只在 0.113 的观者 mod 里 ⇒ 107 不参与
+#if STS2_111   // 「观者」角色只在 0.113 的观者 mod 里 ⇒ 107 不参与
 using System;
 using System.Reflection;
 using MegaCrit.Sts2.Core.Models;
@@ -79,19 +79,33 @@ internal static class WatcherModPresence
                     try { entry = ModelDb.GetId(t)?.Entry ?? string.Empty; } catch { continue; }
                     if (entry.IndexOf("WATCHER", StringComparison.OrdinalIgnoreCase) < 0) continue;
                     _characterType = t;
-                    Logger.Log($"[CharBoss] 观者 mod 探测到：程序集 {name}，角色类型 {t.FullName}（entry={entry}）");
+                    LogOnce($"[CharBoss] 观者 mod 探测到：程序集 {name}，角色类型 {t.FullName}（entry={entry}）");
                     return;
                 }
-                Logger.Log($"[CharBoss] 观者 mod 程序集 {name} 在，但没找到 WATCHER 角色类型");
+                LogOnce($"[CharBoss] 观者 mod 程序集 {name} 在，但没找到 WATCHER 角色类型");
             }
         }
         catch (Exception e)
         {
-            Logger.Log("[CharBoss] 观者 mod 探测失败: " + e.Message);
+            LogOnce("[CharBoss] 观者 mod 探测失败: " + e.Message);
         }
-        if (!_installed) Logger.Log("[CharBoss] 没装观者 mod ⇒ 第三幕候选里不会有观者 Boss");
+        if (!_installed) LogOnce("[CharBoss] 没装观者 mod ⇒ 第三幕候选里不会有观者 Boss");
         // 只有真的探测到观者 mod 才锁死；没找到就保持未锁，下一帧再试（慢车道会反复调 Installed）
         if (_installed) _probed = true;
+    }
+
+    /// <summary>同一句话只打一次（v0.2.805：以前「没装观者 / 探测到」在手机上一局能刷两千多行）。</summary>
+    private static string _lastLog = string.Empty;
+
+    private static void LogOnce(string message)
+    {
+        try
+        {
+            if (message == _lastLog) return;
+            _lastLog = message;
+            Logger.Log(message);
+        }
+        catch { /* 忽略 */ }
     }
 }
 #endif

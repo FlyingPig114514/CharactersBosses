@@ -49,7 +49,9 @@ internal static class VanillaTurnEndTimingPatch
         {
             try
             {
-                Logger.Log($"[CharBoss] 原版回合结束步骤：{name} = {sw.ElapsedMilliseconds}ms");
+                // ★ v0.2.805：手机上不打（这一项实测 4,872 行，纯诊断；卡顿时它自己也救不了场）
+                CharacterBosses.Core.LogLoudness.Diag(
+                    $"[CharBoss] 原版回合结束步骤：{name} = {sw.ElapsedMilliseconds}ms");
             }
             catch { /* 忽略 */ }
         }

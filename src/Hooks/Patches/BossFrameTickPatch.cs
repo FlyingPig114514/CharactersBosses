@@ -142,9 +142,17 @@ public static class BossFrameTick
     private static double _tickSumMs;
     private static double _tickMaxMs;
 
+    /// <summary>
+    /// 进战斗房后要重建面板的 Boss（v0.2.805：**每帧只重建 1 只**，避免那一帧 131ms 的一顿）。
+    /// </summary>
+    private static readonly System.Collections.Generic.List<CharBossMonster> _rebuildQueue = new();
+
     public static void Tick(string source)
     {
         var swTick = System.Diagnostics.Stopwatch.StartNew();
+        // ★ v0.2.805：日志现在是缓冲写的（手机省电）⇒ 每帧顺手把到期的缓冲刷下去，
+        //   免得「最后几行」一直躺在内存里（战斗结束时尤其明显）。
+        try { Patches.SafeLogPatch.FlushIfDue(); } catch { /* 忽略 */ }
         // 进新战斗房（斗蛐蛐连打第二场）时，把上一场留下的面板/层/翻侧计数全拆掉。
         CharacterBosses.UI.BossUiSession.EnsureFresh();
         // 场景树导出器（按 F9 导出，幂等挂载；用户 2026-11-11 要「能看各种节点」）
@@ -161,7 +169,11 @@ public static class BossFrameTick
                 if (ms > _tickMaxMs) _tickMaxMs = ms;
                 if (_tickCalls % 120 == 0)
                 {
-                    Logger.Log($"[CharBoss] 帧回调耗时(每120帧): avg={_tickSumMs / 120:0.000}ms max={_tickMaxMs:0.000}ms");
+                    // ★ v0.2.805：手机上一律不打（这一项实测占整份日志的 29%，203,646 行里 59,064 行），
+                    //   但真卡了（单帧 > 20ms）仍然留一行证据。
+                    double avgMs = _tickSumMs / 120;
+                    Core.LogLoudness.DiagStall(_tickMaxMs, 20.0,
+                        $"[CharBoss] 帧回调耗时(每120帧): avg={avgMs:0.000}ms max={_tickMaxMs:0.000}ms");
                     _tickSumMs = 0; _tickMaxMs = 0;
                 }
             }
@@ -324,7 +336,8 @@ public static class BossFrameTick
             catch (Exception e) { Logger.Log("[CharBoss] 结束回合按钮保险失败: " + e.Message); }
             if (line == _lastEndTurnProbeLine) return;      // 状态没变就不刷屏
             _lastEndTurnProbeLine = line;
-            Logger.Log("[CharBoss] 结束回合按钮探针：" + line);
+            // ★ v0.2.805：手机上不打（这一项实测 6,036 行；真出「没有结束回合按钮」时看 PC 端日志即可）
+            CharacterBosses.Core.LogLoudness.Diag("[CharBoss] 结束回合按钮探针：" + line);
         }
         catch (Exception e)
         {
@@ -503,14 +516,27 @@ public static class BossFrameTick
 
             // ★ v0.2.513：UI 会话刚重置过（进新战斗房的那一帧）⇒ 立刻把面板重建回来。
             //   否则就是「Boss 的卡牌 / 遗物 / 能量整场都没有」（用户 2026-11-08 截图）。
+            //
+            // ★★ v0.2.805（手机卡顿）：以前这里**在同一帧里**把 N 只 Boss 的面板全重建一遍 ——
+            //   实测进 Boss 房那一帧的帧回调能到 **131ms**（常态只有 0.05ms），手机上是明显一顿。
+            //   现在改成**排队、每帧只重建 1 只**（4 只 Boss 也就多花 3 帧 ≈ 50ms，肉眼看不出来）。
             if (CharacterBosses.UI.BossUiSession.ConsumeRebuildRequest() && everyBoss.Count > 0)
             {
-                foreach (var each in everyBoss)
+                _rebuildQueue.Clear();
+                foreach (var each in everyBoss) if (each != null) _rebuildQueue.Add(each);
+                Logger.Log($"[CharBoss] UI 会话重建：{everyBoss.Count} 只 Boss 的面板" +
+                           $"分 {_rebuildQueue.Count} 帧重新挂上（避免进房那一帧一次性卡顿）");
+            }
+            if (_rebuildQueue.Count > 0)
+            {
+                var one = _rebuildQueue[0];
+                _rebuildQueue.RemoveAt(0);
+                try
                 {
-                    try { CharacterBosses.UI.BossHandUi.RefreshForce(each); }
-                    catch (Exception e) { Logger.Log("[CharBoss] 会话重建面板失败: " + e.Message); }
+                    if (one != null && one.Creature != null)
+                        CharacterBosses.UI.BossHandUi.RefreshForce(one);
                 }
-                Logger.Log($"[CharBoss] UI 会话重建：{everyBoss.Count} 只 Boss 的面板已重新挂上");
+                catch (Exception e) { Logger.Log("[CharBoss] 会话重建面板失败: " + e.Message); }
             }
 
             // 药水真正变了（喝掉 / 炼出来 / 混沌药水补满）→ 立刻刷面板。
@@ -918,7 +944,7 @@ public static class BossFrameTick
 
             _perfWindowUsec = now;
             int lowest = _fpsMin == int.MaxValue ? fps : _fpsMin;
-            Logger.Log(CharacterBosses.Core.PerfLog.Drain(PerfWindowSeconds, fps, lowest));
+            CharacterBosses.Core.LogLoudness.Diag(CharacterBosses.Core.PerfLog.Drain(PerfWindowSeconds, fps, lowest));
             _fpsMin = fps > 0 ? fps : int.MaxValue;
         }
         catch { /* 诊断而已，绝不影响战斗 */ }

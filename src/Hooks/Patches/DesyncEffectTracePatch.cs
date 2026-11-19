@@ -57,6 +57,8 @@ internal static class Trace
 
     internal static void Log(string body)
     {
+        // ★ v0.2.805：手机上不打（实测 3,671 行，纯诊断；抓不同步时用 PC 端日志即可）
+        if (!Core.LogLoudness.Verbose) return;
         if (_lines >= MaxLines) return;
         _lines++;
         try

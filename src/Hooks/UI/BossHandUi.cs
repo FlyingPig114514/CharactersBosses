@@ -167,6 +167,22 @@ public static class BossHandUi
     {
         try
         {
+            // ★★ v0.2.805（手机卡顿）：**同一帧内每只 Boss 最多整排重建一次**（纯去重，不改语义）。
+            //   同一次出牌 / 能力变化里往往有好几处都会喊 `RefreshForce`，4 只 Boss 同场时会在同一帧
+            //   叠成好几次整排重建 ⇒ 手机上一顿。面板本来就被标脏，下一次绘制照样会重画。
+            ulong frame = 0;
+            try { frame = (ulong)Engine.GetFramesDrawn(); } catch { frame = 0; }
+            if (frame != 0)
+            {
+                if (ForceFrame.TryGetValue(boss, out var last) && last == frame)
+                {
+                    Refresh(boss);              // 这一帧已经整排重建过 ⇒ 只做增量刷新
+                    return;
+                }
+                if (ForceFrame.Count > 32) ForceFrame.Clear();
+                ForceFrame[boss] = frame;
+            }
+
             var panel = PanelFor(boss);
             if (panel != null && GodotObject.IsInstanceValid(panel)) panel.Invalidate();
         }
@@ -176,6 +192,9 @@ public static class BossHandUi
         }
         Refresh(boss);
     }
+
+    /// <summary>每只 Boss 上一次「整排强制重建」的帧号（v0.2.805，同帧去重用）。</summary>
+    private static readonly Dictionary<CharBossMonster, ulong> ForceFrame = new();
 
     /// <summary>为某只 Boss 建（或取回）它自己的那套面板。</summary>
     private static BossHandPanel? EnsurePanel(SceneTree tree, CharBossMonster boss)

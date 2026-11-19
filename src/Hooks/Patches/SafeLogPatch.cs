@@ -28,25 +28,31 @@ public static class SafeLogPatch
 
     private static int _failures;
 
+    // ── v0.2.805（手机卡顿/耗电）：**写盘改成缓冲 + 长开文件** ──────────────────
+    //   以前每一条日志都 `Directory.CreateDirectory(...)` + `new FileStream(...)` + 关掉 ——
+    //   一局实测 203,646 行 ⇒ 20 万次「建目录 + 开关文件」。PC 上无所谓，
+    //   手机上每次碰 flash 都贵、还费电（玩家反馈「手机版四人联机卡顿明显，耗电也明显」）。
+    //   现在：文件只开一次、目录只建一次，攒够 32 行或过了 0.5 秒才 flush；
+    //   带 ⚠ / 失败 / 不同步 这类**关键行**仍然立刻 flush（出问题时不丢证据）。
+    private static FileStream? _stream;
+    private static StreamWriter? _writer;
+    private static DateTime _openedAtUtc;
+    private static DateTime _lastFlushUtc;
+    private static int _buffered;
+    private static bool _dirEnsured;
+
     [HarmonyPrefix]
     public static bool Prefix(string message)
     {
         try
         {
-            string line = $"[{DateTime.Now:HH:mm:ss}] {message}{Environment.NewLine}";
-            lock (Gate)
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(LogPath)!);
-                using var stream = new FileStream(LogPath, FileMode.Append, FileAccess.Write,
-                    FileShare.ReadWrite);          // ← 关键：允许别的进程同时写
-                using var writer = new StreamWriter(stream);
-                writer.Write(line);
-            }
+            Write(message ?? string.Empty);
         }
         catch
         {
             // 落盘失败就丢弃这条日志：日志绝不能把游戏逻辑打崩（双开/磁盘忙都可能失败）
             _failures++;
+            CloseQuietly();
         }
 
         // 本地数据记录（A5，默认关）：把「我们自己打出来的问题行」也记一份。
@@ -61,6 +67,84 @@ public static class SafeLogPatch
         catch { /* 忽略 */ }
 
         return false;   // 已经自己写过了，跳过原方法
+    }
+
+    private static void Write(string message)
+    {
+        lock (Gate)
+        {
+            if (!_dirEnsured)
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(LogPath)!);
+                _dirEnsured = true;
+            }
+
+            EnsureWriter();
+            _writer!.Write($"[{DateTime.Now:HH:mm:ss}] {message}{Environment.NewLine}");
+            _buffered++;
+
+            var now = DateTime.UtcNow;
+            // 关键行立刻落盘；其余攒批
+            if (_buffered >= 32
+                || (now - _lastFlushUtc).TotalMilliseconds >= 500
+                || LooksLikeProblem(message))
+            {
+                Flush();
+            }
+        }
+    }
+
+    private static void EnsureWriter()
+    {
+        if (_writer != null)
+        {
+            // 每隔 5 分钟换一次文件句柄，避免极长的会话一直占着文件
+            if ((DateTime.UtcNow - _openedAtUtc).TotalMinutes < 5) return;
+            Flush();
+            CloseQuietly();
+        }
+
+        _stream = new FileStream(LogPath, FileMode.Append, FileAccess.Write,
+            FileShare.ReadWrite);              // ← 关键：允许别的进程同时写（双开那次的教训）
+        _writer = new StreamWriter(_stream);
+        _openedAtUtc = DateTime.UtcNow;
+        _lastFlushUtc = DateTime.UtcNow;
+    }
+
+    /// <summary>把缓冲写下去（帧驱动/关键行都会调；失败静默）。</summary>
+    internal static void Flush()
+    {
+        try
+        {
+            lock (Gate)
+            {
+                if (_writer == null) return;
+                _writer.Flush();
+                _buffered = 0;
+                _lastFlushUtc = DateTime.UtcNow;
+            }
+        }
+        catch { _failures++; CloseQuietly(); }
+    }
+
+    private static void CloseQuietly()
+    {
+        try { _writer?.Dispose(); } catch { /* 忽略 */ }
+        try { _stream?.Dispose(); } catch { /* 忽略 */ }
+        _writer = null;
+        _stream = null;
+        _buffered = 0;
+    }
+
+    /// <summary>该不该现在把日志缓冲刷下去（帧驱动每秒调一次就够）。</summary>
+    internal static void FlushIfDue()
+    {
+        try
+        {
+            if (_writer == null) return;
+            if (_buffered > 0 && (DateTime.UtcNow - _lastFlushUtc).TotalMilliseconds >= 500) Flush();
+        }
+        catch { /* 忽略 */ }
     }
 
     /// <summary>这条日志是不是「出问题」的那种（异常 / 失败 / 不同步 / 我们的 ⚠ 诊断）。</summary>

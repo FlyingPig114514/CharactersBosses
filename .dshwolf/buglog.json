@@ -1644,6 +1644,12 @@
       "error_message": "tools\\upload-workshop.ps1 报 Error occurred while uploading to the workshop! Result: k_EResultFail（本次是 0.2.804 第一次尝试）",
       "fix": "跟 k_EResultFileNotFound 同一类：紧接着上一次上传后再跑、或 Steam 刚提交完没缓过来时的瞬时失败。**等 8~10 秒再跑同一条命令即可成功**（2026-11-19 实测：0.2.804 第一次 k_EResultFail ⇒ sleep 8s 重跑 ⇒ Successfully uploaded / UPLOAD OK）。判成功仍只看 `Successfully uploaded`（UploadCommand.cs:301-320，只有 m_eResult==k_EResultOK 才打印）。不要因一次失败去改 workshop.json 或重新打包。",
       "at": "2026-11-18T15:52:54.612Z"
+    },
+    {
+      "id": "bug-252-mwmvs5ob",
+      "error_message": "手机版四人联机「卡顿明显，耗电也明显」（玩家「季节」工坊反馈 2026-11-19）",
+      "fix": "实测帧回调只有 avg=0.05~0.08ms（不是逻辑慢），真开销是日志 I/O：一局 3h40m 203,646 行 / 27.8MB（≈15 行/秒），而 SafeLogPatch 每行都 Directory.CreateDirectory + 新建 FileStream + 关闭。四处改：①日志改长开文件 + 缓冲写（32 行或 0.5s flush，关键行立刻 flush，5 分钟换句柄，帧驱动 FlushIfDue 兜底）；②新增 Core.LogLoudness，手机(Android/iOS)上纯诊断行一律不打（帧回调耗时只在单帧>20ms 时留一行），PC 行为不变；③进战斗房那一帧原本同帧重建所有 Boss 面板（实测 131ms 尖峰）⇒ 改成排队每帧只重建 1 只；④BossHandUi.RefreshForce 加同帧去重。v0.2.805。",
+      "at": "2026-11-19T01:38:02.555Z"
     }
   ]
 }
