@@ -487,18 +487,53 @@ internal static class BossKeys
             return key!;                    // 107 里根本不会有观者 Boss
 #endif
             Logger.Log("[CharBoss] 观者 Boss：这一局是装过观者模组时开的，但现在探测不到它 ⇒ 换成塔罗愚继续");
-            return "FOOL_BOSS";
+            // ★★ v0.2.806（用户 2026-11-19：「不开启观者 mod 时也有可能碰到观者 boss，然后变成占位愚者」）：
+            //   这里以前写的是 `"FOOL_BOSS"` —— 而 `EncounterOf` 的 switch 里**根本没有这个 Key**
+            //   （塔罗愚叫 `FOOL_TAROT`）⇒ 落到 `default: return null` ⇒ 调用方把 null 当成「没有替换」
+            //   ⇒ 观者遭遇原样保留：立绘退化成占位愚者、名字显示成 `Characterbosses`、
+            //   特殊效果却是「斋戒」（截图实证）。改成真正的 Key。
+#if STS2_113
+            return "FOOL_TAROT";
+#else
+            return key!;                    // 0.111 正式版没有愚者遭遇，别硬换
+#endif
         }
         catch { return key ?? string.Empty; }
     }
 
     /// <summary>
-    /// **第二幕**的观者候补（2026-11-16：二层 1 号「印牌观」）。
+    /// **最后一道闸**（v0.2.806，用户 2026-11-19：「不开启观者 mod 时也可能碰到观者 boss，
+    /// 然后就会变成占位愚者」）。
     ///
-    /// 与三层的 <see cref="WatcherRoster"/> 同一套闸门：装了观者 mod、且
-    /// `BossPicksSync.WatcherAllowedHere()` 认为「全端同一实现」才进候补表 ——
-    /// 候补表条数一变阵容就会分叉，所以这条判断不能只写在本机。
+    /// 上面的 <see cref="SubstituteIfUnavailable"/> 只管「按 **Key** 造遭遇」那条路；
+    /// 而真正的 Boss 房走 `ActModel.PullNextEncounter`，它的「**沿用地图上那只**」分支会
+    /// **原样返回存档槽里那个遭遇**（那一局是装过观者 mod 时开的）⇒ 观者 mod 不在时观者 Boss 照样上场：
+    /// 立绘退化成占位愚者、名字显示成 `Characterbosses`、特殊效果却是「斋戒」。
+    /// 这里按**遭遇**再兜一次：观者的遭遇 + 本机没有观者 mod ⇒ 换成塔罗愚（与按 Key 那条同一个目标）。
     /// </summary>
+    internal static EncounterModel? FixUnavailableEncounter(EncounterModel? encounter)
+    {
+#if STS2_111
+        try
+        {
+            if (encounter == null) return encounter;
+            if (Core.WatcherModPresence.Installed) return encounter;
+            string? key = KeyOfEncounter(encounter);
+            if (key == null || !key.StartsWith("WATCHER_", StringComparison.Ordinal)) return encounter;
+#if STS2_113
+            Logger.Log($"[CharBoss] 观者 Boss：这一场是 {key}（存档槽里留着的），但本机探测不到观者 mod " +
+                       "⇒ 换成塔罗愚（占位愚者不上场）");
+            return ModelDb.Encounter<FoolTarotBossEncounter>();
+#else
+            return encounter;               // 0.111 正式版没有愚者遭遇，保持原样
+#endif
+        }
+        catch { return encounter; }
+#else
+        return encounter;
+#endif
+    }
+
     /// <summary>
     /// **第一幕**的观者候补（用户 2026-11-17：一层 1 号「预见观」）。
     /// 闸门与另外两幕完全相同（装了观者 mod + 全端同一实现）。

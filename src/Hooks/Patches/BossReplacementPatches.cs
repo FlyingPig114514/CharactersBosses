@@ -86,6 +86,11 @@ public static class PullNextEncounterPatch
                                (wantSecond ? "（第二只）" : string.Empty) + "，不再按阵容重算");
                 }
 
+                // ★★ v0.2.806（用户 2026-11-19：「不开启观者 mod 时也可能碰到观者 boss ⇒ 变成占位愚者」）：
+                //   上面两条分支都可能**原样返回存档槽里那个观者遭遇**（那一局是装过观者 mod 时开的）。
+                //   这里最后再兜一次：观者遭遇 + 本机没有观者 mod ⇒ 换成塔罗愚。
+                __result = BossKeys.FixUnavailableEncounter(__result);
+
                 // 记账：换了 id 才算「又发了一只」（同一房间重复拉取不会重复计数）
                 if (__result != null && !Equals(__result.Id, _lastHandedBossId))
                 {
