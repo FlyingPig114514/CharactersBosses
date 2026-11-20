@@ -1,9 +1,9 @@
 {
     "DREAD.IRONCLAD.description":  "Ironclad\u0027s Dominion: at the start of each combat, all enemies gain 1 Demon Form.",
-    "DREAD.SILENT.description":  "The Silent's Dominion: at the start of every combat, you lose 1 Strength and gain 1 Weak (in Elite combats: 2 Strength and 2 Weak).",
-    "DREAD.DEFECT.description":  "Defect's Dominion: All enemies gain 1 Artifact.",
+    "DREAD.SILENT.description":  "The Silent's Dominion: at the start of every combat, you lose {Strength} Strength and gain {Weak} Weak .",
+    "DREAD.DEFECT.description":  "Defect's Dominion: All enemies gain {Artifact} Artifact.",
     "DREAD.NECROBINDER.description":  "Necrobinder\u0027s Dominion: at the start of your turn, a random card in your hand costs 1 more this turn.",
-    "DREAD.REGENT.description":  "Regent's Dominion: At the start of your turn, choose 1 non-Status, non-Curse card and transform it into Debris.",
+    "DREAD.REGENT.description":  "Regent's Dominion: At the start of your turn, choose 1 non-Status, non-Curse card and transform it into {Transform}.",
     "DREAD.WATCHER_DEVOTION.description":  "The Watcher\u0027s Dominion: at the start of every combat, all enemies gain 2 [gold]Devotion[/gold] (at the start of your turn each enemy gains 2 [gold]Mantra[/gold]; at 10 [gold]Mantra[/gold] it spends 10 and enters [gold]Divinity[/gold], dealing triple attack damage that turn).",
     "DREAD.FOOL.description":  "The Fool's Dominion: at the start of every combat, add 2 [gold]Sadness[/gold] to your draw pile."
 }

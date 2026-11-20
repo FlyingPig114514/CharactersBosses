@@ -316,7 +316,6 @@ public sealed class SilentDominion : MegaCrit.Sts2.Core.Models.Dread.DominionMod
 
     /// <summary>已经结算过的战斗（「房间进入」与「首个玩家回合开始」两条路只能给一次）。</summary>
     private static readonly HashSet<object> Applied = new();
-
     public override async Task AfterRoomEntered(AbstractRoom room)
     {
         try
@@ -369,7 +368,10 @@ public sealed class SilentDominion : MegaCrit.Sts2.Core.Models.Dread.DominionMod
             var players = combatState.Players;
             if (players == null) return;
 
-            int stacks = elite ? EliteStacks : NormalStacks;
+            // ★ v0.2.844（用户 2026-11-21）：改成**按幕分档** —— 1/2/3 幕 = -1/-2/-3 力量 + 1/2/3 虚弱。
+            //   以前按「普通战 1 / 精英战 2」分，现在用户明确要按层数，精英那套作废（参数保留只为日志）。
+            int stacks = DreadActScaling.ActNumber();
+            _ = elite;
             int given = 0;
             foreach (var p in players)
             {
@@ -558,10 +560,12 @@ public sealed class DefectDominion : MegaCrit.Sts2.Core.Models.Dread.DominionMod
                 return;
             }
 
+            // ★ v0.2.844（用户 2026-11-21）：按幕分档 —— 1/2/3 幕 = 1/2/3 层人工制品
+            int amount = DreadActScaling.ActNumber();
             await MegaCrit.Sts2.Core.Commands.PowerCmd.Apply<
                 MegaCrit.Sts2.Core.Models.Powers.ArtifactPower>(
-                new ThrowingPlayerChoiceContext(), targets, 1m, null, null);
-            Logger.Log($"[CharBoss] 恐惧模式·故障机器人的支配（{why}）：{targets.Count} 个敌人各获得 1 层人工制品" +
+                new ThrowingPlayerChoiceContext(), targets, (decimal)amount, null, null);
+            Logger.Log($"[CharBoss] 恐惧模式·故障机器人的支配（{why}）：{targets.Count} 个敌人各获得 {amount} 层人工制品" +
                        (already > 0 ? $"（另有 {already} 个原本就有，未叠加）" : string.Empty));
         }
         catch (Exception e) { Logger.Log("[CharBoss] 故障机器人的支配（施放人工制品）失败: " + e.Message); }
@@ -963,3 +967,48 @@ internal static class DreadDominionSetPatch
 }
 #endif
 
+#if STS2_113   // 恐惧模式的 DominionModel 是 0.113 才有的类型
+/// <summary>
+/// ★ v0.2.844（用户 2026-11-21）：「只显示当前层数的效果」。
+///
+/// `DominionModel.Description` **不是 virtual**（反编译确认）⇒ 只能挂 Harmony 后缀，
+/// 在我们这三条按幕分档的支配上把占位符填成**当前幕**的数值：
+///   · 静默猎手：`{Strength}` / `{Weak}`
+///   · 故障机器人：`{Artifact}`
+///   · 储君：`{Transform}`（= 当前幕要变成的那张状态牌的名字，取卡牌模型的 Title，
+///     所以 16 种语言自动本地化）
+/// 战士 / 观者 / 愚者三条支配不带占位符，这里也不会碰它们。
+/// </summary>
+[HarmonyLib.HarmonyPatch(typeof(MegaCrit.Sts2.Core.Models.Dread.DominionModel), "get_Description")]
+internal static class DominionDescriptionActScalingPatch
+{
+    [HarmonyLib.HarmonyPostfix]
+    public static void Postfix(MegaCrit.Sts2.Core.Models.Dread.DominionModel __instance,
+                               ref MegaCrit.Sts2.Core.Localization.LocString __result)
+    {
+        try
+        {
+            if (__instance == null || __result == null) return;
+            int n = DreadActScaling.ActNumber();
+
+            if (__instance is SilentDominion)
+            {
+                __result.Add("Strength", (decimal)n);
+                __result.Add("Weak", (decimal)n);
+            }
+            else if (__instance is DefectDominion)
+            {
+                __result.Add("Artifact", (decimal)n);
+            }
+            else if (__instance is RegentDominion)
+            {
+                var type = DreadActScaling.RegentTransformCardType();
+                var card = MegaCrit.Sts2.Core.Models.ModelDb.GetById<MegaCrit.Sts2.Core.Models.CardModel>(
+                    MegaCrit.Sts2.Core.Models.ModelDb.GetId(type));
+                if (card?.Title != null) __result.Add("Transform", card.Title);
+            }
+        }
+        catch { /* 填不上就显示原文，绝不影响 UI */ }
+    }
+}
+#endif

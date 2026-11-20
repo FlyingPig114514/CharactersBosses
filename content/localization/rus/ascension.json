@@ -1,7 +1,7 @@
 {
     "DREAD.IRONCLAD.description":  "Ironclad\u0027s Dominion: at the start of each combat, all enemies gain 1 Demon Form.",
-    "DREAD.SILENT.description":  "Господство Безмолвной: в начале каждого боя ты теряешь 1 силы и получаешь 1 слабости (в боях с элитой: 2 силы и 2 слабости).",
-    "DREAD.DEFECT.description":  "Правление Дефекта: все враги получают 1 Артефакт.",
+    "DREAD.SILENT.description":  "Господство Безмолвной: в начале каждого боя ты теряешь {Strength} силы и получаешь {Weak} слабости .",
+    "DREAD.DEFECT.description":  "Правление Дефекта: все враги получают {Artifact} Артефакт.",
     "DREAD.NECROBINDER.description":  "Necrobinder\u0027s Dominion: at the start of your turn, a random card in your hand costs 1 more this turn.",
     "DREAD.REGENT.description":  "Правление Принца: в начале вашего хода выберите 1 карту (не Статус и не Проклятие) и превратите её в «Обломки».",
     "DREAD.WATCHER_DEVOTION.description":  "Господство Наблюдателя: в начале каждого боя все враги получают 2 [gold]Преданности[/gold] (в начале вашего хода каждый враг получает 2 [gold]мантры[/gold]; при 10 [gold]мантры[/gold] он тратит 10 и входит в [gold]Божественность[/gold], нанося в этот ход тройной урон).",

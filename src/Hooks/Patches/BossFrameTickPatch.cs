@@ -91,17 +91,42 @@ public static class BossFrameTick
         }
         catch { return false; }
     }
-    /// <summary>指纹比对类检查：桌面每帧（零回归）；手机隔帧（约 30Hz）。</summary>
+    /// <summary>
+    /// 指纹比对类检查：桌面每帧（零回归）；手机隔帧（约 30Hz）。
+    ///
+    /// ★ v0.2.844（用户 2026-11-21「6 人时可以再降一档」）：**6 只 Boss 同场**时再收紧一档 ——
+    ///   手机从「隔 1 帧」变成「每隔 2 帧」（约 20Hz），预算从 6ms 收到 4ms；
+    ///   桌面维持每帧（桌面上 6 只也不会掉帧，而且少做一次重算反而可能让意图更新不及时）。
+    ///   1～5 人**完全不变**。
+    /// </summary>
     private static bool AllowFingerprintChecks(double elapsedMs)
     {
         try
         {
             if (!IsPhoneLike()) return true;        // 桌面：每帧都做（零回归）
-            if (elapsedMs > 6.0) return false;      // 本帧已花超 ⇒ 顺延下一帧，别叠成尖峰
+            bool six = SixBossFight();
+            if (elapsedMs > (six ? 4.0 : 6.0)) return false;   // 本帧已花超 ⇒ 顺延下一帧
             _fpFrame++;
-            return (_fpFrame % 2) == 0;             // 手机：隔帧（约 30Hz）
+            return (_fpFrame % (six ? 3 : 2)) == 0;            // 手机：隔帧；6 只时每隔 2 帧
         }
         catch { return true; }
+    }
+
+    /// <summary>这一场是不是「6 只 Boss 同场」（6 人联机）。缓存一次，换场时由 `BossUiSession` 里的重置清掉。</summary>
+    private static int _sixBossCacheFrame = -1;
+    private static bool _sixBossCache;
+
+    private static bool SixBossFight()
+    {
+        try
+        {
+            int frame = (int)Engine.GetFramesDrawn();
+            if (frame == _sixBossCacheFrame) return _sixBossCache;
+            _sixBossCacheFrame = frame;
+            _sixBossCache = Core.BossLineups.PlayersPerFight() >= 6;
+            return _sixBossCache;
+        }
+        catch { return false; }
     }
 
     internal const string SourceStar = "辉星计数器";
@@ -137,7 +162,9 @@ public static class BossFrameTick
     /// 现在：每帧只跑「跟手」的部分（手牌栏跟随、剑的镜像、奥斯提/随从朝向纠正），
     /// 其余进 4Hz 慢车道；<c>AllBosses</c> 每帧只算一次。
     /// </summary>
-    private const ulong SlowIntervalUsec = 250_000;   // 4Hz 足够，用户看不到差别
+    private const ulong SlowIntervalUsec = 250_000;    // 4Hz 足够，用户看不到差别
+    /// <summary>6 只 Boss 同场时的慢车道间隔（≈3.3Hz，用户 2026-11-21 同意再降一档）。</summary>
+    private const ulong SlowIntervalUsec6 = 300_000;
     private static ulong _lastSlowUsec;
 
     // 集中变化监控：充能球激发的伤害（以及守势格挡）随集中变化，用户要求「每当获得集中就刷新意图」。
@@ -812,7 +839,7 @@ public static class BossFrameTick
             Seg(5);   // 显示（面板跟手/炸弹/剑/随从/奥斯提/血条）段结束
 
             // ───────────────── 4Hz 慢车道（纯显示纠正 + 重活） ─────────────────
-            if (now - _lastSlowUsec < SlowIntervalUsec) return;
+            if (now - _lastSlowUsec < (SixBossFight() ? SlowIntervalUsec6 : SlowIntervalUsec)) return;
             _lastSlowUsec = now;
 
             // ★ v0.2.410（用户 2026-11-05：「充能球被动还是没有被薄荷尖塔识别」）：

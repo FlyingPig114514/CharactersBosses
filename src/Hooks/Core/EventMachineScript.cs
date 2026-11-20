@@ -81,20 +81,14 @@ public static class EventMachineScript
             // 4：全是 0 费；万物一心返手 2 张 ⇒ 所有单位 +2 力量
             new()
             {
-                Note = Core.DreadMode.IsActive
-                    ? "4. 疯狂进食(0)、热修复+(0)、万物一心(0，返手超能光束+冰之长枪 ⇒ 所有单位 +2 力量)、疯狂进食+(0)、冰之长枪(0)、超能光束(0)"
-                    : "4. 疯狂进食(0)、热修复+(0)、万物一心(0，返手超能光束+冰之长枪 ⇒ 所有单位 +2 力量)、冰之长枪(0)、超能光束(0)",
+                // ★ v0.2.844：恐惧版的差异挪到运行期 `Resolve`（`Build()` 在 BossDefs 静态初始化里跑，
+                //   那时 `DreadMode.IsActive` 恒为 false ⇒ 以前恐惧版多出来的那张「疯狂进食+」从来没出现过）
+                Note = "4. 疯狂进食(0)、热修复+(0)、万物一心(0，返手超能光束+冰之长枪 ⇒ 所有单位 +2 力量)、冰之长枪(0)、超能光束(0)",
                 Energy = 3,
-                Cards = Core.DreadMode.IsActive
-                    ? Cards(
-                        Free<FeedingFrenzy>(0), Free<Hotfix>(0, upgraded: true),
-                        Returns<AllForOne>(0, typeof(IceLance), typeof(Hyperbeam)),
-                        Free<FeedingFrenzy>(0, upgraded: true),   // 2026-11-13 (dread): 万物一心后再补一张疯狂进食+
-                        Free<IceLance>(0), Free<Hyperbeam>(0))
-                    : Cards(
-                        Free<FeedingFrenzy>(0), Free<Hotfix>(0, upgraded: true),
-                        Returns<AllForOne>(0, typeof(IceLance), typeof(Hyperbeam)),
-                        Free<IceLance>(0), Free<Hyperbeam>(0)),
+                Cards = Cards(
+                    Free<FeedingFrenzy>(0), Free<Hotfix>(0, upgraded: true),
+                    Returns<AllForOne>(0, typeof(IceLance), typeof(Hyperbeam)),
+                    Free<IceLance>(0), Free<Hyperbeam>(0)),
             },
 
             // 5：防御（附魔漩涡）1 + 打击 1 = 2（贪婪是诅咒）
@@ -137,20 +131,12 @@ public static class EventMachineScript
             // 9：只有防御要 1 费；万物一心返 2 张 ⇒ 所有单位 +2 力量
             new()
             {
-                Note = Core.DreadMode.IsActive
-                    ? "9. 疯狂进食(0)、万物一心(0，返手超能光束+冰之长枪 ⇒ 所有单位 +2 力量)、疯狂进食+(0)、冰之长枪(0)、超能光束(0)、防御(1，附魔「漩涡」打出两次)"
-                    : "9. 疯狂进食(0)、万物一心(0，返手超能光束+冰之长枪 ⇒ 所有单位 +2 力量)、冰之长枪(0)、超能光束(0)、防御(1，附魔「漩涡」打出两次)",
+                Note = "9. 疯狂进食(0)、万物一心(0，返手超能光束+冰之长枪 ⇒ 所有单位 +2 力量)、冰之长枪(0)、超能光束(0)、防御(1，附魔「漩涡」打出两次)",
                 Energy = 3,
-                Cards = Core.DreadMode.IsActive
-                    ? Cards(
-                        Free<FeedingFrenzy>(0),
-                        Returns<AllForOne>(0, typeof(IceLance), typeof(Hyperbeam)),
-                        Free<FeedingFrenzy>(0, upgraded: true),   // 2026-11-13 (dread)
-                        Free<IceLance>(0), Free<Hyperbeam>(0), Spiral<DefendDefect>(1))
-                    : Cards(
-                        Free<FeedingFrenzy>(0),
-                        Returns<AllForOne>(0, typeof(IceLance), typeof(Hyperbeam)),
-                        Free<IceLance>(0), Free<Hyperbeam>(0), Spiral<DefendDefect>(1)),
+                Cards = Cards(
+                    Free<FeedingFrenzy>(0),
+                    Returns<AllForOne>(0, typeof(IceLance), typeof(Hyperbeam)),
+                    Free<IceLance>(0), Free<Hyperbeam>(0), Spiral<DefendDefect>(1)),
             },
         };
 
@@ -159,6 +145,46 @@ public static class EventMachineScript
             Turns = turns,
         LoopFrom = 6,      // 用户 2026-11-07 订正：之后 **6～9** 循环（原先 5 把第 5 回合也卷进循环了）
         LoopLength = 4,
+
+            // ★ v0.2.844（用户 2026-11-21 的同类隐患清单第 4 条）：恐惧版的两处差异
+            //   （第 4 / 9 回合在「万物一心」之后多补一张「疯狂进食+」）以前写在 `Build()` 里判
+            //   `DreadMode.IsActive` —— 那是 BossDefs 的静态初始化，恒为 false ⇒ 从来没生效。
+            //   现在改由运行期 `Resolve` 给出。
+            Resolve = turn =>
+            {
+                try
+                {
+                    if (!Core.DreadMode.IsActive) return null;      // 非恐惧：用静态表
+                    if (turn == 4)
+                    {
+                        return new BossTurn
+                        {
+                            Note = "4. 疯狂进食(0)、热修复+(0)、万物一心(0，返手超能光束+冰之长枪 ⇒ 所有单位 +2 力量)、疯狂进食+(0)、冰之长枪(0)、超能光束(0)",
+                            Energy = 3,
+                            Cards = Cards(
+                                Free<FeedingFrenzy>(0), Free<Hotfix>(0, upgraded: true),
+                                Returns<AllForOne>(0, typeof(IceLance), typeof(Hyperbeam)),
+                                Free<FeedingFrenzy>(0, upgraded: true),
+                                Free<IceLance>(0), Free<Hyperbeam>(0)),
+                        };
+                    }
+                    if (turn == 9)
+                    {
+                        return new BossTurn
+                        {
+                            Note = "9. 疯狂进食(0)、万物一心(0，返手超能光束+冰之长枪 ⇒ 所有单位 +2 力量)、疯狂进食+(0)、冰之长枪(0)、超能光束(0)、防御(1，附魔「漩涡」打出两次)",
+                            Energy = 3,
+                            Cards = Cards(
+                                Free<FeedingFrenzy>(0),
+                                Returns<AllForOne>(0, typeof(IceLance), typeof(Hyperbeam)),
+                                Free<FeedingFrenzy>(0, upgraded: true),
+                                Free<IceLance>(0), Free<Hyperbeam>(0), Spiral<DefendDefect>(1)),
+                        };
+                    }
+                }
+                catch { /* 动态解析失败就退回静态表 */ }
+                return null;
+            },
         };
     }
 

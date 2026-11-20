@@ -323,17 +323,20 @@ public sealed class RegentDominionPower : PowerModel
             string entry = "?";
             try { entry = card.Id.Entry; } catch { /* 忽略 */ }
 
-            var canonical = ModelDb.GetById<CardModel>(ModelDb.GetId(typeof(MegaCrit.Sts2.Core.Models.Cards.Debris)));
+            // ★ v0.2.844（用户 2026-11-21）：储君的支配按幕分档 —— 1/2/3 幕分别变成 眩晕 / 粘液 / 碎屑
+            var transformType = Core.DreadActScaling.RegentTransformCardType();
+            string transformLabel = Core.DreadActScaling.RegentTransformCardLabel();
+            var canonical = ModelDb.GetById<CardModel>(ModelDb.GetId(transformType));
             if (canonical == null)
             {
-                Logger.Log("[CharBoss] 恐惧模式·储君的支配：拿不到「碎屑」的卡牌模型 ⇒ 这次跳过");
+                Logger.Log("[CharBoss] 恐惧模式·储君的支配：拿不到变化目标（眩晕/粘液/碎屑）的卡牌模型 ⇒ 这次跳过");
                 return true;
             }
 
             var debris = combat.CreateCard(canonical, player);
             if (debris == null)
             {
-                Logger.Log("[CharBoss] 恐惧模式·储君的支配：造不出碎屑（CreateCard 返回 null）⇒ 这次跳过");
+                Logger.Log("[CharBoss] 恐惧模式·储君的支配：造不出目标状态牌（CreateCard 返回 null）⇒ 这次跳过");
                 return true;
             }
 
@@ -341,7 +344,7 @@ public sealed class RegentDominionPower : PowerModel
                 MegaCrit.Sts2.Core.Nodes.CommonUi.CardPreviewStyle.HorizontalLayout);
 
             Logger.Log($"[CharBoss] 恐惧模式·储君的支配（{phase}）：{player.Character?.GetType().Name} " +
-                       $"把「{entry}」变化成了碎屑（候选 {eligible} 张，已剔除状态牌与诅咒）");
+                       $"把「{entry}」变化成了{transformLabel}（候选 {eligible} 张，已剔除状态牌与诅咒）");
             return true;
         }
         catch (Exception e)

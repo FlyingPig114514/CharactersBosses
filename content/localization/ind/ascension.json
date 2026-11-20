@@ -1,7 +1,7 @@
 {
     "DREAD.IRONCLAD.description":  "Ironclad\u0027s Dominion: at the start of each combat, all enemies gain 1 Demon Form.",
-    "DREAD.SILENT.description":  "Kekuasaan Si Pendiam: pada awal setiap pertarungan, kamu kehilangan 1 Kekuatan dan memperoleh 1 Lemah (di pertarungan Elite: 2 Kekuatan dan 2 Lemah).",
-    "DREAD.DEFECT.description":  "Dominasi Defect: semua musuh mendapatkan 1 Artefak.",
+    "DREAD.SILENT.description":  "Kekuasaan Si Pendiam: pada awal setiap pertarungan, kamu kehilangan {Strength} Kekuatan dan memperoleh {Weak} Lemah .",
+    "DREAD.DEFECT.description":  "Dominasi Defect: semua musuh mendapatkan {Artifact} Artefak.",
     "DREAD.NECROBINDER.description":  "Necrobinder\u0027s Dominion: at the start of your turn, a random card in your hand costs 1 more this turn.",
     "DREAD.REGENT.description":  "Dominasi Pangeran: di awal giliranmu, pilih 1 kartu (bukan Status atau Kutukan) dan ubah menjadi Puing.",
     "DREAD.WATCHER_DEVOTION.description":  "Kekuasaan Pengamat: pada awal setiap pertarungan, semua musuh memperoleh 2 [gold]Pengabdian[/gold] (pada awal giliranmu setiap musuh memperoleh 2 [gold]Mantra[/gold]; saat 10 [gold]Mantra[/gold] ia menghabiskan 10 dan memasuki [gold]Ketuhanan[/gold], memberikan tiga kali kerusakan pada giliran itu).",
