@@ -1,4 +1,7 @@
-﻿本模组灵感来源于杀戮尖塔1代的模组崩坠。启用本模组后，你每一幕的Boss战都会被替换为由原版玩家角色扮演的Boss（可在设置中调整）。他们拥有自己的遗物、卡组，会使用自己职业的卡牌。与玩家不完全相同的是，他们的出牌受到一定程度的限制，但最大生命值更多并且每个都有独特的特殊效果。
+﻿全部 Boss 的卡组 / 遗物 / 特殊效果 / 逐回合意图（含恐惧模式加强）都可以在百科页查到：[url=https://flyingpig114514.github.io/CharactersBosses/]https://flyingpig114514.github.io/CharactersBosses/[/url]
+Decks, relics, special effects and the full turn-by-turn script of every boss (including Dread-mode upgrades) are listed at: [url=https://flyingpig114514.github.io/CharactersBosses/]https://flyingpig114514.github.io/CharactersBosses/[/url]
+
+本模组灵感来源于杀戮尖塔1代的模组崩坠。启用本模组后，你每一幕的Boss战都会被替换为由原版玩家角色扮演的Boss（可在设置中调整）。他们拥有自己的遗物、卡组，会使用自己职业的卡牌。与玩家不完全相同的是，他们的出牌受到一定程度的限制，但最大生命值更多并且每个都有独特的特殊效果。
 
 This mod is inspired by the Slay the Spire mod Downfall. With it enabled, the boss fight of every act is replaced by bosses played by the vanilla playable characters (adjustable in the mod settings). They bring their own relics and decks, and play the cards of their own class. Unlike you, their plays are somewhat restricted — but they have more Max HP, and each of them has a unique special effect.
 

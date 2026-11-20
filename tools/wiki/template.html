@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>玩家角色当Boss · 百科</title>
+<meta name="description" content="《杀戮尖塔2》CharacterBosses 模组百科：每个角色 Boss 的卡组、遗物、特殊效果与逐回合剧本。">
+<style>
+:root{
+  --bg:#0b0908;
+  --panel:#15120f;
+  --panel-2:#1a1613;
+  --line:#2a231c;
+  --line-2:#3a2f24;
+  --gold:#e6c27a;
+  --gold-2:#c79a4e;
+  --gold-dim:#8d7444;
+  --red:#b8443a;
+  --red-2:#d4635a;
+  --ink:#e8dfd2;
+  --ink-2:#c3b6a4;
+  --muted:#8a7f72;
+  --relic:#9fe0da;
+  --mono:"Cascadia Mono","Consolas","Menlo","DejaVu Sans Mono",ui-monospace,monospace;
+  --serif:"Noto Serif SC","Source Han Serif SC","Songti SC","SimSun",Georgia,"Times New Roman",serif;
+  --sans:"Microsoft YaHei","PingFang SC","Hiragino Sans GB","Noto Sans SC",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:
+    radial-gradient(1100px 560px at 12% -12%, #1d1512 0%, rgba(29,21,18,0) 62%),
+    radial-gradient(900px 480px at 100% 0%, #171210 0%, rgba(23,18,16,0) 58%),
+    radial-gradient(700px 700px at 50% 120%, #14100e 0%, rgba(20,16,14,0) 60%),
+    var(--bg);
+  color:var(--ink);
+  font:14px/1.65 var(--sans);
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+code{font-family:var(--mono)}
+
+/* ---------- top bar ---------- */
+.top{
+  position:sticky;top:0;z-index:40;
+  display:flex;flex-wrap:wrap;gap:14px 20px;align-items:center;justify-content:space-between;
+  padding:12px 22px;
+  background:rgba(11,9,8,.92);
+  border-bottom:1px solid var(--line);
+  box-shadow:0 6px 24px rgba(0,0,0,.45);
+  backdrop-filter:blur(8px);
+}
+.brand{display:flex;flex-direction:column;gap:3px;min-width:0}
+.brand h1{
+  margin:0;font:700 21px/1.2 var(--serif);letter-spacing:.06em;color:var(--gold);
+  text-shadow:0 0 26px rgba(230,194,122,.22);
+}
+.brand .sub{margin:0;font-size:12px;color:var(--muted);letter-spacing:.02em}
+.brand .sub b{color:var(--ink-2);font-weight:600}
+.brand .sub .dot{color:var(--line-2);margin:0 6px}
+.tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.search{position:relative;display:flex;align-items:center}
+.search input{
+  width:min(48vw,330px);padding:8px 30px 8px 12px;
+  background:#0d0b09;color:var(--ink);
+  border:1px solid var(--line-2);border-radius:9px;
+  font:13px/1.4 var(--sans);outline:none;transition:border-color .15s,box-shadow .15s;
+}
+.search input::placeholder{color:#6d6358}
+.search input:focus{border-color:var(--gold-dim);box-shadow:0 0 0 3px rgba(230,194,122,.10)}
+.search .clr{
+  position:absolute;right:6px;top:50%;transform:translateY(-50%);
+  width:20px;height:20px;line-height:18px;text-align:center;
+  border:0;border-radius:5px;background:transparent;color:var(--muted);cursor:pointer;font-size:14px;
+}
+.search .clr:hover{color:var(--gold);background:#191511}
+.btn{
+  padding:7px 11px;border-radius:9px;cursor:pointer;
+  background:#141110;border:1px solid var(--line-2);color:var(--ink-2);
+  font:12px/1.3 var(--sans);transition:.15s;
+}
+.btn:hover{color:var(--gold);border-color:var(--gold-dim);background:#191512}
+.btn:active{transform:translateY(1px)}
+#matchinfo{font-size:12px;color:var(--muted);min-width:0}
+
+/* ---------- layout ---------- */
+.layout{display:flex;align-items:flex-start;gap:26px;max-width:1440px;margin:0 auto;padding:20px 22px 60px}
+.side{
+  position:sticky;top:78px;
+  flex:0 0 236px;width:236px;
+  max-height:calc(100vh - 96px);overflow:auto;
+  padding:12px 12px 16px;
+  background:linear-gradient(180deg,rgba(22,18,15,.9),rgba(16,13,11,.75));
+  border:1px solid var(--line);border-radius:13px;
+  scrollbar-width:thin;
+}
+body.side-hidden .side{display:none}
+.side::-webkit-scrollbar{width:8px}
+.side::-webkit-scrollbar-thumb{background:#2a221b;border-radius:4px}
+.side::-webkit-scrollbar-track{background:transparent}
+.navgroup{margin-bottom:12px}
+.navtitle{
+  display:flex;align-items:center;gap:8px;
+  font:600 11px/1.6 var(--sans);letter-spacing:.2em;color:var(--gold-2);
+  padding:2px 6px 5px;border-bottom:1px solid var(--line);margin-bottom:5px;
+}
+.navgroup ul{list-style:none;margin:0;padding:0}
+.navgroup li{margin:1px 0}
+.navlink{
+  display:block;padding:4px 8px;border-radius:7px;font-size:12.5px;color:var(--ink-2);
+  border-left:2px solid transparent;transition:.12s;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.navlink:hover{background:#1c1713;color:var(--gold)}
+.navlink.v{padding-left:15px;color:#a89b8c}
+.navlink .venc{font-family:var(--mono);font-size:10.5px;color:#6f6559;margin-left:4px}
+.navlink:hover .venc{color:var(--gold-dim)}
+.navlink.active .venc{color:var(--gold-2)}
+.navlink.active{background:linear-gradient(90deg,rgba(230,194,122,.14),rgba(230,194,122,.02));color:var(--gold);border-left-color:var(--gold)}
+.navlink.hide{display:none}
+.navgroup.hide{display:none}
+
+main{flex:1 1 auto;min-width:0}
+.intro{
+  border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin:0 0 18px;
+  background:linear-gradient(180deg,rgba(24,19,16,.8),rgba(16,13,11,.6));
+  color:var(--ink-2);font-size:12.5px;
+}
+.intro summary{cursor:pointer;color:var(--gold-2);font-weight:600;letter-spacing:.06em}
+.intro .lg{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:10px}
+.intro .lg div{display:flex;align-items:center;gap:6px}
+.noMatch{
+  display:none;padding:28px;text-align:center;color:var(--muted);
+  border:1px dashed var(--line-2);border-radius:12px;
+}
+.noMatch.on{display:block}
+
+/* ---------- act block ---------- */
+.actblock{margin:0 0 8px}
+.acthead{
+  display:flex;align-items:center;gap:12px;
+  margin:26px 0 10px;font:700 15px/1.4 var(--serif);letter-spacing:.22em;color:var(--gold-2);
+}
+.acthead:first-child{margin-top:6px}
+.acthead::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line-2),transparent)}
+
+/* ---------- design card ---------- */
+.design{
+  scroll-margin-top:96px;
+  margin:0 0 20px;padding:16px 18px 18px;
+  background:linear-gradient(180deg,#171310,#120f0d);
+  border:1px solid var(--line);border-radius:14px;
+  box-shadow:0 12px 34px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.03);
+  break-inside:avoid;
+}
+.design.variant{border-color:#332a20;background:linear-gradient(180deg,#161311,#110e0c)}
+.dhead{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.dtitle{margin:0;font:700 23px/1.25 var(--serif);color:var(--gold);letter-spacing:.03em}
+.design.variant .dtitle{font:700 20px/1.3 var(--serif);letter-spacing:.02em;color:#e9d6ab}
+.dmeta{font-size:12px;color:var(--muted)}
+.dmeta .badge{
+  display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;
+  border:1px solid var(--line-2);font-size:10.5px;letter-spacing:.12em;color:var(--gold-2);
+}
+.design.variant .dmeta .badge{color:#c68f86;border-color:#432a24}
+.keyline{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:9px 0 0}
+.klabel{font:600 10px/1 var(--sans);letter-spacing:.16em;color:#6f6559;text-transform:uppercase}
+.code{
+  padding:3px 7px;border-radius:6px;background:#0d0b09;border:1px solid var(--line-2);
+  font:11.5px/1.5 var(--mono);color:#dcc9a4;white-space:nowrap;
+}
+.code.dim{color:#8d8175;border-color:#2a231c}
+.copy{
+  padding:2px 7px;border-radius:6px;cursor:pointer;
+  background:#131110;border:1px solid var(--line-2);color:var(--muted);
+  font:10.5px/1.6 var(--sans);transition:.15s;
+}
+.copy:hover{color:var(--gold);border-color:var(--gold-dim)}
+.copy.done{color:#9fe0da;border-color:#2c5451}
+
+/* ---------- hp ---------- */
+.hprow{display:flex;flex-wrap:wrap;align-items:flex-end;gap:6px 16px;margin:13px 0 4px}
+.hp{display:flex;align-items:baseline;gap:7px}
+.hp .num{
+  font:800 38px/1 var(--serif);color:#f4dcaa;letter-spacing:.01em;
+  text-shadow:0 0 24px rgba(230,194,122,.3),0 1px 0 #000;
+}
+.hp .unit{font-size:11px;letter-spacing:.18em;color:var(--gold-2)}
+.hpnote{font-size:11.5px;color:var(--muted);padding-bottom:6px}
+.hpnote b{color:var(--ink-2);font-weight:600}
+.hp .hint{
+  position:relative;top:-2px;font-size:11px;color:#6f6559;cursor:help;
+  border:1px solid var(--line-2);border-radius:50%;width:15px;height:15px;line-height:13px;text-align:center;
+}
+.cfg{display:flex;gap:12px;flex-wrap:wrap;margin-left:auto;padding-bottom:7px;font-size:12px;color:var(--muted)}
+.cfg b{color:var(--gold);font-weight:600}
+
+/* ---------- sections ---------- */
+.sect{margin:14px 0 0}
+.sect h3{
+  display:flex;align-items:center;gap:8px;
+  margin:0 0 8px;font:600 11.5px/1.6 var(--sans);letter-spacing:.2em;color:var(--gold-2);
+}
+.sect h3 .cnt{letter-spacing:0;color:var(--muted);font-weight:400;font-size:11px}
+.stats{display:flex;flex-wrap:wrap;gap:6px}
+.stat{
+  display:inline-flex;align-items:baseline;gap:7px;
+  padding:3px 10px;border-radius:999px;background:#100e0c;border:1px solid var(--line-2);
+  font-size:12px;color:var(--muted);
+}
+.stat b{color:var(--ink-2);font-weight:600}
+.stat i{font-style:normal;color:var(--gold);font-weight:600}
+
+/* special */
+.special{
+  margin:8px 0;padding:9px 13px;border-radius:0 9px 9px 0;
+  border-left:2px solid var(--gold-dim);
+  background:linear-gradient(90deg,rgba(230,194,122,.07),rgba(230,194,122,.012) 70%);
+}
+.special.dread{
+  border-left-color:var(--red);border-radius:9px;
+  background:linear-gradient(90deg,rgba(184,68,58,.10),rgba(184,68,58,.02) 70%);
+  border-top:1px solid #3a2320;border-right:1px solid #3a2320;border-bottom:1px solid #3a2320;
+  padding:7px 13px 9px;
+}
+.special .slabel{
+  display:flex;align-items:center;gap:8px;
+  font:600 10px/1.8 var(--sans);letter-spacing:.18em;color:var(--gold-2);text-transform:uppercase;
+}
+.special.dread .slabel{color:#c98a80}
+.special .skey{font-family:var(--mono);letter-spacing:0;text-transform:none;color:#6f6559;font-size:10px}
+.special .stitle{margin-top:3px;font:700 14.5px/1.5 var(--serif);color:var(--gold);letter-spacing:.02em}
+.special.dread .stitle{color:#e6a79d}
+.special .sbody{margin-top:3px;color:var(--ink-2);font-size:13px}
+.special .kw{color:var(--gold);font-weight:600}
+.special .bad{color:var(--red-2);font-weight:600}
+.special .ei{
+  display:inline-block;padding:0 3px;color:#8fd8ff;font-weight:700;
+}
+.special .var{
+  padding:0 3px;border-radius:4px;background:rgba(230,194,122,.12);color:var(--gold);font-weight:600;cursor:help;
+}
+details.dread summary{cursor:pointer;list-style:none;outline:none}
+details.dread summary::-webkit-details-marker{display:none}
+details.dread summary .tw{margin-left:auto;font-size:10px;color:#6f6559;letter-spacing:0}
+details.dread[open] summary .tw::before{content:"收起 ▾"}
+details.dread:not([open]) summary .tw::before{content:"展开 ▸"}
+
+/* chips */
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{
+  display:inline-flex;align-items:baseline;gap:4px;
+  padding:3px 8px;border-radius:7px;border:1px solid var(--line-2);
+  font-size:13px;line-height:1.35;white-space:nowrap;
+}
+.chip .nm{font-weight:500}
+.chip .x{font:600 11px/1 var(--mono);color:var(--gold-2);margin-left:2px}
+.chip .a{
+  font:700 9.5px/1.5 var(--mono);letter-spacing:.04em;color:#0f0d0b;
+  background:var(--gold-2);border-radius:4px;padding:0 4px;margin-right:5px;
+}
+.chip.card{
+  color:#f2e0ba;
+  background:linear-gradient(180deg,rgba(230,194,122,.10),rgba(230,194,122,.035));
+  border-color:#4a3a22;
+}
+.chip.card.up{border-color:#c9a35e;color:#ffe8b4;box-shadow:inset 0 0 0 1px rgba(230,194,122,.22)}
+.chip.relic{
+  color:#b7ece6;background:rgba(84,160,155,.11);border-color:#2c5451;
+}
+.chip.asc{color:#d9cfae;background:rgba(230,194,122,.05);border-color:#3d3223}
+.chip.dreadchip{color:#e0a9a0;background:rgba(184,68,58,.11);border-color:#4d2823}
+.chip .tg{display:inline-flex;flex-wrap:wrap;gap:3px;margin-left:2px}
+.chip .tg i{
+  font-style:normal;font:400 10px/1.5 var(--sans);color:#9c9083;
+  background:#0d0b09;border:1px solid #241e18;border-radius:4px;padding:0 4px;
+}
+.chip.out{
+  color:#dda59d;background:rgba(184,68,58,.09);border-style:dashed;border-color:#5a2b25;
+}
+.chip.out .nm{text-decoration:line-through;text-decoration-color:rgba(216,120,110,.55)}
+.chip.out .tg i{color:#b98d86;border-color:#3a2320}
+
+/* table */
+.loopnote{
+  display:inline-flex;align-items:center;gap:6px;margin:0 0 8px;
+  padding:3px 11px;border-radius:999px;
+  border:1px solid #40331f;background:rgba(230,194,122,.07);
+  font-size:12px;color:var(--gold-2);
+}
+.loopnote b{color:var(--gold)}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:#0f0d0b}
+table.script{width:100%;border-collapse:collapse;font-size:13px}
+table.script th{
+  position:sticky;top:0;
+  padding:7px 10px;text-align:left;white-space:nowrap;
+  font:600 10.5px/1.6 var(--sans);letter-spacing:.2em;color:var(--gold-2);
+  background:#141110;border-bottom:1px solid var(--line-2);
+}
+table.script th:nth-child(1){width:56px;text-align:center}
+table.script td{padding:8px 10px;border-bottom:1px solid #1d1814;vertical-align:top}
+table.script tr:last-child td{border-bottom:0}
+table.script tbody tr:nth-child(even){background:rgba(255,255,255,.012)}
+table.script tbody tr:hover{background:rgba(230,194,122,.035)}
+table.script td.turn{
+  text-align:center;font:700 15px/1.4 var(--serif);color:var(--gold-2);
+  border-left:2px solid transparent;
+}
+table.script tr.loop td.turn{border-left-color:var(--gold-dim);color:var(--gold)}
+table.script td.played,table.script td.notplayed{min-width:200px}
+table.script td.notplayed{min-width:140px}
+table.script td.note{color:var(--ink-2);font-size:12px;min-width:220px}
+table.script td.note:empty::after{content:"—";color:var(--muted)}
+.dash{color:#4c443b}
+.muted{color:var(--muted);font-size:12.5px;margin:6px 0}
+
+footer.page{
+  max-width:1440px;margin:0 auto;padding:0 22px 48px;
+  color:#6a6157;font-size:11.5px;line-height:1.9;
+}
+footer.page b{color:var(--ink-2);font-weight:600}
+footer.page code{color:#a2968a}
+
+@media (max-width:980px){
+  .layout{display:block;padding:14px}
+  .side{position:static;width:auto;max-height:44vh;margin-bottom:14px}
+  .brand h1{font-size:18px}
+  .search input{width:min(70vw,300px)}
+  .cfg{margin-left:0}
+  table.script td.note{min-width:180px}
+}
+@media print{
+  .top,.side,.intro,.copy,#matchinfo,footer.page{display:none!important}
+  body{background:#fff;color:#111}
+  .design{border-color:#bbb;box-shadow:none;background:#fff;page-break-inside:avoid}
+  .dtitle,.hp .num,.acthead{color:#7a5b1e;text-shadow:none}
+  .chip{color:#222;background:#f6f2e8;border-color:#c9bda6}
+  .chip.out{color:#8a3b33;background:#fbeeec;border-color:#cfa9a3}
+  .special .kw{color:#7a5b1e}
+  table.script th{background:#f2ece0;color:#5b4a20}
+  table.script td.note{color:#333}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <h1>玩家角色当Boss · 百科</h1>
+    <p class="sub">
+      数据由模组 DLL 自动导出<span class="dot">·</span><b id="gen-at">—</b><span class="dot">·</span><code id="gen-from">—</code><span class="dot">·</span><span id="gen-count">—</span>
+    </p>
+  </div>
+  <div class="tools">
+    <span id="matchinfo"></span>
+    <div class="search">
+      <input id="q" type="search" placeholder="搜索 Boss / key / 卡牌名（空格分隔多个）" autocomplete="off" spellcheck="false">
+      <button class="clr" id="qclear" type="button" title="清空（Esc）">✕</button>
+    </div>
+    <button class="btn" id="sideToggle" type="button">☰ 目录</button>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="side" id="side" aria-label="目录"></nav>
+  <main id="main">
+    <details class="intro" id="legend">
+      <summary>读法 / 图例（点开）</summary>
+      <div class="lg">
+        <div><span class="chip card"><span class="nm">打击</span></span> 牌组里的牌（×N 为同名张数合并）</div>
+        <div><span class="chip card up"><span class="nm">打击+</span></span> 升级版（名字后的 <b>+</b>）</div>
+        <div><span class="chip relic"><span class="nm">燃烧之血</span></span> 遗物</div>
+        <div><span class="chip out"><span class="nm">打击</span></span> 本回合<b>不出</b>（烧掉 / 留下 / 不抽 / 被丢弃 / 仅显示）</div>
+        <div><span class="chip asc"><b class="a">A8</b><span class="nm">坚毅</span></span> 进阶 8 起生效的升级 / 遗物</div>
+      </div>
+      <p class="muted" style="margin-top:10px">血量 = 角色基础血量 + 该幕额外 + 涅奥的祝福（拾起 +120 / 每进一幕 +180）+ 变体额外。<code>fight &lt;encounter&gt;_BOSS_ENCOUNTER</code> 可在开发者控制台直接开这一场（复制按钮）；遇到 id 与定义 key 不是一回事，卡片上的 <code>key</code> 只是数据源里的定义名。</p>
+    </details>
+    <div id="noMatch" class="noMatch">没有匹配的设计 —— 试试 Boss 名、<code>IRONCLAD_BOSS</code> 这类 key，或某张卡的名字。</div>
+    <div id="content"></div>
+  </main>
+</div>
+
+<footer class="page">
+  <div>本页由 <code>tools\wiki\build-site.ps1</code> 依据 <code>tools\wiki\data.json</code> 自动生成，<b>请勿手工编辑</b>。<span id="foot-meta"></span></div>
+  <div>数据全部内联在页面里，双击本地打开同样可用；不含任何外部 CDN / 字体请求。</div>
+</footer>
+
+<!-- 数据由生成器就地替换：下面这个占位符必须保持唯一 -->
+<script>
+window.BOSS_DATA = /*__BOSS_DATA__*/;
+window.BOSS_HP = /*__BOSS_HP__*/;
+</script>
+
+<script id="renderer">
+(function () {
+  'use strict';
+
+  var DATA = (typeof window.BOSS_DATA === 'object' && window.BOSS_DATA) ? window.BOSS_DATA : { bosses: [] };
+  var HP = (typeof window.BOSS_HP === 'object' && window.BOSS_HP) ? window.BOSS_HP : {};
+
+  var ACT_LABEL = { 1: '一层', 2: '二层', 3: '三层' };
+
+  /* ---------- 小工具 ---------- */
+  function esc(s) {
+    return String(s === null || s === undefined ? '' : s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function isNum(v) { return typeof v === 'number' && isFinite(v); }
+
+  function actGroupLabel(act) {
+    var base = ACT_LABEL[act] || ('第 ' + act + ' 幕');
+    if (act >= 4) { return base + '（隐藏 / 调试）'; }
+    return base;
+  }
+
+  function hpLookup(key) {
+    var v = HP[key];
+    return isNum(v) ? v : null;
+  }
+
+  /* 控制台指令：数据源给了遭遇 id（act.encounter / variant.encounter，例如 IRONCLAD_ANGER），
+     指令 = fight + 遭遇 id + _BOSS_ENCOUNTER。注意主设计的定义 key（IRONCLAD_BOSS）≠ 遭遇 id。
+     数据源缺字段时才退回按定义 key 猜。 */
+  function fightKeyOf(design) {
+    var enc = String(design.encounter || '');
+    if (enc) { return enc + '_BOSS_ENCOUNTER'; }
+    var key = String(design.key || '');
+    return /_BOSS$/.test(key) ? (key + '_ENCOUNTER') : (key + '_BOSS_ENCOUNTER');
+  }
+
+  /* ---------- 文本格式化（游戏 BBCode 风格标记） ---------- */
+  function fmtText(text) {
+    var t = esc(text);
+    t = t.replace(/\[img\][^\[]*\[\/img\]/g, '<span class="ei" title="能量">⚡</span>');
+    t = t.replace(/\[gold\]/g, '<b class="kw">').replace(/\[\/gold\]/g, '</b>');
+    t = t.replace(/\[red\]/g, '<b class="bad">').replace(/\[\/red\]/g, '</b>');
+    t = t.replace(/\[b\]/g, '<b>').replace(/\[\/b\]/g, '</b>');
+    t = t.replace(/\{Loss\}/g, '<span class="var" title="数值随进阶 / 强度变化（原文占位符 {Loss}）">X</span>');
+    t = t.replace(/\[[a-z\/]+\]/g, '');
+    return t;
+  }
+
+  function stripNumberPrefix(note) {
+    var s = String(note === null || note === undefined ? '' : note);
+    for (var i = 0; i < 4; i++) {
+      var t = s.replace(/^\s*\d+\s*[.．、]\s*/, '');
+      if (t === s) { break; }
+      s = t;
+    }
+    return s;
+  }
+
+  function mergeList(list) {
+    var out = [], index = {}, i, name;
+    var arr = list || [];
+    for (i = 0; i < arr.length; i++) {
+      name = String(arr[i]);
+      if (Object.prototype.hasOwnProperty.call(index, name)) {
+        out[index[name]].n += 1;
+      } else {
+        index[name] = out.length;
+        out.push({ name: name, n: 1 });
+      }
+    }
+    return out;
+  }
+
+  /* ---------- 卡牌标记 ---------- */
+  var OUT_FLAGS = [
+    ['Burned', '烧掉'],
+    ['HoldInstead', '留在手中不出'],
+    ['NotDrawn', '不抽'],
+    ['DiscardInstead', '被丢弃'],
+    ['DiscardInsteadWhenMultiplayer', '多人时丢弃'],
+    ['DiscardInsteadSingleOnly', '单人时丢弃'],
+    ['DisplayOnly', '仅显示']
+  ];
+
+  var MARK_FLAGS = [
+    ['Sly', '奇巧'],
+    ['Retain', '保留'],
+    ['AutoPlayed', '自动打出'],
+    ['FreeThisTurn', '本回合免费'],
+    ['ToolsDiscard', '工具弃牌'],
+    ['HellraiserFree', '地狱狂徒免费'],
+    ['EnchantSpiral', '附魔·螺旋'],
+    ['EnchantSouls', '附魔·灵魂'],
+    ['EnchantRoyallyApproved', '附魔·皇室认证'],
+    ['ShowsDrillGain', '显示钻机'],
+    ['SpendsAllEnergy', '耗尽全部能量'],
+    ['ForceDebuffIntent', '强制减益意图'],
+    ['JugglingCopy', '杂耍复制'],
+    ['StampedePlay', '踩踏打出'],
+    ['EmptyDrawPileFirst', '先清空抽牌堆'],
+    ['ScriedFromDraw', '占卜抽到']
+  ];
+
+  var FROM_LABEL = {
+    ai: 'AI 印出',
+    print: '印入抽牌堆',
+    generated: '生成',
+    feral: '野性回手',
+    'ftl-draw': '超越光速抽到',
+    hologram: '全息影像捞回',
+    status: '状态牌',
+    draw: '抽到',
+    display: '仅显示',
+    box: '宝箱'
+  };
+
+  function outReasons(card) {
+    var out = [], i;
+    for (i = 0; i < OUT_FLAGS.length; i++) {
+      if (card[OUT_FLAGS[i][0]] === true) { out.push(OUT_FLAGS[i][1]); }
+    }
+    return out;
+  }
+
+  function isOut(card) { return outReasons(card).length > 0; }
+
+  function cardTags(card) {
+    var tags = [], i, v;
+    for (i = 0; i < MARK_FLAGS.length; i++) {
+      if (card[MARK_FLAGS[i][0]] === true) { tags.push(MARK_FLAGS[i][1]); }
+    }
+    if (isNum(card.CostOverride)) { tags.push('费用 ' + card.CostOverride); }
+    if (isNum(card.CostThisTurn)) { tags.push('本回合 ' + card.CostThisTurn + ' 费'); }
+    if (isNum(card.DamageOverride) && card.DamageOverride > 0) { tags.push('伤害 ' + card.DamageOverride); }
+    if (isNum(card.BlockOverride) && card.BlockOverride > 0) { tags.push('格挡 ' + card.BlockOverride); }
+    if (isNum(card.ExtraAoe) && card.ExtraAoe > 0) { tags.push('附加群攻 ' + card.ExtraAoe); }
+    if (isNum(card.UpgradeMinAscension) && card.UpgradeMinAscension > 0) { tags.push('进阶 ' + card.UpgradeMinAscension + ' 起升级'); }
+    v = card.ExhaustWith;
+    if (v && v.length) { tags.push('随「' + v.join('、') + '」消耗'); }
+    v = card.ReturnsToHand;
+    if (v && v.length) { tags.push('回手：' + v.join('、')); }
+    v = card.PrintsToDrawPile;
+    if (v && v.length) { tags.push('印入抽牌堆：' + v.join('、')); }
+    if (card.from) { tags.push('来源：' + (FROM_LABEL[card.from] || card.from)); }
+    return tags;
+  }
+
+  function chipHTML(name, cls, count, tags, extraTitle) {
+    var h = '<span class="chip ' + cls + '"';
+    var title = String(extraTitle || name) + (tags && tags.length ? '\n· ' + tags.join('\n· ') : '');
+    h += ' title="' + esc(title) + '">';
+    h += '<span class="nm">' + esc(name) + '</span>';
+    if (count && count > 1) { h += '<span class="x">×' + count + '</span>'; }
+    if (tags && tags.length) {
+      h += '<span class="tg">';
+      for (var i = 0; i < tags.length; i++) { h += '<i>' + esc(tags[i]) + '</i>'; }
+      h += '</span>';
+    }
+    return h + '</span>';
+  }
+
+  function cardChipHTML(card) {
+    var name = String(card.name || '？');
+    var tags = cardTags(card);
+    var out = outReasons(card);
+    var cls = 'card' + (card.Upgraded === true ? ' up' : '');
+    var display = name + (card.Upgraded === true ? '+' : '');
+    var allTags = out.concat(tags);
+    var title = display + '（' + String(card.type || '') + '）';
+    if (out.length) { cls += ' out'; }
+    return chipHTML(display, cls, 0, allTags, title);
+  }
+
+  function plainChipsHTML(list, cls) {
+    var merged = mergeList(list), h = [], i;
+    for (i = 0; i < merged.length; i++) {
+      h.push(chipHTML(merged[i].name, cls, merged[i].n, null, merged[i].name));
+    }
+    return h.join('');
+  }
+
+  function ascChipsHTML(list, cls) {
+    var h = [], i, s, m;
+    for (i = 0; i < list.length; i++) {
+      s = String(list[i]);
+      m = s.match(/^\s*(\d+)\s*[:：]\s*(.*)$/);
+      if (m) {
+        h.push('<span class="chip ' + cls + '" title="' + esc(s) + '"><b class="a">A' + esc(m[1]) + '</b><span class="nm">' + esc(m[2]) + '</span></span>');
+      } else {
+        h.push(chipHTML(s, cls, 0, null, s));
+      }
+    }
+    return h.join('');
+  }
+
+  /* ---------- 设计（一个卡片区块的数据） ---------- */
+  function makeDesign(boss, actObj, firstBaseHp, variant) {
+    var src = variant || actObj;
+    var isVariant = !!variant;
+    var key = isVariant ? variant.key : boss.key;
+    var encounter = String(src.encounter || '');
+    var hpKey = isVariant
+      ? ('v|' + boss.key + '|' + actObj.act + '|' + variant.key)
+      : ('a|' + boss.key + '|' + actObj.act);
+    var name = String(src.name || '');
+    if (!name) {
+      name = isVariant ? key : ((boss.character || boss.key) + ' 第' + actObj.act + '幕');
+    }
+    return {
+      id: 'd-' + (encounter || key) + '-a' + actObj.act,
+      name: name,
+      encounter: encounter,
+      isVariant: isVariant,
+      bossKey: boss.key,
+      character: boss.character || boss.key,
+      info: boss.info || '',
+      act: actObj.act,
+      baseHp: actObj.baseHp,
+      firstBaseHp: firstBaseHp,
+      tableBaseHp: hpLookup('b|' + boss.key),
+      hp: hpLookup(hpKey),
+      energy: actObj.energy,
+      handSize: actObj.handSize,
+      key: key,
+      specialKey: src.specialKey || '',
+      special: src.special || '',
+      specialDreadKey: src.specialDreadKey || '',
+      specialDread: src.specialDread || '',
+      deck: src.deck || [],
+      relics: src.relics || [],
+      potions: isVariant ? [] : (actObj.potions || []),
+      ascensionUpgrades: (variant && variant.ascensionUpgrades) || [],
+      ascensionRelics: (variant && variant.ascensionRelics) || [],
+      dreadUpgrades: src.dreadUpgrades || [],
+      hpBonus: isVariant ? (isNum(variant.hpBonus) ? variant.hpBonus : 0) : 0,
+      script: src.script || null
+    };
+  }
+
+  function buildDesigns() {
+    var designs = [], bossList = DATA.bosses || [], bi, ai, vi;
+    for (bi = 0; bi < bossList.length; bi++) {
+      var boss = bossList[bi];
+      var acts = boss.acts || [];
+      if (!acts.length) { continue; }
+      var firstBaseHp = acts[0].baseHp;
+      for (ai = 0; ai < acts.length; ai++) {
+        var actObj = acts[ai];
+        /* 只做一~三幕：act > 3 是导出器带出来的空壳（无剧本），不展示 */
+        if (!(actObj.act <= 3)) { continue; }
+        /* 主设计的 script 为 null 且卡组为空（例如观者第 1/2 幕）→ 不渲染空区块，只渲染它的变体 */
+        var hasMain = !!(actObj.script) || (actObj.deck || []).length > 0;
+        if (hasMain) { designs.push(makeDesign(boss, actObj, firstBaseHp, null)); }
+        var variants = actObj.variants || [];
+        for (vi = 0; vi < variants.length; vi++) {
+          designs.push(makeDesign(boss, actObj, firstBaseHp, variants[vi]));
+        }
+      }
+    }
+    return designs;
+  }
+
+  /* ---------- 各区块渲染 ---------- */
+  function renderInfo(design) {
+    var lines = String(design.info || '').split(/\r?\n/), keep = [], i, line;
+    for (i = 0; i < lines.length; i++) {
+      if (lines[i].trim().length) { keep.push(lines[i].trim()); }
+    }
+    if (!keep.length) { return ''; }
+    var h = ['<div class="sect"><h3>能力统计</h3><div class="stats">'];
+    for (i = 0; i < keep.length; i++) {
+      line = keep[i];
+      var cut = line.indexOf('：');
+      if (cut < 0) { cut = line.indexOf(':'); }
+      if (cut > 0) {
+        h.push('<span class="stat"><b>' + esc(line.slice(0, cut)) + '</b><i>' + esc(line.slice(cut + 1)) + '</i></span>');
+      } else {
+        h.push('<span class="stat"><i>' + esc(line) + '</i></span>');
+      }
+    }
+    h.push('</div></div>');
+    return h.join('');
+  }
+
+  function specialInnerHTML(text, label, key) {
+    var lines = String(text || '').split(/\r?\n/);
+    var head = '', body = lines;
+    if (lines.length > 1 && lines[0].length <= 22) { head = lines[0]; body = lines.slice(1); }
+    var h = [];
+    if (label || key) {
+      h.push('<div class="slabel">'
+        + (label ? '<span>' + esc(label) + '</span>' : '')
+        + (key ? '<span class="skey">' + esc(key) + '</span>' : '')
+        + '</div>');
+    }
+    if (head) { h.push('<div class="stitle">' + fmtText(head) + '</div>'); }
+    var bodyHTML = [];
+    for (var i = 0; i < body.length; i++) {
+      if (body[i].length) { bodyHTML.push(fmtText(body[i])); }
+    }
+    h.push('<div class="sbody">' + bodyHTML.join('<br>') + '</div>');
+    return h.join('');
+  }
+
+  function renderSpecial(design) {
+    if (!design.special && !design.specialDread) { return ''; }
+    var h = ['<div class="sect"><h3>特殊效果</h3>'];
+    if (design.special) {
+      h.push('<div class="special">' + specialInnerHTML(design.special, '常规', design.specialKey) + '</div>');
+    }
+    if (design.specialDread) {
+      h.push('<details class="special dread" open><summary>' +
+        '<div class="slabel"><span>恐惧模式</span>' +
+        (design.specialDreadKey ? '<span class="skey">' + esc(design.specialDreadKey) + '</span>' : '') +
+        '<span class="tw"></span></div>' +
+        '</summary>' + specialInnerHTML(design.specialDread, '', '') + '</details>');
+    }
+    h.push('</div>');
+    return h.join('');
+  }
+
+  function renderLoadout(design) {
+    var h = [];
+    if (design.deck.length) {
+      h.push('<div class="sect"><h3>卡组<span class="cnt">' + design.deck.length + ' 张</span></h3><div class="chips">');
+      h.push(plainChipsHTML(design.deck, 'card'));
+      h.push('</div></div>');
+    }
+    if (design.relics.length) {
+      h.push('<div class="sect"><h3>遗物<span class="cnt">' + design.relics.length + ' 件</span></h3><div class="chips">');
+      h.push(plainChipsHTML(design.relics, 'relic'));
+      h.push('</div></div>');
+    }
+    if (design.potions.length) {
+      h.push('<div class="sect"><h3>药水<span class="cnt">' + design.potions.length + ' 个</span></h3><div class="chips">');
+      h.push(plainChipsHTML(design.potions, 'relic'));
+      h.push('</div></div>');
+    }
+    var extra = [];
+    if (design.ascensionUpgrades.length) {
+      extra.push('<div class="sect"><h3>进阶升级</h3><div class="chips">' + ascChipsHTML(design.ascensionUpgrades, 'asc') + '</div></div>');
+    }
+    if (design.ascensionRelics.length) {
+      extra.push('<div class="sect"><h3>进阶遗物</h3><div class="chips">' + ascChipsHTML(design.ascensionRelics, 'asc') + '</div></div>');
+    }
+    if (design.dreadUpgrades.length) {
+      extra.push('<div class="sect"><h3>恐惧模式额外升级</h3><div class="chips">' + plainChipsHTML(design.dreadUpgrades, 'dreadchip') + '</div></div>');
+    }
+    return h.join('') + extra.join('');
+  }
+
+  function renderScript(design) {
+    var s = design.script;
+    if (!s || !s.turns || !s.turns.length) {
+      return '<div class="sect"><h3>逐回合剧本</h3><p class="muted">这一幕没有配固定的逐回合剧本 —— Boss 按自己的出牌逻辑行动。</p></div>';
+    }
+    var loopFrom = isNum(s.loopFrom) ? s.loopFrom : 0;
+    var loopLength = isNum(s.loopLength) ? s.loopLength : 0;
+    var looping = loopFrom > 0 && loopLength > 0;
+    var h = ['<div class="sect"><h3>逐回合剧本<span class="cnt">共 ' + s.turns.length + ' 回合</span></h3>'];
+    if (looping) {
+      h.push('<p class="loopnote">第 <b>' + loopFrom + '</b> 回合起，每 <b>' + loopLength + '</b> 回合循环</p>');
+    }
+    h.push('<div class="tablewrap"><table class="script"><thead><tr><th>回合</th><th>打出</th><th>不出</th><th>备注</th></tr></thead><tbody>');
+    for (var i = 0; i < s.turns.length; i++) {
+      var turn = s.turns[i] || {};
+      var cards = turn.cards || [];
+      var played = [], out = [], c;
+      for (c = 0; c < cards.length; c++) {
+        if (isOut(cards[c])) { out.push(cards[c]); } else { played.push(cards[c]); }
+      }
+      var turnNo = i + 1;
+      h.push('<tr' + (looping && turnNo >= loopFrom ? ' class="loop"' : '') + '>');
+      h.push('<td class="turn">' + turnNo + '</td>');
+      h.push('<td class="played">');
+      if (!played.length) { h.push('<span class="dash">—</span>'); }
+      else { for (c = 0; c < played.length; c++) { h.push(cardChipHTML(played[c])); } }
+      h.push('</td>');
+      h.push('<td class="notplayed">');
+      if (!out.length) { h.push('<span class="dash">—</span>'); }
+      else { for (c = 0; c < out.length; c++) { h.push(cardChipHTML(out[c])); } }
+      h.push('</td>');
+      h.push('<td class="note">' + esc(stripNumberPrefix(turn.note)) + '</td>');
+      h.push('</tr>');
+    }
+    h.push('</tbody></table></div></div>');
+    return h.join('');
+  }
+
+  function renderDesign(design) {
+    var h = [];
+    var title = design.name;
+    var meta = design.character + ' · 第 ' + design.act + ' 幕'
+      + (design.isVariant ? '<span class="badge">变体</span>' : '<span class="badge">主设计</span>');
+
+    h.push('<section class="design ' + (design.isVariant ? 'variant' : 'main') + '" id="' + esc(design.id) + '">');
+
+    /* 标题 = 数据源里的中文名；key / encounter / fight 命令放下面一行 */
+    h.push('<div class="dhead"><h2 class="dtitle">' + esc(title) + '</h2><span class="dmeta">（' + meta + '）</span></div>');
+
+    var fight = fightKeyOf(design);
+    h.push('<div class="keyline">');
+    h.push('<span class="klabel">encounter</span><code class="code">' + esc(design.encounter || '—') + '</code>');
+    h.push('<span class="klabel">fight</span><code class="code">fight ' + esc(fight) + '</code>');
+    h.push('<button class="copy" type="button" data-copy="fight ' + esc(fight) + '">复制</button>');
+    h.push('<span class="klabel">key</span><code class="code dim">' + esc(design.key) + '</code>');
+    h.push('</div>');
+
+    /* 血量 */
+    var hpText = design.hp === null ? '—' : String(design.hp);
+    var hpTitle = '角色基础 ' + (design.tableBaseHp === null ? '?' : design.tableBaseHp)
+      + ' + 该幕额外 ' + Math.max(0, (design.baseHp - design.firstBaseHp))
+      + ' + 涅奥的祝福 120 + 每进一幕 180×' + (design.act - 1)
+      + (design.hpBonus ? ' + 变体额外 ' + design.hpBonus : '');
+    h.push('<div class="hprow">');
+    h.push('<div class="hp"><span class="num" title="' + esc(hpTitle) + '">' + esc(hpText) + '</span><span class="unit">HP</span>'
+      + (design.hp === null ? '<span class="hint" title="生成器没有拿到这套设计的血量，请检查数据表">?</span>' : '') + '</div>');
+    h.push('<div class="hpnote">（含涅奥的祝福 <b>+120</b> / 每进一幕 <b>+180</b>'
+      + (design.hpBonus ? ' / 变体额外 <b>' + (design.hpBonus > 0 ? '+' : '') + design.hpBonus + '</b>' : '')
+      + (design.tableBaseHp !== null && design.firstBaseHp !== design.tableBaseHp
+        ? ' · <span class="hint" title="数据源里该角色第一幕的 baseHp 是 ' + design.firstBaseHp + '，血量公式用的基础表是 ' + design.tableBaseHp + '（差 ' + (design.firstBaseHp - design.tableBaseHp) + '，未计入）">ⓘ</span>'
+        : '')
+      + '）</div>');
+    h.push('<div class="cfg"><span>能量 <b>' + esc(design.energy) + '</b></span><span>起手手牌 <b>' + esc(design.handSize) + '</b></span></div>');
+    h.push('</div>');
+
+    h.push(renderInfo(design));
+    h.push(renderSpecial(design));
+    h.push(renderLoadout(design));
+    h.push(renderScript(design));
+
+    h.push('</section>');
+    return h.join('');
+  }
+
+  /* ---------- 搜索索引 ---------- */
+  function searchBlob(design) {
+    var parts = [design.name || '', design.character, design.key, design.bossKey, design.encounter || '',
+                 design.specialKey || '', design.specialDreadKey || ''];
+    for (var i = 0; i < design.deck.length; i++) { parts.push(design.deck[i]); }
+    for (i = 0; i < design.relics.length; i++) { parts.push(design.relics[i]); }
+    for (i = 0; i < design.dreadUpgrades.length; i++) { parts.push(design.dreadUpgrades[i]); }
+    for (i = 0; i < design.ascensionUpgrades.length; i++) { parts.push(design.ascensionUpgrades[i]); }
+    for (i = 0; i < design.ascensionRelics.length; i++) { parts.push(design.ascensionRelics[i]); }
+    if (design.script && design.script.turns) {
+      for (i = 0; i < design.script.turns.length; i++) {
+        var cards = design.script.turns[i].cards || [];
+        for (var j = 0; j < cards.length; j++) {
+          if (cards[j] && cards[j].name) { parts.push(cards[j].name); }
+          if (cards[j] && cards[j].type) { parts.push(cards[j].type); }
+        }
+      }
+    }
+    return parts.join(' ').toLowerCase();
+  }
+
+  /* ---------- 侧边栏 ---------- */
+  function renderSidebar(designs) {
+    var groups = {}, order = [], i;
+    for (i = 0; i < designs.length; i++) {
+      var act = designs[i].act;
+      if (!groups[act]) { groups[act] = []; order.push(act); }
+      groups[act].push(designs[i]);
+    }
+    order.sort(function (a, b) { return a - b; });
+
+    var h = [];
+    for (var g = 0; g < order.length; g++) {
+      var list = groups[order[g]];
+      h.push('<div class="navgroup" data-act="' + order[g] + '">');
+      h.push('<div class="navtitle"><span>' + esc(actGroupLabel(order[g])) + '</span></div><ul>');
+      for (i = 0; i < list.length; i++) {
+        var d = list[i];
+        h.push('<li><a class="navlink' + (d.isVariant ? ' v' : '') + '" href="#' + esc(d.id) + '" data-target="' + esc(d.id) + '" title="' + esc(d.key) + '">'
+          + '<span class="vname">' + esc(d.name) + '</span>'
+          + '<span class="venc">(' + esc(d.encounter || d.key) + ')</span>'
+          + '</a></li>');
+      }
+      h.push('</ul></div>');
+    }
+    return h.join('');
+  }
+
+  /* ---------- 主渲染 ---------- */
+  var designs = buildDesigns();
+
+  function renderAll() {
+    var content = document.getElementById('content');
+    if (!designs.length) {
+      content.innerHTML = '<p class="muted">数据为空：请检查 <code>tools\\wiki\\data.json</code> 是否已导出。</p>';
+      return;
+    }
+    var byAct = {}, order = [], i, d;
+    for (i = 0; i < designs.length; i++) {
+      d = designs[i];
+      if (!byAct[d.act]) { byAct[d.act] = []; order.push(d.act); }
+      byAct[d.act].push(d);
+    }
+    order.sort(function (a, b) { return a - b; });
+
+    var h = [];
+    for (var g = 0; g < order.length; g++) {
+      h.push('<div class="actblock"><h2 class="acthead">' + esc(actGroupLabel(order[g])) + '</h2>');
+      var list = byAct[order[g]];
+      for (i = 0; i < list.length; i++) { h.push(renderDesign(list[i])); }
+      h.push('</div>');
+    }
+    content.innerHTML = h.join('');
+
+    /* 给每个卡片挂搜索索引 */
+    for (i = 0; i < designs.length; i++) {
+      var el = document.getElementById(designs[i].id);
+      if (el) { el.setAttribute('data-search', searchBlob(designs[i])); }
+    }
+  }
+
+  function renderHeader() {
+    var at = document.getElementById('gen-at');
+    var from = document.getElementById('gen-from');
+    var cnt = document.getElementById('gen-count');
+    var foot = document.getElementById('foot-meta');
+    if (at) { at.textContent = DATA.generatedAt || '未知时间'; }
+    if (from) { from.textContent = DATA.generatedFrom || '未知来源'; }
+    var bossCount = (DATA.bosses || []).length;
+    if (cnt) { cnt.textContent = bossCount + ' 个角色 · ' + designs.length + ' 套设计'; }
+    if (foot) {
+      foot.textContent = ' 导出时间 ' + (DATA.generatedAt || '—') + '，来源 ' + (DATA.generatedFrom || '—')
+        + '，未解析卡名 ' + ((DATA.cardNameMisses || []).length) + ' 个。';
+    }
+    document.title = '玩家角色当Boss · 百科（' + bossCount + ' 角色 / ' + designs.length + ' 套设计）';
+  }
+
+  /* ---------- 搜索过滤 ---------- */
+  function applyFilter(raw) {
+    var q = String(raw || '').trim().toLowerCase();
+    var tokens = q.length ? q.split(/\s+/) : [];
+    var sections = document.getElementsByClassName('design');
+    var shown = 0, i, j, el, blob, hit;
+
+    for (i = 0; i < sections.length; i++) {
+      el = sections[i];
+      blob = el.getAttribute('data-search') || '';
+      hit = true;
+      for (j = 0; j < tokens.length; j++) {
+        if (blob.indexOf(tokens[j]) < 0) { hit = false; break; }
+      }
+      el.style.display = hit ? '' : 'none';
+      if (hit) { shown++; }
+    }
+
+    var links = document.getElementsByClassName('navlink');
+    for (i = 0; i < links.length; i++) {
+      var target = document.getElementById(links[i].getAttribute('data-target'));
+      var visible = !target || target.style.display !== 'none';
+      if (visible) { links[i].classList.remove('hide'); } else { links[i].classList.add('hide'); }
+    }
+
+    var groups = document.getElementsByClassName('navgroup');
+    for (i = 0; i < groups.length; i++) {
+      var anyVisible = groups[i].querySelector('li > a.navlink:not(.hide)');
+      if (anyVisible) { groups[i].classList.remove('hide'); } else { groups[i].classList.add('hide'); }
+    }
+
+    var info = document.getElementById('matchinfo');
+    if (info) {
+      info.textContent = tokens.length ? ('匹配 ' + shown + ' / ' + sections.length + ' 套') : '';
+    }
+    var noMatch = document.getElementById('noMatch');
+    if (noMatch) {
+      if (tokens.length && shown === 0) { noMatch.classList.add('on'); } else { noMatch.classList.remove('on'); }
+    }
+  }
+
+  /* ---------- 滚动高亮 ---------- */
+  function initSpy() {
+    var links = document.getElementsByClassName('navlink');
+    if (!links.length) { return; }
+    var current = null;
+    var ticking = false;
+
+    function update() {
+      ticking = false;
+      var best = null, bestTop = -Infinity, i, el, rect;
+      for (i = 0; i < links.length; i++) {
+        el = document.getElementById(links[i].getAttribute('data-target'));
+        if (!el || el.style.display === 'none') { continue; }
+        rect = el.getBoundingClientRect();
+        if (rect.top - 110 <= 0 && rect.top > bestTop) { bestTop = rect.top; best = links[i]; }
+      }
+      if (!best) {
+        for (i = 0; i < links.length; i++) {
+          el = document.getElementById(links[i].getAttribute('data-target'));
+          if (!el || el.style.display === 'none') { continue; }
+          best = links[i];
+          break;
+        }
+      }
+      if (best === current) { return; }
+      if (current) { current.classList.remove('active'); }
+      current = best;
+      if (current) {
+        current.classList.add('active');
+        var side = document.getElementById('side');
+        if (side && side.scrollHeight > side.clientHeight && window.innerWidth > 980) {
+          var top = current.offsetTop;
+          if (top < side.scrollTop || top > side.scrollTop + side.clientHeight - 40) {
+            side.scrollTop = Math.max(0, top - side.clientHeight / 2);
+          }
+        }
+      }
+    }
+
+    function onScroll() {
+      if (ticking) { return; }
+      ticking = true;
+      if (window.requestAnimationFrame) { window.requestAnimationFrame(update); }
+      else { window.setTimeout(update, 60); }
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    update();
+  }
+
+  /* ---------- 复制按钮 ---------- */
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text);
+    }
+    var p = new Promise(function (resolve, reject) {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', 'readonly');
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        if (ok) { resolve(); } else { reject(new Error('copy failed')); }
+      } catch (e) { reject(e); }
+    });
+    return p;
+  }
+
+  function initCopy() {
+    document.addEventListener('click', function (ev) {
+      var btn = ev.target;
+      while (btn && btn !== document.body && !(btn.classList && btn.classList.contains('copy'))) {
+        btn = btn.parentNode;
+      }
+      if (!btn || !btn.classList || !btn.classList.contains('copy')) { return; }
+      var text = btn.getAttribute('data-copy') || '';
+      var done = function () {
+        var old = btn.textContent;
+        btn.textContent = '已复制';
+        btn.classList.add('done');
+        window.setTimeout(function () {
+          btn.textContent = old;
+          btn.classList.remove('done');
+        }, 1200);
+      };
+      copyText(text).then(done, function () {
+        window.prompt('自动复制失败，请手动复制：', text);
+      });
+    });
+  }
+
+  /* ---------- 搜索框 / 目录开关 ---------- */
+  function initControls() {
+    var q = document.getElementById('q');
+    var clr = document.getElementById('qclear');
+    var toggle = document.getElementById('sideToggle');
+
+    if (q) {
+      q.addEventListener('input', function () { applyFilter(q.value); });
+      q.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Escape') { q.value = ''; applyFilter(''); }
+        if (ev.key === 'Enter') {
+          var first = document.querySelector('.design:not([style*="none"])');
+          if (first) { first.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        }
+      });
+    }
+    if (clr) {
+      clr.addEventListener('click', function () {
+        if (q) { q.value = ''; applyFilter(''); q.focus(); }
+      });
+    }
+    if (toggle) {
+      toggle.addEventListener('click', function () {
+        document.body.classList.toggle('side-hidden');
+        try { window.localStorage.setItem('cb-wiki-side', document.body.classList.contains('side-hidden') ? '0' : '1'); } catch (e) {}
+      });
+      try {
+        if (window.localStorage.getItem('cb-wiki-side') === '0') { document.body.classList.add('side-hidden'); }
+      } catch (e) {}
+    }
+
+    document.addEventListener('keydown', function (ev) {
+      var tag = (ev.target && ev.target.tagName) || '';
+      if (ev.key === '/' && tag !== 'INPUT' && tag !== 'TEXTAREA') {
+        ev.preventDefault();
+        if (q) { q.focus(); q.select(); }
+      }
+    });
+  }
+
+  /* ---------- 启动 ---------- */
+  renderAll();
+  renderHeader();
+  var side = document.getElementById('side');
+  if (side) { side.innerHTML = renderSidebar(designs); }
+  initControls();
+  initCopy();
+  initSpy();
+  applyFilter('');
+
+  window.CBWiki = { designs: designs, applyFilter: applyFilter };
+})();
+</script>
+</body>
+</html>

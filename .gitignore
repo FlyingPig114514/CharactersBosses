@@ -1,4 +1,4 @@
-# Build artifacts
+﻿# Build artifacts
 **/bin/
 **/obj/
 **/.vs/
@@ -89,3 +89,9 @@ mod_log*.txt
 
 # loader 的安卓试编产物
 /loader/bin-phone/
+
+# 百科页工具链（数据导出器 + 站点生成器）与导出的数据：源码进仓库，页面产物在 docs/wiki
+!/tools/wiki/
+!/tools/wiki/**
+!/tools/wiki-dump/
+!/tools/wiki-dump/**
