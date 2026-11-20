@@ -25,6 +25,9 @@ namespace CharacterBosses.UI;
 /// </summary>
 public partial class BossHandPanel
 {
+    /// <summary>轰击复燃「不在本地玩家身上」的日志限流（v0.2.840）。</summary>
+    private static int _bombElsewhereLogs;
+
     private const string ExtraIntentsName = "ExtraIntents";
 
     /// <summary>「画在**所有卡牌左边**」的那一颗独立意图（目前只有「抱抱先生」）。</summary>
@@ -176,7 +179,25 @@ public partial class BossHandPanel
                     int baseDamage = 18;
                     try { baseDamage = (int)Math.Round((double)bomb.DynamicVars.Damage.BaseValue); }
                     catch { /* 取不到就用 18（卡面基础值） */ }
-                    liveIntents.Add(new Core.LiveSingleAttackIntent(bomb, baseDamage));
+
+                    // ★★ v0.2.840（玩家反馈：「轰击储的轰击从消耗堆打出时的伤害预览似乎错误的显示为群伤」）：
+                    //   `Bombardment` 是 `TargetType.AnyEnemy` = **单体**（反编译 `OnPlay` 就是
+                    //   `DamageCmd.Attack(...).Targeting(cardPlay.Target)`，只打一个目标）。
+                    //   以前这一条不判锁定关系 ⇒ **每个玩家的面板都显示这个数字** ⇒ 看起来就像群攻
+                    //   （和群蛇形态 / 充能球被动踩过的是同一个坑：`LOCK_ON_POWER` 只锁一个人）。
+                    //   现在按 `RandomAimIsElsewhere(boss)` 收窄：本地不是被她锁定的那位 ⇒ 不画这一条。
+                    if (Core.BossIntentBuilder.RandomAimIsElsewhere(boss))
+                    {
+                        if (_bombElsewhereLogs++ < 3)
+                        {
+                            Logger.Log("[CharBoss] 轰击复燃：单体攻击、她锁的不是本地玩家 ⇒ 这一条对本地不显示" +
+                                       "（以前所有人都显示，看起来像群攻）");
+                        }
+                    }
+                    else
+                    {
+                        liveIntents.Add(new Core.LiveSingleAttackIntent(bomb, baseDamage));
+                    }
                 }
             }
         }
