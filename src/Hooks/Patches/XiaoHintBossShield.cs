@@ -51,6 +51,55 @@ internal static class XiaoHintBossShield
 
     private static bool _tried;
     private static int _blocked;
+    private static int _diag;
+
+    /// <summary>
+    /// 玩家 mod_log (48) 用：护栏装上了、但一次都没拦到 ⇒ 说明它的调用参数里认不出我们的 Boss。
+    /// 这里把**前 12 次调用**的入口名与参数类型打出来（只读类型与极短的值，不做任何遍历），
+    /// 下次日志就能直接判断「它到底在对谁下手」。
+    /// </summary>
+    private static void LogArgs(MethodBase? method, object[]? args)
+    {
+        try
+        {
+            if (_diag >= 12 || args == null) return;
+            _diag++;
+
+            var sb = new System.Text.StringBuilder();
+            sb.Append("[CharBoss] 小小姐诊断：").Append(method?.DeclaringType?.Name).Append('.').Append(method?.Name).Append(" 参数");
+            for (int i = 0; i < args.Length; i++)
+            {
+                object? a = args[i];
+                sb.Append(" | [").Append(i).Append("]=");
+                if (a == null) { sb.Append("null"); continue; }
+                sb.Append(a.GetType().Name);
+                switch (a)
+                {
+                    case string s: sb.Append('"').Append(s.Length > 24 ? s.Substring(0, 24) : s).Append('"'); break;
+                    case Player p:
+                        sb.Append("(net=").Append(p.NetId)
+                          .Append(",影子=").Append(p.Creature?.Monster is Monsters.CharBossMonster ? "是" : "否")
+                          .Append(",怪物=").Append(p.Creature?.Monster?.GetType().Name ?? "无")
+                          .Append(",手牌=").Append(SafeHandCount(p)).Append(')');
+                        break;
+                    case Creature c:
+                        sb.Append("(怪物=").Append(c.Monster?.GetType().Name ?? "无").Append(')');
+                        break;
+                    case int n: sb.Append('(').Append(n).Append(')'); break;
+                    case IEnumerable seq when a is not string:
+                        { int k = 0; foreach (var _ in seq) { if (++k >= 6) break; } sb.Append("(约").Append(k).Append("项)"); }
+                        break;
+                }
+            }
+            Logger.Log(sb.ToString());
+        }
+        catch { /* 诊断失败绝不能影响游戏 */ }
+    }
+
+    private static string SafeHandCount(Player p)
+    {
+        try { return (p.PlayerCombatState?.Hand?.Cards?.Count ?? 0).ToString(); } catch { return "?"; }
+    }
 
     /// <summary>装护栏（幂等；对方模组没装就什么都不做）。启动时调一次。</summary>
     internal static void TryApply()
@@ -126,12 +175,14 @@ internal static class XiaoHintBossShield
     /// <summary>给**返回 void** 的入口（`Picker.Before`）用：false = 跳过它那段。</summary>
     private static bool PrefixVoid(MethodBase? __originalMethod, object[] __args)
     {
+        LogArgs(__originalMethod, __args);
         return !ShouldBlock(__originalMethod, __args, out _);
     }
 
     /// <summary>给**返回 string** 的入口（`Pilot.Act`，非 null = 它眼里的「拒绝原因」）用。</summary>
     private static bool PrefixString(MethodBase? __originalMethod, object[] __args, ref string? __result)
     {
+        LogArgs(__originalMethod, __args);
         if (!ShouldBlock(__originalMethod, __args, out var who)) return true;
         __result = null;      // null = 它眼里的「成功」，不会触发它「连续失败 2 次就自动关掉托管」的逻辑
         return false;
