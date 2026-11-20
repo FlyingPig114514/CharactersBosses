@@ -92,13 +92,14 @@ public static class BossFrameTick
         catch { return false; }
     }
     /// <summary>指纹比对类检查：桌面每帧（零回归）；手机隔帧（约 30Hz）。</summary>
-    private static bool AllowFingerprintChecks()
+    private static bool AllowFingerprintChecks(double elapsedMs)
     {
         try
         {
-            if (!IsPhoneLike()) return true;
+            if (!IsPhoneLike()) return true;        // 桌面：每帧都做（零回归）
+            if (elapsedMs > 6.0) return false;      // 本帧已花超 ⇒ 顺延下一帧，别叠成尖峰
             _fpFrame++;
-            return (_fpFrame % 2) == 0;
+            return (_fpFrame % 2) == 0;             // 手机：隔帧（约 30Hz）
         }
         catch { return true; }
     }
@@ -476,6 +477,7 @@ public static class BossFrameTick
             }
 
             var now = Time.GetTicksUsec();
+            ulong _tickStartUsec = Time.GetTicksUsec();   // 本帧预算基准（2026-11-20）
 
             // ①⓪⓪ 出牌队列卡死看门狗（用户 2026-10-30：「杀个小怪怎么卡死了」，日志停在死亡那一行、
             //   之后连帧回调都没有 ⇒ 主线程卡住）。我们不猜原因，只在有卡面滞留在
@@ -623,7 +625,7 @@ public static class BossFrameTick
             //   玩家反馈「第一幕要重开房间才同步」，根因是开局那条自定义消息丢一次就被去重标记钉死。
             try { CharacterBosses.Core.BossPicksSync.Tick(); } catch { /* 绝不影响战斗 */ }
 
-            if (AllowFingerprintChecks())
+            if (AllowFingerprintChecks((Time.GetTicksUsec() - _tickStartUsec) / 1000.0))
             {
             foreach (var each in everyBoss) RefreshIntentsIfFocusChanged(each);
 

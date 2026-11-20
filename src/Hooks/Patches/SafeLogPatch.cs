@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using HarmonyLib;
 
 namespace CharacterBosses.Patches;
@@ -16,10 +18,18 @@ namespace CharacterBosses.Patches;
 ///
 /// 修法：给**我们自己**的 `Logger.Log` 挂前缀，用 `FileShare.ReadWrite` 打开 + 失败静默丢弃，
 /// 绝不把 IO 异常抛给游戏逻辑（`src/ModEntry.cs` 一行都不用改）。
+///
+/// ★ v0.2.830（手机卡顿的真正尖峰）：以前是「主线程缓冲 + 每 0.5 秒/每 32 行由帧回调自己 flush」，
+///   实测手机日志里每 120 帧（≈2 秒）一行 `帧回调耗时: avg=0.44ms max=20~41ms` ——
+///   avg × 120 正好等于「两次 flush 的时间」，也就是说**那两个 20~41ms 的尖峰就是主线程上写 flash**。
+///   现在：主线程只往内存队列里塞一行（纯字符串，微秒级），**落盘全交给后台线程**
+///   （200ms 醒一次；`⚠ / 失败 / 异常 / 不同步` 这类关键行会立刻叫醒它，最多多等 200ms，
+///   崩溃前那几十毫秒的日志仍能保住大部分）。
 /// </summary>
 [HarmonyPatch(typeof(CharacterBosses.Logger), nameof(CharacterBosses.Logger.Log))]
 public static class SafeLogPatch
 {
+    /// <summary>主线程与后台写手之间交换「待落盘行」的锁（只在内存里倒手，不做任何 IO）。</summary>
     private static readonly object Gate = new();
 
     private static readonly string LogPath = Path.Combine(
@@ -28,31 +38,30 @@ public static class SafeLogPatch
 
     private static int _failures;
 
-    // ── v0.2.805（手机卡顿/耗电）：**写盘改成缓冲 + 长开文件** ──────────────────
-    //   以前每一条日志都 `Directory.CreateDirectory(...)` + `new FileStream(...)` + 关掉 ——
-    //   一局实测 203,646 行 ⇒ 20 万次「建目录 + 开关文件」。PC 上无所谓，
-    //   手机上每次碰 flash 都贵、还费电（玩家反馈「手机版四人联机卡顿明显，耗电也明显」）。
-    //   现在：文件只开一次、目录只建一次，攒够 32 行或过了 0.5 秒才 flush；
-    //   带 ⚠ / 失败 / 不同步 这类**关键行**仍然立刻 flush（出问题时不丢证据）。
+    // ── 待落盘队列（只由主线程追加、后台线程取走） ─────────────────────────
+    private static readonly List<string> Pending = new();
+    private const int MaxPendingLines = 20000;      // 兜底上限，写盘长期失败时也不会吃爆内存
+
+    // ── 后台写手（唯一碰文件句柄的线程） ──────────────────────────────────
+    private static readonly AutoResetEvent Wake = new(false);
+    private static Thread? _worker;
     private static FileStream? _stream;
     private static StreamWriter? _writer;
     private static DateTime _openedAtUtc;
-    private static DateTime _lastFlushUtc;
-    private static int _buffered;
     private static bool _dirEnsured;
 
     [HarmonyPrefix]
     public static bool Prefix(string message)
     {
+        bool urgent = false;
         try
         {
-            Write(message ?? string.Empty);
+            Write(message ?? string.Empty, out urgent);
         }
         catch
         {
             // 落盘失败就丢弃这条日志：日志绝不能把游戏逻辑打崩（双开/磁盘忙都可能失败）
             _failures++;
-            CloseQuietly();
         }
 
         // 本地数据记录（A5，默认关）：把「我们自己打出来的问题行」也记一份。
@@ -69,29 +78,119 @@ public static class SafeLogPatch
         return false;   // 已经自己写过了，跳过原方法
     }
 
-    private static void Write(string message)
+    /// <summary>主线程只做这一件事：把带时间戳的一行塞进内存队列（不做任何 IO）。</summary>
+    private static void Write(string message, out bool urgent)
     {
+        var line = $"[{DateTime.Now:HH:mm:ss}] {message}{Environment.NewLine}";
+        urgent = LooksLikeProblem(message);
+
         lock (Gate)
         {
-            if (!_dirEnsured)
+            if (Pending.Count >= MaxPendingLines)
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(LogPath)!);
-                _dirEnsured = true;
+                // 写盘一直失败（磁盘满 / 权限）时丢弃最早的 1/4，留一行说明，绝不涨到吃爆内存
+                Pending.RemoveRange(0, MaxPendingLines / 4);
+                Pending.Add($"[{DateTime.Now:HH:mm:ss}] [CharBoss] ⚠ 日志缓冲溢出，已丢弃最早 {MaxPendingLines / 4} 行{Environment.NewLine}");
             }
-
-            EnsureWriter();
-            _writer!.Write($"[{DateTime.Now:HH:mm:ss}] {message}{Environment.NewLine}");
-            _buffered++;
-
-            var now = DateTime.UtcNow;
-            // 关键行立刻落盘；其余攒批
-            if (_buffered >= 32
-                || (now - _lastFlushUtc).TotalMilliseconds >= 500
-                || LooksLikeProblem(message))
-            {
-                Flush();
-            }
+            Pending.Add(line);
         }
+
+        EnsureWorker();
+
+        // 关键行（⚠ / 失败 / 异常 / 不同步）立刻叫醒写手；普通行就等它 200ms 那一趟。
+        if (urgent)
+        {
+            try { Wake.Set(); } catch { /* 忽略 */ }
+        }
+    }
+
+    /// <summary>后台写手：唯一碰文件句柄的线程（幂等）。</summary>
+    private static void EnsureWorker()
+    {
+        if (_worker != null) return;
+        lock (Gate)
+        {
+            if (_worker != null) return;
+            var t = new Thread(WorkerLoop)
+            {
+                IsBackground = true,                 // 不拦住游戏退出
+                Name = "CharacterBosses.LogWriter",
+                Priority = ThreadPriority.BelowNormal // 抢 CPU 别影响帧率
+            };
+            _worker = t;
+            try { t.Start(); } catch { _worker = null; }
+            try { AppDomain.CurrentDomain.ProcessExit += (_, _) => DrainSync(); } catch { /* 忽略 */ }
+        }
+    }
+
+    private static void WorkerLoop()
+    {
+        while (true)
+        {
+            try { Wake.WaitOne(200); } catch { Thread.Sleep(200); }
+            try { Drain(); } catch { _failures++; CloseQuietly(); }
+        }
+    }
+
+    /// <summary>把内存队列里的行落到盘（**只由后台写手调用**）。</summary>
+    private static void Drain()
+    {
+        string[] batch;
+        lock (Gate)
+        {
+            if (Pending.Count == 0) return;
+            batch = Pending.ToArray();
+            Pending.Clear();
+        }
+
+        int written = 0;
+        try
+        {
+            EnsureWriter();
+            if (_writer == null) { Requeue(batch, written); return; }
+
+            for (; written < batch.Length; written++) _writer.Write(batch[written]);
+            _writer.Flush();                 // 唯一的磁盘动作，发生在后台线程
+        }
+        catch
+        {
+            // 写不进去（磁盘满 / 独占）⇒ 没写成的那些放回队列，下一趟再试，绝不丢
+            _failures++;
+            CloseQuietly();
+            Requeue(batch, written);
+        }
+    }
+
+    /// <summary>把没写成的行放回队列头部（有上限，避免磁盘长期失败时吃爆内存）。</summary>
+    private static void Requeue(string[] batch, int from)
+    {
+        int count = batch.Length - from;
+        if (count <= 0) return;
+        lock (Gate)
+        {
+            if (count > MaxPendingLines)
+            {
+                from += count - MaxPendingLines;
+                count = MaxPendingLines;
+            }
+            Pending.InsertRange(0, new ArraySegment<string>(batch, from, count));
+        }
+    }
+
+    /// <summary>进程退出时尽量把尾巴落盘（同步，最多等一小会儿）。</summary>
+    private static void DrainSync()
+    {
+        try
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                lock (Gate) if (Pending.Count == 0) break;
+                Drain();
+                Thread.Sleep(20);
+            }
+            CloseQuietly();
+        }
+        catch { /* 忽略 */ }
     }
 
     private static void EnsureWriter()
@@ -100,31 +199,19 @@ public static class SafeLogPatch
         {
             // 每隔 5 分钟换一次文件句柄，避免极长的会话一直占着文件
             if ((DateTime.UtcNow - _openedAtUtc).TotalMinutes < 5) return;
-            Flush();
             CloseQuietly();
+        }
+
+        if (!_dirEnsured)
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(LogPath)!);
+            _dirEnsured = true;
         }
 
         _stream = new FileStream(LogPath, FileMode.Append, FileAccess.Write,
             FileShare.ReadWrite);              // ← 关键：允许别的进程同时写（双开那次的教训）
         _writer = new StreamWriter(_stream);
         _openedAtUtc = DateTime.UtcNow;
-        _lastFlushUtc = DateTime.UtcNow;
-    }
-
-    /// <summary>把缓冲写下去（帧驱动/关键行都会调；失败静默）。</summary>
-    internal static void Flush()
-    {
-        try
-        {
-            lock (Gate)
-            {
-                if (_writer == null) return;
-                _writer.Flush();
-                _buffered = 0;
-                _lastFlushUtc = DateTime.UtcNow;
-            }
-        }
-        catch { _failures++; CloseQuietly(); }
     }
 
     private static void CloseQuietly()
@@ -133,18 +220,15 @@ public static class SafeLogPatch
         try { _stream?.Dispose(); } catch { /* 忽略 */ }
         _writer = null;
         _stream = null;
-        _buffered = 0;
     }
 
-    /// <summary>该不该现在把日志缓冲刷下去（帧驱动每秒调一次就够）。</summary>
+    /// <summary>
+    /// 以前是「主线程顺手 flush」的入口，现在是**非阻塞的空操作**（只催一下后台写手）。
+    /// 帧回调里仍然照旧调一次，代价是一次 `Set()`。
+    /// </summary>
     internal static void FlushIfDue()
     {
-        try
-        {
-            if (_writer == null) return;
-            if (_buffered > 0 && (DateTime.UtcNow - _lastFlushUtc).TotalMilliseconds >= 500) Flush();
-        }
-        catch { /* 忽略 */ }
+        try { Wake.Set(); } catch { /* 忽略 */ }
     }
 
     /// <summary>这条日志是不是「出问题」的那种（异常 / 失败 / 不同步 / 我们的 ⚠ 诊断）。</summary>

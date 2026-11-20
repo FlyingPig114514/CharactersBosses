@@ -16,9 +16,12 @@ namespace CharacterBosses.Core;
 public static class BossDefs
 {
     /// <summary>
-    /// 瑙傝€?Boss 鐨?*鍗犱綅瑙掕壊绫诲瀷**锛堣繍琛屾湡鐢?`RefreshWatcherCharacterType` 鎹㈡垚鐪熺殑瑙傝€呰鑹诧級銆?    ///
-    /// 鈽?v0.2.732锛堢敤鎴?2026-11-17锛屽畼鏂逛富绾挎洿鏂板埌 0.111 涔嬪悗锛夛細鍘熸潵杩欓噷鍐欐 `Characters.Fool`锛堟剼鑰咃級鈥斺€?    ///   閭ｆ槸 **0.113 娴嬭瘯鍒嗘敮鎵嶆湁鐨勮鑹?*锛?.111 姝ｅ紡鐗堥噷娌℃湁杩欎釜绫诲瀷 鈬?0.111 鏋勫缓缂栬瘧鏈熷氨鎵句笉鍒般€?    ///   鐜板湪鎸夋瀯寤哄垎锛?.113锛坆eta锛夌户缁敤 `Fool`锛?.111锛堟寮忥級鐢?`DeprecatedCharacter`锛堜袱鐗堥兘鏈夛級銆?    ///   涓変釜瀹氫箟锛坄FOOL_BOSS` / `WATCHER_DIVINITY` / `WATCHER_OMEGA` 瑙傛祴鍙樹綋锛変笌涓ゅ
-    ///   銆岃繕鏄笉鏄崰浣嶇銆嶇殑鍒ゆ柇锛坄BossFrameTickPatch` / `CharBossMonster.Descriptor`锛夐兘璧板畠銆?    /// </summary>
+    /// 观者 Boss 的**占位角色类型**（运行期由 `RefreshWatcherCharacterType` 换成真的观者角色）。
+    /// ★ v0.2.732（用户 2026-11-17，官方主线更新到 0.111 之后）：原来这里写死 `Characters.Fool`（愚者）——
+    ///   那是 **0.113 测试分支才有的角色**，0.111 正式版里没有这个类型，0.111 构建编译期就找不到。
+    ///   现在按构建分支走：0.113（beta）继续用 `Fool`，0.111（正式）用 `DeprecatedCharacter`（两版都有）。
+    ///   三个定义（`FOOL_BOSS` / `WATCHER_DIVINITY` / `WATCHER_OMEGA` 观测变体）与两处「还是不是占位符」的判断
+    ///   （`BossFrameTickPatch` / `CharBossMonster.Descriptor`）都走它。
     public static readonly Type PlaceholderCharacterType =
 #if STS2_113
         // ★ v0.2.745（严重回归修复）：这里以前写成了 `PlaceholderCharacterType;`（**自己赋值给自己**），

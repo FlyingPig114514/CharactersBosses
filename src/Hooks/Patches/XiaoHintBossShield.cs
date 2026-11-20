@@ -71,6 +71,7 @@ internal static class XiaoHintBossShield
                 foreach (var m in pilotType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
                 {
                     if (m.Name != "Act") continue;
+                    if (m.ReturnType != typeof(void)) { Logger.Log("[CharBoss] 小小姐的战斗提示：Pilot.Act 有返回值 ⇒ 跳过不给它打补丁（避免 __result 类型不匹配）"); continue; }
                     harmony.Patch(m, prefix: new HarmonyMethod(prefix));
                     patched.Add("Pilot." + m.Name + "(托管出牌)");
                     break;
@@ -92,7 +93,7 @@ internal static class XiaoHintBossShield
     }
 
     /// <summary>返回 false = 跳过它的自动应答 / 托管出牌（交回我们的选择器 / 原版流程）。</summary>
-    private static bool Prefix(MethodBase? __originalMethod, object[] __args, ref object __result)
+    private static bool Prefix(object[] __args)
     {
         try
         {
@@ -101,19 +102,7 @@ internal static class XiaoHintBossShield
             {
                 if (!InvolvesBoss(arg)) continue;
 
-                // 跳过对方逻辑；如果它这个方法有返回值（Pilot.Act 返回状态字符串），给个安全默认，
-                // 免得那边拿到 null 在 UI 里炸掉。
-                try
-                {
-                    var rt = (__originalMethod as MethodInfo)?.ReturnType;
-                    if (rt != null && rt != typeof(void))
-                    {
-                        __result = rt == typeof(string) ? string.Empty
-                                 : (rt.IsValueType ? Activator.CreateInstance(rt) : null);
-                    }
-                }
-                catch { /* 忽略 */ }
-                return false;
+                return false;   // 跳过对方的自动选牌 / 托管出牌逻辑
             }
         }
         catch { /* 判不出来就放行 */ }
