@@ -539,6 +539,8 @@ public static class BossDefs
                 Deck = Core.DefectThunderScript.Deck(),
                 Relics = Core.DefectThunderScript.Relics(),
                 Script = Core.DefectThunderScript.Build(),
+                // ★ v0.2.842：同上 —— 恐惧版的「暴风雨升级」必须在运行期判，不能在 Build() 里
+                DreadUpgrades = new List<Type> { typeof(Tempest) },
                 SpecialLoc = "DEFECT_BOSS.thunder",
                 SpecialPower = typeof(Powers.BossLightningRodPower),
         // 2026-11-13 (dread): 同名「引雷针」，5 张牌 -1 集中且每回合 1 次

@@ -30,11 +30,14 @@ public static class BoulderIroncladScript
         {
             new()
             {
-                // 2026-11-13（恐惧模式）第 1 回合：执迷 -1 费 ⇒ 多 1 点能量，能多打 1 张巨石+
-                Note = Core.DreadMode.IsActive ? "1. 执迷（恐惧模式 -1 费）、祭品+（王室认证）、腐化+、武装+、原始力量+（变化成打击×2/痛击）、巨石+×3（执迷省出的 1 点 ⇒ 打 2 张，剩 1 张没费）" : "1. 执迷、祭品+（王室认证）、腐化+（此后技能牌 0 费且消耗）、武装+、原始力量+（变化成打击×2/痛击）、巨石+×3（打 1 张，另两张没费不出；祭品+ 的 +2 能量已计入）",
+                // 2026-11-13（恐惧模式）第 1 回合：执迷 −1 费 ⇒ 多 1 点能量，能多打 1 张巨石+
+                // ★★ v0.2.842：这里**不能再判** `DreadMode.IsActive` —— `Build()` 跑在 `BossDefs`
+                //   静态初始化里，那一刻恒为 false（玩家 2026-11-20 截图：「增强似乎没有生效」）。
+                //   恐惧版由下面的 `Resolve` 在**运行期**给出。
+                Note = "1. 执迷、祭品+（王室认证）、腐化+（此后技能牌 0 费且消耗）、武装+、原始力量+（变化成打击×2/痛击）、巨石+×3（打 1 张，另两张没费不出；祭品+ 的 +2 能量已计入）",
                 // ⚠ 这一回合的能量写死 4：加祭品 +2 = 6 点可支配；
                 //   账：执迷 2 + 腐化 2（升级后）+ 武装 1 + 原始力量 0 + 祭品 0 = 5 ⇒ 只剩 1 点，正好打 1 张巨石（1 费）。
-                Energy = Core.DreadMode.IsActive ? 5 : 4,   // 2026-11-13 dread: 执迷 -1 费省出 1 点 ⇒ 多打 1 张巨石+
+                Energy = 4,
                 Cards = Cards(
                     C<Enthralled>(), C<Offering>(true), C<Corruption>(true), C<Armaments>(true),
                     C<PrimalForce>(true), C<GiantRock>(true), C<GiantRock>(true), C<GiantRock>(true)),
@@ -82,10 +85,8 @@ public static class BoulderIroncladScript
             },
             new()
             {
-                Note = Core.DreadMode.IsActive
-                    ? "7. 执迷（恐惧模式 -1 费）、巨石+、巨石+（两张都打得出去）"
-                    : "7. 执迷、巨石+、巨石+（第二张没费）",
-                Energy = Core.DreadMode.IsActive ? Energy + 1 : Energy,   // 2026-11-13 dread
+                Note = "7. 执迷、巨石+、巨石+（第二张没费）",
+                Energy = Energy,
                 Cards = Cards(C<Enthralled>(), C<GiantRock>(true), C<GiantRock>(true)),
             },
             new()
@@ -104,7 +105,75 @@ public static class BoulderIroncladScript
             Turns = turns,
             LoopFrom = 5,      // 用户 2026-10-28：之后 6～8 循环
             LoopLength = 3,
+
+            // ★★ v0.2.842（玩家 2026-11-20 截图：「巨石战在恐惧模式下的增强似乎没有生效」）：
+            //   两个原因叠在一起：
+            //   ① 以前在 `Build()` 里判 `DreadMode.IsActive` —— 而 `Build()` 跑在 `BossDefs` 的
+            //      **静态初始化**里，那时 `RunManager` 还没有 run ⇒ `IsActive` 恒为 false
+            //      ⇒ 恐惧版的能量 +1 从来没生效过（本项目 RegentStar / OstyKeeper 都踩过同一个坑）。
+            //   ② 口径也不对：用户的增强是「**他的执迷减少 1 费**」，不是偷偷多给 1 点能量。
+            //      牌面上的执迷必须真的显示 1 费，省下来的那 1 点才用来多打一张巨石+。
+            //   现在改成**运行期** `Resolve`：只有恐惧模式下才把第 1 / 7 回合换成
+            //   「执迷 CostThisTurn = 1、能量保持原样（4 / 3）」的版本 —— 能量不变，
+            //   但执迷便宜 1 费，于是第 1 回合能多打 1 张巨石+、第 7 回合两张都打得出去。
+            Resolve = turn =>
+            {
+                try
+                {
+                    if (!Core.DreadMode.IsActive) return null;      // 非恐惧：用静态表原样
+                    if (turn == 1)
+                    {
+                        return new BossTurn
+                        {
+                            Note = "1. 执迷（恐惧模式 −1 费 ⇒ 1 费）、祭品+（王室认证）、腐化+、武装+、" +
+                                   "原始力量+（变化成打击×2/痛击）、巨石+×3（执迷省出的 1 点 ⇒ 打 2 张，剩 1 张没费）",
+                            Energy = 4,
+                            Cards = DiscountEnthralled(
+                                C<Enthralled>(), C<Offering>(true), C<Corruption>(true), C<Armaments>(true),
+                                C<PrimalForce>(true), C<GiantRock>(true), C<GiantRock>(true), C<GiantRock>(true)),
+                        };
+                    }
+                    if (turn == 7)
+                    {
+                        return new BossTurn
+                        {
+                            Note = "7. 执迷（恐惧模式 −1 费 ⇒ 1 费）、巨石+、巨石+（两张都打得出去）",
+                            Energy = Energy,
+                            Cards = DiscountEnthralled(
+                                C<Enthralled>(), C<GiantRock>(true), C<GiantRock>(true)),
+                        };
+                    }
+                }
+                catch { /* 动态解析失败就退回静态回合表 */ }
+                return null;
+            },
         };
+    }
+
+    /// <summary>
+    /// 把这一手里那张「执迷」换成**本回合只花 1 费**的版本（恐惧模式）。
+    /// 用 `ScriptCard.CostThisTurn`：造牌时直接改这张实例的 `EnergyCost`
+    /// ⇒ 卡面显示、规划记账、真正扣费三者一致。
+    /// </summary>
+    private static List<ScriptCard> DiscountEnthralled(params ScriptCard[] cards)
+    {
+        var list = new List<ScriptCard>(cards.Length);
+        foreach (var c in cards)
+        {
+            if (c.Card == typeof(Enthralled))
+            {
+                list.Add(new ScriptCard
+                {
+                    Card = c.Card,
+                    Upgraded = c.Upgraded,
+                    From = c.From,
+                    CostThisTurn = 1,
+                });
+                continue;
+            }
+            list.Add(c);
+        }
+        return list;
     }
 
     /// <summary>卡组（用户清单逐条）。</summary>
