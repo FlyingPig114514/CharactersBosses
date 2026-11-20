@@ -1,6 +1,6 @@
 {
     "DEFECT_BOSS.status":  "State Machine\nWhenever the Defect generates a Status card, a copy of it is also added to your discard pile.\nThe first time you draw a Status card each turn, Exhaust it, draw 1 card and gain 1 Energy.\n경고: [gold]배기 장치[/gold]와 [gold]편지 칼[/gold]은 근원이 없는 피해이므로, \u0027살신성인\u0027을 지닌 소환물이 대신 받아 주지 않습니다. «바피의 충성» 소환물도 대신 받지 않는다.",
-    "DEFECT_BOSS.status_dread":  "State Machine\nWhenever the Defect generates a Status card, a copy of it is also added to your discard pile.\nThe first time you draw a Status card each turn, Exhaust it, draw 1 card and gain 1 Energy.\n경고: [gold]배기 장치[/gold]와 [gold]편지 칼[/gold]은 근원이 없는 피해이므로, \u0027살신성인\u0027을 지닌 소환물이 대신 받아 주지 않습니다. «바피의 충성» 소환물도 대신 받지 않는다.",
+    "DEFECT_BOSS.status_dread":  "State Machine\nWhenever the Defect generates a Status card, a copy of it is also added to your discard pile.\n경고: [gold]배기 장치[/gold]와 [gold]편지 칼[/gold]은 근원이 없는 피해이므로, \u0027살신성인\u0027을 지닌 소환물이 대신 받아 주지 않습니다. «바피의 충성» 소환물도 대신 받지 않는다.",
     "IRONCLAD_BOSS.name":  "아이언클래드",
     "SILENT_BOSS.name":  "사일런트",
     "DEFECT_BOSS.name":  "디펙트",

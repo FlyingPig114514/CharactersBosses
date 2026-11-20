@@ -1,6 +1,6 @@
 {
     "DEFECT_BOSS.status":  "State Machine\nWhenever the Defect generates a Status card, a copy of it is also added to your discard pile.\nThe first time you draw a Status card each turn, Exhaust it, draw 1 card and gain 1 Energy.\nADVERTENCIA: [gold]Chimenea[/gold] y [gold]Abrecartas[/gold] infligen daño sin fuente; una criatura vinculada con «[gold]Morirá por ti[/gold]» no absorberá ese daño por ti. Los esbirros con «Lealtad de Vapi» tampoco recibirán ese daño por ti.",
-    "DEFECT_BOSS.status_dread":  "State Machine\nWhenever the Defect generates a Status card, a copy of it is also added to your discard pile.\nThe first time you draw a Status card each turn, Exhaust it, draw 1 card and gain 1 Energy.\nADVERTENCIA: [gold]Chimenea[/gold] y [gold]Abrecartas[/gold] infligen daño sin fuente; una criatura vinculada con «[gold]Morirá por ti[/gold]» no absorberá ese daño por ti. Los esbirros con «Lealtad de Vapi» tampoco recibirán ese daño por ti.",
+    "DEFECT_BOSS.status_dread":  "State Machine\nWhenever the Defect generates a Status card, a copy of it is also added to your discard pile.\nADVERTENCIA: [gold]Chimenea[/gold] y [gold]Abrecartas[/gold] infligen daño sin fuente; una criatura vinculada con «[gold]Morirá por ti[/gold]» no absorberá ese daño por ti. Los esbirros con «Lealtad de Vapi» tampoco recibirán ese daño por ti.",
     "IRONCLAD_BOSS.name":  "El Blindado",
     "SILENT_BOSS.name":  "La Silenciosa",
     "DEFECT_BOSS.name":  "El Defectuoso",

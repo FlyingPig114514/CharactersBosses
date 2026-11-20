@@ -1,6 +1,6 @@
 {
     "DEFECT_BOSS.status":  "State Machine\nWhenever the Defect generates a Status card, a copy of it is also added to your discard pile.\nThe first time you draw a Status card each turn, Exhaust it, draw 1 card and gain 1 Energy.\nUYARI: [gold]Ağır Sanayi[/gold] ve [gold]Zarf Açacağı[/gold] kaynaksız hasar verir - “Senin İçin Öl veya Vapi Sadakati” özellikli çağırılan yaratıklar bu hasarı senin yerine üstlenmez.",
-    "DEFECT_BOSS.status_dread":  "State Machine\nWhenever the Defect generates a Status card, a copy of it is also added to your discard pile.\nThe first time you draw a Status card each turn, Exhaust it, draw 1 card and gain 1 Energy.\nUYARI: [gold]Ağır Sanayi[/gold] ve [gold]Zarf Açacağı[/gold] kaynaksız hasar verir - “Senin İçin Öl veya Vapi Sadakati” özellikli çağırılan yaratıklar bu hasarı senin yerine üstlenmez.",
+    "DEFECT_BOSS.status_dread":  "State Machine\nWhenever the Defect generates a Status card, a copy of it is also added to your discard pile.\nUYARI: [gold]Ağır Sanayi[/gold] ve [gold]Zarf Açacağı[/gold] kaynaksız hasar verir - “Senin İçin Öl veya Vapi Sadakati” özellikli çağırılan yaratıklar bu hasarı senin yerine üstlenmez.",
     "IRONCLAD_BOSS.name":  "Demirkaplı",
     "SILENT_BOSS.name":  "Sessiz",
     "DEFECT_BOSS.name":  "Arıza",

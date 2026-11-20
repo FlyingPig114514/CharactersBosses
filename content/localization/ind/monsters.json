@@ -1,6 +1,6 @@
 {
     "DEFECT_BOSS.status":  "State Machine\nWhenever the Defect generates a Status card, a copy of it is also added to your discard pile.\nThe first time you draw a Status card each turn, Exhaust it, draw 1 card and gain 1 Energy.\nPERINGATAN: [gold]Cerobong Asap[/gold] dan [gold]Pembuka Surat[/gold] memberikan kerusakan tanpa sumber - makhluk panggilan dengan “Mati Buatmu” tidak akan menahan kerusakan itu untukmu. Minion dengan «Kesetiaan Vapi» juga tidak akan menahan damage itu untukmu.",
-    "DEFECT_BOSS.status_dread":  "State Machine\nWhenever the Defect generates a Status card, a copy of it is also added to your discard pile.\nThe first time you draw a Status card each turn, Exhaust it, draw 1 card and gain 1 Energy.\nPERINGATAN: [gold]Cerobong Asap[/gold] dan [gold]Pembuka Surat[/gold] memberikan kerusakan tanpa sumber - makhluk panggilan dengan “Mati Buatmu” tidak akan menahan kerusakan itu untukmu. Minion dengan «Kesetiaan Vapi» juga tidak akan menahan damage itu untukmu.",
+    "DEFECT_BOSS.status_dread":  "State Machine\nWhenever the Defect generates a Status card, a copy of it is also added to your discard pile.\nPERINGATAN: [gold]Cerobong Asap[/gold] dan [gold]Pembuka Surat[/gold] memberikan kerusakan tanpa sumber - makhluk panggilan dengan “Mati Buatmu” tidak akan menahan kerusakan itu untukmu. Minion dengan «Kesetiaan Vapi» juga tidak akan menahan damage itu untukmu.",
     "IRONCLAD_BOSS.name":  "Si Ironclad",
     "SILENT_BOSS.name":  "Si Silent",
     "DEFECT_BOSS.name":  "Si Defect",

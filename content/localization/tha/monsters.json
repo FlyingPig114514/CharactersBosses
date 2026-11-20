@@ -1,6 +1,6 @@
 {
     "DEFECT_BOSS.status":  "State Machine\nWhenever the Defect generates a Status card, a copy of it is also added to your discard pile.\nThe first time you draw a Status card each turn, Exhaust it, draw 1 card and gain 1 Energy.\nคำเตือน: [gold]Smokestack[/gold] และ [gold]มีดเปิดจดหมาย[/gold]สร้างความเสียหายที่ไม่มีแหล่งที่มา สิ่งอัญเชิญที่มี “Die for You หรือ ความภักดีของวาปี” จะไม่รับความเสียหายนั้นแทนคุณ",
-    "DEFECT_BOSS.status_dread":  "State Machine\nWhenever the Defect generates a Status card, a copy of it is also added to your discard pile.\nThe first time you draw a Status card each turn, Exhaust it, draw 1 card and gain 1 Energy.\nคำเตือน: [gold]Smokestack[/gold] และ [gold]มีดเปิดจดหมาย[/gold]สร้างความเสียหายที่ไม่มีแหล่งที่มา สิ่งอัญเชิญที่มี “Die for You หรือ ความภักดีของวาปี” จะไม่รับความเสียหายนั้นแทนคุณ",
+    "DEFECT_BOSS.status_dread":  "State Machine\nWhenever the Defect generates a Status card, a copy of it is also added to your discard pile.\nคำเตือน: [gold]Smokestack[/gold] และ [gold]มีดเปิดจดหมาย[/gold]สร้างความเสียหายที่ไม่มีแหล่งที่มา สิ่งอัญเชิญที่มี “Die for You หรือ ความภักดีของวาปี” จะไม่รับความเสียหายนั้นแทนคุณ",
     "IRONCLAD_BOSS.name":  "นักรบเกราะเหล็ก",
     "SILENT_BOSS.name":  "นักฆ่าแห่งความเงียบ",
     "DEFECT_BOSS.name":  "นักเวทแปรพักตร์",

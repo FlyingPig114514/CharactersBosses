@@ -1,6 +1,6 @@
 {
     "DEFECT_BOSS.status":  "State Machine\nWhenever the Defect generates a Status card, a copy of it is also added to your discard pile.\nThe first time you draw a Status card each turn, Exhaust it, draw 1 card and gain 1 Energy.\nAVERTISSEMENT : [gold]Cheminée[/gold] et [gold]Coupe-papier[/gold] infligent des dégâts sans source – une invocation avec « [gold]Ma vie pour toi[/gold]  ou Loyauté de Vapi» ne les encaissera pas à votre place.",
-    "DEFECT_BOSS.status_dread":  "State Machine\nWhenever the Defect generates a Status card, a copy of it is also added to your discard pile.\nThe first time you draw a Status card each turn, Exhaust it, draw 1 card and gain 1 Energy.\nAVERTISSEMENT : [gold]Cheminée[/gold] et [gold]Coupe-papier[/gold] infligent des dégâts sans source – une invocation avec « [gold]Ma vie pour toi[/gold]  ou Loyauté de Vapi» ne les encaissera pas à votre place.",
+    "DEFECT_BOSS.status_dread":  "State Machine\nWhenever the Defect generates a Status card, a copy of it is also added to your discard pile.\nAVERTISSEMENT : [gold]Cheminée[/gold] et [gold]Coupe-papier[/gold] infligent des dégâts sans source – une invocation avec « [gold]Ma vie pour toi[/gold]  ou Loyauté de Vapi» ne les encaissera pas à votre place.",
     "IRONCLAD_BOSS.name":  "Le Soldat de Fer",
     "SILENT_BOSS.name":  "La Silencieuse",
     "DEFECT_BOSS.name":  "Le Défectueux",

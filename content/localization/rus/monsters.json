@@ -1,6 +1,6 @@
 {
     "DEFECT_BOSS.status":  "State Machine\nWhenever the Defect generates a Status card, a copy of it is also added to your discard pile.\nThe first time you draw a Status card each turn, Exhaust it, draw 1 card and gain 1 Energy.\nВНИМАНИЕ: «[gold]Дымоход[/gold]» и «[gold]Нож для писем[/gold]» наносят урон без источника — призванное существо с «Друзья до гроба или Верность Вапи» не поглотит этот урон за вас.",
-    "DEFECT_BOSS.status_dread":  "State Machine\nWhenever the Defect generates a Status card, a copy of it is also added to your discard pile.\nThe first time you draw a Status card each turn, Exhaust it, draw 1 card and gain 1 Energy.\nВНИМАНИЕ: «[gold]Дымоход[/gold]» и «[gold]Нож для писем[/gold]» наносят урон без источника — призванное существо с «Друзья до гроба или Верность Вапи» не поглотит этот урон за вас.",
+    "DEFECT_BOSS.status_dread":  "State Machine\nWhenever the Defect generates a Status card, a copy of it is also added to your discard pile.\nВНИМАНИЕ: «[gold]Дымоход[/gold]» и «[gold]Нож для писем[/gold]» наносят урон без источника — призванное существо с «Друзья до гроба или Верность Вапи» не поглотит этот урон за вас.",
     "IRONCLAD_BOSS.name":  "Латоносец",
     "SILENT_BOSS.name":  "Безмолвная",
     "DEFECT_BOSS.name":  "Дефект",

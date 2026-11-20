@@ -137,6 +137,8 @@ public static class FirstStatusDrawPatch
 
     private static int _logs;
 
+    private static int _dreadLogged;
+
     [HarmonyPrefix]
     public static bool Prefix(ICombatState combatState, PlayerChoiceContext choiceContext, CardModel card,
                               ref Task __result)
@@ -145,6 +147,17 @@ public static class FirstStatusDrawPatch
         {
             if (combatState == null || card == null) return true;
             if (card.Type != CardType.Status) return true;
+
+            // ★ 用户 2026-11-20（截图：恐惧版正文里不该有这一句）：
+            //   **恐惧模式下「状态机」没有这半段效果** —— 只保留「她生成状态牌时复制一份给你」，
+            //   不再「每回合首次抽到状态牌 ⇒ 消耗 / 抽 1 张 / +1 能量」。
+            //   （同名不同效：恐惧版的强度体现在别处，这里直接整段不触发。）
+            if (Core.DreadMode.IsActive)
+            {
+                if (_dreadLogged++ == 0)
+                    Logger.Log("[CharBoss] 同步（恐惧模式）：不触发「首次抽到状态牌 ⇒ 消耗/抽牌/加能量」这半段");
+                return true;
+            }
 
             var player = card.Owner;
             if (player?.Creature == null) return true;

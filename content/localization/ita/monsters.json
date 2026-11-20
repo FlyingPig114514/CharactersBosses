@@ -1,6 +1,6 @@
 {
     "DEFECT_BOSS.status":  "State Machine\nWhenever the Defect generates a Status card, a copy of it is also added to your discard pile.\nThe first time you draw a Status card each turn, Exhaust it, draw 1 card and gain 1 Energy.\nAVVERTENZA: [gold]Ciminiera[/gold] e [gold]Tagliacarte[/gold] infliggono danno senza fonte: un\u0027invocazione con \"[gold]Morirò per te[/gold] o Lealtà di Vapi\" non lo assorbe al posto tuo.",
-    "DEFECT_BOSS.status_dread":  "State Machine\nWhenever the Defect generates a Status card, a copy of it is also added to your discard pile.\nThe first time you draw a Status card each turn, Exhaust it, draw 1 card and gain 1 Energy.\nAVVERTENZA: [gold]Ciminiera[/gold] e [gold]Tagliacarte[/gold] infliggono danno senza fonte: un\u0027invocazione con \"[gold]Morirò per te[/gold] o Lealtà di Vapi\" non lo assorbe al posto tuo.",
+    "DEFECT_BOSS.status_dread":  "State Machine\nWhenever the Defect generates a Status card, a copy of it is also added to your discard pile.\nAVVERTENZA: [gold]Ciminiera[/gold] e [gold]Tagliacarte[/gold] infliggono danno senza fonte: un\u0027invocazione con \"[gold]Morirò per te[/gold] o Lealtà di Vapi\" non lo assorbe al posto tuo.",
     "IRONCLAD_BOSS.name":  "Ironclad",
     "SILENT_BOSS.name":  "Silent",
     "DEFECT_BOSS.name":  "Defect",

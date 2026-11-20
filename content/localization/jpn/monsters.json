@@ -1,6 +1,6 @@
 {
     "DEFECT_BOSS.status":  "State Machine\nWhenever the Defect generates a Status card, a copy of it is also added to your discard pile.\nThe first time you draw a Status card each turn, Exhaust it, draw 1 card and gain 1 Energy.\n警告：[gold]煙突[/gold]と[gold]レターオープナー[/gold]は発生源のないダメージのため、「身代わり」を持つ召喚物はあなたの代わりに受けません。 「ヴァピの忠誠」を持つ召喚物も身代わりにならない。",
-    "DEFECT_BOSS.status_dread":  "State Machine\nWhenever the Defect generates a Status card, a copy of it is also added to your discard pile.\nThe first time you draw a Status card each turn, Exhaust it, draw 1 card and gain 1 Energy.\n警告：[gold]煙突[/gold]と[gold]レターオープナー[/gold]は発生源のないダメージのため、「身代わり」を持つ召喚物はあなたの代わりに受けません。 「ヴァピの忠誠」を持つ召喚物も身代わりにならない。",
+    "DEFECT_BOSS.status_dread":  "State Machine\nWhenever the Defect generates a Status card, a copy of it is also added to your discard pile.\n警告：[gold]煙突[/gold]と[gold]レターオープナー[/gold]は発生源のないダメージのため、「身代わり」を持つ召喚物はあなたの代わりに受けません。 「ヴァピの忠誠」を持つ召喚物も身代わりにならない。",
     "IRONCLAD_BOSS.name":  "アイアンクラッド",
     "SILENT_BOSS.name":  "サイレント",
     "DEFECT_BOSS.name":  "ディフェクト",
