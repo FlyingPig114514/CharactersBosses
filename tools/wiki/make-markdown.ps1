@@ -249,7 +249,7 @@ foreach ($a in @(1, 2, 3)) {
             $reg = @($d.DeckRegistered)
             $sameKeys = ((@($d.Deck) | Sort-Object) -join '|') -eq (($reg | Sort-Object) -join '|')
             if (-not $sameKeys -and $reg.Count -gt 0) {
-                [void]$sb.AppendLine('- **代码登记卡组**（BossDefs，供对照）：' + (Merge-Counts $reg))
+                [void]$sb.AppendLine('- **代码登记卡组**（BossDefs，可能已过期，仅供对照）：' + (Merge-Counts $reg))
             }
         }
         [void]$sb.AppendLine('- **遗物**：' + (Merge-Counts $d.Relics))

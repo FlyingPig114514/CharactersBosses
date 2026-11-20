@@ -241,7 +241,7 @@ $sheetFiles = @('sheet1.xml', 'sheet2.xml', 'sheet3.xml', 'sheet4.xml', 'sheet5.
 $sheetXml = @{}
 
 $rowsSum = New-Object System.Collections.ArrayList
-[void]$rowsSum.Add(@('楼层', '角色', '设计', 'Key', '控制台指令', '血量', '能量', '手牌', '循环', '卡组', '代码登记卡组', '遗物', '特殊效果', '恐惧版特殊效果', '进阶/恐惧改动', '能力统计'))
+[void]$rowsSum.Add(@('楼层', '角色', '设计', 'Key', '控制台指令', '血量', '能量', '手牌', '循环', '卡组', '代码登记卡组(可能已过期)', '遗物', '特殊效果', '恐惧版特殊效果', '进阶/恐惧改动', '能力统计'))
 foreach ($r in $summaryRows) { [void]$rowsSum.Add($r) }
 $sheetXml['总表'] = Sheet-Xml $rowsSum @(6, 10, 26, 24, 42, 8, 6, 6, 26, 62, 52, 34, 66, 66, 44, 50)
 

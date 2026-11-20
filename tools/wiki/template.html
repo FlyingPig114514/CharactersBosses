@@ -762,7 +762,7 @@ window.BOSS_HP = /*__BOSS_HP__*/;
       h.push(plainChipsHTML(design.deck, 'card'));
       if (design.deckRegistered && design.deckRegistered.length &&
           design.deckRegistered.slice().sort().join('|') !== design.deck.slice().sort().join('|')) {
-        h.push('</div><div class="sub2">代码登记卡组（BossDefs，供对照）：</div><div class="chips">');
+        h.push('</div><div class="sub2">代码登记卡组（BossDefs，可能已过期，仅供对照）：</div><div class="chips">');
         h.push(plainChipsHTML(design.deckRegistered, 'card dim2'));
       }
       h.push('</div></div>');

@@ -311,16 +311,17 @@ internal static class WikiDump
 
         for (int act = 0; act < acts; act++)
         {
-            var script = DumpScript(ArrayAt(scriptByAct, act), IntAt(energy, act));
+            // 先算出代码登记的卡组：剧本没标洗牌时要用「卡组张数 ÷ 每回合抽牌」推算首次洗牌回合
+            var deck = TypeNames(ArrayAt(deckByAct, act));
+            var script = DumpScript(ArrayAt(scriptByAct, act), IntAt(energy, act), IntAt(handSize, act), deck.Count);
             var variants = new List<object>();
             foreach (var v in CallEnumerable(def, "VariantsForAct", act))
             {
                 if (v == null) continue;
-                var dv = DumpVariant(v, IntAt(energy, act));
+                var dv = DumpVariant(v, IntAt(energy, act), IntAt(handSize, act));
                 if (dv["script"] != null) variants.Add(dv);
             }
 
-            var deck = TypeNames(ArrayAt(deckByAct, act));
             if (script == null && deck.Count == 0 && variants.Count == 0) continue;
 
             actsOut.Add(new Dictionary<string, object>
@@ -375,14 +376,16 @@ internal static class WikiDump
     {
         if (script == null) return "代码登记卡组（该设计没有剧本）";
         int shuffleTurn = script.TryGetValue("shuffleTurn", out var st) && st is int n ? n : 0;
+        bool guessed = script.TryGetValue("shuffleGuessed", out var g) && g is bool gb && gb;
         bool fromScript = script.TryGetValue("deckFromScript", out var ds) && ds is List<string> l && l.Count > 0;
-        if (!fromScript) return "代码登记卡组（剧本首次洗牌前没有出牌）";
-        if (shuffleTurn > 0) return "按首次洗牌之前的回合统计（首次洗牌在第 " + shuffleTurn + " 回合）";
-        return "剧本未标洗牌 ⇒ 按全部回合统计（可能重复计入）";
+        if (!fromScript) return "代码登记卡组（首次洗牌前剧本里没有出牌，例如塔罗牌都是生成的）";
+        if (shuffleTurn > 0 && guessed) return "按首次洗牌之前的回合统计（剧本没标洗牌，按「卡组÷每回合抽牌」推算首次洗牌在第 " + shuffleTurn + " 回合）";
+        if (shuffleTurn > 0) return "按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 " + shuffleTurn + " 回合）";
+        return "按全部回合统计（剧本既没标洗牌、也没法推算）";
     }
-    private static Dictionary<string, object> DumpVariant(object v, int actEnergy)
+    private static Dictionary<string, object> DumpVariant(object v, int actEnergy, int actHandSize)
     {
-        var script = DumpScript(Prop<object>(v, "Script"), actEnergy);
+        var script = DumpScript(Prop<object>(v, "Script"), actEnergy, actHandSize, TypeNames(Prop<object>(v, "Deck")).Count);
         return new Dictionary<string, object>
         {
             ["key"] = Prop<string>(v, "Key"),
@@ -404,7 +407,7 @@ internal static class WikiDump
         };
     }
 
-    private static Dictionary<string, object> DumpScript(object script, int actEnergy)
+    private static Dictionary<string, object> DumpScript(object script, int actEnergy, int handSize, int registeredCount)
     {
         if (script == null) return null;
         var turns = new List<object>();
@@ -444,6 +447,20 @@ internal static class WikiDump
             if (shuffles && shuffleTurn == 0) shuffleTurn = turns.Count;   // 1 起
         }
 
+        // 剧本里没标洗牌时自己推算：每回合抽 handSize 张 ⇒ 大约第（卡组张数 ÷ 每回合抽牌 + 1）回合开始洗牌。
+        // 例：黑球机 21 张 ÷ 每回合 5 张 ⇒ 第 5 回合洗牌 ⇒ 只统计前 4 回合（用户 2026-11-20 口径）；
+        //     塔罗愚 登记卡组只有 3 张、每回合抽 6 张 ⇒ 第 1 回合就洗 ⇒ 洗牌前没有牌 ⇒ 退回代码登记卡组。
+        bool guessed = false;
+        if (shuffleTurn == 0 && registeredCount > 0 && handSize > 0)
+        {
+            int guess = registeredCount / handSize + 1;
+            if (guess < turns.Count)
+            {
+                shuffleTurn = guess;
+                guessed = true;
+            }
+        }
+
         // 卡组：**首次洗牌之前的回合**里出现过的牌（用户 2026-11-20 口径）。
         // 剧本跨了至少两次洗牌，直接统计「所有出现过的牌」会把大部分牌重复计入 ⇒ 只取首次洗牌之前。
         var deck = new List<string>();
@@ -469,6 +486,7 @@ internal static class WikiDump
             ["loopFrom"] = Prop<int>(script, "LoopFrom"),
             ["loopLength"] = Prop<int>(script, "LoopLength"),
             ["shuffleTurn"] = shuffleTurn,
+            ["shuffleGuessed"] = guessed,
             ["deckFromScript"] = deck,
             ["turns"] = turns,
         };
