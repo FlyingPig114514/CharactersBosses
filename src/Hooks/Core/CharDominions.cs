@@ -222,13 +222,85 @@ public sealed class IroncladDominion : MegaCrit.Sts2.Core.Models.Dread.DominionM
                 return;
             }
 
-            await MegaCrit.Sts2.Core.Commands.PowerCmd.Apply<MegaCrit.Sts2.Core.Models.Powers.DemonFormPower>(
-                new ThrowingPlayerChoiceContext(), targets, 1m, null, null);
-            Logger.Log($"[CharBoss] 恐惧模式·铁甲战士的支配（{why}）：{targets.Count} 个敌人各获得 1 层恶魔形态" +
+            // ★★ v0.2.838（玩家 4 人恐惧模式实测截图：「战士的支配只给第一个怪加了恶魔形态」）：
+            //   以前是把整个 List 一次交给 `PowerCmd.Apply<IEnumerable<Creature>>` —— 那个群体重载
+            //   在「刚进场 / 血量还没初始化」的生物上会静默不挂（本项目早先也踩过「单体 / 群体两个
+            //   6 参泛型重载挑错」的坑）。现在改成**逐只 apply**，每只各自 try/catch 并单独打日志，
+            //   谁没挂上一眼就能看出来。
+            int ok = 0, failed = 0;
+            foreach (var c in targets)
+            {
+                if (await ApplyOneAsync(c)) ok++;
+                else failed++;
+            }
+
+            Logger.Log($"[CharBoss] 恐惧模式·铁甲战士的支配（{why}）：{ok} 个敌人各获得 1 层恶魔形态" +
+                       (failed > 0 ? $"（{failed} 个失败）" : string.Empty) +
                        (already > 0 ? $"（另有 {already} 个原本就有，未叠加）" : string.Empty));
         }
         catch (Exception e) { Logger.Log("[CharBoss] 铁甲战士的支配（施放恶魔形态）失败: " + e.Message); }
     }
+
+    /// <summary>给**一只**敌人挂 1 层恶魔形态（幂等）。返回是否成功。</summary>
+    private static async Task<bool> ApplyOneAsync(Creature? c)
+    {
+        try
+        {
+            if (c == null || !c.IsAlive) return false;
+            if (c.Side != CombatSide.Enemy) return false;
+            if (c.Monster is Monsters.CharBossMonster) return false;
+            if (c.GetPower<MegaCrit.Sts2.Core.Models.Powers.DemonFormPower>() != null) return true;
+
+            await MegaCrit.Sts2.Core.Commands.PowerCmd.Apply<MegaCrit.Sts2.Core.Models.Powers.DemonFormPower>(
+                new ThrowingPlayerChoiceContext(), c, 1m, null, null);
+            return c.GetPower<MegaCrit.Sts2.Core.Models.Powers.DemonFormPower>() != null;
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 铁甲战士的支配：给一只敌人挂恶魔形态失败: " + e.Message);
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// ★ v0.2.838：**后加入战斗的敌人**补挂（玩家 4 人截图：三只敌人只有第一只拿到恶魔形态）。
+    ///
+    /// 由 <c>Patches.IroncladDominionLateEnemyPatch</c>（`CombatManager.AfterCreatureAdded` 后缀）调用。
+    /// 为什么要延迟一下：那只生物刚 add 进来时 `IsAlive` / 血量可能还没初始化，
+    /// 原版 `AfterEnemiesEnteredCombat` 那一刻判定「不是活着的敌人」就跳过了，之后没人再来一次。
+    /// 这里 300ms 后再看一次（仍然幂等、仍然跳过我们自己的角色 Boss）。
+    /// </summary>
+    internal static void EnsureForLateEnemy(Creature? creature)
+    {
+#if STS2_113
+        try
+        {
+            if (creature == null) return;
+            var run = MegaCrit.Sts2.Core.Runs.RunManager.Instance?.DebugOnlyGetState();
+            if (run?.Dominion is not IroncladDominion) return;      // 本幕不是「铁甲战士的支配」就什么都不做
+            _ = EnsureForLateEnemyAsync(creature);
+        }
+        catch { /* 绝不影响战斗 */ }
+#endif
+    }
+
+#if STS2_113
+    private static async Task EnsureForLateEnemyAsync(Creature creature)
+    {
+        try
+        {
+            if (creature.GetPower<MegaCrit.Sts2.Core.Models.Powers.DemonFormPower>() != null) return;
+            await Task.Delay(300);                                  // 等它的血量/阵营初始化好
+            if (!creature.IsAlive || creature.Side != CombatSide.Enemy) return;
+            if (creature.GetPower<MegaCrit.Sts2.Core.Models.Powers.DemonFormPower>() != null) return;
+
+            bool ok = await ApplyOneAsync(creature);
+            Logger.Log($"[CharBoss] 恐惧模式·铁甲战士的支配：后加入战斗的敌人补挂恶魔形态 ⇒ " +
+                       (ok ? "成功" : "失败（幂等检查后仍没有）"));
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 铁甲战士的支配（后加入补挂）失败: " + e.Message); }
+    }
+#endif
 }
 
 /// <summary>
