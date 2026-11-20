@@ -80,7 +80,11 @@ internal static class StartupWatchdog
             if (!ours && !LooksSuspicious(ex)) return;
 
             _logged++;
-            Logger.Log($"[CharBoss] ⚠ 启动期异常#{_logged}{((ours) ? "（栈里有我们）" : string.Empty)}: " + Describe(ex));
+            string line = $"[CharBoss] ⚠ 启动期异常#{_logged}{((ours) ? "（栈里有我们）" : string.Empty)}: " + Describe(ex);
+            Logger.Log(line);
+            // ★ v0.2.839：同时**同步**写进 crash trace（进程下一秒被杀也留得住）
+            try { CrashTrace.Mark("启动期异常#" + _logged + ((ours) ? "（栈里有我们）" : string.Empty) + ": " + Describe(ex)); }
+            catch { /* 忽略 */ }
         }
         catch { /* 快照器自身绝不能抛 */ }
     }

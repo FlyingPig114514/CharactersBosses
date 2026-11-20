@@ -27,6 +27,8 @@
 
   <ItemGroup>
     <Compile Include="Loader.cs" />
+    <!-- 外壳侧面���屑（同步落盘的启动 trace，见 Core.CrashTrace 的注释） -->
+    <Compile Include="BootTrace.cs" />
     <Reference Include="sts2">
       <HintPath>$(Sts2RefDir)sts2_107.dll</HintPath>
       <Private>false</Private>

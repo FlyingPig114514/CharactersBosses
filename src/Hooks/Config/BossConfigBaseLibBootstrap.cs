@@ -37,12 +37,15 @@ internal static class BossConfigBaseLibBootstrap
                 return;
             }
 
+            Core.CrashTrace.Mark("BaseLib 配置：RegisterCore 开始");
             RegisterCore();
             _registered = true;
+            Core.CrashTrace.Mark("BaseLib 配置：RegisterCore 完成");
         }
         catch (Exception e)
         {
             Logger.Log("[CharBoss] BaseLib 配置注册失败（不影响游戏）: " + e.Message);
+            Core.CrashTrace.Problem("BaseLib 配置注册失败", e);
         }
     }
 

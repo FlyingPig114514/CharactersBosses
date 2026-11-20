@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -40,8 +40,10 @@ public static class LoaderEntry
     {
         try
         {
+            BootTrace.Mark("Initialize 开始");
             string dir = Path.GetDirectoryName(typeof(LoaderEntry).Assembly.Location) ?? ".";
             bool isBeta = DetectBeta();
+            BootTrace.Mark("游戏版本=" + VersionText() + "，探测 beta=" + isBeta);
 
             string want = isBeta ? ImplBeta : ImplRelease;
             string other = isBeta ? ImplRelease : ImplBeta;
@@ -74,6 +76,7 @@ public static class LoaderEntry
                 asm = Assembly.LoadFrom(path);
             }
             Log($"双版本外壳：已载入 {asm.GetName().Name} {asm.GetName().Version}");
+            BootTrace.Mark($"已载入实现 {asm.GetName().Name} {asm.GetName().Version}");
 
             // ★★ v0.2.817（玩家 2026-11-19「联机进不去房间」实证）：
             //   实现程序集是我们自己的 ALC 载入的，游戏**不知道它属于本模组** ⇒ 多人大厅初始化时
@@ -89,6 +92,7 @@ public static class LoaderEntry
             //   ⇒ DuplicateModelException（RELIC.NEOW_BLESSING 重复），启动直接致命错误。
             //   所以先关掉；正确做法见 Loader.cs 里 AssociateImplAssembly 的注释（要配合「放弃手动注册」）。
             bool associated = AssociateImplAssembly(asm);
+            BootTrace.Mark("归属登记=" + associated);
 
             var entry = asm.GetType("CharacterBosses.ModEntry", throwOnError: false);
             if (entry == null)
@@ -123,6 +127,7 @@ public static class LoaderEntry
             if (associated)
             {
                 Log("双版本外壳：归属登记已生效 ⇒ 跳过外壳的手动模型注册（交给游戏自己扫）");
+                BootTrace.Mark("跳过手动模型注册（交给游戏扫）");
             }
             else
             {
@@ -132,12 +137,15 @@ public static class LoaderEntry
             var init = entry.GetMethod("Initialize", BindingFlags.Public | BindingFlags.Static);
             if (init == null) { Log("双版本外壳：ModEntry 里没有静态 Initialize ⇒ 放弃"); return; }
 
+            BootTrace.Mark("调用 ModEntry.Initialize：" + want);
             init.Invoke(null, null);
             Log($"双版本外壳：{want} 已初始化");
+            BootTrace.Mark("ModEntry.Initialize 已返回：" + want);
         }
         catch (Exception e)
         {
             Log("双版本外壳：加载实现失败: " + e);   // 外壳不能抛：抛了游戏会判「模组初始化失败」
+            BootTrace.Problem("加载实现失败", e);
         }
     }
 
