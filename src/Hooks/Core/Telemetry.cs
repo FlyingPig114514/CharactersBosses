@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
@@ -1357,6 +1357,26 @@ public static class Telemetry
         return false;
     }
 
+    /// <summary>
+    /// 飞书多维表格的单元格有长度上限（超了整批被拒，报 `code=1254130 TooLargeCell`）。
+    /// 本模组有几列天然容易很长（`line`=日志行、`hpList`/`bossList`=每只 Boss 一段、`pList`=每个玩家一段），
+    /// 所以**发之前**先按列限长：普通列 1000 字，日志/清单类 8000 字；截断处补「…(截断)」。
+    ///
+    /// 用户 2026-11-20 反馈「玩家记录收集那边的对局数没怎么涨」——
+    /// 本机 telemetry 里今天就有 3 条 `飞书多维表格写入失败：code=1254130 TooLargeCell`，
+    /// 就是这条链路在丢记录。
+    /// </summary>
+    private static string ShrinkCell(string? value, string key, int hardCap = 0)
+    {
+        if (string.IsNullOrEmpty(value)) return "";
+        int cap = hardCap > 0
+            ? hardCap
+            : (key == "line" || key == "hpList" || key == "bossList" || key == "pList" || key == "cfg"
+                ? 8000
+                : 1000);
+        if (value.Length <= cap) return value;
+        return value.Substring(0, cap) + "…(截断)";
+    }
     private static async Task<(bool Ok, bool TokenInvalid)> TryUploadToFeishuBitable(string[] lines,
                                                                                      string appToken, string tableId)
     {
@@ -1417,11 +1437,11 @@ public static class Telemetry
                         {
                             if (!doc.RootElement.TryGetProperty(key, out var v)) continue;
                             if (v.ValueKind == JsonValueKind.Object || v.ValueKind == JsonValueKind.Array)
-                                fields[field] = v.GetRawText();
+                                fields[field] = ShrinkCell(v.GetRawText(), key);
                             else if (NumericKeys.Contains(key) && v.ValueKind == JsonValueKind.Number)
                                 fields[field] = v.GetDouble();
                             else
-                                fields[field] = v.ValueKind == JsonValueKind.Null ? "" : v.ToString();
+                                fields[field] = v.ValueKind == JsonValueKind.Null ? "" : ShrinkCell(v.ToString(), key);
                         }
                     }
                     catch { continue; }
@@ -1435,6 +1455,37 @@ public static class Telemetry
                 req.Content = new System.Net.Http.StringContent(body, System.Text.Encoding.UTF8, "application/json");
                 var resp = await Http.SendAsync(req).ConfigureAwait(false);
                 string text = await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
+                // ★ 2026-11-20：TooLargeCell ⇒ 整批重发一次，这次把每列压到 400 字，尽量把这条记录救回来
+                if (!resp.IsSuccessStatusCode && text.Contains("TooLargeCell") && !text.Contains("_retried"))
+                {
+                    var rescue = new List<Dictionary<string, object?>>();
+                    foreach (var rec in records)
+                    {
+                        var f = rec["fields"] as Dictionary<string, object?>;
+                        if (f == null) continue;
+                        var shrunk = new Dictionary<string, object?>();
+                        foreach (var kv in f)
+                            shrunk[kv.Key] = kv.Value is string s ? ShrinkCell(s, kv.Key, 400) : kv.Value;
+                        rescue.Add(new Dictionary<string, object?> { ["fields"] = shrunk });
+                    }
+                    string rescueBody = JsonSerializer.Serialize(new Dictionary<string, object?>
+                    {
+                        ["records"] = rescue,
+                    });
+                    using var req2 = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Post, url);
+                    req2.Headers.TryAddWithoutValidation("Authorization", "Bearer " + token);
+                    req2.Content = new System.Net.Http.StringContent(rescueBody, System.Text.Encoding.UTF8, "application/json");
+                    var resp2 = await Http.SendAsync(req2).ConfigureAwait(false);
+                    string text2 = await resp2.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    if (resp2.IsSuccessStatusCode && text2.Contains("\"code\":0"))
+                    {
+                        Logger.Log("[CharBoss] 飞书多维表格：整批超长被拒（TooLargeCell）⇒ 已按 400 字截断重发成功");
+                        continue;
+                    }
+                    Logger.Log("[CharBoss] 飞书多维表格：TooLargeCell 截断重发仍失败：" +
+                               (text2.Length > 200 ? text2.Substring(0, 200) : text2));
+                }
+
                 if (!resp.IsSuccessStatusCode || !text.Contains("\"code\":0"))
                 {
                     string detail = text.Length > 300 ? text.Substring(0, 300) : text;
@@ -1444,7 +1495,7 @@ public static class Telemetry
                     Logger.Log($"[CharBoss] 飞书多维表格写入失败：{detail}" +
                                (badToken
                                  ? "（access token 失效 ⇒ 会清缓存重取一次）"
-                                 : "（数据留在本机；多半是某列类型不匹配，例如 seed 必须是文本）"));
+                                 : "（数据留在本机；格式不符/单元格超长/seed 非文本都可能）"));
                     return (false, badToken);
                 }
             }
