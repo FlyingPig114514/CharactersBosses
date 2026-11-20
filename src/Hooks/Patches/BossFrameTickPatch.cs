@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Godot;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Nodes.Combat;
@@ -77,6 +77,32 @@ public static class BossFrameTickBladePatch
 /// </summary>
 public static class BossFrameTick
 {
+    // ── 每帧预算（2026-11-20：修手机偶发 20~39ms 尖峰）────────────────
+    private static int _fpFrame;
+    private static bool _phoneLike;
+    private static bool IsPhoneLike()
+    {
+        try
+        {
+            if (_phoneLike) return true;
+            string os = Godot.OS.GetName();
+            _phoneLike = os == "Android" || os == "iOS";
+            return _phoneLike;
+        }
+        catch { return false; }
+    }
+    /// <summary>指纹比对类检查：桌面每帧（零回归）；手机隔帧（约 30Hz）。</summary>
+    private static bool AllowFingerprintChecks()
+    {
+        try
+        {
+            if (!IsPhoneLike()) return true;
+            _fpFrame++;
+            return (_fpFrame % 2) == 0;
+        }
+        catch { return true; }
+    }
+
     internal const string SourceStar = "辉星计数器";
     internal const string SourceEnergy = "能量球";
     internal const string SourceBlade = "君王之剑";
@@ -597,6 +623,8 @@ public static class BossFrameTick
             //   玩家反馈「第一幕要重开房间才同步」，根因是开局那条自定义消息丢一次就被去重标记钉死。
             try { CharacterBosses.Core.BossPicksSync.Tick(); } catch { /* 绝不影响战斗 */ }
 
+            if (AllowFingerprintChecks())
+            {
             foreach (var each in everyBoss) RefreshIntentsIfFocusChanged(each);
 
             // 灵魂绑定：玩家回合内抽了牌（或她自己又额外抽了牌）→ 死亡行军的伤害预览要跟着变。
@@ -614,6 +642,7 @@ public static class BossFrameTick
         //   充能球被动那条意图的数字来自面板重建，而面板只在若干事件里重建 ⇒
         //   她身上「力量 / 集中 / 球的构成」被**外部**改动时不刷新。这里按指纹兜底：一变就强制重画。
         foreach (var each in everyBoss) RefreshPanelIfStatsChanged(each);
+            }
 
         // ★ v0.2.484（用户 2026-11-08：「为什么我打一张打击伤害−6？」）：
         //   根因是**时序**：打出的那张打击在「出牌中」的短暂几帧里既不在手牌也不在弃牌堆，
