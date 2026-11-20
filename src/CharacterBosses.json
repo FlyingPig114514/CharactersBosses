@@ -1,7 +1,7 @@
 ﻿{
     "id": "CharacterBosses",
     "name": "鐜╁瑙掕壊Boss (Characters Bosses)",
-    "version": "0.2.824",
+    "version": "0.2.825",
     "author": "椋炵尓",
     "description": "鏈ā缁勭伒鎰熸潵婧愪簬鏉€鎴皷濉?浠ｇ殑妯＄粍宕╁潬銆傚惎鐢ㄦ湰妯＄粍鍚庯紝浣犳瘡涓€骞曠殑Boss鎴橀兘浼氳鏇挎崲涓虹敱鍘熺増鐜╁瑙掕壊鎵紨鐨凚oss锛堝彲鍦ㄨ缃腑璋冩暣锛夈€備粬浠嫢鏈夎嚜宸辩殑閬楃墿銆佸崱缁勶紝浼氫娇鐢ㄨ嚜宸辫亴涓氱殑鍗＄墝銆備笌鐜╁涓嶅畬鍏ㄧ浉鍚岀殑鏄紝浠栦滑鐨勫嚭鐗屽彈鍒颁竴瀹氱▼搴︾殑闄愬埗锛屼絾鏈€澶х敓鍛藉€兼洿澶氬苟涓旀瘡涓兘鏈夌嫭鐗圭殑鐗规畩鏁堟灉銆?Replaces each act boss with a vanilla playable character that fights with its own deck, relics and scripted plays.",
     "pck_name": "CharacterBosses",
