@@ -44,10 +44,53 @@ internal static class StrayBossCardQueuePatch
     private static int _removed;
 
     /// <summary>
-    /// 暂停 <see cref="Reap"/>（「抉择，抉择」在等玩家选牌期间由 <c>CharBossMonster.PlayOne</c> 置上）。
+    /// 暂停 <see cref="Reap"/>（「抉择，抉择」/「通晓万物」预见 在等玩家选牌期间置上）。
     /// 只影响这一个时间窗，其它时候照旧收她的卡面。
+    ///
+    /// ★ v0.2.837（玩家反馈「碎屑储的碰撞轨迹打出后卡在屏幕中间」）：
+    ///   以前这是一个**裸 bool** —— 只要有一条路径「置上之后没走到置回」（`ScryGate.Release`
+    ///   在玩家中途退局/失败/异常时没跑到，就是这种情况），**整场战斗直到结束都不再回收卡面**，
+    ///   于是任何一张她的牌（比如 0 费的「碰撞轨迹」）就会永久吊在屏幕中上方。
+    ///   现在改成**带自动过期**的开关：置上时只买 2 分钟，时间一到自动恢复回收（并打一行日志）。
+    ///   正常选牌（玩家慢慢选）仍在 2 分钟内 ⇒ 不会被提前打断；真卡死了也不会把整场锁住。
     /// </summary>
-    internal static bool HoldReap;
+    internal static bool HoldReap
+    {
+        get
+        {
+            long until = System.Threading.Volatile.Read(ref _holdUntilMs);
+            if (until == 0) return false;
+            if (System.Environment.TickCount64 < until) return true;
+
+            // 过期：自动恢复（只打一次日志）
+            System.Threading.Volatile.Write(ref _holdUntilMs, 0);
+            if (_holdExpiredLogs++ < 3)
+            {
+                try
+                {
+                    Logger.Log("[CharBoss] 出牌队列：暂停回收已超过 2 分钟 ⇒ 自动恢复（避免整场不再收卡面）");
+                }
+                catch { /* 忽略 */ }
+            }
+            return false;
+        }
+        set => System.Threading.Volatile.Write(ref _holdUntilMs,
+            value ? System.Environment.TickCount64 + 120_000L : 0L);
+    }
+
+    private static long _holdUntilMs;
+    private static int _holdExpiredLogs;
+
+    /// <summary>
+    /// 「确认过是我们 Boss 的卡面」的登记表（v0.2.837）。
+    /// 为什么要它：牌的 `Model` 在出牌结束后可能被清掉 ⇒ <see cref="IsOurBossCard"/> 返回 false
+    /// ⇒ 那张卡面就**永远不会再被认出来**，于是永久留在屏幕上（玩家报的「碰撞轨迹卡在屏幕中间」）。
+    /// 只要某一张节点被确认过一次是我方的，之后哪怕它的 Model 没了也照样回收。
+    /// </summary>
+    private static readonly System.Collections.Generic.HashSet<NCard> KnownOurs = new();
+
+    /// <summary>卡面第一次被看到的时间（只在「已是我们的牌」时记录，用来判断真滞留）。</summary>
+    private static readonly System.Collections.Generic.Dictionary<NCard, long> FirstSeenMs = new();
 
     /// <summary>
     /// 把「属于我们 Boss 的、挂在出牌队列里的卡面」**真的移出队列**（幂等，随便调）。
@@ -77,28 +120,51 @@ internal static class StrayBossCardQueuePatch
             if (queue == null || !GodotObject.IsInstanceValid(queue)) return;
 
             var ours = new System.Collections.Generic.List<NCard>();
-            foreach (var child in queue.GetChildren())
+            CollectCards(queue, 0, ours);
+            if (ours.Count == 0)
             {
-                if (child is not NCard card) continue;
-                if (!GodotObject.IsInstanceValid(card)) continue;
-                if (!IsOurBossCard(card)) continue;
-                ours.Add(card);
+                // 队列空 ⇒ 顺手把登记表里的死节点清掉（每场最多几百项，成本可忽略）
+                PruneRegistry();
+                return;
             }
-            if (ours.Count == 0) return;
 
+            long nowMs = System.Environment.TickCount64;
+            var reapNow = new System.Collections.Generic.List<NCard>();
             foreach (var card in ours)
+            {
+                // 认出来一次就永久记住（牌的 Model 出牌后可能被清掉，见 KnownOurs 的注释）
+                if (IsOurBossCard(card)) KnownOurs.Add(card);
+
+                bool mine = KnownOurs.Contains(card);
+                if (!mine) continue;
+
+                if (!FirstSeenMs.ContainsKey(card)) FirstSeenMs[card] = nowMs;
+                long age = nowMs - FirstSeenMs[card];
+
+                // ⚠ 仍然**立刻**摘（和以前一样）：这条队列路径是给「远程玩家正在出牌」用的，
+                //   我们跟着把她的牌留在屏幕中上方反而更难看。这里唯一的变化是：
+                //   「认清是谁的牌」不再只依赖 `Model`（出牌结束后 Model 可能被清掉 ⇒ 永远认不出来）。
+                if (age >= 0) reapNow.Add(card);
+            }
+            if (reapNow.Count == 0) return;
+
+            foreach (var card in reapNow)
             {
                 if (!GodotObject.IsInstanceValid(card)) continue;
                 string entry = "?";
                 try { entry = card.Model?.Id.Entry ?? "?"; } catch { /* 忽略 */ }
+                long ageMs = FirstSeenMs.TryGetValue(card, out long t0) ? nowMs - t0 : 0;
+
+                FirstSeenMs.Remove(card);
+                KnownOurs.Remove(card);
 
                 try
                 {
                     queue.RemoveCardFromQueueForCancellation(card, false);
                     if (_removed++ < 40)
                     {
-                        Logger.Log($"[CharBoss] 出牌队列：{entry} 是 Boss 打出的牌 → 已从队列里摘掉" +
-                                   "（以前只隐藏、item 留着，会越积越多，把回合收尾拖慢）");
+                        Logger.Log($"[CharBoss] 出牌队列：{entry} 是 Boss 打出的牌、滞留 {ageMs}ms 没人收 ⇒ 已从队列里摘掉" +
+                                   "（不摘的话它就会一直吊在屏幕中上方）");
                     }
                 }
                 catch (Exception e)
@@ -115,6 +181,38 @@ internal static class StrayBossCardQueuePatch
         {
             Logger.Log("[CharBoss] 出牌队列清理失败（忽略）: " + e.Message);
         }
+    }
+
+    /// <summary>把队列里的卡面节点收集起来（**递归**：有的卡面被塞在子容器里，只扫直接子节点会漏）。</summary>
+    private static void CollectCards(Godot.Node node, int depth, System.Collections.Generic.List<NCard> into)
+    {
+        if (node == null || depth > 3) return;
+        try
+        {
+            foreach (var child in node.GetChildren())
+            {
+                if (!GodotObject.IsInstanceValid(child)) continue;
+                if (child is NCard card) { into.Add(card); continue; }
+                CollectCards(child, depth + 1, into);
+            }
+        }
+        catch { /* 忽略 */ }
+    }
+
+    /// <summary>清掉登记表里已经失效的节点与时间戳。</summary>
+    private static void PruneRegistry()
+    {
+        try
+        {
+            if (KnownOurs.Count == 0 && FirstSeenMs.Count == 0) return;
+            var dead = new System.Collections.Generic.List<NCard>();
+            foreach (var c in KnownOurs) if (!GodotObject.IsInstanceValid(c)) dead.Add(c);
+            foreach (var c in dead) { KnownOurs.Remove(c); FirstSeenMs.Remove(c); }
+            var dead2 = new System.Collections.Generic.List<NCard>();
+            foreach (var kv in FirstSeenMs) if (!GodotObject.IsInstanceValid(kv.Key)) dead2.Add(kv.Key);
+            foreach (var c in dead2) FirstSeenMs.Remove(c);
+        }
+        catch { /* 忽略 */ }
     }
 
     /// <summary>
@@ -134,6 +232,10 @@ internal static class StrayBossCardQueuePatch
     {
         try
         {
+            // 战斗结束了 ⇒ 登记表/暂停标记一并清空（下一场重新开始记）
+            try { KnownOurs.Clear(); FirstSeenMs.Clear(); System.Threading.Volatile.Write(ref _holdUntilMs, 0L); }
+            catch { /* 忽略 */ }
+
             var queue = NCardPlayQueue.Instance;
             if (queue == null || !GodotObject.IsInstanceValid(queue)) return;
 
