@@ -971,6 +971,27 @@ public static class Telemetry
         if (BossConfig.TelemetryUpload) FlushUploads();
     }
 
+    /// <summary>
+    /// 启动时补发一次上次没发出去的队列（用户 2026-11-20：「加上下次重试」）。
+    /// 队列里可能攒着上次 TooLargeCell / 断网 / 令牌失效留下的记录，进游戏就顺手重试一遍。
+    /// </summary>
+    internal static void RetryPendingUploads()
+    {
+        try
+        {
+            if (!BossConfig.TelemetryUpload) return;
+            if (!BossConfig.AnyUploadEndpoint) return;
+            string outbox = OutboxPath;
+            if (string.IsNullOrEmpty(outbox) || !File.Exists(outbox)) return;
+            int n = 0;
+            try { n = File.ReadAllLines(outbox).Length; } catch { n = 0; }
+            if (n <= 0) return;
+            Logger.Log($"[CharBoss] 启动补发：本机队列里还有 {n} 条上次没发出去的记录 ⇒ 现在重试");
+            FlushUploads();
+        }
+        catch { /* 忽略 */ }
+    }
+
     // ── A6：上传（可选，默认关闭；作者在配置里填端点才会走这条） ─────────
 
     private static string OutboxPath
@@ -1046,6 +1067,8 @@ public static class Telemetry
                 }
 
                 bool ok = true;
+                bool fightSeqOk = true;      // 对局数据这一批是否真的发出去了
+                bool diagSeqOk = true;       // 诊断记录这一批是否真的发出去了
 
                 if (fightLines.Count > 0)
                 {
@@ -1067,6 +1090,7 @@ public static class Telemetry
                         fightOk = await UploadToGenericUrl(fightLines.ToArray()).ConfigureAwait(false);
                     }
                     ok = fightOk;
+                    fightSeqOk = fightOk;
                 }
 
                 if (diagLines.Count > 0)
@@ -1077,6 +1101,7 @@ public static class Telemetry
                         bool diagOk = await UploadToFeishuBitable(diagLines.ToArray(),
                             BossConfig.FeishuBitableAppToken, diagTable).ConfigureAwait(false);
                         ok = ok && diagOk;
+                        diagSeqOk = diagOk;
                         if (diagOk) Logger.Log($"[CharBoss] 诊断记录 {diagLines.Count} 条 → 已写入单独的 diag 表 {diagTable}");
                         else Logger.Log($"[CharBoss] 诊断记录写入单独的表失败（{diagTable}），数据仍在本机");
                     }
@@ -1087,6 +1112,7 @@ public static class Telemetry
                         bool diagOk = await UploadToFeishuBitable(diagLines.ToArray(),
                             BossConfig.FeishuBitableAppToken, BossConfig.FeishuTableId).ConfigureAwait(false);
                         ok = ok && diagOk;
+                        diagSeqOk = diagOk;
                         if (diagOk)
                         {
                             Logger.Log($"[CharBoss] 诊断记录 {diagLines.Count} 条 → 写入主表（失败/异常 与 不同步摘要）");
@@ -1102,12 +1128,31 @@ public static class Telemetry
                     }
                 }
 
-                if (ok)
+                // ★ 2026-11-20（用户：「加上下次重试」）：**按条保留**。
+                //   以前这里的逻辑是「全都成功才删整份文件，否则整份留着」，可是只要有一类失败、
+                //   或者同一类里一批成功一批失败，重试时又会把**已经入库的那些再发一次**（飞书里出现重复行）；
+                //   反过来若某次恰好 `ok=true` 而另一批失败，那份文件就被删了 ⇒ 记录永远丢了
+                //   （作者本机 2026-11-20 的 TooLargeCell 就是这么丢的）。
+                //   现在：成功的那些**移出队列**，失败的写回队列等下次再发（上限 MaxOutboxLines，保留最新的）。
+                var stay = new List<string>();
+                if (fightLines.Count > 0 && !fightSeqOk) stay.AddRange(fightLines);
+                if (diagLines.Count > 0 && !diagSeqOk) stay.AddRange(diagLines);
+                if (stay.Count > MaxOutboxLines) stay = stay.GetRange(stay.Count - MaxOutboxLines, MaxOutboxLines);
+
+                if (stay.Count == 0)
                 {
                     try { File.Delete(outbox); } catch { /* 删不掉下次重复发一次，可接受 */ }
-                    Logger.Log($"[CharBoss] 数据上传成功：对局 {fightLines.Count} 条" +
-                               (diagLines.Count > 0 ? $"、诊断 {diagLines.Count} 条" : "") +
-                               (localOnly > 0 ? $"（另有 {localOnly} 条只留本机）" : ""));
+                    if (ok)
+                    {
+                        Logger.Log($"[CharBoss] 数据上传成功：对局 {fightLines.Count} 条" +
+                                   (diagLines.Count > 0 ? $"、诊断 {diagLines.Count} 条" : "") +
+                                   (localOnly > 0 ? $"（另有 {localOnly} 条只留本机）" : ""));
+                    }
+                }
+                else
+                {
+                    try { File.WriteAllLines(outbox, stay.ToArray()); } catch { /* 忽略 */ }
+                    Logger.Log($"[CharBoss] 数据上传**未全部成功**：{stay.Count} 条留在本机队列（{outbox}），下次开打/启动时自动重试");
                 }
             }
             catch (Exception e)
