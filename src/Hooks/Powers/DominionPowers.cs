@@ -240,6 +240,130 @@ public sealed class NecrobinderDominionPower : PowerModel
 
 #if STS2_113
 /// <summary>
+/// 恐惧模式「**储君的支配**」的**可视载体**（用户 2026-11-19 改口径）。
+///
+/// 新效果：**在你的回合开始时，选择 1 张非状态或诅咒牌，将其变化为「碎屑」**。
+/// （旧效果「每当敌人攻击你时，你在本回合失去 1 点力量」—— 那套给敌人挂「王之凝视」的实现**整套删除**。）
+///
+/// 结算时机：`AfterPlayerTurnStartEarly`。必须早于**烘焙手套**（`ToastyMittens`）、
+/// **暴政**（`TyrannyPower` 在普通 `AfterPlayerTurnStart` 里让你消耗手牌）、
+/// **必备工具**（`ToolsOfTheTradePower`）这些同样挂在「你的回合开始」的效果
+/// （用户 2026-11-19：「该效果的结算时间在烘焙手套、暴政、必备工具等效果前」）。
+/// 额外回合（佩尔之眼 / 龙涎香 / 腾跃 / 倒吊人…）也算一次「你的回合开始」⇒ 同样触发
+/// （用户：「额外回合开始时也触发，因为这本身就是影响玩家的效果」）。
+///
+/// 一回合只做一次：Early 那一帧若一张可选牌都没有（例如手牌还没抽上来），记一个待办，
+/// 到普通 `AfterPlayerTurnStart` 再补一次。
+/// </summary>
+public sealed class RegentDominionPower : PowerModel
+{
+    public override PowerType Type => PowerType.Debuff;
+
+    public override PowerStackType StackType => PowerStackType.Single;
+
+    /// <summary>Early 阶段没做成（手牌里没有可选牌）⇒ 普通阶段再补一次。</summary>
+    private bool _awaitingNormalPhase;
+
+    public override async Task AfterPlayerTurnStartEarly(PlayerChoiceContext choiceContext,
+                                                         MegaCrit.Sts2.Core.Entities.Players.Player player)
+    {
+        _awaitingNormalPhase = !await TryResolveAsync(choiceContext, player, "回合开始·早期");
+    }
+
+    public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext,
+                                                    MegaCrit.Sts2.Core.Entities.Players.Player player)
+    {
+        if (!_awaitingNormalPhase) return;
+        _awaitingNormalPhase = false;
+        await TryResolveAsync(choiceContext, player, "回合开始");
+    }
+
+    /// <summary>返回 false = 这一帧还做不了（手牌里没有可选牌），留给下一个阶段再试。</summary>
+    private async Task<bool> TryResolveAsync(PlayerChoiceContext choiceContext,
+                                             MegaCrit.Sts2.Core.Entities.Players.Player player,
+                                             string phase)
+    {
+        try
+        {
+            if (player?.Creature == null) return true;
+            if (!ReferenceEquals(player.Creature, Owner)) return true;    // 每个持有者只管自己
+            if (player.Creature.Monster != null) return true;             // 影子玩家 / 怪物不算
+
+            var combat = player.Creature.CombatState;
+            var hand = player.PlayerCombatState?.Hand?.Cards;
+            if (combat == null || hand == null) return false;
+
+            int eligible = 0;
+            foreach (var c in hand)
+            {
+                if (IsEligible(c)) eligible++;
+            }
+            if (eligible == 0) return false;
+
+            var prefs = new MegaCrit.Sts2.Core.CardSelection.CardSelectorPrefs(
+                MegaCrit.Sts2.Core.CardSelection.CardSelectorPrefs.TransformSelectionPrompt, 1);
+
+            var picked = await CardSelectCmd.FromHand(choiceContext, player, prefs, IsEligible, this);
+            CardModel? card = null;
+            if (picked != null)
+            {
+                foreach (var c in picked)
+                {
+                    if (c == null) continue;
+                    card = c;
+                    break;
+                }
+            }
+            if (card == null)
+            {
+                Logger.Log($"[CharBoss] 恐惧模式·储君的支配（{phase}）：没挑到牌 ⇒ 这一回合不变化");
+                return true;
+            }
+
+            string entry = "?";
+            try { entry = card.Id.Entry; } catch { /* 忽略 */ }
+
+            var canonical = ModelDb.GetById<CardModel>(ModelDb.GetId(typeof(MegaCrit.Sts2.Core.Models.Cards.Debris)));
+            if (canonical == null)
+            {
+                Logger.Log("[CharBoss] 恐惧模式·储君的支配：拿不到「碎屑」的卡牌模型 ⇒ 这次跳过");
+                return true;
+            }
+
+            var debris = combat.CreateCard(canonical, player);
+            if (debris == null)
+            {
+                Logger.Log("[CharBoss] 恐惧模式·储君的支配：造不出碎屑（CreateCard 返回 null）⇒ 这次跳过");
+                return true;
+            }
+
+            await CardCmd.Transform(card, debris,
+                MegaCrit.Sts2.Core.Nodes.CommonUi.CardPreviewStyle.HorizontalLayout);
+
+            Logger.Log($"[CharBoss] 恐惧模式·储君的支配（{phase}）：{player.Character?.GetType().Name} " +
+                       $"把「{entry}」变化成了碎屑（候选 {eligible} 张，已剔除状态牌与诅咒）");
+            return true;
+        }
+        catch (Exception e)
+        {
+            Logger.Log($"[CharBoss] 储君的支配（{phase}）失败: " + e.Message);
+            return true;    // 出过错就不再重试，免得一回合里反复弹窗
+        }
+    }
+
+    /// <summary>可选牌：**非状态、非诅咒**（用户 2026-11-19）。</summary>
+    private static bool IsEligible(CardModel? card)
+    {
+        try
+        {
+            if (card == null) return false;
+            return card.Type != CardType.Status && card.Type != CardType.Curse;
+        }
+        catch { return false; }
+    }
+}
+
+/// <summary>
 /// 恐惧模式「**愚者的支配**」的**可视载体**（用户 2026-11-13 新增）。
 ///
 /// ⚠ 只在 111 构建里：它要发的是 0.113 才有的状态牌 **「悲伤」`Sadness`**

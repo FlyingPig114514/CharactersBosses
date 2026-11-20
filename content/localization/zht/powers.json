@@ -82,6 +82,8 @@
     "BOSS_GUIDE_POWER.description_dread":  "每當儲君打出[gold]抉擇，抉擇[/gold]時，由你替他選擇要被重複打出的牌。\n你選完第1張後他會再打一次[gold]抉擇，抉擇[/gold]（不再抽牌），讓你從剩下的技能牌裡再挑1張，同樣被重複打出。\n多人時由被他鎖定的那位玩家選擇，選完之後他才會繼續打出後面的牌。",
     "DEFECT_DOMINION_POWER.title":  "故障機器人的支配",
     "DEFECT_DOMINION_POWER.description":  "在你的回合結束時，每有一名敵人，你就受到[gold]3[/gold]點傷害。",
+    "REGENT_DOMINION_POWER.title":  "儲君的支配",
+    "REGENT_DOMINION_POWER.description":  "在你的回合開始時，選擇1張非狀態或詛咒牌，將其變化為碎屑。",
     "NECROBINDER_DOMINION_POWER.title":  "亡靈契約師的支配",
     "NECROBINDER_DOMINION_POWER.description":  "在你的回合開始時，你隨機1張手牌的費用在整個回合增加[gold]1[/gold]。",
     "FOOL_DOMINION_POWER.title":  "愚者的支配",

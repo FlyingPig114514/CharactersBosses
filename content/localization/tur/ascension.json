@@ -1,9 +1,9 @@
 {
     "DREAD.IRONCLAD.description":  "Ironclad\u0027s Dominion: at the start of each combat, all enemies gain 1 Demon Form.",
     "DREAD.SILENT.description":  "Sessiz'in Hükmü: her savaşın başında 1 Güç kaybedip 1 Zayıflık kazanırsın (seçkin savaşlarında: 2 Güç ve 2 Zayıflık).",
-    "DREAD.DEFECT.description":  "Defect\u0027s Dominion: at the end of your turn, take 3 damage for each enemy.",
+    "DREAD.DEFECT.description":  "Defekt'in Hükümdarlığı: Tüm düşmanlar 1 Eser kazanır.",
     "DREAD.NECROBINDER.description":  "Necrobinder\u0027s Dominion: at the start of your turn, a random card in your hand costs 1 more this turn.",
-    "DREAD.REGENT.description":  "Regent\u0027s Dominion: whenever an enemy attacks you, you lose 1 Strength this turn.",
+    "DREAD.REGENT.description":  "Prens'in Hükümdarlığı: Turunun başlangıcında Durum veya Lanet olmayan 1 kart seç ve onu Moloz'a dönüştür.",
     "DREAD.WATCHER_DEVOTION.description":  "Gözcü\u0027nün Hükmü: her savaşın başında tüm düşmanlar 2 [gold]Bağlılık[/gold] kazanır (senin turun başladığında her düşman 2 [gold]Mantra[/gold] kazanır; 10 [gold]Mantra[/gold] olunca 10 harcayıp [gold]Kutsallık[/gold] duruşuna girer ve o tur saldırıları üç kat hasar verir).",
     "DREAD.FOOL.description":  "Soytarı'nın Hükmü: her savaşın başında çekme destene 2 [gold]Hüzün[/gold] eklenir."
 }

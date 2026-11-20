@@ -1,9 +1,9 @@
 {
     "DREAD.IRONCLAD.description":  "Ironclad\u0027s Dominion: at the start of each combat, all enemies gain 1 Demon Form.",
     "DREAD.SILENT.description":  "Dominacja Cichej: na początku każdej walki tracisz 1 Siły i otrzymujesz 1 Osłabienia (w walkach z elitami: 2 Siły i 2 Osłabienia).",
-    "DREAD.DEFECT.description":  "Defect\u0027s Dominion: at the end of your turn, take 3 damage for each enemy.",
+    "DREAD.DEFECT.description":  "Dominacja Defekta: wszyscy wrogowie zyskują 1 Artefakt.",
     "DREAD.NECROBINDER.description":  "Necrobinder\u0027s Dominion: at the start of your turn, a random card in your hand costs 1 more this turn.",
-    "DREAD.REGENT.description":  "Regent\u0027s Dominion: whenever an enemy attacks you, you lose 1 Strength this turn.",
+    "DREAD.REGENT.description":  "Dominacja Księcia: na początku twojej tury wybierz 1 kartę (nie Status ani Klątwę) i zamień ją w Gruz.",
     "DREAD.WATCHER_DEVOTION.description":  "Dominacja Obserwatorki: na początku każdej walki wszyscy wrogowie zyskują 2 [gold]Dewocję[/gold] (na początku twojej tury każdy wróg zyskuje 2 [gold]Mantry[/gold]; przy 10 [gold]Mantry[/gold] wydaje 10 i wchodzi w [gold]Boskość[/gold], zadając w tej turze potrójne obrażenia).",
     "DREAD.FOOL.description":  "Dominacja Głupca: na początku każdej walki do twojego stosu doboru dodawane są 2 karty [gold]Smutku[/gold]."
 }

@@ -82,6 +82,8 @@
     "BOSS_GUIDE_POWER.description_dread":  "Whenever the Regent plays [gold]Decisions, Decisions[/gold], *you* choose the card it repeats.\nAfter your first choice he plays [gold]Decisions, Decisions[/gold] again without drawing, letting you pick a second card from the remaining skills, which is also repeated.\nIn multiplayer the player he has locked on chooses, and he only continues after that choice is made.",
     "DEFECT_DOMINION_POWER.title":  "Defect\u0027s Dominion",
     "DEFECT_DOMINION_POWER.description":  "At the end of your turn, you take [gold]3[/gold] damage for each enemy.",
+    "REGENT_DOMINION_POWER.title":  "王子の支配",
+    "REGENT_DOMINION_POWER.description":  "あなたのターン開始時、状態異常でも呪いでもないカードを1枚選び、それを「瓦礫」に変化させる。",
     "NECROBINDER_DOMINION_POWER.title":  "Necrobinder\u0027s Dominion",
     "NECROBINDER_DOMINION_POWER.description":  "At the start of your turn, a random card in your hand costs [gold]1[/gold] more this turn.",
     "FOOL_DOMINION_POWER.title":  "The Fool\u0027s Dominion",

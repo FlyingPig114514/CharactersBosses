@@ -1,9 +1,9 @@
 {
     "DREAD.IRONCLAD.description":  "Ironclad\u0027s Dominion: at the start of each combat, all enemies gain 1 Demon Form.",
     "DREAD.SILENT.description":  "Herrschaft der Stillen: Zu Beginn jedes Kampfes verlierst du 1 Stärke und erhältst 1 Schwäche (in Elitekämpfen 2 Stärke und 2 Schwäche).",
-    "DREAD.DEFECT.description":  "Defect\u0027s Dominion: at the end of your turn, take 3 damage for each enemy.",
+    "DREAD.DEFECT.description":  "Herrschaft des Defekts: Alle Gegner erhalten 1 Artefakt.",
     "DREAD.NECROBINDER.description":  "Necrobinder\u0027s Dominion: at the start of your turn, a random card in your hand costs 1 more this turn.",
-    "DREAD.REGENT.description":  "Regent\u0027s Dominion: whenever an enemy attacks you, you lose 1 Strength this turn.",
+    "DREAD.REGENT.description":  "Herrschaft des Prinzen: Wähle zu Beginn deines Zuges 1 Karte (kein Status, kein Fluch) und verwandle sie in „Trümmer“.",
     "DREAD.WATCHER_DEVOTION.description":  "Herrschaft des Beobachters: Zu Beginn jedes Kampfes erhalten alle Gegner 2 [gold]Hingabe[/gold] (zu Beginn deines Zuges erhält jeder Gegner 2 [gold]Mantra[/gold]; bei 10 [gold]Mantra[/gold] gibt er 10 aus und betritt die [gold]Göttlichkeit[/gold] – in diesem Zug dreifacher Angriffsschaden).",
     "DREAD.FOOL.description":  "Herrschaft des Narren: Zu Beginn jedes Kampfes werden deinem Nachziehstapel 2 [gold]Traurigkeit[/gold] hinzugefügt."
 }

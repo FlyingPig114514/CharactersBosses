@@ -346,25 +346,14 @@ public sealed class SilentDominion : MegaCrit.Sts2.Core.Models.Dread.DominionMod
 
 
 /// <summary>
-/// **储君的支配**（用户 2026-11-13 改口径）：
-/// > 储君的支配的实现效果改成给所有敌人上一层「王之凝视」是 buff
-/// > （是储君打能力牌王之凝视获得的那个正面效果，你做一下适配，效果应该是和我之前描述的是一样的）
+/// **储君的支配**（用户 2026-11-19 改口径）：**在你的回合开始时，选择 1 张非状态或诅咒牌，将其变化为「碎屑」**。
 ///
-/// 适配依据（反编译）：
-/// <code>
-/// // MonarchsGaze.OnPlay
-/// PowerCmd.Apply&lt;MonarchsGazePower&gt;(ctx, Owner.Creature, DynamicVars["StrengthLoss"], Owner.Creature, this);
+/// 与旧实现的区别（旧效果整套删除）：以前是给所有敌人挂「王之凝视」——
+/// 敌人用攻击打你时你在本回合 −1 力量。现在改成给**所有玩家**挂一层
+/// <see cref="Powers.RegentDominionPower"/>（debuff 可视载体），真正的结算在 power 里做。
 ///
-/// // MonarchsGazePower（PowerType.Buff, StackType.Counter）:
-/// //   AfterDamageGiven: if (dealer == Owner &amp;&amp; props.IsPoweredAttack())
-/// //       PowerCmd.Apply&lt;MonarchsGazeStrengthDownPower&gt;(ctx, target, Amount, Owner, null);
-/// </code>
-/// ⇒ 把「王之凝视」这层 **Buff** 挂到**所有敌人**身上：敌人每次用**带攻击力的攻击**打你，
-/// 你就获得 `MonarchsGazeStrengthDownPower`（临时 −1 力量、回合结束自动还回）
-/// —— 正是原来那条「每当敌人攻击你时，你在本回合失去 1 点力量」。
-///
-/// ⚠ 旧写法（自己接管 `AfterDamageReceived` 再手动施加 `MonarchsGazeStrengthDownPower`）**已删除**，
-/// 否则会和原版这层 Buff 各算一次、变成 −2 力量。
+/// 结算时机由 power 自己保证：`AfterPlayerTurnStartEarly`（早于烘焙手套 / 暴政 / 必备工具），
+/// 额外回合同样触发。
 /// </summary>
 public sealed class RegentDominion : MegaCrit.Sts2.Core.Models.Dread.DominionModel
 {
@@ -375,73 +364,25 @@ public sealed class RegentDominion : MegaCrit.Sts2.Core.Models.Dread.DominionMod
             if (room is not CombatRoom cr) return;
             // ★ v0.2.789：本幕 Boss 房 ⇒ 这个支配不生效（游戏要求 Boss 战里没有支配）
             if (DreadMode.SkipBecauseActBossRoom(room, GetType().Name)) return;
-            await GiveMonarchsGazeAsync(cr.Enemies, "进房时");
-        }
-        catch (Exception e) { Logger.Log("[CharBoss] 储君的支配失败: " + e.Message); }
-    }
-
-    /// <summary>
-    /// ★ v0.2.793：进房之后才加入战斗的敌人也要吃「王之凝视」
-    /// （原版 `AfterCreatureAddedToCombat` → `AfterEnemiesEnteredCombat` 这条派发，
-    ///  与铁甲战士的支配同一个洞：活体盾+机枪手那种编队里晚进列表的那只以前拿不到）。
-    /// </summary>
-    protected override async Task AfterEnemiesEnteredCombat(IEnumerable<Creature> creatures)
-    {
-        try
-        {
-            var room = DreadMode.FirstRoomOf(creatures);
-            if (room != null && DreadMode.SkipBecauseActBossRoom(room, GetType().Name)) return;
-            await GiveMonarchsGazeAsync(creatures, "后加入战斗");
-        }
-        catch (Exception e) { Logger.Log("[CharBoss] 储君的支配（后加入的敌人）失败: " + e.Message); }
-    }
-
-    /// <summary>给这批敌人挂「王之凝视」（幂等：身上已经有就跳过；角色 Boss 跳过）。</summary>
-    private static async Task GiveMonarchsGazeAsync(IEnumerable<Creature>? enemies, string why)
-    {
-        try
-        {
-            if (enemies == null)
-            {
-                // ★ v0.2.776：这条以前是**静默** return —— 2026-11-19 玩家联机的不同步就是
-                //   「房主加了王之凝视、客人没加」（客人那一刻拿不到敌人列表）。以后有这行日志
-                //   就能一眼分清「没进这个方法」还是「进来了但敌人列表是空的」。
-                Logger.Log("[CharBoss] 恐惧模式·储君的支配：拿不到敌人列表 ⇒ 这次没发王之凝视" +
-                           "（两端会不同步；见 DreadDominionSync 的对齐日志）");
-                return;
-            }
+            var players = cr.CombatState?.Players;
+            if (players == null) return;
 
             var targets = new List<Creature>();
-            int skippedBosses = 0, already = 0;
-            foreach (var c in enemies)
+            foreach (var p in players)
             {
-                if (c == null || !c.IsAlive) continue;
-                if (c.Side != CombatSide.Enemy) continue;
-                // ★ 用户 2026-11-19：「boss 不应该受支配影响」⇒ 不给角色 Boss 挂「王之凝视」
-                if (c.Monster is Monsters.CharBossMonster) { skippedBosses++; continue; }
-                // 幂等：两条路都覆盖到同一只时不叠成 2 层
-                if (c.GetPower<MegaCrit.Sts2.Core.Models.Powers.MonarchsGazePower>() != null) { already++; continue; }
-                targets.Add(c);
+                var creature = p?.Creature;
+                if (creature == null || !creature.IsAlive) continue;
+                if (creature.Monster != null) continue;      // 影子玩家 / 怪物不算
+                targets.Add(creature);
             }
-            if (skippedBosses > 0)
-                Logger.Log($"[CharBoss] 恐惧模式·储君的支配：跳过 {skippedBosses} 只角色 Boss（Boss 不受支配影响）");
-            if (targets.Count == 0)
-            {
-                if (already > 0)
-                    Logger.Log($"[CharBoss] 恐惧模式·储君的支配（{why}）：{already} 个敌人已有王之凝视 ⇒ 不重复挂");
-                else
-                    Logger.Log("[CharBoss] 恐惧模式·储君的支配：敌人列表为空 ⇒ 这次没发王之凝视（两端会不同步）");
-                return;
-            }
+            if (targets.Count == 0) return;
 
-            await MegaCrit.Sts2.Core.Commands.PowerCmd.Apply<
-                MegaCrit.Sts2.Core.Models.Powers.MonarchsGazePower>(
+            await MegaCrit.Sts2.Core.Commands.PowerCmd.Apply<Powers.RegentDominionPower>(
                 new ThrowingPlayerChoiceContext(), targets, 1m, null, null);
-            Logger.Log($"[CharBoss] 恐惧模式·储君的支配（{why}）：{targets.Count} 个敌人各获得 1 层「王之凝视」" +
-                       "（它们用攻击打你时，你本回合 −1 力量）" +
-                       (already > 0 ? $"（另有 {already} 个原本就有，未叠加）" : string.Empty));
+            Logger.Log($"[CharBoss] 恐惧模式·储君的支配：{targets.Count} 名玩家获得「储君的支配」" +
+                       "（回合开始时选 1 张非状态/非诅咒牌变化成碎屑）");
         }
-        catch (Exception e) { Logger.Log("[CharBoss] 储君的支配（施放王之凝视）失败: " + e.Message); }
+        catch (Exception e) { Logger.Log("[CharBoss] 储君的支配失败: " + e.Message); }
     }
 }
 
@@ -482,10 +423,13 @@ public sealed class NecrobinderDominion : MegaCrit.Sts2.Core.Models.Dread.Domini
 }
 
 /// <summary>
-/// **故障机器人的支配**（用户 2026-11-13 改口径）：改成给所有玩家挂一层
-/// <see cref="Powers.DefectDominionPower"/>（效果不变：你的回合结束时，每有一名敌人你就受到 3 点伤害）。
+/// **故障机器人的支配**（用户 2026-11-19 改口径）：**所有敌人获得 1 层人工制品**。
 ///
-/// ⚠ 旧的 `AfterSideTurnEnd` 实现**已删除**（效果已搬进 power，否则会打两次）。
+/// 与旧实现的区别：
+///   · 旧版是给**所有玩家**挂一层 <see cref="Powers.DefectDominionPower"/>（回合结束按敌人数挨伤害）；
+///     ⇒ 现在**不再给玩家上「故障机器人的支配」的 debuff**（那层 power 类型保留，只为了旧存档能反序列化）。
+///   · 新版与**铁甲战士的支配**同一套时机：进战斗房间给 `cr.Enemies`、之后加入战斗的敌人由
+///     `AfterEnemiesEnteredCombat` 补发（用户 2026-11-19 选的口径），两条路都做幂等。
 /// </summary>
 public sealed class DefectDominion : MegaCrit.Sts2.Core.Models.Dread.DominionModel
 {
@@ -496,24 +440,59 @@ public sealed class DefectDominion : MegaCrit.Sts2.Core.Models.Dread.DominionMod
             if (room is not CombatRoom cr) return;
             // ★ v0.2.789：本幕 Boss 房 ⇒ 这个支配不生效（游戏要求 Boss 战里没有支配）
             if (DreadMode.SkipBecauseActBossRoom(room, GetType().Name)) return;
-            var players = cr.CombatState?.Players;
-            if (players == null) return;
-
-            var targets = new List<Creature>();
-            foreach (var p in players)
-            {
-                var creature = p?.Creature;
-                if (creature == null || !creature.IsAlive) continue;
-                if (creature.Monster != null) continue;      // 影子玩家 / 怪物不算
-                targets.Add(creature);
-            }
-            if (targets.Count == 0) return;
-
-            await MegaCrit.Sts2.Core.Commands.PowerCmd.Apply<Powers.DefectDominionPower>(
-                new ThrowingPlayerChoiceContext(), targets, 1m, null, null);
-            Logger.Log($"[CharBoss] 恐惧模式·故障机器人的支配：{targets.Count} 名玩家获得「故障机器人的支配」");
+            await GiveArtifactAsync(cr.Enemies, "进房时");
         }
         catch (Exception e) { Logger.Log("[CharBoss] 故障机器人的支配失败: " + e.Message); }
+    }
+
+    /// <summary>进房之后才加入战斗的敌人也吃人工制品（与铁甲战士/储君那两条同一个洞）。</summary>
+    protected override async Task AfterEnemiesEnteredCombat(IEnumerable<Creature> creatures)
+    {
+        try
+        {
+            var room = DreadMode.FirstRoomOf(creatures);
+            if (room != null && DreadMode.SkipBecauseActBossRoom(room, GetType().Name)) return;
+            await GiveArtifactAsync(creatures, "后加入战斗");
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 故障机器人的支配（后加入的敌人）失败: " + e.Message); }
+    }
+
+    /// <summary>给这批敌人各 1 层人工制品（幂等：身上已经有就跳过；角色 Boss 跳过）。</summary>
+    private static async Task GiveArtifactAsync(IEnumerable<Creature>? enemies, string why)
+    {
+        try
+        {
+            if (enemies == null) return;
+
+            var targets = new List<Creature>();
+            int skippedBosses = 0, already = 0;
+            foreach (var c in enemies)
+            {
+                if (c == null || !c.IsAlive) continue;
+                if (c.Side != CombatSide.Enemy) continue;
+                // ★ 用户 2026-11-19：Boss 不吃支配
+                if (c.Monster is Monsters.CharBossMonster) { skippedBosses++; continue; }
+                // 幂等：进房那条路与「后加入」那条路都覆盖到同一只时不叠成 2 层
+                if (c.GetPower<MegaCrit.Sts2.Core.Models.Powers.ArtifactPower>() != null) { already++; continue; }
+                targets.Add(c);
+            }
+
+            if (skippedBosses > 0)
+                Logger.Log($"[CharBoss] 恐惧模式·故障机器人的支配：跳过 {skippedBosses} 只角色 Boss（Boss 不受支配影响）");
+            if (targets.Count == 0)
+            {
+                if (already > 0)
+                    Logger.Log($"[CharBoss] 恐惧模式·故障机器人的支配（{why}）：{already} 个敌人已有人工制品 ⇒ 不重复挂");
+                return;
+            }
+
+            await MegaCrit.Sts2.Core.Commands.PowerCmd.Apply<
+                MegaCrit.Sts2.Core.Models.Powers.ArtifactPower>(
+                new ThrowingPlayerChoiceContext(), targets, 1m, null, null);
+            Logger.Log($"[CharBoss] 恐惧模式·故障机器人的支配（{why}）：{targets.Count} 个敌人各获得 1 层人工制品" +
+                       (already > 0 ? $"（另有 {already} 个原本就有，未叠加）" : string.Empty));
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 故障机器人的支配（施放人工制品）失败: " + e.Message); }
     }
 }
 

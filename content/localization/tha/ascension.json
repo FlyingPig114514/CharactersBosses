@@ -1,9 +1,9 @@
 {
     "DREAD.IRONCLAD.description":  "Ironclad\u0027s Dominion: at the start of each combat, all enemies gain 1 Demon Form.",
     "DREAD.SILENT.description":  "การปกครองของผู้เงียบงัน: เมื่อเริ่มการต่อสู้ คุณสูญเสียพละกำลัง 1 และได้รับความอ่อนแอ 1 (ในการต่อสู้กับศัตรูชั้นสูง: พละกำลัง 2 และความอ่อนแอ 2)",
-    "DREAD.DEFECT.description":  "Defect\u0027s Dominion: at the end of your turn, take 3 damage for each enemy.",
+    "DREAD.DEFECT.description":  "การปกครองของดีเฟกต์: ศัตรูทั้งหมดได้รับอาร์ติแฟกต์ 1",
     "DREAD.NECROBINDER.description":  "Necrobinder\u0027s Dominion: at the start of your turn, a random card in your hand costs 1 more this turn.",
-    "DREAD.REGENT.description":  "Regent\u0027s Dominion: whenever an enemy attacks you, you lose 1 Strength this turn.",
+    "DREAD.REGENT.description":  "การปกครองของเจ้าชาย: เมื่อเริ่มเทิร์นของคุณ เลือกการ์ด 1 ใบที่ไม่ใช่สถานะหรือคำสาป แล้วเปลี่ยนเป็นเศษซาก",
     "DREAD.WATCHER_DEVOTION.description":  "การปกครองของผู้เฝ้ามอง: เมื่อเริ่มการต่อสู้ ศัตรูทุกตัวจะได้รับ[gold]ความศรัทธา[/gold] 2 ชั้น (เมื่อเริ่มเทิร์นของคุณ ศัตรูแต่ละตัวจะได้รับ[gold]มนตรา[/gold] 2 ชั้น เมื่อครบ 10 ชั้นจะใช้ 10 ชั้นและเข้าสู่[gold]สภาวะเทพ[/gold] ทำให้การโจมตีในเทิร์นนั้นสร้างความเสียหายสามเท่า)",
     "DREAD.FOOL.description":  "การปกครองของคนเขลา: เมื่อเริ่มการต่อสู้ เพิ่ม[gold]ความโศกเศร้า[/gold] 2 ใบลงในกองจั่วของคุณ"
 }
