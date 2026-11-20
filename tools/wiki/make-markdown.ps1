@@ -68,15 +68,62 @@ function Card-Label($c) {
     return (MdText $label)
 }
 
-function Join-Cards($cards, [bool]$notPlayed) {
-    if ($null -eq $cards) { return '' }
+# 这一回合**真打出来**的牌：数据导出器已经按「队列顺序 + 每张牌实际费用 + 该回合能量」算好了 played。
+function Played-Cards($cards) {
+    if ($null -eq $cards) { return '—' }
     $parts = @()
     foreach ($c in $cards) {
-        if ((Is-NotPlayed $c) -ne $notPlayed) { continue }
+        if (-not (Test-Played $c)) { continue }
         $parts += (Card-Label $c)
     }
     if ($parts.Count -eq 0) { return '—' }
     return ($parts -join '、')
+}
+
+# 这一回合**没打**的牌：没费 / 被烧掉 / 被丢弃 / 留在手里 / 仅显示意图
+function NotPlayed-Cards($cards) {
+    if ($null -eq $cards) { return '—' }
+    $parts = @()
+    foreach ($c in $cards) {
+        if (Test-Played $c) { continue }
+        $reason = ''
+        if ($c.PSObject.Properties.Name -contains 'reason') { $reason = [string]$c.reason }
+        if ($reason.Length -gt 0) { $parts += ((Card-Label $c) + '（' + $reason + '）') }
+        else { $parts += (Card-Label $c) }
+    }
+    if ($parts.Count -eq 0) { return '—' }
+    return ($parts -join '、')
+}
+
+# 老数据没有 played 字段时退回按标记判断，保证脚本不会崩
+function Test-Played($c) {
+    if ($c.PSObject.Properties.Name -contains 'played') { return [bool]$c.played }
+    return -not (Is-NotPlayed $c)
+}
+
+# 备注只在「除了牌名之外还有额外信息」时才写（用户口径：一般情况下备注是空的，主要看前两栏）
+function Note-IfUseful([string]$note, $cards) {
+    if ([string]::IsNullOrWhiteSpace($note)) { return '—' }
+    $clean = [regex]::Replace($note, '^\d+\.\s*', '').Trim()
+    $probe = $clean
+    if ($null -ne $cards) {
+        foreach ($c in $cards) {
+            $nm = [string]$c.name
+            if ($nm.Length -ge 2) { $probe = $probe.Replace($nm, '') }
+        }
+    }
+    # 去掉括号里的补充说明（「（群攻）」「（被坚毅烧掉）」这种已经体现在前两栏了）
+    $probe = [regex]::Replace($probe, '[（(【\[][^）)】\]]*[）)】\]]', '')
+    $probe = [regex]::Replace($probe, '[\s\p{P}\p{S}0-9]', '')
+    # 剩下的还是有信息量（≥4 个字），或者出现了「洗牌 / 循环 / 额外回合」这类关键提示 ⇒ 保留备注
+    $keep = ($probe.Length -ge 4)
+    if (-not $keep) {
+        foreach ($kw in @('洗牌', '循环', '额外回合', '重打', '复制', '进阶', '恐惧', '召唤', '生成', '升级')) {
+            if ($clean.Contains($kw)) { $keep = $true; break }
+        }
+    }
+    if (-not $keep) { return '—' }
+    return (MdText $clean)
 }
 
 function Merge-Counts($list) {
@@ -218,9 +265,8 @@ foreach ($a in @(1, 2, 3)) {
             $i = 0
             foreach ($turn in $d.Script.turns) {
                 $i = $i + 1
-                $note = [string]$turn.note
-                $note = [regex]::Replace($note, '^\d+\.\s*', '')
-                [void]$sb.AppendLine('| ' + $i + ' | ' + (Join-Cards $turn.cards $false) + ' | ' + (Join-Cards $turn.cards $true) + ' | ' + (MdText $note) + ' |')
+                $energyTxt = ' | '   # 能量已经在表头外统一说明；这里保持列数一致
+                [void]$sb.AppendLine('| ' + $i + ' | ' + (Played-Cards $turn.cards) + ' | ' + (NotPlayed-Cards $turn.cards) + ' | ' + (Note-IfUseful ([string]$turn.note) $turn.cards) + ' |')
             }
             [void]$sb.AppendLine('')
         }

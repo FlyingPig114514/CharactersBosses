@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
@@ -309,6 +309,8 @@ table.script td.turn{
 table.script tr.loop td.turn{border-left-color:var(--gold-dim);color:var(--gold)}
 table.script td.played,table.script td.notplayed{min-width:200px}
 table.script td.notplayed{min-width:140px}
+table.script .why{color:#8c7f70;font-size:12px;margin-right:6px}
+table.script td.turn .egy{display:block;font-size:11px;color:#c9a227;opacity:.85;margin-top:2px}
 table.script td.note{color:var(--ink-2);font-size:12px;min-width:220px}
 table.script td.note:empty::after{content:"—";color:var(--muted)}
 .dash{color:#4c443b}
@@ -520,7 +522,40 @@ window.BOSS_HP = /*__BOSS_HP__*/;
     return out;
   }
 
-  function isOut(card) { return outReasons(card).length > 0; }
+  /* 「打不出」：优先用导出器算好的 played（剧本队列顺序 + 每张牌实际费用 + 该回合能量），
+     没有这个字段时才退回按标记猜。 */
+  function isOut(card) {
+    if (card && typeof card.played === 'boolean') { return card.played === false; }
+    return outReasons(card).length > 0;
+  }
+
+  /* 这张牌为什么没打出来（没费 / 被烧掉 / 留在手里 / 打不出…） */
+  function outReason(card) {
+    if (card && typeof card.reason === 'string' && card.reason) { return card.reason; }
+    var r = outReasons(card);
+    return r.length ? r[0] : '';
+  }
+
+  /* 备注只在「除了牌名之外还有额外信息」时才显示（一般情况是空的，主要看打出/不出两栏） */
+  function turnNoteText(turn, cards) {
+    var note = turn && turn.note ? String(turn.note) : '';
+    if (!note) { return '—'; }
+    var clean = note.replace(/^\d+\.\s*/, '').trim();
+    var probe = clean, i;
+    for (i = 0; i < (cards || []).length; i++) {
+      if (cards[i] && cards[i].name && String(cards[i].name).length >= 2) {
+        probe = probe.split(String(cards[i].name)).join('');
+      }
+    }
+    probe = probe.replace(/[（(【\[][^）)】\]]*[）)】\]]/g, '');
+    probe = probe.replace(/[\s\p{P}\p{S}0-9]/gu, '');
+    var keep = probe.length >= 4;
+    if (!keep) {
+      var kw = ['洗牌', '循环', '额外回合', '重打', '复制', '进阶', '恐惧', '召唤', '生成', '升级'];
+      for (i = 0; i < kw.length; i++) { if (clean.indexOf(kw[i]) >= 0) { keep = true; break; } }
+    }
+    return keep ? esc(clean) : '—';
+  }
 
   function cardTags(card) {
     var tags = [], i, v;
@@ -769,16 +804,23 @@ window.BOSS_HP = /*__BOSS_HP__*/;
       }
       var turnNo = i + 1;
       h.push('<tr' + (looping && turnNo >= loopFrom ? ' class="loop"' : '') + '>');
-      h.push('<td class="turn">' + turnNo + '</td>');
+      h.push('<td class="turn">' + turnNo +
+        (isNum(turn.energy) ? '<span class="egy" title="本回合可用能量">⚡' + turn.energy + '</span>' : '') + '</td>');
       h.push('<td class="played">');
       if (!played.length) { h.push('<span class="dash">—</span>'); }
       else { for (c = 0; c < played.length; c++) { h.push(cardChipHTML(played[c])); } }
       h.push('</td>');
       h.push('<td class="notplayed">');
       if (!out.length) { h.push('<span class="dash">—</span>'); }
-      else { for (c = 0; c < out.length; c++) { h.push(cardChipHTML(out[c])); } }
+      else {
+        for (c = 0; c < out.length; c++) {
+          h.push(cardChipHTML(out[c]));
+          var why = outReason(out[c]);
+          if (why) { h.push('<span class="why">（' + esc(why) + '）</span>'); }
+        }
+      }
       h.push('</td>');
-      h.push('<td class="note">' + esc(stripNumberPrefix(turn.note)) + '</td>');
+      h.push('<td class="note">' + turnNoteText(turn, cards) + '</td>');
       h.push('</tr>');
     }
     h.push('</tbody></table></div></div>');

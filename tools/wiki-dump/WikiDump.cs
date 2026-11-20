@@ -96,6 +96,67 @@ internal static class WikiDump
         try { impl = Assembly.LoadFrom(implPath); }
         catch (Exception e) { Console.Error.WriteLine("load impl failed: " + e); return 3; }
 
+        if (args.Length > 4 && args[4] == "--probe")
+        {
+            try
+            {
+                var asm = Assembly.LoadFrom(implPath);
+                foreach (var n in new[] { "MegaCrit.Sts2.Core.Models.Cards.StrikeIronclad", "MegaCrit.Sts2.Core.Models.Cards.Glacier", "MegaCrit.Sts2.Core.Models.Cards.BootSequence" })
+                {
+                    var ty = asm.GetType(n) ?? AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetType(n)).FirstOrDefault(x => x != null);
+                    if (ty == null) { Console.WriteLine($"{n}: TYPE NOT FOUND"); continue; }
+                    try
+                    {
+                        var inst = Activator.CreateInstance(ty);
+                        var pc = ty.GetProperty("CanonicalEnergyCost", BindingFlags.Public | BindingFlags.Instance);
+                        var px = ty.GetProperty("HasEnergyCostX", BindingFlags.Public | BindingFlags.Instance);
+                        Console.WriteLine($"{ty.Name}: cost={(pc?.GetValue(inst) ?? "?")} x={(px?.GetValue(inst) ?? "?")}");
+                    }
+                    catch (Exception e) { Console.WriteLine($"{ty.Name}: INSTANTIATE FAIL {e.GetBaseException().GetType().Name}: {e.GetBaseException().Message}"); }
+                }
+                var defs = asm.GetType("CharacterBosses.Core.BossDefs");
+                var probeAll = defs.GetField("All", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).GetValue(null);
+                foreach (var kv in EnumerateDictionary(probeAll))
+                {
+                    if (kv.Key != "DEFECT_BOSS") continue;
+                    var e = GetField(kv.Value, "Energy") as Array;
+                    Console.WriteLine($"DEFECT energy array = [{string.Join(",", e.Cast<object>())}]");
+                    var sba = GetField(kv.Value, "ScriptByAct") as Array;
+                    var sc = ArrayAt(sba, 0);
+                    foreach (var turn in AsEnumerable(Prop<object>(sc, "Turns")).Take(3))
+                    {
+                        Console.WriteLine($"  turn Energy={Prop<int>(turn, "Energy")} ForceZero={Prop<bool>(turn, "ForceZeroEnergy")}");
+                        foreach (var c in AsEnumerable(Prop<object>(turn, "Cards")))
+                        {
+                            var ty = c?.GetType().GetProperty("Card")?.GetValue(c) as Type;
+                            if (ty == null) continue;
+                            Console.Write($"     {ty.Name}: ");
+                            try
+                            {
+                                var inst = Activator.CreateInstance(ty);
+                                foreach (var mem in ty.GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+                                {
+                                    if (mem.Name.IndexOf("Cost", StringComparison.OrdinalIgnoreCase) < 0) continue;
+                                    string kind = mem.MemberType.ToString();
+                                    object val = null;
+                                    try
+                                    {
+                                        if (mem is PropertyInfo pi && pi.GetIndexParameters().Length == 0) val = pi.GetValue(inst);
+                                        else if (mem is FieldInfo fi) val = fi.GetValue(inst);
+                                    }
+                                    catch (Exception ex) { val = "<" + ex.GetBaseException().GetType().Name + ">"; }
+                                    Console.WriteLine($"       {kind} {mem.Name} = {val}");
+                                }
+                            }
+                            catch (Exception ex) { Console.WriteLine($"FAIL {ex.GetBaseException().GetType().Name}: {ex.GetBaseException().Message}"); }
+                            break;
+                        }
+                    }
+                }
+            }
+            catch (Exception e) { Console.WriteLine("probe failed: " + e); }
+            return 0;
+        }
         var bossDefs = impl.GetType("CharacterBosses.Core.BossDefs", true);
 
         object all;
@@ -250,12 +311,12 @@ internal static class WikiDump
 
         for (int act = 0; act < acts; act++)
         {
-            var script = DumpScript(ArrayAt(scriptByAct, act));
+            var script = DumpScript(ArrayAt(scriptByAct, act), IntAt(energy, act));
             var variants = new List<object>();
             foreach (var v in CallEnumerable(def, "VariantsForAct", act))
             {
                 if (v == null) continue;
-                var dv = DumpVariant(v);
+                var dv = DumpVariant(v, IntAt(energy, act));
                 if (dv["script"] != null) variants.Add(dv);
             }
 
@@ -292,9 +353,9 @@ internal static class WikiDump
         };
     }
 
-    private static Dictionary<string, object> DumpVariant(object v)
+    private static Dictionary<string, object> DumpVariant(object v, int actEnergy)
     {
-        var script = DumpScript(Prop<object>(v, "Script"));
+        var script = DumpScript(Prop<object>(v, "Script"), actEnergy);
         return new Dictionary<string, object>
         {
             ["key"] = Prop<string>(v, "Key"),
@@ -314,19 +375,35 @@ internal static class WikiDump
         };
     }
 
-    private static Dictionary<string, object> DumpScript(object script)
+    private static Dictionary<string, object> DumpScript(object script, int actEnergy)
     {
         if (script == null) return null;
         var turns = new List<object>();
         foreach (var turn in AsEnumerable(Prop<object>(script, "Turns")))
         {
             if (turn == null) continue;
+
             var cards = new List<object>();
             foreach (var c in AsEnumerable(Prop<object>(turn, "Cards")))
             {
                 if (c != null) cards.Add(DumpCard(c));
             }
-            turns.Add(new Dictionary<string, object> { ["note"] = Prop<string>(turn, "Note") ?? "", ["cards"] = cards });
+
+            // 这一回合到底有多少能量：剧本里逐回合写死的（BossTurn.Energy）优先，0 = 用该幕默认；
+            // ForceZeroEnergy = 那一回合故意 0 费（只打得起 0 费牌）。
+            int turnEnergy = Prop<int>(turn, "Energy");
+            bool forceZero = Prop<bool>(turn, "ForceZeroEnergy");
+            int energy = forceZero ? 0 : (turnEnergy > 0 ? turnEnergy : actEnergy);
+
+            // 按「队列顺序 + 费用」走一遍，标出每张牌到底打不打得出
+            AnnotatePlayed(cards, energy);
+
+            turns.Add(new Dictionary<string, object>
+            {
+                ["note"] = Prop<string>(turn, "Note") ?? "",
+                ["energy"] = energy,
+                ["cards"] = cards,
+            });
         }
         if (turns.Count == 0) return null;
         return new Dictionary<string, object>
@@ -346,6 +423,11 @@ internal static class WikiDump
             ["name"] = CardName(typeName),
             ["type"] = typeName,
         };
+        {
+            var (baseCost, xCost) = CardCost(t.GetProperty("Card")?.GetValue(c) as Type, false);
+            card["cost"] = baseCost;
+            if (xCost) card["xCost"] = true;
+        }
         foreach (var flag in new[]
         {
             "Upgraded", "Burned", "DiscardInstead", "DiscardInsteadWhenMultiplayer", "DiscardInsteadSingleOnly",
@@ -376,6 +458,75 @@ internal static class WikiDump
         return card;
     }
 
+    /// <summary>
+    /// 按「剧本队列顺序 + 每张牌实际费用」判定这一回合到底哪些牌打得出来。
+    ///
+    /// 剧本给的是**排队顺序**（和游戏里一样：从前往后打，没费就停），所以：
+    ///   · 0 费牌 / 自动打出（奇巧·被丢弃触发·地狱狂徒免费）不消耗能量，直接算「打出」；
+    ///   · X 费牌（消耗全部能量）算出「打出」并把能量清零；
+    ///   · 其余按费用扣，扣不下就归「不出（没费）」，后面的牌也一律「不出（没费）」；
+    ///   · 带 Burned/HoldInstead/NotDrawn/DiscardInstead/DisplayOnly 标记的牌本来就不打，也不消耗能量。
+    /// </summary>
+    private static void AnnotatePlayed(List<object> cards, int energy)
+    {
+        int remaining = Math.Max(0, energy);
+        bool broke = false;
+        foreach (var o in cards)
+        {
+            var card = o as Dictionary<string, object>;
+            if (card == null) continue;
+
+            string notPlayedBy = null;
+            if (card.ContainsKey("Burned")) notPlayedBy = "被烧掉";
+            else if (card.ContainsKey("HoldInstead")) notPlayedBy = "留在手牌";
+            else if (card.ContainsKey("NotDrawn")) notPlayedBy = "没抽到";
+            else if (card.ContainsKey("DiscardInstead") || card.ContainsKey("DiscardInsteadWhenMultiplayer") || card.ContainsKey("DiscardInsteadSingleOnly")) notPlayedBy = "被丢弃";
+            else if (card.ContainsKey("DisplayOnly")) notPlayedBy = "仅显示意图";
+
+            if (notPlayedBy != null)
+            {
+                card["played"] = false;
+                card["reason"] = notPlayedBy;
+                continue;
+            }
+
+            // 自动打出 / 免费 / 奇巧（被丢弃后自动打出）：不消耗能量
+            bool free = card.ContainsKey("AutoPlayed") || card.ContainsKey("FreeThisTurn")
+                        || card.ContainsKey("Sly") || card.ContainsKey("HellraiserFree")
+                        || card.ContainsKey("ToolsDiscard");
+            if (free)
+            {
+                card["played"] = true;
+                card["freePlay"] = true;
+                continue;
+            }
+
+            bool xCost = card.ContainsKey("xCost");
+            int cost = card.ContainsKey("CostThisTurn") ? Convert.ToInt32(card["CostThisTurn"])
+                     : card.ContainsKey("CostOverride") ? Convert.ToInt32(card["CostOverride"])
+                     : Convert.ToInt32(card["cost"] ?? 0);
+
+            // 费用 -1 = 诅咒/状态/不可打出（笨拙、愧疚、贪婪、疑虑…）⇒ 这一手根本打不出来
+            if (cost < 0)
+            {
+                card["played"] = false;
+                card["reason"] = "打不出·诅咒或状态";
+                continue;
+            }
+
+            if (broke || cost > remaining)
+            {
+                card["played"] = false;
+                card["reason"] = "没费";
+                broke = true;
+                continue;
+            }
+
+            card["played"] = true;
+            if (xCost) remaining = 0;
+            else remaining -= Math.Max(0, cost);
+        }
+    }
     private static List<Dictionary<string, object>> DumpPairs(object list)
     {
         var outl = new List<Dictionary<string, object>>();
@@ -392,6 +543,44 @@ internal static class WikiDump
         return outl;
     }
 
+    // 卡牌费用缓存：key = (类型, 是否升级) ⇒ (费用, 是否 X 费)
+    private static readonly Dictionary<(Type, bool), (int Cost, bool XCost)> CostCache = new();
+
+    private static (int Cost, bool XCost) CardCost(Type t, bool upgraded)
+    {
+        if (t == null) return (0, false);
+        if (CostCache.TryGetValue((t, upgraded), out var hit)) return hit;
+        var result = (0, false);
+        try
+        {
+            var inst = Activator.CreateInstance(t);
+            if (inst != null)
+            {
+                if (upgraded)
+                {
+                    try
+                    {
+                        var m = t.GetMethod("Upgrade", BindingFlags.Public | BindingFlags.Instance, null, Type.EmptyTypes, null);
+                        m?.Invoke(inst, null);
+                    }
+                    catch { /* 升级失败就用基础费用 */ }
+                }
+                // 属性本身在基类上，拿 PropertyInfo 不稳 ⇒ 直接调 getter 方法
+                int cost = 0;
+                bool x = false;
+                var mCost = t.GetMethod("get_CanonicalEnergyCost", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                var vCost = mCost.Invoke(inst, null);
+                if (vCost is int c) cost = c;
+                var mX = t.GetMethod("get_HasEnergyCostX", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                var vX = mX.Invoke(inst, null);
+                if (vX is bool bx) x = bx;
+                result = (cost, x);
+            }
+        }
+        catch { /* 造不出来就按 0 费算 */ }
+        CostCache[(t, upgraded)] = result;
+        return result;
+    }
     private static string DesignName(string defKey, int act)
         => MainDesign.TryGetValue(defKey + "|" + act, out var v) ? v.Name : (defKey + " 第" + act + "幕");
 

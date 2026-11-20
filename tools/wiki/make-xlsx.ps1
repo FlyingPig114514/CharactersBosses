@@ -52,7 +52,9 @@ function Join-Cards($cards, [bool]$notPlayed) {
     if ($null -eq $cards) { return '' }
     $parts = New-Object System.Collections.ArrayList
     foreach ($c in $cards) {
-        if ((Is-NotPlayed $c) -ne $notPlayed) { continue }
+        $isPlayed = $true
+        if ($c.PSObject.Properties.Name -contains 'played') { $isPlayed = [bool]$c.played } else { $isPlayed = -not (Is-NotPlayed $c) }
+        if ($isPlayed -eq $notPlayed) { continue }
         $label = [string]$c.name
         if ($c.PSObject.Properties.Name -contains 'Upgraded') { $label = $label + '+' }
         $cost = -1
@@ -70,6 +72,10 @@ function Join-Cards($cards, [bool]$notPlayed) {
         if ($c.PSObject.Properties.Name -contains 'AutoPlayed') { $label = $label + '〔自动〕' }
         if ($c.PSObject.Properties.Name -contains 'FreeThisTurn') { $label = $label + '〔免费〕' }
         if ($c.PSObject.Properties.Name -contains 'SpendsAllEnergy') { $label = $label + '〔吃掉全部能量〕' }
+        if ($notPlayed -and ($c.PSObject.Properties.Name -contains 'reason')) {
+            $reason = [string]$c.reason
+            if ($reason.Length -gt 0) { $label = $label + '（' + $reason + '）' }
+        }
         [void]$parts.Add($label)
     }
     return ($parts -join '、')
@@ -163,6 +169,13 @@ function Add-TurnRows($target, [string]$key, [string]$name, $script) {
         $i = $i + 1
         $note = [string]$turn.note
         $note = [regex]::Replace($note, '^\d+\.\s*', '')
+        $probe = $note
+        foreach ($c in $turn.cards) { if ($c.name) { $probe = $probe.Replace([string]$c.name, '') } }
+        $probe = [regex]::Replace($probe, '[（(【\[][^）)】\]]*[）)】\]]', '')
+        $probe = [regex]::Replace($probe, '[\s\p{P}\p{S}0-9]', '')
+        $useful = ($probe.Length -ge 4)
+        if (-not $useful) { foreach ($kw in @('洗牌','循环','额外回合','重打','复制','进阶','恐惧','召唤','生成','升级')) { if ($note.Contains($kw)) { $useful = $true; break } } }
+        if (-not $useful) { $note = '' }
         [void]$target.Add(@($key, $name, $i, (Join-Cards $turn.cards $false), (Join-Cards $turn.cards $true), $note))
     }
 }
