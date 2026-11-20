@@ -865,6 +865,14 @@ public static class ShadowPetNotAnOpponentPatch
             // ⚠ **群攻不受影响**：已核对 CrushUnder / Thunderclap / DaggerSpray / EchoingSlash 四张，
             //   它们走的是 `HittableEnemies` + `TargetingAllOpponents`，根本不经过这条。
             NarrowToLockedPlayer(creature, ref __result);
+
+            // ③ ★ v0.2.841（玩家 2026-11-20：「我用机宝对战打击战的时候电球怎么电自己了」）：
+            //    **真人玩家**的「对手列表」里绝不该出现**别的真人玩家**。
+            //    闪球的被动/激发就是拿这份列表随机取一个目标（反编译 `LightningOrb.ApplyLightningDamage`：
+            //    `GetOpponentsOf(Owner.Creature).Where(IsHittable)` → `NextItem`）⇒ 一旦这份列表里
+            //    混进了玩家侧的自己人（我们为角色 Boss 做的翻侧/收窄窗口在某些时序下会漏到这条路径上），
+            //    表现就是「电球电自己」。这里按「同侧 + 没有怪物（= 真人玩家）」摘掉，宠物不受影响。
+            DropSameSideRealPlayers(creature, ref __result);
         }
         catch
         {
@@ -872,6 +880,47 @@ public static class ShadowPetNotAnOpponentPatch
         }
     }
 
+    /// <summary>
+    /// 「真人玩家的对手列表里不能有别的真人玩家」（v0.2.841）。
+    /// 判据收到最紧：**提出询问的必须是真人玩家**（`Monster == null && Player != null`），
+    /// 被摘掉的必须是**同一侧且没有怪物**的生物（= 真人玩家本人；宠物 / 我们的影子玩家都不动）。
+    /// </summary>
+    private static int _sameSideDropLogs;
+
+    private static void DropSameSideRealPlayers(Creature creature, ref IReadOnlyList<Creature> result)
+    {
+        try
+        {
+            if (result == null || result.Count == 0) return;
+            if (creature?.Monster != null || creature.Player == null) return;   // 只针对真人玩家提问
+
+            List<Creature>? kept = null;
+            for (int i = 0; i < result.Count; i++)
+            {
+                var c = result[i];
+                bool drop = c != null && c.Monster == null && c.Side == creature.Side
+                            && !ReferenceEquals(c, creature);
+                if (drop && kept == null)
+                {
+                    kept = new List<Creature>(result.Count);
+                    for (int j = 0; j < i; j++) kept.Add(result[j]);
+                }
+                else if (!drop && kept != null)
+                {
+                    kept.Add(c);
+                }
+            }
+            if (kept == null || kept.Count == 0) return;   // 没摘 / 摘空了 → 保持原结果
+
+            result = kept;
+            if (_sameSideDropLogs++ < 10)
+            {
+                Logger.Log("[CharBoss] 选靶兜底：真人玩家的「对手列表」里混进了同侧真人玩家 ⇒ 已摘掉" +
+                           "（充能球被动/激发就是从这份列表里随机取目标的，不摘就会「电自己」）");
+            }
+        }
+        catch { /* 忽略，保持原结果 */ }
+    }
     /// <summary>把「我们 Boss 的对手列表」收窄成它锁定的那名玩家（单人局不做任何事）。</summary>
     private static void NarrowToLockedPlayer(Creature creature, ref IReadOnlyList<Creature> result)
     {
