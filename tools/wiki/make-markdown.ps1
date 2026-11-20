@@ -232,7 +232,7 @@ foreach ($a in @(1, 2, 3)) {
         [void]$sb.AppendLine('')
         [void]$sb.AppendLine('### ' + $d.Name + '　`' + $d.Key + '`')
         [void]$sb.AppendLine('')
-        [void]$sb.AppendLine('- **角色 / 幕**：' + $d.Char + ' · 第 ' + $d.Act + ' 幕 · ' + $d.Kind)
+        [void]$sb.AppendLine('- **角色 / 幕**：' + $d.Char + ' · 第 ' + $d.Act + ' 幕 · ' + $d.NumberLabel)
         [void]$sb.AppendLine('- **控制台**：`fight ' + $d.Encounter + '_BOSS_ENCOUNTER`')
         [void]$sb.AppendLine('- **血量**：**' + $d.Hp + '** ｜ **能量**：' + $d.Energy + ' ｜ **手牌**：' + $d.Hand + ' ｜ **循环**：' + (Loop-Text $d.Script))
         if ($d.Info) {

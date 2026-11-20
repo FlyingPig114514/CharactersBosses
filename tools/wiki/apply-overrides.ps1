@@ -99,6 +99,11 @@ function Apply-Design($design, $rule, [string]$label) {
     if ($null -ne $rule.loopFrom -and $null -ne $design.script) { $design.script.loopFrom = [int]$rule.loopFrom }
     if ($null -ne $rule.loopLength -and $null -ne $design.script) { $design.script.loopLength = [int]$rule.loopLength }
     if ($rule.special) { $design.special = Clean-Markup ([string]$rule.special) }
+    if ($rule.appendSpecial) {
+        $add = (@($rule.appendSpecial) | ForEach-Object { Clean-Markup ([string]$_) }) -join "`n"
+        $design.special = (Clean-Markup ([string]$design.special)) + "`n" + $add
+        [void]$notes.Add('特殊效果追加说明')
+    }
     if ($rule.specialDread) { $design.specialDread = Clean-Markup ([string]$rule.specialDread) }
     if ($rule.deckNote) { $design.deckNote = [string]$rule.deckNote }
 
@@ -198,15 +203,15 @@ foreach ($boss in $data.bosses) {
 # ── 编号：不再叫「主设计 / 变体」，同一角色内按「幕升序 → 主设计在前 → 变体在后」编成 1号 / 2号 / 3号… ──
 $numApplied = 0
 foreach ($boss in $data.bosses) {
-    $seq = 0
     foreach ($act in @($boss.acts)) {
         if ($act.act -gt 3) { continue }
-        $seq = $seq + 1
-        $act | Add-Member -NotePropertyName numberLabel -NotePropertyValue ($seq.ToString() + '号') -Force
+        $slot = 0
+        $slot = $slot + 1
+        $act | Add-Member -NotePropertyName numberLabel -NotePropertyValue (([string]$act.act) + '层' + $slot + '号') -Force
         $numApplied++
         foreach ($v in @($act.variants)) {
-            $seq = $seq + 1
-            $v | Add-Member -NotePropertyName numberLabel -NotePropertyValue ($seq.ToString() + '号') -Force
+            $slot = $slot + 1
+            $v | Add-Member -NotePropertyName numberLabel -NotePropertyValue (([string]$act.act) + '层' + $slot + '号') -Force
             $numApplied++
         }
     }
