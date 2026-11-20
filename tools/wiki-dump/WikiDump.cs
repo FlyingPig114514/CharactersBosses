@@ -14,6 +14,7 @@ using System.Collections;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 internal static class WikiDump
 {
@@ -412,6 +413,7 @@ internal static class WikiDump
         if (script == null) return null;
         var turns = new List<object>();
         int shuffleTurn = 0;      // 首次洗牌发生在第几回合（0 = 剧本里没标）
+        var subroutine = new bool[1];   // 整份剧本共享：「子程序」是否已经打出来过
         foreach (var turn in AsEnumerable(Prop<object>(script, "Turns")))
         {
             if (turn == null) continue;
@@ -421,6 +423,23 @@ internal static class WikiDump
             {
                 if (c != null) cards.Add(DumpCard(c));
             }
+            // 观者那几套剧本的牌是用运行期反射拿的 Type（没装观者模组/离线都是 null）⇒ Cards 是空的，
+            // 只能从作者手写的 Note 里反解出来（格式固定：`1. 许愿+（永生不死）、打击（有费就打）、…`）。
+            {
+                string noteForParse = Prop<string>(turn, "Note") ?? "";
+                if (noteForParse.Length > 0)
+                {
+                    var fromNote = new List<object>();
+                    foreach (var nc in ParseNoteCards(noteForParse)) fromNote.Add(nc);
+                    // 观者那几套的牌只有一部分能离线解析出来（其余是运行期反射的 Type）⇒
+                    // Note 里列得更全时以 Note 为准。
+                    if (fromNote.Count > cards.Count)
+                    {
+                        cards.Clear();
+                        cards.AddRange(fromNote);
+                    }
+                }
+            }
 
             // 这一回合到底有多少能量：剧本里逐回合写死的（BossTurn.Energy）优先，0 = 用该幕默认；
             // ForceZeroEnergy = 那一回合故意 0 费（只打得起 0 费牌）。
@@ -429,7 +448,7 @@ internal static class WikiDump
             int energy = forceZero ? 0 : (turnEnergy > 0 ? turnEnergy : actEnergy);
 
             // 按「队列顺序 + 费用」走一遍，标出每张牌到底打不打得出
-            AnnotatePlayed(cards, energy);
+            AnnotatePlayed(cards, energy, subroutine);
 
             string noteText = Prop<string>(turn, "Note") ?? "";
             bool shuffles = Prop<bool>(turn, "ShuffleDrawPile")
@@ -477,7 +496,7 @@ internal static class WikiDump
                 if (cd.ContainsKey("from")) continue;                 // 不是从卡组来的（生成/回收）
                 string nm = cd["name"] as string;
                 if (string.IsNullOrEmpty(nm)) continue;
-                deck.Add(nm);
+                deck.Add(DeckLabel(cd, nm));
             }
         }
         if (turns.Count == 0) return null;
@@ -502,9 +521,18 @@ internal static class WikiDump
             ["type"] = typeName,
         };
         {
-            var (baseCost, xCost) = CardCost(t.GetProperty("Card")?.GetValue(c) as Type, false);
+            var cardType = t.GetProperty("Card")?.GetValue(c) as Type;
+            var (baseCost, xCost) = CardCost(cardType, false);
             card["cost"] = baseCost;
             if (xCost) card["xCost"] = true;
+            try
+            {
+                var inst = Activator.CreateInstance(cardType);
+                var mType = cardType.GetMethod("get_Type", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                var vType = mType?.Invoke(inst, null);
+                if (vType != null) card["cardType"] = vType.ToString();
+            }
+            catch { /* 取不到就算了 */ }
         }
         foreach (var flag in new[]
         {
@@ -545,7 +573,66 @@ internal static class WikiDump
     ///   · 其余按费用扣，扣不下就归「不出（没费）」，后面的牌也一律「不出（没费）」；
     ///   · 带 Burned/HoldInstead/NotDrawn/DiscardInstead/DisplayOnly 标记的牌本来就不打，也不消耗能量。
     /// </summary>
-    private static void AnnotatePlayed(List<object> cards, int energy)
+    /// <summary>卡组里一张牌怎么写：名字 + 升级「+」 + 附魔（漩涡 / 灵魂 / 王室认证）。</summary>
+    private static string DeckLabel(Dictionary<string, object> card, string name)
+    {
+        string label = name;
+        if (card.ContainsKey("Upgraded")) label += "+";
+        if (card.ContainsKey("EnchantSpiral")) label += "（漩涡）";
+        if (card.ContainsKey("EnchantSouls")) label += "（灵魂）";
+        if (card.ContainsKey("EnchantRoyallyApproved")) label += "（王室认证）";
+        return label;
+    }
+
+    /// <summary>
+    /// 从作者手写的 Note 反解牌表（只在 `Cards` 为空时用 —— 观者那几套的牌是运行期反射拿的 Type）。
+    /// 格式：`1. 许愿+（永生不死）、打击（有费就打）、警惕（有费就打）`
+    /// </summary>
+    private static IEnumerable<Dictionary<string, object>> ParseNoteCards(string note)
+    {
+        string text = Regex.Replace(note ?? "", @"^\d+\.\s*", "").Trim();
+        if (text.Length == 0) yield break;
+        // 备注里常带「单人：…；多人：…」两套口径（表里以单人为准，多人另写备注）⇒ 只解析单人那段
+        int multi = text.IndexOf("多人：", StringComparison.Ordinal);
+        if (multi > 0) text = text.Substring(0, multi);
+        text = Regex.Replace(text, "^(单人|多人)：", "").Trim();
+        foreach (var raw in text.Split('、'))
+        {
+            string chunk = raw.Trim().TrimEnd('。', '，', ',', '.');
+            if (chunk.Length == 0) continue;
+            if (chunk.IndexOf("洗牌", StringComparison.Ordinal) >= 0) continue;   // 洗牌是标记不是牌
+            int paren = chunk.IndexOf('（');
+            if (paren < 0) paren = chunk.IndexOf('(');
+            string namePart = paren > 0 ? chunk.Substring(0, paren) : chunk;
+            string parenPart = paren > 0 ? chunk.Substring(paren) : "";
+            bool upgraded = namePart.EndsWith("+", StringComparison.Ordinal);
+            if (upgraded) namePart = namePart.Substring(0, namePart.Length - 1);
+            namePart = namePart.Trim();
+            if (namePart.Length == 0) continue;
+
+            var card = new Dictionary<string, object>
+            {
+                ["name"] = namePart,
+                ["type"] = "",
+                ["cost"] = 0,
+                ["fromNote"] = true,
+            };
+            if (upgraded) card["Upgraded"] = true;
+            if (parenPart.IndexOf("没费", StringComparison.Ordinal) >= 0)
+            {
+                card["played"] = false;
+                card["reason"] = "没费";
+            }
+            else if (parenPart.IndexOf("不出", StringComparison.Ordinal) >= 0
+                     || parenPart.IndexOf("保留", StringComparison.Ordinal) >= 0)
+            {
+                card["played"] = false;
+                card["reason"] = "留在手牌";
+            }
+            yield return card;
+        }
+    }
+    private static void AnnotatePlayed(List<object> cards, int energy, bool[] subroutine)
     {
         int remaining = Math.Max(0, energy);
         bool broke = false;
@@ -553,6 +640,8 @@ internal static class WikiDump
         {
             var card = o as Dictionary<string, object>;
             if (card == null) continue;
+
+            if (card.ContainsKey("fromNote")) continue;   // Note 反解出来的牌：费用未知，按 Note 的标注为准
 
             string notPlayedBy = null;
             if (card.ContainsKey("Burned")) notPlayedBy = "被烧掉";
@@ -603,6 +692,11 @@ internal static class WikiDump
             card["played"] = true;
             if (xCost) remaining = 0;
             else remaining -= Math.Max(0, cost);
+
+            // 「子程序」：每打出一张**能力牌** +1 能量（下一张牌用得上）——能力机那套的能量就靠它
+            string ct = card.ContainsKey("cardType") ? Convert.ToString(card["cardType"]) : null;
+            if (subroutine != null && subroutine.Length > 0 && subroutine[0] && ct == "Power") remaining += 1;
+            if (string.Equals(card["name"] as string, "子程序", StringComparison.Ordinal) && subroutine != null) subroutine[0] = true;
         }
     }
     private static List<Dictionary<string, object>> DumpPairs(object list)

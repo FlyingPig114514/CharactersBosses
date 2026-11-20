@@ -1,0 +1,105 @@
+{
+  "_说明": "百科数据的人工订正表（用户 2026-11-20 逐条给的口径）。apply-overrides.ps1 会把它套在 wiki-dump 导出的 data.json 上，三份产物（Markdown / Excel / 网页）都用订正后的数据。",
+  "_语法": {
+    "designs[<遭遇id或设计名>]": "要订正的设计；用 encounter（如 DEFECT_THUNDER）最稳",
+    "deck.remove": "删牌，可写 3 种形式：\"电击\"（删 1 张）、\"电击*2\"（删 2 张）、\"灵魂*\"（删所有名字以「灵魂」开头的）",
+    "deck.add": "加牌，同样支持 \"防御（漩涡）\" 这种带附魔后缀的写法",
+    "deck.raw": "整份替换（按顺序写，用 、 分隔；重复写几次就是几张）",
+    "firstShuffleTurn": "手工指定首次洗牌回合（卡组只统计它之前的回合）",
+    "loopFrom / loopLength": "覆盖循环区间",
+    "special / specialDread": "覆盖特殊效果正文（会先自动去掉 [gold] 之类标记）",
+    "turns": "按回合号逐回合订正：played（打出）/ notPlayed（不出，可带原因）/ note（备注）"
+  },
+  "global": {
+    "removeCards": ["君王之剑"],
+    "alwaysPlayed": ["所向无敌"],
+    "note": "所有设计通用：① 卡组里移除「君王之剑」（它是生成的，不是卡组牌）；② 「所向无敌」是回合结束自动打出 ⇒ 一律算「打出」"
+  },
+  "designs": {
+    "DEFECT_THUNDER": {
+      "deck": { "remove": ["电击"] }
+    },
+    "IRONCLAD_STRIKE": {
+      "deck": { "remove": ["完美打击*2"] }
+    },
+    "SILENT_SLY": {
+      "deck": { "remove": ["防御"] },
+      "turns": {
+        "2": {
+          "played": ["早有准备+", "翻越撑击", "打击", "防御"],
+          "notPlayed": ["余像（没费）", "防御（被丢弃）"],
+          "note": "多人：早有准备+ 改为丢「鬼祟+」与「翻越撑击」，鬼祟+（奇巧）随之打出，其余同单人"
+        }
+      }
+    },
+    "DEFECT_RAINBOW": { "firstShuffleTurn": 8 },
+    "IRONCLAD_BLOOD": {
+      "turns": {
+        "2": { "note": "多人：「味道」替换为「肉盾」" }
+      }
+    },
+    "NECROBINDER_SOUL": {
+      "deck": { "remove": ["灵魂*"] }
+    },
+    "NECROBINDER_ETHEREAL": {
+      "turns": {
+        "4": { "reorder": ["鬼火", "女妖之嚎"] }
+      }
+    },
+    "REGENT_FORGE": {
+      "deck": { "remove": ["君王之剑*"] }
+    },
+    "REGENT_KING": {
+      "deck": { "remove": ["王者之拳", "王者之踢*2"] },
+      "turns": {
+        "5": {
+          "played": ["宇宙冷漠", "辉光", "收集光辉", "淬炼刀刃"],
+          "note": "宇宙冷漠是被「抉择，抉择」重复打出的，属于打出"
+        }
+      }
+    },
+    "SILENT_SNECKO": {
+      "deck": { "remove": ["跟踪*2", "子弹时间*3"] }
+    },
+    "DEFECT_EVENT": {
+      "deck": { "add": ["疯狂进食", "热修复", "防御（漩涡）", "打击"] }
+    },
+    "IRONCLAD_BOULDER": {
+      "deck": { "raw": ["打击", "打击（被变化为巨石）", "打击（被变化为巨石）", "痛击（被变化为巨石）"] },
+      "deckNote": "第 1 张打击没有被变化成巨石，出现在第 5、8 回合"
+    },
+    "NECROBINDER_ERADICATE": {
+      "firstShuffleTurn": 5,
+      "special": "预借时间\n你每花费10能量，你本回合所有牌的耗能就增加1能量，并使亡灵契约师获得1能量。"
+    },
+    "NECROBINDER_OSTY": {
+      "deck": { "remove": ["吸引仇恨*2", "增生"] }
+    },
+    "REGENT_COLORLESS": { "firstShuffleTurn": 4 },
+    "REGENT_STAR": {
+      "firstShuffleTurn": 5,
+      "loopFrom": 5,
+      "loopLength": 4,
+      "turns": {
+        "4": {
+          "notPlayed": ["七星（打不出·只有恐惧模式才打得出来）"]
+        }
+      }
+    },
+    "REGENT_CHOICE": {
+      "deck": { "remove": ["抉择，抉择*3", "君王之剑*"] }
+    },
+    "SILENT_BREWER": {
+      "deck": { "remove": ["炼制药水*3"] }
+    },
+    "SILENT_GRAND_FINALE": {
+      "deck": { "remove": ["杂技*3"] },
+      "turns": {
+        "8": { "played": ["谋杀"], "note": "战术大师给的加费让第 8 回合的谋杀打得出" }
+      }
+    },
+    "WATCHER_DIVINITY": {
+      "special": "你每打出一张牌，观者获得 1 层真言。\n在观者的回合开始时，她失去 5 层真言（最多失去全部）。\n每当她获得 10 层真言时，她会先退出当前姿态、获得 2 点力量，然后进入神格，而且她不再会在回合开始时退出神格。\n神格：进入这一姿态时，获得3能量。处于这一姿态时，你的攻击造成三倍伤害。"
+    }
+  }
+}

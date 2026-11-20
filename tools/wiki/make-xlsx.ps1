@@ -207,7 +207,7 @@ foreach ($boss in $data.bosses) {
         [void]$summaryRows.Add(@(
             $actNo, $boss.character, $name, $act.encounter, ('fight ' + $act.encounter + '_BOSS_ENCOUNTER'),
             $hp, $act.energy, $act.handSize, (Loop-Text $act.script),
-            (Deck-Cell $act.deck $act.deckNote), (Merge-Counts $act.deckRegistered), (Merge-Counts $act.relics),
+            [string]$act.numberLabel, (Merge-Counts $act.deck), (Merge-Counts $act.relics),
             $act.special, $act.specialDread, ($act.dreadUpgrades -join '、'), $boss.info
         ))
         $target = $turn1
@@ -226,7 +226,7 @@ foreach ($boss in $data.bosses) {
             [void]$summaryRows.Add(@(
                 $actNo, $boss.character, ([string]$v.name), $v.encounter, ('fight ' + $v.encounter + '_BOSS_ENCOUNTER'),
                 $vHp, $act.energy, $act.handSize, (Loop-Text $v.script),
-                (Deck-Cell $v.deck $v.deckNote), (Merge-Counts $v.deckRegistered), (Merge-Counts $v.relics),
+                [string]$v.numberLabel, (Merge-Counts $v.deck), (Merge-Counts $v.relics),
                 $v.special, $v.specialDread, ($extras -join '；'), $boss.info
             ))
             Add-TurnRows $target ([string]$v.encounter) ([string]$v.name) $v.script
@@ -241,9 +241,9 @@ $sheetFiles = @('sheet1.xml', 'sheet2.xml', 'sheet3.xml', 'sheet4.xml', 'sheet5.
 $sheetXml = @{}
 
 $rowsSum = New-Object System.Collections.ArrayList
-[void]$rowsSum.Add(@('楼层', '角色', '设计', 'Key', '控制台指令', '血量', '能量', '手牌', '循环', '卡组', '代码登记卡组(可能已过期)', '遗物', '特殊效果', '恐惧版特殊效果', '进阶/恐惧改动', '能力统计'))
+[void]$rowsSum.Add(@('楼层', '编号', '角色', '设计', 'Key', '控制台指令', '血量', '能量', '手牌', '循环', '卡组', '遗物', '特殊效果', '恐惧版特殊效果', '进阶/恐惧改动', '能力统计'))
 foreach ($r in $summaryRows) { [void]$rowsSum.Add($r) }
-$sheetXml['总表'] = Sheet-Xml $rowsSum @(6, 10, 26, 24, 42, 8, 6, 6, 26, 62, 52, 34, 66, 66, 44, 50)
+$sheetXml['总表'] = Sheet-Xml $rowsSum @(6, 6, 10, 26, 24, 42, 8, 6, 6, 26, 62, 34, 66, 66, 44, 50)
 
 $headTurn = @('Key', '设计', '回合', '打出', '不出', '备注')
 $turnSets = @{ '剧本·一层' = $turn1; '剧本·二层' = $turn2; '剧本·三层' = $turn3 }

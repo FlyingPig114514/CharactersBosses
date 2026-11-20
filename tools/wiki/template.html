@@ -662,6 +662,7 @@ window.BOSS_HP = /*__BOSS_HP__*/;
       specialDreadKey: src.specialDreadKey || '',
       specialDread: src.specialDread || '',
       deck: src.deck || [],
+    numberLabel: src.numberLabel || '',
       relics: src.relics || [],
       potions: isVariant ? [] : (actObj.potions || []),
       ascensionUpgrades: (variant && variant.ascensionUpgrades) || [],
@@ -757,14 +758,9 @@ window.BOSS_HP = /*__BOSS_HP__*/;
   function renderLoadout(design) {
     var h = [];
     if (design.deck.length) {
-      h.push('<div class="sect"><h3>卡组<span class="cnt">' + design.deck.length + ' 张</span>' +
-        (design.deckNote ? '<span class="cnt dim">' + esc(design.deckNote) + '</span>' : '') + '</h3><div class="chips">');
+      h.push('<div class="sect"><h3>卡组<span class="cnt">' + design.deck.length + ' 张</span></h3><div class="chips">');
       h.push(plainChipsHTML(design.deck, 'card'));
-      if (design.deckRegistered && design.deckRegistered.length &&
-          design.deckRegistered.slice().sort().join('|') !== design.deck.slice().sort().join('|')) {
-        h.push('</div><div class="sub2">代码登记卡组（BossDefs，可能已过期，仅供对照）：</div><div class="chips">');
-        h.push(plainChipsHTML(design.deckRegistered, 'card dim2'));
-      }
+
       h.push('</div></div>');
     }
     if (design.relics.length) {
@@ -839,7 +835,7 @@ window.BOSS_HP = /*__BOSS_HP__*/;
     var h = [];
     var title = design.name;
     var meta = design.character + ' · 第 ' + design.act + ' 幕'
-      + (design.isVariant ? '<span class="badge">变体</span>' : '<span class="badge">主设计</span>');
+      + '<span class="badge">' + esc(design.numberLabel || (design.isVariant ? '变体' : '主设计')) + '</span>';
 
     h.push('<section class="design ' + (design.isVariant ? 'variant' : 'main') + '" id="' + esc(design.id) + '">');
 

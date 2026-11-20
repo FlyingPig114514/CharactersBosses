@@ -169,7 +169,7 @@ foreach ($boss in $data.bosses) {
             $designs += [pscustomobject]@{
                 Act = $actNo; Char = $boss.character; Name = [string]$act.name; Key = [string]$boss.key
                 Encounter = [string]$act.encounter; Hp = (Get-Hp $boss.key $actNo ([int]$act.baseHp) $firstBaseHp 0)
-                Energy = $act.energy; Hand = $act.handSize; Kind = '主设计'
+                Energy = $act.energy; Hand = $act.handSize; Kind = '主设计'; NumberLabel = [string]$act.numberLabel; DeckExtraNote = [string]$act.deckNote
                 Deck = $act.deck; Relics = $act.relics
                 DeckNote = $act.deckNote; DeckRegistered = $act.deckRegistered
                 Special = $act.special; SpecialDread = $act.specialDread
@@ -185,7 +185,7 @@ foreach ($boss in $data.bosses) {
             $designs += [pscustomobject]@{
                 Act = $actNo; Char = $boss.character; Name = [string]$v.name; Key = [string]$v.key
                 Encounter = [string]$v.encounter; Hp = (Get-Hp $boss.key $actNo 0 $firstBaseHp ([int]$v.hpBonus))
-                Energy = $act.energy; Hand = $act.handSize; Kind = '变体'
+                Energy = $act.energy; Hand = $act.handSize; Kind = '变体'; NumberLabel = [string]$v.numberLabel; DeckExtraNote = [string]$v.deckNote
                 Deck = $v.deck; Relics = $v.relics
                 DeckNote = $v.deckNote; DeckRegistered = $v.deckRegistered
                 Special = $v.special; SpecialDread = $v.specialDread
@@ -238,19 +238,10 @@ foreach ($a in @(1, 2, 3)) {
         if ($d.Info) {
             [void]$sb.AppendLine('- **能力统计**：' + (MdText ($d.Info -replace "`r?`n", ' ｜ ')))
         }
-        $deckNote = ''
-        if ($d.PSObject.Properties.Name -contains 'DeckNote') { $deckNote = [string]$d.DeckNote }
-        $deckLine = '- **卡组**（' + $d.Deck.Count + ' 张'
-        if ($deckNote.Length -gt 0) { $deckLine = $deckLine + '，' + $deckNote }
-        $deckLine = $deckLine + '）：' + (Merge-Counts $d.Deck)
-        [void]$sb.AppendLine($deckLine)
-        # 与代码登记的卡组不一致时并列出来，方便逐条核对（用户口径：先按洗牌前统计，他再逐条订正）
-        if ($d.PSObject.Properties.Name -contains 'DeckRegistered') {
-            $reg = @($d.DeckRegistered)
-            $sameKeys = ((@($d.Deck) | Sort-Object) -join '|') -eq (($reg | Sort-Object) -join '|')
-            if (-not $sameKeys -and $reg.Count -gt 0) {
-                [void]$sb.AppendLine('- **代码登记卡组**（BossDefs，可能已过期，仅供对照）：' + (Merge-Counts $reg))
-            }
+        # 用户 2026-11-20：卡组括号里只保留张数，不要口径说明；也不再显示「代码登记卡组」对照
+        [void]$sb.AppendLine('- **卡组**（' + $d.Deck.Count + ' 张）：' + (Merge-Counts $d.Deck))
+        if ($d.PSObject.Properties.Name -contains 'DeckExtraNote' -and $d.DeckExtraNote) {
+            [void]$sb.AppendLine('- **卡组备注**：' + (MdText ([string]$d.DeckExtraNote)))
         }
         [void]$sb.AppendLine('- **遗物**：' + (Merge-Counts $d.Relics))
         if ($d.Extras.Count -gt 0) {
