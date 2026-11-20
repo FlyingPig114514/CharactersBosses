@@ -151,6 +151,8 @@ public static class BossEnemySpreadPatch
     private static string[] PlacementNames(int count) => count switch
     {
         // 5 只（5 人联机）：用户 2026-11-11「5 个 boss 的站位是 w 型」= 上下上下上（两个谷、三个峰）
+        // 6 只（6 人联机，2026-11-21）：平行四边形 3 行 2 列，索引 = 出手顺序（从左到右）
+        >= 6 => new[] { "行1左", "行2左", "行1右", "行3左", "行2右", "行3右" },
         >= 5 => new[] { "左上", "左下", "中上", "右下", "右上" },
         >= 4 => new[] { "左上", "下偏左", "上偏右", "右下" },
         3 => new[] { "左上", "中下", "右上" },
@@ -193,7 +195,25 @@ public static class BossEnemySpreadPatch
                 right,
             };
         }
-        if (count >= 4)
+        if (count >= 6)
+        {
+            // 两列（间距 g = 1.5*SpreadX，和 4 人局同一套中心距），每下一行整体斜移 g/2
+            // ⇒ 第 3 行第一个（索引 3）的 X 正好等于第 1 行第二个（索引 2）的 X。
+            float g = SpreadX * 1.5f;
+            float left6 = viewW > 600f ? viewW * 0.17f : minX - SpreadX * 0.75f;
+            // 最右不能越过 4 人局那条右缘（视口宽 - 0.75*SpreadX）
+            float rightLimit = viewW > 600f ? viewW - SpreadX * 0.75f : maxX + SpreadX * 0.75f;
+            if (left6 + g * 2f > rightLimit) left6 = Mathf.Max(minX - SpreadX * 0.5f, rightLimit - g * 2f);
+            return new[]
+            {
+                left6,             // 0: 行1 左
+                left6 + g * 0.5f,  // 1: 行2 左
+                left6 + g,         // 2: 行1 右
+                left6 + g,         // 3: 行3 左（= 2 号正下方）
+                left6 + g * 1.5f,  // 4: 行2 右
+                left6 + g * 2f,    // 5: 行3 右
+            };
+        }        if (count >= 4)
         {
             // 用户 2026-10-29 第三次反馈：「右边还有那么大空间呢，再往右错一些」。
             // 上一版把右侧夹在 `视口宽 - 310`，1920 的视口只用到 1610 ⇒ 右边空了 300 多。
@@ -248,7 +268,14 @@ public static class BossEnemySpreadPatch
     private static float[] SlotY(int count, float upY, float downY)
     {
         // 5 只（5 人联机）：上 / 下 / 上 / 下 / 上 —— 字母 W 的五个折点（两个谷、三个峰）
-        if (count >= 5) return new[] { upY, downY, upY, downY, upY };
+        // 6 只（6 人联机，用户 2026-11-21）：**平行四边形 3 行 2 列**，两列都从左上往右下斜。
+        // 索引 = 出手顺序（从左到右）：0 上 / 1 中 / 2 上 / 3 下 / 4 中 / 5 下
+        // 其中 **3 号（第 3 行第一个）正好在第 1 行第二个（2 号）正下方**（见 SlotX 的斜移量）。
+        if (count >= 6)
+        {
+            float midY = (upY + downY) * 0.5f;
+            return new[] { upY, midY, upY, downY, midY, downY };
+        }        if (count >= 5) return new[] { upY, downY, upY, downY, upY };
         if (count >= 4) return new[] { upY, downY, upY, downY };
         if (count == 3) return new[] { upY, downY, upY };
         return new[] { upY, downY };
