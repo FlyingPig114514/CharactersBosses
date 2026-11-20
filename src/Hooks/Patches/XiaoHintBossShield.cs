@@ -43,32 +43,47 @@ internal static class XiaoHintBossShield
 
         try
         {
-            Type? picker = null;
-            foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                try
-                {
-                    picker = asm.GetType(ModTypeName, false);
-                    if (picker != null) break;
-                }
-                catch { /* 某些程序集不允许反射，跳过 */ }
-            }
-            if (picker == null) return;      // 没装那个模组
-
-            var target = picker.GetMethod(ModMethodName,
-                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-            if (target == null)
-            {
-                Logger.Log("[CharBoss] 小小姐的战斗提示：没找到它的自动选择器入口（版本可能变了）⇒ 未加护栏");
-                return;
-            }
+            var picker = FindType(ModTypeName);
+            var pilotProbe = FindType("XiaoSpireHint.Pilot");
+            if (picker == null && pilotProbe == null) return;      // 没装那个模组
 
             var prefix = typeof(XiaoHintBossShield).GetMethod(nameof(Prefix),
                 BindingFlags.Static | BindingFlags.NonPublic);
-
             var harmony = new Harmony("CharacterBosses.XiaoSpireHintBossShield");
-            harmony.Patch(target, prefix: new HarmonyMethod(prefix));
-            Logger.Log("[CharBoss] 小小姐的战斗提示：已给它的自动选择器加护栏 —— 角色 Boss 的选牌不再被它接管");
+
+            var patched = new List<string>();
+
+            // ① 选牌器：Picker.Before(object[] __args) —— 它给 CardSelectCmd 的 FromHand 系列打的前缀
+            var pickerTarget = picker.GetMethod(ModMethodName,
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+            if (pickerTarget != null)
+            {
+                harmony.Patch(pickerTarget, prefix: new HarmonyMethod(prefix));
+                patched.Add("Picker.Before(选牌器)");
+            }
+
+            // ② 托管出牌：Pilot.Act(Answer, Player me, CombatState, string) ——
+            //    它从 me.PlayerCombatState.Hand 里挑牌打出，而 me 来自「谁是本地玩家」；
+            //    我们的角色 Boss 用**影子玩家**出牌，影子正是照着本地玩家造的 ⇒ 它会替 Boss 出牌。
+            var pilotType = FindType("XiaoSpireHint.Pilot");
+            if (pilotType != null)
+            {
+                foreach (var m in pilotType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
+                {
+                    if (m.Name != "Act") continue;
+                    harmony.Patch(m, prefix: new HarmonyMethod(prefix));
+                    patched.Add("Pilot." + m.Name + "(托管出牌)");
+                    break;
+                }
+            }
+
+            if (patched.Count == 0)
+            {
+                Logger.Log("[CharBoss] 小小姐的战斗提示：没找到它的接管入口（版本可能变了）⇒ 未加护栏");
+                return;
+            }
+            Logger.Log("[CharBoss] 小小姐的战斗提示：已加护栏（" + string.Join(" + ", patched) +
+                       "）—— 角色 Boss 的选牌与出牌不再被它接管");
         }
         catch (Exception e)
         {
@@ -76,19 +91,47 @@ internal static class XiaoHintBossShield
         }
     }
 
-    /// <summary>返回 false = 跳过它的自动应答（这次选牌交给我们的选择器 / 原版界面）。</summary>
-    private static bool Prefix(object[] __args)
+    /// <summary>返回 false = 跳过它的自动应答 / 托管出牌（交回我们的选择器 / 原版流程）。</summary>
+    private static bool Prefix(MethodBase? __originalMethod, object[] __args, ref object __result)
     {
         try
         {
             if (__args == null) return true;
             foreach (var arg in __args)
             {
-                if (InvolvesBoss(arg)) return false;
+                if (!InvolvesBoss(arg)) continue;
+
+                // 跳过对方逻辑；如果它这个方法有返回值（Pilot.Act 返回状态字符串），给个安全默认，
+                // 免得那边拿到 null 在 UI 里炸掉。
+                try
+                {
+                    var rt = (__originalMethod as MethodInfo)?.ReturnType;
+                    if (rt != null && rt != typeof(void))
+                    {
+                        __result = rt == typeof(string) ? string.Empty
+                                 : (rt.IsValueType ? Activator.CreateInstance(rt) : null);
+                    }
+                }
+                catch { /* 忽略 */ }
+                return false;
             }
         }
         catch { /* 判不出来就放行 */ }
         return true;
+    }
+
+    private static Type? FindType(string fullName)
+    {
+        foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+        {
+            try
+            {
+                var t = asm.GetType(fullName, false);
+                if (t != null) return t;
+            }
+            catch { /* 某些程序集不允许反射 */ }
+        }
+        return null;
     }
 
     /// <summary>这个参数里有没有我们的角色 Boss（影子玩家 / 她的生物 / 她持有的牌）。</summary>
