@@ -308,6 +308,8 @@ table.script td.turn{
 }
 table.script tr.loop td.turn{border-left-color:var(--gold-dim);color:var(--gold)}
 table.script td.played,table.script td.notplayed{min-width:200px}
+    .sect h3 .cnt.dim{color:#8c7f70;font-weight:400;margin-left:8px}
+    .sub2{color:#8c7f70;font-size:12px;margin:6px 0 4px}
 table.script td.notplayed{min-width:140px}
 table.script .why{color:#8c7f70;font-size:12px;margin-right:6px}
 table.script td.turn .egy{display:block;font-size:11px;color:#c9a227;opacity:.85;margin-top:2px}
@@ -755,8 +757,14 @@ window.BOSS_HP = /*__BOSS_HP__*/;
   function renderLoadout(design) {
     var h = [];
     if (design.deck.length) {
-      h.push('<div class="sect"><h3>卡组<span class="cnt">' + design.deck.length + ' 张</span></h3><div class="chips">');
+      h.push('<div class="sect"><h3>卡组<span class="cnt">' + design.deck.length + ' 张</span>' +
+        (design.deckNote ? '<span class="cnt dim">' + esc(design.deckNote) + '</span>' : '') + '</h3><div class="chips">');
       h.push(plainChipsHTML(design.deck, 'card'));
+      if (design.deckRegistered && design.deckRegistered.length &&
+          design.deckRegistered.slice().sort().join('|') !== design.deck.slice().sort().join('|')) {
+        h.push('</div><div class="sub2">代码登记卡组（BossDefs，供对照）：</div><div class="chips">');
+        h.push(plainChipsHTML(design.deckRegistered, 'card dim2'));
+      }
       h.push('</div></div>');
     }
     if (design.relics.length) {

@@ -335,7 +335,9 @@ internal static class WikiDump
                 ["special"] = LocText(StrAt(specialByAct, act)),
                 ["specialDreadKey"] = StrAt(specialDreadByAct, act),
                 ["specialDread"] = LocText(StrAt(specialDreadByAct, act)),
-                ["deck"] = deck.Select(CardName).Where(s => s.Length > 0).ToList(),
+                ["deck"] = DeckFromScriptOrRegistered(script, deck),
+                ["deckRegistered"] = deck.Select(CardName).Where(s => s.Length > 0).ToList(),
+                ["deckNote"] = DeckNote(script),
                 ["relics"] = TypeNames(ArrayAt(relicsByAct, act)).Select(RelicName).ToList(),
                 ["potions"] = TypeNames(ArrayAt(potionsByAct, act)).Select(RelicName).ToList(),
                 ["dreadUpgrades"] = TypeNames(ArrayAt(dreadUpByAct, act)).Select(CardName).ToList(),
@@ -353,6 +355,31 @@ internal static class WikiDump
         };
     }
 
+    /// <summary>
+    /// 卡组 = **首次洗牌之前的回合**里出现过的牌（用户 2026-11-20 口径：剧本跨了至少两次洗牌，
+    /// 直接统计「出现过的所有牌」会把大部分牌重复计入）。剧本里没牌时退回代码登记的卡组。
+    /// </summary>
+    private static List<string> DeckFromScriptOrRegistered(Dictionary<string, object> script, object registered)
+    {
+        var fromScript = new List<string>();
+        if (script != null && script.TryGetValue("deckFromScript", out var ds) && ds is List<string> list)
+        {
+            fromScript.AddRange(list);
+        }
+        if (fromScript.Count > 0) return fromScript;
+        return TypeNames(registered).Select(CardName).Where(s => s.Length > 0).ToList();
+    }
+
+    /// <summary>卡组是怎么数出来的（写在表里让人知道口径）。</summary>
+    private static string DeckNote(Dictionary<string, object> script)
+    {
+        if (script == null) return "代码登记卡组（该设计没有剧本）";
+        int shuffleTurn = script.TryGetValue("shuffleTurn", out var st) && st is int n ? n : 0;
+        bool fromScript = script.TryGetValue("deckFromScript", out var ds) && ds is List<string> l && l.Count > 0;
+        if (!fromScript) return "代码登记卡组（剧本首次洗牌前没有出牌）";
+        if (shuffleTurn > 0) return "按首次洗牌之前的回合统计（首次洗牌在第 " + shuffleTurn + " 回合）";
+        return "剧本未标洗牌 ⇒ 按全部回合统计（可能重复计入）";
+    }
     private static Dictionary<string, object> DumpVariant(object v, int actEnergy)
     {
         var script = DumpScript(Prop<object>(v, "Script"), actEnergy);
@@ -366,7 +393,9 @@ internal static class WikiDump
             ["specialDreadKey"] = Prop<string>(v, "SpecialLocDread"),
             ["specialDread"] = LocText(Prop<string>(v, "SpecialLocDread")),
             ["hpBonus"] = Prop<int>(v, "HpBonus"),
-            ["deck"] = TypeNames(Prop<object>(v, "Deck")).Select(CardName).ToList(),
+            ["deck"] = DeckFromScriptOrRegistered(script, Prop<object>(v, "Deck")),
+            ["deckRegistered"] = TypeNames(Prop<object>(v, "Deck")).Select(CardName).ToList(),
+            ["deckNote"] = DeckNote(script),
             ["relics"] = TypeNames(Prop<object>(v, "Relics")).Select(RelicName).ToList(),
             ["ascensionUpgrades"] = DumpPairs(Prop<object>(v, "AscensionUpgrades")).Select(p => $"{p["ascension"]}: {CardName((string)p["type"])}").ToList(),
             ["ascensionRelics"] = DumpPairs(Prop<object>(v, "AscensionRelics")).Select(p => $"{p["ascension"]}: {RelicName((string)p["type"])}").ToList(),
@@ -379,6 +408,7 @@ internal static class WikiDump
     {
         if (script == null) return null;
         var turns = new List<object>();
+        int shuffleTurn = 0;      // 首次洗牌发生在第几回合（0 = 剧本里没标）
         foreach (var turn in AsEnumerable(Prop<object>(script, "Turns")))
         {
             if (turn == null) continue;
@@ -398,18 +428,48 @@ internal static class WikiDump
             // 按「队列顺序 + 费用」走一遍，标出每张牌到底打不打得出
             AnnotatePlayed(cards, energy);
 
+            string noteText = Prop<string>(turn, "Note") ?? "";
+            bool shuffles = Prop<bool>(turn, "ShuffleDrawPile")
+                            || noteText.IndexOf("洗牌", StringComparison.Ordinal) >= 0
+                            || noteText.IndexOf("重新洗", StringComparison.Ordinal) >= 0;
+
             turns.Add(new Dictionary<string, object>
             {
-                ["note"] = Prop<string>(turn, "Note") ?? "",
+                ["note"] = noteText,
                 ["energy"] = energy,
+                ["shuffle"] = shuffles,
                 ["cards"] = cards,
             });
+
+            if (shuffles && shuffleTurn == 0) shuffleTurn = turns.Count;   // 1 起
+        }
+
+        // 卡组：**首次洗牌之前的回合**里出现过的牌（用户 2026-11-20 口径）。
+        // 剧本跨了至少两次洗牌，直接统计「所有出现过的牌」会把大部分牌重复计入 ⇒ 只取首次洗牌之前。
+        var deck = new List<string>();
+        int upto = shuffleTurn > 0 ? shuffleTurn - 1 : turns.Count;
+        for (int ti = 0; ti < upto && ti < turns.Count; ti++)
+        {
+            var turnDict = turns[ti] as Dictionary<string, object>;
+            if (turnDict == null) continue;
+            foreach (var co in AsEnumerable(turnDict["cards"]))
+            {
+                var cd = co as Dictionary<string, object>;
+                if (cd == null) continue;
+                if (cd.ContainsKey("DisplayOnly")) continue;          // 只显示意图、不是真牌
+                if (cd.ContainsKey("from")) continue;                 // 不是从卡组来的（生成/回收）
+                string nm = cd["name"] as string;
+                if (string.IsNullOrEmpty(nm)) continue;
+                deck.Add(nm);
+            }
         }
         if (turns.Count == 0) return null;
         return new Dictionary<string, object>
         {
             ["loopFrom"] = Prop<int>(script, "LoopFrom"),
             ["loopLength"] = Prop<int>(script, "LoopLength"),
+            ["shuffleTurn"] = shuffleTurn,
+            ["deckFromScript"] = deck,
             ["turns"] = turns,
         };
     }

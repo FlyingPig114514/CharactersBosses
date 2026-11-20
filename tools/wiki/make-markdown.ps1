@@ -171,6 +171,7 @@ foreach ($boss in $data.bosses) {
                 Encounter = [string]$act.encounter; Hp = (Get-Hp $boss.key $actNo ([int]$act.baseHp) $firstBaseHp 0)
                 Energy = $act.energy; Hand = $act.handSize; Kind = '主设计'
                 Deck = $act.deck; Relics = $act.relics
+                DeckNote = $act.deckNote; DeckRegistered = $act.deckRegistered
                 Special = $act.special; SpecialDread = $act.specialDread
                 Extras = @(); Script = $act.script; Info = $boss.info
             }
@@ -186,6 +187,7 @@ foreach ($boss in $data.bosses) {
                 Encounter = [string]$v.encounter; Hp = (Get-Hp $boss.key $actNo 0 $firstBaseHp ([int]$v.hpBonus))
                 Energy = $act.energy; Hand = $act.handSize; Kind = '变体'
                 Deck = $v.deck; Relics = $v.relics
+                DeckNote = $v.deckNote; DeckRegistered = $v.deckRegistered
                 Special = $v.special; SpecialDread = $v.specialDread
                 Extras = $extras; Script = $v.script; Info = $boss.info
             }
@@ -236,7 +238,20 @@ foreach ($a in @(1, 2, 3)) {
         if ($d.Info) {
             [void]$sb.AppendLine('- **能力统计**：' + (MdText ($d.Info -replace "`r?`n", ' ｜ ')))
         }
-        [void]$sb.AppendLine('- **卡组**（' + $d.Deck.Count + ' 张）：' + (Merge-Counts $d.Deck))
+        $deckNote = ''
+        if ($d.PSObject.Properties.Name -contains 'DeckNote') { $deckNote = [string]$d.DeckNote }
+        $deckLine = '- **卡组**（' + $d.Deck.Count + ' 张'
+        if ($deckNote.Length -gt 0) { $deckLine = $deckLine + '，' + $deckNote }
+        $deckLine = $deckLine + '）：' + (Merge-Counts $d.Deck)
+        [void]$sb.AppendLine($deckLine)
+        # 与代码登记的卡组不一致时并列出来，方便逐条核对（用户口径：先按洗牌前统计，他再逐条订正）
+        if ($d.PSObject.Properties.Name -contains 'DeckRegistered') {
+            $reg = @($d.DeckRegistered)
+            $sameKeys = ((@($d.Deck) | Sort-Object) -join '|') -eq (($reg | Sort-Object) -join '|')
+            if (-not $sameKeys -and $reg.Count -gt 0) {
+                [void]$sb.AppendLine('- **代码登记卡组**（BossDefs，供对照）：' + (Merge-Counts $reg))
+            }
+        }
         [void]$sb.AppendLine('- **遗物**：' + (Merge-Counts $d.Relics))
         if ($d.Extras.Count -gt 0) {
             [void]$sb.AppendLine('- **进阶 / 恐惧改动**：' + (MdText ($d.Extras -join '；')))
