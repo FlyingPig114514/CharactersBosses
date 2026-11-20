@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Godot;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Nodes.Combat;
@@ -194,6 +194,8 @@ public static class BossFrameTick
                 _tickCalls++;
                 _tickSumMs += ms;
                 if (ms > _tickMaxMs) _tickMaxMs = ms;
+                // v0.2.835：慢帧（≥10ms）立刻打一行分段拆解 —— 只打前 40 行，正常帧零开销
+                try { LogSlowFrameBreakdown(ms); } catch { /* 忽略 */ }
                 if (_tickCalls % 120 == 0)
                 {
                     // ★ v0.2.805：手机上一律不打（这一项实测占整份日志的 29%，203,646 行里 59,064 行），
@@ -464,6 +466,51 @@ public static class BossFrameTick
         }
     }
 
+    // ── 慢帧分段计时（v0.2.835，手机性能） ────────────────────────────────
+    //   背景：手机日志里每 120 帧（≈2 秒）一行的 `帧回调耗时` 一直是 avg≈0.5ms / **max≈20~40ms**，
+    //   偶尔 70~130ms。originally 怀疑是「主线程写日志」，v0.2.830 把落盘搬到后台线程后
+    //   **尖峰一条没少**（本机手机 20:16 之后的中位数还是 31ms）⇒ 假设被证伪，得靠分段计时定位。
+    //   只在「单帧 ≥10ms」时打一行拆解，正常帧一分钱都不花（只是 8 次 Time.GetTicksUsec + 加法）。
+    private static readonly double[] _segMs = new double[8];
+    private static readonly string[] SegNames =
+    {
+        "前置", "面板", "逐帧", "指纹", "巴什", "显示", "慢车道", "收尾"
+    };
+    private static long _segMark;
+    private static int _segLogs;
+
+    /// <summary>切一段：把「上一段到此」的耗时累加进第 i 段。</summary>
+    private static void Seg(int i)
+    {
+        try
+        {
+            long t = (long)Time.GetTicksUsec();
+            if (_segMark != 0) _segMs[i] += (t - _segMark) / 1000.0;
+            _segMark = t;
+        }
+        catch { /* 忽略 */ }
+    }
+
+    /// <summary>慢帧（≥10ms）时把 8 段时间拆解打一行；正常帧什么都不打。</summary>
+    private static void LogSlowFrameBreakdown(double totalMs)
+    {
+        try
+        {
+            if (totalMs < 10.0 || _segLogs >= 40) return;
+            _segLogs++;
+
+            var sb = new System.Text.StringBuilder();
+            sb.Append("[CharBoss] 慢帧拆解 ").Append(totalMs.ToString("0.0")).Append("ms =");
+            for (int i = 0; i < _segMs.Length; i++)
+            {
+                if (_segMs[i] < 0.05) continue;
+                sb.Append(' ').Append(SegNames[i]).Append(_segMs[i].ToString("0.0"));
+            }
+            Logger.Log(sb.ToString());
+        }
+        catch { /* 忽略 */ }
+    }
+
     private static void TickInner(string source)
     {
         try
@@ -478,6 +525,9 @@ public static class BossFrameTick
 
             var now = Time.GetTicksUsec();
             ulong _tickStartUsec = Time.GetTicksUsec();   // 本帧预算基准（2026-11-20）
+
+            // 慢帧分段计时的起点（v0.2.835）
+            try { System.Array.Clear(_segMs, 0, _segMs.Length); _segMark = (long)now; } catch { /* 忽略 */ }
 
             // ①⓪⓪ 出牌队列卡死看门狗（用户 2026-10-30：「杀个小怪怎么卡死了」，日志停在死亡那一行、
             //   之后连帧回调都没有 ⇒ 主线程卡住）。我们不猜原因，只在有卡面滞留在
@@ -535,7 +585,9 @@ public static class BossFrameTick
             // ①① BGM 战后延迟还原（用户 2026-10-30：三层 Boss 战没有胜利音效）。
             //     战斗结束后我们的曲目要再放几秒（让游戏的 `Progress=7` 胜利段落在它上面播完），
             //     到点且确实不在战斗里才 `StopCustomMusic()`。放在慢车道（4Hz）里跑。
-            try { CharacterBosses.Core.BossBgm.TickRestore((long)now); } catch { /* 忽略 */ }
+            try { CharacterBosses.Core.BossBgm.TickRestore((long)now); } catch { /* 忽略 */ }    // 慢帧计时锚点见 Seg()
+
+            Seg(0);
 
             // 多人「多 Boss 同场」：每帧要处理的**不只是面板上那只** ——
             // 第二只 Boss 的随从/奥斯提/站位/死亡清理同样得跑，否则会漏（设计见 multiplayer-lockon.md）。
@@ -575,6 +627,8 @@ public static class BossFrameTick
             // 被击晕 / 击晕解除（吹哨等）→ 手牌全暗、全部意图撤掉；解除时立刻恢复（用户 2026-11-04）。
             // 每帧只读一个 bool，翻转才重建面板 ⇒ 不需要额外的失效标记。
             foreach (var each in everyBoss) RefreshIfStunnedChanged(each);
+
+            Seg(1);   // 面板/药水/晕眩 段结束
 
             // ───────────────── 每帧（跟手，不能降频） ─────────────────
 
@@ -625,6 +679,8 @@ public static class BossFrameTick
             //   玩家反馈「第一幕要重开房间才同步」，根因是开局那条自定义消息丢一次就被去重标记钉死。
             try { CharacterBosses.Core.BossPicksSync.Tick(); } catch { /* 绝不影响战斗 */ }
 
+            Seg(2);   // 逐帧（死亡/随从/锁定/同步）段结束
+
             if (AllowFingerprintChecks((Time.GetTicksUsec() - _tickStartUsec) / 1000.0))
             {
             foreach (var each in everyBoss) RefreshIntentsIfFocusChanged(each);
@@ -669,6 +725,10 @@ public static class BossFrameTick
             }
             catch { /* 忽略 */ }
         }
+
+
+            Seg(3);   // 指纹（意图/能力/面板）段结束
+            Seg(4);   // 巴什重算段结束
 
             // ① 手牌栏跟随 Boss（原先写在 OnFrame 里，等于从没跑过）
             //    多人「双 Boss 两套面板」：**每只 Boss 各跑一次自己的面板**
@@ -732,6 +792,8 @@ public static class BossFrameTick
                 // 和格挡一样的银蓝色的」。
                 try { Core.BossBlockBarTint.Enforce(each); } catch { /* 纯显示，失败不影响 */ }
             }
+
+            Seg(5);   // 显示（面板跟手/炸弹/剑/随从/奥斯提/血条）段结束
 
             // ───────────────── 4Hz 慢车道（纯显示纠正 + 重活） ─────────────────
             if (now - _lastSlowUsec < SlowIntervalUsec) return;
@@ -811,6 +873,8 @@ public static class BossFrameTick
             //     每帧硬写会被原版布局拉回去；每只各自挂特殊效果框的逻辑保留（多人时全部不挂）。
             EnsureSpecialUiForAll(everyBoss);
 
+            Seg(6);   // 4Hz 慢车道段结束
+
             // 多 Boss：**每只都已经有自己完整的一套面板**（手牌 + 遗物/能量/辉星 + 意图），
             // 所以那条「给面板外那只补一条状态栏」的补丁不再需要 —— 收掉它，避免同一只 Boss 出现两条状态栏。
             try
@@ -858,6 +922,7 @@ public static class BossFrameTick
                 if (ReferenceEquals(each, boss)) continue;
                 try { BossSovereignBlade.Ensure(each); } catch { /* 忽略 */ }
             }
+            Seg(7);   // 收尾段结束
         }
         catch (Exception e)
         {
