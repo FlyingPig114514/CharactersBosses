@@ -471,10 +471,13 @@ public static class BossFrameTick
     //   偶尔 70~130ms。originally 怀疑是「主线程写日志」，v0.2.830 把落盘搬到后台线程后
     //   **尖峰一条没少**（本机手机 20:16 之后的中位数还是 31ms）⇒ 假设被证伪，得靠分段计时定位。
     //   只在「单帧 ≥10ms」时打一行拆解，正常帧一分钱都不花（只是 8 次 Time.GetTicksUsec + 加法）。
-    private static readonly double[] _segMs = new double[8];
+    private static readonly double[] _segMs = new double[23];
     private static readonly string[] SegNames =
     {
-        "前置", "面板", "逐帧", "指纹", "巴什", "显示", "慢车道", "收尾"
+        "前置", "面板", "逐帧", "指纹", "巴什", "显示", "慢车道", "收尾",
+        "手牌栏", "炸弹", "滚石", "剑", "随从", "奥斯提-视觉", "奥斯提-站位", "血条",
+        "场景剑扫", "多Boss缩放",
+        "指纹-焦点", "指纹-抽牌", "指纹-换手", "指纹-能力", "指纹-面板"
     };
     private static long _segMark;
     private static int _segLogs;
@@ -684,22 +687,27 @@ public static class BossFrameTick
             if (AllowFingerprintChecks((Time.GetTicksUsec() - _tickStartUsec) / 1000.0))
             {
             foreach (var each in everyBoss) RefreshIntentsIfFocusChanged(each);
+            Seg(18);  // 指纹·焦点
 
             // 灵魂绑定：玩家回合内抽了牌（或她自己又额外抽了牌）→ 死亡行军的伤害预览要跟着变。
             // 放在帧驱动里做（不在抽牌回调里直接重排 UI），并且只在真的有变化时跑一次。
             foreach (var each in everyBoss) RefreshIntentsIfDrawsChanged(each);
+            Seg(19);  // 指纹·抽牌
 
             // ★ v0.2.773（红蓝观）：第 12 回合起玩家打出攻击牌 ⇒ **当回合**就把手牌/计划/意图换成
             //   「不惧妖邪无限」那套（用户 2026-11-19：以前要等下一回合才换）。同样放在帧驱动里做。
             foreach (var each in everyBoss) ApplyPendingSwitchReplan(each);
+            Seg(20);  // 指纹·换手重排
 
             // 她身上的**能力层数**变了（玩家的减力量/易伤/虚弱、模组的临时减力量…）→ 意图数字要重算。
             // 用户 2026-10-23：崩坠「哀嚎」减了她 11 点力量，意图还挂着 10×4。
             foreach (var each in everyBoss) RefreshIntentsIfPowersChanged(each);
+            Seg(21);  // 指纹·能力
         // ★ 2026-11-07 用户：「能力机被减力量/集中后，充能球被动的伤害没有及时更新」。
         //   充能球被动那条意图的数字来自面板重建，而面板只在若干事件里重建 ⇒
         //   她身上「力量 / 集中 / 球的构成」被**外部**改动时不刷新。这里按指纹兜底：一变就强制重画。
         foreach (var each in everyBoss) RefreshPanelIfStatsChanged(each);
+            Seg(22);  // 指纹·面板
             }
 
         // ★ v0.2.484（用户 2026-11-08：「为什么我打一张打击伤害−6？」）：
@@ -739,6 +747,7 @@ public static class BossFrameTick
                 {
                     var eachPanel = BossHandUi.PanelFor(panelBoss);
                     if (eachPanel != null && GodotObject.IsInstanceValid(eachPanel)) eachPanel.RunFrame();
+                Seg(8);   // 手牌栏 RunFrame
                 }
                 catch { /* 单套失败不影响其它 */ }
             }
@@ -746,12 +755,14 @@ public static class BossFrameTick
             // ①b 「炸弹」倒计时剩 1 ⇒ 让那个能力图标闪烁（用户 2026-10-29，照 1 代崩坠商人的观感）。
             //     每帧跑（要跟手），节点带缓存；没有炸弹的 Boss 直接返回。
             try { BombBlink.Tick(everyBoss); } catch { /* 忽略 */ }
+            Seg(9);   // 炸弹闪烁
 
             // ①b2 「滚石」的滚向（用户 2026-11-15）：原版动画几何写死「向右滚」，她打出来是反的
             //     ⇒ 隐藏原贴图 + 一个镜像替身跟着它每帧对位（伤害仍由原版节点结算，不受影响）。
             //     滚石只有 0.113+ 的塔罗愚会打 ⇒ 这段只在 111 里编译。
 #if STS2_111
             try { RollingBoulderFacing.Tick(); } catch { /* 纯外观 */ }
+            Seg(10);  // 滚石朝向
 #endif
 
             // ①c 钻石头冠的 20 点格挡**不再在这里补**（v0.2.241）。
@@ -764,6 +775,7 @@ public static class BossFrameTick
 
             // ② 君王之剑剑尖朝左
             BossSovereignBlade.Ensure(boss);
+            Seg(11);  // 君王之剑朝向
 
             // ③ 影子玩家名下的随从（佩尔的士兵）：朝向朝左 + 镜像摆位
             //    （朝向必须每帧钉死：原版 SurroundedPower 会随时把它写正，见 BossShadowPets.ForceFaceLeft）
@@ -772,6 +784,7 @@ public static class BossFrameTick
             foreach (var each in everyBoss)
             {
                 try { BossShadowPets.Update(each); } catch { /* 单只失败不影响其它 */ }
+                Seg(12);  // 影子随从
             }
 
             // ④ 奥斯提：**朝向 + 血条/状态栏每帧确认**（复活出来的节点会被原版写回朝右，
@@ -783,14 +796,17 @@ public static class BossFrameTick
             foreach (var each in everyBoss)
             {
                 try { BossOsty.EnforceVisuals(each); } catch { /* 单只失败不影响其它 */ }
+                Seg(13);  // 奥斯提视觉
 
                 // ⑤ 奥斯提站位：两侧都跑 —— 只在它**跑到 Boss 右手边**时拉回来，
                 //    自己出手时的攻击位移不会被插手（用户实测：复活后整个她回合都挂在右边）。
                 try { BossOsty.EnforcePlacement(each); } catch { /* 单只失败不影响其它 */ }
+                Seg(14);  // 奥斯提站位
                 // 血条配色：她有格挡时前景必须是银蓝色（原版 RefreshBlockUi 只在本机玩家的链路上跑，
                 // 影子玩家收不到 ⇒ 一直是红的）。用户 2026-11-02：「拥有格挡时，boss 的血条应该是
                 // 和格挡一样的银蓝色的」。
                 try { Core.BossBlockBarTint.Enforce(each); } catch { /* 纯显示，失败不影响 */ }
+                Seg(15);  // 血条着色
             }
 
             Seg(5);   // 显示（面板跟手/炸弹/剑/随从/奥斯提/血条）段结束
@@ -915,6 +931,7 @@ public static class BossFrameTick
 
             // 铸造/攻击动画用的剑不是常驻那把节点 → 兜底扫描整个场景把带 Sword/Blade 的节点也翻转
             BossSovereignBlade.MirrorAllInScene();
+            Seg(16);  // 场景剑扫
 
             // ②b 场上**每一只**我们的 Boss 的剑也都要补齐（多 Boss 同场时面板外那只同样需要）
             foreach (var each in everyBoss)
