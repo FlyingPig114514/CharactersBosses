@@ -1,7 +1,7 @@
 {
     "DREAD.IRONCLAD.description":  "Ironclad\u0027s Dominion: at the start of each combat, all enemies gain 1 Demon Form.",
     "DREAD.SILENT.description":  "침묵의 지배: 전투 시작 시 힘을 {Strength} 잃고 약화를 {Weak} 얻는다.",
-    "DREAD.DEFECT.description":  "결함의 지배: 모든 적이 인공물 {Artifact}을 얻는다.",
+    "DREAD.DEFECT.description":  "결함의 지배: 모든 적이 인공물 {Artifact}을 얻는다.（멀티플레이에서는 인원 수에 따라 증가한다）",
     "DREAD.NECROBINDER.description":  "Necrobinder\u0027s Dominion: at the start of your turn, a random card in your hand costs 1 more this turn.",
     "DREAD.REGENT.description":  "왕자의 지배: 당신의 턴 시작 시, 상태이상이나 저주가 아닌 카드 1장을 선택해 「잔해」로 변화시킨다.",
     "DREAD.WATCHER_DEVOTION.description":  "관측자의 지배: 전투 시작 시 모든 적이 [gold]경건[/gold]을 2 얻는다(당신의 턴 시작 시 각 적이 [gold]진언[/gold]을 2 얻는다. 진언이 10이 되면 10을 소모하고 [gold]신격[/gold]에 들어가 그 턴 공격이 세 배의 피해를 준다).",

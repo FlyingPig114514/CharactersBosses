@@ -565,6 +565,17 @@ public static class BossFrameTick
             //   ⚠ 放在 `boss == null` 早退之前 —— 普通小怪战（没有我们的 Boss）也要能看见。
             try { WatchPlayQueue((long)now); } catch { /* 忽略 */ }
 
+            // ①⓪⓪c ★ v0.2.853：玩家那张卡真正卡住的地方 —— `NCombatRoom/Ui/PlayContainer`
+            //   （原版 `NCombatUi.AddToPlayContainer` 把打出去的卡面挂在这儿，靠「离开 play 堆」那步收走，
+            //    而那一笔是替**本机玩家**的出牌准备的，不替影子玩家跑）。
+            try { CharacterBosses.Patches.StrayBossCardQueuePatch.SweepPlayContainer((long)now); } catch { /* 忽略 */ }
+
+            // ①⓪⓪b ★ v0.2.852（用户 2026-11-21 截图：「碎屑储打出的碰撞轨迹还是会卡在天上」）：
+            //   `Reap` 只扫原版出牌队列，而那张大卡根本不在队列里（日志里一条「已从队列里摘掉」都没有）
+            //   ⇒ 补一条**房间级**兜底：1Hz 扫 `NCombatRoom`（跳过手牌容器与出牌队列），
+            //   我方卡面滞留 ≥2.5s 就隐藏并打一行带节点路径的日志。
+            try { CharacterBosses.Patches.StrayBossCardQueuePatch.SweepRoom((long)now); } catch { /* 忽略 */ }
+
             // ①⓪c ★ v0.2.353（用户 2026-11-04：「事件机还是没有结束回合按钮」）：
             //   把「结束回合按钮该不该出现」的每一个前置条件都打出来（1Hz，只在有我们的 Boss 的战斗里）。
             //   反编译 `NEndTurnButton`：

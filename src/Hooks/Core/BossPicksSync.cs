@@ -851,6 +851,8 @@ internal static class BossPicksSync
             sb.Append("sp=").Append(BossConfig.SharePool ? '1' : '0');
             sb.Append(";asc10=").Append(BossConfig.Asc10Act3OneEach ? '1' : '0');
             sb.Append(";wok=").Append(WatcherAllowedHere() ? '1' : '0');
+            // ★ v0.2.849：把房主用的**阵容随机种子**一起广播（客人据此排阵容，避免两端拿到不同种子）
+            try { sb.Append(";seed=").Append(Core.BossLineups.RunSeed); } catch { /* 取不到就不发 */ }
             // ★ v0.2.795：把「本场用几个人」一起广播（阵容条数 = 这个数）
             try { sb.Append(";pc=").Append(Core.BossLineups.PlayersPerFight()); } catch { /* 取不到就不发 */ }
             sb.Append(";maps=");
@@ -982,6 +984,17 @@ internal static class BossPicksSync
                 switch (name)
                 {
                     case "sp": HostSharePool = value == "1"; break;
+                    case "seed":
+                        // ★ v0.2.849（玩家反馈 2026-11-21：「联机时只有我看到的是猎手，别人看到的是骨头」
+                        //   + 日志里出现过 `阵容随机种子 = 1（**固定值**：读不到本局种子，人数=4）`）：
+                        //   **阵容随机种子由房主广播**。以前客人自己读 `RunState.Rng.Seed`，读不到就退到常量 1
+                        //   ⇒ 两端按不同种子排阵容 ⇒ 场上的 Boss 都不一祥 ⇒ 立刻不同步。
+                        //   现在房主把自己的种子放进来，客人直接照用（只认第一次，之后同值忽略）。
+                        if (ulong.TryParse(value, out ulong hostSeed) && hostSeed != 0)
+                        {
+                            try { Core.BossLineups.AdoptHostSeed(hostSeed); } catch { /* 忽略 */ }
+                        }
+                        break;
                     case "pc":
                         // ★ v0.2.795：房主的人数（阵容按它推导；玩家掉线/重连时两端可能不一致）
                         if (int.TryParse(value, out int hostPc) && hostPc > 0) HostPlayersPerFight = hostPc;

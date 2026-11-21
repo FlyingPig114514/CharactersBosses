@@ -20,8 +20,13 @@
 | `defect_bronze_orbs` | 物理机 | `DefectClawBossEncounter` |
 | `defect_focus` | 能力机 | `DefectAiBossEncounter` |
 | `silent_poison` | 涂毒猎（二层静默猎手 1 号） | `SilentEnvenomBossEncounter` |
+| `silent_snakebite` | 蛇咬猎（一层静默猎手 2 号） | `SilentSnakebiteBossEncounter` |
 | `silent_mirror_image` | 奇巧猎（一层静默猎手） | `SilentSlyBossEncounter` |
 | `silent_shiv` | 刀猎（三层静默猎手 1 号） | `SilentShivBossEncounter` |
+| `ironclad_anger` | 愤怒战（一层铁甲战士 1 号） | `IroncladAngerBossEncounter` |
+| `ironclad_strike` | 打击战（一层铁甲战士 2 号） | `IroncladStrikeBossEncounter` |
+| `defect_thunder` | 电球机（一层故障机器人 2 号） | `DefectThunderBossEncounter` |
+| `fool_tarot` | 塔罗愚（三层） | `FoolTarotBossEncounter` |
 | `soul_bone` | 灵魂骨 | `NecrobinderSoulBossEncounter` |
 | `osty_bone` | 养手骨 | `NecrobinderOstyBossEncounter` |
 | `eradicate_bone` | 根除骨 | `NecrobinderEradicateBossEncounter` |
@@ -44,6 +49,21 @@
   按 §5 走一遍流程接到那个遭遇上。
 
 ## 5. 新增一张图标要走完整条链（缺一步地图上就不显示）
+
+> **2026-11-21 起这条链已经脚本化了**，不要再手工拷文件：
+> `tools\art\compose-batch2.ps1`（或你自己的绘图脚本）出图 → `tools\art\make-outline.ps1 -Band 5`
+> 生成 `_outline` → 拷进 `import_proj` → `tools\art\register-map-icon.ps1 -Names <名>`（它会跑
+> Godot `--import` 并从 `.import` 里读 ctex 的 hash 往 `pck_extras.txt` 追加 6 行，已存在就跳过）。
+> 出图/挑图时用 `tools\art\make-icon-sheet.ps1` 把白+alpha 的图标拼到深底上看（直接看 png 是一片纯白）。
+> 装完可以用 `tools\art\check-map-icons.gd` 做静态验证（从 pck 里 `load()` 一次主图与描边）：
+> `Godot --headless --path tools\pck_builder --script <绝对路径>\check-map-icons.gd -- <mod.pck> <名...>`
+> ⚠ 两个 PowerShell 坑：①`$band`/`$Band`、`$names`/`$Names` 这种**同名不同大小写**会把参数清空或
+> 触发类型转换错误；②含中文的 .ps1 必须存成 **UTF-8 with BOM**，否则 PS 5.1 按 ANSI 读会报语法错。
+>
+> **素材口径**（2026-11-21 用户两次纠错后确认）：说到「飞镖」= **「飞镖」（Flechettes）卡图里那把飞刀**
+> （`card_flechettes_big.png` → `tools\art\make-flechette-knife.ps1` 取亮部 + **只留最大连通块** ⇒
+> `refs\flechette_knife.png`），**不是** `dart_tip45.png` 那对蛇头柄匕首；按比例裁剪那张图会切掉刀尖。
+> 另：白色形状放在白色头像底下时，**短于头像宽度的形状会被完全盖住**（实测刀宽 60~125 的产物墨点完全相同）。
 
 1. 从 `D:\SteamLibrary\steamapps\workshop\content\646570\1610056683\Downfall.jar` 取
    `downfallResources/images/ui/map/icon/<名>.png` 与 `.../outline/<名>_outline.png`（512×512）；

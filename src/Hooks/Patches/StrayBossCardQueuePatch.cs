@@ -275,6 +275,238 @@ internal static class StrayBossCardQueuePatch
 
     private static int _afterCombatLogs;
 
+    // ── 「卡面吊在屏幕中间」的第二条路：全房间扫（v0.2.852）──────────────────
+    //
+    // 用户 2026-11-21 截图：「碎屑储打出的碰撞轨迹还是会卡在天上」，那张大卡停在战场中央、
+    // 既不在原版出牌队列里（`Reap` 一次都没摘到过东西，日志里没有一条「已从队列里摘掉」，看门狗也没报），
+    // 也不是我们自己的飞牌动画（`出牌动画` 那行一次都没出现 ⇒ 斗蛐蛐没装、`Fly` 直接收走了）。
+    // ⇒ 说明它是**原版**为「非本机玩家出牌」建的卡面，只是挂在 `NCombatRoom` 的某个容器里，
+    //   而 `Reap` 只扫 `NCardPlayQueue` ⇒ 谁也管不到它。
+    //
+    // 所以补一条**房间级**的兜底扫描（1Hz，只在我们的 Boss 战里跑）：
+    //   · 跳过 `NCardPlayQueue` 子树（那是 `Reap` 的地盘，它有自己的摘除流程）与任何名字带 `Hand` 的子树
+    //     （真人的手牌，一个像素都不动）；
+    //   · 只盯「认得出是我们的牌」或「Model 已经被原版清掉」的卡面（出牌结束后原版会清 Model）；
+    //   · 滞留 ≥2.5 秒 ⇒ 打一行带**节点路径**的日志（下次能直接看出是哪个容器漏了），然后隐藏它。
+    //     隐藏而不是释放：那个容器可能还记着这个节点，提前 QueueFree 更危险。
+    private static readonly System.Collections.Generic.Dictionary<GodotObject, long> _roomSeen = new();
+    private static readonly System.Collections.Generic.HashSet<string> _roomLogged = new(StringComparer.Ordinal);
+    private static long _lastRoomSweepUsec;
+
+    /// <summary>房间级兜底扫描：滞留在 `NCombatRoom` 里的我方卡面（1Hz，幂等）。</summary>
+    internal static void SweepRoom(long nowUsec)
+    {
+        if (nowUsec - _lastRoomSweepUsec < 1_000_000L) return;
+        _lastRoomSweepUsec = nowUsec;
+
+        try
+        {
+            // 只在**我们的 Boss 战**里扫（别的模组的战斗/幕一律不碰，和 `WatchPlayQueue` 同一个门）。
+            if (!Core.BossShadowPets.BossFightActive(
+                    MegaCrit.Sts2.Core.Combat.CombatManager.Instance?.DebugOnlyGetState()))
+            {
+                _roomSeen.Clear();
+                return;
+            }
+
+            var room = MegaCrit.Sts2.Core.Nodes.Rooms.NCombatRoom.Instance;
+            if (room == null || !GodotObject.IsInstanceValid(room)) { _roomSeen.Clear(); return; }
+
+            var found = new System.Collections.Generic.List<NCard>();
+            var paths = new System.Collections.Generic.Dictionary<NCard, string>();
+            CollectRoomCards(room, 0, found, paths);
+
+            var alive = new System.Collections.Generic.HashSet<GodotObject>();
+            foreach (var card in found)
+            {
+                if (!GodotObject.IsInstanceValid(card)) continue;
+                alive.Add(card);
+
+                bool ours = false;
+                try { ours = IsOurBossCard(card) || KnownOurs.Contains(card); } catch { /* 忽略 */ }
+                bool modelGone = false;
+                try { modelGone = card.Model == null; } catch { modelGone = true; }
+                if (!ours && !modelGone) continue;
+                if (ours) KnownOurs.Add(card);
+
+                if (!_roomSeen.TryGetValue(card, out long since)) { _roomSeen[card] = nowUsec; continue; }
+                long age = nowUsec - since;
+                if (age < 2_500_000L) continue;
+
+                string entry = "?";
+                try { entry = card.Model?.Id.Entry ?? "<Model 已清>"; } catch { /* 忽略 */ }
+                string path = paths.TryGetValue(card, out string? p) ? p : card.GetPath().ToString();
+                if (_roomLogged.Count < 15 && _roomLogged.Add(path + "#" + entry))
+                {
+                    Logger.Log($"[CharBoss] ⚠ 卡面滞留：{entry} 在 {path} 已 {(age / 1_000_000.0):0.0}s" +
+                               $"（scale={card.Scale} pos={card.GlobalPosition}）" +
+                               "。这一行的路径就是原版把它挂在哪儿了（**只看不动手**：v0.2.854 起这里只报告，" +
+                               "真正的回收交给 `PlayContainer` 直接子节点那条路，免得误伤我们自己的手牌栏）");
+                }
+                // ★ v0.2.854：**只报告、不隐藏**。上一版在这里直接隐藏，
+                //   结果把她手牌栏里的 5 张卡面（正好是整手牌）当滞留卡面隐藏了
+                //   ⇒ 玩家看到「一提起卡牌，她的意图/卡面就没了」。
+                _roomSeen[card] = nowUsec + 10_000_000L;   // 报过就别反复报
+            }
+
+            if (_roomSeen.Count > alive.Count)
+            {
+                var gone = new System.Collections.Generic.List<GodotObject>();
+                foreach (var kv in _roomSeen) if (!alive.Contains(kv.Key)) gone.Add(kv.Key);
+                foreach (var g in gone) _roomSeen.Remove(g);
+            }
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 房间卡面扫描失败（忽略）: " + e.Message);
+        }
+    }
+
+    /// <summary>递归收集房间里的卡面（跳过出牌队列与任何手牌容器）。</summary>
+    private static void CollectRoomCards(Godot.Node node, int depth,
+        System.Collections.Generic.List<NCard> into,
+        System.Collections.Generic.Dictionary<NCard, string> paths)
+    {
+        if (node == null || depth > 6) return;
+        try
+        {
+            foreach (var child in node.GetChildren())
+            {
+                if (!GodotObject.IsInstanceValid(child)) continue;
+                string name = child.Name.ToString();
+                if (name.Contains("Hand", StringComparison.OrdinalIgnoreCase)) continue;   // 真人手牌
+                // ★ v0.2.854：`PlayContainer` 子树整段跳过 —— 我们自己的手牌栏面板就挂在它底下
+                //   （`UI/BossHudLayer.Resolve`），由 `ClearOurCardsFromPlayContainer` 只对它的**直接子节点**动手。
+                if (name == "PlayContainer") continue;
+                if (child is NCardPlayQueue) continue;                                    // Reap 的地盘
+                if (child is NCard card)
+                {
+                    into.Add(card);
+                    if (!paths.ContainsKey(card)) paths[card] = card.GetPath().ToString();
+                    continue;
+                }
+                CollectRoomCards(child, depth + 1, into, paths);
+            }
+        }
+        catch { /* 忽略 */ }
+    }
+
+    // ── 真正卡住那张牌的容器：`NCombatRoom/Ui/PlayContainer`（v0.2.853）────────────
+    //
+    // 反编译找到了原版把**打出去的卡面**放在哪儿（`NCombatUi`）：
+    // <code>
+    // public void AddToPlayContainer(NCard card) { PlayContainer.AddChildSafely(card); }
+    // private IEnumerable&lt;NCard&gt; PlayContainerCards =&gt; PlayContainer.GetChildren().OfType&lt;NCard&gt;();
+    // </code>
+    // 牌在结算期间 `Pile.Type == Play`，**离开 play 堆那一步才把它从展示区收走** ——
+    // 而我们的 Boss 是影子玩家（`CardCmd.AutoPlay`），那条「离开 play 堆 ⇒ 收走卡面」的流程
+    // 是替**本机玩家的出牌**准备的，不替她跑 ⇒ 卡面永久留在战场中央那张大卡的位置。
+    // 这正好解释了玩家 2026-11-21 的截图：那张「碰撞轨迹」既不在出牌队列（`Reap` 一次都没摘到）、
+    // 也不是我们的飞牌动画（`BossHandPlayFx` 没装斗蛐蛐时直接收走）。
+    //
+    // 多人比单人更容易看到：多人时每台机器上她的每一手都是「**别人**打的牌」，
+    // 展示区的接手/收尾全在本机玩家的出牌流程里 ⇒ 没人收；单人时同一张牌常常赶上本机路径被原版收掉。
+    private static readonly System.Collections.Generic.Dictionary<GodotObject, long> _pcSeen = new();
+    private static long _lastPcSweepMs;
+    private static int _pcLogs;
+
+    private static Control? PlayContainerOrNull()
+    {
+        try
+        {
+            var container = MegaCrit.Sts2.Core.Nodes.Rooms.NCombatRoom.Instance?.Ui?.PlayContainer;
+            if (container == null || !GodotObject.IsInstanceValid(container) || !container.IsInsideTree()) return null;
+            return container;
+        }
+        catch { return null; }
+    }
+
+    /// <summary>
+    /// 把展示区（`PlayContainer`）里**我们 Boss 打出的**卡面收掉。
+    /// <paramref name="minAgeMs"/> = 0 表示立刻全收（她开始打下一张牌时用这个）；
+    /// 大于 0 时只收「已经停留超过这么久」的（1Hz 兜底用，不会打断正在播的动画）。
+    /// </summary>
+    internal static void ClearOurCardsFromPlayContainer(string why, long minAgeMs = 0)
+    {
+        var container = PlayContainerOrNull();
+        if (container == null) { _pcSeen.Clear(); return; }
+
+        long now = System.Environment.TickCount64;
+        try
+        {
+            // ⚠⚠ v0.2.854（用户 2026-11-21：「我一提起卡牌储君的意图就消失了」——是我们上一版的锅）：
+            //   原版 `AddToPlayContainer` 挂进去的「打出去的卡面」是 `PlayContainer` 的**直接子节点**，
+            //   而**我们自己的手牌栏面板（含意图行）也挂在 `PlayContainer` 底下**（见 `UI/BossHudLayer.Resolve`：
+            //   战斗 UI 可见时父节点就是 `%PlayContainer`）⇒ v0.2.852/853 的递归扫描把**她手里那 5 张牌的卡面**
+            //   当成了滞留卡面（日志实证：`⚠ 卡面滞留：HIDDEN_CACHE/DEFEND_REGENT/COLLISION_COURSE/…` 5 张，
+            //   正好是她第 1 回合的整手牌，路径是 `…/PlayContainer/@Control@4493/@Control@4519/Card`）
+            //   然后隐藏/回收 ⇒ 手牌栏的卡面（连带那一排意图的位置）就没了。
+            //   ⇒ 现在**只看 `PlayContainer` 的直接子节点里的 `NCard`**（原版契约），我们的面板在更深的层级，碰不到。
+            foreach (var child in container.GetChildren())
+            {
+                if (child is not NCard card) continue;   // ← 只认直接子节点（v0.2.854）
+                if (!GodotObject.IsInstanceValid(card)) continue;
+
+                bool ours = false;
+                try { ours = IsOurBossCard(card) || KnownOurs.Contains(card); } catch { /* 忽略 */ }
+                if (!ours) continue;
+                KnownOurs.Add(card);
+
+                if (!_pcSeen.TryGetValue(card, out long since)) { _pcSeen[card] = now; since = now; }
+                if (minAgeMs > 0 && now - since < minAgeMs) continue;
+
+                string entry = "?";
+                try { entry = card.Model?.Id.Entry ?? "?"; } catch { /* 忽略 */ }
+                _pcSeen.Remove(card);
+
+                try
+                {
+                    container.RemoveChild(card);
+                    card.QueueFree();
+                    if (_pcLogs++ < 30)
+                    {
+                        Logger.Log($"[CharBoss] 出牌展示区：{entry} 打出后没人从 PlayContainer 收走" +
+                                   $"⇒ 我们自己收掉（{why}）");
+                    }
+                }
+                catch (Exception e)
+                {
+                    try
+                    {
+                        card.Visible = false;
+                        card.Modulate = new Color(1f, 1f, 1f, 0f);
+                    }
+                    catch { /* 忽略 */ }
+                    if (_pcLogs++ < 30)
+                        Logger.Log($"[CharBoss] 出牌展示区：{entry} 移除失败（已隐藏）: " + e.Message);
+                }
+            }
+
+            // 已经不在展示区的记账项清掉
+            if (_pcSeen.Count > 0)
+            {
+                var alive = new System.Collections.Generic.HashSet<GodotObject>();
+                foreach (var child in container.GetChildren())
+                    if (child is NCard c && GodotObject.IsInstanceValid(c)) alive.Add(c);
+                var dead = new System.Collections.Generic.List<GodotObject>();
+                foreach (var kv in _pcSeen) if (!alive.Contains(kv.Key)) dead.Add(kv.Key);
+                foreach (var d in dead) _pcSeen.Remove(d);
+            }
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 出牌展示区清理失败（忽略）: " + e.Message);
+        }
+    }
+
+    /// <summary>1Hz 兜底：展示区里我方卡面停留 ≥1.5s 就收掉（<paramref name="nowUsec"/> = `Time.GetTicksUsec()`）。</summary>
+    internal static void SweepPlayContainer(long nowUsec)
+    {
+        if (nowUsec - _lastPcSweepMs < 1_000_000L) return;
+        _lastPcSweepMs = nowUsec;
+        ClearOurCardsFromPlayContainer("1Hz 兜底", 1_500L);
+    }
+
     /// <summary>这张卡面是不是「我们 Boss 打出的牌」。</summary>
     /// <c>internal</c>：出牌队列看门狗（<see cref="BossFrameTickPatch"/> 的 <c>WatchPlayQueue</c>）
     /// 也用同一个判据 —— 两边必须一致，否则会把真人玩家的牌当成我们 Boss 的牌报出去。

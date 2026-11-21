@@ -33,6 +33,71 @@ public abstract partial class CharBossMonster
             return;
         }
 
+        // ★ v0.2.848（用户 2026-11-21：「装了『小姐姐』之后，boss 第一回合的意图变成第七回合的」）
+        //
+        // `PrepareTurn` 唯一的入口是 `BossThinkState.GetNextState`，正常一回合只进一次。
+        // 但「小小姐的战斗提示」那类模组会为了显示提示**反复询问怪物的下一次行动** ⇒ 这里被多调几次
+        // ⇒ `TurnNumber++` 连跳（实测跳到第 7 回合）⇒ 剧本按错的回合取牌 ⇒ 意图整段错位。
+        //
+        // 闸门：以**真人玩家的回合号**为幂等判据 —— 同一个真人回合里再进来就整段跳过，
+        // 计划/手牌/回合号原样保留（和上面「被击晕」那条闸门同一性质）。多 Boss 时每只各记各的。
+        try
+        {
+            int realTurn = 0;
+            try
+            {
+                var anyPlayer = System.Linq.Enumerable.FirstOrDefault(
+                    CombatState?.Players ?? System.Array.Empty<global::MegaCrit.Sts2.Core.Entities.Players.Player>());
+                realTurn = anyPlayer?.PlayerCombatState?.TurnNumber ?? 0;
+            }
+            catch { realTurn = 0; }
+
+            // ★ v0.2.851（用户 2026-11-21：「怎么 boss 的意图还在变，而且是在我打出腾跃之后？
+            //   难道是观者 mod 引起的问题？」）
+            //
+            //   腾跃 / 龙涎香 / 倒吊人 / 佩尔之眼给的是**额外回合**：玩家那条命没过去，怪物也不该多算一回合。
+            //   原版自己就是这么做的（反编译 `CombatManager.StartTurn` 5316 行）：
+            //     `if (!isExtraPlayerTurn) foreach (敌人) enemy.PrepareForNextTurn(playerCreatures);`
+            //   而**额外回合照样会把真人玩家的 `PlayerCombatState.TurnNumber` +1**（同方法 5311 行读它画回合横幅）
+            //   ⇒ 只要有任何模组在额外回合里问一次「怪物下一步干什么」（`RollMove`→`GetNextState`），
+            //   下面那道「真人回合号变了」的幂等闸门就会**放行** ⇒ `TurnNumber++` ⇒ 她凭空跳过一回合的剧本
+            //   ⇒ 玩家看到的就是「打出腾跃之后意图变了」，而且等真·下一回合开始时**又变一次**。
+            //   所以这里补一道**额外回合闸门**（与「被击晕」同一性质：整段跳过，计划原样保留）。
+            bool extraTurn = false;
+            try { extraTurn = Core.ExtraTurnWatch.IsExtraPlayerTurn; } catch { extraTurn = false; }
+            if (extraTurn && PlanReady)
+            {
+                Logger.Log($"[CharBoss] 额外回合：这次「玩家回合开始」是额外回合" +
+                           $"（腾跃/龙涎香/倒吊人/佩尔之眼）⇒ 她这一回合不重排" +
+                           $"（真人第 {realTurn} 回合，她第 {TurnNumber} 回合，保留 {Plan.Count} 张）" +
+                           $" | 调用者:" + TopFrames());
+                return;
+            }
+
+            if (realTurn > 0)
+            {
+                if (realTurn == PreparedRealTurn)
+                {
+                    Logger.Log($"[CharBoss] 同一回合里被重复要求规划（真人第 {realTurn} 回合，她第 {TurnNumber} 回合，" +
+                               $"额外回合={(extraTurn ? "是" : "否")}）" +
+                               $"⇒ 跳过重建，按**原计划**重刷意图（{Plan.Count} 张）" +
+                               $"（多半是「小小姐的战斗提示」这类模组在反复询问意图）");
+                    // ★ v0.2.850（用户 2026-11-21 第二轮：「装载小姐姐时 boss 的意图又在回合中变化了」）：
+                    //   光 return 不够 —— 外部那次重掷可能已经把 `NextMove` / 它的意图清掉或换掉，
+                    //   于是玩家这一回合里看到的意图会「变」。这里按**当前 Plan** 重刷一次（幂等），
+                    //   把显示钉回她这一回合真正会打的东西。
+                    try { PublishVanillaIntents(); } catch { /* 忽略 */ }
+                    return;
+                }
+                PreparedRealTurn = realTurn;
+            }
+            // ★ v0.2.851 诊断：她**真的**按新回合重排时打一行（正常每回合 1 行；被打断的回合里会有多行，
+            //   那就说明有别的东西在反复触发重排）。带调用栈 ⇒ 下次复现能一眼看出是谁。
+            Logger.Log($"[CharBoss] 准备回合重建：真人第 {realTurn} 回合 → 她第 {TurnNumber + 1} 回合" +
+                       $"（额外回合={(extraTurn ? "是" : "否")}）| 调用者:" + TopFrames());
+        }
+        catch { /* 读不到真人回合号就按老逻辑走 */ }
+
         Plan.Clear();
         PlanReady = true;
         try
@@ -706,17 +771,59 @@ public abstract partial class CharBossMonster
                 return;
             }
 
-            if (state != null) field.SetValue(state, all);
+            // ★ v0.2.851（用户 2026-11-21：「boss 的意图还在变」的**显示侧**那一半）：
+            //   以前只要 `Plan` 暂时为空就发一份**空意图**出去 —— 而那行日志实证（14:38:41 / 14:38:57）：
+            //     `⚠ 意图在她第 1 回合**内**变化：[DefendIntent|] → []`
+            //   就发生在「她这一手的最后一张牌刚打完」那一刻（面板同时打了「计划 0 张」）。
+            //   玩家眼里就是意图图标**先消失再出现**（= 变了一次），第三方（薄荷尖塔）也会瞬间清零。
+            //   现在：**计划为空不等于「她没有任何意图」** —— 除非她被击晕（那种情况空意图才是真的）。
+            //   保留上一次发布的内容，等下一次真·重排再覆盖。
+            bool publishEmpty = all.Count == 0 && !stunned;
+            if (publishEmpty)
+            {
+                if (_emptyPublishLogs++ < 4)
+                {
+                    Logger.Log("[CharBoss] 计划暂时为空 ⇒ **不清空**已发布的原版意图" +
+                               "（避免回合内意图「消失再出现」）");
+                }
+            }
+            else if (state != null) field.SetValue(state, all);
+
+            // ★ v0.2.850（用户 2026-11-21：「装载小姐姐时，boss 的意图又在回合中变化了」）：
+            //   把**同一回合内**意图内容的变化抓出来 —— 谁把意图改了、从什么变成什么。
+            //   只在她这一回合还没结束、且内容真的变了的时候打一行（每条最多几次），
+            //   下一次复现时这一行就能指出是「我们自己的重算」还是「外部模组改的」。
+            if (!publishEmpty)
+            {
+                try
+                {
+                    var fp = new System.Text.StringBuilder();
+                    foreach (var it in all) fp.Append(FpOf(it)).Append('|');
+                    string now = fp.ToString();
+                    if (TurnNumber == _lastPublishedTurn && _lastPublishedFp != null && _lastPublishedFp != now &&
+                        _intentChangeLogs++ < 12)
+                    {
+                        Logger.Log($"[CharBoss] ⚠ 意图在她第 {TurnNumber} 回合**内**变化：" +
+                                   $"[{_lastPublishedFp}] → [{now}] | 调用栈:" + TopFrames());
+                    }
+                    _lastPublishedFp = now;
+                    _lastPublishedTurn = TurnNumber;
+                }
+                catch { /* 诊断失败忽略 */ }
+            }
 
             MoveState? next = null;
             try { next = NextMove; } catch { next = null; }
             if (next != null && !ReferenceEquals(next, state))
             {
-                field.SetValue(next, all);
-                if (_nextMoveMismatchLogs++ < 8)
+                if (!publishEmpty)
                 {
-                    Logger.Log("[CharBoss] 原版意图：NextMove 与状态机日志里那个 MoveState **不是同一个实例** ⇒ " +
-                               "已把本回合意图同时写进 NextMove（否则「他这一手算不算攻击」对第三方恒为否）");
+                    field.SetValue(next, all);
+                    if (_nextMoveMismatchLogs++ < 8)
+                    {
+                        Logger.Log("[CharBoss] 原版意图：NextMove 与状态机日志里那个 MoveState **不是同一个实例** ⇒ " +
+                                   "已把本回合意图同时写进 NextMove（否则「他这一手算不算攻击」对第三方恒为否）");
+                    }
                 }
             }
         }
@@ -728,6 +835,57 @@ public abstract partial class CharBossMonster
 
     /// <summary>「NextMove 与日志里的 MoveState 不是同一个实例」这条诊断最多打几次。</summary>
     private static int _nextMoveMismatchLogs;
+
+    // ── 意图「回合内变化」诊断（v0.2.850）────────────────────────────
+    private string? _lastPublishedFp;
+    private int _lastPublishedTurn = -1;
+    private int _intentChangeLogs;
+
+    /// <summary>「计划暂时为空 ⇒ 不清空意图」这条诊断最多打几次（v0.2.851）。</summary>
+    private static int _emptyPublishLogs;
+
+    /// <summary>一个意图的短指纹（类型 + 常见数值字段），只用于比较「变没变」。</summary>
+    private static string FpOf(MegaCrit.Sts2.Core.MonsterMoves.Intents.AbstractIntent? it)
+    {
+        if (it == null) return "-";
+        var t = it.GetType();
+        string s = t.Name;
+        foreach (var name in new[] { "Damage", "Amount", "Repeat", "Hits" })
+        {
+            try
+            {
+                var p = t.GetProperty(name, System.Reflection.BindingFlags.Instance |
+                                            System.Reflection.BindingFlags.Public |
+                                            System.Reflection.BindingFlags.NonPublic);
+                if (p == null || p.GetIndexParameters().Length > 0) continue;
+                var v = p.GetValue(it);
+                if (v != null) s += ":" + name + "=" + v;
+            }
+            catch { /* 忽略 */ }
+        }
+        return s;
+    }
+
+    /// <summary>调用栈前几帧（跳过我们自己的诊断方法），用来说明「谁改的意图」。</summary>
+    private static string TopFrames()
+    {
+        try
+        {
+            var lines = Environment.StackTrace.Split('\n');
+            var sb = new System.Text.StringBuilder();
+            int taken = 0;
+            foreach (var raw in lines)
+            {
+                var line = raw.Trim();
+                if (line.Length == 0) continue;
+                if (line.Contains("FpOf") || line.Contains("TopFrames") || line.Contains("PublishVanillaIntents")) continue;
+                sb.Append(" « ").Append(line.Length > 90 ? line.Substring(0, 90) : line);
+                if (++taken >= 3) break;
+            }
+            return sb.ToString();
+        }
+        catch { return string.Empty; }
+    }
 
     /// <summary>
     /// 她**这一手会不会真的打出攻击牌**（给 `BossIntendsToAttackPatch` 用）。

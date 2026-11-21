@@ -65,6 +65,26 @@ internal static class BossLineups
     /// </summary>
     internal static ulong RunSeed => CurrentSeed();
 
+    /// <summary>
+    /// 客人端：采用**房主广播下来的**阵容随机种子（<c>BossPicksSync</c> 的 <c>Settings</c> 里 <c>seed=</c>）。
+    ///
+    /// 为什么需要：玩家反馈 2026-11-21「联机时只有我看到的是猎手，别人看到的是骨头」+ 日志实证
+    /// <c>阵容随机种子 = 1（**固定值**：读不到本局种子，人数=4）</c>。以前客人自己读
+    /// <c>RunState.Rng.Seed</c>，某些客户端读不到就退到常量 1 ⇒ 两端按不同种子排阵容 ⇒
+    /// **场上的 Boss 都不一样** ⇒ 进战斗立刻分叉。现在以房主的种子为准。
+    /// </summary>
+    internal static void AdoptHostSeed(ulong hostSeed)
+    {
+        if (hostSeed == 0) return;
+        if (hostSeed == _runSeed) return;
+        bool changed = _runSeed != 0;
+        _runSeed = hostSeed;
+        lock (Cache) { Cache.Clear(); }
+        Logger.Log($"[CharBoss] 阵容随机种子 = {_runSeed}（来源：**房主广播**" +
+                   (changed ? $"，覆盖本机算出来的 {_runSeed} 之前的值" : string.Empty) +
+                   "）—— 两端必须按同一条阵容排 Boss，否则进战斗立刻不同步");
+    }
+
     private static ulong CurrentSeed()
     {
         var state = MultiBossPlan.RunStateOrNull();

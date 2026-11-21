@@ -1,7 +1,7 @@
 {
     "DREAD.IRONCLAD.description":  "Ironclad\u0027s Dominion: at the start of each combat, all enemies gain 1 Demon Form.",
     "DREAD.SILENT.description":  "Dominio de la Silenciosa: al inicio de cada combate pierdes {Strength} de Fuerza y ganas {Weak} de Debilidad .",
-    "DREAD.DEFECT.description":  "Dominio del Defecto: todos los enemigos ganan {Artifact} Artefacto.",
+    "DREAD.DEFECT.description":  "Dominio del Defecto: todos los enemigos ganan {Artifact} Artefacto. (En multijugador aumenta según el número de jugadores.)",
     "DREAD.NECROBINDER.description":  "Necrobinder\u0027s Dominion: at the start of your turn, a random card in your hand costs 1 more this turn.",
     "DREAD.REGENT.description":  "Dominio del Príncipe: al inicio de tu turno, elige 1 carta que no sea Estado ni Maldición y transfórmala en Escombros.",
     "DREAD.WATCHER_DEVOTION.description":  "Dominio de la Observadora: al inicio de cada combate, todos los enemigos ganan 2 de [gold]Devoción[/gold] (al inicio de tu turno cada enemigo gana 2 de [gold]Mantra[/gold]; con 10 de [gold]Mantra[/gold] gasta 10 y entra en [gold]Divinidad[/gold], infligiendo el triple de daño ese turno).",

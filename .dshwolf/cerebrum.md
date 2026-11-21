@@ -13,6 +13,8 @@ Learned preferences, project conventions, and corrections.
 - 打包（Compress-Archive 出 .dist\CharacterBosses-vX.zip）必须等用户明确要求，默认不打包；只构建 + 装进游戏。
 ## Conventions
 
+- Godot mono（tools\godot\..._console.exe）跑 --import / --script 前必须把 `tools\dotnet` 加进 PATH 且设 `DOTNET_ROOT`，否则报「ERROR: .NET Sdk not found. The required version is '9.0.8'」；它还会往 stderr 打无害噪音（root certificate store / editor_settings 保存失败被沙箱挡）⇒ 包它的脚本不能是 ErrorActionPreference=Stop，要临时降级为 Continue。
+- 地图图标别指望 SD1.5 img2img「润色」：本机 ComfyUI 只有 `v1-5-pruned-emaonly` + `control_v11p_sd15_lineart`、**没装任何自定义节点**（无 IPAdapter / CLIP-vision，喂参考图学风格这条路不存在）。实测 denoise 0.45~0.50 几乎原样返回、0.70 把战士角盔重画成黑盾、0.85 直接画成恶魔脸、蛇头匕首变爪子 ⇒ 风格细节来自**素材自带的内部线稿**，正确做法是结构拼接出 icon 规格（保留 alpha 镂空细节），不要过 AI。
 - 创意工坊页面显示的更新日志来自 workshop\workshop.json 的 changeNote 字段（上传器 SubmitItemUpdate 只读它）；workshop\changenote.txt 只是人读副本，改它不会上线。上传前两处都要同步。
 - 【本模组排查口诀】「规划日志说对了、面板上却是错的」⇒ 一定是 `BladesGrowth.RecomputeAll`（无球 Boss）或 `CharBossMonster.RefreshPlannedIntents`（有球 Boss）这条**每帧重算**的路少传了参数，把规划期的 `PlannedPlay.Intents` 盖掉了。新增任何「牌面上没有对应变量、只能由剧本算出来」的意图数值（shivOverride / extraHits / discardsThisTurn / simBlock…）时，**三条路都要传**：BossScriptPlanner 规划、BladesGrowth、有球分支；核对办法是先看日志里的 `剧本第 N 回合: 打 [...]` 与 `意图 X: [...]` 是否与面板一致。
 - Boss 名与特殊效果名相互独立：「状态机」是 Boss 名，「同步」是它的特殊效果名；特殊效果名一般与某张卡牌同名（例外：死亡收割，是 1 代卡），但效果可与该卡无关。不要用一方推断另一方，等用户明确告知。
@@ -46,6 +48,9 @@ Learned preferences, project conventions, and corrections.
 - 本 mod 里 Boss 的影子 Player 也满足 Creature.IsPlayer（Creature.Player != null）⇒ 会出现在 CombatState.Players 里；凡「玩家」判定必须用 BossLockOn.RealPlayers（Creature.Monster == null 过滤），判断是否多人要用 MultiBossPlan.WantsSecondBoss（读 RunState.Players）。
 ## Do-Not-Repeat
 
+- 地图图标里用户说的「飞镖」= **「飞镖」（Flechettes）卡图里那把飞刀**（`card_flechettes_big.png` → `tools/art/make-flechette-knife.ps1` 取亮部 + 只留最大连通块 → `refs/flechette_knife.png`），不是 `dart_tip45.png` 那对**蛇头柄匕首**。用 `Crop-Mask -KeepRight 0.52` 按比例裁 `dart_tip*` 会**切掉刀尖**（2026-11-21 来回改十几轮才发现）。另：白色形状垫在白色头像下面时，**长度小于头像宽度就完全被盖住**（实测刀宽 60~125 的产物墨点完全一致），这条几何约束决定尺寸下限。
+- 含中文的 .ps1 必须存成 UTF-8 **with BOM**：PS 5.1 遇到无 BOM 的 UTF-8 会按 ANSI(GBK) 解码，注释里的中文会变成乱码并可能吞掉下一行/吃掉引号，报「Missing closing '}'」这类假语法错。edit/write 工具写文件会**去掉 BOM** ⇒ 每次编辑含中文的 .ps1 之后都要用 `[System.IO.File]::WriteAllText($p,$t,UTF8Encoding($true))` 补回 BOM（注意用 .NET 读写，别用 Get-Content/Set-Content）。需要频繁改的脚本干脆只写 ASCII 注释。
+- PowerShell 变量名不区分大小写：局部变量绝不能与参数同名不同大小写（`$band` vs 参数 `$Band`、`$names` vs 参数 `$Names`）—— 前者赋值 byte[] 会报「Cannot convert System.Object[] to System.Int32」，后者 `$names = @()` 直接把参数清空、循环一次都不跑（2026-11-21 两个脚本各踩一次）。
 - 工坊上传失败先看 Steam 日志（C:\Program Files (x86)\Steam\logs\workshop_log.txt 与 console_log.txt）：`LogonFailure Rate Limit Exceeded` = 短时间内重复调用 SteamAPI 登录被限流，继续重试只会更糟，必须等几分钟以上；`No Connection` 是客户端掉线，不是上传器的问题。另外 git push 用 wincred 时必须在 danger-full-access 下跑，否则 credential helper 子进程起不来（couldn't create signal pipe）。
 - tools\*.ps1 必须保留 UTF-8 BOM（edit 工具会把它写掉，导致 powershell -File 按 ANSI 解码、CJK 报解析错误）；改完用 [System.IO.File]::WriteAllText + New-Object System.Text.UTF8Encoding($true) 重写。同理 .cs/.json 里写 Windows 路径时反斜杠要写成 `/` 或 `\\`，否则 CS1009。
 - .bat 的 if/else 块里，echo 文本中出现的 `)` 会被 cmd 当成块结束符，导致 else 分支被无条件执行；if 块内的 echo 一律不要写括号。

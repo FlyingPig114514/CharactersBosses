@@ -351,6 +351,13 @@ public abstract partial class CharBossMonster : MonsterModel
     /// <summary>本场战斗内的回合序号（1 起，剧本按它取回合）。</summary>
     internal int TurnNumber;
 
+    /// <summary>
+    /// 上一次真的重建计划时，**真人玩家**的回合号（幂等闸门用）。
+    /// 见 <c>PrepareTurn</c> 顶部：装了「小小姐的战斗提示」这类会反复询问怪物下一次行动的模组时，
+    /// <c>PrepareTurn</c> 会在同一回合里被多调几次 ⇒ <c>TurnNumber</c> 连跳 ⇒ 剧本取到后面的回合。
+    /// </summary>
+    internal int PreparedRealTurn = -1;
+
     /// <summary>**这一回合**她已经打出的攻击牌张数（终结技段数要用它，见 <see cref="Core.BladesGrowth"/>）。</summary>
     internal int AttacksPlayed;
 
@@ -497,6 +504,7 @@ public abstract partial class CharBossMonster : MonsterModel
         await base.AfterAddedToRoom();
         CombatStartFired = false;   // 新的一场战斗
         TurnNumber = 0;
+        PreparedRealTurn = -1;      // 幂等闸门跟着新战斗清零
         NextTurnEnergyBonus = 0;
         // ★ v0.2.573：「能量汲取」的升级进度也必须每场清零。
         //   怪物 Model 在同一次运行里会被复用（上面那行 `CombatStartFired = false` 就是为此），
@@ -1567,6 +1575,13 @@ public abstract partial class CharBossMonster : MonsterModel
         // ★ v0.2.767：预见观让玩家「预见 2」期间，**她**和同场的其它 Boss 都停在这里，
         //   直到玩家选完、预见界面关掉（闸门由 Core.ScryGate 控制）。单人时它恒为「已放行」。
         try { await Core.ScryGate.WaitAsync(); } catch { /* 忽略 */ }
+
+        // ★ v0.2.853：开始打**下一张**之前，把上一张遗留在展示区（`PlayContainer`）里的卡面收掉。
+        //   原版靠「离开 play 堆 ⇒ 从展示区收走」那一步清理，而那一笔只替**本机玩家**的出牌跑
+        //   （她是影子玩家、走 `CardCmd.AutoPlay`）⇒ 卡面会永久停在战场中央那张大卡的位置
+        //   （玩家 2026-11-21 截图：「碎屑储打出的碰撞轨迹卡在天上」，联机时必现）。
+        try { Patches.StrayBossCardQueuePatch.ClearOurCardsFromPlayContainer("她开始打下一张牌"); }
+        catch { /* 纯显示，失败不影响出牌 */ }
 
         // 告诉自动选择器「现在是谁的回合」——它按 (Boss, 回合号) 取「点名要丢的牌」，
         // 否则规划下一回合时那次清空会把本回合的点名抹掉（用户 2026-10-29：杂技丢了触不可及）。

@@ -118,7 +118,7 @@
     "RESONANCE_POWER.description_dread":  "每当玩家在战斗内生成卡牌时，也会触发储君的「创世之柱」。\n警告：炸弹属于无来源伤害，带有「为你而死」和「瓦皮的忠诚」的召唤物不会替你承受该伤害。\n恐惧模式：玩家生成的牌也会增加他[gold]超质量体[/gold]的伤害。",
     "BOSS_ORBITAL_BOMBARD_POWER.description_dread":  "战斗开始时，你获得[gold]1[/gold]层[gold]光谱偏移[/gold]。\n储君[gold]第1回合[/gold]打出[gold]1[/gold]张[gold]轰击[/gold]，之后被击晕。\n在经过[gold]5[/gold]个你打出过无色牌的回合后，储君醒来，并且[gold]轰击[/gold]转而开始打储君自己。",
     "BOSS_CONQUEROR_POWER.description_dread":  "每当储君将1张牌放回抽牌堆顶部时，所有玩家下1张攻击牌的伤害就减少 50%，并且本回合失去[gold]1[/gold]点力量。\n警告：抱抱先生属于无来源伤害，带有「为你而死」和「瓦皮的忠诚」的召唤物不会替你承受该伤害。\n他的[gold]王者之拳[/gold]已升级。",
-    "BOSS_STELLAR_GATHERING_POWER.description_dread":  "每当储君获得「保留手牌」时，所有玩家获得「保留手牌」与「下回合能量」。\n警告：黑洞属于无来源伤害，带有「为你而死」和「瓦皮的忠诚」的召唤物不会替你承受该伤害。\n恐惧模式：他把第3回合的防御与第4回合的[gold]隐秘藏品[/gold]+换了位置 ⇒ 第4回合的[gold]七星[/gold]真的打得出来。",
+    "BOSS_STELLAR_GATHERING_POWER.description_dread":  "每当储君获得「保留手牌」时，所有玩家获得「保留手牌」。\n警告：黑洞属于无来源伤害，带有「为你而死」和「瓦皮的忠诚」的召唤物不会替你承受该伤害。",
     "BOSS_CALL_TO_ARMS_POWER.description_dread":  "[gold]俯冲仆从[/gold]的伤害仍保持在[gold]16[/gold]（升级版也是 16）。\n每当储君打出仆从牌时，若其仆从数不足[gold]1[/gold]，改为召唤对应种类的仆从。\n每当储君用卡牌获得力量时，他的其它友方也获得等量力量。\n因此有的回合储君一定会打出1张[gold]仆从俯冲[/gold]，直接对你造成伤害。",
     "SYNTHESIS_DREAD_POWER.title":  "人工合成",
     "SYNTHESIS_DREAD_POWER.description":  "故障机器人在战斗开始时获得 3 层人工制品。\n警告：闪电充能球属于无来源伤害，带有「为你而死」和「瓦皮的忠诚」的召唤物不会替你承受该伤害。",

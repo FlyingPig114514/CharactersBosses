@@ -26,7 +26,8 @@ namespace CharacterBosses.Powers;
 ///
 /// 落点：
 ///   · 玩家侧 `RetainHandPower`（本回合手牌保留，回合结束不弃）；
-///   · 玩家侧 `EnergyNextTurnPower`（下回合 +`Amount` 能量，默认 1）。
+///   · 玩家侧 `EnergyNextTurnPower`（下回合 +`Amount` 能量，默认 1）——
+///     ★ **恐惧模式不给这一笔**（用户 2026-11-21：恐惧增强改成「只给保留手牌」）。
 /// 只对**真人玩家**生效（影子/宠物一律跳过），多人时每个真人都给。
 /// </summary>
 public sealed class BossStellarGatheringPower : PowerModel
@@ -63,20 +64,32 @@ public sealed class BossStellarGatheringPower : PowerModel
             var ctx = choiceContext ?? new BlockingPlayerChoiceContext();
             int energy = Math.Max(1, Amount) * EnergyPerStack;
 
+            // ★ v0.2.863（用户 2026-11-21）：**恐惧模式下「群星荟萃」改为只给保留手牌、不再给下回合能量**。
+            //   用户口径：「恐惧模式下，辉星储不仅意图被调整，特殊效果也被调整了，改为：每当储君获得
+            //   「保留手牌」时，所有玩家获得「保留手牌」。（警告照旧）即只给玩家保留手牌而不再给玩家下回合能量。
+            //   意图修改保留，这也是恐惧增强的一部分。」
+            //   ⇒ 普通模式一个字都不动（仍给保留手牌 + 下回合能量），只有 `DreadMode.IsActive` 时去掉能量那一笔。
+            bool dread = DreadMode.IsActive;
+
             int given = 0;
             foreach (var player in BossLockOn.RealPlayers(combat))
             {
                 var creature = player?.Creature;
                 if (creature == null || !creature.IsAlive) continue;
                 await PowerCmd.Apply<RetainHandPower>(ctx, creature, RetainStacks, owner, null);
-                await PowerCmd.Apply<EnergyNextTurnPower>(ctx, creature, energy, owner, null);
+                if (!dread)
+                {
+                    await PowerCmd.Apply<EnergyNextTurnPower>(ctx, creature, energy, owner, null);
+                }
                 given++;
             }
 
             if (_logs++ < 20)
             {
                 Logger.Log($"[CharBoss] 群星荟萃：他获得保留手牌（{SafeName(cardSource)}）→ " +
-                           $"{given} 名玩家也获得保留手牌 + 下回合 {energy} 能量");
+                           (dread
+                               ? $"{given} 名玩家也获得保留手牌（**恐惧模式**：不再给下回合能量）"
+                               : $"{given} 名玩家也获得保留手牌 + 下回合 {energy} 能量"));
             }
         }
         catch (Exception e)

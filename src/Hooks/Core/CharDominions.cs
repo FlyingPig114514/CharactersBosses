@@ -514,7 +514,13 @@ public sealed class DefectDominion : MegaCrit.Sts2.Core.Models.Dread.DominionMod
             if (room is not CombatRoom cr) return;
             // ★ v0.2.789：本幕 Boss 房 ⇒ 这个支配不生效（游戏要求 Boss 战里没有支配）
             if (DreadMode.SkipBecauseActBossRoom(room, GetType().Name)) return;
-            await GiveArtifactAsync(cr.Enemies, "进房时");
+            // ★ v0.2.862（用户 2026-11-21）：**改回开局立刻给** —— 人工制品必须在玩家那些
+            //   「开局给敌人上负面」的遗物（红面具等）生效**之前**就在场，否则它挡不住。
+            //   怪物自带负面那一侧改由 `ArtifactIgnoresMonsterDebuffPatch` 按施加者判定放行，不再靠拖时间。
+            var enemies = new List<Creature>();
+            foreach (var c in cr.Enemies) if (c != null) enemies.Add(c);
+            if (enemies.Count == 0) return;
+            await GiveArtifactAsync(enemies, "进房时");
         }
         catch (Exception e) { Logger.Log("[CharBoss] 故障机器人的支配失败: " + e.Message); }
     }
@@ -531,24 +537,119 @@ public sealed class DefectDominion : MegaCrit.Sts2.Core.Models.Dread.DominionMod
         catch (Exception e) { Logger.Log("[CharBoss] 故障机器人的支配（后加入的敌人）失败: " + e.Message); }
     }
 
-    /// <summary>给这批敌人各 1 层人工制品（幂等：身上已经有就跳过；角色 Boss 跳过）。</summary>
-    private static async Task GiveArtifactAsync(IEnumerable<Creature>? enemies, string why)
+    /// <summary>
+    /// 给这批敌人补到**本幕目标层数**的人工制品。
+    ///
+    /// ★ v0.2.855（用户 2026-11-21：「2 层时故障机器人的支配有问题，有的敌人 1 层人工制品有的敌人 2 层」）：
+    ///   以前是「身上**有**人工制品就整只跳过」⇒ 那只敌人如果自己本来就带 1 层（或上一批只发了 1 层），
+    ///   它就永远停在 1 层，而同一场里其它敌人是 2 层 —— 视觉上就是「有的 1 层有的 2 层」。
+    ///   现在改成**补到目标**：已有层数 < 本幕目标 ⇒ 补齐差额；已达到或更高 ⇒ 不动。
+    ///   目标 = `DreadActScaling.ActNumber()`（1/2/3 幕 = 1/2/3 层，v0.2.844 口径）。
+    ///   同时把**逐只明细**打进日志（`名字=层数`），下次再出现「有的 1 有的 2」能一眼看出是哪只、为什么。
+    /// </summary>
+    /// <summary>
+    /// ★ v0.2.861：这一场**我们**给每只敌人发过多少层人工制品（幂等闸门）。
+    /// 用它而不是「看它身上有几层」：啃咬机这类**自带 2 层**的敌人本来就 ≥ 目标，
+    /// 用「已有层数」判幂等会让它永远拿不到支配那 2 层（用户 2026-11-21 报的正是这个）。
+    /// </summary>
+    private static readonly Dictionary<Creature, int> _grantedArtifact = new();
+
+    /// <summary>★ v0.2.861：发放完那一刻它**应该**有多少层（自带 + 支配），兜底回读时按这个补。</summary>
+    private static readonly Dictionary<Creature, int> _expectedArtifactTotal = new();
+
+    private static async Task GiveArtifactAsync(IEnumerable<Creature>? enemies, string why,
+                                                bool deferUntilCombatStart = false)
     {
         try
         {
             if (enemies == null) return;
 
-            var targets = new List<Creature>();
-            int skippedBosses = 0, already = 0;
-            foreach (var c in enemies)
+            // 先把敌人名单**拷下来**（晚点再发的时候，房间里的集合可能已经变了）
+            var all = new List<Creature>();
+            foreach (var c in enemies) if (c != null) all.Add(c);
+            if (all.Count == 0) return;
+
+            // ★ v0.2.860（用户 2026-11-21：「阻止人工制品挡掉怪物自带的 debuff…或者应该这么说：
+            //   在它获得自己的所有 buff 与 debuff 后再给予它们人工制品」）
+            //
+            //   `DominionModel.AfterRoomEntered` 跑在 `CombatManager.StartCombat` **之前**
+            //   （日志实证：支配那行后面紧跟着 `UpdateTrack…战斗开始时` 与 `UI 会话已重置（新的战斗房 …）`）⇒
+            //   敌人**自己开战期**的 buff/debuff 是在我们发完人工制品之后才落地的，
+            //   于是人工制品替它挡掉了它本该吃的那层负面并 −1：
+            //   `落地: 盛碗虫（石）=2` + `人工制品抵消：盛碗虫（石） 挡掉了「IMBALANCED_POWER」⇒ 剩 1 层`。
+            //   ⇒ 进房这条路改成**等战斗真正开始、再留 600ms 让开战期能力结算完**才发（之后还要两轮兜底回读）。
+            //   ⚠ 这一步**不能**在 `AfterRoomEntered` 里被 await（那会在 StartCombat 之前死等）⇒
+            //     调用方改成**不 await**（fire-and-forget），见 `DefectDominion.AfterRoomEntered`。
+            if (deferUntilCombatStart)
             {
-                if (c == null || !c.IsAlive) continue;
+                for (int wait = 0; wait < 40; wait++)
+                {
+                    bool inProgress = false;
+                    try { inProgress = MegaCrit.Sts2.Core.Combat.CombatManager.Instance?.IsInProgress ?? false; }
+                    catch { inProgress = false; }
+                    if (inProgress) break;
+                    try { await Task.Delay(100); } catch { break; }
+                }
+                try { await Task.Delay(600); } catch { /* 忽略 */ }
+            }
+
+            // ★ v0.2.844：按幕分档 —— 1/2/3 幕 = 1/2/3 层人工制品（先算一次，别在循环里反复取）
+            int amount = DreadActScaling.ActNumber();
+
+            // ★ v0.2.857（用户 2026-11-21：「多人层数增加正是我想要的，保持按原版规则增加层数」）：
+            //   期望值 = 本幕层数 + (人数 - 1)，这正是 `ArtifactPower.GetScaledAmountForMultiplayer`
+            //   （`amount + users.Count - 1`）在 `PowerCmd.Apply` 里给出的结果，不额外动手。
+            int players = 1;
+            try
+            {
+                var cs = all[0].CombatState;
+                if (cs?.Players != null && cs.Players.Count > 0) players = cs.Players.Count;
+            }
+            catch { players = 1; }
+            int expected = amount + Math.Max(0, players - 1);
+
+            var targets = new List<Creature>();
+            var detail = new List<string>();
+            int skippedBosses = 0, already = 0;
+            var grants = new List<(Creature c, int delta, int have)>();
+            foreach (var c in all)
+            {
+                if (!c.IsAlive) continue;
                 if (c.Side != CombatSide.Enemy) continue;
                 // ★ 用户 2026-11-19：Boss 不吃支配
                 if (c.Monster is Monsters.CharBossMonster) { skippedBosses++; continue; }
-                // 幂等：进房那条路与「后加入」那条路都覆盖到同一只时不叠成 2 层
-                if (c.GetPower<MegaCrit.Sts2.Core.Models.Powers.ArtifactPower>() != null) { already++; continue; }
+
+                int have = 0;
+                try
+                {
+                    have = (int)Math.Round((double)c.GetPowerAmount<MegaCrit.Sts2.Core.Models.Powers.ArtifactPower>());
+                }
+                catch
+                {
+                    try { have = c.GetPower<MegaCrit.Sts2.Core.Models.Powers.ArtifactPower>() != null ? 1 : 0; }
+                    catch { have = 0; }
+                }
+                string who = "?";
+                try { who = c.Name ?? "?"; } catch { /* 忽略 */ }
+
+                // ★ v0.2.861（用户 2026-11-21：「自身就有 2 层人工的啃咬机不会额外获得人工（加上支配应该是 4 层）」）：
+                //   支配是**额外追加**，不是「补到目标」—— 敌人自带的层数原样保留（啃咬机自带 2 + 支配 2 = 4）。
+                //   以前拿「已有层数 ≥ 目标就跳过」当幂等闸门 ⇒ 自带 2 层的敌人一层都拿不到。
+                //   现在幂等改成**按「我们这一场给它发过多少」记账**（`_grantedArtifact`）：
+                //   同一只敌人被「进房」和「后加入」两条路、以及后面的兜底回读反复碰到也只发一次。
+                int handed = 0;
+                try { handed = _grantedArtifact.TryGetValue(c, out int g) ? g : 0; } catch { handed = 0; }
+                int delta = expected - handed;
+                if (delta <= 0)
+                {
+                    already++;
+                    detail.Add($"{who}=自带 {have}、已由支配发过 {handed} ⇒ 不重复");
+                    continue;
+                }
+
                 targets.Add(c);
+                grants.Add((c, delta, have));
+                detail.Add($"{who}=自带 {have} + 支配 {delta}（目标 {expected}）");
             }
 
             if (skippedBosses > 0)
@@ -556,19 +657,96 @@ public sealed class DefectDominion : MegaCrit.Sts2.Core.Models.Dread.DominionMod
             if (targets.Count == 0)
             {
                 if (already > 0)
-                    Logger.Log($"[CharBoss] 恐惧模式·故障机器人的支配（{why}）：{already} 个敌人已有人工制品 ⇒ 不重复挂");
+                    Logger.Log($"[CharBoss] 恐惧模式·故障机器人的支配（{why}）：目标 {expected} 层，" +
+                               $"{already} 个敌人已由支配发过 ⇒ 不重复挂 | 明细: {string.Join(", ", detail)}");
                 return;
             }
 
-            // ★ v0.2.844（用户 2026-11-21）：按幕分档 —— 1/2/3 幕 = 1/2/3 层人工制品
-            int amount = DreadActScaling.ActNumber();
-            await MegaCrit.Sts2.Core.Commands.PowerCmd.Apply<
-                MegaCrit.Sts2.Core.Models.Powers.ArtifactPower>(
-                new ThrowingPlayerChoiceContext(), targets, (decimal)amount, null, null);
-            Logger.Log($"[CharBoss] 恐惧模式·故障机器人的支配（{why}）：{targets.Count} 个敌人各获得 {amount} 层人工制品" +
-                       (already > 0 ? $"（另有 {already} 个原本就有，未叠加）" : string.Empty));
+            // 逐只发放（`PowerCmd.Apply` 是按「只」结算的，避免一次性给一组时只喂到第一只）
+            foreach (var (c, delta, have) in grants)
+            {
+                try
+                {
+                    await MegaCrit.Sts2.Core.Commands.PowerCmd.Apply<
+                        MegaCrit.Sts2.Core.Models.Powers.ArtifactPower>(
+                        new ThrowingPlayerChoiceContext(), c, (decimal)delta, null, null);
+                    try { _grantedArtifact[c] = expected; } catch { /* 忽略 */ }
+                    try { _expectedArtifactTotal[c] = have + delta; } catch { /* 忽略 */ }
+                }
+                catch (Exception e)
+                {
+                    Logger.Log($"[CharBoss] 故障机器人的支配：给 {(c.Name ?? "?")} 发人工制品失败: " + e.Message);
+                }
+            }
+
+            // ★ v0.2.862：**不再做「补到期望」**。
+            //   以前（v0.2.857~861）怕「发完被削」，所以回读不足就 `SetAmount` 补齐 ——
+            //   但那等于**把玩家施加的负面又退回去**（红面具的虚弱本该被人工制品挡掉一层）。
+            //   现在「怪物自身的负面不吃人工制品」改由 `ArtifactIgnoresMonsterDebuffPatch` 按**施加者**判定，
+            //   所以这里只回读一份落地值写日志，一个 `SetAmount` 都不做。
+            var landed = new List<string>();
+            foreach (var c in targets)
+            {
+                string who = "?";
+                try { who = c.Name ?? "?"; } catch { /* 忽略 */ }
+                try
+                {
+                    if (c == null || !c.IsAlive) { landed.Add($"{who}=<已死/离场>"); continue; }
+                    var power = c.GetPower<MegaCrit.Sts2.Core.Models.Powers.ArtifactPower>();
+                    if (power == null) { landed.Add($"{who}=<没有人工制品>"); continue; }
+                    landed.Add($"{who}={(int)Math.Round((double)power.Amount)}");
+                }
+                catch (Exception e) { landed.Add($"{who}=<读不到: {e.Message}>"); }
+            }
+
+            Logger.Log($"[CharBoss] 恐惧模式·故障机器人的支配（{why}）：本幕 {amount} 层" +
+                       (players > 1 ? $"（多人 {players} 人 ⇒ 原版缩放 +{players - 1} ⇒ 支配发 {expected} 层）" : string.Empty) +
+                       $"，{targets.Count} 个敌人已发（**叠加**在它们自带的层数之上）" +
+                       (already > 0 ? $"（另有 {already} 个已由支配发过，不重复）" : string.Empty) +
+                       $" | 明细: {string.Join(", ", detail)}" +
+                       $" | 落地: {string.Join(", ", landed)}" +
+                       $" | 各自 power: {string.Join(" ; ", DigestPowers(targets))}");
+
+            // 记账表别无限长（每场战斗的 Creature 都是新对象）
+            try
+            {
+                if (_grantedArtifact.Count > 400)
+                {
+                    _grantedArtifact.Clear();
+                    _expectedArtifactTotal.Clear();
+                }
+            }
+            catch { /* 忽略 */ }
         }
         catch (Exception e) { Logger.Log("[CharBoss] 故障机器人的支配（施放人工制品）失败: " + e.Message); }
+    }
+
+    /// <summary>把一批敌人身上的 power 打成一串 `ID=层数`（诊断用，只读）。</summary>
+    private static List<string> DigestPowers(List<Creature> creatures)
+    {
+        var list = new List<string>();
+        foreach (var c in creatures)
+        {
+            var sb = new System.Text.StringBuilder();
+            try
+            {
+                string who = "?";
+                try { who = c.Name ?? "?"; } catch { /* 忽略 */ }
+                foreach (var p in c.Powers)
+                {
+                    if (p == null) continue;
+                    string id = "?";
+                    int amt = 0;
+                    try { id = p.Id.Entry; } catch { /* 忽略 */ }
+                    try { amt = (int)Math.Round((double)p.Amount); } catch { /* 忽略 */ }
+                    if (sb.Length > 0) sb.Append(',');
+                    sb.Append(id).Append('=').Append(amt);
+                }
+                list.Add($"{who}[{(sb.Length == 0 ? "无" : sb.ToString())}]");
+            }
+            catch (Exception e) { list.Add("?" + "[" + e.Message + "]"); }
+        }
+        return list;
     }
 }
 
@@ -966,6 +1144,112 @@ internal static class DreadDominionSetPatch
     }
 }
 #endif
+
+/// <summary>
+/// ★ v0.2.862（用户 2026-11-21：「能不能让它既不会抵消怪物本来就有的 debuff 也不会让它挡不住玩家开局施加
+/// debuff 的遗物？」）
+///
+/// 反编译查清了两种来源的差别：
+/// <code>
+/// // 盛碗虫（石）：失衡是**它自己**给自己上的
+/// BowlbugRock.AfterAddedToRoom:
+///     PowerCmd.Apply&lt;ImbalancedPower&gt;(ctx, bowlbugRock.Creature, 1m, bowlbugRock.Creature, null);
+///                        //                        ^target            ^applier = 它自己
+///
+/// // 红面具：虚弱是**玩家**上的
+/// RedMask:
+///     PowerCmd.Apply&lt;WeakPower&gt;(ctx, combatState.HittableEnemies, value, redMask.Owner.Creature, null);
+///                        //                                        ^applier = 玩家
+/// </code>
+/// 而 `ArtifactPower.TryModifyPowerAmountReceived` 会把「负面」整条吞掉（`modifiedAmount = 0` → 返回 true），
+/// 随后 `AfterModifyingPowerAmountReceived` 里 `PowerCmd.Decrement` 扣掉一层。
+///
+/// ⇒ 这里加一道前缀：**目标是敌人、且施加者不是玩家**（怪物自己 / 另一个怪物 / 无来源）时，
+///   直接跳过人工制品的「吞掉」逻辑 —— 这层负面照常真正生效，人工制品一层都不掉。
+///   玩家（遗物 / 牌 / 药水）施加的负面**照旧被人工制品挡掉**（红面具依然会因为人工制品而失效）。
+/// </summary>
+[HarmonyLib.HarmonyPatch(typeof(MegaCrit.Sts2.Core.Models.Powers.ArtifactPower),
+                          nameof(MegaCrit.Sts2.Core.Models.Powers.ArtifactPower.TryModifyPowerAmountReceived))]
+internal static class ArtifactIgnoresMonsterDebuffPatch
+{
+    private static int _logs;
+
+    [HarmonyLib.HarmonyPrefix]
+    public static bool Prefix(MegaCrit.Sts2.Core.Models.Powers.ArtifactPower __instance,
+                              MegaCrit.Sts2.Core.Models.PowerModel canonicalPower,
+                              MegaCrit.Sts2.Core.Entities.Creatures.Creature target,
+                              decimal amount,
+                              MegaCrit.Sts2.Core.Entities.Creatures.Creature? _,
+                              ref decimal modifiedAmount,
+                              ref bool __result)
+    {
+        try
+        {
+            if (target == null) return true;
+            // 只管敌人身上的（玩家自己的人工制品行为不变）
+            if (target.Side != MegaCrit.Sts2.Core.Combat.CombatSide.Enemy) return true;
+
+            bool fromPlayer = false;
+            try { fromPlayer = _ != null && _.Side == MegaCrit.Sts2.Core.Combat.CombatSide.Player; }
+            catch { fromPlayer = false; }
+            if (fromPlayer) return true;      // 玩家的遗物/牌/药水 ⇒ 照原版被挡
+
+            // 怪物自己/怪物之间/无来源 ⇒ 不吃这一层
+            modifiedAmount = amount;
+            __result = false;
+            if (_logs++ < 40)
+            {
+                string who = "?", what = "?", by = "(无来源)";
+                int amt = 0;
+                try { who = target.Name ?? "?"; } catch { /* 忽略 */ }
+                try { what = canonicalPower?.Id.Entry ?? "?"; } catch { /* 忽略 */ }
+                try { if (_ != null) by = _.Name ?? "?"; } catch { /* 忽略 */ }
+                try { amt = (int)Math.Round((double)(__instance?.Amount ?? 0m)); } catch { /* 忽略 */ }
+                Logger.Log($"[CharBoss] 人工制品放行：{who} 的「{what}」由 {by} 施加（不是玩家）⇒ 照常生效，" +
+                           $"人工制品不扣（仍有 {amt} 层）");
+            }
+            return false;
+        }
+        catch { return true; }
+    }
+}
+
+/// <summary>
+/// ★ v0.2.858（用户 2026-11-21：「还和刚刚一样」）：**人工制品到底被谁吃了**。
+///
+/// 本机日志已经把「支配发多少」这一侧钉死了（v0.2.857，16:00:58）：
+/// <code>
+/// 落地: 盛碗虫（石）=2, 盛碗虫（蜜）=2
+/// 各自 power: 盛碗虫（石）[ARTIFACT_POWER=2] ; 盛碗虫（蜜）[ARTIFACT_POWER=2]
+/// </code>
+/// 开战那一刻两只都只有一条 `ARTIFACT_POWER=2`，没有别的图标 ⇒ 屏幕上出现的 1 只能是**之后**被吃掉的。
+/// 反编译 `ArtifactPower.AfterModifyingPowerAmountReceived`：它挡掉一个负面之后会 `PowerCmd.Decrement`
+/// （层数 −1）。这里挂个后缀，凡是发生「人工制品挡掉一次负面」就打一行，谁吃的、吃什么、剩几层一目了然。
+/// </summary>
+[HarmonyLib.HarmonyPatch(typeof(MegaCrit.Sts2.Core.Models.Powers.ArtifactPower),
+                          nameof(MegaCrit.Sts2.Core.Models.Powers.ArtifactPower.AfterModifyingPowerAmountReceived))]
+internal static class ArtifactConsumeTracePatch
+{
+    private static int _logs;
+
+    [HarmonyLib.HarmonyPostfix]
+    public static void Postfix(MegaCrit.Sts2.Core.Models.Powers.ArtifactPower __instance,
+                               MegaCrit.Sts2.Core.Models.PowerModel power)
+    {
+        try
+        {
+            if (_logs++ >= 40) return;
+            string owner = "?", what = "?";
+            int amt = 0;
+            try { owner = __instance?.Owner?.Name ?? "?"; } catch { /* 忽略 */ }
+            try { what = power?.Id.Entry ?? "?"; } catch { /* 忽略 */ }
+            try { amt = (int)Math.Round((double)(__instance?.Amount ?? 0m)); } catch { /* 忽略 */ }
+            Logger.Log($"[CharBoss] 人工制品抵消：{owner} 挡掉了「{what}」⇒ 剩 {amt} 层" +
+                       "（人工制品每挡一个负面就 −1，这是原版机制；若这里没有任何一行，说明那个图标不是人工制品）");
+        }
+        catch { /* 纯诊断 */ }
+    }
+}
 
 #if STS2_113   // 恐惧模式的 DominionModel 是 0.113 才有的类型
 /// <summary>

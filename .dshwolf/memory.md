@@ -6506,3 +6506,238 @@ Chronological action log.
 | 2026-11-20 22:12 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BoulderIroncladScript.cs` | ok | 0 |
 | 2026-11-20 22:12 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BoulderIroncladScript.cs` | ok | 0 |
 | 2026-11-20 23:42 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/DreadActScaling.cs` | ok | 0 |
+| 2026-11-21 09:18 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/handover-2026-11-21.md` | ok | 0 |
+| 2026-11-21 09:24 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/make-icon-sheet.ps1` | ok | 0 |
+| 2026-11-21 09:24 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/make-icon-sheet.ps1` | ok | 0 |
+| 2026-11-21 09:24 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/make-icon-sheet.ps1` | ok | 0 |
+| 2026-11-21 09:27 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/run-img2img.ps1` | ok | 0 |
+| 2026-11-21 09:27 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/jobs-batch1.json` | ok | 0 |
+| 2026-11-21 09:27 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/make-outline.ps1` | ok | 0 |
+| 2026-11-21 09:28 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/make-outline.ps1` | ok | 0 |
+| 2026-11-21 09:28 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/make-outline.ps1` | ok | 0 |
+| 2026-11-21 09:28 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/register-map-icon.ps1` | ok | 0 |
+| 2026-11-21 09:33 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/run-img2img.ps1` | error | 0 |
+| 2026-11-21 09:33 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/run-img2img.ps1` | ok | 0 |
+| 2026-11-21 09:33 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/run-img2img.ps1` | ok | 0 |
+| 2026-11-21 09:33 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/jobs-method-test.json` | ok | 0 |
+| 2026-11-21 09:34 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/make-icon-sheet.ps1` | error | 0 |
+| 2026-11-21 09:35 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/make-icon-sheet.ps1` | ok | 0 |
+| 2026-11-21 09:35 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/make-icon-sheet.ps1` | ok | 0 |
+| 2026-11-21 09:40 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/tmp/snake-extract-test.ps1` | ok | 0 |
+| 2026-11-21 09:41 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 09:42 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | error | 0 |
+| 2026-11-21 09:42 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | error | 0 |
+| 2026-11-21 09:42 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 09:43 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/tmp/dbg-parts.ps1` | ok | 0 |
+| 2026-11-21 09:44 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | error | 0 |
+| 2026-11-21 09:44 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 09:45 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 09:45 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 09:45 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 09:46 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 09:46 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 09:47 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 09:47 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | error | 0 |
+| 2026-11-21 09:47 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 09:47 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 09:47 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 09:48 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 09:48 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 09:48 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/jobs-batch2.json` | ok | 0 |
+| 2026-11-21 09:49 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/jobs-batch2-hi.json` | ok | 0 |
+| 2026-11-21 09:54 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | error | 0 |
+| 2026-11-21 09:54 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 09:55 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 09:55 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 09:55 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 09:55 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 09:55 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 09:56 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:00 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:00 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:00 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:00 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:00 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:01 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:01 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:01 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:01 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:01 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:02 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:02 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:02 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:02 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | error | 0 |
+| 2026-11-21 10:02 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:03 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | error | 0 |
+| 2026-11-21 10:03 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:05 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | error | 0 |
+| 2026-11-21 10:05 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:06 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/register-map-icon.ps1` | ok | 0 |
+| 2026-11-21 10:07 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/register-map-icon.ps1` | ok | 0 |
+| 2026-11-21 10:07 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/register-map-icon.ps1` | ok | 0 |
+| 2026-11-21 10:07 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/register-map-icon.ps1` | error | 0 |
+| 2026-11-21 10:07 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Encounters/TierBossEncounters.cs` | ok | 0 |
+| 2026-11-21 10:07 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/CharacterBosses.json` | ok | 0 |
+| 2026-11-21 10:08 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BuildInfo.cs` | error | 0 |
+| 2026-11-21 10:08 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-21 10:08 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-21 10:11 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/check-map-icons.gd` | ok | 0 |
+| 2026-11-21 10:11 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/map-icons-policy.md` | ok | 0 |
+| 2026-11-21 10:11 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/map-icons-policy.md` | ok | 0 |
+| 2026-11-21 10:11 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:11 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:11 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:16 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | error | 0 |
+| 2026-11-21 10:16 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:16 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | error | 0 |
+| 2026-11-21 10:17 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:17 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:18 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | error | 0 |
+| 2026-11-21 10:18 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:18 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:21 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:21 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:22 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/tmp/blade-menu.ps1` | ok | 0 |
+| 2026-11-21 10:22 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | error | 0 |
+| 2026-11-21 10:22 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:24 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | error | 0 |
+| 2026-11-21 10:24 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:25 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | error | 0 |
+| 2026-11-21 10:25 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:26 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:26 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:26 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:28 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | error | 0 |
+| 2026-11-21 10:28 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:31 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | error | 0 |
+| 2026-11-21 10:31 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:36 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/tmp/dart-crop-check.ps1` | ok | 0 |
+| 2026-11-21 10:36 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/tmp/flechette-extract.ps1` | ok | 0 |
+| 2026-11-21 10:37 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/make-flechette-knife.ps1` | ok | 0 |
+| 2026-11-21 10:37 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | error | 0 |
+| 2026-11-21 10:37 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 10:40 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-21 10:41 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/map-icons-policy.md` | ok | 0 |
+| 2026-11-21 11:19 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | error | 0 |
+| 2026-11-21 11:19 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 11:19 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 11:19 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 11:20 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | error | 0 |
+| 2026-11-21 11:20 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 11:20 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 11:21 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 11:21 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 11:22 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 11:28 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/make-strike-blades.ps1` | error | 0 |
+| 2026-11-21 11:28 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/make-strike-blades-all.ps1` | ok | 0 |
+| 2026-11-21 11:29 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 11:30 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 11:30 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch2.ps1` | ok | 0 |
+| 2026-11-21 11:36 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-21 11:52 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/workshop/description.txt` | ok | 0 |
+| 2026-11-21 11:52 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/workshop/description.txt` | ok | 0 |
+| 2026-11-21 11:52 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/workshop/description.txt` | ok | 0 |
+| 2026-11-21 11:52 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/workshop/description.txt` | ok | 0 |
+| 2026-11-21 13:07 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/icontools.ps1` | ok | 0 |
+| 2026-11-21 13:07 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/probe-batch3.ps1` | ok | 0 |
+| 2026-11-21 13:07 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/icontools.ps1` | ok | 0 |
+| 2026-11-21 13:08 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/icontools.ps1` | ok | 0 |
+| 2026-11-21 13:08 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/icontools.ps1` | ok | 0 |
+| 2026-11-21 13:08 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/probe-batch3.ps1` | error | 0 |
+| 2026-11-21 13:08 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/probe-batch3.ps1` | ok | 0 |
+| 2026-11-21 13:09 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch3.ps1` | ok | 0 |
+| 2026-11-21 13:10 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/icontools.ps1` | error | 0 |
+| 2026-11-21 13:11 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/icontools.ps1` | ok | 0 |
+| 2026-11-21 13:12 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch3.ps1` | ok | 0 |
+| 2026-11-21 13:12 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch3.ps1` | ok | 0 |
+| 2026-11-21 13:31 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch3.ps1` | ok | 0 |
+| 2026-11-21 13:33 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/make-necrobinder-avatar.ps1` | ok | 0 |
+| 2026-11-21 13:40 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch3.ps1` | ok | 0 |
+| 2026-11-21 14:06 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/make-necrobinder-avatar2.ps1` | ok | 0 |
+| 2026-11-21 14:09 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/art/compose-batch3.ps1` | ok | 0 |
+| 2026-11-21 14:17 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Monsters/CharBossMonster.cs` | ok | 0 |
+| 2026-11-21 14:17 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Monsters/CharBossMonster.cs` | ok | 0 |
+| 2026-11-21 14:17 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Monsters/CharBossMonster.Turn.cs` | ok | 0 |
+| 2026-11-21 14:18 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BuildInfo.cs` | error | 0 |
+| 2026-11-21 14:18 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-21 14:24 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossPicksSync.cs` | ok | 0 |
+| 2026-11-21 14:24 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossPicksSync.cs` | ok | 0 |
+| 2026-11-21 14:24 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossLineups.cs` | ok | 0 |
+| 2026-11-21 14:25 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-21 14:26 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Monsters/CharBossMonster.Turn.cs` | ok | 0 |
+| 2026-11-21 14:27 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Monsters/CharBossMonster.Turn.cs` | ok | 0 |
+| 2026-11-21 14:27 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Monsters/CharBossMonster.Turn.cs` | ok | 0 |
+| 2026-11-21 14:27 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-21 14:29 | write | `workshop/changenote.txt` | ok | 0 |
+| 2026-11-21 14:42 | edit | `src/Hooks/Monsters/CharBossMonster.Turn.cs` | ok | 0 |
+| 2026-11-21 14:42 | edit | `src/Hooks/Monsters/CharBossMonster.Turn.cs` | ok | 0 |
+| 2026-11-21 14:42 | edit | `src/Hooks/Monsters/CharBossMonster.Turn.cs` | ok | 0 |
+| 2026-11-21 14:42 | edit | `src/Hooks/Monsters/CharBossMonster.Turn.cs` | ok | 0 |
+| 2026-11-21 14:42 | edit | `src/Hooks/Monsters/CharBossMonster.Turn.cs` | ok | 0 |
+| 2026-11-21 14:42 | edit | `src/Hooks/Monsters/CharBossMonster.Turn.cs` | ok | 0 |
+| 2026-11-21 14:42 | edit | `src/Hooks/Monsters/CharBossMonster.Turn.cs` | ok | 0 |
+| 2026-11-21 14:42 | edit | `src/CharacterBosses.json` | error | 0 |
+| 2026-11-21 14:42 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-21 14:42 | edit | `src/CharacterBosses.json` | ok | 0 |
+| 2026-11-21 15:36 | edit | `src/Hooks/Patches/StrayBossCardQueuePatch.cs` | ok | 0 |
+| 2026-11-21 15:36 | edit | `src/Hooks/Patches/BossFrameTickPatch.cs` | ok | 0 |
+| 2026-11-21 15:36 | edit | `src/Hooks/Patches/StrayBossCardQueuePatch.cs` | ok | 0 |
+| 2026-11-21 15:36 | edit | `src/CharacterBosses.json` | ok | 0 |
+| 2026-11-21 15:36 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-21 15:36 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-21 15:41 | edit | `src/Hooks/Patches/StrayBossCardQueuePatch.cs` | ok | 0 |
+| 2026-11-21 15:41 | edit | `src/Hooks/Patches/StrayBossCardQueuePatch.cs` | ok | 0 |
+| 2026-11-21 15:41 | edit | `src/Hooks/Patches/BossFrameTickPatch.cs` | ok | 0 |
+| 2026-11-21 15:41 | edit | `src/Hooks/Monsters/CharBossMonster.cs` | ok | 0 |
+| 2026-11-21 15:41 | edit | `src/CharacterBosses.json` | ok | 0 |
+| 2026-11-21 15:41 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-21 15:43 | edit | `src/Hooks/Patches/StrayBossCardQueuePatch.cs` | ok | 0 |
+| 2026-11-21 15:43 | edit | `src/Hooks/Patches/StrayBossCardQueuePatch.cs` | ok | 0 |
+| 2026-11-21 15:43 | edit | `src/Hooks/Patches/StrayBossCardQueuePatch.cs` | ok | 0 |
+| 2026-11-21 15:44 | edit | `src/CharacterBosses.json` | ok | 0 |
+| 2026-11-21 15:44 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-21 15:50 | edit | `src/Hooks/Core/CharDominions.cs` | ok | 0 |
+| 2026-11-21 15:50 | edit | `src/CharacterBosses.json` | ok | 0 |
+| 2026-11-21 15:50 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-21 15:54 | edit | `src/Hooks/Core/CharDominions.cs` | ok | 0 |
+| 2026-11-21 15:54 | edit | `src/CharacterBosses.json` | ok | 0 |
+| 2026-11-21 15:54 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-21 15:55 | edit | `src/Hooks/Core/CharDominions.cs` | ok | 0 |
+| 2026-11-21 15:58 | edit | `src/Hooks/Core/CharDominions.cs` | ok | 0 |
+| 2026-11-21 15:58 | edit | `src/Hooks/Core/CharDominions.cs` | ok | 0 |
+| 2026-11-21 15:59 | edit | `src/CharacterBosses.json` | ok | 0 |
+| 2026-11-21 15:59 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-21 16:01 | edit | `src/Hooks/Core/CharDominions.cs` | ok | 0 |
+| 2026-11-21 16:02 | edit | `src/CharacterBosses.json` | ok | 0 |
+| 2026-11-21 16:02 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-21 16:05 | edit | `src/CharacterBosses.json` | ok | 0 |
+| 2026-11-21 16:05 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-21 16:10 | edit | `src/Hooks/Core/CharDominions.cs` | error | 0 |
+| 2026-11-21 16:10 | edit | `src/Hooks/Core/CharDominions.cs` | ok | 0 |
+| 2026-11-21 16:10 | edit | `src/Hooks/Core/CharDominions.cs` | ok | 0 |
+| 2026-11-21 16:10 | edit | `src/Hooks/Core/CharDominions.cs` | ok | 0 |
+| 2026-11-21 16:10 | edit | `src/Hooks/Core/CharDominions.cs` | ok | 0 |
+| 2026-11-21 16:10 | edit | `src/Hooks/Core/CharDominions.cs` | ok | 0 |
+| 2026-11-21 16:11 | edit | `src/CharacterBosses.json` | ok | 0 |
+| 2026-11-21 16:11 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-21 16:14 | edit | `src/Hooks/Core/CharDominions.cs` | ok | 0 |
+| 2026-11-21 16:14 | edit | `src/Hooks/Core/CharDominions.cs` | ok | 0 |
+| 2026-11-21 16:14 | edit | `src/Hooks/Core/CharDominions.cs` | ok | 0 |
+| 2026-11-21 16:14 | edit | `src/Hooks/Core/CharDominions.cs` | ok | 0 |
+| 2026-11-21 16:14 | edit | `src/Hooks/Core/CharDominions.cs` | ok | 0 |
+| 2026-11-21 16:14 | edit | `src/Hooks/Core/CharDominions.cs` | ok | 0 |
+| 2026-11-21 16:14 | edit | `src/Hooks/Core/CharDominions.cs` | ok | 0 |
+| 2026-11-21 16:15 | edit | `src/CharacterBosses.json` | ok | 0 |
+| 2026-11-21 16:15 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-21 16:21 | edit | `src/Hooks/Core/CharDominions.cs` | ok | 0 |
+| 2026-11-21 16:21 | edit | `src/Hooks/Core/CharDominions.cs` | ok | 0 |
+| 2026-11-21 16:21 | edit | `src/Hooks/Core/CharDominions.cs` | ok | 0 |
+| 2026-11-21 16:21 | edit | `src/CharacterBosses.json` | ok | 0 |
+| 2026-11-21 16:21 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-21 16:37 | edit | `src/Hooks/Powers/BossStellarGatheringPower.cs` | ok | 0 |
+| 2026-11-21 16:37 | edit | `src/Hooks/Powers/BossStellarGatheringPower.cs` | ok | 0 |
+| 2026-11-21 16:38 | edit | `tools/wiki/make-markdown.ps1` | ok | 0 |
+| 2026-11-21 16:38 | edit | `tools/wiki/make-markdown.ps1` | ok | 0 |
+| 2026-11-21 16:39 | edit | `src/CharacterBosses.json` | ok | 0 |
+| 2026-11-21 16:39 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-21 16:51 | write | `workshop/changenote.txt` | ok | 0 |

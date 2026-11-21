@@ -1,4 +1,4 @@
-﻿using CharacterBosses.Core;
+using CharacterBosses.Core;
 
 namespace CharacterBosses.Encounters;
 
@@ -151,10 +151,17 @@ public sealed class DefectThunderBossEncounter : DefectBossEncounter
 /// <summary>
 /// 一层静默猎手的**第二套设计「蛇咬猎」**（Key `SILENT_SNAKEBITE`，用户 2026-11-08）。
 /// 特殊效果「群蛇形态」见 <c>Powers/BossSnakeFormPower.cs</c>，剧本见 <c>Core/SnakeBiteSilentScript.cs</c>。
+///
+/// 地图图标（用户 2026-11-21 定案）：猎人头像居中 + 下半左右两条蛇头镜像对称 +
+/// 上半两把蛇头柄匕首在头像中心交叉成 X（尖分别朝左下 / 右下）。
+/// 资源 <c>res://CharacterBosses/images/map/silent_snakebite</c>（+.png / _outline.png，随 PCK 打包，
+/// 见 tools\art\pck_extras.txt；生成脚本 tools\art\compose-batch2.ps1 -DaggerLayout f）。
 /// </summary>
 public sealed class SilentSnakebiteBossEncounter : SilentBossEncounter
 {
     public override int? TierAct => 0;
+
+    public override string BossNodePath => "res://CharacterBosses/images/map/silent_snakebite";
 }
 /// <summary>
 /// 第二幕故障机器人的**第二套设计「彩虹机」**（Key `DEFECT_RAINBOW`，用户 2026-11-07）。
