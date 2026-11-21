@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Afflictions;
 using MegaCrit.Sts2.Core.Models.Powers;
 using CharacterBosses.Monsters;
 
@@ -82,6 +84,12 @@ public sealed class BossVoidCallPower : PowerModel
             await PowerCmd.Apply<HexPower>(new BlockingPlayerChoiceContext(), targets, amount, owner, null);
             Logger.Log($"[CharBoss] 虚空之唤（恐惧）：战斗开始即生效 ⇒ 给 {targets.Count} 名玩家各挂 " +
                        $"{amount} 层恶咒（所有卡牌获得虚无，直到她死亡）");
+            // ★ v0.2.864（玩家反馈：恐惧模式下只有**战斗中生成的牌**才有虚无，开局手里 / 牌堆里的牌都没有）：
+            //   原版 `HexPower.AfterApplied` 是遍历 `PlayerCombatState.AllCards` 逐张 `CardCmd.Afflict<Hexed>`，
+            //   而我们在「战斗开始」这一刻挂恶咒时玩家的战斗牌堆**还没铺开**（AllCards 是空的）⇒
+            //   那条循环一张都没挂上，只有之后进战斗的新牌走 `AfterCardEnteredCombat` 才拿到虚无。
+            //   ⇒ 这里紧接着自己补一遍；玩家第一个回合开始时再补一遍（那时牌一定都就位了）。
+            await SweepHexAsync("恶咒刚挂上");
         }
         catch (Exception e)
         {
@@ -159,6 +167,81 @@ public sealed class BossVoidCallPower : PowerModel
         catch (Exception e)
         {
             Logger.Log("[CharBoss] 虚空之唤：结算失败（忽略）: " + e.Message);
+        }
+    }
+
+    /// <summary>
+    /// ★ v0.2.864：把「恶咒」（`HexPower`）补挂到玩家**现有的每一张牌**上。
+    ///
+    /// 为什么需要自己补：原版 `HexPower.AfterApplied` 确实会遍历 `PlayerCombatState.AllCards` 逐张
+    /// `CardCmd.Afflict&lt;Hexed&gt;`，但我们在「战斗开始」就挂恶咒时玩家的战斗牌堆还没铺开 ⇒ 那次循环是空的。
+    /// 这一步与 `TryModifyKeywordsInCombat` 配合（那张牌只要有 `Hexed` 就会被加上 `Ethereal`）。
+    /// 只挂在**还没有任何 affliction** 的牌上（与 `HexPower.Afflict` 自己的判据一致）。
+    /// </summary>
+    internal async Task SweepHexAsync(string why)
+    {
+        try
+        {
+            var combat = Owner?.CombatState;
+            if (combat == null) return;
+            int amount = Math.Max(1, Amount);
+            int hexed = 0, skipped = 0, players = 0;
+
+            foreach (var player in Core.BossLockOn.RealPlayers(combat))
+            {
+                var pcs = player?.PlayerCombatState;
+                if (pcs == null) continue;
+                players++;
+                IEnumerable<CardModel>? cards = null;
+                try { cards = pcs.AllCards; } catch { cards = null; }
+                if (cards == null) continue;
+
+                foreach (var card in cards)
+                {
+                    if (card == null) continue;
+                    try
+                    {
+                        if (card.Affliction != null) { skipped++; continue; }
+                        await CardCmd.Afflict<Hexed>(card, (decimal)amount);
+                        hexed++;
+                    }
+                    catch { skipped++; }
+                }
+            }
+
+            _sweeps++;
+            Logger.Log($"[CharBoss] 虚空之唤（{why}）：给 {players} 名玩家补挂恶咒 ⇒ 新挂 {hexed} 张、" +
+                       $"本来就有 affliction 跳过 {skipped} 张（这些牌都会获得虚无）");
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 虚空之唤：补挂恶咒失败（忽略）: " + e.Message);
+        }
+    }
+
+    /// <summary>补挂次数（每场最多补 2 次：挂上那一刻 + 玩家第一个回合开始）。</summary>
+    private int _sweeps;
+
+    /// <summary>
+    /// ★ v0.2.864：恐惧模式下「战斗开始就给所有玩家恶咒」，但那一刻牌堆还没铺开 ⇒
+    /// 在**玩家第一个回合开始**（牌一定就位）再补一次，保证开局手里的牌也有虚无。
+    /// 正常模式（非恐惧）走的仍是「她首次打出女妖之嚎」那条，不受影响。
+    /// </summary>
+    public override async Task AfterSideTurnStart(CombatSide side,
+                                                 IReadOnlyList<Creature> participants,
+                                                 ICombatState combatState)
+    {
+        try
+        {
+            if (side != CombatSide.Player) return;
+            if (!Core.DreadMode.IsActive) return;
+            if (!Applied) return;
+            if (_sweeps >= 2) return;
+            await SweepHexAsync("玩家回合开始补一次");
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 虚空之唤：回合开始补挂失败（忽略）: " + e.Message);
         }
     }
 

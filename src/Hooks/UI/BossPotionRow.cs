@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Godot;
 using MegaCrit.Sts2.Core.Entities.Creatures;
@@ -78,14 +78,58 @@ public static class BossPotionRow
                            $" 本回合计划喝={planned.Count}");
             }
 
-            for (int i = 0; i < held.Count; i++)
+            // ★ v0.2.866（用户 2026-11-21：「由于回合开始时狡诈药水不存在，所以不能显示其意图。
+            //   改为在格挡药水左侧的位置写上狡诈药水的意图…在狡诈药水被炼出来后改为把意图显示在狡诈药水上」）：
+            //   第 8 回合（含循环）二阶段的「狡诈药水」是**混沌药水喝下去之后**才补进栏位的，
+            //   回合开始时那个格子里根本没有它 ⇒ `held` 里没有它 ⇒ 意图压根画不出来。
+            //   现在往显示列表里插一个**占位格**（真的狡诈药水贴图 + 同样的意图，画成半透明表示"还没炼出来"），
+            //   位置放在「格挡药水」左边（没有格挡药水就放最左）；等它真补进栏位之后，
+            //   占位格自然消失、意图就直接画在真的那一格上（两条路都用同一个 `IntentFor`，数字一致）。
+            var display = new List<(PotionModel? Potion, bool Placeholder)>();
+            foreach (var p in held) display.Add((p, false));
+
+            try
             {
-                var potion = held[i];
+                bool stunned = boss!.Stunned;
+                bool wantsBronze = planned.Contains(typeof(LiquidBronze));
+                bool hasBronze = false;
+                foreach (var p in held) if (p != null && p.GetType() == typeof(LiquidBronze)) { hasBronze = true; break; }
+                // 与 `BossPotions.DrinkAsync` 里混沌药水的判据保持一致：栏位里**还有**瓶中精灵 ⇒
+                // 混沌补回来的是精灵、不会出现狡诈药水 ⇒ 这时不画占位（一阶段就该没有这个意图）。
+                bool hasFairy = false;
+                foreach (var p in held) if (p is FairyInABottle) { hasFairy = true; break; }
+                if (wantsBronze && !hasBronze && !hasFairy && !stunned)
+                {
+                    var canonical = BossPotions.CanonicalPotion(typeof(LiquidBronze));
+                    if (canonical != null)
+                    {
+                        int at = 0;
+                        for (int i = 0; i < display.Count; i++)
+                        {
+                            if (display[i].Potion != null && display[i].Potion.GetType() == typeof(BlockPotion)) { at = i; break; }
+                        }
+                        display.Insert(at, (canonical, true));
+                        Logger.Log($"[CharBoss] 药水栏：本回合会喝到「流动铜液」但它还没炼出来 ⇒ 在格挡药水左侧补一个占位意图" +
+                                   $"（位置 {at}，本回合已喝 {boss.PotionsDrunkThisTurn} 瓶）");
+                    }
+                }
+            }
+            catch (Exception e) { Logger.Log("[CharBoss] 药水占位格失败（忽略）: " + e.Message); }
+
+            for (int i = 0; i < display.Count; i++)
+            {
+                var potion = display[i].Potion;
                 if (potion == null) continue;
 
                 var cell = MakeCell(i, potion);
                 row.AddChild(cell);                       // ← ① 先入树（NIntent 的 _Ready 要跑）
                 cells.Add(cell);
+
+                if (display[i].Placeholder)
+                {
+                    // 还没炼出来：压淡一点，玩家一眼能看出「这瓶现在不在她手里」
+                    cell.Modulate = new Color(1f, 1f, 1f, 0.55f);
+                }
 
                 // 意图：只有「本回合要喝」的那几瓶才画
                 bool willDrink = false;
@@ -167,7 +211,7 @@ public static class BossPotionRow
             node.MouseFilter = Control.MouseFilterEnum.Ignore;
             cell.AddChild(node);
             // 到这一步 node 已经在树上、_Ready 已经跑过，UpdateIntent 才不会空引用
-            node.UpdateIntent(IntentFor(potion), TargetsOf(boss), boss.Creature);
+            node.UpdateIntent(IntentFor(potion, boss), TargetsOf(boss), boss.Creature);
 
             float scale = Math.Max(0.2f, BossUiTuning.PotionIntentScalePct / 100f);
             float gap = BossUiTuning.PotionIntentGapY;
@@ -228,7 +272,7 @@ public static class BossPotionRow
     ///   · 镣铐药水 → **策略**（`DebuffIntent`）
     ///   · 其余一律 → **强化**（`BuffIntent`）
     /// </summary>
-    private static MegaCrit.Sts2.Core.MonsterMoves.Intents.AbstractIntent IntentFor(PotionModel potion)
+    private static MegaCrit.Sts2.Core.MonsterMoves.Intents.AbstractIntent IntentFor(PotionModel potion, CharBossMonster? boss = null)
     {
         var type = potion?.GetType();
         if (type == typeof(BlockPotion) || type == typeof(ShipInABottle))
@@ -243,8 +287,24 @@ public static class BossPotionRow
         if (type == typeof(CunningPotion))
         {
             var (shivDamage, shivs) = CunningShivs(potion!);
-            // 段数只有 1 时用单段意图（否则会显示「6×1」）
-            return AttackIntent.Multi(shivDamage, shivs);
+            // ★ v0.2.866（用户 2026-11-21：「受力量虚弱等加成，要考虑回合内喝药触发爬行动物饰品增加的力量
+            //   （也可能已经算上了，别重复计算）」）：爬行动物饰品每喝一瓶 +3 **临时力量**
+            //   （反编译 `ReptileTrinket.AfterPotionUsed` → `ReptileTrinketPower`，它是 `TemporaryStrengthPower`）。
+            //   只把「**排在这瓶之前、还没喝掉**」的那几瓶算进来 —— 已经喝掉的那几瓶真实力量里已经有了
+            //   （意图节点自己会加当前力量）⇒ 不双算。于是回合开始时（一瓶都没喝）显示的数
+            //   就等于「最后那一口真正打出来的数」。
+            // ★ v0.2.867（用户 2026-11-21）：按**实际结算顺序**把整笔算出来，别再交给意图节点：
+            //   → 原版 `AttackIntent.Multi(damage, hits)` 就是直接显示我们给的数字（不会自己加力量/易伤）
+            //   口径（用户给的公式）：
+            //     (6 基础 + 本回合爬行动物饰品给的力量 + 药水自己给的力量 + 当前真实力量)
+            //       × 虚弱 × 易伤  … 再 + 群蛇形态每张牌那一下（普通 4 / 恐惧 6，不吃力量虚弱易伤）
+            //   然后 × 3 把刀；被锁玩家有无实体 ⇒ 每段 1 点、段数变成 3 刀 + 3 次群蛇 = 6 段（1×6）。
+            var (perHit, hits, detail) = CunningShivPreview(potion!, boss);
+            if (_trinketLogs++ < 10)
+            {
+                Logger.Log($"[CharBoss] 狡诈药水意图：{hits} 段 × {perHit} = {perHit * hits}（{detail}）");
+            }
+            return AttackIntent.Multi(perHit, hits);
         }
 
         if (type == typeof(ShacklingPotion))
@@ -253,6 +313,183 @@ public static class BossPotionRow
         return new MegaCrit.Sts2.Core.MonsterMoves.Intents.BuffIntent();
     }
 
+    /// <summary>
+    /// ★ v0.2.867：**狡诈药水的完整伤害预览**（用户 2026-11-21 给的公式）。
+    ///
+    /// <code>
+    /// 每段 = ((6 + 本回合爬行动物饰品力量 + 药水自己给的力量 + 当前真实力量) × 虚弱 × 易伤)
+    ///        + 群蛇形态每张牌那一下（普通 4 / 恐惧 6，ValueProp.Unpowered ⇒ 不吃力量/虚弱/易伤）
+    /// 合计 = 每段 × 3 把刀
+    /// 被锁玩家有「无实体」⇒ 每段 1 点，段数 = 3 刀 + 3 次群蛇 = 6（显示 1×6）
+    /// </code>
+    ///
+    /// 力量的三部分：
+    ///   · 当前真实 `StrengthPower`：她身上已经有的（含本回合已经喝掉的药水带来的）；
+    ///   · 爬行动物饰品：`ReptileTrinketPower`（`TemporaryStrengthPower`，每喝一瓶 +3）——
+    ///     只算「排在这瓶之前、还没喝掉」的那几瓶；
+    ///   · 药水自己给的力量：`FyshOil`（异鱼之油）的 `Strength` 变量，同样只算还没喝掉的那几瓶。
+    /// </summary>
+    private static (int PerHit, int Hits, string Detail) CunningShivPreview(PotionModel potion, CharBossMonster? boss)
+    {
+        try
+        {
+            var (baseDamage, shivs) = CunningShivs(potion);
+            if (shivs <= 0) shivs = 3;
+
+            Creature? self = boss?.Creature;
+            Creature? target = null;
+            try { target = boss != null ? BossLockOn.TargetFor(boss)?.Creature : null; } catch { target = null; }
+
+            // 当前真实力量 / 虚弱 / 目标易伤
+            int strengthNow = 0, weak = 0, vuln = 0, serpent = 0;
+            try { if (self != null) strengthNow = (int)Math.Round((double)self.GetPowerAmount<MegaCrit.Sts2.Core.Models.Powers.StrengthPower>()); } catch { }
+            try { if (self != null) weak = (int)Math.Round((double)self.GetPowerAmount<MegaCrit.Sts2.Core.Models.Powers.WeakPower>()); } catch { }
+            try { if (target != null) vuln = (int)Math.Round((double)target.GetPowerAmount<MegaCrit.Sts2.Core.Models.Powers.VulnerablePower>()); } catch { }
+            try { if (self != null) serpent = (int)Math.Round((double)self.GetPowerAmount<MegaCrit.Sts2.Core.Models.Powers.SerpentFormPower>()); } catch { }
+
+            var (pending, pendingDetail) = PendingPotionStrength(potion, boss);
+
+            decimal value = baseDamage + strengthNow + pending;
+            int beforeMul = (int)value;
+            if (weak > 0) value = Math.Floor(value * 0.75m);
+            if (vuln > 0) value = Math.Floor(value * 1.5m);
+            int per = (int)value;
+
+            // 无实体：每段 1 点，段数把群蛇那几下也算进去（3 刀 + 3 下群蛇 = 6）
+            bool intangible = false;
+            try { intangible = target != null && target.GetPower<MegaCrit.Sts2.Core.Models.Powers.IntangiblePower>() != null; } catch { }
+            if (intangible)
+            {
+                int hitsI = shivs + (serpent > 0 ? shivs : 0);
+                return (1, hitsI,
+                        $"无实体 ⇒ 每段 1 点 × {hitsI}（{shivs} 刀 + {shivs} 次群蛇）；" +
+                        $"不吃力量/虚弱/易伤");
+            }
+
+            per += serpent;
+            string detail = $"基础 {baseDamage} + 当前力量 {strengthNow} + 未喝药水 {pending}（{pendingDetail}）" +
+                            $" = {beforeMul}" +
+                            (weak > 0 ? " ×0.75(虚弱)" : string.Empty) +
+                            (vuln > 0 ? " ×1.5(易伤)" : string.Empty) +
+                            $" = {per - serpent}" +
+                            (serpent > 0 ? $" + 群蛇形态 {serpent} = {per}" : string.Empty) +
+                            $" × {shivs} 刀";
+            return (per, shivs, detail);
+        }
+        catch
+        {
+            var (baseDamage, shivs) = CunningShivs(potion);
+            return (baseDamage, Math.Max(1, shivs), "计算失败，退回基础值");
+        }
+    }
+
+    /// <summary>
+    /// ★ v0.2.867：本回合**还没喝**的那几瓶药水一共会给多少力量
+    /// （爬行动物饰品每瓶 +3，`FyshOil` 异鱼之油给它的 `Strength` 变量）。
+    /// 只算「排在这瓶药水之前、还没喝掉」的 —— 已经喝掉的力量已经在她身上了。
+    /// </summary>
+    private static (int Total, string Detail) PendingPotionStrength(PotionModel potion, CharBossMonster? boss)
+    {
+        int trinket = PendingTrinketStrength(potion, boss);
+        int oil = 0;
+        try
+        {
+            var planned = boss?.PlannedPotions;
+            if (planned != null && potion != null)
+            {
+                int index = -1;
+                var mine = potion.GetType();
+                for (int i = 0; i < planned.Count; i++) { if (planned[i] == mine) { index = i; break; } }
+                if (index >= 0)
+                {
+                    int drunk = Math.Max(0, boss!.PotionsDrunkThisTurn);
+                    int perOil = 0;
+                    try
+                    {
+                        var canonical = BossPotions.CanonicalPotion(typeof(FyshOil));
+                        if (canonical != null && canonical.DynamicVars.TryGetValue("Strength", out var v) && v != null)
+                            perOil = Math.Max(0, (int)Math.Round((double)v.BaseValue));
+                    }
+                    catch { /* 读不到就按 0 算 */ }
+                    if (perOil > 0)
+                    {
+                        for (int i = drunk; i < index; i++)
+                        {
+                            if (planned[i] == typeof(FyshOil)) oil += perOil;
+                        }
+                    }
+                }
+            }
+        }
+        catch { /* 忽略 */ }
+        return (trinket + oil, $"饰品 {trinket} + 异鱼之油 {oil}");
+    }
+    /// <summary>「狡诈药水意图里算了多少临时力量」这条日志最多打几次。</summary>
+    private static int _trinketLogs;
+
+    /// <summary>「药水直伤（含狡诈药水小刀）」这条日志最多打几次。</summary>
+    private static int _directLogs;
+
+    /// <summary>
+    /// ★ v0.2.866：**爬行动物饰品**（`REPTILE_TRINKET`）在回合内喝药给的**临时力量**里，
+    /// 有多少还没到账但一定会到账（= 排在这瓶药水之前、还没喝掉的那几瓶 × 每瓶的层数）。
+    ///
+    /// 反编译：`ReptileTrinket.AfterPotionUsed` → `PowerCmd.Apply&lt;ReptileTrinketPower&gt;(…, Amount)`，
+    /// 而 `ReptileTrinketPower : TemporaryStrengthPower` ⇒ 每喝一瓶 +N 力量（本回合）。
+    /// 已经喝掉的那几瓶不进这个数 —— 它们的真实力量已经在 `Creature` 身上了，
+    /// 意图节点渲染时会自己加当前力量，这里再加就双算了（用户 2026-11-21 特别提醒）。
+    /// </summary>
+    private static int PendingTrinketStrength(PotionModel potion, CharBossMonster? boss)
+    {
+        try
+        {
+            if (boss == null || potion == null) return 0;
+
+            // 她得真的带着爬行动物饰品；层数优先读遗物的变量，读不到用反编译出来的 3
+            int perPotion = 0;
+            var relics = boss.Shadow?.Relics;
+            for (int i = 0; i < (relics?.Count ?? 0); i++)
+            {
+                var relic = relics![i];
+                if (relic == null) continue;
+                string entry = string.Empty;
+                try { entry = relic.Id.Entry; } catch { /* 忽略 */ }
+                if (!string.Equals(entry, "REPTILE_TRINKET", StringComparison.Ordinal)) continue;
+                perPotion = 3;
+                try
+                {
+                    foreach (var key in new[] { "Strength", "ReptileTrinketPower" })
+                    {
+                        if (relic.DynamicVars.TryGetValue(key, out var v) && v != null)
+                        {
+                            int n = (int)Math.Round((double)v.BaseValue);
+                            if (n > 0) { perPotion = n; break; }
+                        }
+                    }
+                }
+                catch { /* 用 3 */ }
+                break;
+            }
+            if (perPotion <= 0) return 0;
+
+            var planned = boss.PlannedPotions;
+            if (planned == null || planned.Count == 0) return 0;
+
+            int index = -1;
+            var mine = potion.GetType();
+            for (int i = 0; i < planned.Count; i++)
+            {
+                if (planned[i] == mine) { index = i; break; }
+            }
+            if (index < 0) return 0;
+
+            int drunk = Math.Max(0, boss.PotionsDrunkThisTurn);
+            int pending = index - drunk;
+            if (pending <= 0) return 0;
+            return pending * perPotion;
+        }
+        catch { return 0; }
+    }
     /// <summary>
     /// 狡诈药水会给几张「小刀+」、每张多少伤害。
     ///
@@ -362,6 +599,9 @@ public static class BossPotionRow
                 if (HitsAllPlayers(potion)) area += damage;
                 else single += damage;
             }
+            // ★ v0.2.869（用户 2026-11-21 削弱）：二阶段混沌药水补出来的那一瓶从「狡诈药水」换成
+            //   **流动铜液**（只给 3 层荆棘、不生成小刀）⇒ 这里不再有「额外的 3 把小刀要计进薄荷尖塔」。
+            //   （v0.2.867 那段狡诈药水的加成逻辑已随之移除；荆棘不是伤害，薄菏那侧本来也不需要它。）
             return (area, single);
         }
         catch { return (0, 0); }

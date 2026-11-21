@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Combat;
@@ -637,9 +637,16 @@ public sealed class DefectDominion : MegaCrit.Sts2.Core.Models.Dread.DominionMod
                 //   以前拿「已有层数 ≥ 目标就跳过」当幂等闸门 ⇒ 自带 2 层的敌人一层都拿不到。
                 //   现在幂等改成**按「我们这一场给它发过多少」记账**（`_grantedArtifact`）：
                 //   同一只敌人被「进房」和「后加入」两条路、以及后面的兜底回读反复碰到也只发一次。
+                // ★ v0.2.871（用户 2026-11-21：「4 人联机、2 层故障机器人的支配，但所有敌人都有 8 层人工制品
+                //   （不算本来就有人工制品的怪），你这直接 2*4 了」）：
+                //   **双重计入**：我们自己按「本幕层数 + (人数−1)」算了一个 `expected` 当发放量，
+                //   而 `PowerCmd.Apply` 里原版还会再按 `ArtifactPower.GetScaledAmountForMultiplayer`
+                //   （`amount + 人数 − 1`）加一次 ⇒ 4 人局 = 2 + 3 + 3 = **8**。
+                //   ⇒ 现在**只把「本幕基础层数」交给原版**（2 层），缩放全部由 `PowerCmd.Apply` 负责；
+                //   记账 `_grantedArtifact` 也改记「我们发了多少基础层数」，因此幂等判据随之改成 `amount`。
                 int handed = 0;
                 try { handed = _grantedArtifact.TryGetValue(c, out int g) ? g : 0; } catch { handed = 0; }
-                int delta = expected - handed;
+                int delta = amount - handed;
                 if (delta <= 0)
                 {
                     already++;
@@ -649,7 +656,8 @@ public sealed class DefectDominion : MegaCrit.Sts2.Core.Models.Dread.DominionMod
 
                 targets.Add(c);
                 grants.Add((c, delta, have));
-                detail.Add($"{who}=自带 {have} + 支配 {delta}（目标 {expected}）");
+                detail.Add($"{who}=自带 {have} + 支配基础 {delta}" +
+                           (players > 1 ? $"（多人 {players} 人 ⇒ 原版再 +{players - 1} ⇒ 期望 {have + expected}）" : $"（期望 {have + expected}）"));
             }
 
             if (skippedBosses > 0)
@@ -670,8 +678,8 @@ public sealed class DefectDominion : MegaCrit.Sts2.Core.Models.Dread.DominionMod
                     await MegaCrit.Sts2.Core.Commands.PowerCmd.Apply<
                         MegaCrit.Sts2.Core.Models.Powers.ArtifactPower>(
                         new ThrowingPlayerChoiceContext(), c, (decimal)delta, null, null);
-                    try { _grantedArtifact[c] = expected; } catch { /* 忽略 */ }
-                    try { _expectedArtifactTotal[c] = have + delta; } catch { /* 忽略 */ }
+                    try { _grantedArtifact[c] = amount; } catch { /* 忽略 */ }
+                    try { _expectedArtifactTotal[c] = have + expected; } catch { /* 忽略 */ }
                 }
                 catch (Exception e)
                 {

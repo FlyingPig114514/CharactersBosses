@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Commands;
@@ -65,8 +65,39 @@ internal static class StampedePlays
                 {
                     if (boss!.Creature == null || boss.Creature.IsDead) break;
                     if (!pcs.Hand.Cards.Contains(card)) continue;
-                    await CardCmd.AutoPlay(ctx, card, null, AutoPlayType.Default);
-                    Logger.Log($"[CharBoss] 惊逃：已打出 {SafeEntry(card)}");
+
+                    // ★ v0.2.868（用户 2026-11-21：「联机时杂耍战用惊逃打出的牌不一定会攻击被他锁定的玩家」）：
+                    //   惊逃是 `CardCmd.AutoPlay(ctx, card, null, …)` —— 目标传 null ⇒ 原版按自己的规则挑
+                    //   （`RandomEnemy` 随机、`AnyEnemy` 取第一个）⇒ 联机时会打到**别的玩家**身上。
+                    //   这里跟其它「跟踪锁定」补丁同一套做法：
+                    //     · 单体/随机目标 ⇒ 显式把目标钉成被锁定的那位，并把 `HittableEnemies` 收窄到他；
+                    //     · 群攻（`AllEnemies`）保持原样（群攻就该打所有玩家）。
+                    bool aoe = false;
+                    try { aoe = card.TargetType == TargetType.AllEnemies; } catch { aoe = false; }
+                    MegaCrit.Sts2.Core.Entities.Creatures.Creature? locked = null;
+                    if (!aoe)
+                    {
+                        try { locked = Core.BossLockOn.TargetFor(boss!)?.Creature; } catch { locked = null; }
+                    }
+                    bool pushed = false;
+                    if (locked != null)
+                    {
+                        try { Patches.HittableEnemiesSidePatch.PushNarrowTo(locked); pushed = true; }
+                        catch { pushed = false; }
+                    }
+                    try
+                    {
+                        await CardCmd.AutoPlay(ctx, card, aoe ? null : locked, AutoPlayType.Default);
+                        Logger.Log($"[CharBoss] 惊逃：已打出 {SafeEntry(card)}" +
+                                   (aoe ? "（群攻 ⇒ 打所有玩家）" : $"（目标钉成被锁定玩家 {locked?.Name ?? "?"}）"));
+                    }
+                    finally
+                    {
+                        if (pushed)
+                        {
+                            try { Patches.HittableEnemiesSidePatch.PopNarrowTo(); } catch { /* 忽略 */ }
+                        }
+                    }
                 }
                 catch (Exception e)
                 {

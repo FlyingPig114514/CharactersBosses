@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -114,14 +114,43 @@ internal static class BossPotions
                 try { shadow.RemoveUsedPotionInternal(potion); } catch { }
                 bool hasFairy = false;
                 foreach (var held in Held(shadow)) if (held is FairyInABottle) { hasFairy = true; break; }
+
+                // ★ v0.2.865（用户 2026-11-21：「第八回合二阶段的额外意图（酿并喝狡诈药水、打小刀）
+                //   从来都没实现过（不论普通还是恐惧）」）—— 日志实证：
+                //     `混沌药水：按初始药水补满栏位` 紧跟 `剧本要喝 CunningPotion，但栏位里没有 → 跳过`
+                //   根因是**顺序**：`InitialPotions()` 里「瓶中精灵」排在**最后一位**，它被替换成
+                //   「狡诈药水」之后仍然排在最后；而栏位只有 8 格，前面那 7 瓶已经把格子占满
+                //   ⇒ 狡诈药水一次都没给出去（`Give` 拿不到空栏位就返回 null）。
+                //   现在先把 `FairyInABottle` → `CunningPotion` 的替换做出来，并把**狡诈药水提到最前面**，
+                //   再逐瓶发放，顺便把「给出几瓶 / 因为没栏位没给出的」打进日志。
+                // ★ v0.2.869（用户 2026-11-21：「削弱炼药猎，2 阶段额外喝的要改为流动铜液（获得 3 荆棘），
+                //   不再为狡诈药水也不再额外打出小刀」）：二阶段（瓶中精灵已用掉）混沌药水补出来的那一格
+                //   从「狡诈药水」改成 **流动铜液**（`LiquidBronze`，反编译：`PowerCmd.Apply&lt;ThornsPower&gt;(… 3)`）。
+                //   于是她只是获得 3 层荆棘，不再生成小刀、也不再额外打出 —— 整体是削弱。
+                var fill = new List<Type>();
                 foreach (var type in entropicFill)
                 {
                     if (type == null) continue;
                     var give = type;
-                    if (type == typeof(FairyInABottle) && !hasFairy) give = typeof(CunningPotion);
-                    Give(shadow, give);
+                    if (type == typeof(FairyInABottle) && !hasFairy) give = typeof(LiquidBronze);
+                    fill.Add(give);
                 }
-                Logger.Log("[CharBoss] 混沌药水：按初始药水补满栏位");
+                if (!hasFairy && fill.Contains(typeof(LiquidBronze)))
+                {
+                    fill.Remove(typeof(LiquidBronze));
+                    fill.Insert(0, typeof(LiquidBronze));
+                }
+
+                int givenCount = 0, failedCount = 0;
+                foreach (var give in fill)
+                {
+                    var made = Give(shadow, give);
+                    if (made != null) givenCount++; else failedCount++;
+                }
+                Logger.Log($"[CharBoss] 混沌药水：按初始药水补满栏位（瓶中精灵已用过={!hasFairy}" +
+                           (hasFairy ? string.Empty : "，这一格补「狡诈药水」并排在最前") +
+                           $"）⇒ 给出 {givenCount} 瓶" +
+                           (failedCount > 0 ? $"，{failedCount} 瓶因为栏位已满没给出去" : string.Empty));
                 // ⚠ 这一瓶也是「使用药水」⇒ 同样要回血。以前这个分支直接 return true，
                 //   于是混沌药水是唯一不回血的药水（用户 2026-10-26 报「喝药回 5 血没实现」时
                 //   有一部分就是这么来的）。

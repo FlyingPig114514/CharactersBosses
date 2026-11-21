@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Combat;
@@ -173,6 +173,13 @@ public sealed class NecrobinderDominionPower : PowerModel
             var all = player.PlayerCombatState?.Hand?.Cards;
             if (all == null || all.Count == 0) return Task.CompletedTask;
 
+            // ★ v0.2.870：与储君那条同因 —— 支配 power 会跟着玩家进 Boss 房，Boss 战里不该再生效。
+            try
+            {
+                var roomNow = player.Creature?.CombatState?.RunState?.CurrentRoom;
+                if (CharacterBosses.Core.DreadMode.SkipBecauseActBossRoom(roomNow, "亡灵契约师的支配（回合开始）")) return Task.CompletedTask;
+            }
+            catch { /* 判断失败就按原逻辑走 */ }
             // ★ 2026-11-13 修（玩家实测：第 1 回合挑中了诅咒牌「登顶者之灾」⇒ 加费毫无意义）：
             //   只从**打得出去**的手牌里随机挑。判据复用规划器那把尺子
             //   （`BossScriptPlanner.IsPlayable`：排除 状态 / 诅咒 / 任务 牌与带 `Unplayable` 关键字的牌，
@@ -292,6 +299,18 @@ public sealed class RegentDominionPower : PowerModel
             var combat = player.Creature.CombatState;
             var hand = player.PlayerCombatState?.Hand?.Cards;
             if (combat == null || hand == null) return false;
+
+            // ★ v0.2.870（用户 2026-11-21：「恐惧模式联机时，主 boss 为储君时首次进入 boss 房储君的支配
+            //   仍会生效（让玩家选择 1 张牌变化为眩晕/粘液/碎屑），然后触发联机不同步（SL 可解决）」）：
+            //   进 Boss 房时游戏会摘掉「本幕支配」，但**已经挂到玩家身上的这层 power 还在** ⇒
+            //   首次进 Boss 房第 1 回合照样弹「选 1 张牌变形」，而这是**玩家选择**：联机时两端各选各的
+            //   ⇒ 立刻分叉（读档后支配已不在，所以 SL 就好了）。与 `AfterRoomEntered` 用同一个闸门。
+            try
+            {
+                var roomNow = combat.RunState?.CurrentRoom;
+                if (CharacterBosses.Core.DreadMode.SkipBecauseActBossRoom(roomNow, "储君的支配（回合开始）")) return true;
+            }
+            catch { /* 判断失败就按原逻辑走 */ }
 
             int eligible = 0;
             foreach (var c in hand)

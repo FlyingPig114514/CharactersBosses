@@ -388,6 +388,11 @@ public static class BossDefs
                 SpecialLoc = "SILENT_BOSS.brewer",   // 特殊效果「调制」
         // 2026-11-13（恐惧模式）：同名「调制」，格挡抵消不消耗格挡
         SpecialLocDread = "SILENT_BOSS.brewer_dread",
+                // ★ v0.2.865（用户 2026-11-21：「恐惧模式下炼药猎的群蛇形态还是没有升级」）：
+                //   剧本里那张 `SerpentForm` 的注释说「恐惧版的升级改走 BossVariant.DreadUpgrades」，
+                //   但这个字段**一直没填** ⇒ 恐惧里她打的仍是未升级的群蛇形态。
+                //   现在补上（走 `AppendDreadUpgrades` 运行期通道，卡组与剧本手牌里同名那张都会升级）。
+                DreadUpgrades = new List<Type> { typeof(SerpentForm) },
                 SpecialPower = typeof(Powers.BrewModPower),
                 Potions = SilentBrewerScript.InitialPotions(),
                 HealPerPotion = 0,      // 用户 2026-10-26：削弱，去掉「喝药回 5 血」

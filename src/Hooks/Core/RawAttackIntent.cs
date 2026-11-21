@@ -266,6 +266,9 @@ internal sealed class LiveMultiAttackIntent : MultiAttackIntent
     private readonly int _plannedStance;
 
     private int _cacheFrame = -1;
+
+    /// <summary>「群攻意图被无实体钳到 1」这条日志最多打几次（v0.2.868）。</summary>
+    private static int _intangibleLogs;
     private int _cachePerHit;
     private int _cacheTimes = 1;
 
@@ -307,6 +310,32 @@ internal sealed class LiveMultiAttackIntent : MultiAttackIntent
             var (perHit, times) = _calc(targets, owner);
             _cachePerHit = BossDamagePredictor.ScaleToPlannedStance(null, owner, Math.Max(0, perHit), _plannedStance);
             _cacheTimes = Math.Max(1, times);
+
+            // ★ v0.2.868（用户 2026-11-21：「联机时，当你有无实体时，不锁定你的 boss 使用群伤的意图
+            //   不会被正确的降低为 1」）：
+            //   群攻意图的每段数字是**按「第一个真人玩家」当受害者**跑原版伤害管道算出来的
+            //   （`LiveSingleAttackIntent.Value` 里那段 `victim = 第一个非怪物目标`）。
+            //   联机时如果自己不是"第一个"，那么自己身上的「无实体」（`IntangiblePower.ModifyDamageCap`
+            //   只对持有者生效）就完全没进这条计算 ⇒ 明明只会挨 1 点，界面还显示 12×2。
+            //   群攻对每名玩家都生效 ⇒ 本机玩家有无实体时，显示值直接钳到 1（与原版上限语义一致）。
+            try
+            {
+                var combat = owner?.CombatState;
+                var me = combat != null
+                    ? MegaCrit.Sts2.Core.Context.LocalContext.GetMe(combat)?.Creature
+                    : null;
+                if (me != null && me.IsAlive && _cachePerHit > 1 &&
+                    me.GetPower<MegaCrit.Sts2.Core.Models.Powers.IntangiblePower>() != null)
+                {
+                    if (_intangibleLogs++ < 10)
+                    {
+                        Logger.Log($"[CharBoss] 群攻意图：本机玩家有无实体 ⇒ 每段从 {_cachePerHit} 钳到 1" +
+                                   $"（{_cacheTimes} 段）");
+                    }
+                    _cachePerHit = 1;
+                }
+            }
+            catch { /* 忽略 */ }
             // 拦截：本地玩家被保护着 ⇒ 这一条攻势预览归 0（玩家 2026-11-19）
             if (Core.InterceptPreview.LocalIsCovered(owner?.CombatState)) _cachePerHit = 0;
         }

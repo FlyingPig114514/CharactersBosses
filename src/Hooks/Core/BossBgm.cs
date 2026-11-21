@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Godot;
 using MegaCrit.Sts2.Core.Nodes.Audio;
@@ -218,7 +218,13 @@ public static class BossBgm
             //   就是它自己在管，我们不要抢。「与原本 Boss 共用匹配池」打开时对手可能是原版女王 / 无厌沙虫 /
             //   墨影幻灵…，抢过来就等于把人家那一首换成我们的兜底曲；往昔之章之类模组的遭遇同理。
             //   （我们自己的遭遇一个都没写 `CustomBgm`，所以正常流程走不到这里。）
-            if (CurrentEncounterHasBgm(out string vanillaBgm))
+            // ★ v0.2.870（用户 2026-11-21：「设置中音乐开启 1 代音乐好像有问题，开启后似乎并不是每场 boss 战
+            //   都会把 bgm 替换为 1 代音乐」）：
+            //   原因就是下面这道「遭遇自带专属 BGM ⇒ 不接管」的闸门 —— 选②一代曲时它仍然把一部分战斗放过去了
+            //   （原版自己的 Boss / 别的模组的遭遇都算「自带 BGM」）⇒ 那些场次照旧放原曲。
+            //   既然用户明确选了「一代 Boss 音乐」，就让它**优先于**这道闸门；只有非②模式才继续礼让。
+            bool forceGen1 = BossConfig.BgmSource == BossConfig.BgmGen1Boss;
+            if (!forceGen1 && CurrentEncounterHasBgm(out string vanillaBgm))
             {
                 if (!_loggedVanillaBgmFight)
                 {

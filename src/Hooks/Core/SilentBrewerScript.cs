@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Cards;
@@ -81,7 +81,9 @@ public static class SilentBrewerScript
             {
                 Note = "4. 格挡药水、异鱼之油、混沌药水｜预判、复制药水、坚韧之环×2、拳斗、偏折",
                 Energy = TurnEnergy,
-                Potions = Potions<BlockPotion, FyshOil, EntropicBrew, CunningPotion>(),   // 最后这瓶只有二阶段（精灵已消耗）才存在
+                // ★ v0.2.869（用户 2026-11-21 削弱）：最后这瓶只有二阶段（精灵已消耗）才存在，
+                //   而且从「狡诈药水」改成 **流动铜液**（+3 荆棘）—— 不再生成小刀、也不再额外打出。
+                Potions = Potions<BlockPotion, FyshOil, EntropicBrew, LiquidBronze>(),
                 Cards = Cards(
                     C<Anticipate>(), Drink(typeof(Duplicator), C<ToricToughness>()),
                     A<Fisticuffs>(9), C<Deflect>()),
@@ -117,9 +119,11 @@ public static class SilentBrewerScript
             // 8
             new()
             {
-                Note = "8. 格挡药水、异鱼之油、混沌药水、（二阶段：混沌补出的狡诈药水 → 3 张小刀当回合打出）｜预判、复制药水、坚韧之环×2、拳斗、偏折",
+                Note = "8. 格挡药水、异鱼之油、混沌药水、（二阶段：混沌补出的流动铜液 → 她获得 3 层荆棘）｜预判、复制药水、坚韧之环×2、拳斗、偏折",
                 Energy = TurnEnergy,
-                Potions = Potions<BlockPotion, FyshOil, EntropicBrew, CunningPotion>(),   // 最后这瓶只有二阶段（精灵已消耗）才存在
+                // ★ v0.2.869（用户 2026-11-21 削弱）：最后这瓶只有二阶段（精灵已消耗）才存在，
+                //   而且从「狡诈药水」改成 **流动铜液**（+3 荆棘）—— 不再生成小刀、也不再额外打出。
+                Potions = Potions<BlockPotion, FyshOil, EntropicBrew, LiquidBronze>(),
                 Cards = Cards(
                     C<Anticipate>(), Drink(typeof(Duplicator), C<ToricToughness>()),
                     A<Fisticuffs>(9), C<Deflect>()),
@@ -233,16 +237,16 @@ public static class SilentBrewerScript
         new ScriptPotion { Potion = typeof(T3) },
     };
     /// <summary>
-    /// 4 瓶版（v0.2.377 加）：第 8 回合用它把「**狡诈药水**」排在**混沌药水之后**。
+    /// 4 瓶版（v0.2.377 加）：第 4 / 8 回合用它把「**流动铜液**」排在**混沌药水之后**。
     ///
     /// 为什么不需要「条件回合」机制：`DrinkPlannedPotionsAsync` 是**按类型在栏位里找**的，
     /// 找不到就只打一行「栏位里没有 → 跳过」继续（见 `CharBossMonster.DrinkPlannedPotionsAsync`）。
     /// 所以：
-    ///   · **一阶段**（她还带着瓶中精灵）：混沌药水补回来的是瓶中精灵 ⇒ 栏位里没有狡诈 ⇒ 这一口自动跳过；
+    ///   · **一阶段**（她还带着瓶中精灵）：混沌药水补回来的是瓶中精灵 ⇒ 栏位里没有流动铜液 ⇒ 这一口自动跳过；
     ///   · **二阶段**（瓶中精灵已被消耗）：`BossPotions.DrinkAsync` 在补混沌药水时会把那一格换成
-    ///     `CunningPotion` ⇒ 她当场把狡诈喝掉 ⇒ 狡诈药水本身给 3 把小刀，
+    ///     `LiquidBronze` ⇒ 她当场把流动铜液喝掉 ⇒ **获得 3 层荆棘**（v0.2.869 削弱：不再生成小刀，也不再额外打出），
     ///     再由 `SilentBlades.FrontloadRealShivs` 摆上牌桌当回合打出去。
-    /// 顺序必须放在混沌药水**之后**，否则那一刻狡诈药水还不存在。
+    /// 顺序必须放在混沌药水**之后**，否则那一刻流动铜液还不存在。
     /// </summary>
     private static List<ScriptPotion> Potions<T1, T2, T3, T4>() => new()
     {
