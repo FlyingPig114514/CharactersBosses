@@ -218,6 +218,10 @@ foreach ($a in @(1, 2, 3)) {
     [void]$sb.AppendLine('')
 }
 
+# 用户 2026-11-21：「在目录那里写上不同角色的支配（有的支配要分 1、2、3 层，有的不用）」
+[void]$sb.AppendLine('**支配**（恐惧模式）：[各角色的支配](#dominions)')
+[void]$sb.AppendLine('')
+
 foreach ($a in @(1, 2, 3)) {
     $inAct = @($designs | Where-Object { $_.Act -eq $a })
     if ($inAct.Count -eq 0) { continue }
@@ -280,6 +284,25 @@ foreach ($a in @(1, 2, 3)) {
 }
 
 [void]$sb.AppendLine('---')
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine('<a id="dominions"></a>')
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine('## 各角色的支配（恐惧模式）')
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine('恐惧模式下，每一幕的「支配」按**本幕主 Boss 的角色**挂；只在本幕的**普通房间**生效（Boss 房里没有支配）。')
+[void]$sb.AppendLine('有的支配**按幕分层**（第 1/2/3 幕效果不同），有的**每幕一样**。')
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine('| 角色 | 支配效果 | 是否按幕分层 |')
+[void]$sb.AppendLine('|---|---|---|')
+[void]$sb.AppendLine('| 铁甲战士 | 每场战斗开始时，所有敌人获得 **1 层**「恶魔形态」 | 不分层 |')
+[void]$sb.AppendLine('| 静默猎手 | 每场战斗开始时，你失去 **1 / 2 / 3** 点力量，并获得 **1 / 2 / 3** 层虚弱 | **分 1/2/3 层** |')
+[void]$sb.AppendLine('| 故障机器人 | 所有敌人获得 **1 / 2 / 3** 层人工制品（**额外叠加**在敌人自带的人工制品之上；**多人时按人数增加**：2 人 +1、3 人 +2） | **分 1/2/3 层** |')
+[void]$sb.AppendLine('| 储君 | 你的回合开始时，把 1 张非状态 / 非诅咒牌变成 **眩晕 / 粘液 / 碎屑** | **分 1/2/3 层** |')
+[void]$sb.AppendLine('| 亡灵契约师 | 你的回合开始时，随机 1 张手牌在本回合费用 **+1** | 不分层 |')
+[void]$sb.AppendLine('| 愚者 | 每场战斗开始时，将 **2 张**「悲伤」加入你的抽牌堆 | 不分层 |')
+[void]$sb.AppendLine('| 观者 | 每场战斗开始时，所有敌人获得 **2 层**「虔信」；你的回合开始时，每个敌人获得 **2 层**「真言」；真言满 10 层时消耗 10 层进入「神格」，那一回合它的攻击造成三倍伤害 | 不分层 |')
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine('> 支配不是 Boss 的「特殊效果」—— 特殊效果只在该 Boss 的 Boss 战里生效，支配只在本幕的普通战斗里生效，两者互不重叠。')
 [void]$sb.AppendLine('')
 [void]$sb.AppendLine('## 说明')
 [void]$sb.AppendLine('')
