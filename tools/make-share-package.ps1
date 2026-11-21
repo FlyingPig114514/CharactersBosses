@@ -68,6 +68,14 @@ robocopy (Join-Path $Root 'tools\pck_builder') (Join-Path $Target 'tools\pck_bui
 robocopy (Join-Path $Root 'tools\ilspy-cli')  (Join-Path $Target 'tools\ilspy-cli')  /MIR /NFL /NDL /NJH /NJS /NP | Out-Null
 Write-Host "  [copy] pck_builder + ilspy-cli done"
 
+# ---- 2b. PRIVACY: strip local-machine traces -----------------------------
+# obj\ under a hand-built tool carries THIS machine's username and absolute NuGet paths
+# (C:\Users\<me>\..., project folder names) and *.pdb embeds the same -> never ship them.
+$ilspyObj = Join-Path $Target 'tools\ilspy-cli\obj'
+if (Test-Path $ilspyObj) { Remove-Item $ilspyObj -Recurse -Force; Write-Host "  [privacy] removed tools\ilspy-cli\obj" }
+Get-ChildItem (Join-Path $Target 'tools') -Recurse -File -Include '*.pdb' -ErrorAction SilentlyContinue |
+    ForEach-Object { Remove-Item $_.FullName -Force; Write-Host ("  [privacy] removed " + $_.Name) }
+
 if (-not $SkipToolchain) {
     Write-Host "[share] 3/5 tools\dotnet (840 MB, this takes a while)"
     robocopy (Join-Path $Root 'tools\dotnet') (Join-Path $Target 'tools\dotnet') /MIR /NFL /NDL /NJH /NJS /NP | Out-Null
@@ -81,9 +89,10 @@ else {
 # ---- 3. .env ------------------------------------------------------------
 Write-Host "[share] 5/5 .env + docs"
 $envPath = Join-Path $Target '.env'
-$envText = "GAME_DIR=$GameDir`n"
+# PRIVACY: ship the generic default path, not THIS machine's layout.
+$envText = "GAME_DIR=C:\Program Files (x86)\Steam\steamapps\common\Slay the Spire 2`r`n"
 [System.IO.File]::WriteAllText($envPath, $envText, (New-Object System.Text.UTF8Encoding($false)))
-Write-Host ("  [write] .env  GAME_DIR=" + $GameDir)
+Write-Host "  [write] .env  (generic default path; the friend edits it or passes it to install-mod.bat)"
 
 $startHere = @'
 # START HERE (offline edition)
