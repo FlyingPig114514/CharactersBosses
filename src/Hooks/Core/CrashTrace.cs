@@ -52,8 +52,54 @@ internal static class CrashTrace
                 Problem("未观察的任务异常", e.Exception);
                 try { e.SetObserved(); } catch { /* 忽略 */ }
             };
+
+            // ★★ v0.2.898（玩家 2026-11-22「亡命之徒打电球机崩溃」：两份日志里**一条异常都没有**，
+            //   `godot.log` 直接断在闪电球激发的受击动画后面 ⇒ 要么是原生层硬崩，要么异常在
+            //   Godot 的帧回调 / 异步续体里被吞掉、进程随即消失）：
+            //   加一道**首过异常**（FirstChanceException）面包屑 —— 只在「原版帧」里抛、又不是我们自己的
+            //   代码抛的那几种（空引用 / 无效操作 / 参数为空）才记，去重 + 全程最多 20 行。
+            //   这样下一份 `characterbosses_trace.txt` 里就能看到「崩之前原版哪一句先空引用了」。
+            AppDomain.CurrentDomain.FirstChanceException += (_, e) => TraceFirstChance(e.Exception);
         }
         catch { /* 忽略 */ }
+    }
+
+    private static readonly System.Collections.Generic.HashSet<string> _seenFirstChance = new();
+    private static int _firstChanceLines;
+
+    /// <summary>首过异常面包屑（过滤 + 去重 + 限量，见 <see cref="Install"/> 里的说明）。</summary>
+    private static void TraceFirstChance(Exception? ex)
+    {
+        try
+        {
+            if (ex == null) return;
+            if (_firstChanceLines >= 20) return;
+            if (ex is not NullReferenceException && ex is not InvalidOperationException &&
+                ex is not ArgumentNullException && ex is not IndexOutOfRangeException) return;
+
+            string stack;
+            try { stack = ex.StackTrace ?? string.Empty; } catch { return; }
+            if (stack.Length == 0) return;
+            if (stack.Contains("CharacterBosses")) return;        // 我们自己抛的（外面都有 try/catch）
+            if (!stack.Contains("MegaCrit")) return;              // 与原版无关
+
+            // 去重：按第一行栈帧（同一个抛点的重复异常只留一条）
+            string key;
+            try
+            {
+                key = ex.GetType().Name + "|" + stack.Replace("\r", string.Empty).Split('\n')[0].Trim();
+            }
+            catch { key = ex.GetType().Name; }
+
+            lock (_seenFirstChance)
+            {
+                if (!_seenFirstChance.Add(key)) return;
+                _firstChanceLines++;
+            }
+
+            Problem("首过异常（原版帧，可能被吞掉）", ex);
+        }
+        catch { /* 面包屑绝不影响游戏 */ }
     }
 
     /// <summary>里程碑：正常推进到某一步就记一行。</summary>

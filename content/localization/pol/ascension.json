@@ -5,5 +5,5 @@
     "DREAD.NECROBINDER.description":  "Necrobinder\u0027s Dominion: at the start of your turn, a random card in your hand costs 1 more this turn.",
     "DREAD.REGENT.description":  "Dominacja Księcia: na początku twojej tury wybierz 1 kartę (nie Status ani Klątwę) i zamień ją w Gruz.",
     "DREAD.WATCHER_DEVOTION.description":  "Dominacja Obserwatorki: na początku każdej walki wszyscy wrogowie zyskują 2 [gold]Dewocję[/gold] (na początku twojej tury każdy wróg zyskuje 2 [gold]Mantry[/gold]; przy 10 [gold]Mantry[/gold] wydaje 10 i wchodzi w [gold]Boskość[/gold], zadając w tej turze potrójne obrażenia).",
-    "DREAD.FOOL.description":  "Dominacja Głupca: na początku każdej walki do twojego stosu doboru dodawane są 2 karty [gold]Smutku[/gold]."
+    "DREAD.FOOL.description":  "Dominacja Głupca: na początku każdej walki do twojego stosu doboru dodawane są {Sadness} karty [gold]Smutku[/gold]."
 }

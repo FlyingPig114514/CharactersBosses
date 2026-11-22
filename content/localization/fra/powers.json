@@ -87,7 +87,7 @@
     "NECROBINDER_DOMINION_POWER.title":  "Necrobinder\u0027s Dominion",
     "NECROBINDER_DOMINION_POWER.description":  "At the start of your turn, a random card in your hand costs [gold]1[/gold] more this turn.",
     "FOOL_DOMINION_POWER.title":  "The Fool\u0027s Dominion",
-    "FOOL_DOMINION_POWER.description":  "At the start of combat, shuffle [gold]2[/gold] Sadness into your draw pile.",
+    "FOOL_DOMINION_POWER.description":  "At the start of combat, shuffle [gold]{Sadness}[/gold] Sadness into your draw pile.",
     "IRONCLAD_RAGE_POWER.description_dread":  "Whenever the Ironclad plays Anger, also add a copy of Anger to every player discard pile.\nWhenever a player plays Anger, the Ironclad loses {Loss} Strength this turn.\nHe also carries Orichalcum: when he ends his turn with no Block, he gains 6 Block.",
     "BOSS_RENDING_POWER.description_dread":  "Whenever the Ironclad deals damage, he heals for the [gold]full amount of damage dealt[/gold], including the part that was blocked.",
     "DOMINATE_WEAK_POWER.description_dread":  "Whenever the Ironclad applies Vulnerable, he also applies 2 Weak and 2 Frail.",

@@ -41,13 +41,60 @@ public static class BossOrbMath
             //   （它会随每次回合结束 `_evokeVal += PassiveVal` 而涨，那时才把集中带进来。）
             //   闪电/玻璃球的 `EvokeVal` 才是 `ModifyOrbValue(基础值)`，要减掉集中。
             if (orb is DarkOrb) return Math.Max(0, (int)Math.Round(orb.EvokeVal));
+
+            // ★★ v0.2.898（玩家 2026-11-22 崩溃报告里的日志实证）：
+            //   反编译 `LightningOrb.EvokeVal => ModifyOrbValue(8m)` →
+            //   `Hook.ModifyOrbValue(Owner.Creature.CombatState, …)`，而 `OrbModel.Owner` **可空**
+            //   ⇒ 球的 `Owner` 为空时读 `EvokeVal` 必然 NRE。
+            //   那一局 16 分钟里打了 **63 次** `evoke value failed: Object reference not set…`（全在打「电球机」时）。
+            //   这类球大多是我们自己的**球位模拟器**造出来的（没 owner），读它没有意义 ⇒
+            //   直接给「基础值」兜底，不再刷屏、也不再算成 0。
+            if (OwnerMissing(orb))
+            {
+                if (_ownerMissingLogs++ < 6)
+                {
+                    Logger.Log($"[CharBoss] 充能球没有主人（{orb.GetType().Name}）：`EvokeVal` 会空引用 ⇒ 按基础值算" +
+                               "（多半是球位模拟器里新造的球；真球若也这样，见 OrbOwnerRepair 的补主人逻辑）");
+                }
+                return BaseEvokeDamage(orb);
+            }
+
             return Math.Max(0, (int)Math.Round(orb.EvokeVal) - focus);
         }
         catch (Exception e)
         {
-            Logger.Log("[CharBoss] evoke value failed: " + e.Message);
-            return 0;
+            if (_evokeFailLogs++ < 6)
+                Logger.Log($"[CharBoss] evoke value failed（{orb.GetType().Name}）: {e.Message}（之后同类不再刷屏）");
+            return BaseEvokeDamage(orb);
         }
+    }
+
+    private static int _ownerMissingLogs;
+    private static int _evokeFailLogs;
+
+    /// <summary>这颗球的 `Owner`（或它的生物 / 战斗状态）是不是拿不到 —— 拿不到就不能读 `EvokeVal`/`PassiveVal`。</summary>
+    internal static bool OwnerMissing(OrbModel? orb)
+    {
+        try { return orb?.Owner?.Creature?.CombatState == null; }
+        catch { return true; }
+    }
+
+    /// <summary>
+    /// 拿不到 `Owner` 时的**基础激发伤害**（反编译的常量，**不含集中**）：
+    ///   · `LightningOrb.EvokeVal => ModifyOrbValue(8m)` ⇒ 8；
+    ///   · `GlassOrb`：`_passiveVal = 4`、`EvokeVal => PassiveVal × 2` ⇒ 8。
+    /// 其余（冰霜/等离子不是伤害；黑暗走字段不需要 Owner）返回 0。
+    /// </summary>
+    internal static int BaseEvokeDamage(OrbModel? orb)
+    {
+        try
+        {
+            if (orb is LightningOrb) return 8;
+            if (orb is GlassOrb) return 8;
+            if (orb is DarkOrb) return Math.Max(0, (int)Math.Round(orb.EvokeVal));
+        }
+        catch { /* 忽略 */ }
+        return 0;
     }
 
     /// <summary>Boss 身上当前的集中层数（用来从球数值里剔除它）。</summary>
@@ -149,7 +196,10 @@ public static class BossOrbMath
         {
             foreach (var orb in queue.Orbs)
             {
-                if (orb is PlasmaOrb) energy += Math.Max(0, (int)Math.Round(orb.PassiveVal));
+                if (orb is not PlasmaOrb) continue;
+                // v0.2.898：`PassiveVal` 走 `ModifyOrbValue(Owner.Creature.CombatState, …)`，没主人就空引用 ⇒ 直接给基础值 1
+                if (OwnerMissing(orb)) { energy += 1; continue; }
+                energy += Math.Max(0, (int)Math.Round(orb.PassiveVal));
             }
         }
         catch (Exception e)

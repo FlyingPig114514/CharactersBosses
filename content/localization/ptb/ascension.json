@@ -5,5 +5,5 @@
     "DREAD.NECROBINDER.description":  "Necrobinder\u0027s Dominion: at the start of your turn, a random card in your hand costs 1 more this turn.",
     "DREAD.REGENT.description":  "Domínio do Príncipe: no início do seu turno, escolha 1 carta que não seja Status nem Maldição e transforme-a em Destroços.",
     "DREAD.WATCHER_DEVOTION.description":  "Domínio da Observadora: no início de cada combate, todos os inimigos ganham 2 de [gold]Devoção[/gold] (no início do seu turno cada inimigo ganha 2 de [gold]Mantra[/gold]; com 10 de [gold]Mantra[/gold] ele gasta 10 e entra em [gold]Divindade[/gold], causando o triplo de dano naquele turno).",
-    "DREAD.FOOL.description":  "Domínio do Tolo: no início de cada combate, 2 de [gold]Tristeza[/gold] são adicionadas ao seu monte de compra."
+    "DREAD.FOOL.description":  "Domínio do Tolo: no início de cada combate, {Sadness} de [gold]Tristeza[/gold] são adicionadas ao seu monte de compra."
 }

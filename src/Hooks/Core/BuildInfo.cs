@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.893 / 2026-11-22 (**根除骨的「预借时间」不再统计重放的牌**）—— 用户 2026-11-22：「根除骨的特殊效果会计算重放的牌的费用（带有重放的牌只有第一次打出是花费费用的，后面重放几次都不需要费用），预借时间应该只计算玩家花费的费用」。重放会给**同一张牌实例**再派几个 `CardPlay`，其 `Resources.EnergySpent` 沿用第一次的扣费记录 ⇒ 被重复累计。现在按「同一张牌实例 + 同一个玩家回合只计第一次」拦掉（复制/双发是另一个实例，照常计），并留一行限流日志 `预借时间：X 本回合已经计过一次 ⇒ 这次是重放`。完整历史见 docs/plans/changelog-history.md";
+    public const string Tag = "v0.2.898 / 2026-11-23 (**给充能球补主人 + 崩溃取证**）—— 玩家 2026-11-22 报「用崩坠的亡命之徒打电球机崩溃」，随附的两份日志（`mod_log` + `godot.log`）里**一条异常都没有**：godot.log 直接断在闪电球激发的受击动画后面。但日志里有一条**canary**：那一局 16 分钟出现 **63 次** `evoke value failed: Object reference not set to an instance of an object.`（全是打电球机时）。反编译确认根因链：`OrbModel.Owner` **可空**，而 `LightningOrb.EvokeVal => ModifyOrbValue(8m)` → `Hook.ModifyOrbValue(Owner.Creature.CombatState, …)`、原版 `Evoke` 里 `base.CombatState` 同样是 `Owner.Creature.CombatState` ⇒ **Owner 为空必然空引用**，而那一下跑在 Boss 回合的协程里。本版：①新增 `Core/OrbOwnerRepair`（4Hz 慢车道把 `Owner` 为空的球补回影子玩家，setter 从空补上永远合法）；②`BossOrbMath.EvokeDamageOf` / `PlasmaEnergyFor` 不再读无主球的 `EvokeVal`/`PassiveVal`，改用反编译常量兜底（闪电 8 / 玻璃 8 / 等离子 1），并且**限流**不再刷屏；③`CrashTrace` 加**首过异常**（FirstChanceException）面包屑：只记「原版帧里抛出、又被吞掉」的空引用/无效操作类异常（去重 + 最多 20 行）⇒ 下次崩溃时 `logs/characterbosses_trace.txt` 里能看到原版哪一句先炸。完整历史见 docs/plans/changelog-history.md";
 
     private static bool _logged;
 
@@ -79,6 +79,12 @@ public static class BuildInfo
         catch (Exception e) { try { Logger.Log("[CharBoss] 群蛇形态锁定补丁安装失败（忽略）: " + e.Message); } catch { } }
         try { Patches.DarkOrbLockOnPatch.TryInstall(); }
         catch (Exception e) { try { Logger.Log("[CharBoss] 黑暗球锁定补丁安装失败（忽略）: " + e.Message); } catch { } }
+
+        // ★ v0.2.896：纯诊断（玩家 2026-11-23「抉择储的天际钻头好像不会优先攻击瓦皮」）。
+        //   瓦皮承伤是**原版钩子**（`WuppysLoyaltyPower.ModifyPreBlockDamageTarget`）干的，
+        //   我们的选靶补丁改不动它 ⇒ 先照出「是被哪一条挡下」（目标/强化攻击/瓦皮已死），再决定要不要动行为。
+        try { Patches.WuppyRedirectTracePatch.TryInstall(); }
+        catch (Exception e) { try { Logger.Log("[CharBoss] 瓦皮承伤诊断安装失败（忽略）: " + e.Message); } catch { } }
 
         // 薄荷尖塔（MintySpire2）的「即将受到的伤害」兼容：它可能排在我们后面加载，
         // 所以等所有程序集都到位后再反射挂补丁（拿不到就安静跳过）。

@@ -5,5 +5,5 @@
     "DREAD.NECROBINDER.description":  "Necrobinder\u0027s Dominion: at the start of your turn, a random card in your hand costs 1 more this turn.",
     "DREAD.REGENT.description":  "Herrschaft des Prinzen: Wähle zu Beginn deines Zuges 1 Karte (kein Status, kein Fluch) und verwandle sie in „Trümmer“.",
     "DREAD.WATCHER_DEVOTION.description":  "Herrschaft des Beobachters: Zu Beginn jedes Kampfes erhalten alle Gegner 2 [gold]Hingabe[/gold] (zu Beginn deines Zuges erhält jeder Gegner 2 [gold]Mantra[/gold]; bei 10 [gold]Mantra[/gold] gibt er 10 aus und betritt die [gold]Göttlichkeit[/gold] – in diesem Zug dreifacher Angriffsschaden).",
-    "DREAD.FOOL.description":  "Herrschaft des Narren: Zu Beginn jedes Kampfes werden deinem Nachziehstapel 2 [gold]Traurigkeit[/gold] hinzugefügt."
+    "DREAD.FOOL.description":  "Herrschaft des Narren: Zu Beginn jedes Kampfes werden deinem Nachziehstapel {Sadness} [gold]Traurigkeit[/gold] hinzugefügt."
 }

@@ -5,5 +5,5 @@
     "DREAD.NECROBINDER.description":  "亡灵契约师的支配：在你的回合开始时，你随机1张手牌的费用在本回合增加 1。",
     "DREAD.REGENT.description":  "储君的支配：在你的回合开始时，选择1张非状态或诅咒牌，将其变化为{Transform}。",
     "DREAD.WATCHER_DEVOTION.description":  "观者的支配：每场战斗开始时，所有敌人获得 2 层[gold]虔信[/gold]（你的回合开始时，每个敌人获得 2 层[gold]真言[/gold]；真言满 10 层时消耗 10 层进入神格，那一回合它的攻击造成三倍伤害）。",
-    "DREAD.FOOL.description":  "愚者的支配：每场战斗开始时，将 2 张[gold]悲伤[/gold]加入你的抽牌堆。"
+    "DREAD.FOOL.description":  "愚者的支配：每场战斗开始时，将 {Sadness} 张[gold]悲伤[/gold]加入你的抽牌堆。"
 }

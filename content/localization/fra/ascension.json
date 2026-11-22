@@ -5,5 +5,5 @@
     "DREAD.NECROBINDER.description":  "Necrobinder\u0027s Dominion: at the start of your turn, a random card in your hand costs 1 more this turn.",
     "DREAD.REGENT.description":  "Domination du Prince : au début de votre tour, choisissez 1 carte (ni Statut ni Malédiction) et transformez-la en « Débris ».",
     "DREAD.WATCHER_DEVOTION.description":  "Domination de l\u0027Observatrice : au début de chaque combat, tous les ennemis gagnent 2 [gold]Dévouement[/gold] (au début de ton tour, chaque ennemi gagne 2 [gold]Mantra[/gold] ; à 10 [gold]Mantra[/gold], il en dépense 10 et entre en [gold]Divinité[/gold], infligeant le triple des dégâts ce tour-là).",
-    "DREAD.FOOL.description":  "Domination du Fou : au début de chaque combat, 2 [gold]Tristesse[/gold] sont ajoutées à ta pioche."
+    "DREAD.FOOL.description":  "Domination du Fou : au début de chaque combat, {Sadness} [gold]Tristesse[/gold] sont ajoutées à ta pioche."
 }

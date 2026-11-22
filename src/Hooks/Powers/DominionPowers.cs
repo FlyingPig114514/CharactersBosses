@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Combat;
@@ -386,7 +386,7 @@ public sealed class RegentDominionPower : PowerModel
 }
 
 /// <summary>
-/// 恐惧模式「**愚者的支配**」的**可视载体**（用户 2026-11-13 新增）。
+/// 恐惧模式「**愚者的支配**」的**可视载体**（用户 2026-11-13 新增；2026-11-23 改成按幕分档 2/3/4 张）。
 ///
 /// ⚠ 只在 111 构建里：它要发的是 0.113 才有的状态牌 **「悲伤」`Sadness`**
 /// （`base(-1, CardType.Status, CardRarity.Status, TargetType.None)`）。107 没有这张牌，
@@ -394,14 +394,33 @@ public sealed class RegentDominionPower : PowerModel
 /// </summary>
 public sealed class FoolDominionPower : PowerModel
 {
-    /// <summary>给几张「悲伤」。</summary>
-    private const int SadnessCount = 2;
+    /// <summary>
+    /// 给几张「悲伤」—— **按幕分档 2 / 3 / 4**（用户 2026-11-23，见
+    /// <see cref="Core.DreadActScaling.SadnessCount"/>；以前是固定 2 张）。
+    /// </summary>
+    private static int SadnessNow() => Core.DreadActScaling.SadnessCount();
 
     public override PowerType Type => PowerType.Debuff;
 
     public override PowerStackType StackType => PowerStackType.Single;
 
     public override bool ShouldPlayVfx => false;
+
+    /// <summary>
+    /// 描述里的 <c>{Sadness}</c> 现填当前幕的数字（2 / 3 / 4）。
+    /// 和 <see cref="IroncladRagePower.Description"/> 同一套做法：文案里不能用 <c>{Amount}</c>
+    /// （那是原版层数，改它会牵动结算），所以单独用占位符。
+    /// </summary>
+    public override MegaCrit.Sts2.Core.Localization.LocString Description
+    {
+        get
+        {
+            var description = base.Description;
+            try { description.Add("Sadness", (decimal)SadnessNow()); }
+            catch { /* 忽略：取不到就把占位符原样显示，不崩 */ }
+            return description;
+        }
+    }
 
     /// <summary>本场是否已经发过（每场战斗只发一次）。</summary>
     private bool _given;
@@ -428,7 +447,8 @@ public sealed class FoolDominionPower : PowerModel
             }
 
             int given = 0;
-            for (int i = 0; i < SadnessCount; i++)
+            int want = SadnessNow();
+            for (int i = 0; i < want; i++)
             {
                 var made = combatState.CreateCard(canonical, player);
                 if (made == null) continue;
@@ -446,7 +466,8 @@ public sealed class FoolDominionPower : PowerModel
             }
 
             _given = true;
-            Logger.Log($"[CharBoss] 愚者的支配：给 {me.Name} 的抽牌堆洗入 {given} 张「悲伤」");
+            Logger.Log($"[CharBoss] 愚者的支配：给 {me.Name} 的抽牌堆洗入 {given} 张「悲伤」" +
+                       $"（第 {Core.DreadActScaling.ActNumber()} 幕 ⇒ 应给 {want} 张）");
         }
         catch (Exception e)
         {

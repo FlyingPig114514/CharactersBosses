@@ -1041,6 +1041,14 @@ public static class BossFrameTick
                 try { FormVfxFacingPatch.EnsureFacing(each); } catch { /* 单只失败不影响其它 */ }
             }
 
+            // ★★ v0.2.898：**给她的充能球补回主人**（`OrbModel.Owner` 为空时 `EvokeVal`/原版 `Evoke`
+            //   会在 `Owner.Creature` 上空引用；玩家 2026-11-22 的崩溃日志里这条 canary 出现了 63 次）。
+            //   放在慢车道：只在 Owner 真的为空时才动手，正常一帧就是一次空转。
+            foreach (var each in everyBoss)
+            {
+                try { Core.OrbOwnerRepair.Sweep(each); } catch { /* 单只失败不影响其它 */ }
+            }
+
             // 「这一手算不算攻击」对第三方永远可见（用户 2026-10-26：眼部攻击上不了虚弱、别的 mod 同类牌也出问题）。
             // 反编译：`GoForTheEyes` 问的是 `Target.Monster.IntendsToAttack`
             //      ⇒ `NextMove.Intents.Any(i => i.IntentType is Attack or DeathBlow)`。

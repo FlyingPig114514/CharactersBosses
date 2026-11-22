@@ -5,5 +5,5 @@
     "DREAD.NECROBINDER.description":  "Necrobinder\u0027s Dominion: at the start of your turn, a random card in your hand costs 1 more this turn.",
     "DREAD.REGENT.description":  "Regent's Dominion: At the start of your turn, choose 1 non-Status, non-Curse card and transform it into {Transform}.",
     "DREAD.WATCHER_DEVOTION.description":  "The Watcher\u0027s Dominion: at the start of every combat, all enemies gain 2 [gold]Devotion[/gold] (at the start of your turn each enemy gains 2 [gold]Mantra[/gold]; at 10 [gold]Mantra[/gold] it spends 10 and enters [gold]Divinity[/gold], dealing triple attack damage that turn).",
-    "DREAD.FOOL.description":  "The Fool's Dominion: at the start of every combat, add 2 [gold]Sadness[/gold] to your draw pile."
+    "DREAD.FOOL.description":  "The Fool's Dominion: at the start of every combat, add {Sadness} [gold]Sadness[/gold] to your draw pile."
 }

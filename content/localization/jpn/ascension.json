@@ -5,5 +5,5 @@
     "DREAD.NECROBINDER.description":  "Necrobinder\u0027s Dominion: at the start of your turn, a random card in your hand costs 1 more this turn.",
     "DREAD.REGENT.description":  "王子の支配：あなたのターン開始時、状態異常でも呪いでもないカードを1枚選び、それを「瓦礫」に変化させる。",
     "DREAD.WATCHER_DEVOTION.description":  "観者の支配：戦闘開始時、すべての敵は[gold]帰依[/gold]を2獲得する（あなたのターン開始時、各敵は[gold]真言[/gold]を2獲得する。真言が10になると10を消費して[gold]神格[/gold]に入り、そのターンの攻撃は3倍のダメージを与える）。",
-    "DREAD.FOOL.description":  "愚者の支配：戦闘開始時、山札に[gold]悲しみ[/gold]を2枚加える。"
+    "DREAD.FOOL.description":  "愚者の支配：戦闘開始時、山札に[gold]悲しみ[/gold]を{Sadness}枚加える。"
 }

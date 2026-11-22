@@ -62,6 +62,15 @@ internal static class SneakyOnlyBossAttacksPatch
             var powerOwner = __instance?.Owner;
             if (powerOwner == null) return true;
 
+            // ★★ v0.2.896（用户 2026-11-23：「多人时，玩家的鬼祟不生效，只当敌方角色 boss 打出攻击牌时生效」）：
+            //   这条 patch 本来是 2026-10-29 为「**奇巧猎自己的**鬼祟」写的
+            //   （用户口径：「让鬼祟判定攻击牌时排除奇巧猎自己，只判定其它 boss」），
+            //   但它没有判断「这份 SneakyPower 是谁的」⇒ 连**真人玩家**身上的鬼祟也一起被掐掉了：
+            //   日志实证 `鬼祟：真人玩家 P#14a04f 打出攻击牌 STRIKE_IRONCLAD → **不触发**`
+            //   （即队友的攻击不再给玩家格挡，正好反了）。
+            //   ⇒ 现在只在「鬼祟的持有者是我们自己的 Boss」时生效，真人玩家的鬼祟完全交还原版。
+            if (powerOwner.Monster is not Monsters.CharBossMonster) return true;
+
             Player? cardOwner = null;
             try { cardOwner = card.Owner; } catch { cardOwner = null; }
             if (cardOwner == null) return true;                      // 判不清是谁打的：交回原版

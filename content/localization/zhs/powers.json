@@ -87,7 +87,7 @@
     "NECROBINDER_DOMINION_POWER.title":  "亡灵契约师的支配",
     "NECROBINDER_DOMINION_POWER.description":  "在你的回合开始时，你随机1张手牌的费用在本回合增加[gold]1[/gold]。",
     "FOOL_DOMINION_POWER.title":  "愚者的支配",
-    "FOOL_DOMINION_POWER.description":  "战斗开始时，将[gold]2[/gold]张「悲伤」加入你的抽牌堆。",
+    "FOOL_DOMINION_POWER.description":  "战斗开始时，将[gold]{Sadness}[/gold]张「悲伤」加入你的抽牌堆。",
     "IRONCLAD_RAGE_POWER.description_dread":  "每当铁甲战士打出「愤怒」时，也向所有玩家的弃牌堆加入1张愤怒的复制品。\n每当有玩家打出「愤怒」时，铁甲战士本回合失去 {Loss} 点力量。\n此外，他装备着遗物「奥利哈钢」：他的回合结束且没有格挡时，获得 6 点格挡。",
     "BOSS_RENDING_POWER.description_dread":  "每当铁甲战士造成伤害时，他恢复等同于[gold]伤害总量[/gold]的生命值——被格挡掉的部分也算。",
     "DOMINATE_WEAK_POWER.description_dread":  "每当铁甲战士给予易伤时，同样给予 2 层虚弱和 2 层脆弱。",

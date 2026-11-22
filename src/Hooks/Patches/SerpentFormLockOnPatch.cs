@@ -36,6 +36,7 @@ namespace CharacterBosses.Patches;
 internal static class SerpentFormLockOnPatch
 {
     private static int _hits;
+    private static int _noDictLogged;
     private static bool _installed;
 
     internal static void TryInstall()
@@ -71,15 +72,73 @@ internal static class SerpentFormLockOnPatch
         }
     }
 
+    /// <summary>
+    /// 取「待结算伤害表」= 反编译里那个 <c>SerpentFormPower.Data.amountsForPlayedCards</c>。
+    ///
+    /// ★★ v0.2.896（用户 2026-11-23：「多人时，炼药猎的群蛇形态怎么又变成随机打玩家了」）：
+    ///   反驳编译（0.111 / 0.113 一致）：
+    ///   <code>
+    ///   public sealed class SerpentFormPower : PowerModel
+    ///   {
+    ///       private class Data { public readonly Dictionary&lt;CardModel, int&gt; amountsForPlayedCards = new(); }
+    ///       protected override object InitInternalData() =&gt; new Data();
+    ///       ...
+    ///       if (cardPlay.Card.Owner == Owner.Player &amp;&amp; GetInternalData&lt;Data&gt;().amountsForPlayedCards.Remove(...))
+    ///   </code>
+    ///   ⇒ 这个字典是**嵌套 `Data` 类**的字段，`SerpentFormPower` 类型上**根本没有**同名字段。
+    ///   v0.2.888 起写的是 <c>power.GetType().GetField("amountsForPlayedCards")</c> ⇒ 永远是 null
+    ///   ⇒ 「自行结算」那条路**一次都没跑过**（日志实证：整份 mod_log 里
+    ///     `群蛇形态：自行结算` 出现 **0** 次，`收窄到锁定` 也是 0 次）⇒ 原版那句
+    ///   `Rng.CombatTargets.NextItem(HittableEnemies)` 照旧执行 ⇒ 就是「又变成随机打玩家」。
+    ///
+    /// 现在三级兜底：① 原版通道 <c>PowerModel._internalData</c>（就是 `InitInternalData()` 造的那个 Data 对象）
+    /// → ② 在 Data 对象里按类型找出唯一的 `IDictionary` 字段
+    /// → ③ 万一以后版本把字典挪回 power 自己身上，再扫一遍 power 的实例字段。
+    /// </summary>
     private static System.Collections.IDictionary? PendingDamageDict(object? power)
     {
         try
         {
-            var fld = power?.GetType().GetField("amountsForPlayedCards",
-                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-            return fld?.GetValue(power) as System.Collections.IDictionary;
+            if (power == null) return null;
+
+            // ① 原版把「待结算表」放在嵌套 `Data` 里；`PowerModel._internalData` 就是那个对象
+            object? data = null;
+            try
+            {
+                data = typeof(MegaCrit.Sts2.Core.Models.PowerModel)
+                    .GetField("_internalData", BindingFlags.Instance | BindingFlags.NonPublic)
+                    ?.GetValue(power);
+            }
+            catch { /* 忽略 */ }
+
+            var fromData = DictFieldOf(data);
+            if (fromData != null) return fromData;
+
+            // ③ 兜底：直接在 power 自己身上找
+            return DictFieldOf(power);
         }
         catch { return null; }
+    }
+
+    /// <summary>在 <paramref name="holder"/> 的实例字段里找出第一个 <see cref="System.Collections.IDictionary"/>。</summary>
+    private static System.Collections.IDictionary? DictFieldOf(object? holder)
+    {
+        if (holder == null) return null;
+        try
+        {
+            foreach (var field in holder.GetType().GetFields(
+                         BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+            {
+                try
+                {
+                    if (!typeof(System.Collections.IDictionary).IsAssignableFrom(field.FieldType)) continue;
+                    if (field.GetValue(holder) is System.Collections.IDictionary dict) return dict;
+                }
+                catch { /* 下一个字段 */ }
+            }
+        }
+        catch { /* 忽略 */ }
+        return null;
     }
 
     private static bool IsHittable(CharBossMonster boss, Creature? target)
@@ -126,26 +185,27 @@ internal static class SerpentFormLockOnPatch
                 catch { /* 纯诊断 */ }
             }
             var power = PowerOf(__instance);
-            // ★ v0.2.885：**只在还真的有待结算伤害时**才收窄。
-            //   这条状态机每次 `MoveNext` 都会进前缀，包括「伤害已打完」之后的收尾帧；
-            //   窗口放宽到 8 帧后，那些收尾帧再设一次收窄就可能串到同一瞬间别人的随机目标上。
-            //   判据：`SerpentFormPower.amountsForPlayedCards` 里还有条目（反编译字段名）。
-            try
-            {
-                var fld = power?.GetType().GetField("amountsForPlayedCards",
-                    System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-                if (fld != null)
-                {
-                    var dict = fld.GetValue(power) as System.Collections.ICollection;
-                    if (dict != null && dict.Count == 0) return;     // 没有待结算伤害 ⇒ 不设收窄
-                }
-            }
-            catch { /* 反射失败就照旧收窄 */ }
             if (power == null) return;
 
-            // 只有「她自己的群蛇形态」才收窄（玩家的群蛇形态保持原版随机）
+            // 只有「她自己的群蛇形态」才处理（玩家的群蛇形态保持原版随机）
             var boss = power.Owner?.Monster as CharBossMonster;
             if (boss == null) return;
+
+            // ★ v0.2.885：**只在还真的有待结算伤害时**才往下做。
+            //   这条状态机每次 `MoveNext` 都会进前缀，包括「伤害已打完」之后的收尾帧；
+            //   那些收尾帧再动一次就可能串到同一瞬间别人的随机目标上。
+            // ★ v0.2.896：判据改成真正能取到那个字典（以前反射字段名写错 ⇒ 恒 null ⇒ 整段静默跳过）。
+            var pending = PendingDamageDict(power);
+            if (pending == null)
+            {
+                if (_noDictLogged++ < 3)
+                {
+                    Logger.Log("[CharBoss] 群蛇形态：取不到待结算伤害表 `amountsForPlayedCards` ⇒ 本次退回原版随机" +
+                               "（若反复出现请把这行发回来：可能游戏又挪了这个字段）");
+                }
+                return;
+            }
+            if (pending.Count == 0) return;      // 没有待结算伤害 ⇒ 什么都不做
 
             // ① 首选「她锁定的那位玩家」
             var locked = Core.BossLockOn.TargetFor(boss)?.Creature;
@@ -181,7 +241,7 @@ internal static class SerpentFormLockOnPatch
             {
                 try
                 {
-                    Logger.Log($"[CharBoss] 群蛇形态：收窄到锁定玩家 {locked.Name}（不做可命中预判）");
+                    Logger.Log($"[CharBoss] 群蛇形态：这次只结算给锁定的玩家 {locked.Name}（不做可命中预判）");
                 }
                 catch { /* 纯诊断 */ }
             }
@@ -201,7 +261,7 @@ internal static class SerpentFormLockOnPatch
             //   两端跑同一份代码 ⇒ 结果一致。
             try
             {
-                var dict = PendingDamageDict(power);
+                var dict = pending;      // v0.2.896：上面已经取到并确认非空
                 if (dict != null && dict.Count > 0)
                 {
                     decimal total = 0m;

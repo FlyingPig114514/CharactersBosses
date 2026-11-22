@@ -99,8 +99,25 @@ public static class SilentBlades
                 {
                     int perHit = BossDamagePredictor.HitDamage(play.Card, play.Target) + Math.Max(0, pendingRise);
                     int hits = Math.Max(1, attacks);
-                    // 段数 = 本回合之前的攻击牌数；只有 1 段时用单段意图（否则会显示「4×1」）
-                    play.Intents = new List<AbstractIntent> { AttackIntent.Multi(perHit, hits) };
+                    // ★★ v0.2.896（用户 2026-11-23：「多人时，刀猎的终结技似乎错误的显示为群伤」）：
+                    //   这里以前**无条件**把整份意图换成 `AttackIntent.Multi(perHit, hits)`，
+                    //   而 `BossIntentBuilder.IntentsFor` 里那条「意图按人清零」（打的是别人 ⇒ 对本地玩家
+                    //   显示 0）只作用于**它自己建出来的那些意图**。整份覆盖 ⇒ 每个玩家的手牌栏都显示
+                    //   同一个真实数字 ⇒ 人人以为自己会挨打 ⇒ 看起来就是群攻。
+                    //   现在补上同一口径：这张牌打的是**别的玩家**时，对本地玩家显示 0。
+                    if (BossIntentBuilder.IsAimedAwayFromLocal(play.Card, play.Target))
+                    {
+                        play.Intents = new List<AbstractIntent> { new RawAttackIntent(0) };
+                        if (FinisherZeroLogs++ < 12)
+                        {
+                            Logger.Log($"[CharBoss] 意图按人清零：终结技打的是别人 → 对本地玩家显示 0" +
+                                       $"（原本 {perHit}×{hits}）");
+                        }
+                    }
+                    else
+                    {
+                        play.Intents = new List<AbstractIntent> { AttackIntent.Multi(perHit, hits) };
+                    }
                 }
                 if (play.Card.Type == CardType.Attack) attacks++;
                 attacks += Math.Max(0, play.GeneratedShivs);   // 这张牌生出来的刀也是攻击
@@ -111,6 +128,8 @@ public static class SilentBlades
             Logger.Log("[CharBoss] 终结技意图重算失败: " + e.Message);
         }
     }
+
+    private static int FinisherZeroLogs;
 
     private static string SafeEntry(CardModel card)
     {

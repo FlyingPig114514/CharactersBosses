@@ -2711,14 +2711,20 @@ public static class BossIntentBuilder
         catch { return false; }
     }
     /// <summary>
+    /// ★ v0.2.896：给**外部重算路径**用的同一个判据（目前是 `SilentBlades.RecomputeFinisherIntents`
+    /// 的「终结技」—— 用户 2026-11-23：「多人时，刀猎的终结技似乎错误的显示为群伤」）。
+    /// 它以前把整份意图覆盖成普通多段意图，于是「按人清零」被抹掉 ⇒ 每个玩家都看到真实数字。
+    /// </summary>
+    internal static bool IsAimedAwayFromLocal(CardModel? card, Creature? target) => AimedAwayFromLocal(card, target);
+
+    /// <summary>
     /// 「这张牌对**本地玩家**来说是不是 0 伤害」。优先级：
     ///   1. 这只 Boss **此刻锁着谁**（`BossLockOn.PeekLock`，只读、不产生副作用）——
     ///      出牌也按它走（见 `CharBossMonster.PlayOne`），所以显示必须跟它一致；
     ///   2. 没有锁（比如开局玩家还没到齐、或这只 Boss 还没分配）→ 退回旧判据
     ///      <see cref="AimsElsewhere"/>（看计划里的 target），至少不会把真实伤害误判成 0。
     /// </summary>
-    private static bool AimedAwayFromLocal(CardModel? card, Creature? target)
-    {
+    private static bool AimedAwayFromLocal(CardModel? card, Creature? target)    {
         try
         {
             var boss = card?.Owner?.Creature?.Monster as Monsters.CharBossMonster;

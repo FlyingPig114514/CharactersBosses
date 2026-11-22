@@ -123,6 +123,42 @@ internal static class DreadMode
     }
 
     /// <summary>
+    /// **这场战斗本身是不是 Boss 战**（v0.2.895，用户 2026-11-22：「boss 战里战士的支配让奥斯提获得了 1 层恶魔形态」）。
+    ///
+    /// 为什么不只看 `RunState.CurrentRoom`：`AfterEnemiesEnteredCombat` 这类钩子跑在
+    /// 「奥斯提刚被召唤」那一刻，而**客人端的 `RunState.CurrentRoom` 那时可能还是 null / 还是地图节点**
+    /// ⇒ 上面那道 `FirstRoomOf` 闸门判不出 Boss 房 ⇒ 支配照样挂到召唤物身上（日志实证：
+    /// `IroncladDominion：本幕 Boss 房 ⇒ 不生效` 已经打了，2 秒后仍走「后加入战斗的敌人补挂」）。
+    /// 而 `CombatState.Encounter.RoomType` 是**战斗自带的、两端同步的**判据 ⇒ 改用它兜底。
+    /// </summary>
+    internal static bool SkipBecauseCombatIsBoss(IEnumerable<Creature>? creatures, string who)
+    {
+        try
+        {
+            if (creatures == null) return false;
+            foreach (var c in creatures)
+            {
+                MegaCrit.Sts2.Core.Models.EncounterModel? enc = null;
+                try { enc = c?.CombatState?.Encounter; } catch { enc = null; }
+                if (enc == null) continue;
+                if (enc.RoomType != MegaCrit.Sts2.Core.Rooms.RoomType.Boss) continue;
+
+                try
+                {
+                    if (_bossCombatLogged.Add(who))
+                        Logger.Log($"[CharBoss] 恐惧模式·{who}：这场战斗是 **Boss 战**（按 CombatState.Encounter 判定）⇒ 不生效");
+                }
+                catch { /* 纯日志 */ }
+                return true;
+            }
+        }
+        catch { /* 判不出来就不拦 */ }
+        return false;
+    }
+
+    private static readonly HashSet<string> _bossCombatLogged = new();
+
+    /// <summary>
     /// 这批生物所在战斗的**当前房间**（用于 `AfterEnemiesEnteredCombat` 这种拿不到 room 参数的钩子里判 Boss 房）。
     /// </summary>
     internal static MegaCrit.Sts2.Core.Rooms.AbstractRoom? FirstRoomOf(IEnumerable<Creature>? creatures)
@@ -200,6 +236,8 @@ public sealed class IroncladDominion : MegaCrit.Sts2.Core.Models.Dread.DominionM
     {
         try
         {
+            // ★ v0.2.895：先按**战斗自带的遭遇**判一次 Boss 战（客人端 CurrentRoom 那时可能是 null）
+            if (DreadMode.SkipBecauseCombatIsBoss(creatures, GetType().Name)) return;
             var room = DreadMode.FirstRoomOf(creatures);
             if (room != null && DreadMode.SkipBecauseActBossRoom(room, GetType().Name)) return;
             await GiveDemonFormAsync(creatures, "后加入战斗");
@@ -213,6 +251,9 @@ public sealed class IroncladDominion : MegaCrit.Sts2.Core.Models.Dread.DominionM
         try
         {
             if (enemies == null) return;
+
+            // ★ v0.2.895 兜底：Boss 战里**一律不挂**（召唤物也一样）
+            if (DreadMode.SkipBecauseCombatIsBoss(enemies, "铁甲战士的支配（发放时兜底）")) return;
 
             var targets = new List<Creature>();
             int skippedBosses = 0, already = 0;
@@ -544,6 +585,8 @@ public sealed class DefectDominion : MegaCrit.Sts2.Core.Models.Dread.DominionMod
     {
         try
         {
+            // ★ v0.2.895：先按**战斗自带的遭遇**判一次 Boss 战（客人端 CurrentRoom 那时可能是 null）
+            if (DreadMode.SkipBecauseCombatIsBoss(creatures, GetType().Name)) return;
             var room = DreadMode.FirstRoomOf(creatures);
             if (room != null && DreadMode.SkipBecauseActBossRoom(room, GetType().Name)) return;
             await GiveArtifactAsync(creatures, "后加入战斗");
@@ -774,7 +817,8 @@ public sealed class DefectDominion : MegaCrit.Sts2.Core.Models.Dread.DominionMod
 
 /// <summary>
 /// **愚者的支配**（用户 2026-11-13 新增；目前还没有「愚者」的 Boss，先把类型写好）。
-/// 效果：**每场战斗开始时，将 2 张「悲伤」加入你的抽牌堆**。
+/// 效果：**每场战斗开始时，将 2/3/4 张「悲伤」加入你的抽牌堆**（按 1/2/3 幕，
+/// 用户 2026-11-23 从「固定 2 张」改成按幕分档，见 <see cref="DreadActScaling.SadnessCount"/>）。
 /// 同样只负责「进战斗房间时给所有玩家挂一层 <see cref="Powers.FoolDominionPower"/>」，
 /// 真正的发牌在 power 里做。
 /// </summary>
@@ -863,6 +907,8 @@ public sealed class WatcherDevotionDominion : MegaCrit.Sts2.Core.Models.Dread.Do
     {
         try
         {
+            // ★ v0.2.895：先按**战斗自带的遭遇**判一次 Boss 战（客人端 CurrentRoom 那时可能是 null）
+            if (DreadMode.SkipBecauseCombatIsBoss(creatures, GetType().Name)) return;
             var room = DreadMode.FirstRoomOf(creatures);
             if (room != null && DreadMode.SkipBecauseActBossRoom(room, GetType().Name)) return;
             await GiveFaithAsync(creatures, "后加入战斗");
@@ -1320,6 +1366,12 @@ internal static class DominionDescriptionActScalingPatch
                     fresh.Add("Transform", card.Title);
                     __result = fresh;
                 }
+            }
+            else if (__instance is FoolDominion)
+            {
+                // ★ v0.2.897（用户 2026-11-23：「增强愚者的支配：2/3/4 张悲伤，分层」）：
+                //   这里填的是**张数**（2/3/4），不是幕数 ⇒ 走 SadnessCount() 而不是上面的 n。
+                __result.Add("Sadness", (decimal)DreadActScaling.SadnessCount());
             }
         }
         catch { /* 填不上就显示原文，绝不影响 UI */ }

@@ -561,6 +561,36 @@ internal static class BossLineups
             picked.Add(choice);
         }
 
+        // ★ v0.2.894（玩家 2026-11-22 截图：「3 人局怎么就 2 个 boss（本机是客机）」，日志实证：
+        //   `多人(3 人)：这一幕同时上 2 只 Boss —— 我=REGENT_CHOICE，伙伴=DEFECT_STATUS=DEFECT_BOSS`
+        //   `※本机生成※ REGENT_CHOICE_BOSS_ENCOUNTER → 怪物 2 只`）：
+        //   ⑥ 那遍是「**每个角色最多一只**」，某个角色的桶被 `usedInThisAct` 清空、
+        //   或它唯一那个 Key 已经被 `takenKeys` 占掉时，那一格就永久丢了 ⇒ 场上 Boss 数 < 玩家数。
+        //   这里补一遍**放宽角色去重**（仍然不重复 Key）：先排除与主 Boss 同角色，还差才允许同角色。
+        //   硬规则是「Boss 数 = 玩家数」，宁可同角色也不能少一只。
+        if (picked.Count < need)
+        {
+            for (int pass = 0; pass < 2 && picked.Count < need; pass++)
+            {
+                foreach (var ch in partnerChars)
+                {
+                    if (picked.Count >= need) break;
+                    if (pass == 0 && ch == mainChar) continue;      // 第一遍仍避开主 Boss 的角色
+                    if (!partnerBuckets.TryGetValue(ch, out var bucket2) || bucket2.Count == 0) continue;
+                    foreach (var candidate in bucket2)
+                    {
+                        if (takenKeys.Contains(candidate)) continue;
+                        takenKeys.Add(candidate);
+                        picked.Add(candidate);
+                        Logger.Log($"[CharBoss] 阵容补齐：第 {act + 1} 层第 {fight + 1} 场少一只 ⇒ " +
+                                   $"补上「{BossKeys.LabelOf(candidate)}」" +
+                                   (pass == 1 ? "（已放宽角色去重）" : "") +
+                                   "——宁可同角色也不能少于玩家数");
+                        break;
+                    }
+                }
+            }
+        }
         if (picked.Count == 0) return Fallback(act);
 
         // ★ v0.2.585（5 人联机）：`need >= 5` 时补一条**构成自检** ——

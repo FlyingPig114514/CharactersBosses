@@ -5,5 +5,5 @@
     "DREAD.NECROBINDER.description":  "Necrobinder\u0027s Dominion: at the start of your turn, a random card in your hand costs 1 more this turn.",
     "DREAD.REGENT.description":  "Правление Принца: в начале вашего хода выберите 1 карту (не Статус и не Проклятие) и превратите её в «Обломки».",
     "DREAD.WATCHER_DEVOTION.description":  "Господство Наблюдателя: в начале каждого боя все враги получают 2 [gold]Преданности[/gold] (в начале вашего хода каждый враг получает 2 [gold]мантры[/gold]; при 10 [gold]мантры[/gold] он тратит 10 и входит в [gold]Божественность[/gold], нанося в этот ход тройной урон).",
-    "DREAD.FOOL.description":  "Господство Шута: в начале каждого боя в твою колоду добора добавляются 2 [gold]Грусти[/gold]."
+    "DREAD.FOOL.description":  "Господство Шута: в начале каждого боя в твою колоду добора добавляются {Sadness} [gold]Грусти[/gold]."
 }

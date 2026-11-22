@@ -66,6 +66,17 @@ internal static class SneakyOnBossAttack
                 var creature = holder?.Creature;
                 if (creature == null) continue;
 
+                // ★★ v0.2.896（用户 2026-11-23：「多人时，玩家的鬼祟不生效，只当敌方角色 boss
+                //   打出攻击牌时生效」）：
+                //   这里以前把**真人玩家**也算进补偿名单 ⇒ 我们 Boss 打出攻击牌时，
+                //   `EnsureGrantedAsync` 会把格挡**补给真人玩家**（日志里那段
+                //   `鬼祟：… 但原版没给 <玩家> 格挡 ⇒ 补 N 点` 就是它）；
+                //   而真人队友打出攻击牌那条又被 `SneakyOnlyBossAttacksPatch` 掐掉
+                //   ⇒ 玩家的鬼祟正好反了：只认 Boss 的攻击牌。
+                //   补偿只该给「我们自己的 Boss」（影子玩家的扇出真的漏了，见类注释），
+                //   真人玩家身上那条原版**本来就会派发**（v0.2.896 起不再被掐）⇒ 一律跳过。
+                if (IsRealPlayer(combat, holder)) continue;
+
                 // ① 出牌者自己 → 不触发（原版条件 `Card.Owner.Creature != Owner`）
                 if (ReferenceEquals(creature, self)) { LogSelfSkip(attacker, card); continue; }
                 // ② 卡牌 owner 也是自己（换牌/生成牌的极端情况）→ 同样不触发
@@ -126,6 +137,30 @@ internal static class SneakyOnBossAttack
         {
             Logger.Log("[CharBoss] 鬼祟补触发失败（忽略）: " + e.Message);
         }
+    }
+
+    /// <summary>
+    /// 这个 Player 是不是**真人玩家**（我们的 Boss 影子玩家挂在怪物生物上、也不在 `CombatState.Players` 里）。
+    /// ★ v0.2.896：用来把「真人玩家的鬼祟」排除在补偿之外（见 <see cref="Snapshot"/> 里的注释）。
+    /// </summary>
+    private static bool IsRealPlayer(MegaCrit.Sts2.Core.Combat.ICombatState? combat,
+                                     MegaCrit.Sts2.Core.Entities.Players.Player? player)
+    {
+        try
+        {
+            if (combat == null || player == null) return false;
+            if (player.Creature?.Monster != null) return false;      // 怪物身上的影子 Player：不是真人
+
+            var players = combat.Players;
+            if (players == null) return false;
+            foreach (var each in players)
+            {
+                if (each == null) continue;
+                if (ReferenceEquals(each, player)) return true;
+            }
+        }
+        catch { /* 忽略 */ }
+        return false;
     }
 
     /// <summary>场上所有带「鬼祟」的生物（真人玩家 + 我们的 Boss 的影子玩家都算）。</summary>
