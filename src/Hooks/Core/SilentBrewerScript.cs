@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Cards;
@@ -46,7 +46,7 @@ public static class SilentBrewerScript
                 Potions = Potions<Clarity, RadiantTincture, DexterityPotion>(),
                 Cards = Cards(
                     C<LegSweep>(), C<Survivor>(), Discarded<Decay>(),
-                    C<PiercingWail>(), A<PreciseCut>(9), C<DefendSilent>()),
+                    C<PiercingWail>(), C<PreciseCut>(), C<DefendSilent>()),
             },
             // 2
             new()
@@ -60,7 +60,7 @@ public static class SilentBrewerScript
                 Potions = Potions<ShacklingPotion, ExplosiveAmpoule>(),
                 Cards = Cards(
                     C<Nightmare>(true), Brew(true, typeof(ShipInABottle)),
-                    Drink(typeof(ShipInABottle), A<Neutralize>(8)), C<DefendSilent>()),
+                    Drink(typeof(ShipInABottle), C<Neutralize>()), C<DefendSilent>()),
             },
             // 3
             new()
@@ -86,7 +86,7 @@ public static class SilentBrewerScript
                 Potions = Potions<BlockPotion, FyshOil, EntropicBrew, LiquidBronze>(),
                 Cards = Cards(
                     C<Anticipate>(), Drink(typeof(Duplicator), C<ToricToughness>()),
-                    A<Fisticuffs>(9), C<Deflect>()),
+                    C<Fisticuffs>(), C<Deflect>()),
             },
             // 5
             new()
@@ -95,7 +95,7 @@ public static class SilentBrewerScript
                 Energy = TurnEnergy,
                 Potions = Potions<Clarity, RadiantTincture, DexterityPotion>(),
                 Cards = Cards(
-                    Brew(true, typeof(BlockPotion)), C<LegSweep>(), A<PreciseCut>(9), C<Survivor>()),
+                    Brew(true, typeof(BlockPotion)), C<LegSweep>(), C<PreciseCut>(), C<Survivor>()),
             },
             // 6
             new()
@@ -114,7 +114,7 @@ public static class SilentBrewerScript
                 Energy = TurnEnergy,
                 Potions = Potions<ShipInABottle, GhostInAJar, ExplosiveAmpoule>(),
                 Cards = Cards(
-                    A<Neutralize>(8), Brew(true, typeof(Duplicator)), C<Burst>(), C<Blur>()),
+                    C<Neutralize>(), Brew(true, typeof(Duplicator)), C<Burst>(), C<Blur>()),
             },
             // 8
             new()
@@ -126,7 +126,7 @@ public static class SilentBrewerScript
                 Potions = Potions<BlockPotion, FyshOil, EntropicBrew, LiquidBronze>(),
                 Cards = Cards(
                     C<Anticipate>(), Drink(typeof(Duplicator), C<ToricToughness>()),
-                    A<Fisticuffs>(9), C<Deflect>()),
+                    C<Fisticuffs>(), C<Deflect>()),
             },
         };
 

@@ -62,6 +62,17 @@ public sealed class BorrowedTimeBossPower : PowerModel
     private readonly System.Collections.Generic.Dictionary<
         MegaCrit.Sts2.Core.Entities.Players.Player, int> _spentByPlayer = new();
 
+    /// <summary>「重放」诊断计数（限流）。</summary>
+    private int _replaySkips;
+
+    /// <summary>
+    /// 每张牌实例**本回合是否已经计过一次**费用（v0.2.893）。
+    /// 重放（`BaseReplayCount` / 回声那类）会给同一张牌再派几个 `CardPlay`，而它们的
+    /// `Resources.EnergySpent` 沿用第一次的扣费记录 ⇒ 会被重复累计。同一张牌实例、同一个玩家回合里
+    /// 只计第一次；复制 / 双发是**另一个实例** ⇒ 照常计。
+    /// </summary>
+    private readonly System.Collections.Generic.Dictionary<object, int> _countedTurnOfCard = new();
+
     /// <summary>取某玩家当前的累计值（没有就是 0）。</summary>
     private int SpentOf(MegaCrit.Sts2.Core.Entities.Players.Player player)
         => _spentByPlayer.TryGetValue(player, out int v) ? v : 0;
@@ -117,6 +128,33 @@ public sealed class BorrowedTimeBossPower : PowerModel
                 }
                 return;
             }
+
+            // ★ v0.2.893（用户 2026-11-22：「根除骨的特殊效果会计算重放的牌的费用（重放的那几次不需要费用），
+            //   预借时间应该只计算玩家**花费**的费用，而不是打出的卡牌的费用」）：
+            //   重放（`BaseReplayCount` / 回声那类）会给**同一张牌**再派几个 `CardPlay`，而它们的
+            //   `Resources.EnergySpent` 沿用第一次的扣费记录 ⇒ 会被当成"又花了这么多能量"重复累计。
+            //   判据：**同一张牌实例、同一个玩家回合里只计第一次**（重放不花能量、复制/双发是另一个实例 ⇒ 照常计）。
+            try
+            {
+                int turn = 0;
+                try { turn = actor.PlayerCombatState?.TurnNumber ?? 0; } catch { turn = 0; }
+                var card = cardPlay.Card;
+                if (card != null)
+                {
+                    if (_countedTurnOfCard.TryGetValue(card, out int seenTurn) && seenTurn == turn)
+                    {
+                        if (_replaySkips++ < 20)
+                        {
+                            Logger.Log($"[CharBoss] 预借时间：{card.Id.Entry} 本回合已经计过一次 ⇒ 这次是**重放**，" +
+                                       "不再重复计入（重放不花能量）");
+                        }
+                        return;
+                    }
+                    _countedTurnOfCard[card] = turn;
+                    if (_countedTurnOfCard.Count > 400) _countedTurnOfCard.Clear();   // 兜底，防无限增长
+                }
+            }
+            catch { /* 统计失败就按老路子走 */ }
 
             int cost = ActualEnergySpent(cardPlay);
             if (cost <= 0) return;

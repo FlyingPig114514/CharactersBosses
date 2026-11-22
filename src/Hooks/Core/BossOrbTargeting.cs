@@ -161,7 +161,10 @@ internal static class LightningOrbBossTargetPatch
         try
         {
             var want = BossOrbTargeting.Rewrite(__instance, target);
-            if (want != null) target = want;
+            // ★ v0.2.891（玩家反馈「鸡煲的球不打自己了，但游戏卡死」）：只接受**还活着且仍在战斗里**的目标。
+            //   以前只要非 null 就塞给原版；万一那个生物已经被移出战斗（召唤物死了/离场），
+            //   原版 `ApplyLightningDamage` 会对着一个不在战斗里的对象 await 伤害 ⇒ 看起来就是「卡死」。
+            if (want != null && want.IsAlive && !want.IsDead && want.CombatState != null) target = want;
         }
         catch { /* 绝不影响战斗 */ }
     }
@@ -178,7 +181,10 @@ internal static class DarkOrbBossTargetPatch
         try
         {
             var want = BossOrbTargeting.Rewrite(__instance, target);
-            if (want != null) target = want;
+            // ★ v0.2.891（玩家反馈「鸡煲的球不打自己了，但游戏卡死」）：只接受**还活着且仍在战斗里**的目标。
+            //   以前只要非 null 就塞给原版；万一那个生物已经被移出战斗（召唤物死了/离场），
+            //   原版 `ApplyLightningDamage` 会对着一个不在战斗里的对象 await 伤害 ⇒ 看起来就是「卡死」。
+            if (want != null && want.IsAlive && !want.IsDead && want.CombatState != null) target = want;
         }
         catch { /* 绝不影响战斗 */ }
     }

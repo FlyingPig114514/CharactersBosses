@@ -47,8 +47,15 @@ internal static class TelemetryConsentPrompt
         try
         {
             if (_asking) return;
-            if (!BossConfig.NeedsConsentPrompt) return;
+            if (!BossConfig.NeedsConsentPrompt)
+            {
+                // v0.2.874：留一行，方便对「玩家到底有没有被问过」这件事下结论
+                Logger.Log($"[CharBoss] 数据记录询问：跳过（已经问过：asked={BossConfig.ConsentAsked}、" +
+                           $"版本={BossConfig.ConsentVersion}/{BossConfig.ConsentVersionCurrent}）");
+                return;
+            }
             _asking = true;
+            Logger.Log("[CharBoss] 数据记录询问：开始（本机还没被问过 ⇒ 准备弹原版通用弹窗）");
             _ = AskAsync();
         }
         catch (Exception e)
@@ -93,6 +100,8 @@ internal static class TelemetryConsentPrompt
             var no = Loc("TELEMETRY_PROMPT_NO", "NO");
 
             container.Add(popup, showBackstop: false);
+            Logger.Log("[CharBoss] 数据记录询问：弹窗已弹出，等待玩家选择…" +
+                       "（如果日志停在这一行不动，说明弹窗卡在屏幕上没人点）");
             bool accepted = await popup.WaitForConfirmation(body, header, no, yes);
 
             BossConfig.SetConsentAsked(true);       // 问过一次就不再问（是/否都算）

@@ -422,6 +422,56 @@ internal static class StrayBossCardQueuePatch
     }
 
     /// <summary>
+    /// <summary>
+    /// 这张卡面上是否还挂着**原版自己的出牌特效**（`NCardFlyPowerVfx` / `NCardTrailVfx`）。
+    ///
+    /// ★ v0.2.873（玩家 2026-11-22 给的 `godot (34).log` + `mod_log (55).txt`，两边时间戳一一对上）：
+    ///   打**能力牌**时原版会建一个 `NCardFlyPowerVfx`（卡面飞向能力栏），它**一直持有这个 `NCard` 节点**，
+    ///   动画结束前谁都不能动它。而我们 v0.2.853 的「她开始打下一张牌 ⇒ 立刻把上一张从 `PlayContainer` 收掉」
+    ///   正好在动画进行中 `QueueFree` 了它 ⇒
+    ///     · `NCardFlyPowerVfx.PlayAnim()` 对着已释放的节点抛 `ObjectDisposedException`；
+    ///     · 它挂的拖尾节点 `NCardTrailVfx` 还活着，**每帧**再去读那张卡 ⇒ 每帧一条异常，
+    ///       玩家那边一小时写出 **350 MB ~ 1.6 GB** 的 `godot.log`（实测 1,008,114 次）。
+    ///   证据：日志里 `出牌展示区：SPEEDSTER 打出后没人从 PlayContainer 收走⇒ 我们自己收掉（她开始打下一张牌）`
+    ///   紧跟着就是 `NCardFlyPowerVfx.PlayAnim` 的 ObjectDisposedException，之后整段全是 `NCardTrailVfx` 刷屏。
+    ///
+    /// ⇒ 只要卡面上还挂着这类特效节点，就**当它还有主**，这一轮什么都不做（不摘、不隐藏、不释放）。
+    /// 按**类名**匹配而不是按类型：这两个类型在 0.107 里不一定存在，写死类型会编不过。
+    /// </summary>
+    private static bool HasVanillaCardVfx(Node? card, int depth = 0)
+    {
+        if (card == null || depth > 3) return false;
+        try
+        {
+            if (!GodotObject.IsInstanceValid(card)) return false;
+            foreach (var child in card.GetChildren())
+            {
+                if (child == null || !GodotObject.IsInstanceValid(child)) continue;
+                string name = child.GetType().Name;
+                if (name.Contains("NCardFlyPowerVfx", StringComparison.Ordinal)
+                    || name.Contains("NCardTrailVfx", StringComparison.Ordinal)
+                    || name.Contains("NCardFlyVfx", StringComparison.Ordinal))
+                {
+                    return true;
+                }
+                if (HasVanillaCardVfx(child, depth + 1)) return true;
+            }
+        }
+        catch { /* 忽略：判断不出来就当没挂（下面还有年龄兜底） */ }
+        return false;
+    }
+
+    /// <summary>
+    /// 这张卡是不是**能力牌**（`CardType.Power`）—— 原版会为它播「飞向能力栏」那段动画，
+    /// 所以它天然会有一段时间「合法地」留在 `PlayContainer` 里（见 <see cref="HasVanillaCardVfx"/>）。
+    /// </summary>
+    private static bool IsPowerCard(NCard card)
+    {
+        try { return card.Model?.Type == MegaCrit.Sts2.Core.Entities.Cards.CardType.Power; }
+        catch { return false; }
+    }
+
+    /// <summary>
     /// 把展示区（`PlayContainer`）里**我们 Boss 打出的**卡面收掉。
     /// <paramref name="minAgeMs"/> = 0 表示立刻全收（她开始打下一张牌时用这个）；
     /// 大于 0 时只收「已经停留超过这么久」的（1Hz 兜底用，不会打断正在播的动画）。
@@ -453,7 +503,14 @@ internal static class StrayBossCardQueuePatch
                 KnownOurs.Add(card);
 
                 if (!_pcSeen.TryGetValue(card, out long since)) { _pcSeen[card] = now; since = now; }
-                if (minAgeMs > 0 && now - since < minAgeMs) continue;
+                long age = now - since;
+                if (minAgeMs > 0 && age < minAgeMs) continue;
+
+                // ★ v0.2.873：两条「**这张卡面还有主，别碰**」的判据（详见 HasVanillaCardVfx 注释）：
+                //   ① 上面还挂着原版的飞牌/拖尾特效 ⇒ 动画还没完，谁动谁炸（每帧一条异常、日志暴涨）；
+                //   ② 能力牌在动画期间本来就会留在展示区里，给它 3 秒冷静期，之后还在才算真滞留。
+                if (HasVanillaCardVfx(card)) continue;
+                if (IsPowerCard(card) && age < 3_000L) continue;
 
                 string entry = "?";
                 try { entry = card.Model?.Id.Entry ?? "?"; } catch { /* 忽略 */ }

@@ -55,13 +55,13 @@ public static class WatcherRushdownScript
             Turn(5, "1. 猛虎下山、暴怒+、警惕、打击（没费不弃）、防御（没费不弃）",
                 Play(WatcherCards.Rushdown),
                 Play(WatcherCards.Crescendo),
-                Play(WatcherCards.Vigilance, upgradeMinAscension: 8),
+                Play(WatcherCards.Vigilance),
                 Hold(WatcherCards.Strike),
                 Hold(WatcherCards.Defend)),
 
             // ── 2 ── 心灵堡垒 / 渐强 / 腰带抽打 / 安宁 / 净化+（保留不出）/ 打击·防御（没费）/ 奇迹（保留不出）   （4 费）
             Turn(4, "2. 心灵堡垒、渐强、腰带抽打、安宁、净化+（保留不出）、打击（没费）、防御（没费）、奇迹（保留不出）",
-                Play(WatcherCards.MentalFortress, upgradeMinAscension: 8),
+                Play(WatcherCards.MentalFortress),
                 Play(WatcherCards.Eruption, upgraded: true),
                 Play(WatcherCards.SashWhip),
                 Play(WatcherCards.Tranquility),
@@ -72,8 +72,8 @@ public static class WatcherRushdownScript
 
             // ── 3 ── 义愤填膺 / 供奉 / 碰撞连击 / 打击 / 冥想（捞暴怒+）⇒ 节制满 12 张，回合结束   （4 费）
             Turn(4, "3. 义愤填膺、供奉、碰撞连击、打击、冥想（捞暴怒+）⇒ 节制触发结束回合",
-                Play(WatcherCards.Indignation, upgradeMinAscension: 9),
-                Play(WatcherCards.Consecrate, upgradeMinAscension: 9),
+                Play(WatcherCards.Indignation),
+                Play(WatcherCards.Consecrate),
                 Play(WatcherCards.BowlingBash),
                 Play(WatcherCards.Strike),
                 Play(WatcherCards.Meditate, returns: WatcherCards.Eruption),
@@ -94,7 +94,7 @@ public static class WatcherRushdownScript
 
             // ── 5 ── 当头棒喝 / 净化+（保留不出）/ 防御×3（没费）/ 奇迹（保留不出）   （2 费）
             Turn(2, "5. 当头棒喝、净化+（保留不出）、防御×3（没费）、奇迹（保留不出）",
-                Play(WatcherCards.Wallop, upgradeMinAscension: 9),
+                Play(WatcherCards.Wallop),
                 HoldPurify(),
                 Hold(WatcherCards.Defend, 1),
                 Hold(WatcherCards.Defend, 1),
@@ -147,14 +147,14 @@ public static class WatcherRushdownScript
             // ── 9 ── 暴怒+ / 当头棒喝 / 义愤填膺 / 不惧妖邪（没费不弃）/ 冥想（没费不弃）   （5 费）
             Turn(5, "9. 暴怒+、当头棒喝、义愤填膺、不惧妖邪（没费不弃）、冥想（没费不弃）",
                 Play(WatcherCards.Eruption, upgraded: true),
-                Play(WatcherCards.Wallop, upgradeMinAscension: 9),
-                Play(WatcherCards.Indignation, upgradeMinAscension: 9),
+                Play(WatcherCards.Wallop),
+                Play(WatcherCards.Indignation),
                 Hold(WatcherCards.FearNoEvil),
                 Hold(WatcherCards.Meditate)),
 
             // ── 10 ── 供奉 / 冥想（捞内心宁静）/ 腰带抽打·警惕·不惧妖邪（不出）   （1 费）
             Turn(1, "10. 供奉、冥想（捞内心宁静）、腰带抽打（不出）、警惕（不出）、不惧妖邪（不出）",
-                Play(WatcherCards.Consecrate, upgradeMinAscension: 9),
+                Play(WatcherCards.Consecrate),
                 Play(WatcherCards.Meditate, returns: WatcherCards.InnerPeace),
                 Hold(WatcherCards.SashWhip),
                 Hold(WatcherCards.Vigilance, 2),
@@ -174,7 +174,7 @@ public static class WatcherRushdownScript
                     Exhausted(WatcherCards.Wallop),
                     Exhausted(WatcherCards.Meditate),
                     Exhausted(WatcherCards.Indignation),
-                    Play(WatcherCards.Vigilance, upgradeMinAscension: 8),
+                    Play(WatcherCards.Vigilance),
                     Hold(WatcherCards.FearNoEvil),
                 }),
 
@@ -183,14 +183,14 @@ public static class WatcherRushdownScript
                 shuffle: true,
                 cards: new[]
                 {
-                    Play(WatcherCards.Eruption, upgraded: true), Play(WatcherCards.Consecrate, upgradeMinAscension: 9),
+                    Play(WatcherCards.Eruption, upgraded: true), Play(WatcherCards.Consecrate),
                     Play(WatcherCards.InnerPeace),
-                    Play(WatcherCards.Eruption, upgraded: true), Play(WatcherCards.Consecrate, upgradeMinAscension: 9),
+                    Play(WatcherCards.Eruption, upgraded: true), Play(WatcherCards.Consecrate),
                     Play(WatcherCards.InnerPeace),
-                    Play(WatcherCards.Eruption, upgraded: true), Play(WatcherCards.Consecrate, upgradeMinAscension: 9),
-                    Play(WatcherCards.Vigilance, upgradeMinAscension: 8),
-                    Play(WatcherCards.Eruption, upgraded: true), Play(WatcherCards.Consecrate, upgradeMinAscension: 9),
-                    Play(WatcherCards.Vigilance, upgradeMinAscension: 8),
+                    Play(WatcherCards.Eruption, upgraded: true), Play(WatcherCards.Consecrate),
+                    Play(WatcherCards.Vigilance),
+                    Play(WatcherCards.Eruption, upgraded: true), Play(WatcherCards.Consecrate),
+                    Play(WatcherCards.Vigilance),
                     Hold(WatcherCards.FearNoEvil),
                     HoldPurify(),
                 }),
@@ -224,13 +224,13 @@ public static class WatcherRushdownScript
         shuffle: true,
         cards: new[]
         {
-            Play(WatcherCards.Eruption, upgraded: true), Play(WatcherCards.Consecrate, upgradeMinAscension: 9),
+            Play(WatcherCards.Eruption, upgraded: true), Play(WatcherCards.Consecrate),
             Play(WatcherCards.FearNoEvil),
-            Play(WatcherCards.Eruption, upgraded: true), Play(WatcherCards.Consecrate, upgradeMinAscension: 9),
+            Play(WatcherCards.Eruption, upgraded: true), Play(WatcherCards.Consecrate),
             Play(WatcherCards.FearNoEvil),
-            Play(WatcherCards.Eruption, upgraded: true), Play(WatcherCards.Consecrate, upgradeMinAscension: 9),
+            Play(WatcherCards.Eruption, upgraded: true), Play(WatcherCards.Consecrate),
             Play(WatcherCards.FearNoEvil),
-            Play(WatcherCards.Eruption, upgraded: true), Play(WatcherCards.Consecrate, upgradeMinAscension: 9),
+            Play(WatcherCards.Eruption, upgraded: true), Play(WatcherCards.Consecrate),
             Play(WatcherCards.FearNoEvil),
             Hold(WatcherCards.Vigilance, 2),
             Hold(WatcherCards.InnerPeace),

@@ -730,6 +730,7 @@ public static class BossDamagePredictor
         int gain = StrengthGainOf(card);
         gain += DiscardReturnStrengthOf(card, boss);
         gain += PrintStrengthOf(card, boss);
+        gain += FocusToStrengthOf(card, boss);   // 能力机：本回合还没打出的加集中牌 ⇒ 等量力量
         return gain;
     }
 
@@ -742,6 +743,24 @@ public static class BossDamagePredictor
     /// （第 6 / 7 回合的「惩恶+」）必须按加过力量的数值预览。
     /// 走的是和「万物一心 / 全息影像」同一条通道（规划期的「预补力量」）。
     /// </summary>
+    /// <summary>
+    /// **能力机的「集中 → 力量」**（用户 2026-11-22：「寒流的伤害预览不会计算热修复带来的集中增加带来的力量增加；
+    /// 这个伤害预览的修复只适用于能力机」）。她的特殊效果让获得集中时同步获得等量力量，而预览只读牌面写的力量
+    /// （`StrengthGainOf`）⇒ 本回合还没打出去的「热修复」（+2）、「碎片整理」（+1）对后面「寒流」的加成被漏掉。
+    /// ⚠ 只对 `DEFECT_BOSS` 第三幕（能力机）生效，其它 Boss 一行不变。
+    /// </summary>
+    private static int FocusToStrengthOf(CardModel? card, Monsters.CharBossMonster? boss)
+    {
+        if (card == null || boss == null) return 0;
+        try
+        {
+            if (boss.Def == null || boss.Def.Key != "DEFECT_BOSS" || boss.ActIndex != 2) return 0;
+            int delta = FocusDeltaOf(card);
+            return delta > 0 ? delta : 0;
+        }
+        catch { return 0; }
+    }
+
     private static int PrintStrengthOf(CardModel? card, Monsters.CharBossMonster? boss)
     {
         if (card == null || boss == null) return 0;

@@ -379,6 +379,8 @@ public static class BossDefs
             new BossVariant
             {
                 Key = "SILENT_BREWER",
+                // ★ v0.2.874：进阶从剧本逐张标记搬到这里（单一数据源，wiki 才能自动导出）
+                AscensionUpgrades = new List<(int, Type)> { (8, typeof(Neutralize)), (9, typeof(PreciseCut)), (9, typeof(Fisticuffs)) },
                 // 以**房间遭遇**为准（控制台 `fight SILENT_BREWER_BOSS_ENCOUNTER` 也才会真的是炼药猎），
                 // 拿不到遭遇时才退回按种子 —— 见 BossLineups.BrewerActive 的说明。
                 Enabled = Core.BossLineups.BrewerActive,
@@ -1148,6 +1150,13 @@ public static class BossDefs
     public static readonly BossDefinition Watcher = new()
     {
         Key = "WATCHER_DIVINITY",
+                AscensionDisplay = new List<string> { "8: 警惕, 8: 旋身, 8: 欺瞒现实, 9: 手摇鼓" },
+                // ★ v0.2.875（用户：「欧米伽错误的获得了神格观进阶增强的手摇鼓」）：这里必须用**按幕**的表 ——
+                //   红蓝观 / Ω观 是挂在 Watcher 主定义底下的变体，而**不带幕的** AscensionUpgrades/Relics`r
+                //   在 VariantTakesOver 时照旧生效 ⇒ 神格观的进阶 8 升级与进阶 9 手摇鼓会漏给那两只。
+                //   按幕的表在 ShadowPlayerFactory 里带 if (def.VariantTakesOver(act)) continue; 闸门，正好。
+                AscensionUpgradesByAct = new List<(int, int, Type)> { (8, 3, WatcherCards.Vigilance), (8, 3, WatcherCards.Swivel), (8, 3, WatcherCards.DeceiveReality) },
+                AscensionRelicsByAct = new List<(int, int, Type, Type?)> { (9, 3, WatcherCards.Damaru, null) },
         VisualScene = "watcher",
         CharacterType = PlaceholderCharacterType,   // 占位，运行期会被替换
         // ⚠ 72 = 观者模组初始生命；再 +31 = **布质果实**（`LoomingFruit`，反编译 `CanonicalVars` = MaxHpVar(31)，
@@ -1191,6 +1200,8 @@ public static class BossDefs
                 new BossVariant
                 {
                     Key = "WATCHER_FORESIGHT",
+                AscensionDisplay = new List<string> { "8: 涅槃, 8: 心灵堡垒, 9: 碰撞连击, 9: 斩破命运" },
+                AscensionUpgrades = new List<(int, Type)> { (8, WatcherCards.Nirvana), (8, WatcherCards.MentalFortress), (9, WatcherCards.CutThroughFate), (9, WatcherCards.BowlingBash) },
                     Enabled = Core.BossLineups.WatcherForesightActive,
                     Deck = WatcherForesightScript.Deck(),
                     Relics = WatcherForesightScript.Relics(),
@@ -1211,6 +1222,8 @@ public static class BossDefs
                 new BossVariant
                 {
                     Key = "WATCHER_CREATE",
+                AscensionDisplay = new List<string> { "8: 创世之柱, 8: 心灵堡垒, 9: 改造现实, 9: 供奉, 9: 义愤填膺" },
+                AscensionUpgrades = new List<(int, Type)> { (8, WatcherCards.PillarOfCreation), (8, WatcherCards.MentalFortress), (9, WatcherCards.CarveReality), (9, WatcherCards.Consecrate), (9, WatcherCards.Indignation) },
                     Enabled = Core.BossLineups.WatcherCreateActive,
                     Deck = WatcherCreateScript.Deck(),
                     Relics = WatcherCreateScript.Relics(),
@@ -1230,6 +1243,8 @@ public static class BossDefs
                 new BossVariant
                 {
                     Key = "WATCHER_RETAIN",
+                AscensionDisplay = new List<string> { "8: 心灵堡垒, 8: 欺瞒现实, 9: 改造现实" },
+                AscensionUpgrades = new List<(int, Type)> { (8, WatcherCards.MentalFortress), (8, WatcherCards.DeceiveReality), (9, WatcherCards.CarveReality) },
                     Enabled = Core.BossLineups.WatcherRetainActive,
                     Deck = WatcherRetainScript.Deck(),
                     Relics = WatcherRetainScript.Relics(),
@@ -1249,6 +1264,8 @@ public static class BossDefs
                 new BossVariant
                 {
                     Key = "WATCHER_OMEGA",
+                AscensionDisplay = new List<string> { "8: 如水, 8: 心灵堡垒, 9: 点穴（第 6 / 11 回合）" },
+                AscensionUpgrades = new List<(int, Type)> { (8, WatcherCards.LikeWater), (8, WatcherCards.MentalFortress) },
                     Enabled = Core.BossLineups.WatcherOmegaActive,
                     Deck = WatcherOmegaScript.Deck(),
                     Relics = WatcherOmegaScript.Relics(),
@@ -1271,6 +1288,8 @@ public static class BossDefs
                 new BossVariant
                 {
                     Key = "WATCHER_RUSHDOWN",
+                AscensionDisplay = new List<string> { "8: 心灵堡垒, 8: 警惕, 9: 义愤填膺, 9: 腰带抽打, 9: 当头棒喝, 9: 供奉" },
+                AscensionUpgrades = new List<(int, Type)> { (8, WatcherCards.MentalFortress), (8, WatcherCards.Vigilance), (9, WatcherCards.Indignation), (9, WatcherCards.Consecrate), (9, WatcherCards.Wallop) },
                     Enabled = Core.BossLineups.WatcherRushdownActive,
                     Deck = WatcherRushdownScript.Deck(),
                     Relics = WatcherRushdownScript.Relics(),

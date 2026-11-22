@@ -873,11 +873,108 @@ public abstract partial class CharBossMonster : MonsterModel
         catch (Exception e) { Logger.Log("[CharBoss] 清空抽牌堆失败: " + e.Message); }
     }
 
+    private static int _deadTurnSkipLogs;
+
+    /// <summary>
+    /// 她**是不是已经死了**（v0.2.872）。
+    ///
+    /// 保守口径：**查不出来就当作还活着**（拿不到 `Creature`、属性读取抛异常都算「活着」），
+    /// 绝不因为查询失败就跳过她的一整手 —— 那道闸门只负责挡「确定已经死亡」的情况。
+    /// </summary>
+    internal bool DeadForThisTurn(out string why)
+    {
+        why = string.Empty;
+        try
+        {
+            var creature = Creature;
+            if (creature == null) { why = "拿不到生物"; return false; }
+
+            bool dead = creature.IsDead || !creature.IsAlive;
+            if (!dead) return false;
+
+            int hp = -1;
+            try { hp = creature.CurrentHp; } catch { /* 忽略 */ }
+            why = $"IsDead={creature.IsDead} IsAlive={creature.IsAlive} HP={hp}";
+            return true;
+        }
+        catch (Exception e)
+        {
+            why = "查询失败: " + e.Message;
+            return false;
+        }
+    }
+
+    internal string SafeEntryName()
+    {
+        try { return Def?.Key ?? "?"; } catch { return "?"; }
+    }
+
+    /// <summary>
+    /// 「她这一手走到哪一步了」的进度标记（v0.2.872，纯诊断）。
+    ///
+    /// 用途：玩家报「回合卡住」时，日志里没卡住前的最后一行，`ProbeTurnStall` 会把这个标记打出来，
+    /// 于是下一份日志就能直接看出是卡在**出牌前 / 药水 / 哪一张牌 / 回合收尾**哪一步。
+    /// 只在内存里留一个字符串，不写文件、不影响任何逻辑。
+    /// </summary>
+    internal static string StageMarker = "-";
+
+    internal static void MarkStage(string stage)
+    {
+        try { StageMarker = stage; } catch { /* 纯诊断 */ }
+    }
+
+    /// <summary>
+    /// 她这一手**整体兜底**（v0.2.872）。真正的实现在 <see cref="PlayPlannedCardsCoreAsync"/>。
+    ///
+    /// 为什么要在外面再包一层：她这一手是**原版敌方回合任务 await 的**（`MoveState` 的委托）。
+    /// 里面只要有一句抛出去（异体生物已死、选牌器拿不到、某个 mod 的钩子炸了……），
+    /// 异常就会一路冒到原版那条敌方回合的任务里 —— 表现就是「回合结束不了」而不是一句报错。
+    /// 所以这里把所有异常吞掉并记日志：这一手该画的没画完，但**回合一定走完**（与 mod 一贯口径一致）。
+    /// </summary>
     private async Task PlayPlannedCards(IReadOnlyList<Creature> targets)
+    {
+        try
+        {
+            await PlayPlannedCardsCoreAsync(targets);
+        }
+        catch (Exception e)
+        {
+            PlanReady = false;
+            MarkStage("整手异常");
+            if (_turnCrashLogs++ < 20)
+            {
+                Logger.Log("[CharBoss] ⚠ 她这一手整体抛异常（已吞掉，避免把原版的敌方回合任务打挂）: " + e);
+            }
+        }
+    }
+
+    private static int _turnCrashLogs;
+
+    private async Task PlayPlannedCardsCoreAsync(IReadOnlyList<Creature> targets)
     {
         // ★ v0.2.351：进这个方法的**第一行**就记日志 —— 事件机上「回合卡住」时，
         //   有这行说明卡在她自己的出牌流程里；没有这行就说明游戏根本没把她这一手派下来。
         Logger.Log($"[CharBoss] 敌方行动入口：PlayPlannedCards（第 {TurnNumber} 回合，Plan={Plan.Count} 张）");
+        MarkStage($"出牌入口(第{TurnNumber}回合)");
+
+        // ★ v0.2.872（玩家反馈：「多人模式的毒杀死对面其中一个会导致回合无法结束」）：
+        //   单人局里她死了就是这一场打完 —— 这一手永远不会被派下来；
+        //   多人局里**另一只 Boss 还活着、战斗继续**，原版仍可能把她这一回合的行动派下来。
+        //   而这时她是个尸体：手牌/牌堆/能量/药水/选牌全都不该再动。以前这里没有这道闸门，
+        //   她能在一个已经死亡的状态下跑完整个剧本（喝药、AutoPlay、等选牌……），
+        //   任何一步等不到结果或抛异常，都会把原版那条敌方回合任务挂住 ⇒ 回合结束不了。
+        //   ⇒ 死了就整手跳过，只留一行日志。真活着的 Boss 一行代码都没变。
+        if (DeadForThisTurn(out string deadWhy))
+        {
+            PlanReady = false;
+            MarkStage("已阵亡跳过");
+            if (_deadTurnSkipLogs++ < 20)
+            {
+                Logger.Log($"[CharBoss] {(SafeEntryName())} 已经倒下（{deadWhy}）⇒ 跳过她这一手，" +
+                           "不再动任何战斗状态（多人局里别的 Boss 还要继续打）");
+            }
+            return;
+        }
 
         // 读档续战等情况下可能没走过 RollMove（没算过计划），这里补算一次，
         // 否则 Boss 会白站一回合。注意用 PlanReady 区分「算过了但没牌可打」。
@@ -940,6 +1037,7 @@ public abstract partial class CharBossMonster : MonsterModel
 
         // 药水先喝（用户设计：炼药猎每回合都是「药水 → 牌」）：按剧本顺序喝她栏位里有的那几瓶。
         await DrinkPlannedPotionsAsync(ctx, Shadow);
+        MarkStage($"药水完成(第{TurnNumber}回合)");   // v0.2.872 诊断标记
         // 喝完药水立刻刷新一次面板/状态条：状态条是按「内容指纹」节流重建的，
         // 指纹里没包含药水列表 ⇒ 不主动刷这一下，药水的增减就不会实时更新（用户 2026-10-26 实测）。
         try { CharacterBosses.UI.BossHandUi.RefreshForce(this); CharacterBosses.UI.BossHandUi.Refresh(this); } catch { /* 忽略 */ }
@@ -1338,6 +1436,7 @@ public abstract partial class CharBossMonster : MonsterModel
 
         Plan.Clear();
         PlanReady = false;
+        MarkStage($"出牌阶段结束(第{TurnNumber}回合)");   // v0.2.872 诊断标记
         var swDiscard = System.Diagnostics.Stopwatch.StartNew();
         BossPiles.DiscardHand(pcs);
 
@@ -1350,6 +1449,7 @@ public abstract partial class CharBossMonster : MonsterModel
         // 记一个时间戳：原版派发「敌方回合结束」（炸弹/冰雹风暴等）时会打出与这里的差值，
         // 用来分辨那 2 秒的延迟是在我们这边还是在原版（见 SideTurnEndTimingPatch）。
         CharacterBosses.Patches.SideTurnEndTimingPatch.MarkOwnTurnEnded();
+        MarkStage($"回合收尾完成(第{TurnNumber}回合)");   // v0.2.872 诊断标记
     }
 
     /// <summary>
@@ -1572,6 +1672,10 @@ public abstract partial class CharBossMonster : MonsterModel
 
     private async Task PlayOne(PlayerChoiceContext ctx, PlayerCombatState pcs, PlannedPlay play)
     {
+        // v0.2.872 诊断标记：卡住时日志里能看出停在**哪一张牌**上
+        try { MarkStage($"出牌:{play?.Card?.Id?.Entry ?? "?"}(第{TurnNumber}回合)"); }
+        catch { /* 纯诊断 */ }
+
         // ★ v0.2.767：预见观让玩家「预见 2」期间，**她**和同场的其它 Boss 都停在这里，
         //   直到玩家选完、预见界面关掉（闸门由 Core.ScryGate 控制）。单人时它恒为「已放行」。
         try { await Core.ScryGate.WaitAsync(); } catch { /* 忽略 */ }
@@ -1580,7 +1684,10 @@ public abstract partial class CharBossMonster : MonsterModel
         //   原版靠「离开 play 堆 ⇒ 从展示区收走」那一步清理，而那一笔只替**本机玩家**的出牌跑
         //   （她是影子玩家、走 `CardCmd.AutoPlay`）⇒ 卡面会永久停在战场中央那张大卡的位置
         //   （玩家 2026-11-21 截图：「碎屑储打出的碰撞轨迹卡在天上」，联机时必现）。
-        try { Patches.StrayBossCardQueuePatch.ClearOurCardsFromPlayContainer("她开始打下一张牌"); }
+        // ★ v0.2.873：**不能是 0**（立刻全收）—— 上一张牌如果还在播「飞向能力栏」那段动画，
+        //   立刻把它 QueueFree 会让原版那句 `PlayAnim` 对着废节点抛异常，而它的拖尾节点每帧再读一次
+        //   ⇒ 每帧一条异常、日志暴涨（玩家实测一小时 350 MB ~ 1.6 GB）。给 1.2 秒让动画收尾。
+        try { Patches.StrayBossCardQueuePatch.ClearOurCardsFromPlayContainer("她开始打下一张牌", 1_200L); }
         catch { /* 纯显示，失败不影响出牌 */ }
 
         // 告诉自动选择器「现在是谁的回合」——它按 (Boss, 回合号) 取「点名要丢的牌」，
@@ -2928,7 +3035,7 @@ public abstract partial class CharBossMonster : MonsterModel
         int asc = AscensionLevel;
         foreach (var (minAsc, type) in Def.AscensionUpgrades)
         {
-            if (asc >= minAsc) result.Add(type);
+            if (asc >= minAsc && type != null) result.Add(type);
         }
         // 变体（如三层「巨石战」）自己的进阶升级表：接管时只看它，主定义那一幕的行不生效。
         var variantUpgrades = Def.VariantAscensionUpgrades(ActIndex);
@@ -2936,7 +3043,7 @@ public abstract partial class CharBossMonster : MonsterModel
         {
             foreach (var (minAsc, type) in variantUpgrades)
             {
-                if (asc >= minAsc) result.Add(type);
+                if (asc >= minAsc && type != null) result.Add(type);
             }
             AppendDreadUpgrades(result);
             return result;
@@ -2946,6 +3053,10 @@ public abstract partial class CharBossMonster : MonsterModel
         {
             if (asc < minAsc) continue;
             if (byAct != 0 && byAct != act) continue;
+            // ★ v0.2.875（用户 2026-11-22：「多人时事件机有时的意图中会错误的包含一心化万」）：
+            //   本幕由**变体**接管时，主定义那一幕的进阶升级不该再生效（与遗物那条同一个闸门）。
+            //   以前缺这一行 ⇒ 能力机（DEFECT_BOSS 主定义第三幕）进阶 9 的一心化万漏给了同幕的变体事件机。
+            if (Def.VariantTakesOver(ActIndex)) continue;
             result.Add(type);
         }
         AppendDreadUpgrades(result);

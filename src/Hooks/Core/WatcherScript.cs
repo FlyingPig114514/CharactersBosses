@@ -33,7 +33,7 @@ public static class WatcherScript
             // 不再是「摆手」）。三张牌分别出现在第 1/8（警惕）、第 4/11（欺瞒现实）、第 5/9（旋身）回合。
             T("1. 许愿+（永生不死）、打击（有费就打）、警惕（有费就打）",
                 W(WatcherCards.Wish, upgraded: true), W(WatcherCards.Strike),
-                W(WatcherCards.Vigilance, upgradeMinAscension: 8)),
+                W(WatcherCards.Vigilance)),
 
             T("2. 光辉、防御、敬拜（有费就打）、奇迹（不出）",
                 W(WatcherCards.Brilliance), W(WatcherCards.Defend), W(WatcherCards.Worship),
@@ -45,11 +45,11 @@ public static class WatcherScript
 
             T("4. 化拳为空、摆手、欺瞒现实（有费就打）、平安（有费就打）",
                 W(WatcherCards.EmptyFist), W(WatcherCards.WaveOfTheHand),
-                W(WatcherCards.DeceiveReality, upgradeMinAscension: 8), W(WatcherCards.Safety)),
+                W(WatcherCards.DeceiveReality), W(WatcherCards.Safety)),
 
             T("5. 灭除之刃（段数 = 本回合 X 费）、虔信、旋身（有费就打）",
                 W(WatcherCards.Expunger), W(WatcherCards.Devotion),
-                W(WatcherCards.Swivel, upgradeMinAscension: 8)),
+                W(WatcherCards.Swivel)),
 
             T("6. 打击、圣洁、结末（有费就打）",
                 W(WatcherCards.Strike), W(WatcherCards.Sanctity), W(WatcherCards.Conclude)),
@@ -61,18 +61,18 @@ public static class WatcherScript
 
             T("8. 打击、供奉、警惕（有费就打）",
                 W(WatcherCards.Strike), W(WatcherCards.Consecrate),
-                W(WatcherCards.Vigilance, upgradeMinAscension: 8)),
+                W(WatcherCards.Vigilance)),
 
             T("9. 灭除之刃、防御、旋身（有费就打）",
                 W(WatcherCards.Expunger), W(WatcherCards.Defend),
-                W(WatcherCards.Swivel, upgradeMinAscension: 8)),
+                W(WatcherCards.Swivel)),
 
             T("10. 打击、圣洁、结末（有费就打）",
                 W(WatcherCards.Strike), W(WatcherCards.Sanctity), W(WatcherCards.Conclude)),
 
             T("11. 化拳为空、摆手、欺瞒现实（有费就打）、平安（有费就打）",
                 W(WatcherCards.EmptyFist), W(WatcherCards.WaveOfTheHand),
-                W(WatcherCards.DeceiveReality, upgradeMinAscension: 8), W(WatcherCards.Safety)),
+                W(WatcherCards.DeceiveReality), W(WatcherCards.Safety)),
         };
 
         return new BossScript

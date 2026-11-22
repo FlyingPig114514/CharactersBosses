@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
@@ -956,7 +956,8 @@ public static class Telemetry
                     ["mod"] = BuildInfo.Tag,
                 };
 
-                string line = JsonSerializer.Serialize(payload) + Environment.NewLine;
+                // ★ v0.2.892：上传/落盘前同样过一遍脱敏（SteamID / NetId → 局内代号 P#xxxxxx、路径用户名 → <userdir>）
+                string line = Redact.Text(JsonSerializer.Serialize(payload)) + Environment.NewLine;
                 using var stream = new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
                 using var writer = new StreamWriter(stream);
                 writer.Write(line);

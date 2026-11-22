@@ -166,6 +166,15 @@ foreach ($boss in $data.bosses) {
 
         # 主设计（空壳幕跳过：没有剧本也没有卡组）
         if (-not ($null -eq $act.script -and $act.deck.Count -eq 0)) {
+            # ★ v0.2.874（用户 2026-11-22：「wiki 上好像没有写进阶增强」）：
+            #   以前这里 Extras 恒为空 —— wiki-dump 只导出了**变体**那两张进阶表，
+            #   于是黑球机 / 愤怒战 / 灾厄骨 / 碎屑储… 这些主设计的进阶升级与额外遗物在 wiki 上一个字都没有。
+            #   现在 dump 也导出了按幕的两张表，这里照变体那套拼进同一行。
+            $mainExtras = @()
+            foreach ($x in $act.ascensionUpgrades) { if ($x) { $mainExtras += ('进阶 ' + $x) } }
+            foreach ($x in $act.ascensionRelics) { if ($x) { $mainExtras += ('进阶 ' + $x) } }
+            foreach ($x in $act.dreadUpgrades) { if ($x) { $mainExtras += ('恐惧升级 ' + $x) } }
+            foreach ($x in $act.ascensionDisplay) { foreach ($part in ([string]$x -split ',')) { if ($part.Trim()) { $mainExtras += ('进阶 ' + $part.Trim()) } } }
             $designs += [pscustomobject]@{
                 Act = $actNo; Char = $boss.character; Name = [string]$act.name; Key = [string]$boss.key
                 Encounter = [string]$act.encounter; Hp = (Get-Hp $boss.key $actNo ([int]$act.baseHp) $firstBaseHp 0)
@@ -173,14 +182,15 @@ foreach ($boss in $data.bosses) {
                 Deck = $act.deck; Relics = $act.relics
                 DeckNote = $act.deckNote; DeckRegistered = $act.deckRegistered
                 Special = $act.special; SpecialDread = $act.specialDread
-                Extras = @(); Script = $act.script; Info = $boss.info
+                Extras = $mainExtras; Script = $act.script; Info = $(if ($act.info) { [string]$act.info } else { [string]$boss.info })
             }
         }
 
         foreach ($v in $act.variants) {
             $extras = @()
-            foreach ($x in $v.ascensionUpgrades) { if ($x) { $extras += ('进阶 ' + $x) } }
-            foreach ($x in $v.ascensionRelics) { if ($x) { $extras += ('进阶 ' + $x) } }
+            foreach ($x in $v.ascensionUpgrades) { if ($x -and ($x -notmatch ':\s*$')) { $extras += ('进阶 ' + $x) } }
+            foreach ($x in $v.ascensionRelics) { if ($x -and ($x -notmatch ':\s*$')) { $extras += ('进阶 ' + $x) } }
+            foreach ($x in $v.ascensionDisplay) { foreach ($part in ([string]$x -split ',')) { if ($part.Trim()) { $extras += ('进阶 ' + $part.Trim()) } } }
             foreach ($x in $v.dreadUpgrades) { if ($x) { $extras += ('恐惧升级 ' + $x) } }
             $designs += [pscustomobject]@{
                 Act = $actNo; Char = $boss.character; Name = [string]$v.name; Key = [string]$v.key
@@ -189,7 +199,7 @@ foreach ($boss in $data.bosses) {
                 Deck = $v.deck; Relics = $v.relics
                 DeckNote = $v.deckNote; DeckRegistered = $v.deckRegistered
                 Special = $v.special; SpecialDread = $v.specialDread
-                Extras = $extras; Script = $v.script; Info = $boss.info
+                Extras = $extras; Script = $v.script; Info = $(if ($v.info) { [string]$v.info } else { [string]$boss.info })
             }
         }
     }
@@ -222,6 +232,91 @@ foreach ($a in @(1, 2, 3)) {
 [void]$sb.AppendLine('**支配**（恐惧模式）：[各角色的支配](#dominions)')
 [void]$sb.AppendLine('')
 
+# ★ 用户 2026-11-22：「github 的 wiki 上好像没有写进阶增强」⇒ 目录里加一条，并单独出一节
+[void]$sb.AppendLine('**进阶**：[进阶增强一览](#ascension)')
+[void]$sb.AppendLine('')
+
+# ── 进阶增强一览（从各设计的 ascensionUpgrades / ascensionRelics 聚合）─────
+[void]$sb.AppendLine('<a id="ascension"></a>')
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine('## 进阶增强（进阶 8 / 9）')
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine('本模组的 Boss 在**进阶 8 / 进阶 9** 会有额外增强（和原版 Boss「进阶只加血」不是一个路子）：')
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine('- **升级牌**：卡组与剧本里点名的牌在该档变成**升级版**（后面带「+」），其余牌不变；')
+[void]$sb.AppendLine('- **额外遗物**：部分 Boss 会**多一件遗物**（下表里「牌名」与「遗物名」混排，遗物就是多出来的那件）；')
+[void]$sb.AppendLine('- **召唤物血量**：Boss 召出来的仆从（奥斯提 / 子嗣 / 仆从储的那几只等）**进阶 8 起**改用更高的血量档；')
+[void]$sb.AppendLine('- **Boss 本体的血量不随进阶变化** —— 只按「幕」+ 涅奥的祝福算（见开头的血量公式）。')
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine('| 幕 | Boss | 进阶 8 | 进阶 9 | 其它档位 |')
+[void]$sb.AppendLine('|:---:|---|---|---|---|')
+
+$ascRows = @()
+# ★ v0.2.874：观者那 6 套 + 炼药猎的进阶已经**搬进 `BossVariant.AscensionUpgrades` 表**（单一数据源），
+#   所以这里跟其它设计一样纯自动导出 —— 不再有手抄表。
+foreach ($d in $designs) {
+    $byLevel = @{}
+    foreach ($e in @($d.Extras)) {
+        $m = [regex]::Match([string]$e, '^进阶\s*(\d+)\s*[:：]\s*(.+)$')
+        if (-not $m.Success) { continue }
+        $lv = [string]$m.Groups[1].Value
+        $val = [string]$m.Groups[2].Value
+        if (-not $byLevel.ContainsKey($lv)) { $byLevel[$lv] = @() }
+        $byLevel[$lv] = @($byLevel[$lv]) + $val
+    }
+
+    # ★ v0.2.874（用户：「这些 boss 我肯定都设计进阶升级了」——确实有）：
+    #   炼药猎 + 6 只观者在 dump 进程里拿不到**结构化剧本卡**（观者那几套要等观者 mod 的类型解析、
+    #   炼药猎的剧本在静态初始化期也没铺开）⇒ dump 退回按「备注文本」拆牌，那些卡上没有
+    #   `UpgradeMinAscension` 字段。但剧本备注里本来就写着「（进阶8起升级）」「（进阶9不升）」，
+    #   这里按同一条口径把它们回收进来（与结构化那条路合并去重）。
+    if ($null -ne $d.Script) {
+        foreach ($t in @($d.Script.turns)) {
+            $note = [string]$t.note
+            if (-not $note) { continue }
+            foreach ($m2 in [regex]::Matches($note, '([^、，,；;→\s（）()]+)\s*（进阶\s*(\d+)\s*起?\s*(升级|不升)）')) {
+                if ($m2.Groups[3].Value -eq '不升') { continue }
+                $cardName = $m2.Groups[1].Value.Trim()
+                if (-not $cardName) { continue }
+                $lv2 = [string]$m2.Groups[2].Value
+                if (-not $byLevel.ContainsKey($lv2)) { $byLevel[$lv2] = @() }
+                if (@($byLevel[$lv2]) -notcontains $cardName) { $byLevel[$lv2] = @($byLevel[$lv2]) + $cardName }
+            }
+        }
+    }
+
+    # ★ v0.2.875：神格观是 `Watcher` **主定义**（不是变体），而 dump 进程里观者卡类型全是 null
+    #   ⇒ 按幕表的条目被 null 过滤掉、`AscensionDisplay` 也没跟着主设计导出来。
+    #   这里只给这一只补上（数据本体在 BossDefs 的 AscensionUpgradesByAct / AscensionRelicsByAct）。
+    if ([string]$d.Name -eq '神格观' -and $byLevel.Count -eq 0) {
+        $byLevel['8'] = @('警惕', '旋身', '欺瞒现实')
+        $byLevel['9'] = @('手摇鼓')
+    }
+
+    if ($byLevel.Count -eq 0) { continue }
+
+    $other = @()
+    foreach ($k in @($byLevel.Keys | Sort-Object)) {
+        if ($k -eq '8' -or $k -eq '9') { continue }
+        $other += ('进阶 ' + $k + '：' + (@($byLevel[$k]) -join '、'))
+    }
+
+    $ascRows += [pscustomobject]@{
+        Act   = $d.Act
+        Name  = $d.Name
+        Lv8   = ((@($byLevel['8']) | Where-Object { $_ } | Select-Object -Unique) -join '、')
+        Lv9   = ((@($byLevel['9']) | Where-Object { $_ } | Select-Object -Unique) -join '、')
+        Other = ($other -join '；')
+    }
+}
+foreach ($r in $ascRows) {
+    [void]$sb.AppendLine('| ' + $actNames[$r.Act] + ' | ' + (MdText $r.Name) + ' | ' + (MdText $r.Lv8) + ' | ' + (MdText $r.Lv9) + ' | ' + (MdText $r.Other) + ' |')
+}
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine('> 表里空白 = 这只 Boss 在该档**没有**额外升级/遗物。每只 Boss 的详细升级名单也写在它自己那一节里')
+[void]$sb.AppendLine('> （「**进阶 / 恐惧改动**」一行），两处同源（同一次 `tools/wiki-dump` 导出）。')
+[void]$sb.AppendLine('')
+
 foreach ($a in @(1, 2, 3)) {
     $inAct = @($designs | Where-Object { $_.Act -eq $a })
     if ($inAct.Count -eq 0) { continue }
@@ -240,7 +335,24 @@ foreach ($a in @(1, 2, 3)) {
         [void]$sb.AppendLine('- **控制台**：`fight ' + $d.Encounter + '_BOSS_ENCOUNTER`')
         [void]$sb.AppendLine('- **血量**：**' + $d.Hp + '** ｜ **能量**：' + $d.Energy + ' ｜ **手牌**：' + $d.Hand + ' ｜ **循环**：' + (Loop-Text $d.Script))
         if ($d.Info) {
-            [void]$sb.AppendLine('- **能力统计**：' + (MdText ($d.Info -replace "`r?`n", ' ｜ ')))
+        # ★ v0.2.883：能力面板按「标签：值」渲染成两列表（与设置界面同一份数据）
+        if ($d.Info) {
+            [void]$sb.AppendLine('**能力面板**')
+            [void]$sb.AppendLine('')
+            [void]$sb.AppendLine('| 项目 | 值 |')
+            [void]$sb.AppendLine('|---|---|')
+            foreach ($infoLine in ((([string]$d.Info) -replace "`r`n", "`n") -split "`n")) {
+                if (-not $infoLine.Trim()) { continue }
+                $sep = $infoLine.IndexOf(':')
+                if ($sep -lt 0) { $sep = $infoLine.IndexOf([char]0xFF1A) }
+                if ($sep -gt 0) {
+                    [void]$sb.AppendLine('| ' + (MdText $infoLine.Substring(0, $sep)) + ' | ' + (MdText $infoLine.Substring($sep + 1)) + ' |')
+                } else {
+                    [void]$sb.AppendLine('| ' + (MdText $infoLine.Trim()) + ' | |')
+                }
+            }
+            [void]$sb.AppendLine('')
+        }
         }
         # 用户 2026-11-20：卡组括号里只保留张数，不要口径说明；也不再显示「代码登记卡组」对照
         [void]$sb.AppendLine('- **卡组**（' + $d.Deck.Count + ' 张）：' + (Merge-Counts $d.Deck))
@@ -320,3 +432,4 @@ if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Force -Path $dir | Ou
 $lines = ($sb.ToString() -split "`n").Count
 Write-Output ('OK: ' + $outPath)
 Write-Output ('  设计 ' + $designs.Count + ' 套；Markdown ' + $lines + ' 行；' + [math]::Round((Get-Item $outPath).Length / 1024, 1) + ' KB')
+

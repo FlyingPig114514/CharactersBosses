@@ -1,6 +1,6 @@
 {
   "generatedFrom": "CharacterBosses.Impl113.dll",
-  "generatedAt": "2026-11-21 16:39",
+  "generatedAt": "2026-11-22 17:41",
   "cardNameMisses": [],
   "bosses": [
     {
@@ -66,6 +66,15 @@
           ],
           "potions": [],
           "dreadUpgrades": [],
+          "ascensionUpgrades": [
+            "8: 飞跃",
+            "9: 趁势打击"
+          ],
+          "ascensionRelics": [
+            "8: 不安油灯"
+          ],
+          "ascensionDisplay": [],
+          "info": "循环：5~7\n单体能力：强\n群攻能力：无\n单体高压回合：5、7\n群体高压回合：无\n特殊效果类型：单体\n群体增益能力：中",
           "script": {
             "loopFrom": 5,
             "loopLength": 3,
@@ -455,6 +464,8 @@
                 "9: 集中打击"
               ],
               "ascensionRelics": [],
+              "ascensionDisplay": [],
+              "info": "循环：7~10\n单体能力：强\n群攻能力：弱\n单体高压回合：3、5、7、8、10\n群体高压回合：无\n特殊效果类型：单体",
               "dreadUpgrades": [
                 "暴风雨"
               ],
@@ -1005,6 +1016,16 @@
           ],
           "potions": [],
           "dreadUpgrades": [],
+          "ascensionUpgrades": [
+            "8: 充电",
+            "8: 启动流程",
+            "9: 一心化万",
+            "9: 冷却剂",
+            "9: 超能光束"
+          ],
+          "ascensionRelics": [],
+          "ascensionDisplay": [],
+          "info": "循环：7~10\n单体能力：强\n群攻能力：强\n单体高压回合：4、8、10\n群体高压回合：5、9\n特殊效果类型：自身\n群体增益强度：中",
           "script": {
             "loopFrom": 7,
             "loopLength": 4,
@@ -1653,6 +1674,8 @@
                 "9: 雷霆"
               ],
               "ascensionRelics": [],
+              "ascensionDisplay": [],
+              "info": "循环：8~12\n单体能力：很强\n群攻能力：很强\n单体高压回合：6~8、12\n群体高压回合：6、9、10\n特殊效果类型：自身",
               "dreadUpgrades": [],
               "script": {
                 "loopFrom": 8,
@@ -2375,12 +2398,13 @@
             "子程序",
             "冰雹风暴",
             "双重释放",
-            "雷暴",
+            "电击",
             "碎片整理+",
             "冷却剂",
             "创造性AI",
+            "热修复",
             "寒流",
-            "电击",
+            "雷暴",
             "全息影像",
             "打击",
             "充电",
@@ -2413,7 +2437,8 @@
             "寒流",
             "缓冲",
             "碎片整理",
-            "冷却剂"
+            "冷却剂",
+            "热修复"
           ],
           "deckNote": "按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 8 回合）",
           "relics": [
@@ -2428,6 +2453,16 @@
           ],
           "potions": [],
           "dreadUpgrades": [],
+          "ascensionUpgrades": [
+            "8: 充电",
+            "8: 究极防御",
+            "8: 高速脱离"
+          ],
+          "ascensionRelics": [
+            "9: 数据磁盘"
+          ],
+          "ascensionDisplay": [],
+          "info": "循环：8~11\n单体能力：极强\n群攻能力：中\n单体高压回合：5、8、9\n群体高压回合：无\n特殊效果类型：单体\n群体增益能力：弱",
           "script": {
             "loopFrom": 8,
             "loopLength": 4,
@@ -2440,12 +2475,13 @@
               "子程序",
               "冰雹风暴",
               "双重释放",
-              "雷暴",
+              "电击",
               "碎片整理+",
               "冷却剂",
               "创造性AI",
+              "热修复",
               "寒流",
-              "电击",
+              "雷暴",
               "全息影像",
               "打击",
               "充电",
@@ -2539,15 +2575,15 @@
                 ]
               },
               {
-                "note": "雷暴、碎片整理+、冷却剂；球位已满 → 引导时激发队首（若队首是冰球，激发给格挡＝守势）",
+                "note": "电击、碎片整理+、冷却剂（用户 2026-11-22 改：雷暴挪到第 5 回合）",
                 "energy": 3,
                 "shuffle": false,
                 "cards": [
                   {
-                    "name": "雷暴",
-                    "type": "Storm",
+                    "name": "电击",
+                    "type": "Zap",
                     "cost": 1,
-                    "cardType": "Power",
+                    "cardType": "Skill",
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
@@ -2580,7 +2616,7 @@
                 ]
               },
               {
-                "note": "创造性AI 落地；寒流铺球；电击没费",
+                "note": "创造性AI、热修复（本回合 +2 集中）、寒流",
                 "energy": 3,
                 "shuffle": false,
                 "cards": [
@@ -2589,6 +2625,17 @@
                     "type": "CreativeAi",
                     "cost": 3,
                     "cardType": "Power",
+                    "DamageOverride": 0,
+                    "BlockOverride": 0,
+                    "ExtraAoe": 0,
+                    "UpgradeMinAscension": 0,
+                    "played": true
+                  },
+                  {
+                    "name": "热修复",
+                    "type": "Hotfix",
+                    "cost": 0,
+                    "cardType": "Skill",
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
@@ -2605,36 +2652,23 @@
                     "ExtraAoe": 0,
                     "UpgradeMinAscension": 0,
                     "played": true
-                  },
-                  {
-                    "name": "电击",
-                    "type": "Zap",
-                    "cost": 1,
-                    "cardType": "Skill",
-                    "DamageOverride": 0,
-                    "BlockOverride": 0,
-                    "ExtraAoe": 0,
-                    "UpgradeMinAscension": 0,
-                    "played": false,
-                    "reason": "没费"
                   }
                 ]
               },
               {
-                "note": "碎片整理（AI 印）、全息影像、冰川（全息影像从弃牌堆捞的那张）；打击没费",
+                "note": "雷暴、全息影像（捞冰川）、冰川、打击（没费）",
                 "energy": 3,
                 "shuffle": false,
                 "cards": [
                   {
-                    "name": "碎片整理",
-                    "type": "Defragment",
+                    "name": "雷暴",
+                    "type": "Storm",
                     "cost": 1,
                     "cardType": "Power",
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
                     "UpgradeMinAscension": 0,
-                    "from": "ai",
                     "played": true
                   },
                   {
@@ -3050,6 +3084,8 @@
                 "9: 疯狂进食"
               ],
               "ascensionRelics": [],
+              "ascensionDisplay": [],
+              "info": "循环：6~9\n单体能力：极强\n群攻能力：强\n单体高压回合：2、4、6、9\n群体高压回合：6、9\n特殊效果类型：自身\n群体增益能力：强",
               "dreadUpgrades": [],
               "script": {
                 "loopFrom": 6,
@@ -3656,6 +3692,8 @@
               "ascensionRelics": [
                 "9: 数据磁盘"
               ],
+              "ascensionDisplay": [],
+              "info": "循环：6~9\n单体能力：极强\n群攻能力：强\n单体高压回合：4、9\n群体高压回合：无\n特殊效果类型：单体\n塞牌能力：强",
               "dreadUpgrades": [],
               "script": {
                 "loopFrom": 6,
@@ -4163,6 +4201,10 @@
           "relics": [],
           "potions": [],
           "dreadUpgrades": [],
+          "ascensionUpgrades": [],
+          "ascensionRelics": [],
+          "ascensionDisplay": [],
+          "info": "",
           "script": null,
           "variants": [
             {
@@ -4221,6 +4263,8 @@
                 "9: 疯狂进食"
               ],
               "ascensionRelics": [],
+              "ascensionDisplay": [],
+              "info": "循环：6~9\n单体能力：极强\n群攻能力：强\n单体高压回合：2、4、6、9\n群体高压回合：6、9\n特殊效果类型：自身\n群体增益能力：强",
               "dreadUpgrades": [],
               "script": {
                 "loopFrom": 6,
@@ -4846,6 +4890,14 @@
             "斗殴",
             "永恒形态"
           ],
+          "ascensionUpgrades": [],
+          "ascensionRelics": [
+            "8: 奥利哈钢",
+            "8: 意外光滑的石头",
+            "9: 金刚杵"
+          ],
+          "ascensionDisplay": [],
+          "info": "循环：10~16\n单体能力：极强\n群攻能力：强\n单体高压回合：7、9、12~16\n群体高压回合：5、12\n特殊效果类型：单体\n群体减益能力：强",
           "script": {
             "loopFrom": 10,
             "loopLength": 7,
@@ -5935,6 +5987,15 @@
           ],
           "potions": [],
           "dreadUpgrades": [],
+          "ascensionUpgrades": [
+            "8: 坚毅",
+            "9: 烙印"
+          ],
+          "ascensionRelics": [
+            "8: 护喉甲"
+          ],
+          "ascensionDisplay": [],
+          "info": "循环：8~9\n单体能力：强\n群攻能力：中\n单体高压回合：6、8\n群体高压回合：无\n特殊效果类型：全局\n塞牌能力：中",
           "script": {
             "loopFrom": 8,
             "loopLength": 2,
@@ -6468,6 +6529,8 @@
               "ascensionRelics": [
                 "8: 护喉甲"
               ],
+              "ascensionDisplay": [],
+              "info": "循环：6~9\n单体能力：强\n群攻能力：偏弱\n单体高压回合：3、9\n群体高压回合：无\n特殊效果类型：单体",
               "dreadUpgrades": [],
               "script": {
                 "loopFrom": 6,
@@ -6958,6 +7021,13 @@
           ],
           "potions": [],
           "dreadUpgrades": [],
+          "ascensionUpgrades": [
+            "8: 血墙",
+            "9: 烙印"
+          ],
+          "ascensionRelics": [],
+          "ascensionDisplay": [],
+          "info": "循环：5~7\n单体能力：强\n群攻能力：中\n单体高压回合：4、7\n群体高压回合：无\n特殊效果类型：自身\n群体增益强度：弱",
           "script": {
             "loopFrom": 5,
             "loopLength": 3,
@@ -7322,6 +7392,8 @@
                 "9: 彼岸咆哮"
               ],
               "ascensionRelics": [],
+              "ascensionDisplay": [],
+              "info": "循环：2~7\n单体能力：极强\n群攻能力：弱\n单体高压回合：2、3、6\n群体高压回合：7\n特殊效果类型：自身",
               "dreadUpgrades": [],
               "script": {
                 "loopFrom": 2,
@@ -7724,6 +7796,15 @@
           ],
           "potions": [],
           "dreadUpgrades": [],
+          "ascensionUpgrades": [
+            "8: 岩石铠甲",
+            "9: 主宰"
+          ],
+          "ascensionRelics": [
+            "8: 护喉甲"
+          ],
+          "ascensionDisplay": [],
+          "info": "循环：6~9\n单体能力：很强\n群攻能力：强\n单体高压回合：4、6、8\n群体高压回合：7\n特殊效果类型：单体\n群体减益能力：中",
           "script": {
             "loopFrom": 6,
             "loopLength": 4,
@@ -8186,6 +8267,8 @@
                 "8: 奥利哈钢",
                 "9: 金刚杵"
               ],
+              "ascensionDisplay": [],
+              "info": "循环：6~8\n单体能力：很强\n群攻能力：中\n单体高压回合：6\n群体高压回合：8\n特殊效果类型：单体",
               "dreadUpgrades": [],
               "script": {
                 "loopFrom": 5,
@@ -8675,6 +8758,10 @@
           ],
           "potions": [],
           "dreadUpgrades": [],
+          "ascensionUpgrades": [],
+          "ascensionRelics": [],
+          "ascensionDisplay": [],
+          "info": "",
           "script": null,
           "variants": []
         }
@@ -8746,6 +8833,17 @@
           ],
           "potions": [],
           "dreadUpgrades": [],
+          "ascensionUpgrades": [
+            "8: 厄运之衣",
+            "9: 友谊",
+            "9: 无处可逃",
+            "9: 荒疫打击"
+          ],
+          "ascensionRelics": [
+            "8: 不死符文"
+          ],
+          "ascensionDisplay": [],
+          "info": "循环：7~11\n单体能力：强\n群攻能力：中\n单体高压回合：5、11\n群体高压回合：2、8\n特殊效果类型：全局",
           "script": {
             "loopFrom": 7,
             "loopLength": 5,
@@ -9296,6 +9394,8 @@
                 "9: 摧残"
               ],
               "ascensionRelics": [],
+              "ascensionDisplay": [],
+              "info": "循环：7～11\n单体能力：强\n群攻能力：强\n单体高压回合：3、5、11\n群体高压回合：4、10\n特殊效果类型：自身\n群体减益能力：极强\n群体增益能力：弱",
               "dreadUpgrades": [
                 "血肉戏法"
               ],
@@ -9885,6 +9985,15 @@
           ],
           "potions": [],
           "dreadUpgrades": [],
+          "ascensionUpgrades": [
+            "8: 死亡之舞",
+            "8: 违逆",
+            "9: 切断",
+            "9: 死亡行军"
+          ],
+          "ascensionRelics": [],
+          "ascensionDisplay": [],
+          "info": "循环：6~8\n单体能力：强\n群攻能力：无\n单体高压回合：4、6\n群体高压回合：无\n特殊效果类型：单体",
           "script": {
             "loopFrom": 6,
             "loopLength": 3,
@@ -10561,6 +10670,8 @@
                 "9: 友谊"
               ],
               "ascensionRelics": [],
+              "ascensionDisplay": [],
+              "info": "循环：7～10\n单体能力：极强\n群攻能力：很强\n单体高压回合：4、7、9\n群体高压回合：4、7\n特殊效果类型：全局",
               "dreadUpgrades": [],
               "script": {
                 "loopFrom": 7,
@@ -11039,6 +11150,16 @@
           ],
           "potions": [],
           "dreadUpgrades": [],
+          "ascensionUpgrades": [
+            "8: 死亡之舞",
+            "9: 友谊",
+            "9: 钙化"
+          ],
+          "ascensionRelics": [
+            "8: 骇人头盔"
+          ],
+          "ascensionDisplay": [],
+          "info": "循环：5~7\n单体能力：极强\n群攻能力：无\n单体高压回合：3、4、7\n群体高压回合：无\n特殊效果类型：单体\n群体增益能力：弱",
           "script": {
             "loopFrom": 5,
             "loopLength": 3,
@@ -11439,6 +11560,8 @@
               "ascensionRelics": [
                 "8: 骇人头盔"
               ],
+              "ascensionDisplay": [],
+              "info": "循环：7~9\n单体能力：极强\n群攻能力：弱\n单体高压回合：2、6、7、9\n群体高压回合：无\n特殊效果类型：自身\n群体减益能力：强",
               "dreadUpgrades": [],
               "script": {
                 "loopFrom": 7,
@@ -12006,6 +12129,12 @@
           ],
           "potions": [],
           "dreadUpgrades": [],
+          "ascensionUpgrades": [],
+          "ascensionRelics": [
+            "8: 星系尘埃"
+          ],
+          "ascensionDisplay": [],
+          "info": "循环：5~8\n单体能力：极强\n群攻能力：弱\n单体高压回合：3、5、7\n群体高压回合：无\n特殊效果类型：单体\n塞牌能力：弱",
           "script": {
             "loopFrom": 5,
             "loopLength": 4,
@@ -12386,9 +12515,9 @@
               "name": "轰击储",
               "encounter": "REGENT_BOMBARD",
               "specialKey": "REGENT_BOSS.orbital",
-              "special": "环绕轨道\n战斗开始时，你获得 1 层[gold]光谱偏移[/gold]。\n储君第 1 回合被击晕，第 2 回合打出 1 张[gold]轰击[/gold]，之后被击晕。\n在经过 5 个你打出过无色牌的回合后，储君醒来，并且[gold]轰击[/gold]转而开始打储君自己。",
+              "special": "环绕轨道\n战斗开始时，所有玩家获得 1 层[gold]光谱偏移[/gold]。\n储君第 1 回合被击晕，第 2 回合打出 1 张[gold]轰击[/gold]，之后被击晕。\n在经过 5 个你打出过无色牌的回合后，储君醒来，并且[gold]轰击[/gold]转而开始打储君自己。",
               "specialDreadKey": "REGENT_BOSS.orbital_dread",
-              "specialDread": "环绕轨道\n战斗开始时，你获得[gold]1[/gold]层[gold]光谱偏移[/gold]。\n储君[gold]第1回合[/gold]打出[gold]1[/gold]张[gold]轰击[/gold]，之后被击晕。\n在经过[gold]5[/gold]个你打出过无色牌的回合后，储君醒来，并且[gold]轰击[/gold]转而开始打储君自己。",
+              "specialDread": "环绕轨道\n战斗开始时，所有玩家获得[gold]1[/gold]层[gold]光谱偏移[/gold]。\n储君[gold]第1回合[/gold]打出[gold]1[/gold]张[gold]轰击[/gold]，之后被击晕。\n在经过[gold]5[/gold]个你打出过无色牌的回合后，储君醒来，并且[gold]轰击[/gold]转而开始打储君自己。",
               "hpBonus": 0,
               "deck": [
                 "被击晕",
@@ -12431,6 +12560,8 @@
               "ascensionRelics": [
                 "9: 金刚杵"
               ],
+              "ascensionDisplay": [],
+              "info": "循环：x+1~x+2\n单体能力：极强\n群攻能力：中\n单体高压回合：2~x、x+2\n群体高压回合：x+1\n特殊效果类型：单体\n群体减益能力：强",
               "dreadUpgrades": [],
               "script": {
                 "loopFrom": 0,
@@ -12607,6 +12738,14 @@
           ],
           "potions": [],
           "dreadUpgrades": [],
+          "ascensionUpgrades": [
+            "8: 所向无敌",
+            "8: 招架",
+            "9: 熔炉"
+          ],
+          "ascensionRelics": [],
+          "ascensionDisplay": [],
+          "info": "循环：6~9\n单体能力：极强\n群攻能力：极强\n单体高压回合：1、7、9\n群体高压回合：7\n特殊效果类型：全局\n启动：慢",
           "script": {
             "loopFrom": 6,
             "loopLength": 4,
@@ -13130,6 +13269,8 @@
                 "8: 奥利哈钢",
                 "9: 抱抱先生"
               ],
+              "ascensionDisplay": [],
+              "info": "循环：7~10\n单体能力：极强\n群攻能力：中\n单体高压回合：3、5、6、7、9、10\n群体高压回合：无\n特殊效果类型：全局\n群体减益能力：强",
               "dreadUpgrades": [
                 "王之凝视"
               ],
@@ -13816,6 +13957,8 @@
                 "8: 仆从捐躯"
               ],
               "ascensionRelics": [],
+              "ascensionDisplay": [],
+              "info": "循环：7~9\n单体能力：极强\n群攻能力：弱\n单体高压回合：3、6~9\n群体高压回合：无\n特殊效果类型：自身\n群体减益能力：极强\n群体增益能力：极强",
               "dreadUpgrades": [],
               "script": {
                 "loopFrom": 7,
@@ -14419,6 +14562,14 @@
           ],
           "potions": [],
           "dreadUpgrades": [],
+          "ascensionUpgrades": [
+            "9: 炸弹"
+          ],
+          "ascensionRelics": [
+            "8: 君王矿石"
+          ],
+          "ascensionDisplay": [],
+          "info": "循环：7~9\n单体能力：极强\n群攻能力：极强\n单体高压回合：2、4、5、6、8、9\n群体高压回合：4、6、9\n特殊效果类型：单体",
           "script": {
             "loopFrom": 7,
             "loopLength": 3,
@@ -15086,6 +15237,8 @@
               "ascensionRelics": [
                 "8: 星系尘埃"
               ],
+              "ascensionDisplay": [],
+              "info": "循环：5~8\n单体能力：极强\n群攻能力：极强\n单体高压回合：2、6~8\n群体高压回合：2、6、8\n特殊效果类型：全局",
               "dreadUpgrades": [],
               "script": {
                 "loopFrom": 4,
@@ -15591,6 +15744,8 @@
                 "9: 震荡波"
               ],
               "ascensionRelics": [],
+              "ascensionDisplay": [],
+              "info": "循环：9~13\n单体能力：强\n群攻能力：中\n单体高压回合：5、13\n群体高压回合：2、6、10、12\n特殊效果类型：单体",
               "dreadUpgrades": [],
               "script": {
                 "loopFrom": 9,
@@ -16579,6 +16734,14 @@
           ],
           "potions": [],
           "dreadUpgrades": [],
+          "ascensionUpgrades": [
+            "8: 中和",
+            "9: 翻越撑击",
+            "9: 连续反弹"
+          ],
+          "ascensionRelics": [],
+          "ascensionDisplay": [],
+          "info": "循环：6~9\n单体能力：偏强\n群攻能力：中\n单体高压回合：5、7、9\n群体高压回合：无\n特殊效果类型：单体",
           "script": {
             "loopFrom": 6,
             "loopLength": 4,
@@ -17332,6 +17495,8 @@
                 "9: 飞镖"
               ],
               "ascensionRelics": [],
+              "ascensionDisplay": [],
+              "info": "循环：6~9\n单体能力：中\n群攻能力：偏弱\n单体高压回合：3、9\n群体高压回合：无\n特殊效果类型：单体\n塞牌能力：偏弱",
               "dreadUpgrades": [],
               "script": {
                 "loopFrom": 6,
@@ -18210,6 +18375,14 @@
           ],
           "potions": [],
           "dreadUpgrades": [],
+          "ascensionUpgrades": [
+            "8: 中和",
+            "9: 毒雾",
+            "9: 连续反弹"
+          ],
+          "ascensionRelics": [],
+          "ascensionDisplay": [],
+          "info": "循环：8~10\n单体能力：强\n群攻能力：偏强\n单体高压回合：2、7、8、9\n群体高压回合：8\n特殊效果类型：全局",
           "script": {
             "loopFrom": 8,
             "loopLength": 3,
@@ -18820,6 +18993,8 @@
                 "9: 冲刺"
               ],
               "ascensionRelics": [],
+              "ascensionDisplay": [],
+              "info": "循环：10~12\n单体能力：很强\n群攻能力：弱\n单体高压回合：5、8、10\n群体高压回合：无\n特殊效果类型：自身",
               "dreadUpgrades": [],
               "script": {
                 "loopFrom": 10,
@@ -19951,6 +20126,15 @@
           ],
           "potions": [],
           "dreadUpgrades": [],
+          "ascensionUpgrades": [
+            "8: 中和",
+            "9: 刀刃之舞",
+            "9: 斗篷与匕首",
+            "9: 隐秘匕首"
+          ],
+          "ascensionRelics": [],
+          "ascensionDisplay": [],
+          "info": "循环：7~11\n单体能力：很强\n群攻能力：极强\n单体高压回合：3、5、9\n群体高压回合：5~8、10、11\n特殊效果类型：单体",
           "script": {
             "loopFrom": 7,
             "loopLength": 5,
@@ -20524,9 +20708,17 @@
                 "灯笼",
                 "吊灯"
               ],
-              "ascensionUpgrades": [],
+              "ascensionUpgrades": [
+                "8: 中和",
+                "9: 精确切击",
+                "9: 拳斗"
+              ],
               "ascensionRelics": [],
-              "dreadUpgrades": [],
+              "ascensionDisplay": [],
+              "info": "循环：5~8\n单体能力：强\n群攻能力：弱\n单体高压回合：3、8\n群体高压回合：无\n特殊效果类型：自身\n群体减益能力：中\n坦度：极高",
+              "dreadUpgrades": [
+                "群蛇形态"
+              ],
               "script": {
                 "loopFrom": 5,
                 "loopLength": 4,
@@ -20936,7 +21128,7 @@
                     ]
                   },
                   {
-                    "note": "8. 格挡药水、异鱼之油、混沌药水、（二阶段：混沌补出的狡诈药水 → 3 张小刀当回合打出）｜预判、复制药水、坚韧之环×2、拳斗、偏折",
+                    "note": "8. 格挡药水、异鱼之油、混沌药水、（二阶段：混沌补出的流动铜液 → 她获得 3 层荆棘）｜预判、复制药水、坚韧之环×2、拳斗、偏折",
                     "energy": 3,
                     "shuffle": false,
                     "cards": [
@@ -20959,7 +21151,7 @@
                         "fromNote": true
                       },
                       {
-                        "name": "（二阶段：混沌补出的狡诈药水 → 3 张小刀当回合打出）｜预判",
+                        "name": "（二阶段：混沌补出的流动铜液 → 她获得 3 层荆棘）｜预判",
                         "type": "",
                         "cost": 0,
                         "fromNote": true
@@ -21098,6 +21290,8 @@
                 "9: 隐秘匕首"
               ],
               "ascensionRelics": [],
+              "ascensionDisplay": [],
+              "info": "循环：8～10\n单体能力：极强\n群攻能力：极强\n单体高压回合：2、3、8、9\n群体高压回合：9\n特殊效果类型：全局",
               "dreadUpgrades": [],
               "script": {
                 "loopFrom": 8,
@@ -22049,6 +22243,10 @@
           "relics": [],
           "potions": [],
           "dreadUpgrades": [],
+          "ascensionUpgrades": [],
+          "ascensionRelics": [],
+          "ascensionDisplay": [],
+          "info": "循环：7～11\n单体能力：极强\n群攻能力：强\n单体高压回合：2、5、7、9\n群体高压回合：6、10\n特殊效果类型：单体",
           "script": null,
           "variants": [
             {
@@ -22093,8 +22291,17 @@
                 "涅奥的祝福",
                 "手里剑"
               ],
-              "ascensionUpgrades": [],
+              "ascensionUpgrades": [
+                "8: ",
+                "8: ",
+                "9: ",
+                "9: "
+              ],
               "ascensionRelics": [],
+              "ascensionDisplay": [
+                "8: 涅槃, 8: 心灵堡垒, 9: 碰撞连击, 9: 斩破命运"
+              ],
+              "info": "循环：6~8\n单体能力：强\n群攻能力：集火\n单体高压回合：4、7\n群体高压回合：无\n特殊效果类型：单体",
               "dreadUpgrades": [],
               "script": {
                 "loopFrom": 6,
@@ -22425,6 +22632,10 @@
           "relics": [],
           "potions": [],
           "dreadUpgrades": [],
+          "ascensionUpgrades": [],
+          "ascensionRelics": [],
+          "ascensionDisplay": [],
+          "info": "循环：7～11\n单体能力：极强\n群攻能力：强\n单体高压回合：2、5、7、9\n群体高压回合：6、10\n特殊效果类型：单体",
           "script": null,
           "variants": [
             {
@@ -22465,8 +22676,18 @@
                 "浮木",
                 "船夹板"
               ],
-              "ascensionUpgrades": [],
+              "ascensionUpgrades": [
+                "8: 创世之柱",
+                "8: ",
+                "9: ",
+                "9: ",
+                "9: "
+              ],
               "ascensionRelics": [],
+              "ascensionDisplay": [
+                "8: 创世之柱, 8: 心灵堡垒, 9: 改造现实, 9: 供奉, 9: 义愤填膺"
+              ],
+              "info": "循环：6～8\n单体能力：强\n群攻能力：中\n单体高压回合：3、4、7、8\n群体高压回合：4、8\n特殊效果类型：单体\n群体减益能力：强",
               "dreadUpgrades": [],
               "script": {
                 "loopFrom": 6,
@@ -22806,8 +23027,16 @@
                 "佩尔的士兵",
                 "臂甲"
               ],
-              "ascensionUpgrades": [],
+              "ascensionUpgrades": [
+                "8: ",
+                "8: ",
+                "9: "
+              ],
               "ascensionRelics": [],
+              "ascensionDisplay": [
+                "8: 心灵堡垒, 8: 欺瞒现实, 9: 改造现实"
+              ],
+              "info": "循环：6~9\n单体能力：极强\n群攻能力：强\n单体高压回合：3~6、8、9\n群体高压回合：4、8\n特殊效果类型：单体",
               "dreadUpgrades": [],
               "script": {
                 "loopFrom": 6,
@@ -23218,6 +23447,10 @@
           ],
           "potions": [],
           "dreadUpgrades": [],
+          "ascensionUpgrades": [],
+          "ascensionRelics": [],
+          "ascensionDisplay": [],
+          "info": "循环：7～11\n单体能力：极强\n群攻能力：强\n单体高压回合：2、5、7、9\n群体高压回合：6、10\n特殊效果类型：单体",
           "script": {
             "loopFrom": 7,
             "loopLength": 5,
@@ -23599,8 +23832,15 @@
                 "钗",
                 "金刚杵"
               ],
-              "ascensionUpgrades": [],
+              "ascensionUpgrades": [
+                "8: ",
+                "8: "
+              ],
               "ascensionRelics": [],
+              "ascensionDisplay": [
+                "8: 如水, 8: 心灵堡垒, 9: 点穴（第 6 / 11 回合）"
+              ],
+              "info": "循环：9～12\n单体能力：极强\n群攻能力：极强\n单体高压回合：5、7、8～12\n群体高压回合：5、7、9、11\n特殊效果类型：单体",
               "dreadUpgrades": [],
               "script": {
                 "loopFrom": 9,
@@ -24063,8 +24303,18 @@
                 "布质果实",
                 "坚固钳子"
               ],
-              "ascensionUpgrades": [],
+              "ascensionUpgrades": [
+                "8: ",
+                "8: ",
+                "9: ",
+                "9: ",
+                "9: "
+              ],
               "ascensionRelics": [],
+              "ascensionDisplay": [
+                "8: 心灵堡垒, 8: 警惕, 9: 义愤填膺, 9: 腰带抽打, 9: 当头棒喝, 9: 供奉"
+              ],
+              "info": "循环：12\n单体能力：极强\n群攻能力：极强、集火\n单体高压回合：3、4、9、12\n群体高压回合：3、10、12\n特殊效果类型：自身/单体",
               "dreadUpgrades": [],
               "script": {
                 "loopFrom": 12,

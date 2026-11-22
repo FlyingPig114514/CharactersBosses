@@ -1,4 +1,4 @@
-﻿// wiki-dump：从编译好的模组 DLL 里把「每个 Boss 的真实数据」导成百科用的 JSON。
+// wiki-dump：从编译好的模组 DLL 里把「每个 Boss 的真实数据」导成百科用的 JSON。
 //
 // 为什么要这样：BossDefs.All / BossVariant / BossScript 都是运行时对象，剧本每一回合的
 // Note（作者手写的说明）+ ScriptCard 的 Card/Upgraded/Burned/… 全在对象里 —— 反射读出来
@@ -343,6 +343,15 @@ internal static class WikiDump
                 ["relics"] = TypeNames(ArrayAt(relicsByAct, act)).Select(RelicName).ToList(),
                 ["potions"] = TypeNames(ArrayAt(potionsByAct, act)).Select(RelicName).ToList(),
                 ["dreadUpgrades"] = TypeNames(ArrayAt(dreadUpByAct, act)).Select(CardName).ToList(),
+                // ★ v0.2.874（用户 2026-11-22：「github 的 wiki 上好像没有写进阶增强」）：
+                //   以前**只**导出了变体（`BossVariant`）的进阶表 ⇒ 主设计（黑球机 / 愤怒战 / 灾厄骨 /
+                //   碎屑储 …）的进阶升级与额外遗物在 wiki 上一个字都没有。这里补上按幕的两张表。
+                ["ascensionUpgrades"] = DumpAscensionForAct(def, act, relic: false),
+                ["ascensionRelics"] = DumpAscensionForAct(def, act, relic: true),
+                // v0.2.875：主设计（如神格观）的**纯展示用**进阶名单
+                ["ascensionDisplay"] = StrList(GetField(def, "AscensionDisplay")),
+                // v0.2.883：主设计的能力面板（key 是设计 key，如 IRONCLAD_ANGER ⇒ 由遭遇 id 去掉后缀得到）
+                ["info"] = InfoOf(infoTable, DesignEncounter(key, act + 1), null, def?.GetType().Assembly),
                 ["script"] = script,
                 ["variants"] = variants,
             });
@@ -352,7 +361,7 @@ internal static class WikiDump
         {
             ["key"] = key,
             ["character"] = CharacterName(GetField(def, "CharacterType") as Type, key),
-            ["info"] = infoTable.TryGetValue(key, out var info) ? info : "",
+            ["info"] = InfoOf(infoTable, key, null, def?.GetType().Assembly),
             ["acts"] = actsOut,
         };
     }
@@ -403,7 +412,10 @@ internal static class WikiDump
             ["relics"] = TypeNames(Prop<object>(v, "Relics")).Select(RelicName).ToList(),
             ["ascensionUpgrades"] = DumpPairs(Prop<object>(v, "AscensionUpgrades")).Select(p => $"{p["ascension"]}: {CardName((string)p["type"])}").ToList(),
             ["ascensionRelics"] = DumpPairs(Prop<object>(v, "AscensionRelics")).Select(p => $"{p["ascension"]}: {RelicName((string)p["type"])}").ToList(),
-            ["dreadUpgrades"] = TypeNames(Prop<object>(v, "DreadUpgrades")).Select(CardName).ToList(),
+            // v0.2.875：纯展示用进阶名单（观者那几只卡类型是 null ⇒ 名字读不出来，改用作者写好的中文名）
+            ["ascensionDisplay"] = StrList(Prop<object>(v, "AscensionDisplay")),
+            // v0.2.883：变体自己的能力面板（key = 设计 key，如 SILENT_BREWER）
+            ["info"] = InfoOf(null, (string?)Prop<string>(v, "Key") ?? "", null, v.GetType().Assembly),            ["dreadUpgrades"] = TypeNames(Prop<object>(v, "DreadUpgrades")).Select(CardName).ToList(),
             ["script"] = script,
         };
     }
@@ -698,6 +710,115 @@ internal static class WikiDump
             if (subroutine != null && subroutine.Length > 0 && subroutine[0] && ct == "Power") remaining += 1;
             if (string.Equals(card["name"] as string, "子程序", StringComparison.Ordinal) && subroutine != null) subroutine[0] = true;
         }
+    }
+    /// <summary>
+    /// 某只 Boss 在**某一幕**的进阶增强（升级牌 / 额外遗物），格式与变体那边一致：`"8: 缓冲"`。
+    ///
+    /// 两张表都要读：`AscensionUpgrades`（对所有幕生效）+ `AscensionUpgradesByAct`（只对指定幕生效；
+    /// 元组的 Item2 是**幕号**而不是类型，所以不能直接丢给 `DumpPairs`）。
+    /// </summary>
+    private static List<string> DumpAscensionForAct(object def, int act, bool relic)
+    {
+        var outl = new List<string>();
+        string plainField = relic ? "AscensionRelics" : "AscensionUpgrades";
+        string byActField = relic ? "AscensionRelicsByAct" : "AscensionUpgradesByAct";
+
+        foreach (var item in AsEnumerable(GetField(def, plainField)))
+        {
+            if (item == null) continue;
+            var t = item.GetType();
+            int minAsc = t.GetField("Item1")?.GetValue(item) is int i ? i : 0;
+            var type = t.GetField("Item2")?.GetValue(item) as Type;
+            if (type == null) continue;
+            outl.Add(minAsc + ": " + (relic ? RelicName(ShortName(type)) : CardName(ShortName(type))));
+        }
+
+        foreach (var item in AsEnumerable(GetField(def, byActField)))
+        {
+            if (item == null) continue;
+            var t = item.GetType();
+            int minAsc = t.GetField("Item1")?.GetValue(item) is int i ? i : 0;
+            int itemAct = t.GetField("Item2")?.GetValue(item) is int a ? a : -1;
+            // ⚠ v0.2.874 修正：`byAct` 是 **1 起**幕号（0 = 所有幕），
+            //   与模组自己的读法逐字一致（`CharBossMonster.AscensionUpgradeTypes`：`int act = ActIndex + 1;`
+            //   与 `ShadowPlayerFactory`：`if (byAct != 0 && byAct != act + 1) continue;`）。
+            //   第一版按 0 起比 ⇒ 每条都**错落到下一幕**、第一幕的条目整条丢掉（用户：「肯定就是你漏了」）。
+            if (itemAct != 0 && itemAct != act + 1) continue;
+            var type = t.GetField("Item3")?.GetValue(item) as Type;
+            if (type == null) continue;
+            outl.Add(minAsc + ": " + (relic ? RelicName(ShortName(type)) : CardName(ShortName(type))));
+        }
+
+        outl.Sort(StringComparer.Ordinal);
+        return outl;
+    }
+
+    private static List<string> StrList(object list)
+    {
+        var o = new List<string>();
+        foreach (var item in AsEnumerable(list))
+        {
+            var s = item?.ToString() ?? "";
+            if (s.Length > 0) o.Add(s);
+        }
+        return o;
+    }
+
+    /// <summary>能力面板：**直接调运行期 API `BossInfoTable.TextOf(key)`**（设置界面就是调它），
+    /// 拿不到才退回读静态字典 —— 只读字段会漏掉运行期合并进来的那些。</summary>
+    private static bool _infoProbeDone;
+    private static string InfoOf(System.Collections.IDictionary? table, string? designKey, string? encounterId, System.Reflection.Assembly? asm)
+    {
+        try
+        {
+            if (!_infoProbeDone)
+            {
+                _infoProbeDone = true;
+                var ks = new List<string>();
+                if (table != null) foreach (var kk in table.Keys) { ks.Add(kk?.ToString() ?? "?"); if (ks.Count >= 80) break; }
+                Console.WriteLine("[INFO] table=" + (table == null ? "null" : table.Count.ToString()) +
+                                  " keys=[" + string.Join(" | ", ks) + "]");
+                Console.WriteLine("[INFO] 第一只设计 key=" + designKey);
+            }
+        }
+        catch (Exception ex) { Console.WriteLine("[INFO] probe failed: " + ex.Message); }
+        var candidates = new List<string?>();
+        candidates.Add(designKey);
+        candidates.Add(encounterId);
+        if (!string.IsNullOrEmpty(encounterId)) candidates.Add(encounterId.Replace("_BOSS_ENCOUNTER", ""));
+
+        System.Reflection.MethodInfo? textOf = null;
+        try
+        {
+            foreach (var a in new[] { asm }.Concat(AppDomain.CurrentDomain.GetAssemblies()))
+            {
+                var tp = a?.GetType("CharacterBosses.Core.BossInfoTable");
+                if (tp == null) continue;
+                textOf = tp.GetMethod("TextOf", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+                break;
+            }
+        }
+        catch { /* 忽略 */ }
+
+        foreach (var k in candidates)
+        {
+            if (string.IsNullOrEmpty(k)) continue;
+            try
+            {
+                if (textOf != null && textOf.Invoke(null, new object?[] { k }) is string s && s.Length > 0) return s;
+            }
+            catch { /* 继续 */ }
+            try
+            {
+                if (table != null && table.Contains(k) && table[k] != null)
+                {
+                    var v = table[k]?.ToString();
+                    if (!string.IsNullOrEmpty(v)) return v!;
+                }
+            }
+            catch { /* 继续 */ }
+        }
+        return "";
     }
     private static List<Dictionary<string, object>> DumpPairs(object list)
     {

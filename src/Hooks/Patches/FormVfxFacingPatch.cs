@@ -68,7 +68,7 @@ public static class FormVfxFacingPatch
             var creature = CreatureOf(__instance);
             if (creature?.Monster is not CharBossMonster boss) return;   // 玩家/别的敌人：保持原样
 
-            if (FaceLeft(formVfx))
+            if (FaceLeft(formVfx, DesiredSign(__instance)))
             {
                 if (_logs++ < 8)
                 {
@@ -113,7 +113,28 @@ public static class FormVfxFacingPatch
     ///   · 净方向是正 ⇒ 翻自己的 `scale.x`，让**净方向**变负。
     ///   这样无论原版把 Holder 放在 Body 里还是放在 Body 外，结果都一致。
     /// </summary>
-    private static bool FaceLeft(Node2D node)
+    /// <summary>
+    /// **本体当前的净朝向**（±1）—— 形态特效要跟它同向，而不是写死朝左。
+    ///
+    /// ★ v0.2.877（用户 2026-11-22：「boss 使用形态牌获得的特效还是反的」）：
+    ///   上一版假设「特效必须朝左」，靠 `GlobalScale.X &lt; 0` 判断是否已翻。可 `FormVfxHolder`
+    ///   现在既可能在被她镜像过的 `Body` 子树里、也可能在外面，某些形态的原生朝向本身又是反的
+    ///   ⇒ 单看一个方向会翻错。改成**跟 `Visuals.Body` 的净方向对齐**：本体翻哪边、特效就跟哪边。
+    /// </summary>
+    private static float DesiredSign(NCreatureVisuals? visuals)
+    {
+        try
+        {
+            var body = AccessTools.Property(visuals!.GetType(), "Body")?.GetValue(visuals) as Node2D
+                       ?? AccessTools.Field(visuals!.GetType(), "Body")?.GetValue(visuals) as Node2D;
+            if (body != null && GodotObject.IsInstanceValid(body) && Math.Abs(body.GlobalScale.X) > 0.001f)
+                return body.GlobalScale.X < 0f ? -1f : 1f;
+        }
+        catch { /* 忽略 */ }
+        return -1f;    // 拿不到本体 ⇒ 沿用旧口径（朝左）
+    }
+
+    private static bool FaceLeft(Node2D node, float desiredSign = -1f)
     {
         try
         {
@@ -122,13 +143,14 @@ public static class FormVfxFacingPatch
             float net = 1f;
             try { net = node.GlobalScale.X; }        // 含所有父级
             catch { net = node.Scale.X; }
-
-            if (net < -0.001f) return false;         // 净方向已朝左 ⇒ 别重复翻
+            // ★ v0.2.877：不再写死「朝左」，而是和**本体当前的净方向**比（见 DesiredSign）。
+            float want = desiredSign < 0f ? -1f : 1f;
+            if ((net < 0f ? -1f : 1f) == want) return false;   // 已经和本体同向 ⇒ 别重复翻
             if (Math.Abs(net) < 0.001f) return false;
 
             var scale = node.Scale;
             float x = Math.Abs(scale.X) < 0.001f ? 1f : Math.Abs(scale.X);
-            node.Scale = new Vector2(-x, scale.Y);
+            node.Scale = new Vector2(want * x, scale.Y);
             return true;
         }
         catch { return false; }
@@ -151,7 +173,7 @@ public static class FormVfxFacingPatch
 
             foreach (var child in holder.GetChildren())
             {
-                if (child is Node2D vfx && GodotObject.IsInstanceValid(vfx)) FaceLeft(vfx);
+                if (child is Node2D vfx && GodotObject.IsInstanceValid(vfx)) FaceLeft(vfx, DesiredSign(visuals));
             }
         }
         catch { /* 忽略 */ }

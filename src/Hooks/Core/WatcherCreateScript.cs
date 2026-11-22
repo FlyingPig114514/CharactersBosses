@@ -61,26 +61,26 @@ public static class WatcherCreateScript
             Turn(2, "1. 武器库+、操控现实+、改造现实、惩恶+（没费）",
                 W(WatcherCards.Arsenal, upgraded: true),
                 W(WatcherCards.MasterReality, upgraded: true),
-                W(WatcherCards.CarveReality, upgradeMinAscension: 9),
+                W(WatcherCards.CarveReality),
                 W(WatcherCards.Smite, upgraded: true)),
 
             // ── 2 ── 奇迹 / 心灵堡垒（进阶 8 起升级）/ 警惕 / 打击（没费）/ 惩恶+（没费）   （2 费 + 奇迹 1 = 3）
             Turn(2, "2. 奇迹、心灵堡垒（进阶8起升级）、警惕、打击（没费）、惩恶+（没费）",
                 W(WatcherCards.Miracle),
-                W(WatcherCards.MentalFortress, upgradeMinAscension: 8),
+                W(WatcherCards.MentalFortress),
                 W(WatcherCards.Vigilance),
                 W(WatcherCards.Strike),
                 W(WatcherCards.Smite, upgraded: true)),
 
             // ── 3 ── 义愤填膺（进阶 9 起升级）/ 惩恶+ / 创世之柱（进阶 8 起升级）   （3 费）— 单体高压
             Turn(3, "3. 义愤填膺（进阶9起升级）、惩恶+、创世之柱（进阶8起升级）",
-                W(WatcherCards.Indignation, upgradeMinAscension: 9),
+                W(WatcherCards.Indignation),
                 W(WatcherCards.Smite, upgraded: true),
-                W(WatcherCards.PillarOfCreation, upgradeMinAscension: 8)),
+                W(WatcherCards.PillarOfCreation)),
 
             // ── 4 ── 供奉（进阶 9 起升级）/ 暴怒+ / 内心宁静   （2 费）— 群体高压
             Turn(2, "4. 供奉（进阶9起升级）、暴怒+、内心宁静",
-                W(WatcherCards.Consecrate, upgradeMinAscension: 9),
+                W(WatcherCards.Consecrate),
                 W(WatcherCards.Eruption, upgraded: true),
                 W(WatcherCards.InnerPeace)),
 
@@ -99,7 +99,7 @@ public static class WatcherCreateScript
             //     离开平静照旧 +2 能量，所以能量账不变：
             //     2 −改造现实1 = 1 → 化体为空 1 = 0 → 离开平静 +2 = 2 → 警惕 2 = 0 → 惩恶+ 差 1 ⇒ 没费 ✔
             Turn(2, "6. 洗牌（她重新洗牌）、改造现实（进阶9起升级）、化体为空、警惕、惩恶+（没费）",
-                W(WatcherCards.CarveReality, upgradeMinAscension: 9),
+                W(WatcherCards.CarveReality),
                 W(WatcherCards.EmptyBody),
                 W(WatcherCards.Vigilance),
                 W(WatcherCards.Smite, upgraded: true)),
@@ -116,8 +116,8 @@ public static class WatcherCreateScript
             //   ★ v0.2.715（用户 2026-11-16）：「第八回合内心宁静应当打出」⇒ 供奉 0 + 义愤填膺 1 + 内心宁静 1 = **2**，
             //     正好花光基础 2 费（上一版我写成 1 费，把内心宁静挡掉了）。
             Turn(2, "8. 供奉（进阶9起升级）、义愤填膺（进阶9起升级）、内心宁静",
-                W(WatcherCards.Consecrate, upgradeMinAscension: 9),
-                W(WatcherCards.Indignation, upgradeMinAscension: 9),
+                W(WatcherCards.Consecrate),
+                W(WatcherCards.Indignation),
                 W(WatcherCards.InnerPeace)),
         };
 

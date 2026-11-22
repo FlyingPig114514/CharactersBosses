@@ -106,8 +106,8 @@ public static class WatcherRetainScript
             Turn(3, 2, "3. 奇迹、时之沙（0费）、欺瞒现实、改造现实、防御、平安·惩恶·坚韧·旋转打击（保留不出）",
                 C(WatcherCards.Miracle, cost: 0),
                 C(WatcherCards.SandsOfTime, cost: 0),
-                C(WatcherCards.DeceiveReality, upgradeMinAscension: 8),
-                C(WatcherCards.CarveReality, upgradeMinAscension: 9),
+                C(WatcherCards.DeceiveReality),
+                C(WatcherCards.CarveReality),
                 C(WatcherCards.Defend),
                 Hold(WatcherCards.Safety, cost: -1),
                 Hold(WatcherCards.Smite, cost: -1),
@@ -116,7 +116,7 @@ public static class WatcherRetainScript
 
             // ── 4 ── 心灵堡垒 / 义愤填膺 / 惩恶(0) / 平安(0) / 坚韧(0) / 结末 / 旋转打击（0费，保留不出）   （4 费 = 退出平静）
             Turn(4, 4, "4. 心灵堡垒、义愤填膺、惩恶(0)、平安(0)、坚韧(0)、结末、旋转打击（0费，保留不出）",
-                C(WatcherCards.MentalFortress, upgradeMinAscension: 8),
+                C(WatcherCards.MentalFortress),
                 C(WatcherCards.Indignation),
                 C(WatcherCards.Smite, cost: 0),
                 C(WatcherCards.Safety, cost: 0),
@@ -132,8 +132,8 @@ public static class WatcherRetainScript
 
             // ── 6 ── 洗牌 / 欺瞒现实 / 改造现实 / 时之沙(0) / 惩恶·平安（保留不出）   ← 6～9 循环起点   （2 费）
             TurnEnergy(6, 2, "6. 洗牌。欺瞒现实、改造现实、时之沙(0)、惩恶（保留不出）、平安（保留不出）", true,
-                C(WatcherCards.DeceiveReality, upgradeMinAscension: 8),
-                C(WatcherCards.CarveReality, upgradeMinAscension: 9),
+                C(WatcherCards.DeceiveReality),
+                C(WatcherCards.CarveReality),
                 C(WatcherCards.SandsOfTime, cost: 0),
                 Hold(WatcherCards.Smite, cost: -1),
                 Hold(WatcherCards.Safety, cost: -1)),

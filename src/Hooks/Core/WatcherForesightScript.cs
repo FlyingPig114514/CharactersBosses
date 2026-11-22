@@ -62,14 +62,14 @@ public static class WatcherForesightScript
         {
             // ── 1 ── 涅槃 / 打击 / 笨拙（诅咒留手）   （2 费）
             Turn(2, "1. 涅槃、打击、笨拙（诅咒留手）",
-                Play(WatcherCards.Nirvana, upgradeMinAscension: 8),
+                Play(WatcherCards.Nirvana),
                 Play(WatcherCards.Strike),
                 Curse(WatcherCards.Clumsy)),
 
             // ── 2 ── 奇迹 / 心灵堡垒 / 警惕 / 打击（没费）   （2 费 = 2 + 奇迹 1 − 打击 1）
             Turn(2, "2. 奇迹、心灵堡垒、警惕、打击（没费）",
                 Play(WatcherCards.Miracle, cost: 0),
-                Play(WatcherCards.MentalFortress, upgradeMinAscension: 8),
+                Play(WatcherCards.MentalFortress),
                 Play(WatcherCards.Vigilance),
                 Hold(WatcherCards.Strike, cost: 1)),
 
@@ -86,7 +86,7 @@ public static class WatcherForesightScript
                 Scried(WatcherCards.Injury), Scried(WatcherCards.Defend),
                 Play(WatcherCards.Weave),
                 Play(WatcherCards.EmptyBody),
-                Play(WatcherCards.CutThroughFate, upgradeMinAscension: 9),
+                Play(WatcherCards.CutThroughFate),
                 Scried(WatcherCards.Eruption), Scried(WatcherCards.Greed),
                 Play(WatcherCards.Weave),
                 Play(WatcherCards.Defend),
@@ -95,7 +95,7 @@ public static class WatcherForesightScript
             // ── 5 ── （先见之明不弃）/ 迂回 / 碰撞连击 / 安宁 / 打击（没费）   （2 费）
             Turn(2, "5. 迂回、碰撞连击、安宁、打击（没费）",
                 Play(WatcherCards.Weave),
-                Play(WatcherCards.BowlingBash, upgradeMinAscension: 9),
+                Play(WatcherCards.BowlingBash),
                 Play(WatcherCards.Tranquility),
                 Hold(WatcherCards.Strike, cost: 1)),
 
@@ -115,11 +115,11 @@ public static class WatcherForesightScript
                 Scried(WatcherCards.Injury),
                 Play(WatcherCards.Weave),
                 Play(WatcherCards.EmptyBody),
-                Play(WatcherCards.CutThroughFate, upgradeMinAscension: 9),
+                Play(WatcherCards.CutThroughFate),
                 Scried(WatcherCards.Strike),
                 Play(WatcherCards.Weave),
                 Play(WatcherCards.Defend),
-                Play(WatcherCards.BowlingBash, upgradeMinAscension: 9)),
+                Play(WatcherCards.BowlingBash)),
 
             // ── 8 ── （先见之明不弃）/ 迂回 / 警惕 / 打击（没费）/ 防御（没费）   （2 费）
             Turn(2, "8. 迂回、警惕、打击（没费）、防御（没费）",

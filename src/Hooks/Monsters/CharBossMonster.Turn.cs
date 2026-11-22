@@ -16,6 +16,20 @@ public abstract partial class CharBossMonster
     /// <summary>在玩家回合开始前跑一次：抽牌/造牌 → 选牌 → 把计划写进招式（意图即实际计划）。</summary>
     internal void PrepareTurn()
     {
+        // ★ v0.2.872（玩家反馈：「多人模式的毒杀死对面其中一个会导致回合无法结束」）：
+        //   她**已经死了**就不要再替她算下一手 —— 单人局里她死=打完，这条路根本走不到；
+        //   多人局里另一只 Boss 还活着、战斗继续，原版仍可能在玩家回合开始时替她 `RollMove`。
+        //   那时给她重建手牌/能量/计划，等于让一具尸体再去碰战斗状态，是这类「回合卡住」的常见来源。
+        //   保守口径见 `DeadForThisTurn`：查不出来就当作活着，绝不误跳过。
+        if (DeadForThisTurn(out string deadWhy))
+        {
+            PlanReady = false;
+            MarkStage("已阵亡跳过规划");
+            Logger.Log($"[CharBoss] {SafeEntryName()} 已经倒下（{deadWhy}）⇒ 不再为她规划下一手" +
+                       "（多人局里别的 Boss 还要继续打，这里只清掉她自己的计划状态）");
+            return;
+        }
+
         // ★ 击晕闸门（用户 2026-11-04）：被击晕时**绝不能重建计划**，否则「下回合补打被打断的那一套」就没了。
         //
         // 为什么这道闸门正好只在「她上一轮被晕」时成立（反编译实证，见 docs/plans/stun-behavior.md）：

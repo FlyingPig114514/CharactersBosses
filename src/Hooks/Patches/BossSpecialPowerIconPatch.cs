@@ -174,6 +174,11 @@ public static class BossSpecialPowerIconPatch
                 return ExistingOrNull(CharacterIconPath(typeof(MegaCrit.Sts2.Core.Models.Characters.Defect)));
             if (power is Powers.NecrobinderDominionPower)
                 return ExistingOrNull(CharacterIconPath(typeof(MegaCrit.Sts2.Core.Models.Characters.Necrobinder)));
+#if STS2_113
+            // ★ v0.2.889（用户 2026-11-22：「将『储君的支配』buff 图标变为储君的头像」）
+            if (power is Powers.RegentDominionPower)
+                return ExistingOrNull(CharacterIconPath(typeof(MegaCrit.Sts2.Core.Models.Characters.Regent)));
+#endif
 #if STS2_111
 #if STS2_113
             if (power is Powers.FoolDominionPower)

@@ -37,6 +37,12 @@ internal static class BossSpecialRichUi
     private const float TopY = 212f;   // 让开斗蛐蛐自己的「红队/蓝队」标签
     private const float StackStep = 104f;
 
+    /// <summary>这一场是不是**多人**（真人玩家 &gt; 1）。多人时不弹特殊效果说明框。</summary>
+    private static bool Multiplayer(CharBossMonster? boss)
+    {
+        try { return Core.BossLockOn.RealPlayerCount(boss?.CombatState) > 1; } catch { return false; }
+    }
+
     public static void Ensure(CharBossMonster boss)
     {
         try
@@ -196,6 +202,12 @@ internal static class BossSpecialUi
         }
     }
 
+    /// <summary>这一场是不是**多人**（真人玩家 &gt; 1）。多人时不弹特殊效果说明框。</summary>
+    private static bool Multiplayer(CharBossMonster? boss)
+    {
+        try { return Core.BossLockOn.RealPlayerCount(boss?.CombatState) > 1; } catch { return false; }
+    }
+
     public static void Ensure(CharBossMonster boss)
     {
         try
@@ -208,7 +220,11 @@ internal static class BossSpecialUi
             else
             {
                 BossSpecialRichUi.HideAll();         // 退回原版说明框时把自绘面板收干净
-                BossSpecialTip.Ensure(boss);
+                // ★ v0.2.881（用户 2026-11-22：「多人游戏时，如果塔罗愚是敌方剩的最后一个 boss，
+                //   它就会弹出它特殊效果的说明框（按理说只应该在单人模式下出现）… 只要在多人模式下就不弹出」）：
+                //   多人一律**不弹**这块说明框（它的定位是单人「这只 Boss 有什么特殊效果」的提示）。
+                if (Multiplayer(boss)) { BossSpecialTip.Hide(); }
+                else BossSpecialTip.Ensure(boss);
             }
         }
         catch (Exception e) { Logger.Log("[CharBoss] 特殊效果说明分发失败: " + e.Message); }

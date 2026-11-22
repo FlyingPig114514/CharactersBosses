@@ -277,6 +277,16 @@ internal static class DivergenceStateProbe
             }
             catch { /* 忽略 */ }
 
+            // ── v0.2.880：玩家侧牌堆指纹（两端不同 ⇒ 分叉在玩家牌堆，不在 Boss）──
+            try
+            {
+                foreach (var pp in BossLockOn.RealPlayers(combat))
+                {
+                    ulong id = 0; try { id = pp?.NetId ?? 0; } catch { /* 忽略 */ }
+                    sb.Append($"\n  玩家 {id} 牌堆 {Core.DivergenceFingerprint.OfPlayer(pp)}");
+                }
+            }
+            catch { /* 纯诊断 */ }
             // ── 每名真人玩家的锁定图标实例 ──
             var players = BossLockOn.RealPlayers(combat);
             players.Sort((a, b) =>
@@ -339,6 +349,8 @@ internal static class DivergenceStateProbe
                     {
                         parts.Add($"手牌={pcs.Hand.Cards.Count}/抽={pcs.DrawPile.Cards.Count}" +
                                   $"/弃={pcs.DiscardPile.Cards.Count}/耗={pcs.ExhaustPile.Cards.Count}");
+                        // ★ v0.2.878：张数一样不代表牌一样 ⇒ 补「牌堆顺序指纹」（首/尾牌 + 顺序哈希）
+                        try { parts.Add("牌堆=" + Core.DivergenceFingerprint.OfPiles(pcs)); } catch { /* 纯诊断 */ }
                         parts.Add($"能量={pcs.Energy}/星={pcs.Stars}");
                     }
                     else

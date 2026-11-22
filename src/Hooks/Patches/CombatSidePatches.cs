@@ -72,6 +72,7 @@ public static class HittableEnemiesSidePatch
     /// </summary>
     internal static int ForceRelativeHold;
 
+    private static int _narrowConsumedLogs;
     private static int _vanillaOnceFrame = -1;
 
     /// <summary>「这一场没有角色 Boss ⇒ 走原版」这条日志最多打几次（免得普通战斗刷屏）。</summary>
@@ -481,8 +482,27 @@ public static class HittableEnemiesSidePatch
         _narrowOnceFrame = -1;
         var t = NarrowOnceTarget;
         NarrowOnceTarget = null;
-        if (now - requested > 2) return false;      // 超过两帧还没被用到 ⇒ 作废
+        // ★ v0.2.885：2 帧太紧 —— 群蛇形态那条状态机在读完目标前会先 `await Cmd.CustomScaledWait(0.1f, 0.2f)`，
+        //   超过 2 帧（33ms）就过期 ⇒ 收窄白设、`NextItem` 拿原版列表（甚至空）⇒ 看起来「完全没伤害」。
+        //   放宽到 8 帧（约 130ms）仍然只覆盖「刚设完就立刻读」这一小段，不会串到别人的牌上。
+        // ★ v0.2.887：群蛇那条状态机在挑目标前会 await 0.1~0.2 秒（30fps 下 6 帧、更慢时更多），
+        //   所以窗口放宽到 20 帧（≈0.33s @60fps）。不会误伤：调用方（群蛇）现在只在
+        //   `SerpentFormPower.amountsForPlayedCards` 还有条目时才设收窄 ⇒ 窗口内一定就是那次结算。
+        if (now - requested > 2) return false;      // 超过两帧还没被用到 ⇒ 作废（v0.2.890 回到 2 帧：放宽到 20 帧会串到玩家自己的球被动）
         target = t;
+        // ★ v0.2.887 诊断：收窄**真的被读走了**才说明这条通道通着（单人也打这行，便于不进联机就能验）。
+        try
+        {
+            if (BossActingDepth > 0 || ForceRelativeSide || ForceRelativeHold > 0)
+            {
+                if (_narrowConsumedLogs < 10)
+                {
+                    _narrowConsumedLogs++;
+                    Logger.Log($"[CharBoss] 选靶收窄被消费：{t?.Name}（她要打的就是这一位）");
+                }
+            }
+        }
+        catch { /* 纯诊断 */ }
         return true;
     }
 

@@ -181,6 +181,8 @@ public sealed class BossDefinition
     /// 而像「中和」这种牌两套卡组里都有 —— 不分幕的话，给涂毒猎加的进阶升级会漏到刀猎身上。
     /// </summary>
     public List<(int MinAscension, int Act, Type Card)> AscensionUpgradesByAct = new();
+    /// <summary>**纯展示用**的进阶名单（卡名文本）。运行期无人读取，仅供 wiki 导出。</summary>
+    public List<string> AscensionDisplay { get; init; } = new();
 
     /// <summary>进阶加成：达到 <c>MinAscension</c> 时额外获得的遗物（例如进阶 8 的不死符文）。</summary>
     public List<(int MinAscension, Type Relic)> AscensionRelics = new();
@@ -526,6 +528,14 @@ public sealed class BossVariant
     /// （易伤战进阶 8 升岩石铠甲 + 护喉甲；巨石战进阶 8 升无惧疼痛 + 奥利哈钢）。
     /// </summary>
     public List<(int MinAscension, Type Card)>? AscensionUpgrades { get; init; }
+
+    /// <summary>
+    /// **纯展示用**的进阶名单（卡名文本，如 8: 涅槃）。
+    /// 只为 wiki 导出准备：观者那 6 套的卡类型是 Type?（没装观者 mod 时是 null），
+    /// dump 进程里读不出名字 ⇒ 在这里写一份中文名，导出器直接用它。
+    /// ⚠ 运行期**没有任何代码读这个字段**，改它不会影响游戏。
+    /// </summary>
+    public List<string> AscensionDisplay { get; init; } = new();
 
     /// <summary>这套设计**自己的进阶遗物表**（同上，取代主定义在那一幕的 `AscensionRelicsByAct` 行）。</summary>
     public List<(int MinAscension, Type Relic)>? AscensionRelics { get; init; }

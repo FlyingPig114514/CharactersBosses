@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Combat;
@@ -71,6 +71,20 @@ internal static class DreadMode
         try
         {
             if (room is not MegaCrit.Sts2.Core.Rooms.CombatRoom cr) return false;
+
+            // ★ v0.2.873（玩家 2026-11-22 的 `mod_log (55)` 实证）：**先按房间类型判**。
+            //   游戏那句 `Encounter.RoomType != RoomType.Boss` 用的就是这个字段；而只比遭遇 id 会漏 ——
+            //   我们把每一幕的 Boss 遭遇都换成了自己的，`Act.BossEncounter` 那份和房间里的这份不一定是同一个 id
+            //   （日志里 Boss 房 `REGENT_DEBRIS_BOSS_ENCOUNTER` 那场，三名玩家身上都挂着 `REGENT_DOMINION_POWER`，
+            //    说明闸门没拦住 ⇒ 支配在 Boss 房里照样挂 power。这既是玩法 bug，也会让
+            //    「玩家身上多一层 power」这类状态在两端的出现时机不一致 ⇒ 联机不同步）。
+            //   Boss 类型的遭遇一律算「Boss 战」，支配本来就不该出现在这里。
+            try
+            {
+                if (cr.Encounter?.RoomType == MegaCrit.Sts2.Core.Rooms.RoomType.Boss) return true;
+            }
+            catch { /* 拿不到就退回按 id 判 */ }
+
             var id = cr.Encounter?.Id;
             if (id == null) return false;
 
@@ -1297,7 +1311,15 @@ internal static class DominionDescriptionActScalingPatch
                 var type = DreadActScaling.RegentTransformCardType();
                 var card = MegaCrit.Sts2.Core.Models.ModelDb.GetById<MegaCrit.Sts2.Core.Models.CardModel>(
                     MegaCrit.Sts2.Core.Models.ModelDb.GetId(type));
-                if (card?.Title != null) __result.Add("Transform", card.Title);
+                // ★ v0.2.889（用户 2026-11-22：「2 层储君的支配的描述错误的写为变化成碎屑（应为粘液）」）：
+                //   只 `Add` 会沿用**缓存的同一个 LocString 实例**里上一次填的值（例如在第 3 幕填过「碎屑」），
+                //   于是第 2 幕也显示碎屑。这里每次重新构造一份，保证拿到的是**当前幕**那张牌的名字。
+                if (card?.Title != null)
+                {
+                    var fresh = new MegaCrit.Sts2.Core.Localization.LocString("ascension", "DREAD.REGENT.description");
+                    fresh.Add("Transform", card.Title);
+                    __result = fresh;
+                }
             }
         }
         catch { /* 填不上就显示原文，绝不影响 UI */ }

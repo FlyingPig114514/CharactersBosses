@@ -400,6 +400,136 @@ public static class BossFrameTick
             Logger.Log("[CharBoss] 结束回合按钮探针失败: " + e.Message);
         }
     }
+    // ── 「回合卡住」看门狗（v0.2.872，**纯日志、不改任何状态**） ─────────────
+
+    private static long _lastStallProbeUsec;
+    private static string _lastStallFingerprint = string.Empty;
+    private static long _stallSinceUsec;
+    private static long _lastStallReportUsec;
+    private static int _stallReports;
+
+    /// <summary>
+    /// 1Hz：**战斗还在进行、玩家也不需要做任何操作**（不是玩家侧，或者玩家已经点了结束回合），
+    /// 却连续 12 秒状态一点没变 ⇒ 打一行「卡住」诊断。
+    ///
+    /// 加这个的原因（v0.2.872，玩家在 Steam 评论区反馈：「多人模式的毒杀死对面其中一个会导致回合无法结束」）：
+    /// 那位玩家拿不出日志，而「回合结束不了」在这个 mod 里有好几种可能来源（她这一手没走完 /
+    /// 原版某条命令等不到回应 / 联机不同步）。有了这一行，**下一份日志**就能直接看到：
+    ///   · 卡住时是哪一侧、玩家是不是已经点了结束回合；
+    ///   · `StageMarker` —— 她这一手停在**哪一步**（出牌入口 / 药水 / 某一张牌 / 回合收尾）；
+    ///   · 场上每只 Boss 的存活、血量、计划状态，以及每个玩家的血量（=有没有任何推进）。
+    ///
+    /// ⚠ 只记日志，**绝不自动恢复**：在联机里替玩家强推回合会直接制造不同步，
+    ///   宁可留着这一行让人来看。
+    /// </summary>
+    private static void ProbeTurnStall(long nowUsec)
+    {
+        if (nowUsec - _lastStallProbeUsec < 1_000_000L) return;
+        _lastStallProbeUsec = nowUsec;
+
+        try
+        {
+            var mgr = MegaCrit.Sts2.Core.Combat.CombatManager.Instance;
+            if (mgr == null) return;
+            bool inProgress;
+            try { inProgress = mgr.IsInProgress; } catch { return; }
+            if (!inProgress) { _lastStallFingerprint = string.Empty; _stallSinceUsec = 0; return; }
+
+            var combat = mgr.DebugOnlyGetState();
+            if (combat == null) return;
+
+            // 只在「场上有我们的 Boss」的战斗里工作
+            var bossBits = new System.Text.StringBuilder();
+            bool hasOurs = false;
+            try
+            {
+                foreach (var creature in combat.Enemies)
+                {
+                    if (creature?.Monster is not Monsters.CharBossMonster boss) continue;
+                    hasOurs = true;
+                    bool alive = false;
+                    int hp = -1;
+                    try { alive = creature.IsAlive; hp = creature.CurrentHp; } catch { /* 忽略 */ }
+                    bossBits.Append('[').Append(boss.SafeEntryName())
+                           .Append(alive ? " 活" : " 死").Append(" hp=").Append(hp)
+                           .Append(" planReady=").Append(boss.PlanReady)
+                           .Append(" plan=").Append(boss.Plan?.Count ?? 0)
+                           .Append(" turn=").Append(boss.TurnNumber)
+                           .Append("] ");
+                }
+            }
+            catch { if (!hasOurs) return; }
+            if (!hasOurs) { _lastStallFingerprint = string.Empty; _stallSinceUsec = 0; return; }
+
+            var side = combat.CurrentSide;
+            bool ready = false;
+            try { ready = mgr.AllPlayersReadyToEndTurn(); } catch { ready = false; }
+
+            // 玩家侧、且玩家还能动手 ⇒ 那是他在思考，不算卡住
+            bool playerThinking = side == MegaCrit.Sts2.Core.Combat.CombatSide.Player && !ready;
+
+            // 指纹：任何推进（换侧、掉血、换阶段、计划变化、玩家点结束回合）都会让它变
+            var fp = new System.Text.StringBuilder();
+            fp.Append(side).Append('|').Append(ready).Append('|')
+              .Append(Monsters.CharBossMonster.StageMarker).Append('|').Append(bossBits);
+            try
+            {
+                foreach (var creature in combat.Creatures)
+                {
+                    if (creature == null) continue;
+                    var monster = creature.Monster;
+                    if (monster is Monsters.CharBossMonster) continue;      // Boss 已经记在上面
+                    int hp = -1;
+                    try { hp = creature.CurrentHp; } catch { /* 忽略 */ }
+                    fp.Append(monster?.Id.Entry ?? creature.Name).Append('=').Append(hp).Append(' ');
+                }
+            }
+            catch { /* 忽略 */ }
+
+            string fingerprint = fp.ToString();
+            if (fingerprint != _lastStallFingerprint)
+            {
+                _lastStallFingerprint = fingerprint;
+                _stallSinceUsec = nowUsec;
+                _stallReports = 0;
+                return;
+            }
+            if (playerThinking) { _stallSinceUsec = nowUsec; return; }
+
+            long stuckMs = (nowUsec - _stallSinceUsec) / 1000;
+            if (stuckMs < 12_000) return;
+            if (_stallReports >= 15) return;
+            if (nowUsec - _lastStallReportUsec < 6_000_000L) return;
+            _lastStallReportUsec = nowUsec;
+            _stallReports++;
+
+            string buttonState = "?";
+            try
+            {
+                var room = MegaCrit.Sts2.Core.Nodes.Rooms.NCombatRoom.Instance;
+                var btn = room?.Ui?.EndTurnButton;
+                if (btn != null)
+                {
+                    var f = btn.GetType().GetField("_state",
+                        System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                    buttonState = $"{f?.GetValue(btn)}(visible={btn.Visible})";
+                }
+            }
+            catch { /* 忽略 */ }
+
+            CharacterBosses.Core.LogLoudness.Diag(
+                $"[CharBoss] ⚠ 战斗 {stuckMs / 1000} 秒没有任何推进（不是卡在玩家操作上）：" +
+                $"side={side} 玩家已点结束回合={ready} 结束回合按钮={buttonState} " +
+                $"她这一手停在「{Monsters.CharBossMonster.StageMarker}」 " +
+                $"场上 Boss：{bossBits.ToString().Trim()} " +
+                "（这一行只用于定位，不改任何状态；请把它连同上下 20 行日志一起反馈）");
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 回合卡住看门狗失败（忽略）: " + e.Message);
+        }
+    }
+
     private static void SweepLeftoverCardsAfterCombat(long nowUsec)
     {
         if (nowUsec - _lastLeftoverUsec < 1_000_000L) return;
@@ -586,6 +716,9 @@ public static class BossFrameTick
             //       战斗房不是当前 screen context、或 `Ui.Hand.IsInCardSelection` 而**藏掉**按钮。
             //   这些值一打出来就知道是哪一条不成立。
             try { ProbeEndTurnButton((long)now); } catch { /* 忽略 */ }
+
+            // ①⓪d ★ v0.2.872：「回合卡住」看门狗（纯日志）—— 见 ProbeTurnStall 的注释
+            try { ProbeTurnStall((long)now); } catch { /* 忽略 */ }
 
             // ①⓪b ★ v0.2.295：**战斗结束后**兜一次「出牌队列残留卡面」
             //   （用户 2026-11-02：「一堆剑柄打击+ 把 boss 揍死了，卡还卡在屏幕中间」——

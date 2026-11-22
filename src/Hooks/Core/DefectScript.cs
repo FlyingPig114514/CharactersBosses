@@ -33,14 +33,14 @@ public static class DefectScript
             Turn("子程序（能力牌 → 之后每张能力牌 +1 费）、冰雹风暴；双重释放激发电球两次（意图显示 14×2）",
                 C<Subroutine>(), C<Hailstorm>(), C<Dualcast>()),
 
-            Turn("雷暴、碎片整理+、冷却剂；球位已满 → 引导时激发队首（若队首是冰球，激发给格挡＝守势）",
-                C<Storm>(), C<Defragment>(true), C<Coolant>()),
+            Turn("电击、碎片整理+、冷却剂（用户 2026-11-22 改：雷暴挪到第 5 回合）",
+                C<Zap>(), C<Defragment>(true), C<Coolant>()),
 
-            Turn("创造性AI 落地；寒流铺球；电击没费",
-                C<CreativeAi>(), C<ColdSnap>(), C<Zap>()),
+            Turn("创造性AI、热修复（本回合 +2 集中）、寒流",
+                C<CreativeAi>(), C<Hotfix>(), C<ColdSnap>()),
 
-            Turn("碎片整理（AI 印）、全息影像、冰川（全息影像从弃牌堆捞的那张）；打击没费",
-                C<Defragment>(false, "ai"), C<Hologram>(), C<Glacier>(false, "hologram"), C<StrikeDefect>()),
+            Turn("雷暴、全息影像（捞冰川）、冰川、打击（没费）",
+                C<Storm>(), C<Hologram>(), C<Glacier>(false, "hologram"), C<StrikeDefect>()),
 
             Turn("缓冲（AI 印）、充电、高速脱离（塞晕眩）、防御",
                 C<MegaCrit.Sts2.Core.Models.Cards.Buffer>(false, "ai"), C<ChargeBattery>(), C<BoostAway>(), C<DefendDefect>()),
@@ -79,7 +79,7 @@ public static class DefectScript
         typeof(Subroutine), typeof(Hailstorm), typeof(Storm),
         typeof(Capacitor), typeof(BulkUp), typeof(Hologram),
         typeof(CreativeAi), typeof(ColdSnap), typeof(MegaCrit.Sts2.Core.Models.Cards.Buffer),
-        typeof(Defragment), typeof(Coolant),    // 碎片整理 / 冷却剂（用户新加入第 3 回合剧本）
+        typeof(Defragment), typeof(Coolant), typeof(Hotfix),   // 热修复（用户 2026-11-22 加入第 4 回合）    // 碎片整理 / 冷却剂（用户新加入第 3 回合剧本）
     };
 
     /// <summary>遗物（用户给的顺序，从右往左显示时最右是起始遗物破损核心）。</summary>
