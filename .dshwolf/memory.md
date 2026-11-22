@@ -6859,3 +6859,5 @@ Chronological action log.
 | 2026-11-22 23:07 | edit | `tools/wiki/make-markdown.ps1` | ok | 0 |
 | 2026-11-22 23:09 | write | `tools/wiki/make-bosses-md.ps1` | ok | 0 |
 | 2026-11-22 23:10 | edit | `tools/wiki/make-bosses-md.ps1` | error | 0 |
+| 2026-11-22 23:14 | edit | `src/Hooks/Core/CrashTrace.cs` | ok | 0 |
+| 2026-11-22 23:14 | edit | `src/Hooks/Core/CrashTrace.cs` | ok | 0 |

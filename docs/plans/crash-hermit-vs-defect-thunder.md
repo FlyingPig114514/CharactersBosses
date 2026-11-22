@@ -104,6 +104,31 @@ var list = CombatState.GetOpponentsOf(Owner.Creature).Where(e => e.IsHittable)..
 2. 或者用二分法定位：先关掉 SpeedX（它在同一帧也在动结束回合按钮），再关掉 HermitRework 的宠物（`GOD_BYRD` 召的小异鸟，
    它是我们球索敌的首选目标）各打一次同款战斗，看还崩不崩。
 
+## 三·补二：玩家的 `characterbosses_trace.txt` 逐会话拆开看（28 个进程，2026-11-23 复核）
+
+| # | pid | 时间 | 行数 | `!!` | 未观察的任务异常 |
+|---|---|---|---|---|---|
+| 25 | 17308 | 19:31:41 → **20:20:28** | 408 | 391 | **391** |
+| 16 | 74620 | 20:58:30 → **01:53:54** | 392 | 161 | **161** |
+| 26 | 26808 | 21:20:47 → 21:22:00 | 55 | 0 | 0（38 条启动期异常） |
+| 27 | 21024 | 21:39:43 → 21:40:27 | 53 | 0 | 0（36 条启动期异常） |
+| **28** | **64348** | **22:37:32 → 22:37:46** | **17** | **0** | **0** |
+
+三条结论：
+
+1. **崩溃会话（pid=64348）确实一条面包屑都没有** —— 不是「没写」，是「没有托管异常可写」。
+2. 另外两个会话被 **未观察的任务异常**灌满（391 / 161 条），而那 400 行的写入额度是**按进程共享**的 ⇒
+   一旦被灌满，同一进程里**真正出事时的面包屑会被直接丢掉**。这解释了「为什么崩溃时什么都没留下」的一半。
+3. 那份 trace 里其余「启动期异常」**都不是我们的**：
+   - `AfterModifyingCardPlayResultLocation call site not found in OnPlayWrapper` ← **ChampBeta** 的 transpiler（它和 0.113 不兼容）；
+   - `Patching exception in method virtual … <OnPlayWrapper>d__359::MoveNext()` ← 别人的补丁类；
+   - `Version terminated in an invalid place! Parse state is Minor` ← 原版 `SemanticVersion.FromString`；
+   - `Operation is not valid … at MemberInfo.get_MetadataToken()` ← 动态/可回收程序集上的反射。
+
+⇒ v0.2.899 把面包屑改成：拆开 `AggregateException` 取**内层**异常（内层的栈才是真正抛出的那一帧）、
+按「类型 + 首帧」去重、最多 20 行。这样下一次：① 额度不会被灌满；② 能看到是**谁**抛的
+（如果栈里有 `CharacterBosses`，就是我们的 fire-and-forget 任务；那我们就能直接定位到具体那一行）。
+
 ## 四、还需要玩家提供（一次就能定性）
 
 1. `%APPDATA%\SlayTheSpire2\logs\characterbosses_trace.txt`（**面包屑**，逐行 `Flush(true)` 落盘，

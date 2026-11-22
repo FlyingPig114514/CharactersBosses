@@ -49,7 +49,7 @@ internal static class CrashTrace
 
             System.Threading.Tasks.TaskScheduler.UnobservedTaskException += (_, e) =>
             {
-                Problem("未观察的任务异常", e.Exception);
+                TraceUnobserved(e.Exception);
                 try { e.SetObserved(); } catch { /* 忽略 */ }
             };
 
@@ -66,6 +66,68 @@ internal static class CrashTrace
 
     private static readonly System.Collections.Generic.HashSet<string> _seenFirstChance = new();
     private static int _firstChanceLines;
+
+    private static readonly System.Collections.Generic.HashSet<string> _seenUnobserved = new();
+    private static int _unobservedLines;
+
+    /// <summary>
+    /// **未观察的任务异常**的面包屑（v0.2.899，玩家 2026-11-22 的 `characterbosses_trace.txt` 实证）。
+    ///
+    /// 玩家那份 trace 里 28 个会话是这样分布的：
+    /// <code>
+    /// 25. pid=17308  19:31:41 → 20:20:28  408 行  «!! 391 条 未观察的任务异常»
+    /// 16. pid=74620  20:58:30 → 01:53:54  392 行  «!! 161 条 未观察的任务异常»
+    /// 28. pid=64348  22:37:32 → 22:37:46   17 行  «真正的崩溃会话：一条面包屑都没有»
+    /// </code>
+    /// 两个毛病：
+    ///   ① 旧写法把 **AggregateException 本身**丢给 `Describe`，而它的 `StackTrace` 基本是空的
+    ///      ⇒ 391 行全是同一句「A Task's exception(s) were not observed…」，**看不到是谁抛的**；
+    ///   ② 它还会**吃光** `_writes` 那 400 行的总额度 ⇒ 同一个进程里真出事时的面包屑被丢掉
+    ///      （这很可能就是崩溃会话什么都留不下的原因之一）。
+    ///
+    /// 现在：拆开 AggregateException 取**内层**异常（它的栈才是真正抛出的那一帧）、
+    /// 按「类型 + 第一帧」去重、全程最多 20 行，超了打一行说明就停 —— 把额度留给真正的崩溃。
+    /// </summary>
+    private static void TraceUnobserved(Exception? ex)
+    {
+        try
+        {
+            if (ex == null) return;
+            if (_unobservedLines >= 20)
+            {
+                if (_unobservedLines++ == 20) Write("!! 未观察的任务异常已记满 20 条（去重后），后面的只计数不再记");
+                return;
+            }
+
+            var inner = ex;
+            try
+            {
+                if (inner is AggregateException agg && agg.InnerExceptions.Count > 0)
+                    inner = agg.InnerExceptions[0];
+            }
+            catch { /* 忽略：拆不开就用原异常 */ }
+
+            string key;
+            try
+            {
+                string stack = inner.StackTrace ?? string.Empty;
+                string first = stack.Length > 0
+                    ? stack.Replace("\r", string.Empty).Split('\n')[0].Trim()
+                    : "(无栈)";
+                key = inner.GetType().Name + "|" + first;
+            }
+            catch { key = inner.GetType().Name; }
+
+            lock (_seenUnobserved)
+            {
+                if (!_seenUnobserved.Add(key)) return;
+                _unobservedLines++;
+            }
+
+            Problem("未观察的任务异常（内层）", inner);
+        }
+        catch { /* 面包屑绝不影响游戏 */ }
+    }
 
     /// <summary>首过异常面包屑（过滤 + 去重 + 限量，见 <see cref="Install"/> 里的说明）。</summary>
     private static void TraceFirstChance(Exception? ex)
