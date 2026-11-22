@@ -74,6 +74,36 @@ var list = CombatState.GetOpponentsOf(Owner.Creature).Where(e => e.IsHittable)..
    代码抛的」空引用 / 无效操作 / 参数为空 / 越界，去重 + 全程最多 20 行。
    下次崩溃时 `logs/characterbosses_trace.txt` 里就会出现「崩之前原版哪一句先空引用了」。
 
+## 三·补：玩家的 `characterbosses_trace.txt` 已经看到了（2026-11-22 23:11 收到）
+
+```
+===== 外壳入口 pid=64348 =====
+[22:37:32.696] [外壳] Initialize 开始
+[22:37:32.701] [外壳] 游戏版本=0.1.0+d09d48e…，探测 beta=True
+[22:37:32.705] [外壳] 已载入实现 CharacterBosses.Impl113 1.0.0.0
+[22:37:33.080] · Install（进程 pid=64348）
+[22:37:33.087] · 启动阶段 1/5 … 5/5
+[22:37:46.359] · BaseLib 配置：RegisterCore 完成
+<文件到此结束>
+```
+
+这份文件是**逐行 `Flush(true)`** 落的盘（不受缓冲影响），结论很硬：
+
+| 期望 | 实际 |
+|---|---|
+| `!! 未处理异常（进程可能立刻退出）` | **没有** |
+| `· 进程正常退出（ProcessExit）` | **没有** |
+
+⇒ 崩的那一刻**没有任何被 CLR 看到的托管异常**，也不是正常退出。
+`AppDomain.UnhandledException` 只有「托管异常逃到线程顶层」才会触发；它没触发 + 日志在原生层断掉
+⇒ **基本可以断定是原生层硬崩（访问冲突一类）或者被强杀**，托管侧只能靠「崩溃转储」看栈。
+
+所以下一步只有两条路：
+1. 让玩家开 **Windows 崩溃转储**（`%LOCALAPPDATA%\CrashDumps`，注册表 `LocalDumps` 或 WER 默认即可），
+   崩完把 `SlayTheSpire2.exe.*.dmp` 发来，我们用 `tools\read-crash-dump.ps1` 读异常码 / 归属模块；
+2. 或者用二分法定位：先关掉 SpeedX（它在同一帧也在动结束回合按钮），再关掉 HermitRework 的宠物（`GOD_BYRD` 召的小异鸟，
+   它是我们球索敌的首选目标）各打一次同款战斗，看还崩不崩。
+
 ## 四、还需要玩家提供（一次就能定性）
 
 1. `%APPDATA%\SlayTheSpire2\logs\characterbosses_trace.txt`（**面包屑**，逐行 `Flush(true)` 落盘，

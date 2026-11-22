@@ -1,4 +1,4 @@
-﻿# Build artifacts
+# Build artifacts
 **/bin/
 **/obj/
 **/.vs/
@@ -95,3 +95,7 @@ mod_log*.txt
 !/tools/wiki/**
 !/tools/wiki-dump/
 !/tools/wiki-dump/**
+# 玩家的诊断日志（copy 进仓库时别提交）
+characterbosses_trace.txt
+mod_log*.txt
+godot*.log
