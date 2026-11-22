@@ -6861,3 +6861,4 @@ Chronological action log.
 | 2026-11-22 23:10 | edit | `tools/wiki/make-bosses-md.ps1` | error | 0 |
 | 2026-11-22 23:14 | edit | `src/Hooks/Core/CrashTrace.cs` | ok | 0 |
 | 2026-11-22 23:14 | edit | `src/Hooks/Core/CrashTrace.cs` | ok | 0 |
+| 2026-11-22 23:28 | write | `workshop/changenote.txt` | ok | 0 |
