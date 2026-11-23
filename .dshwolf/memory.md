@@ -7048,3 +7048,8 @@ Chronological action log.
 | 2026-11-23 18:15 | edit | `src/Hooks/Core/BossInfoTable.cs` | ok | 0 |
 | 2026-11-23 18:16 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
 | 2026-11-23 18:16 | edit | `docs/plans/changelog-history.md` | ok | 0 |
+| 2026-11-23 19:47 | edit | `src/Hooks/Patches/TopBarBossIconFallbackPatch.cs` | ok | 0 |
+| 2026-11-23 19:48 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-23 19:48 | edit | `docs/plans/changelog-history.md` | ok | 0 |
+| 2026-11-23 19:51 | edit | `src/Hooks/Patches/TopBarBossIconFallbackPatch.cs` | ok | 0 |
+| 2026-11-23 19:51 | edit | `src/Hooks/Patches/TopBarBossIconFallbackPatch.cs` | ok | 0 |

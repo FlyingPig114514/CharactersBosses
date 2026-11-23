@@ -291,13 +291,35 @@ public static class TopBarBossIconFallbackPatch
                 string key;
                 try { key = monster.Id.Entry; } catch { key = string.Empty; }
 
-                if (!string.IsNullOrEmpty(key)
-                    && BossDefs.All.TryGetValue(key, out var def) && def?.CharacterType != null)
+                if (!string.IsNullOrEmpty(key))
                 {
-                    // 愚者占位 = 「观者还没解析出来」⇒ 当成没解析到，交给下面的观者兜底
-                    // （宁可留着原版占位图，也不能把愚者的头像安到观者头上）
-                    if (def.CharacterType != BossDefs.PlaceholderCharacterType)
-                        viaDef = ModelDb.GetById<CharacterModel>(ModelDb.GetId(def.CharacterType));
+                    BossDefinition? def = null;
+                    BossDefs.All.TryGetValue(key, out def);
+
+                    Type? characterType = def?.CharacterType;
+                    // ★ v0.2.912：愚者 Boss 的怪物 id 是 `FOOL_TAROT`，而 `BossDefs` 里的 key 是
+                    //   `FOOL_BOSS` ⇒ 直接查字典会**查不到**（以前就是这里断的，最后退回白色地图徽章）。
+                    bool isFoolSlot = key.StartsWith("FOOL", StringComparison.Ordinal);
+#if STS2_113
+                    // ⚠ `BossDefs.Fool` 整个定义都在 `#if STS2_113` 里（愚者角色只有 0.113 有）
+                    if (characterType == null && isFoolSlot) characterType = BossDefs.Fool?.CharacterType;
+#endif
+
+                    if (characterType != null)
+                    {
+                        // 愚者占位 = 「观者还没解析出来」⇒ 当成没解析到，交给下面的观者兜底
+                        // （宁可留着原版占位图，也不能把愚者的头像安到观者头上）
+                        //
+                        // ★ v0.2.912（用户 2026-11-23：「本幕有愚者 boss 时，最上方一栏显示的愚者头像
+                        //   不正确，历史记录中显示的也不正确，都是白色的，正常应该是彩色的」）：
+                        //   `PlaceholderCharacterType` 在 0.113 构建里**就是愚者本人**
+                        //   （`BossDefs.PlaceholderCharacterType = typeof(Characters.Fool)`），
+                        //   而愚者 Boss 自己的 `CharacterType` 也写着它 ⇒ 被上面那条「占位符 ⇒ 跳过」
+                        //   误判掉，最终退回**我们那张白色的地图徽章** `fool_tarot.png`。
+                        //   现在只对**愚者自己的遭遇**放行（`WATCHER_*` 仍然跳过）。
+                        if (characterType != BossDefs.PlaceholderCharacterType || isFoolSlot)
+                            viaDef = ModelDb.GetById<CharacterModel>(ModelDb.GetId(characterType));
+                    }
                 }
             }
         }

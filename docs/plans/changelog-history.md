@@ -4,6 +4,24 @@
 > 旧条目逐字来自 `git show HEAD:src/Hooks/Core/BuildInfo.cs` 的 Tag 常量（v0.2.871 及其之前，共 236 条）。
 > 最新版本（0.2.889）是当前 Tag，同时在各条 `workshop/changenote.txt` 里也有面向玩家的摘要。
 
+## v0.2.912（2026-11-23）：电球机地图徽章改圆 + 愚者 Boss 头像变彩色
+
+用户实机反馈两条：
+
+1. **「新加的电球机图标是方形的，其它 boss 图标都是圆的」**
+   地图徽章由 `<BossNodePath>.png`（角色剪影）+ `<BossNodePath>_outline.png`（背后白底盘）两张图组成。
+   养手骨 / 魂骨 / 根除骨那几颗的 `_outline` 是**纯圆盘**（半径约 248），而 `defect_thunder_outline`
+   是一块**带方角的实心块** ⇒ 顶栏那颗徽章看着是方的。
+   现在 `defect_thunder_outline.png` 重画成纯圆盘（半径 248、边缘 1.2px 抗锯齿，与养手骨同几何），
+   `defect_thunder.png` 裁进半径 236 的圆（不溢出圆盘）。原图备份在 `tools/art/map-backup/`。
+
+2. **「本幕有愚者 boss 时，最上方一栏与历史记录里的愚者头像都是白色的，正常应该是彩色」**
+   根因：`BossDefs.PlaceholderCharacterType` 在 **0.113 构建里就是愚者本人**
+   （`typeof(Characters.Fool)`，用作「观者还没解析出来」的占位符），而
+   `TopBarBossIconFallbackPatch.CharacterFor` 把「CharacterType == 占位符」一律当成「没解析到」跳过
+   ⇒ 愚者 Boss 也被跳过 ⇒ 退回我们那张白色剪影地图徽章 `fool_tarot.png`。
+   现在只对 `FOOL*` 遭遇放行（`WATCHER_*` 仍按原逻辑跳过），顶栏 / 结算 / 历史都会用愚者自己的彩色头像。
+
 ## v0.2.911（2026-11-23）：疾风观第 1～5 回合重排
 
 用户：「削弱，调换了一下一些意图的顺序」，并明确「我就这改了这几个回合，**后面的不变**」。
