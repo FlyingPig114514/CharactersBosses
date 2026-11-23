@@ -6965,3 +6965,16 @@ Chronological action log.
 | 2026-11-23 15:44 | edit | `tools/wiki-dump/WikiDump.cs` | ok | 0 |
 | 2026-11-23 15:45 | edit | `tools/wiki/i18n-en.json` | ok | 0 |
 | 2026-11-23 15:49 | edit | `src/Hooks/Core/BossInfoTable.cs` | ok | 0 |
+| 2026-11-23 16:06 | edit | `src/Hooks/Core/WatcherFlurryScript.cs` | ok | 0 |
+| 2026-11-23 16:06 | edit | `src/Hooks/Core/WatcherFlurryScript.cs` | ok | 0 |
+| 2026-11-23 16:06 | edit | `src/Hooks/Core/WatcherFlurryScript.cs` | ok | 0 |
+| 2026-11-23 16:06 | edit | `src/Hooks/Core/WatcherFlurryScript.cs` | ok | 0 |
+| 2026-11-23 16:07 | edit | `src/Hooks/Core/WatcherFlurryScript.cs` | ok | 0 |
+| 2026-11-23 16:07 | edit | `src/Hooks/Core/BossInfoTable.cs` | ok | 0 |
+| 2026-11-23 16:07 | edit | `src/Hooks/Core/WatcherRuntimePatches.cs` | ok | 0 |
+| 2026-11-23 16:08 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-23 16:08 | write | `C:/Users/fzy18/AppData/Local/Temp/dsh-flurry-append.json` | ok | 0 |
+| 2026-11-23 16:09 | edit | `docs/plans/changelog-history.md` | ok | 0 |
+| 2026-11-23 16:09 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-23 16:12 | edit | `tools/wiki/make-markdown.ps1` | ok | 0 |
+| 2026-11-23 16:12 | edit | `tools/wiki/make-markdown-en.ps1` | ok | 0 |

@@ -224,6 +224,6 @@
     "WATCHER_FLURRY_BOSS.name":  "Flurry Watcher",
     "WATCHER_FLURRY_BOSS.title":  "Flurry Watcher",
     "WATCHER_FLURRY_BOSS.moves.CHARBOSS_PLAY.title":  "Play",
-    "WATCHER_FLURRY_BOSS.flurry":  "Whenever the Watcher's [gold]Flurry of Blows[/gold] deals unblocked damage to you, you lose 1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img] at the start of your next turn.",
-    "WATCHER_FLURRY_BOSS.flurry_dread":  "Whenever the Watcher's [gold]Flurry of Blows[/gold] deals unblocked damage to you, you lose 1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img] at the start of your next turn."
+    "WATCHER_FLURRY_BOSS.flurry":  "Whenever the Watcher's [gold]Flurry of Blows[/gold] deals unblocked damage to you, you lose 1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img] at the start of your next turn. Her Fasting does not make her lose energy at the start of her turn.",
+    "WATCHER_FLURRY_BOSS.flurry_dread":  "Whenever the Watcher's [gold]Flurry of Blows[/gold] deals unblocked damage to you, you lose 1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img] at the start of your next turn. Her Fasting does not make her lose energy at the start of her turn."
 }

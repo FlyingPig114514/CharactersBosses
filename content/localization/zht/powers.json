@@ -164,8 +164,8 @@
 "BOSS_TEMPERANCE_POWER.description": "每当观者打出 12 张牌，她就会强制结束自己的回合并使她和她的其他友方获得 2 点力量。\n警告：观者会在第12回合开始无限。",
 "BOSS_TEMPERANCE_POWER.description_dread": "每当观者打出 12 张牌，她就会强制结束自己的回合并使她和她的其他友方获得 2 点力量。此外，[gold]时间扭曲[/gold]会记录你的出牌：你每打出 12 张牌，观者就会强制结束你的回合。\n警告：观者会在第12回合开始无限。",
     "BOSS_FLURRY_POWER.title":  "疾風連擊",
-    "BOSS_FLURRY_POWER.description":  "每當觀者的[gold]疾風連擊[/gold]對你造成未被格擋的傷害時，你在下回合失去1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]。",
-    "BOSS_FLURRY_POWER.description_dread":  "每當觀者的[gold]疾風連擊[/gold]對你造成未被格擋的傷害時，你在下回合失去1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]。",
+    "BOSS_FLURRY_POWER.description":  "每當觀者的[gold]疾風連擊[/gold]對你造成未被格擋的傷害時，你在下回合失去1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]。她的「齋戒」不會使她在回合開始時失去能量。",
+    "BOSS_FLURRY_POWER.description_dread":  "每當觀者的[gold]疾風連擊[/gold]對你造成未被格擋的傷害時，你在下回合失去1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]。她的「齋戒」不會使她在回合開始時失去能量。",
     "FLURRY_DRAINED_POWER.title":  "力竭",
     "FLURRY_DRAINED_POWER.description":  "在下個回合，失去{Amount}[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]。"
 }

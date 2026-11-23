@@ -224,6 +224,6 @@
     "WATCHER_FLURRY_BOSS.name":  "連打ウォッチャー",
     "WATCHER_FLURRY_BOSS.title":  "連打ウォッチャー",
     "WATCHER_FLURRY_BOSS.moves.CHARBOSS_PLAY.title":  "カードプレイ",
-    "WATCHER_FLURRY_BOSS.flurry":  "ウォッチャーの[gold]連打[/gold]があなたに未ブロックのダメージを与えるたび、次のターンに1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]を失う。",
-    "WATCHER_FLURRY_BOSS.flurry_dread":  "ウォッチャーの[gold]連打[/gold]があなたに未ブロックのダメージを与えるたび、次のターンに1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]を失う。"
+    "WATCHER_FLURRY_BOSS.flurry":  "ウォッチャーの[gold]連打[/gold]があなたに未ブロックのダメージを与えるたび、次のターンに1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]を失う。彼女の「断食」によって、彼女がターン開始時にエネルギーを失うことはない。",
+    "WATCHER_FLURRY_BOSS.flurry_dread":  "ウォッチャーの[gold]連打[/gold]があなたに未ブロックのダメージを与えるたび、次のターンに1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]を失う。彼女の「断食」によって、彼女がターン開始時にエネルギーを失うことはない。"
 }

@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.902 / 2026-11-23 (**新 Boss：一层 2 号「疾风观」**）—— 用户 2026-11-23 设计的第一层第二只观者 Boss。内部 Key `WATCHER_FLURRY`（= 疾风连击 Flurry of Blows），遭遇 `WATCHER_FLURRY_BOSS_ENCOUNTER`，控制台 `fight WATCHER_FLURRY_BOSS_ENCOUNTER`。特殊效果「疾风连击」：观者的「疾风连击」对你造成**未被格挡**的伤害时，你**下回合失去 1 能量**（可叠、单张牌最多 1 层；= 崩坠「力竭」Drained 的同款，能量用观者能量图标）。遗物 至纯之水 / 涅奥的祝福 / 手里剑 / 苦无；9 回合剧本（6~9 循环）；进阶 8 升 以手拒之·心灵堡垒，进阶 9 升 供奉·斋戒。完整历史见 docs/plans/changelog-history.md";
+    public const string Tag = "v0.2.903 / 2026-11-23 (**疾风观订正：斋戒不再扣她的能量**）—— 用户 2026-11-23 第二轮订正。① 第 6 回合意图改成「洗牌、疾风连击、防御、打击（没费）」，第 8 回合改成「打击、打击（没费）、防御（没费）」；② 能力面板：单体高压回合加上第 1 回合（1、4、5、7、9），群体高压回合改成「无」；③ 恐惧强化 = 升级**疾风连击**；④ **斋戒不再使她（观者）在回合开始时失去能量** —— 两份观者 mod 的斋戒都会给自己叠一层 `EnergyDownPower`（`AfterEnergyReset` → `PlayerCmd.LoseEnergy`），而那个钩子对我们的 Boss **是派发的**，于是她第 3 回合打出斋戒后每回合都被扣 1 能量、第 6/8 回合全变「没费」。现在由 `WatcherRuntimePatches.InstallFastingNoEnergyDown` 对她那一次压掉（真人玩家的斋戒不变），描述里也补了这一句（16 语言）。v0.2.902 是新 Boss 本体。完整历史见 docs/plans/changelog-history.md";
 
     private static bool _logged;
 
@@ -90,6 +90,16 @@ public static class BuildInfo
         // 所以等所有程序集都到位后再反射挂补丁（拿不到就安静跳过）。
         try { Core.MintySpireDamagePreviewCompat.TryInstall(); }
         catch (Exception e) { try { Logger.Log("[CharBoss] 薄荷尖塔兼容安装失败（忽略）: " + e.Message); } catch { } }
+
+        // ★★ v0.2.903（用户 2026-11-23「疾风观」订正时发现）：
+        //   `Core.WatcherRuntimePatches.TryInstall()` **一直没有调用点** —— 和上面 v0.2.533 记的那四个
+        //   一模一样的毛病：神格不退 / 许愿固定选 / 真言满 10 层接管 / B 版姿态伤害兜底 这些
+        //   运行期补丁**从来没被安装过**（日志里也没有「已挂上…」那几行）。
+        //   现在补上调用；它内部对「观者 mod 没装」是**安全跳过 + 下次再试**的（`ModAssembly() == null` 直接 return），
+        //   所以 0.107 / 没装观者的玩家完全不受影响。
+        //   新增的「斋戒不再使她失去能量」也挂在这批里（`InstallFastingNoEnergyDown`）。
+        try { Core.WatcherRuntimePatches.TryInstall(); }
+        catch (Exception e) { try { Logger.Log("[CharBoss] 观者运行期补丁安装失败（忽略）: " + e.Message); } catch { } }
 
         try { Logger.Log("[CharBoss] 启动阶段 5/5：完成（如果日志停在这之前，就说明死在对应那一步）"); } catch { /* 忽略 */ }
         try { CrashTrace.Mark("启动阶段 5/5"); } catch { /* 忽略 */ }

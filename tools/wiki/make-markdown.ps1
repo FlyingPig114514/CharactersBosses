@@ -43,6 +43,10 @@ function CleanLoc([string]$s) {
     if ([string]::IsNullOrEmpty($s)) { return $s }
     # 先按**字面**把精灵字体内联图标换掉（正则容易把它连着的 img 标签一起吞掉）
     $r = $s
+    # ★ 2026-11-23：「数字 + 能量图标」连写（例如「你在下回合失去1[img]⚡[/img]」）时，
+    #   如果只把图标换成「1 点能量」就会变成「失去11 点能量」（疾风观的特殊效果就是这样）。
+    #   所以先把「数字+图标」整段换成「N 点能量」。
+    $r = [regex]::Replace($r, '(\d+)\s*\[img\]res://[^\[]*energy_icon[^\[]*\[/img\]', '$1 点能量')
     $r = $r.Replace('[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]', '1 点能量')
     $r = $r.Replace('res://images/packed/sprite_fonts/watcher_energy_icon.png', '')
     $r = [regex]::Replace($r, '(1 点能量)+', '1 点能量')     # 图标连写多次 ⇒ 收成一个

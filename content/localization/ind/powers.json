@@ -164,8 +164,8 @@
 "BOSS_TEMPERANCE_POWER.description": "Whenever the Watcher plays 12 cards, she forcibly ends her own turn and she and her other allies gain 2 Strength.\nWarning: the Watcher starts her infinite loop on turn 12.",
 "BOSS_TEMPERANCE_POWER.description_dread": "Whenever the Watcher plays 12 cards, she forcibly ends her own turn and she and her other allies gain 2 Strength. In addition, [gold]Time Warp[/gold] counts your cards: every 12 cards you play, the Watcher forcibly ends your turn.\nWarning: the Watcher starts her infinite loop on turn 12.",
     "BOSS_FLURRY_POWER.title":  "Flurry of Blows",
-    "BOSS_FLURRY_POWER.description":  "Setiap kali [gold]Flurry of Blows[/gold] milik Pengamat memberimu kerusakan yang tidak terblokir, kamu kehilangan 1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img] pada giliran berikutnya.",
-    "BOSS_FLURRY_POWER.description_dread":  "Setiap kali [gold]Flurry of Blows[/gold] milik Pengamat memberimu kerusakan yang tidak terblokir, kamu kehilangan 1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img] pada giliran berikutnya.",
+    "BOSS_FLURRY_POWER.description":  "Setiap kali [gold]Flurry of Blows[/gold] milik Pengamat memberimu kerusakan yang tidak terblokir, kamu kehilangan 1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img] pada giliran berikutnya. Puasa miliknya tidak membuatnya kehilangan Energi pada awal gilirannya.",
+    "BOSS_FLURRY_POWER.description_dread":  "Setiap kali [gold]Flurry of Blows[/gold] milik Pengamat memberimu kerusakan yang tidak terblokir, kamu kehilangan 1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img] pada giliran berikutnya. Puasa miliknya tidak membuatnya kehilangan Energi pada awal gilirannya.",
     "FLURRY_DRAINED_POWER.title":  "Terkuras",
     "FLURRY_DRAINED_POWER.description":  "Pada giliran berikutnya, kehilangan {Amount}[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]."
 }

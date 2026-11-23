@@ -50,10 +50,79 @@ internal static class WatcherRuntimePatches
             any |= InstallWishChoice();
             any |= InstallMantraTakeover();
             any |= InstallStanceDamageFallback();
+            any |= InstallFastingNoEnergyDown();
             if (any) _tried = true;      // 都装上了才不再重试
         }
         catch (Exception e) { Logger.Log("[CharBoss] 观者运行期补丁安装失败: " + e.Message); }
     }
+
+    // ── ⑤ 斋戒不再扣她自己的能量（用户 2026-11-23「疾风观」）─────────────────────
+    /// <summary>
+    /// 用户原话（2026-11-23）：
+    /// > 「修改特殊效果：**斋戒不再会使观者在回合开始时失去能量**。……（后面不变）
+    /// >  PS：这意味着她第六回合和第八回合能多打一张打击」
+    ///
+    /// 根因：两份观者 mod 的「斋戒」除了给力量/敏捷，还会给持有者自己叠一层
+    /// `EnergyDownPower`（反编译：`Type = Debuff`、`StackType = Counter`、
+    /// `AfterEnergyReset(player)` 里 `PlayerCmd.LoseEnergy(Amount, player)`）。
+    /// 而 `AfterEnergyReset` 对我们这只 Boss **是派发的**（所以 `BossRadianceSuppressPatch`
+    /// 才必须手动压掉明耀酊剂那一条），结果她第 3 回合打出斋戒之后，每回合都被扣 1 点能量
+    /// ⇒ 剧本里写死的每回合能量全部少 1，第 6/8 回合本该打得出的牌全变成「没费」。
+    ///
+    /// 修法：把 `EnergyDownPower.AfterEnergyReset` 对她的那一次**压掉**（真玩家的斋戒一点不变）。
+    /// 只认「持有者是我们的观者 Boss」⇒ 其它角色 Boss / 真人玩家都不受影响。
+    /// </summary>
+    private static bool InstallFastingNoEnergyDown()
+    {
+        try
+        {
+            var type = WatcherCards.T("EnergyDownPower");
+            if (type == null)
+            {
+                Logger.Log("[CharBoss] 斋戒不扣能量：当前观者实现没有 EnergyDownPower ⇒ 跳过");
+                return true;      // 不再重试
+            }
+            var method = type.GetMethod("AfterEnergyReset",
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            if (method == null)
+            {
+                Logger.Log("[CharBoss] 斋戒不扣能量：EnergyDownPower 上没有 AfterEnergyReset ⇒ 跳过");
+                return true;
+            }
+
+            var prefix = new HarmonyMethod(typeof(WatcherRuntimePatches)
+                .GetMethod(nameof(FastingNoEnergyDownPrefix), BindingFlags.Static | BindingFlags.NonPublic)!);
+            new Harmony("CharacterBosses.watcher.fastingnoenergydown").Patch(method, prefix: prefix);
+            Logger.Log($"[CharBoss] 斋戒不扣能量：已挂上 {type.Name}.AfterEnergyReset（只对她生效）");
+            return true;
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 斋戒不扣能量：挂载失败: " + e.Message);
+            return true;
+        }
+    }
+
+    private static bool FastingNoEnergyDownPrefix(object __instance, ref Task __result)
+    {
+        try
+        {
+            var power = __instance as PowerModel;
+            if (power == null) return true;
+            Creature? owner = null;
+            try { owner = power.Owner; } catch { return true; }
+            if (owner == null) return true;
+            if (OurBossOwning(owner) == null) return true;      // 不是我们的 Boss ⇒ 走原版
+
+            __result = Task.CompletedTask;
+            if (_logs4++ < 4)
+                Logger.Log("[CharBoss] 斋戒：压掉「她每回合开始少 1 能量」（用户 2026-11-23 订正）");
+            return false;
+        }
+        catch { return true; }
+    }
+
+    private static int _logs4;
 
     // ── ④ 姿态倍率兜底（B 版）─────────────────────────────────────────────
     /// <summary>

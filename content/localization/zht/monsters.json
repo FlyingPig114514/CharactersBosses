@@ -224,6 +224,6 @@
     "WATCHER_FLURRY_BOSS.name":  "疾風觀",
     "WATCHER_FLURRY_BOSS.title":  "疾風觀",
     "WATCHER_FLURRY_BOSS.moves.CHARBOSS_PLAY.title":  "出牌",
-    "WATCHER_FLURRY_BOSS.flurry":  "每當觀者的[gold]疾風連擊[/gold]對你造成未被格擋的傷害時，你在下回合失去1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]。",
-    "WATCHER_FLURRY_BOSS.flurry_dread":  "每當觀者的[gold]疾風連擊[/gold]對你造成未被格擋的傷害時，你在下回合失去1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]。"
+    "WATCHER_FLURRY_BOSS.flurry":  "每當觀者的[gold]疾風連擊[/gold]對你造成未被格擋的傷害時，你在下回合失去1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]。她的「齋戒」不會使她在回合開始時失去能量。",
+    "WATCHER_FLURRY_BOSS.flurry_dread":  "每當觀者的[gold]疾風連擊[/gold]對你造成未被格擋的傷害時，你在下回合失去1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]。她的「齋戒」不會使她在回合開始時失去能量。"
 }

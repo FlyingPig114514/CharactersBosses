@@ -1,6 +1,6 @@
 {
   "generatedFrom": "CharacterBosses.Impl113.dll",
-  "generatedAt": "2026-11-23 15:50",
+  "generatedAt": "2026-11-23 16:11",
   "cardNameMisses": [],
   "bosses": [
     {
@@ -23049,9 +23049,9 @@
               "name": "疾风观",
               "encounter": "WATCHER_FLURRY",
               "specialKey": "WATCHER_FLURRY_BOSS.flurry",
-              "special": "每当观者的[gold]疾风连击[/gold]对你造成未被格挡的伤害时，你在下回合失去1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]。",
+              "special": "每当观者的[gold]疾风连击[/gold]对你造成未被格挡的伤害时，你在下回合失去1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]。她的「斋戒」不会使她在回合开始时失去能量。",
               "specialDreadKey": "WATCHER_FLURRY_BOSS.flurry_dread",
-              "specialDread": "每当观者的[gold]疾风连击[/gold]对你造成未被格挡的伤害时，你在下回合失去1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]。",
+              "specialDread": "每当观者的[gold]疾风连击[/gold]对你造成未被格挡的伤害时，你在下回合失去1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]。她的「斋戒」不会使她在回合开始时失去能量。",
               "hpBonus": 0,
               "deck": [
                 "以手拒之",
@@ -23115,8 +23115,10 @@
               "ascensionDisplay": [
                 "8: 以手拒之, 8: 心灵堡垒, 9: 供奉, 9: 斋戒"
               ],
-              "info": "循环：6~9\n单体能力：强\n群攻能力：偏弱\n单体高压回合：4、5、7、9\n群体高压回合：4、7\n特殊效果类型：单体",
-              "dreadUpgrades": [],
+              "info": "循环：6~9\n单体能力：强\n群攻能力：偏弱\n单体高压回合：1、4、5、7、9\n群体高压回合：无\n特殊效果类型：单体",
+              "dreadUpgrades": [
+                "疾风连击"
+              ],
               "script": {
                 "loopFrom": 6,
                 "loopLength": 4,
@@ -23415,7 +23417,7 @@
                     ]
                   },
                   {
-                    "note": "6. 洗牌、疾风连击、防御、防御（没费）",
+                    "note": "6. 洗牌、疾风连击、防御、打击（没费）",
                     "energy": 1,
                     "shuffle": true,
                     "cards": [
@@ -23442,10 +23444,10 @@
                         "played": true
                       },
                       {
-                        "name": "防御",
-                        "type": "WatcherDefend_P",
+                        "name": "打击",
+                        "type": "WatcherStrike_P",
                         "cost": 1,
-                        "cardType": "Skill",
+                        "cardType": "Attack",
                         "HoldInstead": true,
                         "CostThisTurn": 1,
                         "DamageOverride": 0,
@@ -23498,7 +23500,7 @@
                     ]
                   },
                   {
-                    "note": "8. 打击、打击×2（没费）",
+                    "note": "8. 打击、打击（没费）、防御（没费）",
                     "energy": 1,
                     "shuffle": false,
                     "cards": [
@@ -23528,10 +23530,10 @@
                         "reason": "留在手牌"
                       },
                       {
-                        "name": "打击",
-                        "type": "WatcherStrike_P",
+                        "name": "防御",
+                        "type": "WatcherDefend_P",
                         "cost": 1,
-                        "cardType": "Attack",
+                        "cardType": "Skill",
                         "HoldInstead": true,
                         "CostThisTurn": 1,
                         "DamageOverride": 0,

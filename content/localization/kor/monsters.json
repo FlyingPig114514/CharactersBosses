@@ -224,6 +224,6 @@
     "WATCHER_FLURRY_BOSS.name":  "일진광풍 왓처",
     "WATCHER_FLURRY_BOSS.title":  "일진광풍 왓처",
     "WATCHER_FLURRY_BOSS.moves.CHARBOSS_PLAY.title":  "카드 사용",
-    "WATCHER_FLURRY_BOSS.flurry":  "와처의 [gold]일진광풍[/gold]이 당신에게 막지 못한 피해를 줄 때마다, 다음 턴에 1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]을 잃습니다.",
-    "WATCHER_FLURRY_BOSS.flurry_dread":  "와처의 [gold]일진광풍[/gold]이 당신에게 막지 못한 피해를 줄 때마다, 다음 턴에 1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]을 잃습니다."
+    "WATCHER_FLURRY_BOSS.flurry":  "와처의 [gold]일진광풍[/gold]이 당신에게 막지 못한 피해를 줄 때마다, 다음 턴에 1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]을 잃습니다. 그녀의 단식은 그녀가 턴 시작 시 에너지를 잃게 하지 않습니다.",
+    "WATCHER_FLURRY_BOSS.flurry_dread":  "와처의 [gold]일진광풍[/gold]이 당신에게 막지 못한 피해를 줄 때마다, 다음 턴에 1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]을 잃습니다. 그녀의 단식은 그녀가 턴 시작 시 에너지를 잃게 하지 않습니다."
 }

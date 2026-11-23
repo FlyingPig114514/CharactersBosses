@@ -224,6 +224,6 @@
     "WATCHER_FLURRY_BOSS.name":  "Sağanak Gözcüsü",
     "WATCHER_FLURRY_BOSS.title":  "Sağanak Gözcüsü",
     "WATCHER_FLURRY_BOSS.moves.CHARBOSS_PLAY.title":  "Oyna",
-    "WATCHER_FLURRY_BOSS.flurry":  "Gözlemci'nin [gold]Flurry of Blows[/gold] kartı sana bloklanmamış hasar verdiğinde, bir sonraki turda 1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img] kaybedersin.",
-    "WATCHER_FLURRY_BOSS.flurry_dread":  "Gözlemci'nin [gold]Flurry of Blows[/gold] kartı sana bloklanmamış hasar verdiğinde, bir sonraki turda 1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img] kaybedersin."
+    "WATCHER_FLURRY_BOSS.flurry":  "Gözlemci'nin [gold]Flurry of Blows[/gold] kartı sana bloklanmamış hasar verdiğinde, bir sonraki turda 1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img] kaybedersin. Onun Orucu, turunun başında enerji kaybetmesine neden olmaz.",
+    "WATCHER_FLURRY_BOSS.flurry_dread":  "Gözlemci'nin [gold]Flurry of Blows[/gold] kartı sana bloklanmamış hasar verdiğinde, bir sonraki turda 1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img] kaybedersin. Onun Orucu, turunun başında enerji kaybetmesine neden olmaz."
 }

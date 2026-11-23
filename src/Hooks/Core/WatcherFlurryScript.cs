@@ -15,12 +15,17 @@ namespace CharacterBosses.Core;
 /// 3.奇迹、斋戒、防御、防御（没费）
 /// 4.供奉、追击、腰带抽打
 /// 5.化体为空、疾风连击、心灵堡垒、安宁、疾风连击
-/// 6.洗牌、疾风连击、防御、防御（没费）
+/// 6.洗牌、疾风连击、防御、打击（没费）
 /// 7.同 4
-/// 8.打击、打击×2（没费）
+/// 8.打击、打击（没费）、防御（没费）
 /// 9.化体为空、疾风连击、警惕、疾风连击、打击（没费）
 /// 之后 6～9 循环
 /// </code>
+///
+/// ★ 2026-11-23 用户订正（第二版）：第 6 回合第三张由「防御」改成「打击」，
+///   第 8 回合第三张由「打击」改成「防御」；同时**斋戒不再使她在回合开始时失去能量**
+///   （见 `WatcherRuntimePatches.InstallFastingNoEnergyDown`）—— 正是这一条让第 6、8 回合
+///   真的拿得到各自那 1 点能量，能多打一张牌。
 ///
 /// ## 卡费（反编译两份观者 mod 的构造函数 `: base(cost, …)` 逐个核过）
 /// | 牌 | 费 | | 牌 | 费 |
@@ -40,9 +45,9 @@ namespace CharacterBosses.Core;
 /// 3 = 奇迹0(+1) + 斋戒2 + 防御1 ⇒ 2 + 1 = 3 ⇒ **2**（第二张防御没费）
 /// 4 = 供奉0 + 追击1 + 腰带抽打1 ⇒ **2**
 /// 5 = 化体为空1 + 疾风0 + 心灵堡垒1 + 安宁1 + 疾风0 ⇒ 3 ⇒ **3**
-/// 6 = 疾风0 + 防御1 ⇒ **1**（洗牌回合，第二张防御没费）
+/// 6 = 疾风0 + 防御1 ⇒ **1**（洗牌回合，打击没费）
 /// 7 = 同 4 ⇒ **2**
-/// 8 = 打击1 ⇒ **1**（另两张打击没费）
+/// 8 = 打击1 ⇒ **1**（第二张打击、防御没费）
 /// 9 = 化体为空1 + 疾风0 + 警惕2 + 疾风0 ⇒ 3 ⇒ **3**（打击没费）
 ///
 /// 第 5 回合的 3 点与第 9 回合的 3 点都按用户清单里「这几张都打出来了」反推，
@@ -51,7 +56,7 @@ namespace CharacterBosses.Core;
 /// ## 进阶（用户 2026-11-23）
 /// · 进阶 8：升级 **以手拒之 / 心灵堡垒**
 /// · 进阶 9：升级 **供奉 / 斋戒**
-/// · 恐惧模式：用户没单独指定 ⇒ 与普通一致（升级表为空）。
+/// · 恐惧模式：**升级疾风连击**。
 /// </summary>
 public static class WatcherFlurryScript
 {
@@ -93,11 +98,12 @@ public static class WatcherFlurryScript
                 Play(WatcherCards.Tranquility),
                 Play(WatcherCards.FlurryOfBlows)),
 
-            // ── 6 ── 洗牌 / 疾风连击 / 防御 / 防御（没费）   ← 6~9 循环起点   （1 费 = 0 + 1）
-            TurnEnergy(1, true, "6. 洗牌、疾风连击、防御、防御（没费）",
+            // ── 6 ── 洗牌 / 疾风连击 / 防御 / 打击（没费）   ← 6~9 循环起点   （1 费 = 0 + 1）
+            // ★ 2026-11-23 用户订正：原来是「疾风连击、防御、防御（没费）」，第三张改成**打击**。
+            TurnEnergy(1, true, "6. 洗牌、疾风连击、防御、打击（没费）",
                 Play(WatcherCards.FlurryOfBlows),
                 Play(WatcherCards.Defend),
-                Hold(WatcherCards.Defend)),
+                Hold(WatcherCards.Strike)),
 
             // ── 7 ── 同第 4 回合                       （2 费）
             Turn(2, "7. 供奉、追击、腰带抽打",
@@ -105,10 +111,12 @@ public static class WatcherFlurryScript
                 Play(WatcherCards.FollowUp),
                 Play(WatcherCards.SashWhip)),
 
-            // ── 8 ── 打击 / 打击×2（没费）              （1 费 = 1）
-            Turn(1, "8. 打击、打击×2（没费）",
+            // ── 8 ── 打击 / 打击（没费）/ 防御（没费）    （1 费 = 1）
+            // ★ 2026-11-23 用户订正：原来是「打击、打击×2（没费）」，第三张改成**防御**。
+            Turn(1, "8. 打击、打击（没费）、防御（没费）",
                 Play(WatcherCards.Strike),
-                Hold(WatcherCards.Strike), Hold(WatcherCards.Strike)),
+                Hold(WatcherCards.Strike),
+                Hold(WatcherCards.Defend)),
 
             // ── 9 ── 化体为空 / 疾风连击 / 警惕 / 疾风连击 / 打击（没费）   （3 费 = 1 + 0 + 2 + 0）
             Turn(3, "9. 化体为空、疾风连击、警惕、疾风连击、打击（没费）",
@@ -219,7 +227,12 @@ public static class WatcherFlurryScript
         return relics;
     }
 
-    /// <summary>恐惧模式额外升级的牌：用户没指定 ⇒ 空表（与普通一致）。</summary>
-    public static List<Type> DreadUpgradeTypes() => new List<Type>();
+    /// <summary>恐惧模式额外升级的牌：**疾风连击**（用户 2026-11-23「恐惧强化：升级疾风连击」）。</summary>
+    public static List<Type> DreadUpgradeTypes()
+    {
+        var list = new List<Type>();
+        if (WatcherCards.FlurryOfBlows is Type flurry) list.Add(flurry);
+        return list;
+    }
 }
 #endif

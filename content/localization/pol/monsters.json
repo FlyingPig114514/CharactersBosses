@@ -224,6 +224,6 @@
     "WATCHER_FLURRY_BOSS.name":  "Obserwator Lawiny",
     "WATCHER_FLURRY_BOSS.title":  "Obserwator Lawiny",
     "WATCHER_FLURRY_BOSS.moves.CHARBOSS_PLAY.title":  "Zagraj",
-    "WATCHER_FLURRY_BOSS.flurry":  "Za każdym razem, gdy [gold]Lawina ciosów[/gold] Obserwatora zadaje ci nieblokowane obrażenia, w następnej turze tracisz 1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img].",
-    "WATCHER_FLURRY_BOSS.flurry_dread":  "Za każdym razem, gdy [gold]Lawina ciosów[/gold] Obserwatora zadaje ci nieblokowane obrażenia, w następnej turze tracisz 1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]."
+    "WATCHER_FLURRY_BOSS.flurry":  "Za każdym razem, gdy [gold]Lawina ciosów[/gold] Obserwatora zadaje ci nieblokowane obrażenia, w następnej turze tracisz 1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]. Jej Post nie sprawia, że traci energię na początku swojej tury.",
+    "WATCHER_FLURRY_BOSS.flurry_dread":  "Za każdym razem, gdy [gold]Lawina ciosów[/gold] Obserwatora zadaje ci nieblokowane obrażenia, w następnej turze tracisz 1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]. Jej Post nie sprawia, że traci energię na początku swojej tury."
 }

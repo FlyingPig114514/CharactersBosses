@@ -196,6 +196,8 @@ function CleanLoc([string]$s) {
     if ([string]::IsNullOrEmpty($s)) { return $s }
     # 先按**字面**把精灵字体内联图标换掉（正则容易把它连着的 img 标签一起吞掉）
     $r = $s
+    # ★ 2026-11-23：同 make-markdown.ps1 —— 「数字 + 能量图标」连写时不要重复计一次。
+    $r = [regex]::Replace($r, '(\d+)\s*\[img\]res://[^\[]*energy_icon[^\[]*\[/img\]', '$1 Energy')
     $r = $r.Replace('[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]', '1 Energy')
     $r = $r.Replace('res://images/packed/sprite_fonts/watcher_energy_icon.png', '')
     $r = [regex]::Replace($r, '(1 Energy)+', '1 Energy')     # 图标连写多次 ⇒ 收成一个
