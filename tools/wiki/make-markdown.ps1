@@ -43,6 +43,10 @@ function CleanLoc([string]$s) {
     if ([string]::IsNullOrEmpty($s)) { return $s }
     # 先按**字面**把精灵字体内联图标换掉（正则容易把它连着的 img 标签一起吞掉）
     $r = $s
+    $r = $r.Replace('[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]', '1 点能量')
+    $r = $r.Replace('res://images/packed/sprite_fonts/watcher_energy_icon.png', '')
+    $r = [regex]::Replace($r, '(1 点能量)+', '1 点能量')     # 图标连写多次 ⇒ 收成一个
+    $r = $r.Replace('1点能量', '获得 1 点能量')
     foreach ($tag in @('gold','red','green','blue','purple','orange','yellow')) {
         $r = [regex]::Replace($r, '\[' + $tag + '\](.*?)\[/' + $tag + '\]', '**$1**')
         $r = [regex]::Replace($r, '(?<![\w/])' + $tag + '([^/\s\[\]]{1,60})/' + $tag, '**$1**')
@@ -56,6 +60,8 @@ function CleanLoc([string]$s) {
     $r = [regex]::Replace($r, '\[/?(gold|red|green|blue|purple|orange|yellow|img)\]', '')
     $r = $r.Replace('[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]', '1 点能量')
     $r = $r.Replace('res://images/packed/sprite_fonts/watcher_energy_icon.png', '')
+    $r = [regex]::Replace($r, '(1 点能量)+', '1 点能量')     # 图标连写多次 ⇒ 收成一个
+    $r = $r.Replace('1点能量', '获得 1 点能量')
     return $r
 }
 function MdText([string]$s) {

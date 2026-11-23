@@ -1931,14 +1931,14 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 > Whenever you play a card, the Watcher gains 1 **Mantra**.
 > At the start of the Watcher's turn, she loses 5 **Mantra** (up to all of it).
 > Whenever she gains 10 **Mantra**, she first exits her current stance, gains 2 **Strength**, then enters **Divinity**, and she no longer exits **Divinity** at the start of her turn.
-> **Divinity**: entering this stance grants. While in this stance, your attacks deal triple damage.
+> **Divinity**: entering this stance grants 1 Energy. While in this stance, your attacks deal triple damage.
 
 **Dread mode upgrade**
 
 > Whenever you play a card, the Watcher gains 1 **Mantra**.
 > At the start of the Watcher's turn, she loses 3 **Mantra** (up to all of it).
 > Whenever she gains 10 **Mantra**, she first exits her current stance, gains 3 **Strength**, then enters **Divinity**, and she no longer exits **Divinity** at the start of her turn.
-> **Divinity**: entering this stance grants. While in this stance, your attacks deal triple damage.
+> **Divinity**: entering this stance grants 1 Energy. While in this stance, your attacks deal triple damage.
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
