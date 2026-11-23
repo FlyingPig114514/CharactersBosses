@@ -78,15 +78,16 @@ public static class WatcherFlurryScript
                 Hold(WatcherCards.Defend),
                 Hold(WatcherCards.Miracle, cost: 0)),
 
-            // ── 3 ── 化体为空 / 疾风连击 / 警惕 / 疾风连击 / 打击 / 奇迹（不出）
-            //        （4 费 = 化体1 + 疾风0 + 警惕2 + 疾风0 + 打击1；泪滴吊坠盒让她开局在平静，
+            // ── 3 ── 化体为空 / 疾风连击 / 警惕 / 疾风连击 / 防御 / 奇迹（不出）
+            //        （4 费 = 化体1 + 疾风0 + 警惕2 + 疾风0 + 防御1；泪滴吊坠盒让她开局在平静，
             //          「化体为空」退出平静原版还给 +2，所以这回合实际有富余）
-            Turn(4, "3. 化体为空、疾风连击、警惕、疾风连击、打击、奇迹（不出）",
+            //        ★ 2026-11-23 用户：「第 3 和第 9 回合的那张打击改成防御」。
+            Turn(4, "3. 化体为空、疾风连击、警惕、疾风连击、防御、奇迹（不出）",
                 Play(WatcherCards.EmptyBody),
                 Play(WatcherCards.FlurryOfBlows),
                 Play(WatcherCards.Vigilance),
                 Play(WatcherCards.FlurryOfBlows),
-                Play(WatcherCards.Strike),
+                Play(WatcherCards.Defend),
                 Hold(WatcherCards.Miracle, cost: 0)),
 
             // ── 4 ── 奇迹 / 斋戒 / 心灵堡垒 / 防御（没费）   （2 费 + 奇迹 1 = 3 = 0 + 2 + 1）
@@ -120,13 +121,13 @@ public static class WatcherFlurryScript
                 Hold(WatcherCards.Defend),
                 Hold(WatcherCards.Strike)),
 
-            // ── 9 ── 同第 5 回合                        （3 费）
-            Turn(3, "9. 化体为空、疾风连击、警惕、疾风连击、打击（没费）",
+            // ── 9 ── 同第 3 回合（这张「防御」普通模式没费留手、恐惧模式打出去）   （3 费）
+            Turn(3, "9. 化体为空、疾风连击、警惕、疾风连击、防御（没费）",
                 Play(WatcherCards.EmptyBody),
                 Play(WatcherCards.FlurryOfBlows),
                 Play(WatcherCards.Vigilance),
                 Play(WatcherCards.FlurryOfBlows),
-                Hold(WatcherCards.Strike)),
+                Hold(WatcherCards.Defend)),
         };
 
         return new BossScript
@@ -161,14 +162,15 @@ public static class WatcherFlurryScript
 
         if (turn == 9)
         {
-            // 第 9 回合仍是「化体为空」那一套：恐惧模式多打一张打击
-            // （4 费 = 化体1 + 疾风0 + 警惕2 + 疾风0 + 打击1）；普通模式那张是「打击（没费）」留手。
-            return Turn(4, "9.（恐惧）化体为空、疾风连击、警惕、疾风连击、打击",
+            // 第 9 回合仍是「化体为空」那一套：恐惧模式多打一张**防御**
+            // （4 费 = 化体1 + 疾风0 + 警惕2 + 疾风0 + 防御1）；普通模式那张是「防御（没费）」留手。
+            // ★ 2026-11-23 用户：「第 3 和第 9 回合的那张打击改成防御」。
+            return Turn(4, "9.（恐惧）化体为空、疾风连击、警惕、疾风连击、防御",
                 Play(WatcherCards.EmptyBody),
                 Play(WatcherCards.FlurryOfBlows),
                 Play(WatcherCards.Vigilance),
                 Play(WatcherCards.FlurryOfBlows),
-                Play(WatcherCards.Strike));
+                Play(WatcherCards.Defend));
         }
 
         if (turn == 6)
@@ -238,9 +240,9 @@ public static class WatcherFlurryScript
 
     /// <summary>
     /// 卡组（剧本里出现过的牌，按**同回合最大张数**收）：
-    /// · 疾风连击 2 张 —— 第 5 / 9 回合同回合各打两张；
-    /// · 打击 3 张 —— 第 2 回合两张、第 8 回合两张（含恐惧版两张）；
-    /// · 防御 3 张 —— 第 3 / 6 回合各两张，多备一张防洗牌；
+    /// · 疾风连击 2 张 —— 第 3 / 9 回合同回合各打两张；
+    /// · 打击 2 张 —— 第 2 回合打一张、第 8 回合留一张（v0.2.915 起第 3 / 9 回合那张改成防御了）；
+    /// · 防御 3 张 —— 第 2 / 6 / 8 回合各要两张，多备一张防洗牌；
     /// · 奇迹 2 张 —— 至纯之水战斗开始也会给一张。
     /// ★ v0.2.905（用户 2026-11-23 削弱版）：**去掉「安宁」**（她不再需要主动进平静 ——
     ///   泪滴吊坠盒已经让她每场战斗开局就在平静里）。
@@ -263,7 +265,7 @@ public static class WatcherFlurryScript
         Add(WatcherCards.MentalFortress);
         Add(WatcherCards.Vigilance, 2);
         Add(WatcherCards.Miracle, 2);
-        Add(WatcherCards.Strike, 3);
+        Add(WatcherCards.Strike, 2);
         Add(WatcherCards.Defend, 3);
         return deck;
     }

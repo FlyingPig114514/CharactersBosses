@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.914 / 2026-11-23 (**B 版斋戒扣费也免疫了 + 进阶 9 只升斋戒**）—— 用户 2026-11-23 三条。① 「进阶 9 只升级斋戒，不再升级供奉」⇒ `WATCHER_FLURRY` 的 `AscensionUpgrades` 去掉 `(9, 供奉)`。② 「B 版中恐惧模式下没有免疫 debuff 斋戒（这和 A 版中的能量降低不是同一个 buff，虽然效果一样）」⇒ 两份观者实现的扣费 power **不是同一个类**：A 版 `EnergyDownPower`（扣费在 `AfterEnergyReset`）、B 版 `FastingPower`（扣费在 `AfterPlayerTurnStart` → `LoseEnergy`）。v0.2.905 只压了 A 那条 ⇒ B 版照样扣。现在两条都压，`StripFastingEnergyDown` 兜底也把 `FastingPower` 一起摘。③ 「B 版有的回合斋戒的减费好像被重复计算了」⇒ 同一条修掉（`FastingPower.AfterPlayerTurnStart` 对她的派发整段跳过，不再可能扣两次）。完整历史见 docs/plans/changelog-history.md";
+    public const string Tag = "v0.2.915 / 2026-11-23 (**疾风观：第 3 / 9 回合那张打击改成防御**）—— 用户 2026-11-23：「削弱，第 3 和第 9 回合的那张打击改成防御」。⇒ 第 3 回合 = `化体为空、疾风连击、警惕、疾风连击、防御、奇迹（不出）`（4 费）；第 9 回合同构，普通模式那张「防御」没费留手、恐惧模式打出去（4 费）。卡组里的「打击」跟着从 3 张减到 2 张（只剩第 2 回合打一张、第 8 回合留一张）。v0.2.914 = B 版斋戒扣费免疫 + 进阶 9 只升斋戒。完整历史见 docs/plans/changelog-history.md";
 
     private static bool _logged;
 
