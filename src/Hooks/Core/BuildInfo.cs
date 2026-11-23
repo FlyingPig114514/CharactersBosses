@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.915 / 2026-11-23 (**疾风观：第 3 / 9 回合那张打击改成防御**）—— 用户 2026-11-23：「削弱，第 3 和第 9 回合的那张打击改成防御」。⇒ 第 3 回合 = `化体为空、疾风连击、警惕、疾风连击、防御、奇迹（不出）`（4 费）；第 9 回合同构，普通模式那张「防御」没费留手、恐惧模式打出去（4 费）。卡组里的「打击」跟着从 3 张减到 2 张（只剩第 2 回合打一张、第 8 回合留一张）。v0.2.914 = B 版斋戒扣费免疫 + 进阶 9 只升斋戒。完整历史见 docs/plans/changelog-history.md";
+    public const string Tag = "v0.2.916 / 2026-11-23 (**疾风连击的意图只留攻势**）—— 用户 2026-11-23：「疾风连击的意图中错误的包含了强化，应当只有攻势」。疾风连击是 0 费攻击牌，卡面只有「造成伤害 + 转换姿态时从弃牌堆回手」，但那个「回手」被 `CardBehaviorScan`/`ClassifyPowers` 认成「捞牌 = 强化」⇒ 意图里多一条蓝色上箭头。把它加进 `BossIntentBuilder.NoBuffIntentCards`（两个版本 id：`WATCHER_FLURRY_OF_BLOWS` / `WATCHER-FLURRY_OF_BLOWS`），与「迂回」同款处理 —— 它是纯攻击牌，只留攻势。v0.2.915 = 第 3/9 回合那张打击改防御。完整历史见 docs/plans/changelog-history.md";
 
     private static bool _logged;
 

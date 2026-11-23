@@ -4,6 +4,15 @@
 > 旧条目逐字来自 `git show HEAD:src/Hooks/Core/BuildInfo.cs` 的 Tag 常量（v0.2.871 及其之前，共 236 条）。
 > 最新版本（0.2.889）是当前 Tag，同时在各条 `workshop/changenote.txt` 里也有面向玩家的摘要。
 
+## v0.2.916（2026-11-23）：疾风连击的意图只留攻势
+
+用户：「疾风连击的意图中错误的包含了强化，应当只有攻势」。
+
+疾风连击是 0 费攻击牌，卡面只有「造成伤害 + 每次转换姿态时从弃牌堆回到手牌」，
+但「回手」被 `CardBehaviorScan` / `ClassifyPowers` 识别成「捞牌 = 强化」⇒ 意图里多一条蓝色上箭头。
+把 `WATCHER_FLURRY_OF_BLOWS`（A 版）/ `WATCHER-FLURRY_OF_BLOWS`（B 版）加进
+`BossIntentBuilder.NoBuffIntentCards`，和「迂回」同款处理 —— 纯攻击牌，只留攻势。
+
 ## v0.2.915（2026-11-23）：疾风观第 3 / 9 回合那张打击改成防御
 
 用户：「削弱，第 3 和第 9 回合的那张打击改成防御」。

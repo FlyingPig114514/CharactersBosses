@@ -1832,6 +1832,13 @@ public static class BossIntentBuilder
         //   但 `ClassifyPowers` 把它身上的某个变量认成了增益 ⇒ 多出一条「强化」。
         //   这里点名禁掉；第 4 回合那条「策略」是剧本 `ScriptCard.ForceDebuffIntent` 单独画的。
         "BANSHEES_CRY",
+        // ★ v0.2.916（用户 2026-11-23：「疾风连击的意图中错误的包含了强化，应当只有攻势」）：
+        //   疾风连击（A 版 `WATCHER_FLURRY_OF_BLOWS` / B 版 `WATCHER-FLURRY_OF_BLOWS`）是 0 费攻击，
+        //   卡面只有「造成伤害 + 每次转换姿态时从弃牌堆回手」，但那个「回手」被
+        //   `CardBehaviorScan` / `ClassifyPowers` 认成「捞牌 = 强化」⇒ 多一条蓝色上箭头。
+        //   它是纯攻击牌，点名排除（和迂回同款）。
+        "WATCHER_FLURRY_OF_BLOWS",
+        "WATCHER-FLURRY_OF_BLOWS",
     };
 
     /// <summary>
