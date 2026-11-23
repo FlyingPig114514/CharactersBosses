@@ -7087,3 +7087,4 @@ Chronological action log.
 | 2026-11-23 20:48 | edit | `src/Hooks/Patches/BossFrameTickPatch.cs` | ok | 0 |
 | 2026-11-23 20:49 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
 | 2026-11-23 20:49 | edit | `docs/plans/changelog-history.md` | ok | 0 |
+| 2026-11-23 22:51 | write | `workshop/changenote.txt` | ok | 0 |
