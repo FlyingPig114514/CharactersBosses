@@ -1366,7 +1366,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | 3 | Rocket Punch (0 energy), Defend, Compact | Doubt (unplayable (curse / status)) | — |
 | 4 | Overclock, TURBO, Hologram, Flak Cannon | Defend (no energy), Defend (no energy) | — |
 | 5 | Chill, Zap, Hotfix | — | — |
-| 6 | Gunk Up, Fight Through, Defend | — | **Shuffle.** (大抱抱 ⇒ Soot into 她的 Draw Pile, 并 gives 你也塞 1 cards), Gunk Up, Fight Through, Defend (no energy) |
+| 6 | Gunk Up, Fight Through, Defend | — | **Shuffle.** (Biiig Hug ⇒ Soot into 她的 Draw Pile, 并 gives 你也塞 1 cards), Gunk Up, Fight Through, Defend (no energy) |
 | 7 | Zap, Boost Away, Defend | — | — |
 | 8 | Rocket Punch (0 energy), Defend, Compact | Doubt (unplayable (curse / status)) | — |
 | 9 | Overclock, TURBO, Hologram, Boost Away, Flak Cannon | Defend (no energy) | — |
@@ -1646,7 +1646,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
-| 1 | Spectrum Shiftfree, Pillar of Creation, Glitterstream+ | Supermassive (no energy) | Spectrum Shift (机关盒 prints 的, this turn 0 energy), Pillar of Creation (ascension 8 时 Level Up), Glitterstream +, Supermassive |
+| 1 | Spectrum Shiftfree, Pillar of Creation, Glitterstream+ | Supermassive (no energy) | Spectrum Shift (Vexing Puzzlebox prints 的, this turn 0 energy), Pillar of Creation (ascension 8 时 Level Up), Glitterstream +, Supermassive |
 | 2 | Dramatic Entrance, The Bomb, Crush Under+, Know Thy Place+ | — | — |
 | 3 | Discovery, Pillar of Creationfree, Manifest Authority, Ultimate Strike | Ultimate Defend+ (no energy) | Discovery (prints Pillar of Creation, this turn 0 energy), Pillar of Creation, Manifest Authority (prints Ultimate Strike), Ultimate Strike; Ultimate Defend + no energy |
 | 4 | Dark Shackles, Manifest Authority, Bolas, The Bomb | Defend (no energy) | Dark Shackles, Manifest Authority (prints Bolas), Bolas, The Bomb; Defend no energy |
