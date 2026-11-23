@@ -318,6 +318,18 @@ function Note-En([string]$zh) {
     if ($I18n['notes'].ContainsKey($k)) { return $I18n['notes'][$k] }
 
     $s = $k
+    # ① 卡组备注的三套模板（占待译条目近 1/4，用正则一次覆盖）
+    if ($s -eq '按全部回合统计（剧本既没标洗牌、也没法推算）') {
+        return 'counted over all turns (the script marks no shuffles and none can be estimated)'
+    }
+    $mSh = [regex]::Match($s, '^按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 (\d+) 回合）$')
+    if ($mSh.Success) {
+        return ('counted over the turns before the first shuffle (the script notes: first shuffle on turn ' + $mSh.Groups[1].Value + ')')
+    }
+    $mEs = [regex]::Match($s, '^按首次洗牌之前的回合统计（剧本没标洗牌，按「卡组÷每回合抽牌」推算首次洗牌在第 (\d+) 回合）$')
+    if ($mEs.Success) {
+        return ('counted over the turns before the first shuffle (the script marks no shuffles; estimated from deck size ÷ cards drawn per turn: first shuffle on turn ' + $mEs.Groups[1].Value + ')')
+    }
     foreach ($n in @($Script:NameKeysByLen)) { if ($s.Contains($n)) { $s = $s.Replace($n, ' ' + (N $n) + ' ') } }
     foreach ($ph in @($Script:PhraseKeysByLen)) {
         if ($s.Contains($ph)) { $s = $s.Replace($ph, ' ' + $I18n['phrases'][$ph] + ' ') }
