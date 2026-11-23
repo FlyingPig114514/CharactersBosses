@@ -254,12 +254,12 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 **Special effect**
 
 > Bash
-> Cards in your deck whose name contains «Strike» also increase the Ironclad's goldPerfected Strike/gold damage. Each time you play a card whose name contains «Strike», the Ironclad's goldPerfected Strike/gold loses the bonus of one such card.
+> Cards in your deck whose name contains «Strike» also increase the Ironclad's **Perfected Strike** damage. Each time you play a card whose name contains «Strike», the Ironclad's **Perfected Strike** loses the bonus of one such card.
 
 **Dread mode upgrade**
 
 > Bash
-> Cards in your deck whose name contains Strike also increase the Ironclad goldPerfected Strike/gold and goldBash/gold damage. Each time you play a card whose name contains Strike, both lose the bonus of one such card.
+> Cards in your deck whose name contains Strike also increase the Ironclad **Perfected Strike** and **Bash** damage. Each time you play a card whose name contains Strike, both lose the bonus of one such card.
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
@@ -350,15 +350,15 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 **Special effect**
 
 > Devour Life
-> Whenever the Necrobinder applies a debuff, she gains gold4/gold Block.
-> redWarning: /redgoldSleight of Flesh/gold deals unpowered damage: summons with goldDie for You or Vapi Loyalty/gold will not absorb it for you.
+> Whenever the Necrobinder applies a debuff, she gains **4** Block.
+> **Warning: ****Sleight of Flesh** deals unpowered damage: summons with **Die for You or Vapi Loyalty** will not absorb it for you.
 
 **Dread mode upgrade**
 
 > Devour Life
-> Whenever the Necrobinder applies a debuff, she gains gold6/gold Block.
-> Her goldSleight of Flesh/gold is upgraded: each stack deals gold13/gold instead of gold9/gold.
-> redWarning: /redgoldSleight of Flesh/gold deals unpowered damage from no source: summons with goldDie for You or Vapi Loyalty/gold will not absorb it for you.
+> Whenever the Necrobinder applies a debuff, she gains **6** Block.
+> Her **Sleight of Flesh** is upgraded: each stack deals **13** instead of **9**.
+> **Warning: ****Sleight of Flesh** deals unpowered damage from no source: summons with **Die for You or Vapi Loyalty** will not absorb it for you.
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
@@ -448,16 +448,16 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 **Special effect**
 
 > Orbital Bombardment
-> At the start of combat, all players gain 1 stack of goldSpectrum Shift/gold.
-> The Regent is Stunned on turn 1, plays 1 goldBombardment/gold on turn 2, and is Stunned again after that.
-> After 5 turns in which you played a colorless card, the Regent wakes up — and goldBombardment/gold turns around and starts hitting the Regent himself.
+> At the start of combat, all players gain 1 stack of **Spectrum Shift**.
+> The Regent is Stunned on turn 1, plays 1 **Bombardment** on turn 2, and is Stunned again after that.
+> After 5 turns in which you played a colorless card, the Regent wakes up — and **Bombardment** turns around and starts hitting the Regent himself.
 
 **Dread mode upgrade**
 
 > Orbital Bombardment
-> At the start of combat you gain gold1/gold goldSpectrum Shift/gold.
-> The Regent plays gold1/gold goldBombardment/gold on goldturn 1/gold and is then Stunned.
-> After gold5/gold of your turns in which you played a colorless card, the Regent wakes up and goldBombardment/gold starts hitting the Regent himself.
+> At the start of combat you gain **1** **Spectrum Shift**.
+> The Regent plays **1** **Bombardment** on **turn 1** and is then Stunned.
+> After **5** of your turns in which you played a colorless card, the Regent wakes up and **Bombardment** starts hitting the Regent himself.
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
@@ -538,7 +538,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 > Serpent Form
 > There is no limit to the Silent's hand size.
-> Whenever you or the Silent shuffle, that player shuffles a goldSnakebite/gold into their draw pile.
+> Whenever you or the Silent shuffle, that player shuffles a **Snakebite** into their draw pile.
 
 **Dread mode upgrade**
 
@@ -584,11 +584,11 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 **Special effect**
 
-> Whenever the Watcher triggers goldForesight/gold, you Scry 2.
+> Whenever the Watcher triggers **Foresight**, you Scry 2.
 
 **Dread mode upgrade**
 
-> Whenever the Watcher triggers goldForesight/gold, discard a random card from your draw pile.
+> Whenever the Watcher triggers **Foresight**, discard a random card from your draw pile.
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
@@ -685,7 +685,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 > Rainbow
 > Every 5 orbs the Defect generates, it gains 2 Focus. Its Dark orbs do not trigger their passive.
-> Warning: Glass orbs deal damage from no source; summons with goldDie for You or Vapi Loyalty/gold will not take it for you.
+> Warning: Glass orbs deal damage from no source; summons with **Die for You or Vapi Loyalty** will not take it for you.
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
@@ -734,7 +734,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 **Dread mode upgrade**
 
 > Reap
-> Whenever the Ironclad deals damage, he heals for the goldfull amount of damage dealt/gold, including the part that was blocked.
+> Whenever the Ironclad deals damage, he heals for the **full amount of damage dealt**, including the part that was blocked.
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
@@ -861,12 +861,12 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 **Special effect**
 
 > Call of the Void
-> When the Necrobinder plays goldBanshee's Cry/gold for the first time, all of your cards gain goldEthereal/gold until the Necrobinder dies.
+> When the Necrobinder plays **Banshee's Cry** for the first time, all of your cards gain **Ethereal** until the Necrobinder dies.
 
 **Dread mode upgrade**
 
 > Call of the Void
-> At the start of combat every card of every player gains goldEthereal/gold until the Necrobinder dies (she no longer has to play goldBanshee's Cry/gold first).
+> At the start of combat every card of every player gains **Ethereal** until the Necrobinder dies (she no longer has to play **Banshee's Cry** first).
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
@@ -913,7 +913,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 **Dread mode upgrade**
 
 > Know Thy Place
-> Whenever the Regent loses gold25/gold HP in a single turn, all players lose gold1/gold Strength this turn.
+> Whenever the Regent loses **25** HP in a single turn, all players lose **1** Strength this turn.
 > On Dread he no longer loses Forge from this, and there is no per-turn trigger limit.
 
 | Turn | Plays | Not played | Note |
@@ -961,9 +961,9 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 **Dread mode upgrade**
 
 > Conqueror
-> Whenever the Regent puts a card on top of the draw pile, all players' next Attack deals 50% less damage and they lose gold1/gold Strength this turn.
+> Whenever the Regent puts a card on top of the draw pile, all players' next Attack deals 50% less damage and they lose **1** Strength this turn.
 > WARNING: Mr. Struggles deals sourceless damage, so a summon with Die for You or Vapi Loyalty will not absorb it for you.
-> His goldMonarch's Gaze/gold is upgraded.
+> His **Monarch's Gaze** is upgraded.
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
@@ -1012,10 +1012,10 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 **Dread mode upgrade**
 
 > Call to Arms
-> goldDive Bomb Minion/gold keeps its damage at gold16/gold (the upgraded copy is 16 too).
-> Whenever the Regent plays a Minion card and has fewer than gold1/gold minions, he summons the matching minion instead.
+> **Dive Bomb Minion** keeps its damage at **16** (the upgraded copy is 16 too).
+> Whenever the Regent plays a Minion card and has fewer than **1** minions, he summons the matching minion instead.
 > Whenever the Regent gains Strength from a card, his other allies gain the same amount.
-> So on some turns the Regent always plays a goldMinion Dive Bomb/gold that hits you directly.
+> So on some turns the Regent always plays a **Minion Dive Bomb** that hits you directly.
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
@@ -1105,14 +1105,14 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 > Well-Laid Plans
 > The first time the Silent draws a card costing 3 each turn, she retains it.
-> Her goldMurder/gold only gains damage from drawing cards while it is retained in her hand.
-> Warning: Mr. Struggles deals damage from no source; summons with goldDie for You or Vapi Loyalty/gold will not take it for you.
+> Her **Murder** only gains damage from drawing cards while it is retained in her hand.
+> Warning: Mr. Struggles deals damage from no source; summons with **Die for You or Vapi Loyalty** will not take it for you.
 
 **Dread mode upgrade**
 
 > Well-Laid Pla
 > The Silent retains the first card costing 3 Energy she draws each turn.
-> Her goldMurder/gold now grows in damage with every card she draws, without needing to be retained in hand.
+> Her **Murder** now grows in damage with every card she draws, without needing to be retained in hand.
 > Warning: Mr. Snuggles deals unblockable, sourceless damage; summons with Die For You do not absorb it.  Summons with Vapi Loyalty will not take it for you either.
 
 | Turn | Plays | Not played | Note |
@@ -1156,13 +1156,13 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 **Special effect**
 
-> Whenever you create a card during combat, it is golddowngraded/gold; if it is not a token, it also gains goldExhaust/gold.
-> The Watcher obtained goldArsenal/gold, goldPillar of Creation/gold and goldKnow Thy Place/gold through the Colour Philosopher.
+> Whenever you create a card during combat, it is **downgraded**; if it is not a token, it also gains **Exhaust**.
+> The Watcher obtained **Arsenal**, **Pillar of Creation** and **Know Thy Place** through the Colour Philosopher.
 
 **Dread mode upgrade**
 
-> Whenever you create a card during combat, it is golddowngraded/gold; if it is not a token, it also gains goldExhaust/gold.
-> The Watcher obtained goldArsenal/gold, goldPillar of Creation/gold and goldKnow Thy Place/gold through the Colour Philosopher.
+> Whenever you create a card during combat, it is **downgraded**; if it is not a token, it also gains **Exhaust**.
+> The Watcher obtained **Arsenal**, **Pillar of Creation** and **Know Thy Place** through the Colour Philosopher.
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
@@ -1300,15 +1300,15 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 **Special effect**
 
 > One for All
-> The Defect's goldAll for One/gold only puts 0-cost goldAttacks/gold from its goldDiscard Pile/gold into its goldHand/gold, instead of every 0-cost card.
-> Whenever one of its cards returns from its Discard Pile to its Hand, ALL units gain 1 goldStrength/gold.
+> The Defect's **All for One** only puts 0-cost **Attacks** from its **Discard Pile** into its **Hand**, instead of every 0-cost card.
+> Whenever one of its cards returns from its Discard Pile to its Hand, ALL units gain 1 **Strength**.
 
 **Dread mode upgrade**
 
 > O
-> The Defect goldAll for One/gold only puts 0-cost goldAttacks/gold from its goldDiscard Pile/gold into its goldHand/gold, instead of every 0-cost card.
-> Whenever one of its cards returns from its Discard Pile to its Hand, ALL units gain 1 goldStrength/gold.
-> On turns 4 and 9 it also plays an upgraded goldFeeding Frenzy/gold right after goldAll for One/gold.
+> The Defect **All for One** only puts 0-cost **Attacks** from its **Discard Pile** into its **Hand**, instead of every 0-cost card.
+> Whenever one of its cards returns from its Discard Pile to its Hand, ALL units gain 1 **Strength**.
+> On turns 4 and 9 it also plays an upgraded **Feeding Frenzy** right after **All for One**.
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
@@ -1398,17 +1398,17 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 **Special effect**
 
 > The Fool
-> Its deck holds only 3 goldMythic Form/gold cards, so it fights almost entirely with tarot cards.
-> Whenever you gain goldDoom/gold, if you have goldBlock/gold, that goldBlock/gold is spent to cancel an equal amount of goldDoom/gold first (the goldDoom/gold you already have is unaffected).
-> redWARNING:/red Kill the Fool before turn 12. Otherwise, you are on your own.
+> Its deck holds only 3 **Mythic Form** cards, so it fights almost entirely with tarot cards.
+> Whenever you gain **Doom**, if you have **Block**, that **Block** is spent to cancel an equal amount of **Doom** first (the **Doom** you already have is unaffected).
+> **WARNING:** Kill the Fool before turn 12. Otherwise, you are on your own.
 
 **Dread mode upgrade**
 
 > The Fool
-> Its deck holds only 3 goldMythic Form/gold cards, so it fights almost entirely with tarot cards.
-> Whenever you gain goldDoom/gold, if you have goldBlock/gold, that goldBlock/gold is spent to cancel an equal amount of goldDoom/gold first (the goldDoom/gold you already have is unaffected).
-> On Dread: every card it plays that is not colorless is upgraded, goldThe Magician/gold channels 2 Lightning orbs and 1 Glass orb instead, and goldBundle of Joy/gold and goldThe Hierophant/gold print 1 extra goldProwess/gold.
-> redWARNING:/red Kill the Fool before turn 12. Otherwise, you are on your own.
+> Its deck holds only 3 **Mythic Form** cards, so it fights almost entirely with tarot cards.
+> Whenever you gain **Doom**, if you have **Block**, that **Block** is spent to cancel an equal amount of **Doom** first (the **Doom** you already have is unaffected).
+> On Dread: every card it plays that is not colorless is upgraded, **The Magician** channels 2 Lightning orbs and 1 Glass orb instead, and **Bundle of Joy** and **The Hierophant** print 1 extra **Prowess**.
+> **WARNING:** Kill the Fool before turn 12. Otherwise, you are on your own.
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
@@ -1507,9 +1507,9 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 **Dread mode upgrade**
 
 > Primal Force
-> When the Ironclad plays goldGiant Rock/gold, he gains gold1/gold Strength and gold3/gold Plating.
-> If goldGiant Rock/gold deals unblocked damage to you, you gain gold1/gold Weak.
-> His goldEnthralled/gold costs gold1/gold less, so on turns 1 and 7 he plays one more goldGiant Rock+/gold.
+> When the Ironclad plays **Giant Rock**, he gains **1** Strength and **3** Plating.
+> If **Giant Rock** deals unblocked damage to you, you gain **1** Weak.
+> His **Enthralled** costs **1** less, so on turns 1 and 7 he plays one more **Giant Rock+**.
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
@@ -1549,12 +1549,12 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 **Special effect**
 
 > Borrowed Time
-> Whenever you spend 10 imgres://images/packed/sprite_fonts/necrobinder_energy_icon.png/img, your cards cost 1 more imgres://images/packed/sprite_fonts/necrobinder_energy_icon.png/img this turn, and the Necrobinder gains 1 imgres://images/packed/sprite_fonts/necrobinder_energy_icon.png/img.
+> Whenever you spend 10, your cards cost 1 more this turn, and the Necrobinder gains 1.
 
 **Dread mode upgrade**
 
 > Borrowed Time
-> Whenever you spend 6 imgres://images/packed/sprite_fonts/necrobinder_energy_icon.png/img, your cards cost 1 more imgres://images/packed/sprite_fonts/necrobinder_energy_icon.png/img this turn, and the Necrobinder gains 1 imgres://images/packed/sprite_fonts/necrobinder_energy_icon.png/img.
+> Whenever you spend 6, your cards cost 1 more this turn, and the Necrobinder gains 1.
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
@@ -1642,7 +1642,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 > Resonance
 > Whenever a player generates a card in combat, the Regent's Pillar of Creation triggers as well.
 > WARNING: The Bomb deals sourceless damage - a summon with "Die for You or Vapi Loyalty" will not absorb it for you.
-> On Dread the cards you generate also increase his goldSupermassive/gold damage.
+> On Dread the cards you generate also increase his **Supermassive** damage.
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
@@ -1728,14 +1728,14 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 **Special effect**
 
 > Guidance
-> Whenever the Regent plays goldDecisions, Decisions/gold, *you* choose which card it repeats.
+> Whenever the Regent plays **Decisions, Decisions**, *you* choose which card it repeats.
 > In multiplayer the locked-on player chooses, and he only plays the rest of his cards afterwards.
 
 **Dread mode upgrade**
 
 > Guidance
-> Whenever the Regent plays goldDecisions, Decisions/gold, *you* choose the card it repeats.
-> After your first choice he plays goldDecisions, Decisions/gold again without drawing, letting you pick a second card from the remaining skills, which is also repeated.
+> Whenever the Regent plays **Decisions, Decisions**, *you* choose the card it repeats.
+> After your first choice he plays **Decisions, Decisions** again without drawing, letting you pick a second card from the remaining skills, which is also repeated.
 > In multiplayer the player he has locked on chooses, and he only continues after that choice is made.
 
 | Turn | Plays | Not played | Note |
@@ -1785,7 +1785,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 **Dread mode upgrade**
 
 > Sleeve Trick
-> Each turn, the first time you play a card costing gold2/gold or more, add gold4/gold Shivs to the Silent's hand.
+> Each turn, the first time you play a card costing **2** or more, add **4** Shivs to the Silent's hand.
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
@@ -1821,7 +1821,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Team debuff power | Average |
 | Durability | Very high |
 
-- **Deck** (26 cards): Clarity Extract, Radiant Tincture, Dexterity Potion / Leg Sweep, Survivor, Piercing Wail, Precise Cut, Defend ×2, Shackling Potion, Explosive Potion / Nightmare, Alchemize+, Neutralize, Serpent Form, Alchemize+（Soul） ×3, Footwork, Burst, Blur, Block Potion, Fysh Oil, Entropic Brew / Anticipate, Duplicator, Toric Toughness ×2, Fisticuffs, Deflect
+- **Deck** (26 cards): Clarity Extract, Radiant Tincture, Dexterity Potion / Leg Sweep, Survivor, Piercing Wail, Precise Cut, Defend ×2, Shackling Potion, Explosive Ampoule / Nightmare, Alchemize+, Neutralize, Serpent Form, Alchemize+（Soul） ×3, Footwork, Burst, Blur, Block Potion, Fysh Oil, Entropic Brew / Anticipate, Duplicator, Toric Toughness ×2, Fisticuffs, Deflect
 - **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 5 回合）
 - **Relics**: Ring of the Snake, Neow's Blessing, Reptile Trinket, Alchemical Coffer, Potion Belt, White Beast Statue, Delicate Frond, Paper Krane, Lantern, Chandelier
 - **Ascension / Dread changes**: Ascension 8: Neutralize; Ascension 9: Precise Cut; Ascension 9: Fisticuffs; Dread upgrade Serpent Form
@@ -1840,18 +1840,18 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 > The Silent keeps her starting potion slots and uses potions in combat.
 > Whenever she would lose HP while she has Block, Block equal to that amount is consumed instead.
 > Triggering Fairy in a Bottle removes all her debuffs.
-> Her goldSerpent Form/gold is upgraded (it deals more damage per trigger).
+> Her **Serpent Form** is upgraded (it deals more damage per trigger).
 > Warning: Explosive Potion and Serpent Form deal sourceless damage; summons with Die For You do not absorb it.  Summons with Vapi Loyalty will not take it for you either.
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
 | 1 | Clarity Extract, Radiant Tincture, Dexterity Potion / Leg Sweep, Survivor, Piercing Wail, Precise Cut | Defend (no energy) | — |
-| 2 | Shackling Potion, Explosive Potion / Nightmare, Alchemize+, Neutralize | Defend (no energy) | 镣铐药水、爆炸药水｜夜魇（复制炼药）、炼制药水+（灵魂之力）→ 喝瓶中船、中和、防御（没费） |
+| 2 | Shackling Potion, Explosive Ampoule / Nightmare, Alchemize+, Neutralize | Defend (no energy) | 镣铐药水、爆炸药水｜夜魇（复制炼药）、炼制药水+（灵魂之力）→ 喝瓶中船、中和、防御（没费） |
 | 3 | Serpent Form | Alchemize+ (no energy), Alchemize+ (no energy), Alchemize+ (no energy), Footwork (no energy), Burst (no energy), Blur (no energy) | 瓶中船、罐装幽灵｜炼制药水+×3（格挡/复制/异鱼之油）、灵动步法、爆发、残影 |
 | 4 | Block Potion, Fysh Oil, Entropic Brew / Anticipate, Duplicator, Toric Toughness ×2, Fisticuffs, Deflect | — | 格挡药水、异鱼之油、混沌药水｜预判、复制药水、坚韧之环×2、拳斗、偏折 |
 | 5 | Radiant Tincture, Dexterity Potion / Alchemize+, Leg Sweep, Precise Cut, Survivor | — | 洗牌。明晰提取物、明耀酊剂、敏捷药水｜炼制药水+（炼格挡药水）、扫腿、精确切击、生存者 |
 | 6 | Alchemize+, Alchemize+, Defend | Decay (unplayable (curse / status)) | 镣铐药水｜炼制药水+（瓶中船）、炼制药水+（异鱼之油）、防御、腐朽 |
-| 7 | Ship in a Bottle, Ghost in a Jar, Explosive Potion / Neutralize, Alchemize+, Burst, Blur | — | 瓶中船、罐装幽灵、爆炸药水｜中和、炼制药水+（复制药水）、爆发、残影 |
+| 7 | Ship in a Bottle, Ghost in a Jar, Explosive Ampoule / Neutralize, Alchemize+, Burst, Blur | — | 瓶中船、罐装幽灵、爆炸药水｜中和、炼制药水+（复制药水）、爆发、残影 |
 | 8 | Block Potion, Fysh Oil, Entropic Brew, （二阶段：Chaos补出的Liquid Bronze → 她获得 3 层Thorns） / Anticipate, Duplicator, Toric Toughness ×2, Fisticuffs, Deflect | — | 格挡药水、异鱼之油、混沌药水、（二阶段：混沌补出的流动铜液 → 她获得 3 层荆棘）｜预判、复制药水、坚韧之环×2、拳斗、偏折 |
 
 <a id="SILENT_GRAND_FINALE"></a>
@@ -1880,16 +1880,16 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 **Special effect**
 
 > Suppression
-> The Silent first plays goldGrand Finale/gold on turn 9.
-> Whenever the Silent plays goldGrand Finale/gold, put a goldVoid/gold on top of every player's draw pile.
+> The Silent first plays **Grand Finale** on turn 9.
+> Whenever the Silent plays **Grand Finale**, put a **Void** on top of every player's draw pile.
 
 **Dread mode upgrade**
 
 > Suppression
-> The Silent first plays goldGrand Finale/gold on turn 9.
-> Whenever the Silent plays goldGrand Finale/gold, put a goldVoid/gold on top of every player's draw pile.
-> Whenever the Silent plays goldGrand Finale/gold, also give every player gold1/gold goldRinging/gold: they can only play 1 card next turn.
-> On Dread her turn 6 goldPiercing Wail/gold is replaced with goldPrecise Cut/gold+.
+> The Silent first plays **Grand Finale** on turn 9.
+> Whenever the Silent plays **Grand Finale**, put a **Void** on top of every player's draw pile.
+> Whenever the Silent plays **Grand Finale**, also give every player **1** **Ringing**: they can only play 1 card next turn.
+> On Dread her turn 6 **Piercing Wail** is replaced with **Precise Cut**+.
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
@@ -1928,17 +1928,17 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 **Special effect**
 
-> Whenever you play a card, the Watcher gains 1 goldMantra/gold.
-> At the start of the Watcher's turn, she loses 5 goldMantra/gold (up to all of it).
-> Whenever she gains 10 goldMantra/gold, she first exits her current stance, gains 2 goldStrength/gold, then enters goldDivinity/gold, and she no longer exits goldDivinity/gold at the start of her turn.
-> goldDivinity/gold: entering this stance grants imgres://images/packed/sprite_fonts/watcher_energy_icon.png/imgimgres://images/packed/sprite_fonts/watcher_energy_icon.png/imgimgres://images/packed/sprite_fonts/watcher_energy_icon.png/img. While in this stance, your attacks deal triple damage.
+> Whenever you play a card, the Watcher gains 1 **Mantra**.
+> At the start of the Watcher's turn, she loses 5 **Mantra** (up to all of it).
+> Whenever she gains 10 **Mantra**, she first exits her current stance, gains 2 **Strength**, then enters **Divinity**, and she no longer exits **Divinity** at the start of her turn.
+> **Divinity**: entering this stance grants. While in this stance, your attacks deal triple damage.
 
 **Dread mode upgrade**
 
-> Whenever you play a card, the Watcher gains 1 goldMantra/gold.
-> At the start of the Watcher's turn, she loses 3 goldMantra/gold (up to all of it).
-> Whenever she gains 10 goldMantra/gold, she first exits her current stance, gains 3 goldStrength/gold, then enters goldDivinity/gold, and she no longer exits goldDivinity/gold at the start of her turn.
-> goldDivinity/gold: entering this stance grants imgres://images/packed/sprite_fonts/watcher_energy_icon.png/imgimgres://images/packed/sprite_fonts/watcher_energy_icon.png/imgimgres://images/packed/sprite_fonts/watcher_energy_icon.png/img. While in this stance, your attacks deal triple damage.
+> Whenever you play a card, the Watcher gains 1 **Mantra**.
+> At the start of the Watcher's turn, she loses 3 **Mantra** (up to all of it).
+> Whenever she gains 10 **Mantra**, she first exits her current stance, gains 3 **Strength**, then enters **Divinity**, and she no longer exits **Divinity** at the start of her turn.
+> **Divinity**: entering this stance grants. While in this stance, your attacks deal triple damage.
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
@@ -2036,7 +2036,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 **Dread mode upgrade**
 
-> Whenever the Watcher plays 12 cards, she forcibly ends her own turn and she and her other allies gain 2 Strength. In addition, goldTime Warp/gold counts your cards: every 12 cards you play, the Watcher forcibly ends your turn.
+> Whenever the Watcher plays 12 cards, she forcibly ends her own turn and she and her other allies gain 2 Strength. In addition, **Time Warp** counts your cards: every 12 cards you play, the Watcher forcibly ends your turn.
 > Warning: the Watcher starts her infinite loop on turn 12.
 
 | Turn | Plays | Not played | Note |

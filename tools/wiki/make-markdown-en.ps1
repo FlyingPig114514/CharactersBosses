@@ -169,8 +169,34 @@ function Get-Hp([string]$defKey, [int]$actNo, [int]$actBaseHp, [int]$firstBaseHp
     return $start + $extra + 120 + 180 * ($actNo - 1) + $variantBonus
 }
 
+# 本地化标记清洗（中英两版共用逻辑）：
+#   [gold]真言[/gold] / gold真言/gold  →  **真言**
+#   [red]…[/red] / red…/red            →  **…**
+#   imgres://xxx.png/img              →  删掉（markdown 里画不出图标）
+#   其余 [tag]…[/tag]                 →  **…**
+# ⚠ 必须在 MdText 去方括号**之前**调用，否则会变成「gold真言/gold」这种残渣。
+function CleanLoc([string]$s) {
+    if ([string]::IsNullOrEmpty($s)) { return $s }
+    # 先按**字面**把精灵字体内联图标换掉（正则容易把它连着的 img 标签一起吞掉）
+    $r = $s
+    foreach ($tag in @('gold','red','green','blue','purple','orange','yellow')) {
+        $r = [regex]::Replace($r, '\[' + $tag + '\](.*?)\[/' + $tag + '\]', '**$1**')
+        $r = [regex]::Replace($r, '(?<![\w/])' + $tag + '([^/\s\[\]]{1,60})/' + $tag, '**$1**')
+    }
+    $r = [regex]::Replace($r, 'img\s*res://[^\s]*(energy_icon|energy)[^\s]*?/img', '1 Energy')
+    $r = [regex]::Replace($r, '\s*\[?img\]?\s*res://[^\s\]]*\s*\[?/?img\]?', '')
+    $r = [regex]::Replace($r, 'img\s*res://[^\s]*(energy_icon|energy)[^\s]*?/img', '1 Energy')
+    $r = [regex]::Replace($r, 'img\s*res://[^\s]*?/img', '')
+    # 内联图标（精灵字体）换成文字：观者能量图标 = 1 点能量
+    $r = [regex]::Replace($r, '\s*img\s*res://[^\s\]]*(energy_icon|energy)[^\s\]]*\.png\s*/img', '1 Energy')
+    $r = [regex]::Replace($r, '\[/?(gold|red|green|blue|purple|orange|yellow|img)\]', '')
+    $r = $r.Replace('[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]', '1 Energy')
+    $r = $r.Replace('res://images/packed/sprite_fonts/watcher_energy_icon.png', '')
+    return $r
+}
 function MdText([string]$s) {
-    if ($null -eq $s) { return '' }
+    if ($null -eq $s) { return '''' }
+    $s = CleanLoc $s
     $s = $s.Replace('|', '\|')
     $s = $s -replace '[\[\]]', ''
     return $s.Trim()
