@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.912 / 2026-11-23 (**电球机地图徽章改成圆盘 + 愚者 Boss 顶栏/历史头像变彩色**）—— 用户 2026-11-23 两处实机反馈。① 「新加的电球机图标是方形的，其它 boss 图标都是圆的」⇒ 把 `images/map/defect_thunder_outline.png`（徽章背后的白底盘）重画成**纯圆盘**（半径 248，和养手骨/魂骨那几颗同一个几何），`defect_thunder.png`（角色剪影）裁进半径 236 的圆里，不再溢出圆盘；原图备份在 `tools/art/map-backup/`。② 「本幕有愚者 boss 时，最上方一栏与历史记录里的愚者头像都是白色的，正常应该是彩色」⇒ `PlaceholderCharacterType` 在 0.113 构建里**就是愚者本人**，而 `TopBarBossIconFallbackPatch.CharacterFor` 把「等于占位符」当成「观者还没解析出来」一律跳过 ⇒ 愚者 Boss 被误判、退回我们那张白色地图徽章。现在只对 `FOOL*` 遭遇放行（`WATCHER_*` 仍然跳过），顶栏/结算/历史都会用愚者自己的彩色头像。完整历史见 docs/plans/changelog-history.md";
+    public const string Tag = "v0.2.913 / 2026-11-23 (**拦回手终于生效 + 至纯之水的奇迹改到战斗开始**）—— 用户 2026-11-23 两条。① 「疾风连击的回手还是没有拦掉」：v0.2.905 那条前缀挂上了（日志有「已压掉 A 版 WatcherCombatHelper.OnStanceChanged」），但**判定写错了** —— `IsFlurryBossShadowPlayer` 比的是 `boss.Def?.Key`，而变体的 `Def` 是 `DefSource.WithVariantPin(key)` 的副本、`Key` 仍是主定义的 `WATCHER_DIVINITY`，变体 key 只在 `PinnedVariantKey` 上 ⇒ 判定永远 false ⇒ 前缀一直放行。现在先比 `PinnedVariantKey/SpawnVariantKey`。② 「至纯之水应该在战斗开始时就给她手里放一张奇迹，而不是第一回合开始时」：A 版（Boninall）原来直接跳过我们自己的注入、指望它自己的 `BeforeCombatStart()`，而那个钩子对影子玩家派发**很晚**（她回合开始之后）。现在两个版本都由我们在「她第 1 回合手牌建好后」注入（= 玩家第 1 回合刚开始），模组自己那次印牌由新的 `InstallPureWaterNoDouble` 压掉，不会变两张。完整历史见 docs/plans/changelog-history.md";
 
     private static bool _logged;
 

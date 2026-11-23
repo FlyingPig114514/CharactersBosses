@@ -1,7 +1,7 @@
 {
     "id": "CharacterBosses",
     "name": "玩家角色Boss (Characters Bosses)",
-    "version": "0.2.912",
+    "version": "0.2.913",
     "author": "飞猪",
     "description": "本模组灵感来源于杀戮尖塔1代的模组崩坠。启用本模组后，你每一幕的Boss战都会被替换为由原版玩家角色扮演的Boss（可在设置中调整）。他们拥有自己的遗物、卡组，会使用自己职业的卡牌。与玩家不完全相同的是，他们的出牌受到一定程度的限制，但最大生命值更多并且每个都有独特的特殊效果。Replaces each act boss with a vanilla playable character that fights with its own deck, relics and scripted plays.",
     "pck_name": "CharacterBosses",

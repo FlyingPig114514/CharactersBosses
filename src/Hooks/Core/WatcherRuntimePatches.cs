@@ -52,6 +52,7 @@ internal static class WatcherRuntimePatches
             any |= InstallStanceDamageFallback();
             any |= InstallFastingNoEnergyDown();
             any |= InstallFlurryNoReturn();
+            any |= InstallPureWaterNoDouble();
             if (any) _tried = true;      // 都装上了才不再重试
         }
         catch (Exception e) { Logger.Log("[CharBoss] 观者运行期补丁安装失败: " + e.Message); }
@@ -156,6 +157,13 @@ internal static class WatcherRuntimePatches
             {
                 if (c?.Monster is not Monsters.CharBossMonster boss) continue;
                 if (!ReferenceEquals(boss.Shadow, player)) continue;
+                // ★ v0.2.913（用户 2026-11-23：「疾风连击的回手还是没有拦掉」）：
+                //   这里以前比的是 `boss.Def?.Key` —— 而**变体**的 `Def` 是
+                //   `DefSource.WithVariantPin(key)` 出来的副本，`Key` 仍是主定义的
+                //   `WATCHER_DIVINITY`，变体的 key 只写在 `PinnedVariantKey` 上
+                //   ⇒ 这个判定永远 false ⇒ 前缀一直放行 ⇒ 回手从来没被拦掉。
+                string variant = boss.PinnedVariantKey ?? boss.SpawnVariantKey ?? string.Empty;
+                if (string.Equals(variant, "WATCHER_FLURRY", StringComparison.Ordinal)) return true;
                 string key = string.Empty;
                 try { key = boss.Def?.Key ?? string.Empty; } catch { key = string.Empty; }
                 return string.Equals(key, "WATCHER_FLURRY", StringComparison.Ordinal);
@@ -267,6 +275,75 @@ internal static class WatcherRuntimePatches
         }
         catch (Exception e) { Logger.Log("[CharBoss] 斋戒兜底失败: " + e.Message); }
     }
+
+    // ── ⑦ 至纯之水：改由我们自己在她第 1 回合的手牌建好之后补「奇迹」（用户 2026-11-23）──────
+    /// <summary>
+    /// 用户原话（2026-11-23）：「她的至纯之水应该在**战斗开始**时就给她手里放一张奇迹，
+    /// 而不是她第一回合开始时才放」。
+    ///
+    /// 为什么以前是「她第一回合开始时」才放：A 版（Boninall）的 `PureWater.BeforeCombatStart()`
+    /// 给持有者印一张「奇迹」，而那个钩子对我们的影子玩家派发得**很晚**（在她自己回合开始之后），
+    /// 于是玩家在自己的第 1 回合看到的她的手牌里没有奇迹。
+    /// 我们自己那条注入（`BossHookBridge` → `WatcherCards.EnsurePureWaterMiracle`）当时
+    /// **只对 B 版**启用（A 版「原版自己会印」），所以 A 版就走了那条晚路径。
+    ///
+    /// 现在：① 我们自己**两个版本都注入**（在她第 1 回合手牌建好之后 —— 那正是玩家第 1 回合
+    /// 刚开始的时刻，手牌栏立刻就能看到 4 张）；② 这里把模组自己那次印牌**压掉**，避免变两张。
+    /// 只对她（我们的影子玩家）生效，真人玩家拿至纯之水一点不变。
+    /// </summary>
+    private static bool InstallPureWaterNoDouble()
+    {
+        var type = WatcherCards.PureWater;
+        if (type == null)
+        {
+            Logger.Log("[CharBoss] 至纯之水去重：当前观者实现取不到 PureWater ⇒ 跳过");
+            return true;
+        }
+
+        bool ok = false;
+        foreach (var name in new[] { "BeforeCombatStart", "BeforeHandDraw" })
+        {
+            try
+            {
+                var method = type.GetMethod(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                if (method == null) continue;
+                // 只补返回 Task 的那条（void 的挂不上 `ref Task __result`）
+                if (method.ReturnType != typeof(Task)) continue;
+
+                var prefix = new HarmonyMethod(typeof(WatcherRuntimePatches)
+                    .GetMethod(nameof(PureWaterNoDoublePrefix), BindingFlags.Static | BindingFlags.NonPublic)!);
+                new Harmony("CharacterBosses.watcher.purewater." + name).Patch(method, prefix: prefix);
+                Logger.Log($"[CharBoss] 至纯之水去重：已压掉 {type.Name}.{name}（她的奇迹改由我们注入）");
+                ok = true;
+            }
+            catch (Exception e) { Logger.Log($"[CharBoss] 至纯之水去重：{name} 挂载失败: " + e.Message); }
+        }
+
+        if (!ok) Logger.Log("[CharBoss] 至纯之水去重：没找到可压的印牌钩子（可能改了名）");
+        return true;
+    }
+
+    private static bool PureWaterNoDoublePrefix(object __instance, ref Task __result)
+    {
+        try
+        {
+            var relic = __instance as RelicModel;
+            Player? owner = null;
+            try { owner = relic?.Owner; } catch { owner = null; }
+            if (owner == null || !IsOurBossShadowPlayer(owner)) return true;   // 真人玩家：走原版
+
+            __result = Task.CompletedTask;
+            if (!_pureWaterSuppressedOnce)
+            {
+                _pureWaterSuppressedOnce = true;
+                Logger.Log("[CharBoss] 至纯之水：压掉模组自己那次印牌（奇迹由我们在她第 1 回合手牌建好后注入）");
+            }
+            return false;
+        }
+        catch { return true; }
+    }
+
+    private static bool _pureWaterSuppressedOnce;
 
     private static int _logs6;
 

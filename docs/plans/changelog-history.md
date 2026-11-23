@@ -4,6 +4,26 @@
 > 旧条目逐字来自 `git show HEAD:src/Hooks/Core/BuildInfo.cs` 的 Tag 常量（v0.2.871 及其之前，共 236 条）。
 > 最新版本（0.2.889）是当前 Tag，同时在各条 `workshop/changenote.txt` 里也有面向玩家的摘要。
 
+## v0.2.913（2026-11-23）：拦回手终于生效 + 至纯之水的奇迹改到战斗开始
+
+用户两条：
+
+1. **「疾风连击的回手还是没有拦掉」**
+   v0.2.905 那条前缀其实**挂上了**（日志：`疾风连击不回手：已压掉 A 版 WatcherCombatHelper.OnStanceChanged（只对她）`），
+   坏在**判定**：`IsFlurryBossShadowPlayer` 比的是 `boss.Def?.Key`，而**变体**的 `Def` 是
+   `DefSource.WithVariantPin(key)` 出来的副本 —— `Key` 仍是主定义的 `WATCHER_DIVINITY`，
+   变体的 key 只写在 `PinnedVariantKey`（`SpawnVariantKey`）上 ⇒ 判定永远 false ⇒ 前缀一直放行。
+   现在先比 `PinnedVariantKey ?? SpawnVariantKey`，再退回 `Def.Key`。
+
+2. **「她的至纯之水应该在战斗开始时就给她手里放一张奇迹，而不是她第一回合开始时才放」**
+   `WatcherCards.EnsurePureWaterMiracle` 以前对 **A 版（Boninall）直接 return**，
+   指望模组自己的 `PureWater.BeforeCombatStart()` —— 而那个钩子对我们的影子玩家派发得**很晚**
+   （在她自己回合开始之后），于是玩家第 1 回合看到的手牌里没有奇迹。
+   现在：① **两个版本都由我们自己注入**（时机不变：她第 1 回合手牌建好之后 = 玩家第 1 回合刚开始，
+   手牌栏立刻能看到 4 张）；② 新增 `WatcherRuntimePatches.InstallPureWaterNoDouble`，
+   把模组自己的 `BeforeCombatStart` / `BeforeHandDraw` 印牌对她压掉 ⇒ 不会变两张。
+   真人玩家的至纯之水一点不变。
+
 ## v0.2.912（2026-11-23）：电球机地图徽章改圆 + 愚者 Boss 头像变彩色
 
 用户实机反馈两条：

@@ -488,12 +488,13 @@ internal static class WatcherCards
             catch { has = false; }
             if (!has) return;
 
-            // ② A 版原版自己会印 ⇒ 一个字都不动
-            if (Current != Provider.Lamali)
-            {
-                Logger.Log("[CharBoss] 至纯之水：Boninall 版走 `BeforeCombatStart`（无 player 参数）⇒ 原版自己会印「奇迹」，不重复补");
-                return;
-            }
+            // ② ★ v0.2.913（用户 2026-11-23：「她的至纯之水应该在**战斗开始**时就给她手里放一张奇迹，
+            //   而不是她第一回合开始时才放」）：**两个版本都由我们自己补**。
+            //   以前 A 版（Boninall）这里直接 return，指望它自己的 `BeforeCombatStart()` 印牌 ——
+            //   而那个钩子对我们的影子玩家派发得**很晚**（在她自己回合开始之后），
+            //   于是玩家在自己第 1 回合看到的她的手牌里没有奇迹。
+            //   现在模组那次印牌由 `WatcherRuntimePatches.InstallPureWaterNoDouble` 压掉，
+            //   统一走下面这条注入（时机 = 她第 1 回合手牌建好之后 = 玩家第 1 回合刚开始）。
 
             var pcs = shadow.PlayerCombatState;
             if (pcs == null) return;
@@ -513,33 +514,32 @@ internal static class WatcherCards
             catch { existing = 0; }
             if (existing > 0)
             {
-                Logger.Log($"[CharBoss] 至纯之水（lamali 版）：她手里已经有 {existing} 张「奇迹」⇒ 不重复补");
+                Logger.Log($"[CharBoss] 至纯之水：她手里已经有 {existing} 张「奇迹」⇒ 不重复补");
                 return;
             }
 
-            // ④ 造一张「奇迹」放进她手牌（和 A 版同一张牌：`CreateCard` 复制原型再绑 Owner）
+            // ④ 造一张「奇迹」放进她手牌（和原版同一张牌：`CreateCard` 复制原型再绑 Owner）
             var miracleType = Miracle;
             if (miracleType == null)
             {
-                Logger.Log("[CharBoss] 至纯之水（lamali 版）：取不到「奇迹」这张牌 ⇒ 无法补");
+                Logger.Log("[CharBoss] 至纯之水：取不到「奇迹」这张牌 ⇒ 无法补");
                 return;
             }
             var canonical = ModelDb.GetById<CardModel>(ModelDb.GetId(miracleType));
             if (canonical == null)
             {
-                Logger.Log("[CharBoss] 至纯之水（lamali 版）：「奇迹」原型取不到 ⇒ 无法补");
+                Logger.Log("[CharBoss] 至纯之水：「奇迹」原型取不到 ⇒ 无法补");
                 return;
             }
             var card = combat.CreateCard(canonical, shadow);
             if (card == null)
             {
-                Logger.Log("[CharBoss] 至纯之水（lamali 版）：造牌失败 ⇒ 无法补");
+                Logger.Log("[CharBoss] 至纯之水：造牌失败 ⇒ 无法补");
                 return;
             }
             pcs.Hand.AddInternal(card, -1, true);
-            Logger.Log("[CharBoss] 至纯之水（lamali 版钩子是 `BeforeHandDraw`，只在真人玩家回合派发；" +
-                       "敌方侧的影子玩家永远收不到）⇒ 战斗开始自己补 1 张「奇迹」到她手里，与 Boninall 版一致" +
-                       "（剧本没写这张牌 ⇒ 她不会打它，能量账不变）");
+            Logger.Log($"[CharBoss] 至纯之水（{ProviderName}）：她第 1 回合的手牌建好之后补 1 张「奇迹」" +
+                       "（观众第 1 回合就能看到；剧本没写这张牌 ⇒ 她不会打它，能量账不变）");
         }
         catch (Exception e)
         {
