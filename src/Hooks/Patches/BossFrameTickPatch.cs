@@ -211,6 +211,8 @@ public static class BossFrameTick
         CharacterBosses.UI.BossUiSession.EnsureFresh();
         // 场景树导出器（按 F9 导出，幂等挂载；用户 2026-11-11 要「能看各种节点」）
         try { Core.SceneTreeDumper.Ensure(); } catch { /* 忽略 */ }
+        // 最近日志导出器（按 F8，幂等挂载；v0.2.900 玩家报 bug 用：不用再发整份 mod_log）
+        try { Core.RecentLogDumper.Ensure(); } catch { /* 忽略 */ }
         try { TickInner(source); }
         finally
         {

@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.899 / 2026-11-23 (**崩溃面包屑不再被「未观察的任务异常」吃光额度**）—— 玩家的 `characterbosses_trace.txt` 共 28 个会话，逐段统计发现：两次会话（pid=17308 19:31→20:20、pid=74620 20:58→01:53）分别灌进 **391 / 161 条**「未观察的任务异常」，而那次电球机崩溃的会话（pid=64348）**一条面包屑都没有**。两个毛病：① 旧写法把 `AggregateException` 本体丢给 Describe，它的 StackTrace 基本是空的 ⇒ 391 行全是同一句，看不到是谁抛的；② 它吃光 `_writes` 的 400 行总额度 ⇒ 同进程里真出事时面包屑被丢掉。现在拆开 AggregateException 取**内层**异常（那才是真正抛出的帧）、按类型+首帧去重、最多 20 行，把额度留给真正的崩溃。顺带核对：那份 trace 里其余启动期异常都不是我们的（`AfterModifyingCardPlayResultLocation call site not found` = ChampBeta 的 transpiler、`Patching exception … <OnPlayWrapper>d__359::MoveNext` = 别人的补丁、`Version terminated in an invalid place` = 原版 SemanticVersion）。完整历史见 docs/plans/changelog-history.md";
+    public const string Tag = "v0.2.900 / 2026-11-23 (**按 F8 一键导出「最近 3000 行日志」**）—— 用户 2026-11-23 问「报 bug 模板里为什么没有 mod_log」。原因是整份 mod_log 有两个硬伤：一局能写 20 万行 / 几十 MB（玩家的累计到 96 MB），且崩溃时后台缓冲的尾巴会丢。但非崩溃类问题（数值/意图/不同步）恰恰只能靠它，所以正确做法是「发得小」而不是不发：`SafeLogPatch` 现在额外维护最近 3000 行的环形缓冲，按 **F8**（新增 `Core/RecentLogDumper`）导出到 `%APPDATA%\\SlayTheSpire2\\logs\\characterbosses_recent.txt` —— 几十 KB、WriteThrough 落盘、开头带构建串与导出时间、正文已脱敏。与 F9（场景树）同一套挂载方式。完整历史见 docs/plans/changelog-history.md";
 
     private static bool _logged;
 

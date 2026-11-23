@@ -42,6 +42,19 @@ public static class SafeLogPatch
     private static readonly List<string> Pending = new();
     private const int MaxPendingLines = 20000;      // 兜底上限，写盘长期失败时也不会吃爆内存
 
+    // ── 「最近 N 行」环形缓冲（v0.2.900） ────────────────────────────────
+    // 玩家报 bug 时按 **F8** 就把这 3000 行导出成 characterbosses_recent.txt（几十 KB），
+    // 不用再让人发几十上百 MB 的整份 mod_log（玩家 2026-11-23 问「模板里为什么没有 mod_log」）。
+    private const int RecentLimit = 3000;
+    private static readonly List<string> Recent = new();
+
+    /// <summary>取「最近若干行」的快照（供 <c>RecentLogDumper</c> 一键导出）。</summary>
+    internal static string[] SnapshotRecent()
+    {
+        try { lock (Gate) return Recent.ToArray(); }
+        catch { return Array.Empty<string>(); }
+    }
+
     // ── 后台写手（唯一碰文件句柄的线程） ──────────────────────────────────
     private static readonly AutoResetEvent Wake = new(false);
     private static Thread? _worker;
@@ -93,6 +106,8 @@ public static class SafeLogPatch
                 Pending.Add($"[{DateTime.Now:HH:mm:ss}] [CharBoss] ⚠ 日志缓冲溢出，已丢弃最早 {MaxPendingLines / 4} 行{Environment.NewLine}");
             }
             Pending.Add(line);
+            Recent.Add(line);
+            if (Recent.Count > RecentLimit) Recent.RemoveRange(0, Recent.Count - RecentLimit);
         }
 
         EnsureWorker();

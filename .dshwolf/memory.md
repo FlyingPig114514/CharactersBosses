@@ -6862,3 +6862,9 @@ Chronological action log.
 | 2026-11-22 23:14 | edit | `src/Hooks/Core/CrashTrace.cs` | ok | 0 |
 | 2026-11-22 23:14 | edit | `src/Hooks/Core/CrashTrace.cs` | ok | 0 |
 | 2026-11-22 23:28 | write | `workshop/changenote.txt` | ok | 0 |
+| 2026-11-23 09:52 | write | `docs/qq-group-announcement.md` | ok | 0 |
+| 2026-11-23 09:59 | edit | `src/Hooks/Patches/SafeLogPatch.cs` | ok | 0 |
+| 2026-11-23 09:59 | edit | `src/Hooks/Patches/SafeLogPatch.cs` | ok | 0 |
+| 2026-11-23 09:59 | write | `src/Hooks/Core/RecentLogDumper.cs` | ok | 0 |
+| 2026-11-23 09:59 | edit | `src/Hooks/Patches/BossFrameTickPatch.cs` | ok | 0 |
+| 2026-11-23 10:02 | edit | `src/Hooks/Core/RecentLogDumper.cs` | ok | 0 |
