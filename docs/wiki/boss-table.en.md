@@ -173,7 +173,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | 3 | Tempest | Strike (no energy), Strike (no energy) | — |
 | 4 | Capacitor, Capacitor | Defend (no energy) | — |
 | 5 | Hotfix+, Hologram, Zap | Defend (no energy) | — |
-| 6 | Double Energy+, Signal Boost, Buffer | — | Double Energy +, Signal Boost, Buffer (Signal Boost 会自己 Duplication 一 times) |
+| 6 | Double Energy+, Signal Boost, Buffer | — | Double Energy+, Amplify, Buffer (Amplify copies itself once) |
 | 7 | Focused Strike, Zap | Defend (no energy) | — |
 | 8 | Hotfix+, Defend, Defend | — | — |
 | 9 | Charge Battery, Sweeping Beam | Guilty (unplayable (curse / status)), Strike (no energy) | — |
@@ -221,7 +221,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | 1 | Anger, Strike, Strike | — | — |
 | 2 | Breakthrough, True Grit | Strike (burned) | — |
 | 3 | Aggression, Brand | Strike (burned) | — |
-| 4 | Brand, Anger+, Strike | Strike (burned) | Shuffle.. Brand, Anger + (Shuffle. 前 Aggression retrieved 的), Strike, Strike (burned) |
+| 4 | Brand, Anger+, Strike | Strike (burned) | Shuffle. Brand, Anger+ (retrieved by Aggression before the shuffle), Strike, Strike (burned) |
 | 5 | Anger+, True Grit, Breakthrough | Anger (burned) | — |
 | 6 | Anger+, True Grit, Anger+ | Strike (burned) | Shuffle.. Anger + (retrieved), True Grit, Anger +, Strike (burned) |
 | 7 | Brand, Anger+, Breakthrough | Anger+ (burned) | — |
@@ -263,7 +263,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
-| 1 | Strike, Strike | Perfected Strike (no energy) | 1. Strike, Strike, Perfected Strike (Enchantment 皇室认证, not played (no energy)) |
+| 1 | Strike, Strike | Perfected Strike (no energy) | 1. Strike, Strike, Perfected Strike (enchanted Royally Approved, not played — no energy) |
 | 2 | Stone Armor, Defend | Bash (no energy), Perfected Strike (no energy) | — |
 | 3 | Perfected Strike | Defend (no energy), Whirlwind (intent only) | — |
 | 4 | Setup Strike, Ashen Strike | Defend (no energy) | — |
@@ -312,15 +312,15 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 |:---:|---|---|---|
 | 1 | Sow, Defend | Defend (no energy) | — |
 | 2 | Deathbringer | Strike (no energy), Defend (no energy) | Deathbringer (21 Doom + 1 Weak); Strike, Defend both have no energy |
-| 3 | Scourge, Death's Door | Defend (no energy) | Sparkling Rouge triggers (+1 Strength/+1 Dexterity); Scourge (13 Doom, draw 1 cards Strike), Death's Door; Defend and draw 到的 Strike no energy |
-| 4 | Shroud, Blight Strike | Strike (no energy) | Shroud (成衣后每 times gives Doom 得 3 block), Blight Strike; Strike no energy |
-| 5 | Drain Power, No Escape | Strike (no energy) | Drain Power (Level Up Scourge and Deathbringer; 玩家 +3 Neurosurge), No Escape; Strike no energy |
-| 6 | Friendship, Unleash | Bodyguard (no energy) | Friendship (−2 Strength, 口红已 gives +1 → 实际 −1; every turn after that +1 Strength), Unleash; Bodyguard no energy |
-| 7 | Scourge+, Death's Door, Defend | Strike (no energy), Strike (no energy) | Shuffle.. Scourge + (16 Doom, draw 2 cards Strike), Death's Door, Defend; two cards draw 到的 Strike no energy |
-| 8 | Deathbringer, Strike | Defend (no energy) | Deathbringer (21 Doom + 1 Weak; 要等第 11 turn 那 times Drain Power 才 Level Up), Strike; Defend no energy |
+| 3 | Scourge, Death's Door | Defend (no energy) | Shiny Lipstick triggers (+1 Strength / +1 Dexterity); Whip (13 Doom, draws 1 Strike), Death's Door; Defend and the drawn Strike have no energy |
+| 4 | Shroud, Blight Strike | Strike (no energy) | Robe of Doom (after it is woven, gain 3 block each time Doom is applied), Blight Strike; Strike has no energy |
+| 5 | Drain Power, No Escape | Strike (no energy) | Energy Drain (upgrades Whip and Deathbringer; players +3 Neurosurge), No Escape; Strike has no energy |
+| 6 | Friendship, Unleash | Bodyguard (no energy) | Friendship (−2 Strength, the Lipstick already gave +1 ⇒ net −1; +1 Strength every turn after), Strike Out; Guard has no energy |
+| 7 | Scourge+, Death's Door, Defend | Strike (no energy), Strike (no energy) | Shuffle. Whip+ (16 Doom, draws 2 Strikes), Death's Door, Defend; both drawn Strikes have no energy |
+| 8 | Deathbringer, Strike | Defend (no energy) | Deathbringer (21 Doom + 1 Weak; only upgraded by the Energy Drain on turn 11), Strike; Defend has no energy |
 | 9 | Sow, Blight Strike, Defend | — | — |
-| 10 | Bodyguard, Unleash, Defend | — | Bodyguard (summon 5), Unleash (奥斯提 damage 害), Defend |
-| 11 | No Escape, Strike, Drain Power | — | No Escape, Strike, Drain Power (Level Up No Escape and Blight Strike; 玩家再 +3 Neurosurge) |
+| 10 | Bodyguard, Unleash, Defend | — | Guard (summons 5), Strike Out (Osty's damage), Defend |
+| 11 | No Escape, Strike, Drain Power | — | No Escape, Strike, Energy Drain (upgrades No Escape and Blight Strike; players +3 more Neurosurge) |
 
 <a id="NECROBINDER_FLESH"></a>
 
@@ -463,7 +463,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 |:---:|---|---|---|
 | 1 | Stunned | — | — |
 | 2 | Bombardment | Clumsy (unplayable (curse / status)), Clumsy (unplayable (curse / status)) | — |
-| 3 | Dying Star, Hidden Cache | Gold Axe+ (no energy) | Awakening 后 A: Dying Star, Hidden Cache, Gold Axe + (Retain, not played) |
+| 3 | Dying Star, Hidden Cache | Gold Axe+ (no energy) | After Awakening A: Star Blight, Hidden Cache, Golden Axe+ (Retain, not played) |
 
 <a id="SILENT_SLY"></a>
 
@@ -641,10 +641,10 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
-| 1 | Bulk Up, +2 Strength, +2 Dexterity), Chill, Boot Sequence | — | Bulk Up (失 away 2 个 Charge Up 球栏位, +2 Strength, +2 Dexterity), Chill (玩家方每有一个单位生成 1 个冰霜球), Boot Sequence (10 block) |
+| 1 | Bulk Up, +2 Strength, +2 Dexterity), Chill, Boot Sequence | — | Overflow (loses 2 orb slots, +2 Strength +2 Dexterity), Chill (1 Frost orb per unit on the players' side), Boot Sequence (10 block) |
 | 2 | Claw, Strike, Defend | — | — |
 | 3 | Feral, Claw, Claw, Hotfix | — | — |
-| 4 | Coolant, FTL, FTL, Charge Battery, Helix Drill | Strike (no energy) | Coolant (single-player)/ One for All (multiplayer), FTL, FTL (Feral retrieved), Charge Battery (下 turn +1 energy), Drill (FTL drawn this turn), Strike (drawn this turn, no energy) |
+| 4 | Coolant, FTL, FTL, Charge Battery, Helix Drill | Strike (no energy) | Coolant (single-player) / One for All (multiplayer), Overclock, Overclock (retrieved by Feral), Recharge (next turn +1 energy), Spiral Drill (drawn by Overclock), Strike (drawn, no energy) |
 | 5 | Hyperbeam, lose 3 Focus), Defend | Defend (no energy) | — |
 | 6 | Strike, Strike | Defend (no energy) | — |
 | 7 | Claw, Claw, Strike, Defend | — | Shuffle.. Claw, Claw (Feral retrieved), Strike, Defend |
@@ -739,7 +739,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
 | 1 | Rupture, Blood Wall | Body Slam+ (no energy) | — |
-| 2 | Not Yet, Brand | Strike (burned) | Not Yet (multiplayer: 换成 Tank), Brand; Strike 被 Brand Exhaust (not played) |
+| 2 | Not Yet, Brand | Strike (burned) | Not Yet (multiplayer: swapped for Tank), Brand; Strike is Exhausted by Brand (not played) |
 | 3 | Strike, Strike, Defend | — | — |
 | 4 | Iron Wave, Breakthrough, Defend | — | — |
 | 5 | Strike, Strike, Defend | — | — |
@@ -783,8 +783,8 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
 | 1 | Juggling+, Feel No Pain | Stampede+ (no energy) | — |
-| 2 | Breakthrough, Strike | Strike (no energy), Strike (kept in hand) | Breakthrough, Strike, Strike (由 Stampede plays), Strike (Juggling Duplication, Ethereal + Exhaust → Feel No Pain 起甲) |
-| 3 | Strike, Strike, Strike | Strike (no energy) | Strike, Strike, Strike, Strike (Juggling Duplication → turn 结束被 Stampede plays 后 Exhaust) |
+| 2 | Breakthrough, Strike | Strike (no energy), Strike (kept in hand) | Breakthrough, Strike, Strike (played by Stampede), Strike (Juggling copy, Ethereal + Exhaust ⇒ Feel No Pain grants block) |
+| 3 | Strike, Strike, Strike | Strike (no energy) | Strike, Strike, Strike, Strike (Juggling copy ⇒ free-played by Stampede at end of turn, then Exhausted) |
 | 4 | Defend, Defend | Bash (no energy) | — |
 | 5 | Defend, Defend | Injury (unplayable (curse / status)) | — |
 | 6 | Perfected Strike | Greed (unplayable (curse / status)), Guilty (unplayable (curse / status)) | — |
@@ -829,7 +829,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | 1 | Delay+, Automation+, Dirge | Severance (no energy), Defend (no energy) | Delay +, Automation +, Dirge; Severance, Defend no energy |
 | 2 | Grave Warden+ | Reanimate (no energy), Death March (no energy) | — |
 | 3 | The Scythedmg 23, Defy | Shame (unplayable (curse / status)) | — |
-| 4 | Soul, Wisp, Graveblast+, Severance, Soul | Soul Storm (no energy), Melancholy (no energy), Defend (no energy) | Soul, Wisp, Graveblast + (retrieved Severance), Severance (prints 一 cards Soul), Soul, Soul Storm, Melancholy, Defend |
+| 4 | Soul, Wisp, Graveblast+, Severance, Soul | Soul Storm (no energy), Melancholy (no energy), Defend (no energy) | Soul, Ghost Fire, Grave Burst+ (retrieves Sever), Sever (prints one Soul), Soul, Soul Storm, Melancholy, Defend |
 | 5 | Devour Life+, Soul, Soul, Spur, Danse Macabre | Unleash (no energy), Defend (no energy) | — |
 | 6 | Severance, Soul, Death March | Melancholy (no energy), Defend (no energy), Shame (unplayable (curse / status)) | Shuffle.. Severance (prints Soul), Soul, Death March, Melancholy, Defend, Shame |
 | 7 | Grave Warden+, Delay+, Soul | Soul Storm (no energy), Defend (no energy) | Grave Warden +, Delay +, Soul, Soul Storm, Defend |
@@ -918,13 +918,13 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
-| 1 | Sovereign Blade, Cloak of Stars | Defend (no energy), Defend (no energy) | Sovereign Blade (Fencing Manual 在战斗开始就铸造并把剑放 into 他手里, 所以 this turn draw card 数不 becomes), Cloak of Stars (Mini Regent +1 Strength, Pael's Legion gives 14 block); two cards Defend no energy |
+| 1 | Sovereign Blade, Cloak of Stars | Defend (no energy), Defend (no energy) | Sovereign Blade (Fencing Manual forges it at combat start and puts it in his hand, so the draw count is unchanged), Cloak of Stars (Mini Regent +1 Strength, Pael's Legion gives 14 block); both Defends have no energy |
 | 2 | Furnace, Venerate, Know Thy Place | — | — |
 | 3 | Crush Under, Parry, Falling Star | — | — |
-| 4 | Seeking Edge, Convergence | Sword Sage+ (intent only) | Seeking Edge, Convergence; Sword Sage + no energy unplayable (被 Convergence Retain, 第 5 turn 才打, **只打一 times **) |
+| 4 | Seeking Edge, Convergence | Sword Sage+ (intent only) | Tracking Blade, Confluence; Sword Saint+ cannot be played (no energy) — Confluence retains it, it is played on turn 5, and **only once** |
 | 5 | Sword Sage+, Strike | Beat into Shape (no energy), Defend (no energy), I Am Invincibleauto (intent only) | Sword Sage +, Strike, Beat into Shape; Defend no energy (energy 2+1=3). I Am Invincible 在他 turn 结束时正好在 Draw Pile 顶 → free-played |
 | 6 | Crush Under, Defend | Defend (no energy) | Shuffle.: Crush Under, Defend; 2nd cards Defend no energy |
-| 7 | Sovereign Blade, Cloak of Stars | Defend (no energy) | Sovereign Blade (铸造已叠高), Cloak of Stars (+1 Strength); Defend no energy |
+| 7 | Sovereign Blade, Cloak of Stars | Defend (no energy) | Sovereign Blade (Forge already stacked high), Cloak of Stars (+1 Strength); Defend has no energy |
 | 8 | Venerate, Convergence, Falling Star | — | — |
 | 9 | Strike, Strike, Beat into Shape | I Am Invincibleauto (intent only) | Strike, Strike, Beat into Shape. I Am Invincible 在他 turn 结束时正好在 Draw Pile 顶 → free-played |
 
@@ -969,11 +969,11 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 |:---:|---|---|---|
 | 1 | The Sealed Throne+ | Monarch's Gaze (no energy), Clumsy (unplayable (curse / status)) | — |
 | 2 | Photon Cut+, Kingly Punch | Kingly Kick (3 energy) (kept in hand), Defend (no energy), Strike (no energy) | — |
-| 3 | Kingly Kick (2 energy), Cloak of Stars | Strike (no energy), I Am Invincibleauto (intent only) | Kingly Kick (2 energy), Cloak of Stars, Strike (no energy); I Am Invincible 在 Draw Pile 顶 → free-played at end of turn |
+| 3 | Kingly Kick (2 energy), Cloak of Stars | Strike (no energy), I Am Invincibleauto (intent only) | King's Kick (2 energy), Cloak of Stars, Strike (no energy); Invincible is on top of the draw pile ⇒ free-played at end of turn |
 | 4 | Royalties, Defend, Royal Gamble | — | — |
 | 5 | Decisions, Decisions, Summon Forth, Alignment, Sovereign Blade | Cosmic Indifferenceauto (intent only), Clumsy (unplayable (curse / status)), I Am Invincibleauto (intent only) | Decisions, Decisions (plays Cosmic Indifference 3 times: put back on top Kingly Kick/ Kingly Punch/ I Am Invincible), Summon Forth, Alignment, Sovereign Blade, Clumsy (Curse, unplayable); I Am Invincible free-played at end of turn |
 | 6 | Kingly Punch, Kingly Kick (1 energy) | Strike (no energy) | — |
-| 7 | Summon Forth, Alignment, Sovereign Blade | — | Shuffle.. Summon Forth (铸造 8 + 把剑放 into Hand), Alignment, Sovereign Blade |
+| 7 | Summon Forth, Alignment, Sovereign Blade | — | Shuffle. Summon Forth (forges 8 and puts the blade in hand), Alignment, Sovereign Blade |
 | 8 | Defend, Defend | Strike (no energy) | — |
 | 9 | Kingly Punch, Cloak of Stars, Kingly Kick (0 energy) | — | — |
 | 10 | Cosmic Indifference, Photon Cut+, Kingly Kick (0 energy) | I Am Invincibleauto (intent only), Strike (no energy), Strike (no energy) | Cosmic Indifference (put back on top Kingly Kick), Photon Cut + (put back on top I Am Invincible), Kingly Kick (0 energy), Strike ×2 (no energy); I Am Invincible free-played at end of turn |
@@ -1019,15 +1019,15 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
-| 1 | Collision Course, BEGONE!, Minion Strike, Hidden Cache+ | Defend (no energy) | Collision Course (prints Debris), BEGONE! (becomes Debris), Minion Strike (不造成 damage 害, summon Strike 仆从), Hidden Cache +, Defend (no energy) |
+| 1 | Collision Course, BEGONE!, Minion Strike, Hidden Cache+ | Defend (no energy) | Collision Course (prints Debris), Go Down! (becomes Debris), Minion Strike (no damage, summons a Strike minion), Hidden Cache+, Defend (no energy) |
 | 2 | Royal Gamble, Spectrum Shift+ | CHARGE!! (no energy) | — |
-| 3 | Minion Dive Bomb, Minion Dive Bomb, Prowess, Resonance | — | Minion Dive Bomb (summons if fewer than 2), Minion Dive Bomb (同上), Prowess, Resonance |
-| 4 | Dark Shackles, Quasar, Shockwave | Defend (no energy), Defend (no energy) | 暗黑镣铐, Quasar (prints Shockwave), Shockwave, Defend ×2 (no energy) |
-| 5 | GUARDS!!!, Minion Sacrifice, Minion Sacrifice, Minion Sacrifice | — | GUARDS!!!, Minion Sacrifice ×3 (summons if fewer than 2, 否则获得 block) |
+| 3 | Minion Dive Bomb, Minion Dive Bomb, Prowess, Resonance | — | Minion Dive Bomb (summons if fewer than 2), Minion Dive Bomb (same as above), Prowess, Resonance |
+| 4 | Dark Shackles, Quasar, Shockwave | Defend (no energy), Defend (no energy) | Dark Shackles, Quasar (prints Shockwave), Shockwave, Defend ×2 (no energy) |
+| 5 | GUARDS!!!, Minion Sacrifice, Minion Sacrifice, Minion Sacrifice | — | To My Aid!!!, Minion Sacrifice ×3 (summons if fewer than 2 minions, otherwise grants block) |
 | 6 | Rend, Child of the Stars | Clumsy (unplayable (curse / status)), Defend (no energy) | — |
 | 7 | Dramatic Entrance, Collision Course, BEGONE!, Minion Strike, Hidden Cache+ | Defend (no energy) | **Shuffle.**, Dramatic Entrance, Collision Course (prints Debris), BEGONE! (becomes Debris), Minion Strike, Hidden Cache +, Defend (no energy) |
 | 8 | Minion Dive Bomb, Minion Dive Bomb, Prowess, Resonance | — | — |
-| 9 | Rend, Quasar, Ultimate Defend | Jackpot (no energy), Defend (no energy), Defend (no energy) | Rend (无色 card), Quasar (prints Flash of Steel), Ultimate Strike, Jackpot (no energy), Defend ×2 (no energy) |
+| 9 | Rend, Quasar, Ultimate Defend | Jackpot (no energy), Defend (no energy), Defend (no energy) | Tear Apart (colorless), Quasar (prints Draw Sword), Ultimate Strike, Jackpot (no energy), Defend ×2 (no energy) |
 
 <a id="SILENT_ENVENOM"></a>
 
@@ -1067,13 +1067,13 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
-| 1 | Envenom+, Backstab, Deflect | Strike (burned), Defend (no energy) | Envenom + (2 energy: 之后每 times 攻击的未 block damage 害各 gives 1 stacks Poison), Backstab, Deflect; Strike 被 Toasty Mittens 烧掉, Defend no energy |
-| 2 | Survivor | Ricochet (0 energy) (discarded), Defend (burned) | Survivor (discard 1 cards → Ricochet), Ricochet (Sly: 被 discarded 后 free-played); Defend burned |
-| 3 | Poisoned Stab, Dagger Spray | Strike (burned) | Poisoned Stab (6 damage + 3 毒), Dagger Spray (4 damage ×2); Strike burned |
-| 4 | Noxious Fumes, Piercing Wail | Defend (burned) | Noxious Fumes (每 turn gives 玩家上毒), Piercing Wail; Defend burned |
-| 5 | Strike, Echoing Slash | Strike (burned) | Strike, Echoing Slash (all 体 10); 3rd cards Strike burned |
-| 6 | Infinite Blades, The Hunt | Strike (burned) | Infinite Blades (every turn after that 1 Shiv), The Hunt (10 damage, 斩 Kill 加成); Strike burned |
-| 7 | Shiv, Neutralize, Blade Dance | Defend (burned) | Shiv, Neutralize, Blade Dance (3 Shiv); Defend burned. 到此累计烧掉 Strike ×4, Defend ×3 |
+| 1 | Envenom+, Backstab, Deflect | Strike (burned), Defend (no energy) | Envenom+ (2 cost: each unblocked attack damage now applies 1 Poison), Backstab, Deflect; Strike is burned by Toasty Mittens, Defend has no energy |
+| 2 | Survivor | Ricochet (0 energy) (discarded), Defend (burned) | Survivor (discard 1 ⇒ Ricochet), Ricochet (Sly: free-played after being discarded); Defend is burned |
+| 3 | Poisoned Stab, Dagger Spray | Strike (burned) | Poisoned Stab (6 damage + 3 Poison), Dagger Spray (4 damage ×2); Strike is burned |
+| 4 | Noxious Fumes, Piercing Wail | Defend (burned) | Noxious Fumes (Poison on the players each turn), Piercing Wail; Defend is burned |
+| 5 | Strike, Echoing Slash | Strike (burned) | Strike, Echoing Slash (10 to all); the third Strike is burned |
+| 6 | Infinite Blades, The Hunt | Strike (burned) | Infinite Blades (1 Shiv every turn after), Hunt (10 damage, execute bonus); Strike is burned |
+| 7 | Shiv, Neutralize, Blade Dance | Defend (burned) | Shiv, Neutralize, Blade Dance (3 Shivs); Defend is burned. Running total burned: Strike ×4, Defend ×3 |
 | 8 | Poisoned Stab, Echoing Slash, Deflect | Shiv (burned) | Shuffle.: Shiv burned; Poisoned Stab, Echoing Slash, Deflect |
 | 9 | Survivor, Defend | Shiv (burned), Ricochet (0 energy) (discarded) | Shiv burned; Survivor, Ricochet (Sly free-played), Defend |
 | 10 | Dagger Spray, Neutralize+, Defend | Shiv (burned) | Shiv burned; Dagger Spray, Neutralize +, Defend |
@@ -1119,7 +1119,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 |:---:|---|---|---|
 | 1 | Backstab (0 energy), Piercing Wail (0 energy) | Bullet Time (3 energy)Retain (kept in hand), Leading Strike (1 energy) (kept in hand), Strike (1 energy) (kept in hand), Defend (2 energy) (kept in hand), Dagger Spray (1 energy) (kept in hand) | Backstab (0), Piercing Wail (0); not played: Bullet Time (3, Retain), Leading Strike (1), Strike (1), Defend (2), Dagger Spray (1) |
 | 2 | Dash (2 energy), Blade Dance (1 energy) | Slice (2 energy) (kept in hand), Sucker Punch (1 energy) (kept in hand), Tracking (3 energy)Retain (kept in hand), Bullet Time (3 energy)Retain (kept in hand) | 2. Dash (2), Blade Dance (1); not played: Slice (2), Sucker Punch (1), Tracking (3, Retain), Bullet Time (3, Retain) |
-| 3 | Anticipate (1 energy), Dodge and Roll (2 energy) | Cloak and Dagger (1 energy) (kept in hand), Clumsy (unplayable (curse / status)), Injury (unplayable (curse / status)), Tracking (3 energy)Retain (kept in hand), Bullet Time (3 energy)Retain (kept in hand) | 3. Anticipate (1), Dodge 避 Roll Through (2); not played: Cloak and Dagger (1), Clumsy, Injury, Tracking (3, Retain), Bullet Time (3, Retain) |
+| 3 | Anticipate (1 energy), Dodge and Roll (2 energy) | Cloak and Dagger (1 energy) (kept in hand), Clumsy (unplayable (curse / status)), Injury (unplayable (curse / status)), Tracking (3 energy)Retain (kept in hand), Bullet Time (3 energy)Retain (kept in hand) | 3. Forethought (1), Dodge and Roll (2); not played: Cloak and Dagger (1), Clumsy, Injury, Pursuit (3, Retain), Bullet Time (3, Retain) |
 | 4 | Piercing Wail (2 energy), Distraction (0 energy), Untouchable (0 energy) | Clumsy (unplayable (curse / status)), Ultimate Defend (2 energy) (kept in hand), Murder (3 energy)Retain (kept in hand), Tracking (3 energy)Retain (kept in hand), Bullet Time (3 energy)Retain (kept in hand) | 4. Piercing Wail (2), Distraction (0, prints Untouchable), Untouchable (0); not played: Clumsy, Ultimate Defend (2), Murder (3, Retain), Tracking (3, Retain), Bullet Time (Retain) |
 | 5 | Bullet Time (3 energy), Tracking (0 energy), Murder (0 energy), Leading Strike (0 energy), Strike (0 energy), Defend (0 energy), Slice (0 energy) | — | — |
 | 6 | Anticipate (1 energy), Dash (0 energy), Sucker Punch (2 energy) | Cloak and Dagger (2 energy) (kept in hand), Untouchable (2 energy) (kept in hand) | 6. Anticipate (1), Dash (0), Sucker Punch (2); not played: Cloak and Dagger (2), Untouchable (2) |
@@ -1261,8 +1261,8 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
-| 1 | Biased Cognition+, Glacier | Barrage (no energy) | Opening:: Biased Cognition + takes Focus (Permafrost gives 7 block), Glacier 铺冰球; Barrage no energy |
-| 2 | Subroutine, Hailstorm, Dualcast | — | Subroutine (能 Strength card → 之后每 cards 能 Strength card +1 energy), Hailstorm; Dualcast 激发电球 two times (意图显示 14×2) |
+| 1 | Biased Cognition+, Glacier | Barrage (no energy) | Opening: Biased Cognition+ for Focus (Permafrost gives 7 block), Glacier to lay Frost orbs; Barrage has no energy |
+| 2 | Subroutine, Hailstorm, Dualcast | — | Subroutine (Power card ⇒ every Power afterwards costs +1), Hailstorm; Dualcast evokes the lightning orb twice (the intent shows 14×2) |
 | 3 | Zap, Defragment+, Coolant | — | — |
 | 4 | Creative AI, Hotfix, Cold Snap | — | — |
 | 5 | Storm, Hologram, Glacier | Strike (no energy) | — |
@@ -1271,7 +1271,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | 8 | Capacitor, Ultimate Defend, Charge Battery, Defend | — | Shuffle.. Capacitor (AI prints), Ultimate Defend, Charge Battery, Defend |
 | 9 | Bulk Up, Glacier | Cold Snap (no energy), Strike (no energy) | Bulk Up (AI prints), Glacier, Cold Snap; Strike no energy |
 | 10 | Hailstorm, Barrage, Boost Away | Dazed (unplayable (curse / status)) | — |
-| 11 | Bulk Up, Dualcast, Zap | Defend (no energy) | Bulk Up (AI prints), Dualcast (队首是冰球 → 意图是守势; 是电球则是 damage 害×2), Zap; Defend no energy |
+| 11 | Bulk Up, Dualcast, Zap | Defend (no energy) | Overflow (printed by Creative AI), Dualcast (frost orb on top ⇒ block intent; lightning orb ⇒ damage ×2), Zap; Defend has no energy |
 
 <a id="DEFECT_EVENT"></a>
 
@@ -1312,13 +1312,13 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
-| 1 | Metamorphosis (2 energy)prints All for One/Ice Lance/Hyperbeam, Leap (1 energy)Retain | — | Metamorphosis (2): 把 0 energy 的 All for One/ Ice Lance/ Hyperbeam prints into Draw Pile 并展示; Leap (1, Choices Paradox prints 的, 带 Retain) |
+| 1 | Metamorphosis (2 energy)prints All for One/Ice Lance/Hyperbeam, Leap (1 energy)Retain | — | Feather (2): prints 0-cost One for All / Glacier Spear / Hyperbeam into the draw pile and reveals them; Leap (1, the one printed by Choices Paradox, with Retain) |
 | 2 | Distraction (1 energy), White Noise (0 energy), Consuming Shadow (0 energy), Ice Lance (0 energy), Dualcast (1 energy) | — | — |
 | 3 | Mad Science (1 energy), Boot Sequence (0 energy), Hyperbeam (0 energy) | Doubt (unplayable (curse / status)) | Mad Science (1, prints Boot Sequence/ Energy Surge), Boot Sequence single-player/ Energy Surge multiplayer (0), Hyperbeam (0); Doubt keep in hand |
 | 4 | Feeding Frenzy (0 energy), Hotfix+ (0 energy), All for One (0 energy)returns Ice Lance/Hyperbeam, Ice Lance (0 energy), Hyperbeam (0 energy) | — | — |
-| 5 | Defend (1 energy), Strike (1 energy) | Greed (unplayable (curse / status)) | Defend (1, Enchantment 「漩涡」 plays two times), Strike (1), Greed keep in hand |
+| 5 | Defend (1 energy), Strike (1 energy) | Greed (unplayable (curse / status)) | Defend (1, enchanted "Vortex" ⇒ played twice), Strike (1), Greed kept in hand |
 | 6 | Hyperbeam (0 energy), Leap (1 energy), Ice Lance (0 energy) | — | — |
-| 7 | Mad Science (1 energy), Hologram (0 energy), Ice Lance (0 energy), Dualcast (1 energy) | Greed (unplayable (curse / status)) | Mad Science (1, 只 prints Hologram), Hologram (0), Ice Lance (0), Dualcast (1), Greed keep in hand |
+| 7 | Mad Science (1 energy), Hologram (0 energy), Ice Lance (0 energy), Dualcast (1 energy) | Greed (unplayable (curse / status)) | Mad Science (1, prints Hologram only), Hologram (0), Glacier Spear (0), Dualcast (1), Greed kept in hand |
 | 8 | Hotfix+ (0 energy), Strike (1 energy) | Doubt (unplayable (curse / status)) | Hotfix +(0), Strike (1); Doubt keep in hand |
 | 9 | Feeding Frenzy (0 energy), All for One (0 energy)returns Ice Lance/Hyperbeam, Ice Lance (0 energy), Hyperbeam (0 energy), Defend (1 energy) | — | — |
 
@@ -1361,7 +1361,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
-| 1 | Smokestack, Fight Through | Flak Cannon (no energy) | Smokestack (之后每生成一 cards card ⇒ 对 all 体玩家 5 点无来源 damage 害), Fight Through, Flak Cannon (no energy, kept in hand) |
+| 1 | Smokestack, Fight Through | Flak Cannon (no energy) | Smokestack (each card generated afterwards ⇒ 5 unpowered damage to all players), Brace, Flak Cannon (no energy, stays in hand) |
 | 2 | Gunk Up, Boost Away, Defend | — | — |
 | 3 | Rocket Punch (0 energy), Defend, Compact | Doubt (unplayable (curse / status)) | — |
 | 4 | Overclock, TURBO, Hologram, Flak Cannon | Defend (no energy), Defend (no energy) | — |
@@ -1391,7 +1391,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Team debuff power | Strong |
 
 - **Deck** (3 cards): Mythic Form ×3
-- **Deck note**: 代码登记卡组 (首 times Shuffle. 前剧本里没有 out card, e.g. Tarot Cards 都是生成的)
+- **Deck note**: Deck registered in code (the script plays nothing before the first shuffle — the tarot cards are all generated)
 - **Relics**: Song Bow, Neow's Blessing, Anchor, Ringing Triangle, Pael's Tears, Permafrost, Philosopher's Stone, Mercury Hourglass
 - **Ascension / Dread changes**: Ascension 8: Orichalcum; Ascension 8: Oddly Smooth Stone; Ascension 9: Vajra; Dread upgrade Mythic Form; Dread upgrade The Emperor; Dread upgrade Empress; Dread upgrade Strength; Dread upgrade Justice; Dread upgrade The Fool; Dread upgrade The Magician; Dread upgrade The High Priestess; Dread upgrade The Chariot; Dread upgrade The World; Dread upgrade Temperance; Dread upgrade Wheel of Fortune; Dread upgrade The Moon; Dread upgrade The Star; Dread upgrade 太Yang; Dread upgrade Death; Dread upgrade The Hermit; Dread upgrade The Lovers; Dread upgrade The Hanged Man; Dread upgrade 高The Tower; Dread upgrade Judgement; Dread upgrade The Devil; Dread upgrade The Hierophant; Dread upgrade Forgotten Ritual; Dread upgrade Wisp; Dread upgrade Demon Form; Dread upgrade Serpent Form; Dread upgrade Reaper Form; Dread upgrade Echo Form; Dread upgrade Void Form; Dread upgrade 精神Overload; Dread upgrade Inflame; Dread upgrade Footwork; Dread upgrade Pillar of Creation; Dread upgrade Sleight of Flesh; Dread upgrade Defragment; Dread upgrade Rolling Boulder; Dread upgrade Eternal Armor; Dread upgrade Shockwave; Dread upgrade Fasting; Dread upgrade Deva Form; Dread upgrade Brawl; Dread upgrade Eternity形态
 
@@ -1418,16 +1418,16 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | 4 | The Fool, The Magician, The High Priestess | — | — |
 | 5 | The Chariot, The World, The Devil | — | — |
 | 6 | Temperance, The Magician, Wheel of Fortune | — | — |
-| 7 | Death, Strength, The Hermit | — | 死亡, Strength, The Hermit (no effect) |
+| 7 | Death, Strength, The Hermit | — | Death, Strength, The Hermit (no effect) |
 | 8 | The Star, The Star, The Magician | — | — |
 | 9 | The Emperor, The Emperor, The Lovers, Forgotten Ritual, Wisp | Demon Form (no energy), Serpent Form (no energy), Reaper Form (no energy), Echo Form (no energy), Deva Form (no energy), Eternal Form (no energy), Bundle of Joy (no energy), Dark Shackles (no energy), Prowess (no energy), Panic Button (no energy), Void Form (no energy) | — |
 | 10 | The Fool, The High Priestess, The Magician | — | — |
 | 11 | Empress, The Emperor, The Hierophant, Rolling Boulder | Eternal Armor (no energy), Shockwave (no energy) | The Empress (2 times), The Emperor, The Hierophant (prints Rolling Boulder/ Eternal Armor/ Shockwave), Rolling Boulder, Eternal Armor, Shockwave |
 | 12 | Strength, The Chariot, The Lovers, Neurosurge, Neurosurge, Inflame, Footwork, Pillar of Creation | Sleight of Flesh (no energy), Defragment (no energy), Fasting (no energy), Brawl (no energy), Bundle of Joy (no energy), Dark Shackles (no energy), Panic Button (no energy), Panache (no energy) | — |
 | 13 | Justice, The Hermit, Wheel of Fortune | — | — |
-| 14 | Temperance, The Hanged Man, Death, The Tower, The Star, The Devil | — | Temperance (2 times), The Hanged Man, Death ⇒【 The Hanged Man 的 Extra Turn 】 The Tower (2 times), The Star, The Devil (no effect) |
+| 14 | Temperance, The Hanged Man, Death, The Tower, The Star, The Devil | — | Temperance (×2), The Hanged Man, Death ⇒ The Hanged Man's extra turn The Tower (×2), The Star, The Devil (no effect) |
 | 15 | The Star, The Sun, The Moon | — | — |
-| 16 | Judgement, The World, The Devil | Soot (discarded) | Judgement (HP ≤30 秒 Kill; Fear 模式 Level Up 版 ≤40) (2 times), The World (no effect), The Devil, Soot (被 Exhaust) |
+| 16 | Judgement, The World, The Devil | Soot (discarded) | Judgement (executes at HP ≤ 30; Dread version ≤ 40) (×2), The World (no effect), The Devil, Coal Ash (Exhausted) |
 
 <a id="IRONCLAD_VULN"></a>
 
@@ -1467,7 +1467,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 |:---:|---|---|---|
 | 1 | Stone Armor, Defend, Tremble | — | — |
 | 2 | Dismantle, Conflagration, Taunt | — | — |
-| 3 | Impervious, Dominate | Strike (no energy) | Impervious (30 block), Dominate + Soul power (Vulnerable 换 Strength), Strike (no energy) |
+| 3 | Impervious, Dominate | Strike (no energy) | Immovable (30 block), Dominate + Soul Power (Vulnerable traded for Strength), Strike (no energy) |
 | 4 | Strike, Bully, Thunderclap | — | — |
 | 5 | Defend, Bash | Defend (no energy) | — |
 | 6 | Dismantle, Strike, Taunt | — | Shuffle.. Dismantle, Strike, Taunt |
@@ -1646,7 +1646,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
-| 1 | Spectrum Shiftfree, Pillar of Creation, Glitterstream+ | Supermassive (no energy) | Spectrum Shift (Vexing Puzzlebox prints 的, this turn 0 energy), Pillar of Creation (ascension 8 时 Level Up), Glitterstream +, Supermassive |
+| 1 | Spectrum Shiftfree, Pillar of Creation, Glitterstream+ | Supermassive (no energy) | Spectrum Shift (printed by Vexing Puzzlebox, 0 cost this turn), Pillar of Creation (upgraded at Ascension 8), Dazzling+, Supermassive |
 | 2 | Dramatic Entrance, The Bomb, Crush Under+, Know Thy Place+ | — | — |
 | 3 | Discovery, Pillar of Creationfree, Manifest Authority, Ultimate Strike | Ultimate Defend+ (no energy) | Discovery (prints Pillar of Creation, this turn 0 energy), Pillar of Creation, Manifest Authority (prints Ultimate Strike), Ultimate Strike; Ultimate Defend + no energy |
 | 4 | Dark Shackles, Manifest Authority, Bolas, The Bomb | Defend (no energy) | Dark Shackles, Manifest Authority (prints Bolas), Bolas, The Bomb; Defend no energy |
@@ -1740,11 +1740,11 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
-| 1 | Child of the Stars, Venerate+, Royalties, Decisions, Decisions+, Heavenly Drillspends all energy | Hidden Cache (intent only), Bulwark (intent only), Alignment (intent only), Resonance (intent only), Shockwave (intent only), Sovereign Blade (no energy) | Child of the Stars, Venerate, Royalties, Decisions, Decisions + (Royally Approved): 让玩家在 5 cards Skill cards 里挑一 cards 打 3 times ⇒ Heavenly Drill (只有选了 Alignment 才有 energy), Sovereign Blade (no energy) |
-| 2 | Big Bang, Glow, Gather Light, Radiate, Refine Blade | Decisions, Decisions+ (kept in hand) | Big Bang (+1 energy), Glow, Gather Light, Radiate (this turn 每获得 1 星打一 times), Refine Blade; Decisions, Decisions + not played |
-| 3 | Parry, Stardust, Convergence+, Defend | Decisions, Decisions+ (kept in hand) | Parry, Stardust (花光所有星), Convergence +, Defend; Decisions, Decisions + not played |
+| 1 | Child of the Stars, Venerate+, Royalties, Decisions, Decisions+, Heavenly Drillspends all energy | Hidden Cache (intent only), Bulwark (intent only), Alignment (intent only), Resonance (intent only), Shockwave (intent only), Sovereign Blade (no energy) | Child of the Stars, Venerate, Royalties, Decisions, Decisions+ (Royally Approved): the player picks 1 of 5 Skill cards to play 3 times ⇒ Heavenly Drill (only affordable if Alignment was chosen), Sovereign Blade (no energy) |
+| 2 | Big Bang, Glow, Gather Light, Radiate, Refine Blade | Decisions, Decisions+ (kept in hand) | Big Bang (+1 energy), Glow, Gather Light, Radiate (1 hit per Star gained this turn), Refine Blade; Decisions, Decisions+ not played |
+| 3 | Parry, Stardust, Convergence+, Defend | Decisions, Decisions+ (kept in hand) | Parry, Stardust (spends all Stars), Confluence+, Defend; Decisions, Decisions+ not played |
 | 4 | Sovereign Blade, Hidden Cache | Strike (no energy), Decisions, Decisions+ (kept in hand) | Sovereign Blade, Hidden Cache, Strike (no energy); Decisions, Decisions + not played |
-| 5 | Decisions, Decisions+, Heavenly Drillspends all energy | Hidden Cache (intent only), Bulwark (intent only), Alignment (intent only), Resonance (intent only), Shockwave (intent only), Sovereign Blade (no energy), Strike (no energy) | Shuffle.. Decisions, Decisions + (Royally Approved): 让玩家挑一 cards 打 3 times ⇒ Heavenly Drill (一定 plays), Sovereign Blade (no energy), Strike (no energy) |
+| 5 | Decisions, Decisions+, Heavenly Drillspends all energy | Hidden Cache (intent only), Bulwark (intent only), Alignment (intent only), Resonance (intent only), Shockwave (intent only), Sovereign Blade (no energy), Strike (no energy) | Shuffle. Decisions, Decisions+ (Royally Approved): the player picks one card to play 3 times ⇒ Heavenly Drill (always played), Sovereign Blade (no energy), Strike (no energy) |
 | 6 | Glow, Radiate, Refine Blade | Gather Light (no energy) | — |
 | 7 | Sovereign Blade, Convergence+ | Venerate+ (no energy) | — |
 | 8 | Venerate+, Hidden Cache, Stardust, Defend | — | — |
@@ -1792,8 +1792,8 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | 1 | Afterimage, Cloak and Dagger, Neutralize, Defend | Defend (no energy) | Afterimage, Cloak and Dagger (6 block ＋1 Shiv), Neutralize, Defend; 2nd cards Defend no energy |
 | 2 | Leading Strike, Defend | Strike (no energy) | Leading Strike (3 damage ＋2 Shiv), Defend; Strike no energy |
 | 3 | Slice, Strike, Finisher | — | — |
-| 4 | Phantom Blades, Piercing Wail, Hidden Daggers | — | Phantom Blades (Fear 模式换成 Accuracy +), Piercing Wail, Hidden Daggers (0 energy gives 2 Shiv, 当 turn 就 plays away) |
-| 5 | Fan of Knives | Curse of the Bell (unplayable (curse / status)), Defend (no energy) | Fan of Knives (2 energy 能 Strength: gives 4 Shiv, 且 Shiv 改打 all 体); Curse of the Bell/ Defend no energy |
+| 4 | Phantom Blades, Piercing Wail, Hidden Daggers | — | Phantom Blades (Dread mode swaps in Accuracy+), Piercing Wail, Hidden Daggers (0 cost, 2 Shivs, played this turn) |
+| 5 | Fan of Knives | Curse of the Bell (unplayable (curse / status)), Defend (no energy) | Fan of Knives (2-cost Power: 4 Shivs, and Shivs hit all enemies); the Bell's curse / Defend has no energy |
 | 6 | Blade Dance, Survivor | Defend (discarded) | — |
 | 7 | Cloak and Dagger, Defend, Neutralize | — | Shuffle.: Cloak and Dagger (6 block ＋1 Shiv), Defend, Neutralize |
 | 8 | Leading Strike, Defend | Strike (no energy) | Leading Strike (3 damage ＋2 Shiv), Defend; Strike no energy |
@@ -1846,13 +1846,13 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
 | 1 | Clarity Extract, Radiant Tincture, Dexterity Potion / Leg Sweep, Survivor, Piercing Wail, Precise Cut | Defend (no energy) | — |
-| 2 | Shackling Potion, Explosive Ampoule / Nightmare, Alchemize+, Neutralize | Defend (no energy) | Shackling Potion, Explosive Ampoule ｜ Nightmare (Duplication 炼药), Alchemize + (Soul power)→ drinks Ship in a Bottle, Neutralize, Defend (no energy) |
+| 2 | Shackling Potion, Explosive Ampoule / Nightmare, Alchemize+, Neutralize | Defend (no energy) | Shackling Potion, Explosive Ampoule \| Nightmare (copies Alchemize), Alchemize+ (Soul Power) ⇒ drinks Ship in a Bottle, Neutralize, Defend (no energy) |
 | 3 | Serpent Form | Alchemize+ (no energy), Alchemize+ (no energy), Alchemize+ (no energy), Footwork (no energy), Burst (no energy), Blur (no energy) | Ship in a Bottle, Ghost in a Jar ｜ Alchemize +×3 (block/ Duplication/ Fysh Oil), Footwork, Burst, Blur |
 | 4 | Block Potion, Fysh Oil, Entropic Brew / Anticipate, Duplicator, Toric Toughness ×2, Fisticuffs, Deflect | — | Block Potion, Fysh Oil, Entropic Brew ｜ Anticipate, Duplicator, Toric Toughness ×2, Fisticuffs, Deflect |
-| 5 | Radiant Tincture, Dexterity Potion / Alchemize+, Leg Sweep, Precise Cut, Survivor | — | Shuffle.. Clarity Extract, Radiant Tincture, Dexterity Potion ｜ Alchemize + (炼 Block Potion), Leg Sweep, Precise Cut, Survivor |
+| 5 | Radiant Tincture, Dexterity Potion / Alchemize+, Leg Sweep, Precise Cut, Survivor | — | Shuffle. Clarity Extract, Radiant Tincture, Dexterity Potion \| Alchemize+ (brews a Block Potion), Sweeping Leg, Precise Cut, Survivor |
 | 6 | Alchemize+, Alchemize+, Defend | Decay (unplayable (curse / status)) | Shackling Potion ｜ Alchemize + (Ship in a Bottle), Alchemize + (Fysh Oil), Defend, Decay |
 | 7 | Ship in a Bottle, Ghost in a Jar, Explosive Ampoule / Neutralize, Alchemize+, Burst, Blur | — | Ship in a Bottle, Ghost in a Jar, Explosive Ampoule ｜ Neutralize, Alchemize + (Duplicator), Burst, Blur |
-| 8 | Block Potion, Fysh Oil, Entropic Brew, （二阶段：Chaos补出的Liquid Bronze → 她获得 3 层Thorns） / Anticipate, Duplicator, Toric Toughness ×2, Fisticuffs, Deflect | — | Block Potion, Fysh Oil, Entropic Brew, (二阶段: Chaos 补 out 的 Liquid Bronze → 她获得 3 stacks Thorns)｜ Anticipate, Duplicator, Toric Toughness ×2, Fisticuffs, Deflect |
+| 8 | Block Potion, Fysh Oil, Entropic Brew, （二阶段：Chaos补出的Liquid Bronze → 她获得 3 层Thorns） / Anticipate, Duplicator, Toric Toughness ×2, Fisticuffs, Deflect | — | Block Potion, Fysh Oil, Chaos Potion, (phase 2: Liquid Bronze from Chaos ⇒ she gains 3 Thorns) \| Forethought, Duplication Potion, Ring of Fortitude ×2, Fisticuffs, Deflect |
 
 <a id="SILENT_GRAND_FINALE"></a>
 
@@ -1899,10 +1899,10 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | 4 | Murder | Tools of the Trade+ (no energy), Deflect (no energy) | — |
 | 5 | Strike, Strike, Defend | Strike (discarded) | — |
 | 6 | Piercing Wail, Strike, Survivor | Defend (discarded) | — |
-| 7 | Acrobatics, Hand Trick, Strike, Hidden Daggers | Strike (discarded), Defend (discarded), Storm of Steel (discarded) | Shuffle.; Acrobatics (discard Strike), Hand Trick (gives Defend 加 Sly), Strike, Hidden Daggers (discard Defend), Defend (Sly); Storm of Steel (被 Tools of the Trade discarded) |
+| 7 | Acrobatics, Hand Trick, Strike, Hidden Daggers | Strike (discarded), Defend (discarded), Storm of Steel (discarded) | Shuffle; Acrobatics (discards Strike), Hand Trick (gives Defend Sly), Strike, Hidden Daggers (discards Defend), Defend (Sly); Storm of Steel (discarded by Tools of the Trade) |
 | 8 | Acrobatics | TacticianSly (discarded), Murder (no energy), Deflect (no energy), Survivor (discarded), Defend (intent only), Strike (intent only) | — |
 | 9 | Acrobatics, Neutralize, Defend, Defend, Grand Finale | Memento MoriSly (discarded), Strike (discarded), Defend (intent only), Strike (intent only) | — |
-| 10 | Acrobatics, Hand Trick, Storm of Steel | Defend (discarded), Defend (discarded), Hidden Daggers (discarded), Strike (discarded), Strike (discarded), Strike (discarded) | Shuffle.; Acrobatics (discard Defend), Hand Trick (gives Defend 加 Sly), Storm of Steel (discard 光剩下的 4 cards), Defend (Sly); Strike (被 Tools of the Trade discarded) |
+| 10 | Acrobatics, Hand Trick, Storm of Steel | Defend (discarded), Defend (discarded), Hidden Daggers (discarded), Strike (discarded), Strike (discarded), Strike (discarded) | Shuffle; Acrobatics (discards Defend), Hand Trick (gives Defend Sly), Storm of Steel (discards the remaining 4), Defend (Sly); Strike (discarded by Tools of the Trade) |
 
 <a id="WATCHER_DIVINITY"></a>
 
@@ -1993,7 +1993,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
-| 1 | Alpha+, Pressure Points | Defend (no energy) | Alpha+, Pressure Points, Defend (用户原稿写「 Defend (no energy)」, by 3 energy 三 cards all playable) |
+| 1 | Alpha+, Pressure Points | Defend (no energy) | Alpha+, Pressure Points, Defend (the original draft said "Defend (no energy)"; with 3 energy all three are playable) |
 | 2 | Establishment, Meditate, Clumsy | Miracle (kept in hand) | — |
 | 3 | Empty Body, Pressure Points, Like Water, Beta | Miracle (kept in hand) | — |
 | 4 | Eruption+, Strike, Vigilance | Miracle (kept in hand) | Eruption+, Strike (ascension 9起 Level Up), Vigilance, Miracle (not played) |
@@ -2048,10 +2048,10 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | 5 | Wallop | Purity+ (kept in hand), Defend ×3 (no energy), Miracle (kept in hand) | — |
 | 6 | Strike, Inner Peace, Purity+ | — | — |
 | 7 | Bowling Bash, Rushdown | Vault (no energy), Miracle (kept in hand) | — |
-| 8 | Purity+ (0 energy) | — | Shuffle.; Miracle, Vault (Temperance 2nd times 满 12 cards ⇒ end of turn, Vault gives out Extra Turn) |
+| 8 | Purity+ (0 energy) | — | Shuffle; Miracle, Vault (the second Temperance hits 12 cards ⇒ the turn ends, and Vault grants an extra turn) |
 | 9 | Eruption+, Wallop, Indignation | Play (no energy), Meditate (no energy) | — |
 | 10 | Consecrate, Meditate | Sash Whip (kept in hand), Vigilance (kept in hand), Play (kept in hand) | — |
-| 11 | Eruption+, Purity+, Vigilance | Play (no energy) | Shuffle.; Inner Peace, Eruption+, Purity + (Exhaust Sash Whip · Bowling Bash · Wallop · Meditate · Indignation), Vigilance (triggers Temperance end of turn), Play (no energy 不 discard) |
+| 11 | Eruption+, Purity+, Vigilance | Play (no energy) | Shuffle; Inner Peace, Eruption+, Cleanse+ (Exhausts Sash Whip, Bowling Bash, Wallop, Meditate, Indignation), Vigilance (triggers Temperance to end the turn), Fear No Evil (kept, no energy) |
 | 12 | Consecrate, Inner Peace ×3 sets, Eruption+, Consecrate, Vigilance, Eruption+, Consecrate, Vigilance | Play (kept in hand), Purity+ (kept in hand) | 12+ (by default): Shuffle.; Eruption+, Consecrate, Inner Peace ×3 sets, Eruption+, Consecrate, Vigilance (triggers Temperance end of turn), Eruption+, Consecrate, Vigilance, Play (not played), Purity + (not played) |
 
 ---

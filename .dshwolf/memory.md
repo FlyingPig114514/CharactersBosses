@@ -6878,3 +6878,4 @@ Chronological action log.
 | 2026-11-23 11:04 | edit | `tools/loc-dump/dump_loc.gd` | ok | 0 |
 | 2026-11-23 11:10 | write | `tools/wiki/make-markdown-en.ps1` | ok | 0 |
 | 2026-11-23 11:10 | write | `tools/wiki/i18n-en.json` | ok | 0 |
+| 2026-11-23 12:04 | write | `tools/tmp/_en_work/notes_en.tsv` | ok | 0 |
