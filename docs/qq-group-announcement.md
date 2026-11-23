@@ -19,7 +19,8 @@
 3. 把「模板 + 那个 txt + 截图」一起发到群里，或传群文件「问题反馈」文件夹
 
 　崩溃 / 卡死 → 再加同目录的 characterbosses_trace.txt（很小，崩得再快也留得住）
-　　　　　　　 有 %LOCALAPPDATA%\CrashDumps\SlayTheSpire2.exe.*.dmp 的话也发（最准）
+　　　　　　　 想更准的话：打开 %LOCALAPPDATA%\CrashDumps（地址里**别带 ***.dmp**，资源管理器不认通配符），
+　　　　　　　 把 SlayTheSpire2 开头的 .dmp 发来（注意：Windows 默认不存，要先开启，见下）
 　多人掉线 / 不同步 → **房主和客机各按一次 F8**，两份我都要
 　按不了 F8（键位冲突 / 找不到文件）→ Win+R 输入 %APPDATA%\SlayTheSpire2\logs\
 　　　　　　　 先把 mod_log.txt 改个名，再复现一次，把新生成的那个发来
@@ -78,7 +79,8 @@
 
 ▍A. 崩溃 / 闪退 / 卡死（游戏直接没了，或画面完全不动）
 · 必发：%APPDATA%\SlayTheSpire2\logs\characterbosses_trace.txt
-· 有的话再发：%LOCALAPPDATA%\CrashDumps\SlayTheSpire2.exe.*.dmp（崩完才有，文件名带时间）
+· 崩溃转储（可选，最准）：打开 %LOCALAPPDATA%\CrashDumps，把 **SlayTheSpire2 开头**的 .dmp 发来
+  （不要写 *.dmp —— 通配符资源管理器不认，会弹「请检查拼写」；Windows 默认不存本地转储，需先按下面开启）
 · 再补：%APPDATA%\SlayTheSpire2\logs\godot.log 的**最后 100 行**
 · 顺手按一下 F8（有些崩溃是「假崩溃」，其实进程还在，recent 里能看到最后在干嘛）
 · 说清楚：卡死前你在做什么（点了结束回合？谁在出牌？有没有激发充能球？）
@@ -125,7 +127,25 @@
 
 ---
 
-## 四、管理员三件事（贴给管理员看，不用发群里）
+## 四、怎么开启崩溃转储（可选，给作者用）
+
+Windows 默认**不**在本地保存崩溃转储，所以 `%LOCALAPPDATA%\CrashDumps` 里通常只有别的程序（比如资源管理器、NVIDIA）的 dmp。
+想让游戏下次原生崩溃时留下证据，用**管理员** PowerShell 跑：
+
+```powershell
+$k = 'HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\SlayTheSpire2.exe'
+New-Item -Path $k -Force | Out-Null
+New-ItemProperty $k -Name DumpFolder -PropertyType ExpandString -Value '%LOCALAPPDATA%\CrashDumps' -Force | Out-Null
+New-ItemProperty $k -Name DumpType   -PropertyType DWord -Value 1 -Force | Out-Null   # 1=mini（够看调用栈）/ 2=完整（更大）
+New-ItemProperty $k -Name DumpCount  -PropertyType DWord -Value 3 -Force | Out-Null
+```
+
+关闭：`Remove-Item $k -Recurse`
+
+⚠ ① 只对本机有效；② 只对**原生层崩溃**有效（托管异常请用 `characterbosses_trace.txt`）；
+③ 地址栏里 `*.dmp` 是通配符，资源管理器不认 —— 要打开目录就写 `%LOCALAPPDATA%\CrashDumps`。
+
+## 五、管理员三件事（贴给管理员看，不用发群里）
 
 1. **收料**：按模板缺什么就问什么，缺「模组版本 / 是否多人 / 复现步骤」的一律先补齐。
 2. **归类**：把同一问题合并，给个编号（例：`#12 电球机崩溃`），方便我在 GitHub 里对上。
