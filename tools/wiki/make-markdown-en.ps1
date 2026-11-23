@@ -47,6 +47,13 @@ foreach ($t in @('cards', 'relics', 'powers', 'potions')) {
     Add-Pairs $NameZhEn (Join-Path $locDir "zhs_$t.json") (Join-Path $locDir "eng_$t.json")
     Add-Pairs $NameZhEn (Join-Path $Root "content\localization\zhs\$t.json") (Join-Path $Root "content\localization\eng\$t.json")
 }
+# 创意工坊那**两个观者模组**（3747492505 / 3747526116）的官方中英表 —— 观者卡名以它们为准
+foreach ($w in @('loc-w1', 'loc-w2')) {
+    $wDir = Join-Path $Root ('tools\tmp\' + $w)
+    foreach ($t in @('cards', 'relics', 'powers', 'potions')) {
+        Add-Pairs $NameZhEn (Join-Path $wDir "zhs_$t.json") (Join-Path $wDir "eng_$t.json")
+    }
+}
 
 # ── 人工英译表 ────────────────────────────────────────────────────────
 $I18n = @{ designs = @{}; info = @{}; reasons = @{}; notes = @{}; chars = @{}; extra = @{} }
@@ -74,8 +81,8 @@ $Missing = @{ designs = @{}; notes = @{}; names = @{}; reasons = @{}; info = @{}
 function N1([string]$zh) {
     $k = $zh.Trim()
     if ($k.Length -eq 0) { return '' }
-    if ($I18n['extra'].ContainsKey($k)) { return $I18n['extra'][$k] }
-    if ($NameZhEn.ContainsKey($k)) { return $NameZhEn[$k] }
+    if ($NameZhEn.ContainsKey($k)) { return $NameZhEn[$k] }      # 官方表优先（观者模组 / 游戏本体 / 本模组）
+    if ($I18n['extra'].ContainsKey($k)) { return $I18n['extra'][$k] }   # 只有官方表里没有的才用人工补的
     return $null
 }
 
