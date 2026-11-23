@@ -72,12 +72,12 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Act 3 | Shiv Huntress | Neutralize | Blade Dance, Cloak and Dagger, Hidden Daggers |  |
 | Act 3 | Brewer Huntress | Neutralize | Precise Cut, Fisticuffs |  |
 | Act 3 | Grand Finale Huntress | Neutralize | Backstab, Storm of Steel, Hidden Daggers |  |
-| Act 1 | Foresight Watcher | 涅槃, 心灵堡垒 | 碰撞连击, 斩破命运 |  |
-| Act 2 | Create Watcher | Pillar of Creation, 心灵堡垒 | 改造现实, 供奉, 义愤填膺 |  |
-| Act 2 | Retain Watcher | 心灵堡垒, Deceive Reality | 改造现实 |  |
-| Act 3 | Divinity Watcher | Vigilance, Swivel, Deceive Reality | 手摇鼓 |  |
-| Act 3 | Omega Watcher | 如水, 心灵堡垒 | 点穴（第 6 / 11 回合）, Strike |  |
-| Act 3 | Red-Blue Watcher | 心灵堡垒, Vigilance | 义愤填膺, 腰带抽打, 当头棒喝, 供奉 |  |
+| Act 1 | Foresight Watcher | Nirvana, Mental Fortress | Crash Combo, Cut Through Fate |  |
+| Act 2 | Create Watcher | Pillar of Creation, Mental Fortress | Establish Reality, Offer, Indignation |  |
+| Act 2 | Retain Watcher | Mental Fortress, Deceive Reality | Establish Reality |  |
+| Act 3 | Divinity Watcher | Vigilance, Swivel, Deceive Reality | Damaru |  |
+| Act 3 | Omega Watcher | Like Water, Mental Fortress | Pressure Points（第 6 / 11 回合）, Strike |  |
+| Act 3 | Red-Blue Watcher | Mental Fortress, Vigilance | Indignation, Sash Whip, Wallop, Offer |  |
 
 > Blank cell = that boss has **no** extra upgrade/relic at that level. The full list also appears in each boss's own section
 > (the "Ascension / Dread changes" line) — both come from the same `tools/wiki-dump` export.
@@ -150,7 +150,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | AoE burst turns | None |
 | Special effect type | Single-target |
 
-- **Deck** (20 cards): Zap ×2, Defend ×3, Guilty, Sweeping Beam, Charge Battery, Focused Strike, Greed, Tempest, Strike ×2, Capacitor ×2, 热修复+, Hologram, 双倍能量+, Signal Boost, Buffer
+- **Deck** (20 cards): Zap ×2, Defend ×3, Guilty, Sweeping Beam, Charge Battery, Focused Strike, Greed, Tempest, Strike ×2, Capacitor ×2, Hotfix+, Hologram, Double Energy+, Signal Boost, Buffer
 - **Deck note**: 按首次洗牌之前的回合统计（剧本没标洗牌，按「卡组÷每回合抽牌」推算首次洗牌在第 7 回合）
 - **Relics**: Cracked Core, Neow's Blessing, Permafrost, Horn Cleat
 - **Ascension / Dread changes**: Ascension 8: Buffer; Ascension 8: Charge Battery; Ascension 9: Sweeping Beam; Ascension 9: FocusStrike; Dread upgrade Tempest
@@ -246,7 +246,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | AoE burst turns | None |
 | Special effect type | Single-target |
 
-- **Deck** (15 cards): Strike ×4, 完美打击（王室认证） ×3, Stone Armor, Defend ×3, Bash, Setup Strike, Ashen Strike, Hellraiser
+- **Deck** (15 cards): Strike ×4, 完美Strike（王室认证） ×3, Stone Armor, Defend ×3, Bash, Setup Strike, Ashen Strike, Hellraiser
 - **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 6 回合）
 - **Relics**: Burning Blood, Neow's Blessing, Royal Stamp, Shuriken
 - **Ascension / Dread changes**: Ascension 8: Stone Armor; Ascension 9: 完美Strike; Ascension 9: 预备Strike; Ascension 8: Gorget
@@ -393,7 +393,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Special effect type | Single-target |
 | Junk-inserting power | Weak |
 
-- **Deck** (14 cards): 隐秘藏品+, Defend ×5, Collision Course ×2, Child of the Stars, Crush Under, Comet, Clumsy, Greed, Doubt
+- **Deck** (14 cards): Hidden Cache+, Defend ×5, Collision Course ×2, Child of the Stars, Crush Under, Comet, Clumsy, Greed, Doubt
 - **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 5 回合）
 - **Relics**: Divine Right, Neow's Blessing, Bag of Preparation, Mini Regent
 - **Ascension / Dread changes**: Ascension 8: Galactic Dust
@@ -440,7 +440,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Special effect type | Single-target |
 | Team debuff power | Strong |
 
-- **Deck** (7 cards): 被击晕, Bombardment, Clumsy ×2, Dying Star, Hidden Cache, 金斧+
+- **Deck** (7 cards): Stunned, Bombardment, Clumsy ×2, Dying Star, Hidden Cache, Gold Axe+
 - **Deck note**: 按全部回合统计（剧本既没标洗牌、也没法推算）
 - **Relics**: Divine Right, Neow's Blessing, Red Mask, Chandelier
 - **Ascension / Dread changes**: Ascension 8: Cloak of Stars; Ascension 8: Fisticuffs; Ascension 9: Dying Star; Ascension 9: Vajra
@@ -461,7 +461,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
-| 1 | 被击晕 | — | — |
+| 1 | Stunned | — | — |
 | 2 | Bombardment | Clumsy (unplayable (curse / status)), Clumsy (unplayable (curse / status)) | — |
 | 3 | Dying Star, Hidden Cache | Gold Axe+ (no energy) | 唤醒后 A：星灭、隐秘藏品、金斧+（保留，不出） |
 
@@ -483,7 +483,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | AoE burst turns | None |
 | Special effect type | Single-target |
 
-- **Deck** (27 cards): 速行者+, Strike ×5, Defend ×6, 早有准备+ ×2, Flick-Flack, Afterimage, Acrobatics, Ricochet, Survivor, Untouchable, Clumsy, 谋划专家+, Piercing Wail, Guilty, Backflip, Neutralize, Hidden Daggers
+- **Deck** (27 cards): Speedster+, Strike ×5, Defend ×6, Prepared+ ×2, Flick-Flack, Afterimage, Acrobatics, Ricochet, Survivor, Untouchable, Clumsy, Master Planner+, Piercing Wail, Guilty, Backflip, Neutralize, Hidden Daggers
 - **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 6 回合）
 - **Relics**: Ring of the Snake, Neow's Blessing, Shuriken, War Paint
 - **Ascension / Dread changes**: Ascension 8: Neutralize; Ascension 9: Flick-Flack; Ascension 9: Ricochet
@@ -529,7 +529,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Special effect type | Single-target |
 | Junk-inserting power | Below average |
 
-- **Deck** (16 cards): 速行者+, Backstab, Escape Plan, Survivor, Defend ×2, Flechettes, Blur, Strike, Sucker Punch, Hand Trick, Flick-Flack, Dagger Throw, Untouchable, Spore Mind, Deflect
+- **Deck** (16 cards): Speedster+, Backstab, Escape Plan, Survivor, Defend ×2, Flechettes, Blur, Strike, Sucker Punch, Hand Trick, Flick-Flack, Dagger Throw, Untouchable, Spore Mind, Deflect
 - **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 6 回合）
 - **Relics**: Ring of the Snake, Neow's Blessing, Cloak Clasp, Sparkling Rouge
 - **Ascension / Dread changes**: Ascension 8: Blur; Ascension 8: Escape Plan; Ascension 9: Backstab; Ascension 9: Flechettes
@@ -577,10 +577,10 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | AoE burst turns | None |
 | Special effect type | Single-target |
 
-- **Deck** (21 cards): 涅槃, Strike ×5, Clumsy, 奇迹, 心灵堡垒, Vigilance, 天眼, 迂回 ×3, 先见之明, 先见之明弃 受伤·防御；迂回, 化体为空, 斩破命运, Defend, 碰撞连击, 安宁
+- **Deck** (21 cards): Nirvana, Strike ×5, Clumsy, Miracle, Mental Fortress, Vigilance, Third Eye, Follow-Up ×3, Foresight, Foresight: discard, take damage / Defend; Follow-Up, Empty Body, Cut Through Fate, Defend, Crash Combo, Tranquility
 - **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 6 回合）
 - **Relics**: Neow's Blessing, Shuriken
-- **Ascension / Dread changes**: Ascension 8: 涅槃; Ascension 8: 心灵堡垒; Ascension 9: 碰撞连击; Ascension 9: 斩破命运
+- **Ascension / Dread changes**: Ascension 8: Nirvana; Ascension 8: Mental Fortress; Ascension 9: Crash Combo; Ascension 9: Cut Through Fate
 
 **Special effect**
 
@@ -592,14 +592,14 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
-| 1 | 涅槃, Strike, Clumsy | — | — |
-| 2 | 奇迹, 心灵堡垒, Vigilance | Strike (no energy) | — |
-| 3 | 天眼, 迂回, 先见之明 | Strike (no energy) | — |
-| 4 | 先见之明弃 受伤·防御；迂回, 化体为空, 斩破命运, 迂回, Defend, Strike | — | — |
-| 5 | 迂回, 碰撞连击, 安宁 | Strike (no energy) | — |
-| 6 | 天眼, 迂回, Defend | Strike (no energy) | 洗牌（美琅脂弃 暴怒·迂回）；先见之明弃 贪婪；迂回、天眼（弃 打击·防御）、迂回、防御、打击（没费） |
-| 7 | 先见之明弃 受伤；迂回, 化体为空, 斩破命运, 迂回, Defend, 碰撞连击 | — | — |
-| 8 | 迂回, Vigilance | Strike (no energy), Defend (no energy) | — |
+| 1 | Nirvana, Strike, Clumsy | — | — |
+| 2 | Miracle, Mental Fortress, Vigilance | Strike (no energy) | — |
+| 3 | Third Eye, Follow-Up, Foresight | Strike (no energy) | — |
+| 4 | Foresight: discard, take damage / Defend; Follow-Up, Empty Body, Cut Through Fate, Follow-Up, Defend, Strike | — | — |
+| 5 | Follow-Up, Crash Combo, Tranquility | Strike (no energy) | — |
+| 6 | Third Eye, Follow-Up, Defend | Strike (no energy) | 洗牌（美琅脂弃 暴怒·迂回）；先见之明弃 贪婪；迂回、天眼（弃 打击·防御）、迂回、防御、打击（没费） |
+| 7 | Foresight: discard, take damage; Follow-Up, Empty Body, Cut Through Fate, Follow-Up, Defend, Crash Combo | — | — |
+| 8 | Follow-Up, Vigilance | Strike (no energy), Defend (no energy) | — |
 
 ---
 
@@ -624,7 +624,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Special effect type | Self |
 | Team buff strength | Average |
 
-- **Deck** (20 cards): Bulk Up, +2 力量 +2 敏捷）, Chill, Boot Sequence, Claw ×2, Strike ×3, Defend ×4, Feral, Hotfix, Coolant, FTL, Charge Battery, Hyperbeam, 失去 3 集中）
+- **Deck** (20 cards): Bulk Up, +2 Strength, +2 Dexterity), Chill, Boot Sequence, Claw ×2, Strike ×3, Defend ×4, Feral, Hotfix, Coolant, FTL, Charge Battery, Hyperbeam, lose 3 Focus)
 - **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 7 回合）
 - **Relics**: Cracked Core, Neow's Blessing, Gold-Plated Cables, Driftwood, Data Disk
 - **Ascension / Dread changes**: Ascension 8: Charge Battery; Ascension 8: Boot Sequence; Ascension 9: One for All; Ascension 9: Coolant; Ascension 9: Hyperbeam
@@ -641,11 +641,11 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
-| 1 | Bulk Up, +2 力量 +2 敏捷）, Chill, Boot Sequence | — | 暴涨（失去 2 个充能球栏位、+2 力量 +2 敏捷）、冰寒（玩家方每有一个单位生成 1 个冰霜球）、启动流程（10 格挡） |
+| 1 | Bulk Up, +2 Strength, +2 Dexterity), Chill, Boot Sequence | — | 暴涨（失去 2 个充能球栏位、+2 力量 +2 敏捷）、冰寒（玩家方每有一个单位生成 1 个冰霜球）、启动流程（10 格挡） |
 | 2 | Claw, Strike, Defend | — | — |
 | 3 | Feral, Claw, Claw, Hotfix | — | — |
 | 4 | Coolant, FTL, FTL, Charge Battery, Helix Drill | Strike (no energy) | 冷却剂（单人）/一心化万（多人）、超越光速、超越光速（野性捞）、充电（下回合 +1 费）、螺旋钻机（超越光速抽上来的）、打击（抽上来的，没费） |
-| 5 | Hyperbeam, 失去 3 集中）, Defend | Defend (no energy) | — |
+| 5 | Hyperbeam, lose 3 Focus), Defend | Defend (no energy) | — |
 | 6 | Strike, Strike | Defend (no energy) | — |
 | 7 | Claw, Claw, Strike, Defend | — | 洗牌。爪击、爪击（野性捞）、打击、防御 |
 | 8 | FTL, FTL, Charge Battery, Defend, Helix Drill | Strike (no energy) | 超越光速、超越光速（野性捞）、充电、防御、螺旋钻机（抽上来的）、打击（抽上来的，没费） |
@@ -670,7 +670,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | AoE burst turns | 6, 9, 10 |
 | Special effect type | Self |
 
-- **Deck** (38 cards): Boot Sequence, Defragment, 彩虹+ ×2, Capacitor, Hailstorm, Thunder, 聚变+ ×2, Glasswork ×2, Defend ×7, Coolant, Greed, 热修复+ ×4, 全息影像+ ×2, Doubt ×2, Synchronize ×2, Barrage, Compile Driver, Bloodletting, Blur, Summon Forth, Defy, Tesla Coil, Sovereign Blade
+- **Deck** (38 cards): Boot Sequence, Defragment, Rainbow+ ×2, Capacitor, Hailstorm, Thunder, Fusion+ ×2, Glasswork ×2, Defend ×7, Coolant, Greed, Hotfix+ ×4, Hologram+ ×2, Doubt ×2, Synchronize ×2, Barrage, Compile Driver, Bloodletting, Blur, Summon Forth, Defy, Tesla Coil, Sovereign Blade
 - **Deck note**: 按首次洗牌之前的回合统计（剧本没标洗牌，按「卡组÷每回合抽牌」推算首次洗牌在第 11 回合）
 - **Relics**: Cracked Core, Neow's Blessing, Oddly Smooth Stone, Prismatic Gem, War Paint
 - **Ascension / Dread changes**: Ascension 8: Boot Sequence; Ascension 8: Coolant; Ascension 9: Hailstorm; Ascension 9: Thunder
@@ -721,7 +721,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Special effect type | Self |
 | Team buff strength | Weak |
 
-- **Deck** (9 cards): Rupture, Blood Wall, 全身撞击+, Not Yet, Brand, Strike ×3, Defend
+- **Deck** (9 cards): Rupture, Blood Wall, Body Slam+, Not Yet, Brand, Strike ×3, Defend
 - **Deck note**: 按首次洗牌之前的回合统计（剧本没标洗牌，按「卡组÷每回合抽牌」推算首次洗牌在第 4 回合）
 - **Relics**: Burning Blood, Neow's Blessing, Self-Forming Clay, Anchor, Pael's Flesh, Lantern
 - **Ascension / Dread changes**: Ascension 8: Blood Wall; Ascension 9: Brand
@@ -764,7 +764,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | AoE burst turns | 7 |
 | Special effect type | Self |
 
-- **Deck** (11 cards): 杂耍+, Feel No Pain, 惊逃+, Breakthrough, Strike ×7
+- **Deck** (11 cards): Juggling+, Feel No Pain, Stampede+, Breakthrough, Strike ×7
 - **Deck note**: 按首次洗牌之前的回合统计（剧本没标洗牌，按「卡组÷每回合抽牌」推算首次洗牌在第 4 回合）
 - **Relics**: Burning Blood, Neow's Blessing, Lantern, Pael's Wing, Happy Flower, Ornamental Fan, Shuriken
 - **Ascension / Dread changes**: Ascension 8: Feel No Pain; Ascension 8: Evil Eye; Ascension 9: 完美Strike; Ascension 9: Howl from Beyond
@@ -808,7 +808,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | AoE burst turns | None |
 | Special effect type | Single-target |
 
-- **Deck** (26 cards): 拖延+, 自动化+, Dirge, Severance ×2, Defend ×3, 守墓人+, Reanimate, Death March, The Scythe, Defy, Shame, Soul ×4, Wisp, 坟冢爆射+, Soul Storm, Melancholy, 吞噬生命+, Spur, Danse Macabre, Unleash
+- **Deck** (26 cards): Delay+, Automation+, Dirge, Severance ×2, Defend ×3, Grave Warden+, Reanimate, Death March, The Scythe, Defy, Shame, Soul ×4, Wisp, Graveblast+, Soul Storm, Melancholy, Devour Life+, Spur, Danse Macabre, Unleash
 - **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 6 回合）
 - **Relics**: Bound Phylactery, Neow's Blessing, War Paint, Ectoplasm, Bag of Preparation, Belt Buckle
 - **Ascension / Dread changes**: Ascension 8: Danse Macabre; Ascension 8: Defy; Ascension 9: Severance; Ascension 9: Death March
@@ -900,7 +900,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Special effect type | Global |
 | Ramp-up | Slow |
 
-- **Deck** (16 cards): Sovereign Blade, Cloak of Stars, Defend ×3, Furnace, Venerate, Know Thy Place, Crush Under, Parry, Falling Star, Seeking Edge, Convergence, 剑圣+, Strike, Beat into Shape
+- **Deck** (16 cards): Sovereign Blade, Cloak of Stars, Defend ×3, Furnace, Venerate, Know Thy Place, Crush Under, Parry, Falling Star, Seeking Edge, Convergence, Sword Sage+, Strike, Beat into Shape
 - **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 6 回合）
 - **Relics**: Divine Right, Neow's Blessing, Fencing Manual, Pael's Legion, Mini Regent
 - **Ascension / Dread changes**: Ascension 8: I Am Invincible; Ascension 8: Parry; Ascension 9: Furnace
@@ -947,7 +947,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Special effect type | Global |
 | Team debuff power | Strong |
 
-- **Deck** (22 cards): 封印王座+, Monarch's Gaze, Clumsy ×2, 光子切割+, Kingly Punch ×2, Kingly Kick ×3, Defend ×2, Strike ×3, Cloak of Stars, Royalties, Royal Gamble, Decisions, Decisions, Summon Forth, Alignment, Sovereign Blade
+- **Deck** (22 cards): The Sealed Throne+, Monarch's Gaze, Clumsy ×2, Photon Cut+, Kingly Punch ×2, Kingly Kick ×3, Defend ×2, Strike ×3, Cloak of Stars, Royalties, Royal Gamble, Decisions, Decisions, Summon Forth, Alignment, Sovereign Blade
 - **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 7 回合）
 - **Relics**: Divine Right, Neow's Blessing, Gorget, Dusty Tome, Red Mask
 - **Ascension / Dread changes**: Ascension 8: Cosmic Indifference; Ascension 9: Summon Forth; Ascension 8: Orichalcum; Ascension 9: Mr. Struggles; Dread upgrade Monarch's Gaze
@@ -998,7 +998,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Team debuff power | Extreme |
 | Team buff power | Extreme |
 
-- **Deck** (25 cards): Collision Course, BEGONE!, Minion Strike, 隐秘藏品+, Defend ×4, Royal Gamble, 光谱偏移+, CHARGE!!, Minion Dive Bomb ×2, Prowess, Resonance, Dark Shackles, Quasar, Shockwave, GUARDS!!!, Minion Sacrifice ×3, Rend, Child of the Stars, Clumsy
+- **Deck** (25 cards): Collision Course, BEGONE!, Minion Strike, Hidden Cache+, Defend ×4, Royal Gamble, Spectrum Shift+, CHARGE!!, Minion Dive Bomb ×2, Prowess, Resonance, Dark Shackles, Quasar, Shockwave, GUARDS!!!, Minion Sacrifice ×3, Rend, Child of the Stars, Clumsy
 - **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 7 回合）
 - **Relics**: Divine Right, Neow's Blessing, Galactic Dust, Biiig Hug, Vitruvian Minion, Regalite
 - **Ascension / Dread changes**: Ascension 8: GUARDS!!!; Ascension 8: Child of the Stars; Ascension 9: BEGONE!; Ascension 9: CHARGE!!; Ascension 9: Quasar; Ascension 9: Shockwave; Ascension 9: Ultimate Defend; Ascension 9: Minion Dive Bomb; Ascension 9: 仆从Strike; Ascension 8: Minion Sacrifice
@@ -1047,7 +1047,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | AoE burst turns | 8 |
 | Special effect type | Global |
 
-- **Deck** (24 cards): 涂毒+, Backstab, Deflect, Strike ×5, Defend ×4, Survivor, Ricochet, Poisoned Stab, Dagger Spray, Noxious Fumes, Piercing Wail, Echoing Slash, Infinite Blades, The Hunt, Shiv, Neutralize, Blade Dance
+- **Deck** (24 cards): Envenom+, Backstab, Deflect, Strike ×5, Defend ×4, Survivor, Ricochet, Poisoned Stab, Dagger Spray, Noxious Fumes, Piercing Wail, Echoing Slash, Infinite Blades, The Hunt, Shiv, Neutralize, Blade Dance
 - **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 8 回合）
 - **Relics**: Ring of the Snake, Neow's Blessing, Snecko Skull, Toasty Mittens, Anchor
 - **Ascension / Dread changes**: Ascension 8: Neutralize; Ascension 9: Noxious Fumes; Ascension 9: Ricochet
@@ -1149,10 +1149,10 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Special effect type | Single-target |
 | Team debuff power | Strong |
 
-- **Deck** (19 cards): 武器库+, 操控现实+, 改造现实, 惩恶+ ×3, 奇迹, 心灵堡垒, Vigilance, Strike, 义愤填膺, Pillar of Creation, 供奉, 暴怒+, 内心宁静, Deceive Reality, 平安+, Know Thy Place, 化体为空
+- **Deck** (19 cards): Arsenal+, Master Reality+, Establish Reality, Punish+ ×3, Miracle, Mental Fortress, Vigilance, Strike, Indignation, Pillar of Creation, Offer, Eruption+, Inner Peace, Deceive Reality, Safety+, Know Thy Place, Empty Body
 - **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 6 回合）
 - **Relics**: Neow's Blessing, Cloak Clasp, Driftwood, Horn Cleat
-- **Ascension / Dread changes**: Ascension 8: Pillar of Creation; Ascension 8: Pillar of Creation; Ascension 8: 心灵堡垒; Ascension 9: 改造现实; Ascension 9: 供奉; Ascension 9: 义愤填膺
+- **Ascension / Dread changes**: Ascension 8: Pillar of Creation; Ascension 8: Pillar of Creation; Ascension 8: Mental Fortress; Ascension 9: Establish Reality; Ascension 9: Offer; Ascension 9: Indignation
 
 **Special effect**
 
@@ -1166,14 +1166,14 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
-| 1 | Arsenal+, Master Reality+, 改造现实 | 惩恶+ (no energy) | — |
-| 2 | 奇迹, 心灵堡垒, Vigilance | Strike (no energy), 惩恶+ (no energy) | 奇迹、心灵堡垒（进阶8起升级）、警惕、打击（没费）、惩恶+（没费） |
-| 3 | 义愤填膺, 惩恶+, Pillar of Creation | — | 义愤填膺（进阶9起升级）、惩恶+、创世之柱（进阶8起升级） |
-| 4 | 供奉, 暴怒+, 内心宁静 | — | 供奉（进阶9起升级）、暴怒+、内心宁静 |
-| 5 | Deceive Reality, 平安+, Know Thy Place | 化体为空 (no energy) | — |
-| 6 | 改造现实, 化体为空, Vigilance | 惩恶+ (no energy) | 洗牌（她重新洗牌）、改造现实（进阶9起升级）、化体为空、警惕、惩恶+（没费） |
-| 7 | 暴怒+, Deceive Reality, 惩恶+, 平安+ | Strike (no energy) | — |
-| 8 | 供奉, 义愤填膺, 内心宁静 | — | 供奉（进阶9起升级）、义愤填膺（进阶9起升级）、内心宁静 |
+| 1 | Arsenal+, Master Reality+, Establish Reality | Punish+ (no energy) | — |
+| 2 | Miracle, Mental Fortress, Vigilance | Strike (no energy), Punish+ (no energy) | 奇迹、心灵堡垒（进阶8起升级）、警惕、打击（没费）、惩恶+（没费） |
+| 3 | Indignation, Punish+, Pillar of Creation | — | 义愤填膺（进阶9起升级）、惩恶+、创世之柱（进阶8起升级） |
+| 4 | Offer, Eruption+, Inner Peace | — | 供奉（进阶9起升级）、暴怒+、内心宁静 |
+| 5 | Deceive Reality, Safety+, Know Thy Place | Empty Body (no energy) | — |
+| 6 | Establish Reality, Empty Body, Vigilance | Punish+ (no energy) | 洗牌（她重新洗牌）、改造现实（进阶9起升级）、化体为空、警惕、惩恶+（没费） |
+| 7 | Eruption+, Deceive Reality, Punish+, Safety+ | Strike (no energy) | — |
+| 8 | Offer, Indignation, Inner Peace | — | 供奉（进阶9起升级）、义愤填膺（进阶9起升级）、内心宁静 |
 
 <a id="WATCHER_RETAIN"></a>
 
@@ -1193,10 +1193,10 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | AoE burst turns | 4, 8 |
 | Special effect type | Single-target |
 
-- **Deck** (24 cards): 确立基础+, Strike, 时之沙 ×3, Vigilance, 坚韧 ×2, 旋转打击 ×3, 奇迹 ×2, Deceive Reality, 改造现实, Defend, 平安·惩恶·坚韧·旋转打击, 心灵堡垒, 义愤填膺, 惩恶, 平安, 结末, 停顿, 安宁
+- **Deck** (24 cards): Establishment+, Strike, Sands of Time ×3, Vigilance, Perseverance ×2, Wheel Kick ×3, Miracle ×2, Deceive Reality, Establish Reality, Defend, Safety / Punish / Perseverance / Wheel Kick, Mental Fortress, Indignation, Punish, Safety, Finale, Halt, Tranquility
 - **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 6 回合）
 - **Relics**: Neow's Blessing, Cloak Clasp, Pael's Legion, Vambrace
-- **Ascension / Dread changes**: Ascension 8: 心灵堡垒; Ascension 8: Deceive Reality; Ascension 9: 改造现实
+- **Ascension / Dread changes**: Ascension 8: Mental Fortress; Ascension 8: Deceive Reality; Ascension 9: Establish Reality
 
 **Special effect**
 
@@ -1208,15 +1208,15 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
-| 1 | Establishment+, Strike | 时之沙 (kept in hand) | — |
-| 2 | Vigilance | 坚韧 (kept in hand), 旋转打击 (kept in hand), 时之沙 (kept in hand), 奇迹 (kept in hand) | — |
-| 3 | 奇迹, 时之沙, Deceive Reality, 改造现实, Defend | 平安·惩恶·坚韧·旋转打击 (kept in hand) | — |
-| 4 | 心灵堡垒, 义愤填膺, 惩恶, 平安, 坚韧, 结末 | 旋转打击 (kept in hand) | — |
-| 5 | 旋转打击, 停顿, 安宁 | — | — |
-| 6 | 改造现实, 时之沙 | 惩恶 (kept in hand), 平安 (kept in hand) | 洗牌。欺瞒现实、改造现实、时之沙(0)、惩恶（保留不出）、平安（保留不出） |
-| 7 | Strike | 坚韧·旋转打击·惩恶·平安 (kept in hand) | 打击、坚韧·旋转打击·惩恶·平安（0费，保留不出） |
-| 8 | 义愤填膺, 坚韧, Defend, 惩恶, 平安, 结末 | 旋转打击 (kept in hand) | — |
-| 9 | 旋转打击, 停顿, Vigilance | — | — |
+| 1 | Establishment+, Strike | Sands of Time (kept in hand) | — |
+| 2 | Vigilance | Perseverance (kept in hand), Wheel Kick (kept in hand), Sands of Time (kept in hand), Miracle (kept in hand) | — |
+| 3 | Miracle, Sands of Time, Deceive Reality, Establish Reality, Defend | Safety / Punish / Perseverance / Wheel Kick (kept in hand) | — |
+| 4 | Mental Fortress, Indignation, Punish, Safety, Perseverance, Finale | Wheel Kick (kept in hand) | — |
+| 5 | Wheel Kick, Halt, Tranquility | — | — |
+| 6 | Establish Reality, Sands of Time | Punish (kept in hand), Safety (kept in hand) | 洗牌。欺瞒现实、改造现实、时之沙(0)、惩恶（保留不出）、平安（保留不出） |
+| 7 | Strike | Perseverance / Wheel Kick / Punish / Safety (kept in hand) | 打击、坚韧·旋转打击·惩恶·平安（0费，保留不出） |
+| 8 | Indignation, Perseverance, Defend, Punish, Safety, Finale | Wheel Kick (kept in hand) | — |
+| 9 | Wheel Kick, Halt, Vigilance | — | — |
 
 ---
 
@@ -1241,7 +1241,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Special effect type | Single-target |
 | Team buff power | Weak |
 
-- **Deck** (21 cards): 偏差认知+, Glacier, Barrage, Subroutine, Hailstorm, Dualcast, Zap, 碎片整理+, Coolant, Creative AI, Hotfix, Cold Snap, Storm, Hologram, Strike, Charge Battery, Boost Away, Defend ×2, Ultimate Defend, Leap
+- **Deck** (21 cards): Biased Cognition+, Glacier, Barrage, Subroutine, Hailstorm, Dualcast, Zap, Defragment+, Coolant, Creative AI, Hotfix, Cold Snap, Storm, Hologram, Strike, Charge Battery, Boost Away, Defend ×2, Ultimate Defend, Leap
 - **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 8 回合）
 - **Relics**: Cracked Core, Neow's Blessing, Red Mask, Permafrost, Dusty Tome, Sturdy Clamp, Whispering Earring, Tungsten Rod
 - **Ascension / Dread changes**: Ascension 8: Charge Battery; Ascension 8: Ultimate Defend; Ascension 8: Boost Away; Ascension 9: Data Disk
@@ -1393,7 +1393,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 - **Deck** (3 cards): Mythic Form ×3
 - **Deck note**: 代码登记卡组（首次洗牌前剧本里没有出牌，例如塔罗牌都是生成的）
 - **Relics**: Song Bow, Neow's Blessing, Anchor, Ringing Triangle, Pael's Tears, Permafrost, Philosopher's Stone, Mercury Hourglass
-- **Ascension / Dread changes**: Ascension 8: Orichalcum; Ascension 8: Oddly Smooth Stone; Ascension 9: Vajra; Dread upgrade Mythic Form; Dread upgrade The Emperor; Dread upgrade 皇后; Dread upgrade Strength; Dread upgrade Justice; Dread upgrade The Fool; Dread upgrade The Magician; Dread upgrade The High Priestess; Dread upgrade The Chariot; Dread upgrade The World; Dread upgrade Temperance; Dread upgrade Wheel of Fortune; Dread upgrade The Moon; Dread upgrade The Star; Dread upgrade The Sun; Dread upgrade Death; Dread upgrade The Hermit; Dread upgrade The Lovers; Dread upgrade The Hanged Man; Dread upgrade 高The Tower; Dread upgrade Judgement; Dread upgrade The Devil; Dread upgrade The Hierophant; Dread upgrade 被遗忘的Ritual; Dread upgrade Wisp; Dread upgrade Demon Form; Dread upgrade Serpent Form; Dread upgrade Death形态; Dread upgrade Echo Form; Dread upgrade Void Form; Dread upgrade Neurosurge; Dread upgrade Inflame; Dread upgrade Footwork; Dread upgrade Pillar of Creation; Dread upgrade Sleight of Flesh; Dread upgrade Defragment; Dread upgrade Rolling Boulder; Dread upgrade Eternal Armor; Dread upgrade Shockwave; Dread upgrade Fasting; Dread upgrade Deva Form; Dread upgrade Brawl; Dread upgrade Eternal Form
+- **Ascension / Dread changes**: Ascension 8: Orichalcum; Ascension 8: Oddly Smooth Stone; Ascension 9: Vajra; Dread upgrade Mythic Form; Dread upgrade The Emperor; Dread upgrade The Empress; Dread upgrade Strength; Dread upgrade Justice; Dread upgrade The Fool; Dread upgrade The Magician; Dread upgrade The High Priestess; Dread upgrade The Chariot; Dread upgrade The World; Dread upgrade Temperance; Dread upgrade Wheel of Fortune; Dread upgrade The Moon; Dread upgrade The Star; Dread upgrade The Sun; Dread upgrade Death; Dread upgrade The Hermit; Dread upgrade The Lovers; Dread upgrade The Hanged Man; Dread upgrade 高The Tower; Dread upgrade Judgement; Dread upgrade The Devil; Dread upgrade The Hierophant; Dread upgrade 被遗忘的Ritual; Dread upgrade Wisp; Dread upgrade Demon Form; Dread upgrade Serpent Form; Dread upgrade Death形态; Dread upgrade Echo Form; Dread upgrade Void Form; Dread upgrade Neurosurge; Dread upgrade Inflame; Dread upgrade Footwork; Dread upgrade Pillar of Creation; Dread upgrade Sleight of Flesh; Dread upgrade Defragment; Dread upgrade Rolling Boulder; Dread upgrade Eternal Armor; Dread upgrade Shockwave; Dread upgrade Fasting; Dread upgrade Deva Form; Dread upgrade Brawl; Dread upgrade Eternal Form
 
 **Special effect**
 
@@ -1414,7 +1414,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 |:---:|---|---|---|
 | 1 | Mythic Form | Mythic Form (no energy), Mythic Form (no energy) | — |
 | 2 | The Emperor, Mythic Form | Mythic Form (no energy) | — |
-| 3 | The High Priestess, Justice, 皇后 | — | 女祭司（无效果）、正义、女皇 |
+| 3 | The High Priestess, Justice, The Empress | — | 女祭司（无效果）、正义、女皇 |
 | 4 | The Fool, The Magician, The High Priestess | — | — |
 | 5 | The Chariot, The World, The Devil | — | — |
 | 6 | Temperance, The Magician, Wheel of Fortune | — | — |
@@ -1422,10 +1422,10 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | 8 | The Star, The Star, The Magician | — | — |
 | 9 | The Emperor, The Emperor, The Lovers, Forgotten Ritual, Wisp | Demon Form (no energy), Serpent Form (no energy), Reaper Form (no energy), Echo Form (no energy), Deva Form (no energy), Eternal Form (no energy), Bundle of Joy (no energy), Dark Shackles (no energy), Prowess (no energy), Panic Button (no energy), Void Form (no energy) | — |
 | 10 | The Fool, The High Priestess, The Magician | — | — |
-| 11 | 皇后, The Emperor, The Hierophant, Rolling Boulder | Eternal Armor (no energy), Shockwave (no energy) | 女皇（2 次）、皇帝、教皇（印滚石/永恒铠甲/震荡波）、滚石、永恒铠甲、震荡波 |
+| 11 | The Empress, The Emperor, The Hierophant, Rolling Boulder | Eternal Armor (no energy), Shockwave (no energy) | 女皇（2 次）、皇帝、教皇（印滚石/永恒铠甲/震荡波）、滚石、永恒铠甲、震荡波 |
 | 12 | Strength, The Chariot, The Lovers, Neurosurge, Neurosurge, Inflame, Footwork, Pillar of Creation | Sleight of Flesh (no energy), Defragment (no energy), Fasting (no energy), Brawl (no energy), Bundle of Joy (no energy), Dark Shackles (no energy), Panic Button (no energy), Panache (no energy) | — |
 | 13 | Justice, The Hermit, Wheel of Fortune | — | — |
-| 14 | Temperance, The Hanged Man, Death, 高塔, The Star, The Devil | — | 节制（2 次）、倒吊人、死神 ⇒【倒吊人的额外回合】高塔（2 次）、星星、恶魔（无效果） |
+| 14 | Temperance, The Hanged Man, Death, The Tower, The Star, The Devil | — | 节制（2 次）、倒吊人、死神 ⇒【倒吊人的额外回合】高塔（2 次）、星星、恶魔（无效果） |
 | 15 | The Star, The Sun, The Moon | — | — |
 | 16 | Judgement, The World, The Devil | Soot (discarded) | 审判（生命 ≤30 秒杀；恐惧模式升级版 ≤40）（2 次）、世界（无效果）、恶魔、煤灰（被消耗） |
 
@@ -1448,7 +1448,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Special effect type | Single-target |
 | Team debuff power | Average |
 
-- **Deck** (15 cards): Stone Armor, Defend ×3, Tremble, Dismantle, Conflagration, Taunt, Impervious, 主宰（灵魂）, Strike ×2, Bully, Thunderclap, Bash
+- **Deck** (15 cards): Stone Armor, Defend ×3, Tremble, Dismantle, Conflagration, Taunt, Impervious, Dominate（Soul）, Strike ×2, Bully, Thunderclap, Bash
 - **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 6 回合）
 - **Relics**: Burning Blood, Neow's Blessing, Oddly Smooth Stone, Pael's Legion, Orichalcum, Whispering Earring, Vambrace
 - **Ascension / Dread changes**: Ascension 8: Stone Armor; Ascension 9: Dominate; Ascension 8: Gorget
@@ -1493,7 +1493,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | AoE burst turns | 8 |
 | Special effect type | Single-target |
 
-- **Deck** (20 cards): Enthralled, 祭品+, 腐化+, 武装+, 原始力量+, 巨石+ ×4, Headbutt, Feel No Pain, Flame Barrier, Defend ×4, 坚毅+, Howl from Beyond, Iron Wave, Strike
+- **Deck** (20 cards): Enthralled, Offering+, Corruption+, Armaments+, Primal Force+, Giant Rock+ ×4, Headbutt, Feel No Pain, Flame Barrier, Defend ×4, True Grit+, Howl from Beyond, Iron Wave, Strike
 - **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 6 回合）
 - **Relics**: Burning Blood, Neow's Blessing, Gorget, Dusty Tome, Anchor, Blood-Soaked Rose, Permafrost, Royal Stamp
 - **Ascension / Dread changes**: Ascension 8: Feel No Pain; Ascension 9: Howl from Beyond; Ascension 8: Orichalcum; Ascension 9: Vajra
@@ -1626,7 +1626,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | AoE burst turns | 4, 6, 9 |
 | Special effect type | Single-target |
 
-- **Deck** (3 cards): Pillar of Creation, 流光溢彩+, Supermassive
+- **Deck** (3 cards): Pillar of Creation, Glitterstream+, Supermassive
 - **Deck note**: 按首次洗牌之前的回合统计（剧本没标洗牌，按「卡组÷每回合抽牌」推算首次洗牌在第 2 回合）
 - **Relics**: Lantern, Yummy Cookie, Vexing Puzzlebox, Philosopher's Stone, Permafrost
 - **Ascension / Dread changes**: Ascension 9: The Bomb; Ascension 8: Regalite
@@ -1674,7 +1674,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | AoE burst turns | 2, 6, 8 |
 | Special effect type | Global |
 
-- **Deck** (20 cards): 黑洞+, 辉光+ ×2, 汇流+ ×2, Astral Pulse ×2, 太阳打击+, Defend ×2, 花样百出+, Omnislice, Kingly Punch, Ultimate Defend ×2, Cloak of Stars, Salvo, 隐秘藏品+, Normality, Seven Stars
+- **Deck** (20 cards): Black Hole+, Glow+ ×2, Convergence+ ×2, Astral Pulse ×2, Solar Strike+, Defend ×2, Jack of All Trades+, Omnislice, Kingly Punch, Ultimate Defend ×2, Cloak of Stars, Salvo, Hidden Cache+, Normality, Seven Stars
 - **Deck note**: 按首次洗牌之前的回合统计（剧本没标洗牌，按「卡组÷每回合抽牌」推算首次洗牌在第 6 回合）
 - **Relics**: Divine Right, Neow's Blessing, Sparkling Rouge, Yummy Cookie, Captain's Wheel, Philosopher's Stone, Mini Regent
 - **Ascension / Dread changes**: Ascension 8: Cloak of Stars; Ascension 9: Salvo; Ascension 9: Kingly Punch; Ascension 8: Galactic Dust
@@ -1720,7 +1720,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | AoE burst turns | 2, 6, 10, 12 |
 | Special effect type | Single-target |
 
-- **Deck** (21 cards): Child of the Stars, 崇拜+, Royalties, 抉择，抉择+（王室认证） ×4, Heavenly Drill, Sovereign Blade ×2, Big Bang, Glow, Gather Light, Radiate, Refine Blade, Parry, Stardust, 汇流+, Defend, Hidden Cache, Strike
+- **Deck** (21 cards): Child of the Stars, Venerate+, Royalties, Decisions, Decisions+（王室认证） ×4, Heavenly Drill, Sovereign Blade ×2, Big Bang, Glow, Gather Light, Radiate, Refine Blade, Parry, Stardust, Convergence+, Defend, Hidden Cache, Strike
 - **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 5 回合）
 - **Relics**: Divine Right, Neow's Blessing, Bag of Preparation, Burning Sticks, Glass Eye, Fencing Manual, Royal Stamp, Sai, Lantern
 - **Ascension / Dread changes**: Ascension 8: Child of the Stars; Ascension 8: Gather Light; Ascension 9: Refine Blade; Ascension 9: Shockwave
@@ -1821,7 +1821,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Team debuff power | Average |
 | Durability | Very high |
 
-- **Deck** (26 cards): 明晰提取物, 明耀酊剂, 敏捷药水｜扫腿, Survivor, Piercing Wail, Precise Cut, Defend ×2, 镣铐药水, 爆炸药水｜夜魇, 炼制药水+, Neutralize, Serpent Form, 炼制药水+（灵魂） ×3, Footwork, Burst, Blur, 格挡药水, 异鱼之油, 混沌药水｜预判, 复制药水, 坚韧之环×2, Fisticuffs, Deflect
+- **Deck** (26 cards): Clarity Extract, Radiant Tincture, Dexterity Potion / Leg Sweep, Survivor, Piercing Wail, Precise Cut, Defend ×2, Shackling Potion, Explosive Potion / Nightmare, Alchemize+, Neutralize, Serpent Form, Alchemize+（Soul） ×3, Footwork, Burst, Blur, Block Potion, Fysh Oil, Entropic Brew / Anticipate, Duplicator, Toric Toughness ×2, Fisticuffs, Deflect
 - **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 5 回合）
 - **Relics**: Ring of the Snake, Neow's Blessing, Reptile Trinket, Alchemical Coffer, Potion Belt, White Beast Statue, Delicate Frond, Paper Krane, Lantern, Chandelier
 - **Ascension / Dread changes**: Ascension 8: Neutralize; Ascension 9: Precise Cut; Ascension 9: Fisticuffs; Dread upgrade Serpent Form
@@ -1845,14 +1845,14 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
-| 1 | 明晰提取物, 明耀酊剂, 敏捷药水｜扫腿, Survivor, Piercing Wail, Precise Cut | Defend (no energy) | — |
-| 2 | 镣铐药水, 爆炸药水｜夜魇, Alchemize+, Neutralize | Defend (no energy) | 镣铐药水、爆炸药水｜夜魇（复制炼药）、炼制药水+（灵魂之力）→ 喝瓶中船、中和、防御（没费） |
+| 1 | Clarity Extract, Radiant Tincture, Dexterity Potion / Leg Sweep, Survivor, Piercing Wail, Precise Cut | Defend (no energy) | — |
+| 2 | Shackling Potion, Explosive Potion / Nightmare, Alchemize+, Neutralize | Defend (no energy) | 镣铐药水、爆炸药水｜夜魇（复制炼药）、炼制药水+（灵魂之力）→ 喝瓶中船、中和、防御（没费） |
 | 3 | Serpent Form | Alchemize+ (no energy), Alchemize+ (no energy), Alchemize+ (no energy), Footwork (no energy), Burst (no energy), Blur (no energy) | 瓶中船、罐装幽灵｜炼制药水+×3（格挡/复制/异鱼之油）、灵动步法、爆发、残影 |
-| 4 | 格挡药水, 异鱼之油, 混沌药水｜预判, 复制药水, 坚韧之环×2, Fisticuffs, Deflect | — | 格挡药水、异鱼之油、混沌药水｜预判、复制药水、坚韧之环×2、拳斗、偏折 |
-| 5 | 明耀酊剂, 敏捷药水｜炼制药水+, Leg Sweep, Precise Cut, Survivor | — | 洗牌。明晰提取物、明耀酊剂、敏捷药水｜炼制药水+（炼格挡药水）、扫腿、精确切击、生存者 |
+| 4 | Block Potion, Fysh Oil, Entropic Brew / Anticipate, Duplicator, Toric Toughness ×2, Fisticuffs, Deflect | — | 格挡药水、异鱼之油、混沌药水｜预判、复制药水、坚韧之环×2、拳斗、偏折 |
+| 5 | Radiant Tincture, Dexterity Potion / Alchemize+, Leg Sweep, Precise Cut, Survivor | — | 洗牌。明晰提取物、明耀酊剂、敏捷药水｜炼制药水+（炼格挡药水）、扫腿、精确切击、生存者 |
 | 6 | Alchemize+, Alchemize+, Defend | Decay (unplayable (curse / status)) | 镣铐药水｜炼制药水+（瓶中船）、炼制药水+（异鱼之油）、防御、腐朽 |
-| 7 | 瓶中船, 罐装幽灵, 爆炸药水｜中和, Alchemize+, Burst, Blur | — | 瓶中船、罐装幽灵、爆炸药水｜中和、炼制药水+（复制药水）、爆发、残影 |
-| 8 | 格挡药水, 异鱼之油, 混沌药水, （二阶段：混沌补出的流动铜液 → 她获得 3 层荆棘）｜预判, 复制药水, 坚韧之环×2, Fisticuffs, Deflect | — | 格挡药水、异鱼之油、混沌药水、（二阶段：混沌补出的流动铜液 → 她获得 3 层荆棘）｜预判、复制药水、坚韧之环×2、拳斗、偏折 |
+| 7 | Ship in a Bottle, Ghost in a Jar, Explosive Potion / Neutralize, Alchemize+, Burst, Blur | — | 瓶中船、罐装幽灵、爆炸药水｜中和、炼制药水+（复制药水）、爆发、残影 |
+| 8 | Block Potion, Fysh Oil, Entropic Brew, （二阶段：Chaos补出的Liquid Bronze → 她获得 3 层Thorns） / Anticipate, Duplicator, Toric Toughness ×2, Fisticuffs, Deflect | — | 格挡药水、异鱼之油、混沌药水、（二阶段：混沌补出的流动铜液 → 她获得 3 层荆棘）｜预判、复制药水、坚韧之环×2、拳斗、偏折 |
 
 <a id="SILENT_GRAND_FINALE"></a>
 
@@ -1872,7 +1872,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | AoE burst turns | 9 |
 | Special effect type | Global |
 
-- **Deck** (30 cards): Well-Laid Plans, Backstab, Clumsy, Adrenaline, 夜魇+, Acrobatics ×4, Tactician, Hidden Daggers, Defend ×5, Memento Mori, Neutralize, Hand Trick, Storm of Steel, Grand Finale, Murder, 必备工具+, Deflect, Strike ×4, Piercing Wail, Survivor
+- **Deck** (30 cards): Well-Laid Plans, Backstab, Clumsy, Adrenaline, Nightmare+, Acrobatics ×4, Tactician, Hidden Daggers, Defend ×5, Memento Mori, Neutralize, Hand Trick, Storm of Steel, Grand Finale, Murder, Tools of the Trade+, Deflect, Strike ×4, Piercing Wail, Survivor
 - **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 7 回合）
 - **Relics**: Ring of the Snake, Neow's Blessing, Bag of Marbles, Pael's Flesh, Tough Bandages, Looming Fruit, Mercury Hourglass
 - **Ascension / Dread changes**: Ascension 8: Neutralize; Ascension 9: Backstab; Ascension 9: Storm of Steel; Ascension 9: Hidden Daggers
@@ -1922,7 +1922,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | AoE burst turns | 6, 10 |
 | Special effect type | Single-target |
 
-- **Deck** (21 cards): 许愿+, Strike ×2, Vigilance, 光辉, Defend, 敬拜, 奇迹 ×2, 聚能成刃, 供奉, Greed, 化拳为空, 摆手, Deceive Reality, 平安, 灭除之刃, Devotion, Swivel, 圣洁, 结末
+- **Deck** (21 cards): Wish+, Strike ×2, Vigilance, Brilliance, Defend, Worship, Miracle ×2, Gather Blade, Offer, Greed, Empty Fist, Wave of the Hand, Deceive Reality, Safety, Annihilate Blade, Devotion, Swivel, Sanctity, Finale
 - **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 7 回合）
 - **Relics**: Neow's Blessing, Lantern, Pael's Legion, Oddly Smooth Stone, Empty Cage, Orichalcum
 
@@ -1943,16 +1943,16 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
 | 1 | Wish+, Strike, Vigilance | — | — |
-| 2 | 光辉, Defend, 敬拜 | 奇迹 (kept in hand) | — |
-| 3 | 奇迹, 聚能成刃, 供奉, Greed | — | — |
-| 4 | 化拳为空, 摆手, Deceive Reality, 平安 | — | — |
-| 5 | 灭除之刃, Devotion, Swivel | — | — |
-| 6 | Strike, 圣洁, 结末 | — | — |
-| 7 | 光辉, 敬拜, Greed | — | 洗牌（待确认）、光辉、敬拜（有费就打）、贪婪 |
-| 8 | Strike, 供奉, Vigilance | — | — |
-| 9 | 灭除之刃, Defend, Swivel | — | — |
-| 10 | Strike, 圣洁, 结末 | — | — |
-| 11 | 化拳为空, 摆手, Deceive Reality, 平安 | — | — |
+| 2 | Brilliance, Defend, Worship | Miracle (kept in hand) | — |
+| 3 | Miracle, Gather Blade, Offer, Greed | — | — |
+| 4 | Empty Fist, Wave of the Hand, Deceive Reality, Safety | — | — |
+| 5 | Annihilate Blade, Devotion, Swivel | — | — |
+| 6 | Strike, Sanctity, Finale | — | — |
+| 7 | Brilliance, Worship, Greed | — | 洗牌（待确认）、光辉、敬拜（有费就打）、贪婪 |
+| 8 | Strike, Offer, Vigilance | — | — |
+| 9 | Annihilate Blade, Defend, Swivel | — | — |
+| 10 | Strike, Sanctity, Finale | — | — |
+| 11 | Empty Fist, Wave of the Hand, Deceive Reality, Safety | — | — |
 
 <a id="WATCHER_OMEGA"></a>
 
@@ -1972,10 +1972,10 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | AoE burst turns | 5, 7, 9, 11 |
 | Special effect type | Single-target |
 
-- **Deck** (26 cards): 阿尔法+, 点穴 ×3, Defend, Establishment, 冥想, Clumsy, 奇迹 ×4, 化体为空, 如水, 贝塔, 暴怒+, Strike ×2, Vigilance, 欧米伽, Play, Greed, 心灵堡垒, Deceive Reality, 渐强, 安宁
+- **Deck** (26 cards): Alpha+, Pressure Points ×3, Defend, Establishment, Meditate, Clumsy, Miracle ×4, Empty Body, Like Water, Beta, Eruption+, Strike ×2, Vigilance, Omega, Play, Greed, Mental Fortress, Deceive Reality, Crescendo, Tranquility
 - **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 8 回合）
 - **Relics**: Neow's Blessing, Permafrost, Empty Cage, Captain's Wheel, Sai, Vajra
-- **Ascension / Dread changes**: Ascension 8: 如水; Ascension 8: 心灵堡垒; Ascension 9: 点穴（第 6 / 11 回合）
+- **Ascension / Dread changes**: Ascension 8: Like Water; Ascension 8: Mental Fortress; Ascension 9: Pressure Points（第 6 / 11 回合）
 
 **Special effect**
 
@@ -1993,18 +1993,18 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
-| 1 | 阿尔法+, 点穴 | Defend (no energy) | 阿尔法+、点穴、防御（用户原稿写「防御（没费）」，按 3 费三张都打得出） |
-| 2 | Establishment, 冥想, Clumsy | 奇迹 (kept in hand) | — |
-| 3 | 化体为空, 点穴, 如水, 贝塔 | 奇迹 (kept in hand) | — |
-| 4 | 暴怒+, Strike, Vigilance | 奇迹 (kept in hand) | 暴怒+、打击（进阶9起升级）、警惕、奇迹（不出） |
-| 5 | 奇迹, 欧米伽, Greed | Play (no energy) | — |
-| 6 | 点穴, 心灵堡垒 | Deceive Reality (no energy) | 点穴、心灵堡垒（进阶8起升级）、欺瞒现实（没费） |
-| 7 | 渐强, Strike, 安宁 | — | 渐强、打击（进阶9起升级）、安宁 |
-| 8 | 点穴, 暴怒+, Play | — | 洗牌（她重新洗牌）、点穴、暴怒+、不惧妖邪 |
-| 9 | Strike, 冥想 | Defend (no energy) | 打击（进阶9起升级）、冥想、防御（没费） |
-| 10 | 点穴, 点穴, Vigilance | Strike (no energy) | 点穴（0费）、点穴（0费）、警惕、打击（没费，进阶9起升级） |
-| 11 | 化体为空, Deceive Reality, 平安 | Greed (kept in hand) | — |
-| 12 | 点穴, 暴怒, Play | — | 洗牌（她重新洗牌）、点穴（0费）、暴怒、不惧妖邪 |
+| 1 | Alpha+, Pressure Points | Defend (no energy) | 阿尔法+、点穴、防御（用户原稿写「防御（没费）」，按 3 费三张都打得出） |
+| 2 | Establishment, Meditate, Clumsy | Miracle (kept in hand) | — |
+| 3 | Empty Body, Pressure Points, Like Water, Beta | Miracle (kept in hand) | — |
+| 4 | Eruption+, Strike, Vigilance | Miracle (kept in hand) | 暴怒+、打击（进阶9起升级）、警惕、奇迹（不出） |
+| 5 | Miracle, Omega, Greed | Play (no energy) | — |
+| 6 | Pressure Points, Mental Fortress | Deceive Reality (no energy) | 点穴、心灵堡垒（进阶8起升级）、欺瞒现实（没费） |
+| 7 | Crescendo, Strike, Tranquility | — | 渐强、打击（进阶9起升级）、安宁 |
+| 8 | Pressure Points, Eruption+, Play | — | 洗牌（她重新洗牌）、点穴、暴怒+、不惧妖邪 |
+| 9 | Strike, Meditate | Defend (no energy) | 打击（进阶9起升级）、冥想、防御（没费） |
+| 10 | Pressure Points, Pressure Points, Vigilance | Strike (no energy) | 点穴（0费）、点穴（0费）、警惕、打击（没费，进阶9起升级） |
+| 11 | Empty Body, Deceive Reality, Safety | Greed (kept in hand) | — |
+| 12 | Pressure Points, Eruption, Play | — | 洗牌（她重新洗牌）、点穴（0费）、暴怒、不惧妖邪 |
 
 <a id="WATCHER_RUSHDOWN"></a>
 
@@ -2024,10 +2024,10 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | AoE burst turns | 3, 10, 12 |
 | Special effect type | Self / single-target |
 
-- **Deck** (36 cards): 猛虎下山 ×2, 暴怒+ ×2, Vigilance, Strike ×5, Defend ×3, 心灵堡垒, 渐强, 腰带抽打, 安宁, 净化+ ×4, 奇迹 ×4, 义愤填膺, 供奉, 碰撞连击 ×2, 冥想, Play, 防御×2, 当头棒喝, 防御×3, 内心宁静, 腾越
+- **Deck** (36 cards): Pouncing Tiger ×2, Eruption+ ×2, Vigilance, Strike ×5, Defend ×3, Mental Fortress, Crescendo, Sash Whip, Tranquility, Purity+ ×4, Miracle ×4, Indignation, Offer, Crash Combo ×2, Meditate, Play, Defend ×2, Wallop, Defend ×3, Inner Peace, Vault
 - **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 8 回合）
 - **Relics**: Neow's Blessing, Runic Pyramid, Tuning Fork, Looming Fruit, Sturdy Clamp
-- **Ascension / Dread changes**: Ascension 8: 心灵堡垒; Ascension 8: Vigilance; Ascension 9: 义愤填膺; Ascension 9: 腰带抽打; Ascension 9: 当头棒喝; Ascension 9: 供奉
+- **Ascension / Dread changes**: Ascension 8: Mental Fortress; Ascension 8: Vigilance; Ascension 9: Indignation; Ascension 9: Sash Whip; Ascension 9: Wallop; Ascension 9: Offer
 
 **Special effect**
 
@@ -2041,18 +2041,18 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
-| 1 | 猛虎下山, 暴怒+, Vigilance | Strike (no energy), Defend (no energy) | — |
-| 2 | 心灵堡垒, 渐强, 腰带抽打, 安宁 | Purity+ (kept in hand), Strike (no energy), Defend (no energy), 奇迹 (kept in hand) | — |
-| 3 | 义愤填膺, 供奉, 碰撞连击, Strike, 冥想 | — | 义愤填膺、供奉、碰撞连击、打击、冥想（捞暴怒+）⇒ 节制触发结束回合 |
-| 4 | 暴怒+, Strike, Defend, Play | Purity+ (kept in hand), 防御×2 (no energy), 奇迹 (kept in hand) | — |
-| 5 | 当头棒喝 | Purity+ (kept in hand), 防御×3 (no energy), 奇迹 (kept in hand) | — |
-| 6 | Strike, 内心宁静, Purity+ | — | — |
-| 7 | 碰撞连击, 猛虎下山 | 腾越 (no energy), 奇迹 (kept in hand) | — |
+| 1 | Pouncing Tiger, Eruption+, Vigilance | Strike (no energy), Defend (no energy) | — |
+| 2 | Mental Fortress, Crescendo, Sash Whip, Tranquility | Purity+ (kept in hand), Strike (no energy), Defend (no energy), Miracle (kept in hand) | — |
+| 3 | Indignation, Offer, Crash Combo, Strike, Meditate | — | 义愤填膺、供奉、碰撞连击、打击、冥想（捞暴怒+）⇒ 节制触发结束回合 |
+| 4 | Eruption+, Strike, Defend, Play | Purity+ (kept in hand), Defend ×2 (no energy), Miracle (kept in hand) | — |
+| 5 | Wallop | Purity+ (kept in hand), Defend ×3 (no energy), Miracle (kept in hand) | — |
+| 6 | Strike, Inner Peace, Purity+ | — | — |
+| 7 | Crash Combo, Pouncing Tiger | Vault (no energy), Miracle (kept in hand) | — |
 | 8 | Purity+ (0 energy) | — | 洗牌；奇迹、腾越（节制第二次满 12 张 ⇒ 结束回合，腾越给出额外回合） |
-| 9 | 暴怒+, 当头棒喝, 义愤填膺 | Play (no energy), 冥想 (no energy) | — |
-| 10 | 供奉, 冥想 | 腰带抽打 (kept in hand), Vigilance (kept in hand), Play (kept in hand) | — |
-| 11 | 暴怒+, Purity+, Vigilance | Play (no energy) | 洗牌；内心宁静、暴怒+、净化+（消耗 腰带抽打·碰撞连击·当头棒喝·冥想·义愤填膺）、警惕（触发节制结束回合）、不惧妖邪（没费不弃） |
-| 12 | 供奉, 内心宁静 ×3 组, 暴怒+, 供奉, Vigilance, 暴怒+, 供奉, Vigilance | Play (kept in hand), Purity+ (kept in hand) | 12+（默认）：洗牌；暴怒+、供奉、内心宁静 ×3 组、暴怒+、供奉、警惕（触发节制结束回合）、暴怒+、供奉、警惕、不惧妖邪（不出）、净化+（不出） |
+| 9 | Eruption+, Wallop, Indignation | Play (no energy), Meditate (no energy) | — |
+| 10 | Offer, Meditate | Sash Whip (kept in hand), Vigilance (kept in hand), Play (kept in hand) | — |
+| 11 | Eruption+, Purity+, Vigilance | Play (no energy) | 洗牌；内心宁静、暴怒+、净化+（消耗 腰带抽打·碰撞连击·当头棒喝·冥想·义愤填膺）、警惕（触发节制结束回合）、不惧妖邪（没费不弃） |
+| 12 | Offer, Inner Peace ×3 sets, Eruption+, Offer, Vigilance, Eruption+, Offer, Vigilance | Play (kept in hand), Purity+ (kept in hand) | 12+（默认）：洗牌；暴怒+、供奉、内心宁静 ×3 组、暴怒+、供奉、警惕（触发节制结束回合）、暴怒+、供奉、警惕、不惧妖邪（不出）、净化+（不出） |
 
 ---
 

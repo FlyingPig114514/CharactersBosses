@@ -43,7 +43,7 @@ function Add-Pairs([hashtable]$h, [string]$zPath, [string]$ePath) {
     }
 }
 $locDir = Join-Path $Root 'tools\tmp\loc'
-foreach ($t in @('cards', 'relics', 'powers')) {
+foreach ($t in @('cards', 'relics', 'powers', 'potions')) {
     Add-Pairs $NameZhEn (Join-Path $locDir "zhs_$t.json") (Join-Path $locDir "eng_$t.json")
     Add-Pairs $NameZhEn (Join-Path $Root "content\localization\zhs\$t.json") (Join-Path $Root "content\localization\eng\$t.json")
 }
@@ -70,13 +70,61 @@ foreach ($t in @('monsters', 'powers', 'cards', 'ascension')) {
 
 $Missing = @{ designs = @{}; notes = @{}; names = @{}; reasons = @{}; info = @{} }
 
-function N([string]$zh) {
-    if ([string]::IsNullOrEmpty($zh)) { return '' }
+# 单个名字（不含组合语法）：extra（人工补）优先，其次官方 zh→en 表
+function N1([string]$zh) {
     $k = $zh.Trim()
+    if ($k.Length -eq 0) { return '' }
     if ($I18n['extra'].ContainsKey($k)) { return $I18n['extra'][$k] }
     if ($NameZhEn.ContainsKey($k)) { return $NameZhEn[$k] }
-    if (-not $Missing['names'].ContainsKey($k)) { $Missing['names'][$k] = 1 }
-    return $k
+    return $null
+}
+
+# 名字解析：**不删任何内容**，只把组合语法拆开逐段译再拼回。
+#   支持：升级后缀「+」、张数「×2」、并列「A｜B」「A·B」「A、B」「A/B」、
+#         以及包在括号里的补充说明（原样保留在括号里，只译里面的名字）。
+function N([string]$zh) {
+    if ([string]::IsNullOrEmpty($zh)) { return '' }
+    $raw = $zh.Trim()
+    if ($raw.Length -eq 0) { return '' }
+
+    # ① 整串直接命中
+    $hit = N1 $raw
+    if ($hit) { return $hit }
+
+    # ② 升级后缀：「暴怒+」→ N1(暴怒)+"+"
+    if ($raw.EndsWith('+')) {
+        $b = N1 $raw.Substring(0, $raw.Length - 1)
+        if ($b) { return $b + '+' }
+    }
+
+    # ③ 张数后缀：「防御×2」→ N1(防御) + " ×2"
+    $m = [regex]::Match($raw, '^(.*?)\s*[×xX*]\s*(\d+)$')
+    if ($m.Success) {
+        $b = N $m.Groups[1].Value
+        if ($b) { return ($b + ' ×' + $m.Groups[2].Value) }
+    }
+
+    # ④ 并列：｜ ｜ ｜ · 、 / 以及「＋」连接 —— 逐段译，用「 / 」拼回
+    if ($raw -match '[｜|·、/]') {
+        $parts = @()
+        foreach ($seg in ($raw -split '[｜|·、/]')) {
+            $s = $seg.Trim()
+            if ($s.Length -eq 0) { continue }
+            $parts += (N $s)
+        }
+        if ($parts.Count -gt 0) { return ($parts -join ' / ') }
+    }
+
+    # ⑤ 括号里带说明：「（二阶段：…）｜预判」这种：括号内也译名字，括号外照原样
+    if ($raw -match '[（(]') {
+        $out = $raw
+        foreach ($k in @($I18n['extra'].Keys)) { if ($out.Contains($k)) { $out = $out.Replace($k, $I18n['extra'][$k]) } }
+        foreach ($k in @($NameZhEn.Keys)) { if ($out.Contains($k)) { $out = $out.Replace($k, $NameZhEn[$k]) } }
+        return $out
+    }
+
+    if (-not $Missing['names'].ContainsKey($raw)) { $Missing['names'][$raw] = 1 }
+    return $raw
 }
 
 function T([string]$zh, [string]$section) {

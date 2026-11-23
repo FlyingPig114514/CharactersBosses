@@ -22,6 +22,7 @@
 | `docs/wiki/index.html` | 生成出来的页面（GitHub Pages 的入口） |
 | `docs/wiki/boss-table.md` | Markdown 版意图表（GitHub 上直接以表格形式阅读 / 可按 Ctrl+F 搜） |
 | `tools/wiki/make-bosses-md.ps1` | 读 `data.json`，生成 `docs/bosses.md`（「全部 Boss 一览」：档位 / Key / 特殊效果 / `fight` 指令）—— 这张表以前是**手写**的，长期停在「27 个档位」，现在改为自动生成 |
+| `tools/wiki/make-markdown-en.ps1` | **英文版**生成器：读同一份 `data.json`，写 `docs\wiki\boss-table.en.md`；卡牌/遗物/药水名与特殊效果正文全部取自游戏官方 eng 本地化表，只有「我们自己写的中文」（设计名/能力面板/不出原因/回合备注）走 `tools/wiki/i18n-en.json` 人工英译 |
 
 ## 三、改完模组后怎么重新生成
 
@@ -40,6 +41,8 @@ tools\dotnet\dotnet.exe run --project tools\wiki-dump -c Release -- `
 powershell -ExecutionPolicy Bypass -File tools\wiki\build-site.ps1
 powershell -ExecutionPolicy Bypass -File tools\wiki\make-markdown.ps1
 powershell -ExecutionPolicy Bypass -File tools\wiki\make-bosses-md.ps1
+# 英文版（读同一份 data.json ⇒ 两版永远同步；卡牌/遗物名字取自游戏官方 eng 表）
+powershell -ExecutionPolicy Bypass -File tools\wiki\make-markdown-en.ps1
 powershell -ExecutionPolicy Bypass -File tools\wiki\make-xlsx.ps1
 ```
 
