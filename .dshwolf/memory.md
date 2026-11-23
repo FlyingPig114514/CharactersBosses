@@ -6872,3 +6872,9 @@ Chronological action log.
 | 2026-11-23 10:07 | edit | `src/Hooks/Patches/SafeLogPatch.cs` | ok | 0 |
 | 2026-11-23 10:07 | edit | `src/Hooks/Core/RecentLogDumper.cs` | ok | 0 |
 | 2026-11-23 10:07 | edit | `src/Hooks/Core/RecentLogDumper.cs` | ok | 0 |
+| 2026-11-23 10:49 | write | `tools/loc-dump/dump_loc.gd` | ok | 0 |
+| 2026-11-23 11:04 | edit | `tools/loc-dump/dump_loc.gd` | ok | 0 |
+| 2026-11-23 11:04 | edit | `tools/loc-dump/dump_loc.gd` | ok | 0 |
+| 2026-11-23 11:04 | edit | `tools/loc-dump/dump_loc.gd` | ok | 0 |
+| 2026-11-23 11:10 | write | `tools/wiki/make-markdown-en.ps1` | ok | 0 |
+| 2026-11-23 11:10 | write | `tools/wiki/i18n-en.json` | ok | 0 |

@@ -1,0 +1,109 @@
+{
+  "_comment": "English strings that the mod itself writes (design names, ability-panel labels, 'not played' reasons, per-turn notes). Card / relic / potion names are NOT here — they come straight from the game's own English localization tables. Missing keys fall back to Chinese and are reported by tools/wiki/make-markdown-en.ps1.",
+
+  "chars": {
+    "铁甲战士": "Ironclad",
+    "静默猎手": "Silent",
+    "故障机器人": "Defect",
+    "亡灵契约师": "Necrobinder",
+    "储君": "Regent",
+    "愚者": "Fool",
+    "观者": "Watcher"
+  },
+
+  "designs": {
+    "黑球机": "Dark-Orb Machine",
+    "电球机": "Lightning-Orb Machine",
+    "物理机": "Claw Machine",
+    "彩虹机": "Rainbow Machine",
+    "能力机": "Power Machine",
+    "事件机": "Event Machine",
+    "状态机": "Status Machine",
+    "塔罗愚": "Tarot Fool",
+    "愤怒战": "Anger War",
+    "打击战": "Strike War",
+    "放血战": "Bloodletting War",
+    "杂耍战": "Juggler War",
+    "易伤战": "Vulnerable War",
+    "巨石战": "Boulder War",
+    "灾厄骨": "Doom Bone",
+    "血肉骨": "Flesh Bone",
+    "灵魂骨": "Soul Bone",
+    "虚无骨": "Void Bone",
+    "根除骨": "Eradicate Bone",
+    "养手骨": "Osty Bone",
+    "碎屑储": "Debris Regent",
+    "轰击储": "Bombard Regent",
+    "铸剑储": "Forge Regent",
+    "王储": "Crown Prince",
+    "仆从储": "Minion Regent",
+    "无色储": "Colorless Regent",
+    "辉星储": "Star Regent",
+    "抉择储": "Choice Regent",
+    "奇巧猎": "Sly Huntress",
+    "蛇咬猎": "Snakebite Huntress",
+    "涂毒猎": "Envenom Huntress",
+    "蛇眼猎": "Snecko Huntress",
+    "刀猎": "Shiv Huntress",
+    "炼药猎": "Brewer Huntress",
+    "华丽猎": "Grand Finale Huntress",
+    "预见观": "Foresight Watcher",
+    "印牌观": "Create Watcher",
+    "保留观": "Retain Watcher",
+    "神格观": "Divinity Watcher",
+    "欧米伽观": "Omega Watcher",
+    "红蓝观": "Red-Blue Watcher"
+  },
+
+  "info": {
+    "循环": "Loop",
+    "启动": "Ramp-up",
+    "单体能力": "Single-target power",
+    "群攻能力": "AoE power",
+    "单体高压回合": "Single-target burst turns",
+    "群体高压回合": "AoE burst turns",
+    "特殊效果类型": "Special effect type",
+    "群体增益能力": "Team buff power",
+    "群体减益能力": "Team debuff power",
+    "群体增益强度": "Team buff strength",
+    "塞牌能力": "Junk-inserting power",
+    "坦度": "Durability",
+
+    "单体": "Single-target",
+    "自身": "Self",
+    "自身/单体": "Self / single-target",
+    "全局": "Global",
+    "极强": "Extreme",
+    "极强、集火": "Extreme, focus-fire",
+    "很强": "Very strong",
+    "强": "Strong",
+    "偏强": "Above average",
+    "中": "Average",
+    "偏弱": "Below average",
+    "弱": "Weak",
+    "无": "None",
+    "慢": "Slow",
+    "集火": "Focus-fire",
+    "极高": "Very high"
+  },
+
+  "reasons": {
+    "没费": "no energy",
+    "被烧掉": "burned",
+    "被丢弃": "discarded",
+    "打不出·诅咒或状态": "unplayable (curse / status)",
+    "仅显示意图": "intent only",
+    "留在手牌": "kept in hand",
+    "没抽到": "not drawn"
+  },
+
+  "extra": {
+    "警惕": "Vigilance",
+    "欺瞒现实": "Deceive Reality",
+    "旋身": "Swivel",
+    "悲伤": "Sadness"
+  },
+
+  "notes": {
+  }
+}
