@@ -8,24 +8,23 @@ namespace CharacterBosses.Core;
 /// **一层 2 号观者 Boss「疾风观」**的剧本（用户 2026-11-23 设计，内部 Key = `WATCHER_FLURRY`，
 /// 因为「疾风连击」的英文是 **Flurry of Blows**）。
 ///
-/// 用户原话（逐字）：
+/// 用户原话（逐字，2026-11-23 第三轮「削弱」定稿）：
 /// <code>
-/// 1.以手拒之、疾风连击、打击
-/// 2.警惕、疾风连击、打击×2（没费）、奇迹（不出）
-/// 3.奇迹、斋戒、防御、防御（没费）
+/// 1.以手拒之、疾风连击、防御
+/// 2.打击、打击、防御、奇迹（不出）
+/// 3.奇迹、斋戒、心灵堡垒、防御（没费）
 /// 4.供奉、追击、腰带抽打
-/// 5.化体为空、疾风连击、心灵堡垒、安宁、疾风连击
-/// 6.洗牌、疾风连击、防御、打击（没费）
-/// 7.同 4
-/// 8.打击、打击（没费）、防御（没费）
-/// 9.化体为空、疾风连击、警惕、疾风连击、打击（没费）
+/// 5.化体为空、疾风连击、警惕、疾风连击、防御（没费）（恐惧模式下打出）
+/// 6.洗牌、疾风连击、防御、防御（没费）（恐惧模式下打出）
+/// 7.供奉、追击、腰带抽打
+/// 8.防御、打击（没费）（恐惧模式下打出）、打击（没费）
+/// 9.化体为空、疾风连击、警惕、疾风连击、防御（没费）（恐惧模式下打出）
 /// 之后 6～9 循环
 /// </code>
 ///
-/// ★ 2026-11-23 用户订正（第二版）：第 6 回合第三张由「防御」改成「打击」，
-///   第 8 回合第三张由「打击」改成「防御」；同时**斋戒不再使她在回合开始时失去能量**
-///   （见 `WatcherRuntimePatches.InstallFastingNoEnergyDown`）—— 正是这一条让第 6、8 回合
-///   真的拿得到各自那 1 点能量，能多打一张牌。
+/// ★ 2026-11-23 第四轮：「第 5、9 回合**只在恐惧模式打出**的那 2 张打击改成防御」，
+///   随后又订正「**普通模式也改**，那两张留在手里的打击也改成防御（虽然效果没有区别，因为都不打出）」
+///   ⇒ 现在第 5 / 9 回合无论哪个模式，第五张都是「防御」（恐惧模式真的打出去，普通模式没费留手）。
 ///
 /// ## 卡费（反编译两份观者 mod 的构造函数 `: base(cost, …)` 逐个核过）
 /// | 牌 | 费 | | 牌 | 费 |
@@ -90,13 +89,14 @@ public static class WatcherFlurryScript
                 Play(WatcherCards.FollowUp),
                 Play(WatcherCards.SashWhip)),
 
-            // ── 5 ── 化体为空 / 疾风连击 / 警惕 / 疾风连击 / 打击（没费）   （3 费 = 1 + 0 + 2 + 0）
-            Turn(3, "5. 化体为空、疾风连击、警惕、疾风连击、打击（没费）",
+            // ── 5 ── 化体为空 / 疾风连击 / 警惕 / 疾风连击 / 防御（没费）   （3 费 = 1 + 0 + 2 + 0）
+            // ★ 2026-11-23 用户：「那两张留在手里的打击也改成防御（虽然效果没有区别，因为都不打出）」。
+            Turn(3, "5. 化体为空、疾风连击、警惕、疾风连击、防御（没费）",
                 Play(WatcherCards.EmptyBody),
                 Play(WatcherCards.FlurryOfBlows),
                 Play(WatcherCards.Vigilance),
                 Play(WatcherCards.FlurryOfBlows),
-                Hold(WatcherCards.Strike)),
+                Hold(WatcherCards.Defend)),
 
             // ── 6 ── 洗牌 / 疾风连击 / 防御 / 防御（没费）   ← 6~9 循环起点   （1 费 = 0 + 1）
             TurnEnergy(1, true, "6. 洗牌、疾风连击、防御、防御（没费）",
@@ -117,12 +117,12 @@ public static class WatcherFlurryScript
                 Hold(WatcherCards.Strike)),
 
             // ── 9 ── 同第 5 回合                        （3 费）
-            Turn(3, "9. 化体为空、疾风连击、警惕、疾风连击、打击（没费）",
+            Turn(3, "9. 化体为空、疾风连击、警惕、疾风连击、防御（没费）",
                 Play(WatcherCards.EmptyBody),
                 Play(WatcherCards.FlurryOfBlows),
                 Play(WatcherCards.Vigilance),
                 Play(WatcherCards.FlurryOfBlows),
-                Hold(WatcherCards.Strike)),
+                Hold(WatcherCards.Defend)),
         };
 
         return new BossScript

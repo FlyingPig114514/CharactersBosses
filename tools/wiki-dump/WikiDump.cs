@@ -750,6 +750,11 @@ internal static class WikiDump
             if (xCost) remaining = 0;
             else remaining -= Math.Max(0, cost);
 
+            // ★ 2026-11-23：「奇迹」打出去**回 1 点能量**（反编译 `WatcherMiracle.OnPlay`
+            //   就是 `PlayerCmd.GainEnergy(1, Owner)`）⇒ 记账时要还回来，否则它后面那张牌
+            //   会被错标成「没费」（疾风观第 3 回合的「心灵堡垒」就是这么被标错的，实测她打得出）。
+            if (string.Equals(card["name"] as string, "奇迹", StringComparison.Ordinal)) remaining += 1;
+
             // 「子程序」：每打出一张**能力牌** +1 能量（下一张牌用得上）——能力机那套的能量就靠它
             string ct = card.ContainsKey("cardType") ? Convert.ToString(card["cardType"]) : null;
             if (subroutine != null && subroutine.Length > 0 && subroutine[0] && ct == "Power") remaining += 1;
