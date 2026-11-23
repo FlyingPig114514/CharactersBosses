@@ -4,6 +4,23 @@
 > 旧条目逐字来自 `git show HEAD:src/Hooks/Core/BuildInfo.cs` 的 Tag 常量（v0.2.871 及其之前，共 236 条）。
 > 最新版本（0.2.889）是当前 Tag，同时在各条 `workshop/changenote.txt` 里也有面向玩家的摘要。
 
+## v0.2.902（2026-11-23）：新 Boss —— 一层 2 号「疾风观」
+
+用户原话：「加一个新boss，1层2号观者boss疾风观（内部名用疾风连击的英文）」。
+
+- 内部 Key **`WATCHER_FLURRY`**（疾风连击 = Flurry of Blows），遭遇 `WATCHER_FLURRY_BOSS_ENCOUNTER`，
+  控制台 `fight WATCHER_FLURRY_BOSS_ENCOUNTER`；挂 `BossDefs.Watcher.ExtraVariants[0]`（第一幕，与预见观同幕，
+  按 `BossLineups.WatcherFlurryActive()` 分辨），候补表 `BossKeys.WatcherRosterAct1()` 追加。
+- 特殊效果「疾风连击」（`Powers.BossFlurryPower`）：观者的「疾风连击」对玩家造成**未被格挡**的伤害时，
+  该玩家叠加 1 层「力竭」（`Powers.FlurryDrainedPower`，= 崩坠 `DrainedPower`：`AfterEnergyReset` 里
+  `PlayerCmd.LoseEnergy` 后自移除；**单张牌最多 1 层**，不是每段）。图标借观者 mod「能量降低」那张。
+- 遗物：至纯之水 / 涅奥的祝福 / 手里剑 / 苦无。卡组 13 张（疾风连击×2、打击×3、防御×3 …）。
+- 剧本 9 回合、6～9 循环（第 6 回合洗牌）；进阶 8 升 以手拒之·心灵堡垒，进阶 9 升 供奉·斋戒。
+- `WatcherCards` 补 4 张牌的反射访问器（`FlurryOfBlows` / `TalkToTheHand` / `FollowUp` / `Fasting`）
+  与本体遗物 `Kunai`；两份观者 mod 的类名/模型 id 都从各自 dll 核过（A 版斋戒的 id 是 `WATCHER_FASTING2`）。
+- 16 语言文案（特殊效果的描述里能量用观者能量图标）；`tools/wiki-dump` 的 `VariantName` 加「疾风观」，
+  中英两版百科同步重生成。
+
 ## 2026-11-22 这一批（v0.2.872 ~ v0.2.889，摘要）
 
 - v0.2.889 储君的支配：描述按当前幕重新构造 LocString（第 2 幕显示「粘液」而不是「碎屑」）；`DominionIconOf` 补 `RegentDominionPower → 储君头像`。

@@ -118,5 +118,7 @@
     "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "[gold]The Watcher[/gold] kept {character}'s hand, card by card, until the very end.",
     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "The Watcher",     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "{character} was crushed by [gold]The Watcher[/gold]'s [gold]Omniscience[/gold].",
 "WATCHER_RUSHDOWN_BOSS_ENCOUNTER.title": "Watcher",
-"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} was flattened by the Watcher's red and blue palms."
+"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} was flattened by the Watcher's red and blue palms.",
+    "WATCHER_FLURRY_BOSS_ENCOUNTER.title":  "The Watcher",
+    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character} was crushed by [gold]The Watcher[/gold]'s [gold]Flurry of Blows[/gold]."
 }

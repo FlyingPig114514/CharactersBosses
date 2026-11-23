@@ -162,5 +162,10 @@
     "BOSS_OMNISCIENCE_POWER.title":  "通晓万物",     "BOSS_OMNISCIENCE_POWER.description": "每当观者触发[gold]先见之明[/gold]时，你预见 2 张牌。",     "BOSS_OMNISCIENCE_POWER.description_dread": "每当观者触发[gold]先见之明[/gold]时，将你抽牌堆中的一张随机牌丢弃。",
 "BOSS_TEMPERANCE_POWER.title": "节制",
 "BOSS_TEMPERANCE_POWER.description": "每当观者打出 12 张牌，她就会强制结束自己的回合并使她和她的其他友方获得 2 点力量。\n警告：观者会在第12回合开始无限。",
-"BOSS_TEMPERANCE_POWER.description_dread": "每当观者打出 12 张牌，她就会强制结束自己的回合并使她和她的其他友方获得 2 点力量。此外，[gold]时间扭曲[/gold]会记录你的出牌：你每打出 12 张牌，观者就会强制结束你的回合。\n警告：观者会在第12回合开始无限。"
+"BOSS_TEMPERANCE_POWER.description_dread": "每当观者打出 12 张牌，她就会强制结束自己的回合并使她和她的其他友方获得 2 点力量。此外，[gold]时间扭曲[/gold]会记录你的出牌：你每打出 12 张牌，观者就会强制结束你的回合。\n警告：观者会在第12回合开始无限。",
+    "BOSS_FLURRY_POWER.title":  "疾风连击",
+    "BOSS_FLURRY_POWER.description":  "每当观者的[gold]疾风连击[/gold]对你造成未被格挡的伤害时，你在下回合失去1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]。",
+    "BOSS_FLURRY_POWER.description_dread":  "每当观者的[gold]疾风连击[/gold]对你造成未被格挡的伤害时，你在下回合失去1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]。",
+    "FLURRY_DRAINED_POWER.title":  "力竭",
+    "FLURRY_DRAINED_POWER.description":  "在下个回合，失去{Amount}[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]。"
 }

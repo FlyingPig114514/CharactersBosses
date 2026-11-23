@@ -118,5 +118,7 @@
     "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "[gold]La Vigilante[/gold] retuvo la mano de {character} carta a carta hasta el final.",
     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "La Vigilante",     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "{character} fue aplastado por la [gold]Omnisciencia[/gold] de [gold]La Vigilante[/gold].",
 "WATCHER_RUSHDOWN_BOSS_ENCOUNTER.title": "Watcher",
-"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} was flattened by the Watcher's red and blue palms."
+"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} was flattened by the Watcher's red and blue palms.",
+    "WATCHER_FLURRY_BOSS_ENCOUNTER.title":  "La Vigilante",
+    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character} fue aplastado por la [gold]Flurry of Blows[/gold] de [gold]La Vigilante[/gold]."
 }

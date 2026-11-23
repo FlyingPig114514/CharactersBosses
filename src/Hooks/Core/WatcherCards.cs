@@ -288,6 +288,8 @@ internal static class WatcherCards
     internal static Type? Melange => T("Melange");
     /// <summary>手里剑（本体遗物 `Shuriken`）：每打出 3 张攻击牌 +1 力量。</summary>
     internal static Type? Shuriken => typeof(MegaCrit.Sts2.Core.Models.Relics.Shuriken);
+    /// <summary>苦无（本体遗物 `Kunai`）：每打出 3 张攻击牌 +1 敏捷。</summary>
+    internal static Type? Kunai => typeof(MegaCrit.Sts2.Core.Models.Relics.Kunai);
     /// <summary>停顿（`Halt`，0 费技能）：获得格挡；若在愤怒中额外获得格挡。</summary>
     internal static Type? Halt => Card("WatcherHalt", "Halt",
         "WATCHER_HALT", "WATCHER-HALT");
@@ -328,6 +330,24 @@ internal static class WatcherCards
     /// <summary>当头棒喝（`Wallop`，2 费攻击）：造成伤害并获得等量格挡。</summary>
     internal static Type? Wallop => Card("WatcherWallop", "Wallop",
         "WATCHER_WALLOP", "WATCHER-WALLOP");
+
+    // ── 一层 2 号「疾风观」（内部 Key `WATCHER_FLURRY` = 疾风连击，用户 2026-11-23）──────
+    //   两份观者模组的类名 / 模型 id 都是从各自 dll 里核过的（`ilspy-cli types` + pck 的 zhs json）：
+    //   A 版（3747526116，`WatcherMod.`）  : WatcherFlurryOfBlows / WatcherFollowUp / WatcherFasting2 / WatcherTalkToTheHand
+    //   B 版（3747492505，`Watcher.Code.`）: FlurryOfBlows / FollowUp / Fasting / TalkToTheHand
+    //   注意 A 版的斋戒模型 id 是 `WATCHER_FASTING2`（不是 `WATCHER_FASTING`）。
+    /// <summary>疾风连击（`FlurryOfBlows`，1 费攻击）：造成伤害；每次转换姿态时从弃牌堆回到手牌。</summary>
+    internal static Type? FlurryOfBlows => Card("WatcherFlurryOfBlows", "FlurryOfBlows",
+        "WATCHER_FLURRY_OF_BLOWS", "WATCHER-FLURRY_OF_BLOWS");
+    /// <summary>以手拒之（`TalkToTheHand`，1 费攻击）：造成伤害；目标受到攻击时她获得格挡。</summary>
+    internal static Type? TalkToTheHand => Card("WatcherTalkToTheHand", "TalkToTheHand",
+        "WATCHER_TALK_TO_THE_HAND", "WATCHER-TALK_TO_THE_HAND");
+    /// <summary>追击（`FollowUp`，1 费攻击）：造成伤害；若上一张牌是攻击牌则获得 1 能量。</summary>
+    internal static Type? FollowUp => Card("WatcherFollowUp", "FollowUp",
+        "WATCHER_FOLLOW_UP", "WATCHER-FOLLOW_UP");
+    /// <summary>斋戒（`Fasting`，2 费能力）：+力量 +敏捷；每回合开始少获得 1 能量。</summary>
+    internal static Type? Fasting => Card("WatcherFasting2", "Fasting",
+        "WATCHER_FASTING2", "WATCHER-FASTING");
 
     /// <summary>
     /// **B 版（lamali）她此刻的姿态倍率**：1（无/平静）/ 2（愤怒）/ 3（神格）。

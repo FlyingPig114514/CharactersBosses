@@ -162,5 +162,10 @@
     "BOSS_OMNISCIENCE_POWER.title":  "Allwissenheit",     "BOSS_OMNISCIENCE_POWER.description": "Whenever the Watcher triggers [gold]Foresight[/gold], you Scry 2.",     "BOSS_OMNISCIENCE_POWER.description_dread": "Whenever the Watcher triggers [gold]Foresight[/gold], discard a random card from your draw pile.",
 "BOSS_TEMPERANCE_POWER.title": "Temperance",
 "BOSS_TEMPERANCE_POWER.description": "Whenever the Watcher plays 12 cards, she forcibly ends her own turn and she and her other allies gain 2 Strength.\nWarning: the Watcher starts her infinite loop on turn 12.",
-"BOSS_TEMPERANCE_POWER.description_dread": "Whenever the Watcher plays 12 cards, she forcibly ends her own turn and she and her other allies gain 2 Strength. In addition, [gold]Time Warp[/gold] counts your cards: every 12 cards you play, the Watcher forcibly ends your turn.\nWarning: the Watcher starts her infinite loop on turn 12."
+"BOSS_TEMPERANCE_POWER.description_dread": "Whenever the Watcher plays 12 cards, she forcibly ends her own turn and she and her other allies gain 2 Strength. In addition, [gold]Time Warp[/gold] counts your cards: every 12 cards you play, the Watcher forcibly ends your turn.\nWarning: the Watcher starts her infinite loop on turn 12.",
+    "BOSS_FLURRY_POWER.title":  "Hiebregen",
+    "BOSS_FLURRY_POWER.description":  "Immer wenn die Seherin dir mit [gold]Hiebregen[/gold] ungeblockten Schaden zufügt, verlierst du in der nächsten Runde 1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img].",
+    "BOSS_FLURRY_POWER.description_dread":  "Immer wenn die Seherin dir mit [gold]Hiebregen[/gold] ungeblockten Schaden zufügt, verlierst du in der nächsten Runde 1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img].",
+    "FLURRY_DRAINED_POWER.title":  "Ausgelaugt",
+    "FLURRY_DRAINED_POWER.description":  "Verliere in der nächsten Runde {Amount}[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]."
 }

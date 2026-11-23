@@ -220,5 +220,10 @@
 "WATCHER_RUSHDOWN_BOSS.title": "Red-Blue Watcher",
 "WATCHER_RUSHDOWN_BOSS.moves.CHARBOSS_PLAY.title": "Play",
 "WATCHER_RUSHDOWN_BOSS.temperance": "Whenever the Watcher plays 12 cards, she forcibly ends her own turn and she and her other allies gain 2 Strength.\nWarning: the Watcher starts her infinite loop on turn 12.",
-"WATCHER_RUSHDOWN_BOSS.temperance_dread": "Whenever the Watcher plays 12 cards, she forcibly ends her own turn and she and her other allies gain 2 Strength. In addition, [gold]Time Warp[/gold] counts your cards: every 12 cards you play, the Watcher forcibly ends your turn.\nWarning: the Watcher starts her infinite loop on turn 12."
+"WATCHER_RUSHDOWN_BOSS.temperance_dread": "Whenever the Watcher plays 12 cards, she forcibly ends her own turn and she and her other allies gain 2 Strength. In addition, [gold]Time Warp[/gold] counts your cards: every 12 cards you play, the Watcher forcibly ends your turn.\nWarning: the Watcher starts her infinite loop on turn 12.",
+    "WATCHER_FLURRY_BOSS.name":  "Hiebregen-Wächter",
+    "WATCHER_FLURRY_BOSS.title":  "Hiebregen-Wächter",
+    "WATCHER_FLURRY_BOSS.moves.CHARBOSS_PLAY.title":  "Ausspielen",
+    "WATCHER_FLURRY_BOSS.flurry":  "Immer wenn die Seherin dir mit [gold]Hiebregen[/gold] ungeblockten Schaden zufügt, verlierst du in der nächsten Runde 1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img].",
+    "WATCHER_FLURRY_BOSS.flurry_dread":  "Immer wenn die Seherin dir mit [gold]Hiebregen[/gold] ungeblockten Schaden zufügt, verlierst du in der nächsten Runde 1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]."
 }

@@ -118,5 +118,7 @@
     "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "[gold]La gardienne[/gold] a retenu la main de {character}, carte après carte, jusqu'à la fin.",
     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "La gardienne",     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "{character} a été écrasé par l'[gold]Omniscience[/gold] de [gold]la gardienne[/gold].",
 "WATCHER_RUSHDOWN_BOSS_ENCOUNTER.title": "Watcher",
-"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} was flattened by the Watcher's red and blue palms."
+"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} was flattened by the Watcher's red and blue palms.",
+    "WATCHER_FLURRY_BOSS_ENCOUNTER.title":  "La gardienne",
+    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character} a été écrasé par la [gold]Rafale de coups[/gold] de [gold]la gardienne[/gold]."
 }

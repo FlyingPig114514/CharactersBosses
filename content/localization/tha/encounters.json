@@ -118,5 +118,7 @@
     "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "[gold]นักพรตเฝ้าการณ์[/gold]เก็บการ์ดในมือของ{character}ไว้ทีละใบจนถึงที่สุด",
     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "นักพรตเฝ้าการณ์",     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "{character} ถูกบดขยี้โดย[gold]สัพพัญญู[/gold]ของ[gold]นักพรตเฝ้าการณ์[/gold]",
 "WATCHER_RUSHDOWN_BOSS_ENCOUNTER.title": "Watcher",
-"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} was flattened by the Watcher's red and blue palms."
+"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} was flattened by the Watcher's red and blue palms.",
+    "WATCHER_FLURRY_BOSS_ENCOUNTER.title":  "นักพรตเฝ้าการณ์",
+    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character} ถูกบดขยี้โดย[gold]Flurry of Blows[/gold]ของ[gold]นักพรตเฝ้าการณ์[/gold]"
 }

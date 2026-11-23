@@ -6880,3 +6880,87 @@ Chronological action log.
 | 2026-11-23 11:10 | write | `tools/wiki/i18n-en.json` | ok | 0 |
 | 2026-11-23 12:04 | write | `tools/tmp/_en_work/notes_en.tsv` | ok | 0 |
 | 2026-11-23 12:16 | write | `workshop/changenote.txt` | ok | 0 |
+| 2026-11-23 15:30 | edit | `src/Hooks/Core/WatcherCards.cs` | ok | 0 |
+| 2026-11-23 15:31 | edit | `src/Hooks/Core/WatcherCards.cs` | ok | 0 |
+| 2026-11-23 15:36 | write | `src/Hooks/Core/WatcherFlurryScript.cs` | ok | 0 |
+| 2026-11-23 15:36 | write | `src/Hooks/Powers/BossFlurryPower.cs` | ok | 0 |
+| 2026-11-23 15:36 | edit | `src/Hooks/Monsters/CharacterBosses.cs` | ok | 0 |
+| 2026-11-23 15:36 | edit | `src/Hooks/Encounters/CharBossEncounters.cs` | ok | 0 |
+| 2026-11-23 15:36 | edit | `src/Hooks/Encounters/CharBossEncounters.cs` | ok | 0 |
+| 2026-11-23 15:36 | edit | `src/Hooks/Encounters/CharBossEncounters.cs` | ok | 0 |
+| 2026-11-23 15:36 | edit | `src/Hooks/Core/BossKeys.cs` | ok | 0 |
+| 2026-11-23 15:36 | edit | `src/Hooks/Core/BossKeys.cs` | ok | 0 |
+| 2026-11-23 15:36 | edit | `src/Hooks/Core/BossKeys.cs` | ok | 0 |
+| 2026-11-23 15:36 | edit | `src/Hooks/Core/BossLineups.cs` | ok | 0 |
+| 2026-11-23 15:36 | edit | `src/Hooks/Core/BossLineups.cs` | ok | 0 |
+| 2026-11-23 15:37 | edit | `src/Hooks/Core/BossDefs.cs` | ok | 0 |
+| 2026-11-23 15:37 | edit | `src/Hooks/Patches/BossSpecialPowerIconPatch.cs` | ok | 0 |
+| 2026-11-23 15:38 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/eng/monsters.json` | ok | 0 |
+| 2026-11-23 15:38 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/eng/powers.json` | ok | 0 |
+| 2026-11-23 15:38 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/eng/encounters.json` | ok | 0 |
+| 2026-11-23 15:38 | edit | `src/CharacterBosses.json` | error | 0 |
+| 2026-11-23 15:38 | edit | `src/CharacterBosses.json` | ok | 0 |
+| 2026-11-23 15:39 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/deu/monsters.json` | error | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/deu/encounters.json` | error | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/deu/powers.json` | error | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/esp/monsters.json` | error | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/esp/encounters.json` | error | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/esp/powers.json` | error | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/fra/monsters.json` | error | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/fra/encounters.json` | error | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/fra/powers.json` | error | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/deu/monsters.json` | ok | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/deu/encounters.json` | ok | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/deu/powers.json` | ok | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/esp/monsters.json` | ok | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/esp/encounters.json` | ok | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/esp/powers.json` | ok | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/fra/monsters.json` | ok | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/fra/encounters.json` | ok | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/fra/powers.json` | ok | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/ind/monsters.json` | ok | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/ind/encounters.json` | ok | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/ind/powers.json` | ok | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/ita/monsters.json` | ok | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/ita/encounters.json` | ok | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/ita/powers.json` | ok | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/jpn/monsters.json` | ok | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/jpn/encounters.json` | ok | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/jpn/powers.json` | ok | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/kor/monsters.json` | ok | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/kor/encounters.json` | ok | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/kor/powers.json` | ok | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/pol/monsters.json` | ok | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/pol/encounters.json` | ok | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/pol/powers.json` | ok | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/ptb/monsters.json` | ok | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/ptb/encounters.json` | ok | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/ptb/powers.json` | ok | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/rus/monsters.json` | ok | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/rus/encounters.json` | ok | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/rus/powers.json` | ok | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/spa/monsters.json` | ok | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/spa/encounters.json` | ok | 0 |
+| 2026-11-23 15:39 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/spa/powers.json` | ok | 0 |
+| 2026-11-23 15:40 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/tha/monsters.json` | ok | 0 |
+| 2026-11-23 15:40 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/tha/encounters.json` | ok | 0 |
+| 2026-11-23 15:40 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/tha/powers.json` | ok | 0 |
+| 2026-11-23 15:40 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/tur/monsters.json` | ok | 0 |
+| 2026-11-23 15:40 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/tur/encounters.json` | ok | 0 |
+| 2026-11-23 15:40 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/tur/powers.json` | ok | 0 |
+| 2026-11-23 15:40 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/zhs/monsters.json` | ok | 0 |
+| 2026-11-23 15:40 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/zhs/encounters.json` | ok | 0 |
+| 2026-11-23 15:40 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/zhs/powers.json` | ok | 0 |
+| 2026-11-23 15:40 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/zht/monsters.json` | ok | 0 |
+| 2026-11-23 15:40 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/zht/encounters.json` | ok | 0 |
+| 2026-11-23 15:40 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/content/localization/zht/powers.json` | ok | 0 |
+| 2026-11-23 15:40 | edit | `tools/wiki-dump/WikiDump.cs` | ok | 0 |
+| 2026-11-23 15:40 | edit | `tools/wiki/i18n-en.json` | ok | 0 |
+| 2026-11-23 15:40 | edit | `tools/wiki/i18n-en.json` | ok | 0 |
+| 2026-11-23 15:40 | edit | `docs/plans/changelog-history.md` | ok | 0 |
+| 2026-11-23 15:42 | edit | `tools/wiki-dump/WikiDump.cs` | ok | 0 |
+| 2026-11-23 15:42 | edit | `tools/wiki-dump/WikiDump.cs` | ok | 0 |
+| 2026-11-23 15:43 | edit | `tools/wiki-dump/WikiDump.cs` | ok | 0 |
+| 2026-11-23 15:44 | edit | `tools/wiki-dump/WikiDump.cs` | ok | 0 |
+| 2026-11-23 15:45 | edit | `tools/wiki/i18n-en.json` | ok | 0 |

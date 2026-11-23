@@ -74,6 +74,7 @@ internal static class WikiDump
         ["REGENT_STAR"] = "辉星储", ["REGENT_CHOICE"] = "抉择储",
         ["WATCHER_FORESIGHT"] = "预见观", ["WATCHER_CREATE"] = "印牌观", ["WATCHER_RETAIN"] = "保留观",
         ["WATCHER_OMEGA"] = "欧米伽观", ["WATCHER_RUSHDOWN"] = "红蓝观",
+        ["WATCHER_FLURRY"] = "疾风观",   // 一层 2 号（用户 2026-11-23）
     };
     private static int Main(string[] args)
     {
@@ -90,6 +91,34 @@ internal static class WikiDump
 
         _probeDirs = new[] { Path.GetDirectoryName(implPath), gameDir, AppContext.BaseDirectory };
         AppDomain.CurrentDomain.AssemblyResolve += Resolve;
+
+        // ★ 2026-11-23：**可选地把观者模组预加载进来**（第 6 个参数 = 那个 mod 的目录）。
+        //   我们的观者 Boss 全是「运行期反射」取牌/遗物的（`WatcherCards.Probe()` 只扫
+        //   **已加载**的程序集），不预加载时 `至纯之水`（PureWater）/ `美琅脂`（Melange）这类
+        //   **观者 mod 自己的遗物**会在导出的 data.json 里整个消失 —— 旧版表里那几行就少了它们。
+        //   不传这个参数时行为与以前完全一致。
+        //   用法：在 4 个位置参数之后再跟一个目录（例如观者 mod 的工坊目录），不是 `--` 开头的都算候选。
+        string? preloadDir = null;
+        for (int i = 4; i < args.Length; i++)
+        {
+            if (args[i].StartsWith("--", StringComparison.Ordinal)) continue;
+            if (Directory.Exists(args[i])) preloadDir = args[i];
+        }
+        if (preloadDir != null)
+        {
+            foreach (var dll in Directory.GetFiles(preloadDir, "*.dll"))
+            {
+                try
+                {
+                    Assembly.LoadFrom(dll);
+                    Console.WriteLine("[INFO] 预加载 " + Path.GetFileName(dll));
+                }
+                catch (Exception e)
+                {
+                    Console.Error.WriteLine("[WARN] 预加载失败 " + Path.GetFileName(dll) + ": " + e.GetBaseException().Message);
+                }
+            }
+        }
 
         LoadLocalization(root);
 
@@ -227,6 +256,19 @@ internal static class WikiDump
     // ── 本地化 ─────────────────────────────────────────────
     private static void LoadLocalization(string root)
     {
+        // ★ 2026-11-23：**观者模组**（3747526116）的 zhs 表也读进来 —— 我们预加载它之后，
+        //   牌/遗物会按真实 Type 出现（`WatcherNirvana` / `PureWater`），而它们的中文名只在
+        //   观者自己的 pck 里（`tools\tmp\loc-w2\zhs_*.json` 就是那份 dump，key 是下划线 id，
+        //   正好对上 `Snake("WatcherNirvana")` = `WATCHER_NIRVANA`）。不读的话会回退成类名。
+        //   没预加载观者 mod 时这些 key 也用不上，纯属多读三个文件。
+        string watcherLoc = Path.Combine(root, "tools", "tmp", "loc-w2");
+        if (File.Exists(Path.Combine(watcherLoc, "zhs_cards.json")))
+        {
+            Load(Path.Combine(watcherLoc, "zhs_cards.json"), Cards);
+            Load(Path.Combine(watcherLoc, "zhs_relics.json"), Relics);
+            Load(Path.Combine(watcherLoc, "zhs_powers.json"), Powers);
+        }
+
         // 先读**游戏本体**的中文表（tools\tmp\zhs_*.json 是从游戏 pck 里 dump 出来的全量表），
         // 再用本模组自己的 content\localization\zhs\* 覆盖/补充（本模组的牌、遗物、能力只在后者里）。
         string gameLoc = Path.Combine(root, "tools", "tmp");
@@ -256,7 +298,10 @@ internal static class WikiDump
         for (int i = 0; i < typeName.Length; i++)
         {
             char c = typeName[i];
-            if (char.IsUpper(c) && i > 0) sb.Append('_');
+            // ★ 2026-11-23：类名里本来就带下划线的（观者 mod 的 `WatcherStrike_P` / `WatcherDefend_P`）
+            //   以前会变成 `WATCHER_STRIKE__P`（双下划线）⇒ 对不上本地化 key `WATCHER_STRIKE_P`。
+            //   紧跟在 `_` 后面的大写字母不再补分隔符。
+            if (char.IsUpper(c) && i > 0 && typeName[i - 1] != '_') sb.Append('_');
             sb.Append(char.ToUpperInvariant(c));
         }
         return sb.ToString();

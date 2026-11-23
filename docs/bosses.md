@@ -1,5 +1,5 @@
 
-# 全部 Boss 一览（43 个档位）
+# 全部 Boss 一览（44 个档位）
 
 > 登记规则：**「第几层 + 某角色的第几号」**。同一角色在同一场战斗里最多一只；主 Boss 的角色整局不重复。
 > 控制台点名统一形状：`fight <KEY>_BOSS_ENCOUNTER`，**会把档位（幕数）钉死**，不管你现在在第几幕。
@@ -7,7 +7,7 @@
 > 本文件由 `tools\wiki\make-bosses-md.ps1` 从 `tools\wiki\data.json` **自动生成，请勿手改**；
 > 数据与百科页同源（`tools\wiki-dump` 从模组 DLL 反射导出），改完模组要重新导出 + 重新生成。
 
-## 一层（12 个）
+## 一层（13 个）
 
 | 角色·号 | 设计 | Key | 特殊效果 | 对战指令 |
 |---|---|---|---|---|
@@ -23,6 +23,7 @@
 | 铁甲 2 号 | 打击战 | `IRONCLAD_STRIKE` | 痛击 | `fight IRONCLAD_STRIKE_BOSS_ENCOUNTER` |
 | 观者 1 号 | （本幕主设计） | `WATCHER_DIVINITY` | - | `fight WATCHER_DIVINITY_BOSS_ENCOUNTER` |
 | 观者 2 号 | 预见观 | `WATCHER_FORESIGHT` | 每当观者触发[gold]先见之明[/… | `fight WATCHER_FORESIGHT_BOSS_ENCOUNTER` |
+| 观者 3 号 | 疾风观 | `WATCHER_FLURRY` | 每当观者的[gold]疾风连击[/g… | `fight WATCHER_FLURRY_BOSS_ENCOUNTER` |
 
 ## 二层（14 个）
 
@@ -89,7 +90,7 @@ fight NECROBINDER_BOSS_NORMAL_ENCOUNTER     fight REGENT_BOSS_NORMAL_ENCOUNTER
 1. **`fight` 每一场只出 1 只 Boss**（走的是单怪遭遇，不套「按玩家数排阵容」那套）；想看多 Boss 联机阵容得正常爬塔。
 2. 内部名字分 4 层，别混：
    - 怪物模型 id `MONSTER.*` —— **每个角色只有 1 个**，同角色所有设计共用（例如电球机和黑球机都是 `MONSTER.DEFECT_BOSS`）；
-   - 阵容 Key（上表的 Key）—— 决定「用哪一套设计」，43 个；
+   - 阵容 Key（上表的 Key）—— 决定「用哪一套设计」，44 个；
    - 遭遇 id —— 上表的对战指令，=`<Key>_BOSS_ENCOUNTER`；
    - C# 类 —— `Monsters.DefectBoss` 之类，7 个（含愚者 / 观者）。
 3. 缺本地化文案的遭遇会在战斗顶部/败北提示里直接显示 `encounters.XXX` 原文（发现了就补 `content/localization/<语言>/encounters.json`）。

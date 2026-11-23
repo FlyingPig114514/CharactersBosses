@@ -118,5 +118,7 @@
     "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "[gold]Созерцающая[/gold] удерживала руку {character} карту за картой до самого конца.",
     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "Созерцающая",     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "{character} был раздавлен [gold]Всеведением[/gold] [gold]Созерцающей[/gold].",
 "WATCHER_RUSHDOWN_BOSS_ENCOUNTER.title": "Watcher",
-"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} was flattened by the Watcher's red and blue palms."
+"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} was flattened by the Watcher's red and blue palms.",
+    "WATCHER_FLURRY_BOSS_ENCOUNTER.title":  "Созерцающая",
+    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character} был раздавлен [gold]Натиском[/gold] [gold]Созерцающей[/gold]."
 }

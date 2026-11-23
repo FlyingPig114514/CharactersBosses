@@ -118,5 +118,7 @@
     "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "[gold]Gözlemci[/gold], {character}'in elini kart kart sonuna kadar tuttu.",
     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "Gözlemci",     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "{character}, [gold]Gözlemci[/gold]'nin [gold]Herşeyi Bilme[/gold] yeteneğiyle ezildi.",
 "WATCHER_RUSHDOWN_BOSS_ENCOUNTER.title": "Watcher",
-"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} was flattened by the Watcher's red and blue palms."
+"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} was flattened by the Watcher's red and blue palms.",
+    "WATCHER_FLURRY_BOSS_ENCOUNTER.title":  "Gözlemci",
+    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character}, [gold]Gözlemci[/gold]'nin [gold]Flurry of Blows[/gold] yeteneğiyle ezildi."
 }

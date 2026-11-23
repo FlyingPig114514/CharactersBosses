@@ -118,5 +118,7 @@
     "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "[gold]Watcher[/gold] menahan kartu {character}, satu per satu, sampai akhir.",
     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "Watcher",     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "{character} dihancurkan oleh [gold]Mahatahu[/gold] milik [gold]Watcher[/gold].",
 "WATCHER_RUSHDOWN_BOSS_ENCOUNTER.title": "Watcher",
-"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} was flattened by the Watcher's red and blue palms."
+"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} was flattened by the Watcher's red and blue palms.",
+    "WATCHER_FLURRY_BOSS_ENCOUNTER.title":  "Watcher",
+    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character} dihancurkan oleh [gold]Flurry of Blows[/gold] milik [gold]Watcher[/gold]."
 }

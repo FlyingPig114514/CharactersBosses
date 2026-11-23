@@ -1,4 +1,4 @@
-﻿{
+{
     "_comment":  "English strings that the mod itself writes (design names, ability-panel labels, \u0027not played\u0027 reasons, per-turn notes). Card / relic / potion names are NOT here — they come straight from the game\u0027s own English localization tables. Missing keys fall back to Chinese and are reported by tools/wiki/make-markdown-en.ps1.",
     "chars":  {
                   "铁甲战士":  "Ironclad",
@@ -50,7 +50,8 @@
                     "保留观":  "Retain Watcher",
                     "神格观":  "Divinity Watcher",
                     "欧米伽观":  "Omega Watcher",
-                    "红蓝观":  "Red-Blue Watcher"
+                    "红蓝观":  "Red-Blue Watcher",
+                    "疾风观":  "Flurry Watcher"
                 },
     "info":  {
                  "循环":  "Loop",
@@ -93,6 +94,8 @@
                 },
     "extra":  {
                   "迂回":  "Follow-Up",
+                  "以手拒之":  "Talk to the Hand",
+                  "疾风连击":  "Flurry of Blows",
                   "奇迹":  "Miracle",
                   "内心宁静":  "Inner Peace",
                   "平安+":  "Safety+",
@@ -250,6 +253,7 @@
                     "首次洗牌在第":  "first shuffle on turn",
                     "免费打出":  "free-played",
                     "保留不出":  "kept, not played",
+                    "没费不弃":  "kept, no energy",
                     "结束回合":  "end of turn",
                     "剑雨":  "Sword Rain",
                     "进阶":  "ascension",

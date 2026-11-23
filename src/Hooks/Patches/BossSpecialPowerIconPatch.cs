@@ -276,6 +276,9 @@ public static class BossSpecialPowerIconPatch
                 Powers.TarotBrawlPower => "tarot_brawl",               // Hermit · 斗殴
                 Powers.TarotBruisePower => "tarot_bruise",             // Hermit · 瘀伤
                 Powers.TarotEternalPower => "tarot_eternal",           // Hermit · 永恒形态
+                // ★ 2026-11-23（用户「疾风观」）：「力竭」= 下回合少 1 能量 ⇒ 借用观者 mod
+                //   「能量降低」（`WatcherMod.EnergyDownPower`，斋戒给的那层）那张图，同义且不缺图。
+                Powers.FlurryDrainedPower => "tarot_energy_down",      // 观者 · 力竭（下回合少能量）
                 _ => null,
             };
             if (file == null) return null;

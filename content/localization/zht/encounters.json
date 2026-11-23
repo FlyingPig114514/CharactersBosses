@@ -118,5 +118,7 @@
     "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "{character} 的手牌被[gold]觀者[/gold]一張張留到了死。",
     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "觀者",     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "{character} 被[gold]觀者[/gold]的[gold]通曉萬物[/gold]碾碎。",
 "WATCHER_RUSHDOWN_BOSS_ENCOUNTER.title": "观者",
-"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} 被[gold]观者[/gold]的红蓝双掌拍成了齑粉。"
+"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} 被[gold]观者[/gold]的红蓝双掌拍成了齑粉。",
+    "WATCHER_FLURRY_BOSS_ENCOUNTER.title":  "觀者",
+    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character} 被[gold]觀者[/gold]的[gold]疾風連擊[/gold]碾碎。"
 }

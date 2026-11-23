@@ -227,6 +227,23 @@ public class WatcherForesightBossEncounter : CharBossEncounterBase<WatcherForesi
     // 地图图标（用户 2026-11-18 规则：一个图标只对应唯一一个 Boss）：
     // **不覆写** ⇒ 走基类兜底的剪影；`watcher_divinity` 只留给神格观自己用。
 }
+
+public sealed class WatcherFlurryBossNormalEncounter : WatcherFlurryBossEncounter
+{
+    public override RoomType RoomType => RoomType.Monster;
+}
+
+/// <summary>
+/// **一层 2 号「疾风观」**（设计 Key `WATCHER_FLURRY` = 疾风连击 Flurry of Blows，用户 2026-11-23）：
+/// 观者角色 + 疾风连击/以手拒之/斋戒 的攻防节奏 + 特殊效果「疾风连击」（给玩家叠「力竭」）。
+/// 控制台：`fight WATCHER_FLURRY_BOSS_ENCOUNTER`。
+/// </summary>
+public class WatcherFlurryBossEncounter : CharBossEncounterBase<WatcherFlurryBoss>
+{
+    public override int? TierAct => 0;      // 第一幕
+
+    // 地图图标：同上，**不覆写** ⇒ 走基类兜底剪影（一个图标只对应唯一一个 Boss）。
+}
 #endif
 // ── 调试专用的「普通战斗」版本 ──
 // 调试开关换进来的战斗如果仍是 RoomType.Boss，打赢后会走 Boss 结算（第一幕的 Boss 一死就直接进下一幕）。
@@ -651,6 +668,7 @@ public static class CharBossEncounters
         ModelDb.Encounter<WatcherCreateBossEncounter>(),                // 二层 1 号：印牌观（用户 2026-11-16）
         ModelDb.Encounter<WatcherRetainBossEncounter>(),                // 二层 2 号：保留观（用户 2026-11-17）
         ModelDb.Encounter<WatcherForesightBossEncounter>(),             // 一层 1 号：预见观（用户 2026-11-17）
+        ModelDb.Encounter<WatcherFlurryBossEncounter>(),                 // 一层 2 号：疾风观（用户 2026-11-23）
         ModelDb.Encounter<WatcherRushdownBossEncounter>(),              // 三层 3 号：红蓝观（用户 2026-11-18）
 #endif
     });
@@ -748,6 +766,11 @@ public static class CharBossEncounters
             //   控制台点名 `WATCHER_RETAIN_BOSS_ENCOUNTER` 或读档回到保留观那场时，按遭遇认人。
             if (character == WatcherCharacterIndex && actIndex == 1 && Core.BossLineups.WatcherRetainActive())
                 return ModelDb.Encounter<WatcherRetainBossEncounter>();
+
+            // ★ v0.2.9xx（用户 2026-11-23）：一层观者有两套设计 —— 1 号预见观（档位默认）/ 2 号疾风观。
+            //   控制台点名 `WATCHER_FLURRY_BOSS_ENCOUNTER` 或读档回到疾风观那场时，按遭遇认人。
+            if (character == WatcherCharacterIndex && actIndex == 0 && Core.BossLineups.WatcherFlurryActive())
+                return ModelDb.Encounter<WatcherFlurryBossEncounter>();
 
             return TierByCharacterAct.Value.TryGetValue((character, actIndex), out var encounter)
                 ? encounter

@@ -97,6 +97,8 @@ internal static class BossKeys
         new("WATCHER_RETAIN",            6, 1, 2, typeof(WatcherRetainBoss)),
         // 一层 1 号：**预见观**（用户 2026-11-17）—— 预见/先见之明流 + 特殊效果「通晓万物」
         new("WATCHER_FORESIGHT",         6, 0, 1, typeof(WatcherForesightBoss)),
+        // 一层 2 号：**疾风观**（用户 2026-11-23）—— 疾风连击/以手拒之 + 特殊效果「疾风连击」
+        new("WATCHER_FLURRY",            6, 0, 2, typeof(WatcherFlurryBoss)),
         // 三层 3 号：**红蓝观**（用户 2026-11-18）—— 红蓝姿态无限流 + 特殊效果「节制」。
         new("WATCHER_RUSHDOWN",          6, 2, 3, typeof(WatcherRushdownBoss)),
 #endif
@@ -412,6 +414,7 @@ internal static class BossKeys
             case "WATCHER_RUSHDOWN": return ModelDb.Encounter<WatcherRushdownBossEncounter>();
             case "WATCHER_RETAIN": return ModelDb.Encounter<WatcherRetainBossEncounter>();
             case "WATCHER_FORESIGHT": return ModelDb.Encounter<WatcherForesightBossEncounter>();
+            case "WATCHER_FLURRY": return ModelDb.Encounter<WatcherFlurryBossEncounter>();
 #endif
 #endif
             default: return null;
@@ -535,8 +538,8 @@ internal static class BossKeys
     }
 
     /// <summary>
-    /// **第一幕**的观者候补（用户 2026-11-17：一层 1 号「预见观」）。
-    /// 闸门与另外两幕完全相同（装了观者 mod + 全端同一实现）。
+    /// **第一幕**的观者候补（用户 2026-11-17：一层 1 号「预见观」；
+    /// 2026-11-23 追加一层 2 号「疾风观」）。闸门与另外两幕完全相同（装了观者 mod + 全端同一实现）。
     /// </summary>
     private static string[] WatcherRosterAct1()
     {
@@ -544,7 +547,7 @@ internal static class BossKeys
         try
         {
             if (Core.WatcherModPresence.Installed && Core.BossPicksSync.WatcherAllowedHere())
-                return new[] { "WATCHER_FORESIGHT" };
+                return new[] { "WATCHER_FORESIGHT", "WATCHER_FLURRY" };
         }
         catch { /* 探测失败就当没装 */ }
 #endif

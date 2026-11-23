@@ -976,6 +976,58 @@ internal static class BossLineups
         return (false, false);
     }
 
+    /// <summary>
+    /// **一层 2 号「疾风观」这套设计**（设计 Key `WATCHER_FLURRY` = 疾风连击，用户 2026-11-23）。
+    /// 与预见观同幕 ⇒ 判据只能是「本场遭遇 / 钉死的变体 key」。
+    /// </summary>
+    internal static bool WatcherFlurryActive() => Latched("WATCHER_FLURRY", ComputeWatcherFlurry);
+
+    private static (bool Value, bool Decisive) ComputeWatcherFlurry()
+    {
+        // ① 先看场上那只怪钉死的变体 key（造怪时 `WatcherFlurryBoss` 就钉成 `WATCHER_FLURRY`）
+        try
+        {
+            foreach (var c in MegaCrit.Sts2.Core.Combat.CombatManager.Instance?.DebugOnlyGetState()?.Enemies
+                                ?? (IEnumerable<MegaCrit.Sts2.Core.Entities.Creatures.Creature>)Array.Empty<MegaCrit.Sts2.Core.Entities.Creatures.Creature>())
+            {
+                if (c?.Monster is not Monsters.CharBossMonster boss) continue;
+                string? pinned = boss.PinnedVariantKey ?? boss.SpawnVariantKey;
+                if (string.Equals(pinned, "WATCHER_FLURRY", StringComparison.Ordinal)) return (true, true);
+            }
+        }
+        catch { /* 继续往下 */ }
+
+        // ② 再看房间遭遇
+        try
+        {
+            string? entry = CurrentEncounterEntry();
+            if (!string.IsNullOrEmpty(entry))
+            {
+                if (entry == "WATCHER_FLURRY_BOSS_ENCOUNTER") return (true, true);
+                if (entry.StartsWith("WATCHER_", StringComparison.Ordinal)) return (false, true);
+            }
+        }
+        catch { /* 继续往下 */ }
+
+        // ③ 最后看阵容
+        try
+        {
+            var lineup = CurrentFightLineup();
+            if (lineup != null)
+            {
+                foreach (var k in lineup)
+                {
+                    if (k == "WATCHER_FLURRY") return (true, true);
+                    if (k.StartsWith("WATCHER", StringComparison.Ordinal)) return (false, true);
+                }
+            }
+        }
+        catch { /* 继续 */ }
+
+        // ⚠ 什么都不知道 ⇒ **不决断**（别把 false 锁死）
+        return (false, false);
+    }
+
     internal static bool WatcherForesightActive() => Latched("WATCHER_FORESIGHT", ComputeWatcherForesight);
 
     private static (bool Value, bool Decisive) ComputeWatcherForesight()

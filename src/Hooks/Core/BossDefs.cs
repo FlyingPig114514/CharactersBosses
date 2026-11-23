@@ -1215,6 +1215,34 @@ public static class BossDefs
                     HpBonus = 0,
                     BlocksVanillaDraw = true,
                 },
+                // ★ v0.2.9xx（用户 2026-11-23）：**一层 2 号「疾风观」** —— 同一个观者角色的第七套设计，
+                //   挂在**第一幕**（`ExtraVariants[0]`，与预见观同幕，按 `BossLineups.WatcherFlurryActive()` 分辨）。
+                //   特殊效果「疾风连击」：观者的「疾风连击」对玩家造成**未被格挡**伤害时，
+                //   该玩家**下回合失去 1 能量**（可叠；崩坠「力竭」的同款，单张牌最多 1 层）。
+                //   剧本 9 回合 + 6~9 循环；遗物 至纯之水 / 涅奥的祝福 / 手里剑 / 苦无；
+                //   进阶 8 升 以手拒之·心灵堡垒，进阶 9 升 供奉·斋戒。
+                new BossVariant
+                {
+                    Key = "WATCHER_FLURRY",
+                    AscensionDisplay = new List<string> { "8: 以手拒之, 8: 心灵堡垒, 9: 供奉, 9: 斋戒" },
+                    AscensionUpgrades = new List<(int, Type)>
+                    {
+                        (8, WatcherCards.TalkToTheHand), (8, WatcherCards.MentalFortress),
+                        (9, WatcherCards.Consecrate), (9, WatcherCards.Fasting),
+                    },
+                    Enabled = Core.BossLineups.WatcherFlurryActive,
+                    Deck = WatcherFlurryScript.Deck(),
+                    Relics = WatcherFlurryScript.Relics(),
+                    Script = WatcherFlurryScript.Build(),
+                    SpecialLoc = "WATCHER_FLURRY_BOSS.flurry",
+                    SpecialLocDread = "WATCHER_FLURRY_BOSS.flurry_dread",
+                    SpecialPower = typeof(Powers.BossFlurryPower),
+                    SpecialPowerDread = typeof(Powers.BossFlurryPower),
+                    DreadUpgrades = WatcherFlurryScript.DreadUpgradeTypes(),
+                    // 观者模组初始生命 72（这四件遗物里没有布质果实 ⇒ 主定义的 103 那 +31 不吃）
+                    HpBonus = 0,
+                    BlocksVanillaDraw = true,
+                },
             },
 
             [1] = new List<BossVariant>

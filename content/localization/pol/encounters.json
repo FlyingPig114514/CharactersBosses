@@ -118,5 +118,7 @@
     "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "[gold]Obserwatorka[/gold] zatrzymywała rękę {character} karta po karcie aż do końca.",
     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "Obserwatorka",     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "{character} został zmiażdżony przez [gold]Wszechwiedzę[/gold] [gold]Obserwatorki[/gold].",
 "WATCHER_RUSHDOWN_BOSS_ENCOUNTER.title": "Watcher",
-"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} was flattened by the Watcher's red and blue palms."
+"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} was flattened by the Watcher's red and blue palms.",
+    "WATCHER_FLURRY_BOSS_ENCOUNTER.title":  "Obserwatorka",
+    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character} został zmiażdżony przez [gold]Lawinę ciosów[/gold] [gold]Obserwatorki[/gold]."
 }

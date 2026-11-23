@@ -138,6 +138,24 @@ public sealed class WatcherForesightBoss : WatcherBoss
 }
 
 /// <summary>
+/// **一层 2 号「疾风观」**（设计 Key <c>WATCHER_FLURRY</c> = 疾风连击 Flurry of Blows，用户 2026-11-23）。
+///
+/// 同一个观者角色的**第七套设计** ⇒ 走 `BossDefs.Watcher` 的 `ExtraVariants[0]`（与预见观同幕，
+/// 靠 `BossLineups.WatcherFlurryActive()` 分辨这一场是谁）：剧本 `WatcherFlurryScript`
+/// （9 回合，6~9 循环）、遗物 至纯之水/涅奥的祝福/手里剑/苦无、
+/// 特殊效果「疾风连击」（`Powers.BossFlurryPower` ⇒ 给玩家叠「力竭」`Powers.FlurryDrainedPower`）。
+/// 控制台：`fight WATCHER_FLURRY_BOSS_ENCOUNTER`。
+/// </summary>
+public sealed class WatcherFlurryBoss : WatcherBoss
+{
+    public WatcherFlurryBoss() { SpawnVariantKey = "WATCHER_FLURRY"; }
+
+    public override int? TierAct => 0;      // 第一幕
+
+    public override string? PinnedVariantKey => "WATCHER_FLURRY";
+}
+
+/// <summary>
 /// **三层 3 号「红蓝观」**（设计 Key <c>WATCHER_RUSHDOWN</c> = 猛虎下山，用户 2026-11-18）。
 ///
 /// 同一个观者角色的**第六套设计** ⇒ 走 `BossDefs.Watcher` 的 `ExtraVariants[2]`（第三幕）。

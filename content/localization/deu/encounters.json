@@ -118,5 +118,7 @@
     "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "[gold]Die Seherin[/gold] behielt {character}s Hand Karte für Karte bis zum Ende.",
     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "Die Seherin",     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "{character} wurde von der [gold]Allwissenheit[/gold] der [gold]Seherin[/gold] zermalmt.",
 "WATCHER_RUSHDOWN_BOSS_ENCOUNTER.title": "Watcher",
-"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} was flattened by the Watcher's red and blue palms."
+"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} was flattened by the Watcher's red and blue palms.",
+    "WATCHER_FLURRY_BOSS_ENCOUNTER.title":  "Die Seherin",
+    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character} wurde vom [gold]Hiebregen[/gold] der [gold]Seherin[/gold] zermalmt."
 }
