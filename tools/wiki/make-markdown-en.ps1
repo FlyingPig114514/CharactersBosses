@@ -318,9 +318,9 @@ function Note-En([string]$zh) {
     if ($I18n['notes'].ContainsKey($k)) { return $I18n['notes'][$k] }
 
     $s = $k
-    foreach ($n in @($Script:NameKeysByLen)) { if ($s.Contains($n)) { $s = $s.Replace($n, (N $n)) } }
+    foreach ($n in @($Script:NameKeysByLen)) { if ($s.Contains($n)) { $s = $s.Replace($n, ' ' + (N $n) + ' ') } }
     foreach ($ph in @($Script:PhraseKeysByLen)) {
-        if ($s.Contains($ph)) { $s = $s.Replace($ph, $I18n['phrases'][$ph]) }
+        if ($s.Contains($ph)) { $s = $s.Replace($ph, ' ' + $I18n['phrases'][$ph] + ' ') }
     }
     $s = $s.Replace('、', ', ').Replace('（', ' (').Replace('）', ')').Replace('：', ': ').Replace('；', '; ')
     $s = $s.Replace('，', ', ').Replace('。', '. ').Replace('×', '×').Replace('～', '~')
