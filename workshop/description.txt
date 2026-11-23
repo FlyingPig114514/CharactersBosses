@@ -25,13 +25,17 @@ Single-player is fairly stable at the moment, but multiplayer can still run into
 
 Because the bosses' intents are fairly complex, working out the total incoming damage is difficult — which is especially noticeable in multiplayer with several bosses on the field at once. The mod therefore supports the damage preview from Minty Spire 2 (薄荷尖塔, 3737336234), and installing it is recommended.
 
-本模组的代码完全由Deepseek-Harness编写，我只是个总策划。在此，我还需要向所有在本模组制作过程中进行投稿、测试等帮助的朋友表达由衷的感谢！作者B站：疯狂的飞猪_
+本模组的代码完全由Deepseek-Harness编写，我只是个总策划。在此，我还需要向所有在本模组制作过程中进行投稿、测试等帮助的朋友表达由衷的感谢！
 
 All of the code in this mod was written by DeepSeek-Harness — I am merely the lead designer. I would also like to sincerely thank every friend who helped during development by contributing content, testing and so on!
 
-本模组依赖BaseLib用于编写设置界面，请确保你装载了BaseLib，否则相关功能可能受到影响。
+本模组依赖BaseLib用于编写设置界面，若你未装载该模组，设置和联机等功能可能受到影响。
 
-This mod depends on BaseLib for building its settings screen — please make sure BaseLib is installed, otherwise the related features may be affected.
+This mod depends on BaseLib for building its settings screen — if you do not have it installed, settings and multiplayer features may be affected.
+
+若遇到bug，欢迎向作者反馈！反馈qq群：971526482；作者B站：疯狂的飞猪_
+
+If you run into a bug, feel free to report it! Feedback QQ group: 971526482; the author's Bilibili: 疯狂的飞猪_
 
 声明：本模组使用了《杀戮尖塔2》本身的美术资源、《杀戮尖塔》与《杀戮尖塔2》的音乐，以及《杀戮尖塔》模组「崩坠（Downfall）」的美术资源。以上素材的版权归各自作者（MegaCrit 与崩坠模组的作者）所有，本模组仅供免费、非商业性使用，不以任何形式出售或收费；如原作者提出要求，可随时移除相关内容。除此之外的内容（代码、Boss 设计等）均为本模组原创（仅少量Boss参考了崩坠中的Boss设计）。
 
