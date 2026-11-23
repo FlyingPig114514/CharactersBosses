@@ -53,6 +53,10 @@ public static partial class BossHookBridge
         //   刚开始抽牌时也会丢他一张牌。现在改在这里（她自己的回合开始）显式触发一次。
 #if STS2_111
         try { Powers.BossOmnisciencePower.OnBossTurnStart(boss, context); } catch { /* 忽略 */ }
+        // ★ v0.2.917（用户 2026-11-23：「A 版的第一回合她手里有 2 张奇迹」）：
+        //   至纯之水的「奇迹」有两个来源（模组自己 `PureWater.BeforeCombatStart` 是**异步**的 +
+        //   我们自己的注入）⇒ 竞争下可能进两张。她的回合开始时两张都已经在手里，这里修剪到 1 张。
+        try { WatcherCards.TrimExtraMiracles(boss.Shadow?.PlayerCombatState); } catch { /* 忽略 */ }
 #endif
         // ⚠ 这里**不再**补破损核心的球：改成战斗开始时引导（见 ChannelCrackedCoreOrbAtCombatStart），
         // 否则他第 1 回合会和原版遗物那条叠成两个（用户实测）。

@@ -4,6 +4,21 @@
 > 旧条目逐字来自 `git show HEAD:src/Hooks/Core/BuildInfo.cs` 的 Tag 常量（v0.2.871 及其之前，共 236 条）。
 > 最新版本（0.2.889）是当前 Tag，同时在各条 `workshop/changenote.txt` 里也有面向玩家的摘要。
 
+## v0.2.917（2026-11-23）：修「A 版第一回合手里有 2 张奇迹」
+
+用户报的 bug。至纯之水的「奇迹」有**两个来源**：
+
+- 模组自己的 `PureWater.BeforeCombatStart`（`AddGeneratedCardToCombat`，**异步**，落手时间不确定）；
+- 我们 v0.2.913 加的注入（她第 1 回合手牌建好之后）。
+
+日志实证这个竞争：`至纯之水（Boninall）：…补 1 张「奇迹」` 在 20:38:32，
+而 `至纯之水去重：已压掉 PureWater.BeforeCombatStart` 在 20:38:33 —— 压得晚了一拍，
+模组那张已经进了手牌，于是两张。
+
+光靠「已有就不补」堵不住异步，所以改成**修剪**（`WatcherCards.TrimExtraMiracles`）：
+① 我们注入的时候顺手修剪；② **她的回合开始时**（`BossHookBridge.FireSideTurnStart`）再修剪一次 ——
+那时两张都已经在手里，多出来的直接 `Hand.RemoveInternal` 掉，只留 1 张。
+
 ## v0.2.916（2026-11-23）：疾风连击的意图只留攻势
 
 用户：「疾风连击的意图中错误的包含了强化，应当只有攻势」。

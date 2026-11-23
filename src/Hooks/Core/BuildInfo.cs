@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.916 / 2026-11-23 (**疾风连击的意图只留攻势**）—— 用户 2026-11-23：「疾风连击的意图中错误的包含了强化，应当只有攻势」。疾风连击是 0 费攻击牌，卡面只有「造成伤害 + 转换姿态时从弃牌堆回手」，但那个「回手」被 `CardBehaviorScan`/`ClassifyPowers` 认成「捞牌 = 强化」⇒ 意图里多一条蓝色上箭头。把它加进 `BossIntentBuilder.NoBuffIntentCards`（两个版本 id：`WATCHER_FLURRY_OF_BLOWS` / `WATCHER-FLURRY_OF_BLOWS`），与「迂回」同款处理 —— 它是纯攻击牌，只留攻势。v0.2.915 = 第 3/9 回合那张打击改防御。完整历史见 docs/plans/changelog-history.md";
+    public const string Tag = "v0.2.917 / 2026-11-23 (**修：A 版第一回合手里有 2 张奇迹**）—— 用户 2026-11-23 报的 bug。至纯之水的「奇迹」有**两个来源**：模组自己的 `PureWater.BeforeCombatStart`（**异步**，落手时间不确定）和我们 v0.2.913 加的注入 ⇒ 竞争下进两张（日志实证：`至纯之水（Boninall）：…补 1 张` 在 20:38:32、`去重：已压掉 BeforeCombatStart` 在 20:38:33，晚了一拍）。光靠「已有就不补」堵不住异步，所以改成**修剪**：① 注入时；② **她的回合开始时**（`FireSideTurnStart`）—— 那时两张都已进手牌，多出来的直接摘掉、只留 1 张（`WatcherCards.TrimExtraMiracles`）。v0.2.916 = 疾风连击意图只留攻势。完整历史见 docs/plans/changelog-history.md";
 
     private static bool _logged;
 

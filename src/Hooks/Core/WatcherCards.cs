@@ -500,21 +500,15 @@ internal static class WatcherCards
             if (pcs == null) return;
 
             // ③ 幂等：手里已经有一张「奇迹」（比如剧本那一手正好也写了）就别再补
-            int existing = 0;
-            try
-            {
-                foreach (var c in pcs.Hand.Cards)
-                {
-                    if (c == null) continue;
-                    string entry = string.Empty;
-                    try { entry = c.Id.Entry ?? string.Empty; } catch { /* 忽略 */ }
-                    if (entry.IndexOf("MIRACLE", StringComparison.OrdinalIgnoreCase) >= 0) existing++;
-                }
-            }
-            catch { existing = 0; }
+            int existing = CountMiracles(pcs);
             if (existing > 0)
             {
-                Logger.Log($"[CharBoss] 至纯之水：她手里已经有 {existing} 张「奇迹」⇒ 不重复补");
+                // ★ v0.2.917（用户 2026-11-23：「A 版的第一回合她手里有 2 张奇迹」）：
+                //   光「有就不补」不够 —— 模组自己的印牌是**异步**的，可能在我们之后才落进手里
+                //   （也可能在我们之前落进但还没进堆）。这里改成**修剪到 1 张**。
+                TrimExtraMiracles(pcs, 1);
+                Logger.Log($"[CharBoss] 至纯之水：她手里已经有 {existing} 张「奇迹」⇒ 不重复补" +
+                           (existing > 1 ? "（多余的已摘掉）" : string.Empty));
                 return;
             }
 
@@ -545,6 +539,61 @@ internal static class WatcherCards
         {
             Logger.Log("[CharBoss] 至纯之水补「奇迹」失败（不影响战斗）: " + e.Message);
         }
+    }
+
+    /// <summary>她手牌里「奇迹」的张数。</summary>
+    internal static int CountMiracles(MegaCrit.Sts2.Core.Entities.Players.PlayerCombatState? pcs)
+    {
+        int n = 0;
+        try
+        {
+            if (pcs == null) return 0;
+            foreach (var c in pcs.Hand.Cards)
+            {
+                if (c == null) continue;
+                string entry = string.Empty;
+                try { entry = c.Id.Entry ?? string.Empty; } catch { /* 忽略 */ }
+                if (entry.IndexOf("MIRACLE", StringComparison.OrdinalIgnoreCase) >= 0) n++;
+            }
+        }
+        catch { /* 忽略 */ }
+        return n;
+    }
+
+    /// <summary>
+    /// 把她手牌里的「奇迹」修剪到最多 <paramref name="keep"/> 张。
+    ///
+    /// ★ v0.2.917（用户 2026-11-23：「A 版的第一回合她手里有 2 张奇迹」）：
+    ///   至纯之水的「奇迹」有两个来源 —— 模组自己的 `PureWater.BeforeCombatStart`
+    ///   （**异步**，落手时间不确定，可能在我们之后才进手牌）和我们自己的注入。
+    ///   光靠「已有就不补」堵不住这个竞争，所以两个时机都修剪一次：
+    ///   ① 我们注入的时候；② **她的回合开始时**（`BossHookBridge.FireSideTurnStart`）。
+    ///   只对「奇迹」动手，别的一律不碰。
+    /// </summary>
+    internal static void TrimExtraMiracles(MegaCrit.Sts2.Core.Entities.Players.PlayerCombatState? pcs, int keep = 1)
+    {
+        try
+        {
+            if (pcs == null) return;
+            int seen = 0;
+            var doomed = new List<CardModel>();
+            foreach (var c in pcs.Hand.Cards)
+            {
+                if (c == null) continue;
+                string entry = string.Empty;
+                try { entry = c.Id.Entry ?? string.Empty; } catch { continue; }
+                if (entry.IndexOf("MIRACLE", StringComparison.OrdinalIgnoreCase) < 0) continue;
+                seen++;
+                if (seen > keep) doomed.Add(c);
+            }
+            if (doomed.Count == 0) return;
+            foreach (var c in doomed)
+            {
+                try { pcs.Hand.RemoveInternal(c, true); } catch { /* 忽略 */ }
+            }
+            Logger.Log($"[CharBoss] 至纯之水：她手里有 {seen} 张「奇迹」⇒ 摘掉多余的 {doomed.Count} 张（只留 {keep} 张）");
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 至纯之水修剪失败: " + e.Message); }
     }
 
     /// <summary>手摇鼓（进阶 9 遗物）。</summary>
