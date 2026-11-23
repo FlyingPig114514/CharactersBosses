@@ -4,6 +4,31 @@
 > 旧条目逐字来自 `git show HEAD:src/Hooks/Core/BuildInfo.cs` 的 Tag 常量（v0.2.871 及其之前，共 236 条）。
 > 最新版本（0.2.889）是当前 Tag，同时在各条 `workshop/changenote.txt` 里也有面向玩家的摘要。
 
+## v0.2.905（2026-11-23）：疾风观削弱版
+
+用户 2026-11-23 第三轮（「削弱」）：
+
+- **拦掉疾风连击的回手**：A 版写在 `WatcherCombatHelper.OnStanceChanged`（转换姿态时把弃牌堆里的
+  疾风连击挪回手牌），B 版写在卡自己的 `FlurryOfBlows.OnStanceChange` —— 两条都压，且只对
+  `WATCHER_FLURRY` 这只生效。
+- **「力竭」图标换成崩坠力竭的原图**：从 `Downfall.pck` 的 `res://Awakened/images/powers/drained_power.png`
+  解出 PNG → 导入成 `res://CharacterBosses/images/powers/flurry_drained.png`（`tools/art/pck_extras.txt`）。
+- **特殊效果描述去掉「1」**（一个能量图标就代表 1 能量），16 语言；
+  **恐惧版**把「她的斋戒不会使她在回合开始时失去能量。」**单独分段**（`\n`）。
+- **斋戒的能量降低真的免疫了**：v0.2.903 的 Harmony 前缀没生效 ——
+  `WatcherRuntimePatches.TryInstall()` 只在 `BuildInfo.LogOnce` 里调**一次**，
+  那时观者模组程序集可能还没加载（`ModAssembly() == null` 直接 return，`_tried` 永远是 false，
+  之后再没人调它）。现在：① `BossFrameTick.Tick` **每帧重试**；② `PrepareTurn` 里
+  `Core.WatcherRuntimePatches.StripFastingEnergyDown(this)` 直接把 `EnergyDownPower` 从她身上摘掉兜底。
+- **削弱**：苦无 → **泪滴吊坠盒**（去掉「每 3 张攻击 +1 敏捷」的成长；代价是她开局就在平静，
+  第 5/9 回合「化体为空」退平静会按原版拿 +2 能量）；卡组去掉「安宁」。
+- **全新意图表**（普通模式）：1 以手拒之·疾风连击·防御｜2 打击·打击·防御·奇迹(不出)｜
+  3 奇迹·斋戒·心灵堡垒·防御(没费)｜4 供奉·追击·腰带抽打｜5 化体为空·疾风连击·警惕·疾风连击·打击(没费)｜
+  6 洗牌·疾风连击·防御·防御(没费)｜7 同 4｜8 防御·打击(没费)·打击(没费)｜9 同 5；之后 6～9 循环。
+  用户标注「（恐惧模式下打出）」的牌 = 恐惧模式多打出来的那一张：
+  第 5/9 回合多一张打击（4 费）、第 6 回合两张防御都打（2 费）、第 8 回合两张打击都打（3 费）。
+- 能力面板：单体高压回合改回 `4、5、7、9`（群体高压仍是「无」）。
+
 ## v0.2.904（2026-11-23）：疾风观 —— 恐惧模式第 5 / 8 回合单独一套
 
 用户实机截图（恐惧模式第 8 回合只有 1 张打击打出来）后订正：

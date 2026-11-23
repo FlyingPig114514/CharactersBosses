@@ -51,9 +51,118 @@ internal static class WatcherRuntimePatches
             any |= InstallMantraTakeover();
             any |= InstallStanceDamageFallback();
             any |= InstallFastingNoEnergyDown();
+            any |= InstallFlurryNoReturn();
             if (any) _tried = true;      // 都装上了才不再重试
         }
         catch (Exception e) { Logger.Log("[CharBoss] 观者运行期补丁安装失败: " + e.Message); }
+    }
+
+    // ── ⑥ 疾风连击不再「转换姿态时从弃牌堆回手」（用户 2026-11-23）──────────────
+    /// <summary>
+    /// 用户原话：「**拦掉疾风连击的回手**」。
+    ///
+    /// 两份观者 mod 的实现位置不同，两条都压：
+    /// · **A 版（3747526116）**：写在姿态切换的总入口
+    ///   `WatcherCombatHelper.OnStanceChanged(Player, Type, Type)` 里 ——
+    ///   它把**弃牌堆**里所有 `WatcherFlurryOfBlows` 挪回手牌（反编译实证）。
+    ///   对她整段跳过（她身上没有紫莲 `VIOLET_LOTUS`，这个方法的另一半是紫莲抽牌，跳过无副作用）；
+    /// · **B 版（3747492505）**：挂在卡自己的 `FlurryOfBlows.OnStanceChange(...)` 上，直接压掉。
+    ///
+    /// 只对我们的 **疾风观**（`WATCHER_FLURRY`）生效 —— 别的观者设计/w 真人玩家一点都不变。
+    /// </summary>
+    private static bool InstallFlurryNoReturn()
+    {
+        bool ok = false;
+
+        // A 版：姿态切换总入口
+        try
+        {
+            var helper = WatcherCards.T("WatcherCombatHelper");
+            var method = helper?.GetMethod("OnStanceChanged",
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+            if (method != null)
+            {
+                var prefix = new HarmonyMethod(typeof(WatcherRuntimePatches)
+                    .GetMethod(nameof(FlurryNoReturnStancePrefix), BindingFlags.Static | BindingFlags.NonPublic)!);
+                new Harmony("CharacterBosses.watcher.flurrnoreturn.a").Patch(method, prefix: prefix);
+                Logger.Log("[CharBoss] 疾风连击不回手：已压掉 A 版 WatcherCombatHelper.OnStanceChanged（只对她）");
+                ok = true;
+            }
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 疾风连击不回手（A 版）挂载失败: " + e.Message); }
+
+        // B 版：卡自己的 OnStanceChange
+        try
+        {
+            var cardType = WatcherCards.FlurryOfBlows;
+            var method = cardType?.GetMethod("OnStanceChange",
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            if (method != null)
+            {
+                var prefix = new HarmonyMethod(typeof(WatcherRuntimePatches)
+                    .GetMethod(nameof(FlurryNoReturnCardPrefix), BindingFlags.Static | BindingFlags.NonPublic)!);
+                new Harmony("CharacterBosses.watcher.flurrnoreturn.b").Patch(method, prefix: prefix);
+                Logger.Log("[CharBoss] 疾风连击不回手：已压掉 B 版 FlurryOfBlows.OnStanceChange（只对她）");
+                ok = true;
+            }
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 疾风连击不回手（B 版）挂载失败: " + e.Message); }
+
+        if (!ok) Logger.Log("[CharBoss] 疾风连击不回手：两份实现都没找到姿态切换钩子 ⇒ 跳过");
+        return true;
+    }
+
+    /// <summary>A 版：`OnStanceChanged(Player owner, Type oldStance, Type newStance)`。</summary>
+    private static bool FlurryNoReturnStancePrefix(Player owner, ref Task __result)
+    {
+        try
+        {
+            if (!IsFlurryBossShadowPlayer(owner)) return true;
+            __result = Task.CompletedTask;
+            if (_logs5++ < 4)
+                Logger.Log("[CharBoss] 疾风连击不回手：她转换姿态 ⇒ 压掉「弃牌堆里的疾风连击回手」");
+            return false;
+        }
+        catch { return true; }
+    }
+
+    /// <summary>B 版：`FlurryOfBlows.OnStanceChange(...)`，`__instance` 是那张牌。</summary>
+    private static bool FlurryNoReturnCardPrefix(object __instance, ref Task __result)
+    {
+        try
+        {
+            var card = __instance as CardModel;
+            if (card == null) return true;
+            if (!IsFlurryBossShadowPlayer(card.Owner)) return true;
+            __result = Task.CompletedTask;
+            if (_logs5++ < 4)
+                Logger.Log("[CharBoss] 疾风连击不回手：她转换姿态 ⇒ 压掉 B 版卡上的回手");
+            return false;
+        }
+        catch { return true; }
+    }
+
+    private static int _logs5;
+
+    /// <summary>这个 Player 是不是**疾风观**那只 Boss 的影子玩家（只认设计 Key `WATCHER_FLURRY`）。</summary>
+    private static bool IsFlurryBossShadowPlayer(Player? player)
+    {
+        try
+        {
+            if (player == null) return false;
+            var enemies = player.Creature?.CombatState?.Enemies;
+            if (enemies == null) return false;
+            foreach (var c in enemies)
+            {
+                if (c?.Monster is not Monsters.CharBossMonster boss) continue;
+                if (!ReferenceEquals(boss.Shadow, player)) continue;
+                string key = string.Empty;
+                try { key = boss.Def?.Key ?? string.Empty; } catch { key = string.Empty; }
+                return string.Equals(key, "WATCHER_FLURRY", StringComparison.Ordinal);
+            }
+        }
+        catch { /* 忽略 */ }
+        return false;
     }
 
     // ── ⑤ 斋戒不再扣她自己的能量（用户 2026-11-23「疾风观」）─────────────────────
@@ -121,6 +230,45 @@ internal static class WatcherRuntimePatches
         }
         catch { return true; }
     }
+
+    /// <summary>
+    /// **兜底**：把「能量降低」（`EnergyDownPower`）从她身上摘掉。
+    ///
+    /// 为什么除了 Harmony 前缀还要这一手：用户 2026-11-23 实测「她还是没有免疫斋戒给自己上的能量降低」——
+    /// 前缀只在「观者 mod 的程序集已加载 + 补丁真的挂上」时才有效，而那条链一旦断（加载次序、
+    /// 类型改名）用户是看不出来的。这里在 `PrepareTurn`（**玩家回合开始、她的能量刚算完**）里
+    /// 直接把这类 power 摘掉，下一回合她的 `AfterEnergyReset` 就没东西可扣了 ——
+    /// 与 Harmony 那条互不依赖，任意一条生效她就免疫。
+    /// </summary>
+    internal static void StripFastingEnergyDown(Monsters.CharBossMonster? boss)
+    {
+        try
+        {
+            var type = WatcherCards.T("EnergyDownPower");
+            if (type == null) return;
+            var creature = boss?.Creature;
+            if (creature == null) return;
+
+            List<PowerModel>? doomed = null;
+            foreach (var p in creature.Powers)
+            {
+                if (p == null) continue;
+                if (p.GetType() != type) continue;
+                (doomed ??= new List<PowerModel>()).Add(p);
+            }
+            if (doomed == null) return;
+
+            foreach (var p in doomed)
+            {
+                try { _ = MegaCrit.Sts2.Core.Commands.PowerCmd.Remove(p); } catch { /* 忽略 */ }
+            }
+            if (_logs6++ < 6)
+                Logger.Log($"[CharBoss] 斋戒兜底：摘掉她身上的「能量降低」×{doomed.Count}（她免疫这一条）");
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 斋戒兜底失败: " + e.Message); }
+    }
+
+    private static int _logs6;
 
     private static int _logs4;
 

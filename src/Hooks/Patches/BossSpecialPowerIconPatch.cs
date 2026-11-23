@@ -95,6 +95,26 @@ public static class BossSpecialPowerIconPatch
             return false;
         }
 
+        // ★ 2026-11-23（用户「疾风观」）：「力竭」的图标就用**崩坠里力竭那张**（用户原话：
+        //   「让力竭的图标就用崩坠中的力竭的图标」）。已经从 `Downfall.pck` 的
+        //   `res://Awakened/images/powers/drained_power.png` 解出来、导入并打进我们的 PCK
+        //   （`tools/art/pck_extras.txt` ⇒ `res://CharacterBosses/images/powers/flurry_drained.png`）。
+        if (__instance is Powers.FlurryDrainedPower)
+        {
+            const string drained = "res://CharacterBosses/images/powers/flurry_drained.png";
+            try
+            {
+                if (Godot.ResourceLoader.Exists(drained))
+                {
+                    __result = drained;
+                    return false;
+                }
+            }
+            catch { /* 取不到就走下面「借观者能量降低」的老路 */ }
+            __result = "res://CharacterBosses/images/powers/tarot_energy_down.png";
+            return false;
+        }
+
         // 其余：**只有本 mod 的 Power** 才接管（原版/别的 mod 的 Power 完全不受影响）
         try
         {
@@ -276,9 +296,6 @@ public static class BossSpecialPowerIconPatch
                 Powers.TarotBrawlPower => "tarot_brawl",               // Hermit · 斗殴
                 Powers.TarotBruisePower => "tarot_bruise",             // Hermit · 瘀伤
                 Powers.TarotEternalPower => "tarot_eternal",           // Hermit · 永恒形态
-                // ★ 2026-11-23（用户「疾风观」）：「力竭」= 下回合少 1 能量 ⇒ 借用观者 mod
-                //   「能量降低」（`WatcherMod.EnergyDownPower`，斋戒给的那层）那张图，同义且不缺图。
-                Powers.FlurryDrainedPower => "tarot_energy_down",      // 观者 · 力竭（下回合少能量）
                 _ => null,
             };
             if (file == null) return null;

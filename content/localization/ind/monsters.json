@@ -224,6 +224,6 @@
     "WATCHER_FLURRY_BOSS.name":  "Pengamat Pukulan",
     "WATCHER_FLURRY_BOSS.title":  "Pengamat Pukulan",
     "WATCHER_FLURRY_BOSS.moves.CHARBOSS_PLAY.title":  "Mainkan",
-    "WATCHER_FLURRY_BOSS.flurry":  "Setiap kali [gold]Flurry of Blows[/gold] milik Pengamat memberimu kerusakan yang tidak terblokir, kamu kehilangan 1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img] pada giliran berikutnya. Puasa miliknya tidak membuatnya kehilangan Energi pada awal gilirannya.",
-    "WATCHER_FLURRY_BOSS.flurry_dread":  "Setiap kali [gold]Flurry of Blows[/gold] milik Pengamat memberimu kerusakan yang tidak terblokir, kamu kehilangan 1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img] pada giliran berikutnya. Puasa miliknya tidak membuatnya kehilangan Energi pada awal gilirannya."
+    "WATCHER_FLURRY_BOSS.flurry":  "Setiap kali [gold]Flurry of Blows[/gold] milik Pengamat memberimu kerusakan yang tidak terblokir, kamu kehilangan [img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img] pada giliran berikutnya. Puasa miliknya tidak membuatnya kehilangan Energi pada awal gilirannya.",
+    "WATCHER_FLURRY_BOSS.flurry_dread":  "Setiap kali [gold]Flurry of Blows[/gold] milik Pengamat memberimu kerusakan yang tidak terblokir, kamu kehilangan [img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img] pada giliran berikutnya.\nPuasa miliknya tidak membuatnya kehilangan Energi pada awal gilirannya."
 }

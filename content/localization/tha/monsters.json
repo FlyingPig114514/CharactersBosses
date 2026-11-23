@@ -224,6 +224,6 @@
     "WATCHER_FLURRY_BOSS.name":  "ผู้เฝ้ามองลมกรรโชก",
     "WATCHER_FLURRY_BOSS.title":  "ผู้เฝ้ามองลมกรรโชก",
     "WATCHER_FLURRY_BOSS.moves.CHARBOSS_PLAY.title":  "เล่นการ์ด",
-    "WATCHER_FLURRY_BOSS.flurry":  "ทุกครั้งที่[gold]Flurry of Blows[/gold]ของผู้เฝ้ามองสร้างความเสียหายที่ไม่ถูกบล็อกให้กับคุณ คุณจะสูญเสีย 1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img] ในเทิร์นถัดไป การอดอาหารของเธอไม่ทำให้เธอสูญเสียพลังงานเมื่อเริ่มเทิร์นของเธอ.",
-    "WATCHER_FLURRY_BOSS.flurry_dread":  "ทุกครั้งที่[gold]Flurry of Blows[/gold]ของผู้เฝ้ามองสร้างความเสียหายที่ไม่ถูกบล็อกให้กับคุณ คุณจะสูญเสีย 1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img] ในเทิร์นถัดไป การอดอาหารของเธอไม่ทำให้เธอสูญเสียพลังงานเมื่อเริ่มเทิร์นของเธอ."
+    "WATCHER_FLURRY_BOSS.flurry":  "ทุกครั้งที่[gold]Flurry of Blows[/gold]ของผู้เฝ้ามองสร้างความเสียหายที่ไม่ถูกบล็อกให้กับคุณ คุณจะสูญเสีย [img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img] ในเทิร์นถัดไป การอดอาหารของเธอไม่ทำให้เธอสูญเสียพลังงานเมื่อเริ่มเทิร์นของเธอ.",
+    "WATCHER_FLURRY_BOSS.flurry_dread":  "ทุกครั้งที่[gold]Flurry of Blows[/gold]ของผู้เฝ้ามองสร้างความเสียหายที่ไม่ถูกบล็อกให้กับคุณ คุณจะสูญเสีย [img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img] ในเทิร์นถัดไป\nการอดอาหารของเธอไม่ทำให้เธอสูญเสียพลังงานเมื่อเริ่มเทิร์นของเธอ."
 }

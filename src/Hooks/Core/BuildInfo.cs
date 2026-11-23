@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.904 / 2026-11-23 (**疾风观：恐惧模式的第 5 / 8 回合单独一套**）—— 用户实机截图后订正。恐惧模式下：① 第 5 回合意图改成「心灵堡垒、化体为空、疾风连击、安宁、疾风连击」（心灵堡垒提到最前，她随后退出姿态才有格挡）；② 第 8 回合改成「打击、打击、防御（没费）」，本回合 2 费 —— 因为她在恐惧模式下**自身免疫「能量降低」**（`WatcherRuntimePatches.InstallFastingNoEnergyDown` 压掉她斋戒叠的 `EnergyDownPower`），斋戒不再吞她 1 点能量，所以第二张打击真的打得出来。实现走 `BossScript.Resolve`（静态初始化时 `DreadMode.IsActive` 恒 false，不能在 `Build()` 里分支）。v0.2.903 = 6/8 回合意图 + 能力面板 + 恐惧升级疾风连击 + 斋戒不扣能量；v0.2.902 = 新 Boss 本体。完整历史见 docs/plans/changelog-history.md";
+    public const string Tag = "v0.2.905 / 2026-11-23 (**疾风观削弱版**）—— 用户 2026-11-23 第三轮（削弱）。① **拦掉疾风连击的回手**：A 版压 `WatcherCombatHelper.OnStanceChanged`、B 版压卡自己的 `OnStanceChange`，只对她；② 「力竭」图标换成**崩坠力竭原图**（从 `Downfall.pck` 的 `res://Awakened/images/powers/drained_power.png` 解出 → `flurry_drained.png` 打进 PCK）；③ 特殊效果描述去掉「1」（一个能量图标就代表 1 能量），恐惧版把那句斋戒说明**分段**；④ **斋戒免疫真修好**：`TryInstall` 原来只在启动时调一次（观者 mod 还没加载就永久放弃），现在每帧重试 + `PrepareTurn` 里直接摘掉 `EnergyDownPower` 兜底；⑤ 苦无 → **泪滴吊坠盒**（去掉敏捷成长）、卡组去掉「安宁」；⑥ 全新意图表（第 1 回合只打 2 张攻击、第 2 回合三张、第 8 回合防御为主），恐惧版在第 5/6/8/9 回合多打一张（用户标注「恐惧模式下打出」）；⑦ 单体高压回合改回 4、5、7、9。完整历史见 docs/plans/changelog-history.md";
 
     private static bool _logged;
 

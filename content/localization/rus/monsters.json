@@ -224,6 +224,6 @@
     "WATCHER_FLURRY_BOSS.name":  "Наблюдатель Натиска",
     "WATCHER_FLURRY_BOSS.title":  "Наблюдатель Натиска",
     "WATCHER_FLURRY_BOSS.moves.CHARBOSS_PLAY.title":  "Разыграть",
-    "WATCHER_FLURRY_BOSS.flurry":  "Каждый раз, когда [gold]Натиск[/gold] Созерцающей наносит тебе незаблокированный урон, в следующем ходу ты теряешь 1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]. Её «Пост» не заставляет её терять энергию в начале своего хода.",
-    "WATCHER_FLURRY_BOSS.flurry_dread":  "Каждый раз, когда [gold]Натиск[/gold] Созерцающей наносит тебе незаблокированный урон, в следующем ходу ты теряешь 1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]. Её «Пост» не заставляет её терять энергию в начале своего хода."
+    "WATCHER_FLURRY_BOSS.flurry":  "Каждый раз, когда [gold]Натиск[/gold] Созерцающей наносит тебе незаблокированный урон, в следующем ходу ты теряешь [img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]. Её «Пост» не заставляет её терять энергию в начале своего хода.",
+    "WATCHER_FLURRY_BOSS.flurry_dread":  "Каждый раз, когда [gold]Натиск[/gold] Созерцающей наносит тебе незаблокированный урон, в следующем ходу ты теряешь [img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img].\nЕё «Пост» не заставляет её терять энергию в начале своего хода."
 }

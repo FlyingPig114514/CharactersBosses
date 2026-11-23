@@ -64,24 +64,24 @@ public static class WatcherFlurryScript
     {
         var turns = new List<BossTurn>
         {
-            // ── 1 ── 以手拒之 / 疾风连击 / 打击        （2 费 = 1 + 0 + 1）
-            Turn(2, "1. 以手拒之、疾风连击、打击",
+            // ── 1 ── 以手拒之 / 疾风连击 / 防御        （2 费 = 1 + 0 + 1）
+            Turn(2, "1. 以手拒之、疾风连击、防御",
                 Play(WatcherCards.TalkToTheHand),
                 Play(WatcherCards.FlurryOfBlows),
-                Play(WatcherCards.Strike)),
+                Play(WatcherCards.Defend)),
 
-            // ── 2 ── 警惕 / 疾风连击 / 打击×2（没费）/ 奇迹（不出）   （2 费 = 2 + 0）
-            Turn(2, "2. 警惕、疾风连击、打击×2（没费）、奇迹（不出）",
-                Play(WatcherCards.Vigilance),
-                Play(WatcherCards.FlurryOfBlows),
-                Hold(WatcherCards.Strike), Hold(WatcherCards.Strike),
+            // ── 2 ── 打击 / 打击 / 防御 / 奇迹（不出）   （3 费 = 1 + 1 + 1）
+            Turn(3, "2. 打击、打击、防御、奇迹（不出）",
+                Play(WatcherCards.Strike),
+                Play(WatcherCards.Strike),
+                Play(WatcherCards.Defend),
                 Hold(WatcherCards.Miracle, cost: 0)),
 
-            // ── 3 ── 奇迹 / 斋戒 / 防御 / 防御（没费）   （2 费 + 奇迹 1 = 3 = 0 + 2 + 1）
-            Turn(2, "3. 奇迹、斋戒、防御、防御（没费）",
+            // ── 3 ── 奇迹 / 斋戒 / 心灵堡垒 / 防御（没费）   （2 费 + 奇迹 1 = 3 = 0 + 2 + 1）
+            Turn(2, "3. 奇迹、斋戒、心灵堡垒、防御（没费）",
                 Play(WatcherCards.Miracle, cost: 0),
                 Play(WatcherCards.Fasting),
-                Play(WatcherCards.Defend),
+                Play(WatcherCards.MentalFortress),
                 Hold(WatcherCards.Defend)),
 
             // ── 4 ── 供奉 / 追击 / 腰带抽打            （2 费 = 0 + 1 + 1）
@@ -90,20 +90,19 @@ public static class WatcherFlurryScript
                 Play(WatcherCards.FollowUp),
                 Play(WatcherCards.SashWhip)),
 
-            // ── 5 ── 化体为空 / 疾风连击 / 心灵堡垒 / 安宁 / 疾风连击   （3 费 = 1 + 0 + 1 + 1 + 0）
-            Turn(3, "5. 化体为空、疾风连击、心灵堡垒、安宁、疾风连击",
+            // ── 5 ── 化体为空 / 疾风连击 / 警惕 / 疾风连击 / 打击（没费）   （3 费 = 1 + 0 + 2 + 0）
+            Turn(3, "5. 化体为空、疾风连击、警惕、疾风连击、打击（没费）",
                 Play(WatcherCards.EmptyBody),
                 Play(WatcherCards.FlurryOfBlows),
-                Play(WatcherCards.MentalFortress),
-                Play(WatcherCards.Tranquility),
-                Play(WatcherCards.FlurryOfBlows)),
+                Play(WatcherCards.Vigilance),
+                Play(WatcherCards.FlurryOfBlows),
+                Hold(WatcherCards.Strike)),
 
-            // ── 6 ── 洗牌 / 疾风连击 / 防御 / 打击（没费）   ← 6~9 循环起点   （1 费 = 0 + 1）
-            // ★ 2026-11-23 用户订正：原来是「疾风连击、防御、防御（没费）」，第三张改成**打击**。
-            TurnEnergy(1, true, "6. 洗牌、疾风连击、防御、打击（没费）",
+            // ── 6 ── 洗牌 / 疾风连击 / 防御 / 防御（没费）   ← 6~9 循环起点   （1 费 = 0 + 1）
+            TurnEnergy(1, true, "6. 洗牌、疾风连击、防御、防御（没费）",
                 Play(WatcherCards.FlurryOfBlows),
                 Play(WatcherCards.Defend),
-                Hold(WatcherCards.Strike)),
+                Hold(WatcherCards.Defend)),
 
             // ── 7 ── 同第 4 回合                       （2 费）
             Turn(2, "7. 供奉、追击、腰带抽打",
@@ -111,14 +110,13 @@ public static class WatcherFlurryScript
                 Play(WatcherCards.FollowUp),
                 Play(WatcherCards.SashWhip)),
 
-            // ── 8 ── 打击 / 打击（没费）/ 防御（没费）    （1 费 = 1）
-            // ★ 2026-11-23 用户订正：原来是「打击、打击×2（没费）」，第三张改成**防御**。
-            Turn(1, "8. 打击、打击（没费）、防御（没费）",
-                Play(WatcherCards.Strike),
+            // ── 8 ── 防御 / 打击（没费）/ 打击（没费）    （1 费 = 1）
+            Turn(1, "8. 防御、打击（没费）、打击（没费）",
+                Play(WatcherCards.Defend),
                 Hold(WatcherCards.Strike),
-                Hold(WatcherCards.Defend)),
+                Hold(WatcherCards.Strike)),
 
-            // ── 9 ── 化体为空 / 疾风连击 / 警惕 / 疾风连击 / 打击（没费）   （3 费 = 1 + 0 + 2 + 0）
+            // ── 9 ── 同第 5 回合                        （3 费）
             Turn(3, "9. 化体为空、疾风连击、警惕、疾风连击、打击（没费）",
                 Play(WatcherCards.EmptyBody),
                 Play(WatcherCards.FlurryOfBlows),
@@ -143,35 +141,42 @@ public static class WatcherFlurryScript
     }
 
     /// <summary>
-    /// **恐惧模式的回合覆盖**（用户 2026-11-23）：
-    /// · 第 5 回合 → `心灵堡垒、化体为空、疾风连击、安宁、疾风连击`
-    ///   （普通模式是「化体为空、疾风连击、心灵堡垒、安宁、疾风连击」；
-    ///    恐惧版把心灵堡垒提到最前，于是她随后「化体为空」退出姿态时会因为有心灵堡垒而拿到格挡）；
-    /// · 第 8 回合 → `打击、打击、防御（没费）`，本回合 **2 费**（普通模式 1 费、只打一张打击）。
-    ///   —— 恐惧模式下她**自身免疫「能量降低」**（见 `WatcherRuntimePatches.InstallFastingNoEnergyDown`），
-    ///   斋戒不再吞掉她那 1 点能量，所以这一回合真的打得出第二张打击。
+    /// **恐惧模式的回合覆盖**（用户 2026-11-23，第二版削弱后的口径）：
+    /// 用户原话里带「（恐惧模式下打出）」的那几张，就是**恐惧模式才打得出来**的牌
+    /// —— 恐惧模式下她自身免疫「能量降低」（`InstallFastingNoEnergyDown`），斋戒不再吞她那 1 点能量：
+    /// · 第 5 / 9 回合 → 多打一张 **打击**（4 费；普通模式 3 费、打击没费）；
+    /// · 第 6 回合 → 两张 **防御** 都打出来（2 费；普通模式 1 费、第二张没费）；
+    /// · 第 8 回合 → 两张 **打击** 都打出来（3 费；普通模式只打防御）。
     /// 返回 null ⇒ 交回静态回合表。
     /// </summary>
     private static BossTurn? DreadTurnOverride(int turn)
     {
         if (!Core.DreadMode.IsActive) return null;
 
-        if (turn == 5)
+        if (turn == 5 || turn == 9)
         {
-            return Turn(3, "5.（恐惧）心灵堡垒、化体为空、疾风连击、安宁、疾风连击",
-                Play(WatcherCards.MentalFortress),
+            return Turn(4, $"{turn}.（恐惧）化体为空、疾风连击、警惕、疾风连击、打击",
                 Play(WatcherCards.EmptyBody),
                 Play(WatcherCards.FlurryOfBlows),
-                Play(WatcherCards.Tranquility),
-                Play(WatcherCards.FlurryOfBlows));
+                Play(WatcherCards.Vigilance),
+                Play(WatcherCards.FlurryOfBlows),
+                Play(WatcherCards.Strike));
+        }
+
+        if (turn == 6)
+        {
+            return TurnEnergy(2, true, "6.（恐惧）洗牌、疾风连击、防御、防御",
+                Play(WatcherCards.FlurryOfBlows),
+                Play(WatcherCards.Defend),
+                Play(WatcherCards.Defend));
         }
 
         if (turn == 8)
         {
-            return Turn(2, "8.（恐惧）打击、打击、防御（没费）",
+            return Turn(3, "8.（恐惧）防御、打击、打击",
+                Play(WatcherCards.Defend),
                 Play(WatcherCards.Strike),
-                Play(WatcherCards.Strike),
-                Hold(WatcherCards.Defend));
+                Play(WatcherCards.Strike));
         }
 
         return null;
@@ -223,9 +228,11 @@ public static class WatcherFlurryScript
     /// <summary>
     /// 卡组（剧本里出现过的牌，按**同回合最大张数**收）：
     /// · 疾风连击 2 张 —— 第 5 / 9 回合同回合各打两张；
-    /// · 打击 3 张 —— 第 8 回合手里三张（一张打、两张没费）；
-    /// · 防御 2 张 —— 第 3 / 6 回合各两张，多备一张防洗牌；
+    /// · 打击 3 张 —— 第 2 回合两张、第 8 回合两张（含恐惧版两张）；
+    /// · 防御 3 张 —— 第 3 / 6 回合各两张，多备一张防洗牌；
     /// · 奇迹 2 张 —— 至纯之水战斗开始也会给一张。
+    /// ★ v0.2.905（用户 2026-11-23 削弱版）：**去掉「安宁」**（她不再需要主动进平静 ——
+    ///   泪滴吊坠盒已经让她每场战斗开局就在平静里）。
     /// </summary>
     public static List<Type> Deck()
     {
@@ -243,7 +250,6 @@ public static class WatcherFlurryScript
         Add(WatcherCards.SashWhip);
         Add(WatcherCards.EmptyBody, 2);
         Add(WatcherCards.MentalFortress);
-        Add(WatcherCards.Tranquility);
         Add(WatcherCards.Vigilance, 2);
         Add(WatcherCards.Miracle, 2);
         Add(WatcherCards.Strike, 3);
@@ -252,11 +258,15 @@ public static class WatcherFlurryScript
     }
 
     /// <summary>
-    /// 遗物（用户 2026-11-23）：**至纯之水、涅奥的祝福、手里剑、苦无**。
+    /// 遗物（用户 2026-11-23 削弱版）：**至纯之水、涅奥的祝福、手里剑、泪滴吊坠盒**。
     /// · 至纯之水 = 观者 mod 的初始遗物（反射取，战斗开始给一张奇迹）；
     /// · 涅奥的祝福 = 本 mod 的遗物（每回合 −1 能量 / −2 抽牌，她高血量的代价）；
     /// · 手里剑 `Shuriken`（本体）：每打出 3 张攻击牌 +1 力量；
-    /// · 苦无 `Kunai`（本体）：每打出 3 张攻击牌 +1 敏捷。
+    /// · 泪滴吊坠盒 `TeardropLocket`（观者 mod 遗物）：每场战斗开始时处于**平静**。
+    ///   ★ 用户 2026-11-23：「削弱，**苦无换成泪滴吊坠盒**」—— 苦无（每 3 张攻击 +1 敏捷）
+    ///   让她越打越肉，换成泪滴吊坠盒后没有敏捷成长了（平静本身不给格挡）。
+    ///   ⚠ 副作用：她开局就在平静，第 5 / 9 回合的「化体为空」退出平静时**原版会给 +2 能量**
+    ///   （v0.2.716 用户口径：那 2 费不要压），所以那两回合她手上会多出 2 点余量。
     /// </summary>
     public static List<Type> Relics()
     {
@@ -264,7 +274,7 @@ public static class WatcherFlurryScript
         if (WatcherCards.PureWater is Type pure) relics.Add(pure);
         relics.Add(typeof(CharacterBosses.Relics.NeowBlessing));
         if (WatcherCards.Shuriken is Type shuriken) relics.Add(shuriken);
-        if (WatcherCards.Kunai is Type kunai) relics.Add(kunai);
+        if (WatcherCards.TeardropLocket is Type locket) relics.Add(locket);
         return relics;
     }
 

@@ -388,6 +388,14 @@ public abstract partial class CharBossMonster
             if (charged > 0) Logger.Log($"[CharBoss] 充电 +{charged} 能量");
             if (delayed > 0) Logger.Log($"[CharBoss] 「下回合 +{delayed} 能量」到账（EnergyNextTurnPower）→ 本回合 {pcs.Energy} 点");
 
+            // ★ v0.2.905（用户 2026-11-23：「她还是没有免疫斋戒给自己上的能量降低」）：
+            //   观者的「斋戒」会给持有者叠一层 `EnergyDownPower`，它在**她自己的回合开始时**
+            //   （`AfterEnergyReset`）扣 1 点能量 —— 而上面这行是在**玩家**回合开始就把她的能量
+            //   重新算好的 ⇒ 那一扣会落在我们算完之后，等于每回合白少 1 费。
+            //   Harmony 那条前缀（`InstallFastingNoEnergyDown`）依赖「观者 mod 已加载 + 挂得上」，
+            //   断了用户也看不出来，所以这里再加一道**与补丁无关**的兜底：直接把这类 power 摘掉。
+            try { Core.WatcherRuntimePatches.StripFastingEnergyDown(this); } catch { /* 忽略 */ }
+
             // 「下回合获得 N 点辉星」（StarNextTurnPower）：原版是靠
             // <c>StarNextTurnPower.AfterEnergyReset(Player)</c> 里 <c>PlayerCmd.GainStars</c> 结算的，
             // 而那个钩子只对 <c>CombatState.Players</c> 里的人触发 —— 影武者不在里面，星永远不到账

@@ -164,8 +164,8 @@
 "BOSS_TEMPERANCE_POWER.description": "Whenever the Watcher plays 12 cards, she forcibly ends her own turn and she and her other allies gain 2 Strength.\nWarning: the Watcher starts her infinite loop on turn 12.",
 "BOSS_TEMPERANCE_POWER.description_dread": "Whenever the Watcher plays 12 cards, she forcibly ends her own turn and she and her other allies gain 2 Strength. In addition, [gold]Time Warp[/gold] counts your cards: every 12 cards you play, the Watcher forcibly ends your turn.\nWarning: the Watcher starts her infinite loop on turn 12.",
     "BOSS_FLURRY_POWER.title":  "Flurry of Blows",
-    "BOSS_FLURRY_POWER.description":  "Siempre que la [gold]Flurry of Blows[/gold] de la Vigía te inflija daño no bloqueado, pierdes 1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img] en el siguiente turno. Su Ayuno no le hace perder energía al comienzo de su turno.",
-    "BOSS_FLURRY_POWER.description_dread":  "Siempre que la [gold]Flurry of Blows[/gold] de la Vigía te inflija daño no bloqueado, pierdes 1[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img] en el siguiente turno. Su Ayuno no le hace perder energía al comienzo de su turno.",
+    "BOSS_FLURRY_POWER.description":  "Siempre que la [gold]Flurry of Blows[/gold] de la Vigía te inflija daño no bloqueado, pierdes [img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img] en el siguiente turno. Su Ayuno no le hace perder energía al comienzo de su turno.",
+    "BOSS_FLURRY_POWER.description_dread":  "Siempre que la [gold]Flurry of Blows[/gold] de la Vigía te inflija daño no bloqueado, pierdes [img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img] en el siguiente turno.\nSu Ayuno no le hace perder energía al comienzo de su turno.",
     "FLURRY_DRAINED_POWER.title":  "Drenado",
     "FLURRY_DRAINED_POWER.description":  "En el siguiente turno, pierdes {Amount}[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]."
 }

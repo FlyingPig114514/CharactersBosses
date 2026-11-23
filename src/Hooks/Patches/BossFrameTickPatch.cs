@@ -213,6 +213,12 @@ public static class BossFrameTick
         try { Core.SceneTreeDumper.Ensure(); } catch { /* 忽略 */ }
         // 最近日志导出器（按 F8，幂等挂载；v0.2.900 玩家报 bug 用：不用再发整份 mod_log）
         try { Core.RecentLogDumper.Ensure(); } catch { /* 忽略 */ }
+        // ★ v0.2.905（用户 2026-11-23：「她还是没有免疫斋戒给自己上的能量降低」）：
+        //   观者那几套运行期补丁**必须等观者模组的程序集加载好**才装得上，而
+        //   `BuildInfo.LogOnce` 只在启动时跑一次 —— 那时观者 mod 可能还没加载
+        //   ⇒ `TryInstall` 直接 return，之后**再也没有人调它**（`_tried` 也一直是 false）。
+        //   现在每帧都试一次（内部 `_tried` 命中后就是一次 bool 判断，零开销）。
+        try { Core.WatcherRuntimePatches.TryInstall(); } catch { /* 忽略 */ }
         try { TickInner(source); }
         finally
         {
