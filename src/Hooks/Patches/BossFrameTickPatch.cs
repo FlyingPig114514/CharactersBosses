@@ -219,6 +219,11 @@ public static class BossFrameTick
         //   ⇒ `TryInstall` 直接 return，之后**再也没有人调它**（`_tried` 也一直是 false）。
         //   现在每帧都试一次（内部 `_tried` 命中后就是一次 bool 判断，零开销）。
         try { Core.WatcherRuntimePatches.TryInstall(); } catch { /* 忽略 */ }
+        // ★ v0.2.918（用户 2026-11-23 第二次：「A 版还是 2 张」奇迹）：
+        //   至纯之水的奇迹有两个来源，模组那次是**异步**的、可能在我们注入之后才落手；
+        //   而玩家第 1 回合就能看到她的手牌 ⇒ 在她的第 1 回合期间每帧兜底修剪一次
+        //   （没有观者 Boss / 不是第 1 回合时只是一次空判断）。
+        try { Core.WatcherRuntimePatches.TrimDuplicateMiraclesTick(); } catch { /* 忽略 */ }
         try { TickInner(source); }
         finally
         {

@@ -145,6 +145,27 @@ internal static class WatcherRuntimePatches
 
     private static int _logs5;
 
+    /// <summary>她手牌里「奇迹」的张数（转发给 <see cref="WatcherCards"/>）。</summary>
+    internal static void TrimDuplicateMiraclesTick()
+    {
+        try
+        {
+            var combat = MegaCrit.Sts2.Core.Combat.CombatManager.Instance?.DebugOnlyGetState();
+            if (combat == null) return;
+            foreach (var c in combat.Enemies)
+            {
+                if (c?.Monster is not Monsters.CharBossMonster boss) continue;
+                // 只在她**第 1 回合**期间兜底（重复只会出现在开战那一刻），平时零开销
+                if (boss.TurnNumber > 1) continue;
+                var shadow = boss.Shadow;
+                if (shadow?.PlayerCombatState == null) continue;
+                if (WatcherCards.CountMiracles(shadow.PlayerCombatState) <= 1) continue;
+                WatcherCards.TrimExtraMiracles(shadow.PlayerCombatState);
+            }
+        }
+        catch { /* 忽略 */ }
+    }
+
     /// <summary>这个 Player 是不是**疾风观**那只 Boss 的影子玩家（只认设计 Key `WATCHER_FLURRY`）。</summary>
     private static bool IsFlurryBossShadowPlayer(Player? player)
     {

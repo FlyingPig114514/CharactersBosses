@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.917 / 2026-11-23 (**修：A 版第一回合手里有 2 张奇迹**）—— 用户 2026-11-23 报的 bug。至纯之水的「奇迹」有**两个来源**：模组自己的 `PureWater.BeforeCombatStart`（**异步**，落手时间不确定）和我们 v0.2.913 加的注入 ⇒ 竞争下进两张（日志实证：`至纯之水（Boninall）：…补 1 张` 在 20:38:32、`去重：已压掉 BeforeCombatStart` 在 20:38:33，晚了一拍）。光靠「已有就不补」堵不住异步，所以改成**修剪**：① 注入时；② **她的回合开始时**（`FireSideTurnStart`）—— 那时两张都已进手牌，多出来的直接摘掉、只留 1 张（`WatcherCards.TrimExtraMiracles`）。v0.2.916 = 疾风连击意图只留攻势。完整历史见 docs/plans/changelog-history.md";
+    public const string Tag = "v0.2.918 / 2026-11-23 (**再修 2 张奇迹：改成她第 1 回合期间每帧兜底修剪**）—— 用户 2026-11-23 截图「A 版还是 2 张」。v0.2.917 的两个修剪时机（我们注入时 / 她的回合开始）都太早：模组那次印牌是**异步**的、落手时间不定，而玩家在第 1 回合就能看到她的手牌 ⇒ 那个窗口里就是 2 张。现在在 `BossFrameTick.Tick` 里加 `WatcherRuntimePatches.TrimDuplicateMiraclesTick()`：**她的第 1 回合期间每帧**检查一次，观者 Boss 手牌里「奇迹」超过 1 张就摘掉多余的（`TurnNumber > 1` 直接早退 ⇒ 平时零开销）。日志会打 `至纯之水：她手里有 2 张「奇迹」⇒ 摘掉多余的 1 张（只留 1 张）`。v0.2.917 = 注入时/她回合开始各修剪一次。完整历史见 docs/plans/changelog-history.md";
 
     private static bool _logged;
 

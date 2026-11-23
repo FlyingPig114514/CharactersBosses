@@ -7082,3 +7082,8 @@ Chronological action log.
 | 2026-11-23 20:42 | edit | `src/Hooks/Core/BossHookBridge.SideTurn.cs` | ok | 0 |
 | 2026-11-23 20:43 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
 | 2026-11-23 20:43 | edit | `docs/plans/changelog-history.md` | ok | 0 |
+| 2026-11-23 20:48 | edit | `src/Hooks/Core/WatcherRuntimePatches.cs` | ok | 0 |
+| 2026-11-23 20:48 | edit | `src/Hooks/Patches/BossFrameTickPatch.cs` | error | 0 |
+| 2026-11-23 20:48 | edit | `src/Hooks/Patches/BossFrameTickPatch.cs` | ok | 0 |
+| 2026-11-23 20:49 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-23 20:49 | edit | `docs/plans/changelog-history.md` | ok | 0 |
