@@ -6879,3 +6879,4 @@ Chronological action log.
 | 2026-11-23 11:10 | write | `tools/wiki/make-markdown-en.ps1` | ok | 0 |
 | 2026-11-23 11:10 | write | `tools/wiki/i18n-en.json` | ok | 0 |
 | 2026-11-23 12:04 | write | `tools/tmp/_en_work/notes_en.tsv` | ok | 0 |
+| 2026-11-23 12:16 | write | `workshop/changenote.txt` | ok | 0 |
