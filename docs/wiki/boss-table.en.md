@@ -76,7 +76,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Act 2 | WATCHER_CREATE | Pillar of Creation, Mental Fortress | Carve Reality, Consecrate, Indignation |  |
 | Act 2 | WATCHER_RETAIN | Mental Fortress, Deceive Reality | Carve Reality |  |
 | Act 3 | WATCHER_DIVINITY | Vigilance, Swivel, Deceive Reality | Damaru |  |
-| Act 3 | WATCHER_OMEGA | Like Water, Mental Fortress | Pressure Points（第 6 / 11 回合）, Strike |  |
+| Act 3 | WATCHER_OMEGA | Like Water, Mental Fortress | Pressure Points (turns 6 / 11), Strike |  |
 | Act 3 | WATCHER_RUSHDOWN | Mental Fortress, Vigilance | Indignation, Sash Whip, Wallop, Consecrate |  |
 
 > Blank cell = that boss has **no** extra upgrade/relic at that level. The full list also appears in each boss's own section
@@ -1975,7 +1975,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 - **Deck** (26 cards): Alpha+, Pressure Points ×3, Defend, Establishment, Meditate, Clumsy, Miracle ×4, Empty Body, Like Water, Beta, Eruption+, Strike ×2, Vigilance, Omega, Play, Greed, Mental Fortress, Deceive Reality, Crescendo, Tranquility
 - **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 8)
 - **Relics**: Neow's Blessing, Permafrost, Empty Cage, Captain's Wheel, Sai, Vajra
-- **Ascension / Dread changes**: Ascension 8: Like Water; Ascension 8: Mental Fortress; Ascension 9: Pressure Points（第 6 / 11 回合）
+- **Ascension / Dread changes**: Ascension 8: Like Water; Ascension 8: Mental Fortress; Ascension 9: Pressure Points (turns 6 / 11)
 
 **Special effect**
 
