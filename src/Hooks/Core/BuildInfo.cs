@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.913 / 2026-11-23 (**拦回手终于生效 + 至纯之水的奇迹改到战斗开始**）—— 用户 2026-11-23 两条。① 「疾风连击的回手还是没有拦掉」：v0.2.905 那条前缀挂上了（日志有「已压掉 A 版 WatcherCombatHelper.OnStanceChanged」），但**判定写错了** —— `IsFlurryBossShadowPlayer` 比的是 `boss.Def?.Key`，而变体的 `Def` 是 `DefSource.WithVariantPin(key)` 的副本、`Key` 仍是主定义的 `WATCHER_DIVINITY`，变体 key 只在 `PinnedVariantKey` 上 ⇒ 判定永远 false ⇒ 前缀一直放行。现在先比 `PinnedVariantKey/SpawnVariantKey`。② 「至纯之水应该在战斗开始时就给她手里放一张奇迹，而不是第一回合开始时」：A 版（Boninall）原来直接跳过我们自己的注入、指望它自己的 `BeforeCombatStart()`，而那个钩子对影子玩家派发**很晚**（她回合开始之后）。现在两个版本都由我们在「她第 1 回合手牌建好后」注入（= 玩家第 1 回合刚开始），模组自己那次印牌由新的 `InstallPureWaterNoDouble` 压掉，不会变两张。完整历史见 docs/plans/changelog-history.md";
+    public const string Tag = "v0.2.914 / 2026-11-23 (**B 版斋戒扣费也免疫了 + 进阶 9 只升斋戒**）—— 用户 2026-11-23 三条。① 「进阶 9 只升级斋戒，不再升级供奉」⇒ `WATCHER_FLURRY` 的 `AscensionUpgrades` 去掉 `(9, 供奉)`。② 「B 版中恐惧模式下没有免疫 debuff 斋戒（这和 A 版中的能量降低不是同一个 buff，虽然效果一样）」⇒ 两份观者实现的扣费 power **不是同一个类**：A 版 `EnergyDownPower`（扣费在 `AfterEnergyReset`）、B 版 `FastingPower`（扣费在 `AfterPlayerTurnStart` → `LoseEnergy`）。v0.2.905 只压了 A 那条 ⇒ B 版照样扣。现在两条都压，`StripFastingEnergyDown` 兜底也把 `FastingPower` 一起摘。③ 「B 版有的回合斋戒的减费好像被重复计算了」⇒ 同一条修掉（`FastingPower.AfterPlayerTurnStart` 对她的派发整段跳过，不再可能扣两次）。完整历史见 docs/plans/changelog-history.md";
 
     private static bool _logged;
 

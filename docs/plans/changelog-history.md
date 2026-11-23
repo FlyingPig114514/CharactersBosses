@@ -4,6 +4,23 @@
 > 旧条目逐字来自 `git show HEAD:src/Hooks/Core/BuildInfo.cs` 的 Tag 常量（v0.2.871 及其之前，共 236 条）。
 > 最新版本（0.2.889）是当前 Tag，同时在各条 `workshop/changenote.txt` 里也有面向玩家的摘要。
 
+## v0.2.914（2026-11-23）：B 版斋戒扣费也免疫 + 进阶 9 只升斋戒
+
+用户三条：
+
+1. **「削弱，现在进阶 9 只升级斋戒，不再升级供奉」**
+   `WATCHER_FLURRY` 的 `AscensionUpgrades` 去掉 `(9, 供奉)`；进阶 8 不变（以手拒之 / 心灵堡垒）。
+2. **「B 版中恐惧模式下没有免疫 debuff 斋戒（这和 A 版中的能量降低不是同一个 buff，虽然效果一样）」**
+   两份观者实现的扣费 power **不是同一个类**：
+   - A 版 `WatcherMod.EnergyDownPower` —— 扣费在 `AfterEnergyReset(player)`；
+   - B 版 `Watcher.Code.Powers.FastingPower` —— `Type => Buff`、扣费在
+     `AfterPlayerTurnStart(ctx, player)` 里 `Owner.Player.PlayerCombatState.LoseEnergy(Amount)`。
+   v0.2.905 只压了 A 那条 ⇒ B 版每回合照样扣。现在 `InstallFastingNoEnergyDown` **两条都挂**，
+   `StripFastingEnergyDown` 兜底也把 `FastingPower` 一起从她身上摘掉。
+3. **「B 版有的回合斋戒的减费好像被重复计算了」**
+   同一条修掉：`FastingPower.AfterPlayerTurnStart` 对她的整段派发被跳过，
+   无论这个钩子被派发几次都不会再扣。
+
 ## v0.2.913（2026-11-23）：拦回手终于生效 + 至纯之水的奇迹改到战斗开始
 
 用户两条：

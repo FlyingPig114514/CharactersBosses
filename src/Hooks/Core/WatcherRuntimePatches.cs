@@ -191,33 +191,48 @@ internal static class WatcherRuntimePatches
     /// </summary>
     private static bool InstallFastingNoEnergyDown()
     {
+        bool ok = false;
+
+        // ── A 版（Boninall）：斋戒给她叠一层 `EnergyDownPower`，扣费在 `AfterEnergyReset` ──
         try
         {
             var type = WatcherCards.T("EnergyDownPower");
-            if (type == null)
-            {
-                Logger.Log("[CharBoss] 斋戒不扣能量：当前观者实现没有 EnergyDownPower ⇒ 跳过");
-                return true;      // 不再重试
-            }
-            var method = type.GetMethod("AfterEnergyReset",
+            var method = type?.GetMethod("AfterEnergyReset",
                 BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            if (method == null)
+            if (method != null)
             {
-                Logger.Log("[CharBoss] 斋戒不扣能量：EnergyDownPower 上没有 AfterEnergyReset ⇒ 跳过");
-                return true;
+                var prefix = new HarmonyMethod(typeof(WatcherRuntimePatches)
+                    .GetMethod(nameof(FastingNoEnergyDownPrefix), BindingFlags.Static | BindingFlags.NonPublic)!);
+                new Harmony("CharacterBosses.watcher.fastingnoenergydown").Patch(method, prefix: prefix);
+                Logger.Log($"[CharBoss] 斋戒不扣能量：已挂上 {type!.Name}.AfterEnergyReset（A 版，只对她生效）");
+                ok = true;
             }
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 斋戒不扣能量（A 版）挂载失败: " + e.Message); }
 
-            var prefix = new HarmonyMethod(typeof(WatcherRuntimePatches)
-                .GetMethod(nameof(FastingNoEnergyDownPrefix), BindingFlags.Static | BindingFlags.NonPublic)!);
-            new Harmony("CharacterBosses.watcher.fastingnoenergydown").Patch(method, prefix: prefix);
-            Logger.Log($"[CharBoss] 斋戒不扣能量：已挂上 {type.Name}.AfterEnergyReset（只对她生效）");
-            return true;
-        }
-        catch (Exception e)
+        // ── B 版（lamali）：斋戒叠的是**另一个** power `FastingPower`（Buff），
+        //    扣费在 `AfterPlayerTurnStart(ctx, player)` 里 `Owner.Player.PlayerCombatState.LoseEnergy(Amount)`。
+        //    ★ v0.2.914（用户 2026-11-23：「B 版中恐惧模式下没有免疫 debuff 斋戒（这和 A 版的能量降低
+        //      不是同一个 buff，虽然效果一样）」「B 版有的回合斋戒的减费好像被重复计算了」）
+        //      ⇒ 这条以前完全没管，B 版每回合照样扣（还可能被派发两次）。
+        try
         {
-            Logger.Log("[CharBoss] 斋戒不扣能量：挂载失败: " + e.Message);
-            return true;
+            var type = WatcherCards.T("FastingPower");
+            var method = type?.GetMethod("AfterPlayerTurnStart",
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            if (method != null)
+            {
+                var prefix = new HarmonyMethod(typeof(WatcherRuntimePatches)
+                    .GetMethod(nameof(FastingNoEnergyDownPrefix), BindingFlags.Static | BindingFlags.NonPublic)!);
+                new Harmony("CharacterBosses.watcher.fastingnoenergydown.b").Patch(method, prefix: prefix);
+                Logger.Log($"[CharBoss] 斋戒不扣能量：已挂上 {type!.Name}.AfterPlayerTurnStart（B 版，只对她生效）");
+                ok = true;
+            }
         }
+        catch (Exception e) { Logger.Log("[CharBoss] 斋戒不扣能量（B 版）挂载失败: " + e.Message); }
+
+        if (!ok) Logger.Log("[CharBoss] 斋戒不扣能量：两版都没找到可压的扣费钩子 ⇒ 跳过（靠 PrepareTurn 里的兜底摘除）");
+        return true;
     }
 
     private static bool FastingNoEnergyDownPrefix(object __instance, ref Task __result)
@@ -252,16 +267,23 @@ internal static class WatcherRuntimePatches
     {
         try
         {
-            var type = WatcherCards.T("EnergyDownPower");
-            if (type == null) return;
             var creature = boss?.Creature;
             if (creature == null) return;
+
+            // ★ v0.2.914：两个版本各有一个「斋戒扣费」power ——
+            //   A 版 = `EnergyDownPower`，B 版 = `FastingPower`（名字、类型都不一样，效果相同）。
+            var types = new List<Type>();
+            var a = WatcherCards.T("EnergyDownPower");
+            if (a != null) types.Add(a);
+            var b = WatcherCards.T("FastingPower");
+            if (b != null && b != a) types.Add(b);
+            if (types.Count == 0) return;
 
             List<PowerModel>? doomed = null;
             foreach (var p in creature.Powers)
             {
                 if (p == null) continue;
-                if (p.GetType() != type) continue;
+                if (!types.Contains(p.GetType())) continue;
                 (doomed ??= new List<PowerModel>()).Add(p);
             }
             if (doomed == null) return;
@@ -271,7 +293,7 @@ internal static class WatcherRuntimePatches
                 try { _ = MegaCrit.Sts2.Core.Commands.PowerCmd.Remove(p); } catch { /* 忽略 */ }
             }
             if (_logs6++ < 6)
-                Logger.Log($"[CharBoss] 斋戒兜底：摘掉她身上的「能量降低」×{doomed.Count}（她免疫这一条）");
+                Logger.Log($"[CharBoss] 斋戒兜底：摘掉她身上的「斋戒扣费」×{doomed.Count}（她免疫这一条）");
         }
         catch (Exception e) { Logger.Log("[CharBoss] 斋戒兜底失败: " + e.Message); }
     }
