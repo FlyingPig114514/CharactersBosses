@@ -326,6 +326,8 @@ function Note-En([string]$zh) {
     $s = $s.Replace('，', ', ').Replace('。', '. ').Replace('×', '×').Replace('～', '~')
     $s = $s.Trim()
     while ($s.Contains('  ')) { $s = $s.Replace('  ', ' ') }
+    # 补空格留下的「逗号前空格」之类收掉
+    foreach ($pair in @(@(' ,', ','), @(' .', '.'), @(' ;', ';'), @(' )', ')'), @('( ', '('), @(' :', ':'), @(' /', '/'))) { $s = $s.Replace($pair[0], $pair[1]) }
     if ($s -match '[\u4e00-\u9fff]') { if (-not $Missing['notes'].ContainsKey($k)) { $Missing['notes'][$k] = 1 } }
     return $s
 }
