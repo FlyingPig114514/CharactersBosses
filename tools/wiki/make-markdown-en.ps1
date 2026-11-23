@@ -523,7 +523,7 @@ foreach ($a in @(1, 2, 3)) {
             [void]$sb.AppendLine('')
         }
         [void]$sb.AppendLine('- **Deck** (' + $d.Deck.Count + ' cards): ' + (Merge-Counts $d.Deck))
-        if ($d.DeckNote) { [void]$sb.AppendLine('- **Deck note**: ' + (MdText (T $d.DeckNote 'notes'))) }
+        if ($d.DeckNote) { [void]$sb.AppendLine('- **Deck note**: ' + (MdText (Note-En ([string]$d.DeckNote)))) }
         [void]$sb.AppendLine('- **Relics**: ' + (Merge-Counts $d.Relics))
         if ($d.Extras.Count -gt 0) { [void]$sb.AppendLine('- **Ascension / Dread changes**: ' + (MdText ($d.Extras -join '; '))) }
         [void]$sb.AppendLine('')

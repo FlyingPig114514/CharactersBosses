@@ -106,7 +106,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Team buff power | Average |
 
 - **Deck** (12 cards): Boot Sequence, Glacier, Strike, Leap, Go for the Eyes, Hotfix, Null, Clumsy, Defend, Genetic Algorithm, Rebound, Momentum Strike
-- **Deck note**: 按首次洗牌之前的回合统计（剧本没标洗牌，按「卡组÷每回合抽牌」推算首次洗牌在第 5 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script marks no shuffles; estimated from deck size ÷ cards drawn per turn: first shuffle on turn 5)
 - **Relics**: Cracked Core, Neow's Blessing, Bread, Symbiotic Virus, Data Disk
 - **Ascension / Dread changes**: Ascension 8: Leap; Ascension 9: Momentum Strike; Ascension 8: Unsettling Lamp
 
@@ -151,7 +151,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Special effect type | Single-target |
 
 - **Deck** (20 cards): Zap ×2, Defend ×3, Guilty, Sweeping Beam, Charge Battery, Focused Strike, Greed, Tempest, Strike ×2, Capacitor ×2, Hotfix+, Hologram, Double Energy+, Signal Boost, Buffer
-- **Deck note**: 按首次洗牌之前的回合统计（剧本没标洗牌，按「卡组÷每回合抽牌」推算首次洗牌在第 7 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script marks no shuffles; estimated from deck size ÷ cards drawn per turn: first shuffle on turn 7)
 - **Relics**: Cracked Core, Neow's Blessing, Permafrost, Horn Cleat
 - **Ascension / Dread changes**: Ascension 8: Buffer; Ascension 8: Charge Battery; Ascension 9: Sweeping Beam; Ascension 9: Focused Strike; Dread upgrade Tempest
 
@@ -199,7 +199,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Junk-inserting power | Average |
 
 - **Deck** (9 cards): Anger, Strike ×4, Breakthrough, True Grit, Aggression, Brand
-- **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 4 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 4)
 - **Relics**: Burning Blood, Neow's Blessing, Anchor, Charon's Ashes
 - **Ascension / Dread changes**: Ascension 8: True Grit; Ascension 9: Brand; Ascension 8: Gorget
 
@@ -247,7 +247,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Special effect type | Single-target |
 
 - **Deck** (15 cards): Strike ×4, Perfected Strike（王室认证） ×3, Stone Armor, Defend ×3, Bash, Setup Strike, Ashen Strike, Hellraiser
-- **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 6 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 6)
 - **Relics**: Burning Blood, Neow's Blessing, Royal Stamp, Shuriken
 - **Ascension / Dread changes**: Ascension 8: Stone Armor; Ascension 9: Perfected Strike; Ascension 9: Setup Strike; Ascension 8: Gorget
 
@@ -292,7 +292,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Special effect type | Global |
 
 - **Deck** (18 cards): Sow, Defend ×4, Deathbringer, Strike ×3, Scourge, Death's Door, Shroud, Blight Strike, Drain Power, No Escape, Friendship, Unleash, Bodyguard
-- **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 7 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 7)
 - **Relics**: Sparkling Rouge, Neow's Blessing, Horn Cleat
 - **Ascension / Dread changes**: Ascension 8: Shroud; Ascension 9: Friendship; Ascension 9: No Escape; Ascension 9: 荒疫Strike; Ascension 8: Undying Sigil
 
@@ -343,7 +343,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Team buff power | Weak |
 
 - **Deck** (6 cards): Sleight of Flesh, Wisp, Defend, Pull Aggro, Debilitate, Strike
-- **Deck note**: 按首次洗牌之前的回合统计（剧本没标洗牌，按「卡组÷每回合抽牌」推算首次洗牌在第 3 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script marks no shuffles; estimated from deck size ÷ cards drawn per turn: first shuffle on turn 3)
 - **Relics**: Bound Phylactery, Neow's Blessing, Intimidating Helmet, Anchor
 - **Ascension / Dread changes**: Ascension 8: Bodyguard; Ascension 8: Pull Aggro; Ascension 9: Debilitate; Dread upgrade Sleight of Flesh
 
@@ -394,7 +394,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Junk-inserting power | Weak |
 
 - **Deck** (14 cards): Hidden Cache+, Defend ×5, Collision Course ×2, Child of the Stars, Crush Under, Comet, Clumsy, Greed, Doubt
-- **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 5 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 5)
 - **Relics**: Divine Right, Neow's Blessing, Bag of Preparation, Mini Regent
 - **Ascension / Dread changes**: Ascension 8: Galactic Dust
 
@@ -441,7 +441,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Team debuff power | Strong |
 
 - **Deck** (7 cards): Stunned, Bombardment, Clumsy ×2, Dying Star, Hidden Cache, Gold Axe+
-- **Deck note**: 按全部回合统计（剧本既没标洗牌、也没法推算）
+- **Deck note**: counted over all turns (the script marks no shuffles and none can be estimated)
 - **Relics**: Divine Right, Neow's Blessing, Red Mask, Chandelier
 - **Ascension / Dread changes**: Ascension 8: Cloak of Stars; Ascension 8: Fisticuffs; Ascension 9: Dying Star; Ascension 9: Vajra
 
@@ -484,7 +484,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Special effect type | Single-target |
 
 - **Deck** (27 cards): Speedster+, Strike ×5, Defend ×6, Prepared+ ×2, Flick-Flack, Afterimage, Acrobatics, Ricochet, Survivor, Untouchable, Clumsy, Master Planner+, Piercing Wail, Guilty, Backflip, Neutralize, Hidden Daggers
-- **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 6 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 6)
 - **Relics**: Ring of the Snake, Neow's Blessing, Shuriken, War Paint
 - **Ascension / Dread changes**: Ascension 8: Neutralize; Ascension 9: Flick-Flack; Ascension 9: Ricochet
 
@@ -530,7 +530,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Junk-inserting power | Below average |
 
 - **Deck** (16 cards): Speedster+, Backstab, Escape Plan, Survivor, Defend ×2, Flechettes, Blur, Strike, Sucker Punch, Hand Trick, Flick-Flack, Dagger Throw, Untouchable, Spore Mind, Deflect
-- **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 6 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 6)
 - **Relics**: Ring of the Snake, Neow's Blessing, Cloak Clasp, Sparkling Rouge
 - **Ascension / Dread changes**: Ascension 8: Blur; Ascension 8: Escape Plan; Ascension 9: Backstab; Ascension 9: Flechettes
 
@@ -578,7 +578,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Special effect type | Single-target |
 
 - **Deck** (21 cards): Nirvana, Strike ×5, Clumsy, Miracle, Mental Fortress, Vigilance, Third Eye, Weave ×3, Foresight, Foresight: discard, take damage / Defend; Follow-Up, Empty Body, Cut Through Fate, Defend, Bowling Bash, Tranquility
-- **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 6 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 6)
 - **Relics**: Neow's Blessing, Shuriken
 - **Ascension / Dread changes**: Ascension 8: Nirvana; Ascension 8: Mental Fortress; Ascension 9: Bowling Bash; Ascension 9: Cut Through Fate
 
@@ -625,7 +625,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Team buff strength | Average |
 
 - **Deck** (20 cards): Bulk Up, +2 Strength, +2 Dexterity), Chill, Boot Sequence, Claw ×2, Strike ×3, Defend ×4, Feral, Hotfix, Coolant, FTL, Charge Battery, Hyperbeam, lose 3 Focus)
-- **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 7 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 7)
 - **Relics**: Cracked Core, Neow's Blessing, Gold-Plated Cables, Driftwood, Data Disk
 - **Ascension / Dread changes**: Ascension 8: Charge Battery; Ascension 8: Boot Sequence; Ascension 9: One for All; Ascension 9: Coolant; Ascension 9: Hyperbeam
 
@@ -671,7 +671,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Special effect type | Self |
 
 - **Deck** (38 cards): Boot Sequence, Defragment, Rainbow+ ×2, Capacitor, Hailstorm, Thunder, Fusion+ ×2, Glasswork ×2, Defend ×7, Coolant, Greed, Hotfix+ ×4, Hologram+ ×2, Doubt ×2, Synchronize ×2, Barrage, Compile Driver, Bloodletting, Blur, Summon Forth, Defy, Tesla Coil, Sovereign Blade
-- **Deck note**: 按首次洗牌之前的回合统计（剧本没标洗牌，按「卡组÷每回合抽牌」推算首次洗牌在第 11 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script marks no shuffles; estimated from deck size ÷ cards drawn per turn: first shuffle on turn 11)
 - **Relics**: Cracked Core, Neow's Blessing, Oddly Smooth Stone, Prismatic Gem, War Paint
 - **Ascension / Dread changes**: Ascension 8: Boot Sequence; Ascension 8: Coolant; Ascension 9: Hailstorm; Ascension 9: Thunder
 
@@ -722,7 +722,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Team buff strength | Weak |
 
 - **Deck** (9 cards): Rupture, Blood Wall, Body Slam+, Not Yet, Brand, Strike ×3, Defend
-- **Deck note**: 按首次洗牌之前的回合统计（剧本没标洗牌，按「卡组÷每回合抽牌」推算首次洗牌在第 4 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script marks no shuffles; estimated from deck size ÷ cards drawn per turn: first shuffle on turn 4)
 - **Relics**: Burning Blood, Neow's Blessing, Self-Forming Clay, Anchor, Pael's Flesh, Lantern
 - **Ascension / Dread changes**: Ascension 8: Blood Wall; Ascension 9: Brand
 
@@ -765,7 +765,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Special effect type | Self |
 
 - **Deck** (11 cards): Juggling+, Feel No Pain, Stampede+, Breakthrough, Strike ×7
-- **Deck note**: 按首次洗牌之前的回合统计（剧本没标洗牌，按「卡组÷每回合抽牌」推算首次洗牌在第 4 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script marks no shuffles; estimated from deck size ÷ cards drawn per turn: first shuffle on turn 4)
 - **Relics**: Burning Blood, Neow's Blessing, Lantern, Pael's Wing, Happy Flower, Ornamental Fan, Shuriken
 - **Ascension / Dread changes**: Ascension 8: Feel No Pain; Ascension 8: Evil Eye; Ascension 9: Perfected Strike; Ascension 9: Howl from Beyond
 
@@ -809,7 +809,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Special effect type | Single-target |
 
 - **Deck** (26 cards): Delay+, Automation+, Dirge, Severance ×2, Defend ×3, Grave Warden+, Reanimate, Death March, The Scythe, Defy, Shame, Soul ×4, Wisp, Graveblast+, Soul Storm, Melancholy, Devour Life+, Spur, Danse Macabre, Unleash
-- **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 6 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 6)
 - **Relics**: Bound Phylactery, Neow's Blessing, War Paint, Ectoplasm, Bag of Preparation, Belt Buckle
 - **Ascension / Dread changes**: Ascension 8: Danse Macabre; Ascension 8: Defy; Ascension 9: Severance; Ascension 9: Death March
 
@@ -854,7 +854,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Special effect type | Global |
 
 - **Deck** (12 cards): Defy, Defend ×2, Strike ×2, Fear, Demesne, Defile, Friendship, Parse, Banshee's Cry, Wisp
-- **Deck note**: 按首次洗牌之前的回合统计（剧本没标洗牌，按「卡组÷每回合抽牌」推算首次洗牌在第 5 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script marks no shuffles; estimated from deck size ÷ cards drawn per turn: first shuffle on turn 5)
 - **Relics**: Bound Phylactery, Neow's Blessing, Unsettling Lamp, Empty Cage, Vambrace
 - **Ascension / Dread changes**: Ascension 8: Spirit of Ash; Ascension 8: Defy; Ascension 9: Friendship
 
@@ -901,7 +901,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Ramp-up | Slow |
 
 - **Deck** (16 cards): Sovereign Blade, Cloak of Stars, Defend ×3, Furnace, Venerate, Know Thy Place, Crush Under, Parry, Falling Star, Seeking Edge, Convergence, Sword Sage+, Strike, Beat into Shape
-- **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 6 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 6)
 - **Relics**: Divine Right, Neow's Blessing, Fencing Manual, Pael's Legion, Mini Regent
 - **Ascension / Dread changes**: Ascension 8: I Am Invincible; Ascension 8: Parry; Ascension 9: Furnace
 
@@ -948,7 +948,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Team debuff power | Strong |
 
 - **Deck** (22 cards): The Sealed Throne+, Monarch's Gaze, Clumsy ×2, Photon Cut+, Kingly Punch ×2, Kingly Kick ×3, Defend ×2, Strike ×3, Cloak of Stars, Royalties, Royal Gamble, Decisions, Decisions, Summon Forth, Alignment, Sovereign Blade
-- **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 7 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 7)
 - **Relics**: Divine Right, Neow's Blessing, Gorget, Dusty Tome, Red Mask
 - **Ascension / Dread changes**: Ascension 8: Cosmic Indifference; Ascension 9: Summon Forth; Ascension 8: Orichalcum; Ascension 9: Mr. Struggles; Dread upgrade Monarch's Gaze
 
@@ -999,7 +999,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Team buff power | Extreme |
 
 - **Deck** (25 cards): Collision Course, BEGONE!, Minion Strike, Hidden Cache+, Defend ×4, Royal Gamble, Spectrum Shift+, CHARGE!!, Minion Dive Bomb ×2, Prowess, Resonance, Dark Shackles, Quasar, Shockwave, GUARDS!!!, Minion Sacrifice ×3, Rend, Child of the Stars, Clumsy
-- **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 7 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 7)
 - **Relics**: Divine Right, Neow's Blessing, Galactic Dust, Biiig Hug, Vitruvian Minion, Regalite
 - **Ascension / Dread changes**: Ascension 8: GUARDS!!!; Ascension 8: Child of the Stars; Ascension 9: BEGONE!; Ascension 9: CHARGE!!; Ascension 9: Quasar; Ascension 9: Shockwave; Ascension 9: Ultimate Defend; Ascension 9: Minion Dive Bomb; Ascension 9: Minion Strike; Ascension 8: Minion Sacrifice
 
@@ -1048,7 +1048,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Special effect type | Global |
 
 - **Deck** (24 cards): Envenom+, Backstab, Deflect, Strike ×5, Defend ×4, Survivor, Ricochet, Poisoned Stab, Dagger Spray, Noxious Fumes, Piercing Wail, Echoing Slash, Infinite Blades, The Hunt, Shiv, Neutralize, Blade Dance
-- **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 8 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 8)
 - **Relics**: Ring of the Snake, Neow's Blessing, Snecko Skull, Toasty Mittens, Anchor
 - **Ascension / Dread changes**: Ascension 8: Neutralize; Ascension 9: Noxious Fumes; Ascension 9: Ricochet
 
@@ -1097,7 +1097,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Special effect type | Self |
 
 - **Deck** (28 cards): Backstab, Piercing Wail ×2, Bullet Time ×4, Leading Strike, Strike, Defend, Dagger Spray, Dash, Blade Dance, Slice, Sucker Punch, Tracking ×3, Anticipate, Dodge and Roll, Cloak and Dagger, Clumsy ×2, Injury, Distraction, Untouchable, Ultimate Defend, Murder
-- **Deck note**: 按首次洗牌之前的回合统计（剧本没标洗牌，按「卡组÷每回合抽牌」推算首次洗牌在第 5 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script marks no shuffles; estimated from deck size ÷ cards drawn per turn: first shuffle on turn 5)
 - **Relics**: Ring of the Snake, Neow's Blessing, Bread, Anchor, Snecko Eye, Mr. Struggles, Cloak Clasp
 - **Ascension / Dread changes**: Ascension 8: Ultimate Defend; Ascension 8: Dodge and Roll; Ascension 9: Dagger Spray; Ascension 9: Dash
 
@@ -1150,7 +1150,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Team debuff power | Strong |
 
 - **Deck** (19 cards): Arsenal+, Master Reality+, Carve Reality, Smite+ ×3, Miracle, Mental Fortress, Vigilance, Strike, Indignation, Pillar of Creation, Consecrate, Eruption+, Inner Peace, Deceive Reality, Safety+, Know Thy Place, Empty Body
-- **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 6 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 6)
 - **Relics**: Neow's Blessing, Cloak Clasp, Driftwood, Horn Cleat
 - **Ascension / Dread changes**: Ascension 8: Pillar of Creation; Ascension 8: Pillar of Creation; Ascension 8: Mental Fortress; Ascension 9: Carve Reality; Ascension 9: Consecrate; Ascension 9: Indignation
 
@@ -1194,7 +1194,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Special effect type | Single-target |
 
 - **Deck** (24 cards): Establishment+, Strike, Sands of Time ×3, Vigilance, Perseverance ×2, Windmill Strike ×3, Miracle ×2, Deceive Reality, Carve Reality, Defend, Safety / Smite / Perseverance / Windmill Strike, Mental Fortress, Indignation, Smite, Safety, Conclude, Halt, Tranquility
-- **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 6 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 6)
 - **Relics**: Neow's Blessing, Cloak Clasp, Pael's Legion, Vambrace
 - **Ascension / Dread changes**: Ascension 8: Mental Fortress; Ascension 8: Deceive Reality; Ascension 9: Carve Reality
 
@@ -1242,7 +1242,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Team buff power | Weak |
 
 - **Deck** (21 cards): Biased Cognition+, Glacier, Barrage, Subroutine, Hailstorm, Dualcast, Zap, Defragment+, Coolant, Creative AI, Hotfix, Cold Snap, Storm, Hologram, Strike, Charge Battery, Boost Away, Defend ×2, Ultimate Defend, Leap
-- **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 8 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 8)
 - **Relics**: Cracked Core, Neow's Blessing, Red Mask, Permafrost, Dusty Tome, Sturdy Clamp, Whispering Earring, Tungsten Rod
 - **Ascension / Dread changes**: Ascension 8: Charge Battery; Ascension 8: Ultimate Defend; Ascension 8: Boost Away; Ascension 9: Data Disk
 
@@ -1293,7 +1293,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Team buff power | Strong |
 
 - **Deck** (5 cards): Metamorphosis, Distraction, Dualcast, Mad Science, Doubt
-- **Deck note**: 按首次洗牌之前的回合统计（剧本没标洗牌，按「卡组÷每回合抽牌」推算首次洗牌在第 4 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script marks no shuffles; estimated from deck size ÷ cards drawn per turn: first shuffle on turn 4)
 - **Relics**: Oddly Smooth Stone, Neow's Blessing, Tea of Discourtesy, Pumpkin Candle, Gold-Plated Cables, Anchor, Wongo Customer Appreciation Badge, Choices Paradox, Big Mushroom, Royal Poison, Emotion Chip
 - **Ascension / Dread changes**: Ascension 8: Defend; Ascension 9: Feeding Frenzy
 
@@ -1342,7 +1342,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Junk-inserting power | Strong |
 
 - **Deck** (18 cards): Smokestack, Fight Through, Flak Cannon, Gunk Up, Boost Away, Defend ×4, Rocket Punch, Compact, Doubt, Overclock, TURBO, Hologram, Chill, Zap, Hotfix
-- **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 6 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 6)
 - **Relics**: Cracked Core, Neow's Blessing, Permafrost, Biiig Hug, Letter Opener, Diamond Diadem, Oddly Smooth Stone
 - **Ascension / Dread changes**: Ascension 8: Fight Through; Ascension 8: Boost Away; Ascension 9: Gunk Up; Ascension 9: Data Disk
 
@@ -1391,7 +1391,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Team debuff power | Strong |
 
 - **Deck** (3 cards): Mythic Form ×3
-- **Deck note**: 代码登记卡组（首次洗牌前剧本里没有出牌，例如塔罗牌都是生成的）
+- **Deck note**: 代码登记卡组 (首 times Shuffle. 前剧本里没有 out card, e.g. The Tower 罗 card 都是生成的)
 - **Relics**: Song Bow, Neow's Blessing, Anchor, Ringing Triangle, Pael's Tears, Permafrost, Philosopher's Stone, Mercury Hourglass
 - **Ascension / Dread changes**: Ascension 8: Orichalcum; Ascension 8: Oddly Smooth Stone; Ascension 9: Vajra; Dread upgrade Mythic Form; Dread upgrade The Emperor; Dread upgrade The Empress; Dread upgrade Strength; Dread upgrade Justice; Dread upgrade The Fool; Dread upgrade The Magician; Dread upgrade The High Priestess; Dread upgrade The Chariot; Dread upgrade The World; Dread upgrade Temperance; Dread upgrade Wheel of Fortune; Dread upgrade The Moon; Dread upgrade The Star; Dread upgrade 太Yang; Dread upgrade Death; Dread upgrade The Hermit; Dread upgrade The Lovers; Dread upgrade The Hanged Man; Dread upgrade 高The Tower; Dread upgrade Judgement; Dread upgrade The Devil; Dread upgrade The Hierophant; Dread upgrade 被遗忘的Ritual; Dread upgrade Wisp; Dread upgrade The Devil形态; Dread upgrade Serpent Form; Dread upgrade Reaper Form; Dread upgrade Echo Form; Dread upgrade Void形态; Dread upgrade Neurosurge; Dread upgrade Inflame; Dread upgrade Footwork; Dread upgrade Pillar of Creation; Dread upgrade Sleight of Flesh; Dread upgrade Defragment; Dread upgrade Rolling Boulder; Dread upgrade Eternal Armor; Dread upgrade Shockwave; Dread upgrade Fasting; Dread upgrade Deva Form; Dread upgrade Brawl; Dread upgrade Eternal Form
 
@@ -1449,7 +1449,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Team debuff power | Average |
 
 - **Deck** (15 cards): Stone Armor, Defend ×3, Tremble, Dismantle, Conflagration, Taunt, Impervious, Dominate（Soul）, Strike ×2, Bully, Thunderclap, Bash
-- **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 6 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 6)
 - **Relics**: Burning Blood, Neow's Blessing, Oddly Smooth Stone, Pael's Legion, Orichalcum, Whispering Earring, Vambrace
 - **Ascension / Dread changes**: Ascension 8: Stone Armor; Ascension 9: Dominate; Ascension 8: Gorget
 
@@ -1494,7 +1494,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Special effect type | Single-target |
 
 - **Deck** (20 cards): Enthralled, Offering+, Corruption+, Armaments+, Primal Force+, Giant Rock+ ×4, Headbutt, Feel No Pain, Flame Barrier, Defend ×4, True Grit+, Howl from Beyond, Iron Wave, Strike
-- **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 6 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 6)
 - **Relics**: Burning Blood, Neow's Blessing, Gorget, Dusty Tome, Anchor, Blood-Soaked Rose, Permafrost, Royal Stamp
 - **Ascension / Dread changes**: Ascension 8: Feel No Pain; Ascension 9: Howl from Beyond; Ascension 8: Orichalcum; Ascension 9: Vajra
 
@@ -1542,7 +1542,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Team buff power | Weak |
 
 - **Deck** (6 cards): Poke, Fear, Friendship, Danse Macabre, Pull Aggro, Eradicate
-- **Deck note**: 按首次洗牌之前的回合统计（剧本没标洗牌，按「卡组÷每回合抽牌」推算首次洗牌在第 3 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script marks no shuffles; estimated from deck size ÷ cards drawn per turn: first shuffle on turn 3)
 - **Relics**: Bound Phylactery, Neow's Blessing, Shuriken, Biiig Hug, Ice Cream, Looming Fruit, Ivory Tile
 - **Ascension / Dread changes**: Ascension 8: Danse Macabre; Ascension 9: Friendship; Ascension 9: Calcify; Ascension 8: Intimidating Helmet
 
@@ -1586,7 +1586,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Team debuff power | Strong |
 
 - **Deck** (18 cards): Snap, Bodyguard, Pull Aggro ×3, Sic 'Em, Flatten, Rattle, Friendship, Unleash, Spur ×2, Lethality, High Five, Clumsy, Afterlife ×2, Danse Macabre
-- **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 6 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 6)
 - **Relics**: Phylactery Unbound, Neow's Blessing, Bone Flute, Touch of Orobas, Razor Tooth, Sai, Bookmark
 - **Ascension / Dread changes**: Ascension 8: Danse Macabre; Ascension 8: Afterlife; Ascension 9: Lethality; Ascension 8: Intimidating Helmet
 
@@ -1627,7 +1627,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Special effect type | Single-target |
 
 - **Deck** (3 cards): Pillar of Creation, Glitterstream+, Supermassive
-- **Deck note**: 按首次洗牌之前的回合统计（剧本没标洗牌，按「卡组÷每回合抽牌」推算首次洗牌在第 2 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script marks no shuffles; estimated from deck size ÷ cards drawn per turn: first shuffle on turn 2)
 - **Relics**: Lantern, Yummy Cookie, Vexing Puzzlebox, Philosopher's Stone, Permafrost
 - **Ascension / Dread changes**: Ascension 9: The Bomb; Ascension 8: Regalite
 
@@ -1675,7 +1675,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Special effect type | Global |
 
 - **Deck** (20 cards): Black Hole+, Glow+ ×2, Convergence+ ×2, Astral Pulse ×2, Solar Strike+, Defend ×2, Jack of All Trades+, Omnislice, Kingly Punch, Ultimate Defend ×2, Cloak of Stars, Salvo, Hidden Cache+, Normality, Seven Stars
-- **Deck note**: 按首次洗牌之前的回合统计（剧本没标洗牌，按「卡组÷每回合抽牌」推算首次洗牌在第 6 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script marks no shuffles; estimated from deck size ÷ cards drawn per turn: first shuffle on turn 6)
 - **Relics**: Divine Right, Neow's Blessing, Sparkling Rouge, Yummy Cookie, Captain's Wheel, Philosopher's Stone, Mini Regent
 - **Ascension / Dread changes**: Ascension 8: Cloak of Stars; Ascension 9: Salvo; Ascension 9: Kingly Punch; Ascension 8: Galactic Dust
 
@@ -1721,7 +1721,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Special effect type | Single-target |
 
 - **Deck** (21 cards): Child of the Stars, Venerate+, Royalties, Decisions, Decisions+（王室认证） ×4, Heavenly Drill, Sovereign Blade ×2, Big Bang, Glow, Gather Light, Radiate, Refine Blade, Parry, Stardust, Convergence+, Defend, Hidden Cache, Strike
-- **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 5 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 5)
 - **Relics**: Divine Right, Neow's Blessing, Bag of Preparation, Burning Sticks, Glass Eye, Fencing Manual, Royal Stamp, Sai, Lantern
 - **Ascension / Dread changes**: Ascension 8: Child of the Stars; Ascension 8: Gather Light; Ascension 9: Refine Blade; Ascension 9: Shockwave
 
@@ -1773,7 +1773,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Special effect type | Single-target |
 
 - **Deck** (20 cards): Afterimage, Cloak and Dagger, Neutralize, Defend ×5, Leading Strike, Strike ×2, Slice, Finisher, Phantom Blades, Piercing Wail, Hidden Daggers, Fan of Knives, Curse of the Bell, Blade Dance, Survivor
-- **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 7 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 7)
 - **Relics**: Ring of the Snake, Neow's Blessing, Shuriken, Calling Bell, Lantern, Ornamental Fan, Kunai, Helical Dart, Diamond Diadem, Tuning Fork
 - **Ascension / Dread changes**: Ascension 8: Neutralize; Ascension 9: Blade Dance; Ascension 9: Cloak and Dagger; Ascension 9: Hidden Daggers
 
@@ -1822,7 +1822,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Durability | Very high |
 
 - **Deck** (26 cards): Clarity Extract, Radiant Tincture, Dexterity Potion / Leg Sweep, Survivor, Piercing Wail, Precise Cut, Defend ×2, Shackling Potion, Explosive Ampoule / Nightmare, Alchemize+, Neutralize, Serpent Form, Alchemize+（Soul） ×3, Footwork, Burst, Blur, Block Potion, Fysh Oil, Entropic Brew / Anticipate, Duplicator, Toric Toughness ×2, Fisticuffs, Deflect
-- **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 5 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 5)
 - **Relics**: Ring of the Snake, Neow's Blessing, Reptile Trinket, Alchemical Coffer, Potion Belt, White Beast Statue, Delicate Frond, Paper Krane, Lantern, Chandelier
 - **Ascension / Dread changes**: Ascension 8: Neutralize; Ascension 9: Precise Cut; Ascension 9: Fisticuffs; Dread upgrade Serpent Form
 
@@ -1873,7 +1873,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Special effect type | Global |
 
 - **Deck** (30 cards): Well-Laid Plans, Backstab, Clumsy, Adrenaline, Nightmare+, Acrobatics ×4, Tactician, Hidden Daggers, Defend ×5, Memento Mori, Neutralize, Hand Trick, Storm of Steel, Grand Finale, Murder, Tools of the Trade+, Deflect, Strike ×4, Piercing Wail, Survivor
-- **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 7 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 7)
 - **Relics**: Ring of the Snake, Neow's Blessing, Bag of Marbles, Pael's Flesh, Tough Bandages, Looming Fruit, Mercury Hourglass
 - **Ascension / Dread changes**: Ascension 8: Neutralize; Ascension 9: Backstab; Ascension 9: Storm of Steel; Ascension 9: Hidden Daggers
 
@@ -1923,7 +1923,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Special effect type | Single-target |
 
 - **Deck** (21 cards): Wish+, Strike ×2, Vigilance, Brilliance, Defend, Worship, Miracle ×2, Conjure Blade, Consecrate, Greed, Empty Fist, Wave of the Hand, Deceive Reality, Safety, Expunger, Devotion, Swivel, Sanctity, Conclude
-- **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 7 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 7)
 - **Relics**: Neow's Blessing, Lantern, Pael's Legion, Oddly Smooth Stone, Empty Cage, Orichalcum
 
 **Special effect**
@@ -1973,7 +1973,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Special effect type | Single-target |
 
 - **Deck** (26 cards): Alpha+, Pressure Points ×3, Defend, Establishment, Meditate, Clumsy, Miracle ×4, Empty Body, Like Water, Beta, Eruption+, Strike ×2, Vigilance, Omega, Play, Greed, Mental Fortress, Deceive Reality, Crescendo, Tranquility
-- **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 8 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 8)
 - **Relics**: Neow's Blessing, Permafrost, Empty Cage, Captain's Wheel, Sai, Vajra
 - **Ascension / Dread changes**: Ascension 8: Like Water; Ascension 8: Mental Fortress; Ascension 9: Pressure Points（第 6 / 11 回合）
 
@@ -2025,7 +2025,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Special effect type | Self / single-target |
 
 - **Deck** (36 cards): Rushdown ×2, Eruption+ ×2, Vigilance, Strike ×5, Defend ×3, Mental Fortress, Crescendo, Sash Whip, Tranquility, Purity+ ×4, Miracle ×4, Indignation, Consecrate, Bowling Bash ×2, Meditate, Play, Defend ×2, Wallop, Defend ×3, Inner Peace, Vault
-- **Deck note**: 按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 8 回合）
+- **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 8)
 - **Relics**: Neow's Blessing, Runic Pyramid, Tuning Fork, Looming Fruit, Sturdy Clamp
 - **Ascension / Dread changes**: Ascension 8: Mental Fortress; Ascension 8: Vigilance; Ascension 9: Indignation; Ascension 9: Sash Whip; Ascension 9: Wallop; Ascension 9: Consecrate
 
