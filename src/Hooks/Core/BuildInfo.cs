@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.906 / 2026-11-23 (**修：观者 mod 的遗物静默丢失（泪滴吊坠盒）**）—— 用户截图「她的泪滴吊坠盒呢」。日志实证 `观者引用层：使用 未装`：`WatcherCards.Probe()` 在启动早期被调用一次、那时观者模组还没加载 ⇒ 旧代码**第一行就把 `_probed` 锁死**，之后 `T(...)` 全返回 null 且**连 null 一起缓存** ⇒ 泪滴吊坠盒那件遗物静默不上身（v0.2.904 是苦无=4 件，v0.2.905 换成泪滴后只剩 3 件）。三处修：① `Probe()` 没探到**不锁**（最多每 2 秒再探一次，和 v0.2.686 修 WatcherModPresence 同一个坑）；② `T()` **只缓存找到的结果**；③ `BossVariant` 新增 `RelicsFactory`（运行期求值、优先于静态 `Relics`）—— 疾风观改用它，于是开打那一刻（观者模组早已就绪）才解析遗物。另外 `ShadowPlayerFactory` 现在会打一行「遗物清单」，下次掉了哪件一眼可见。v0.2.905 = 削弱版（拦回手 / 力竭原图 / 斋戒免疫 / 苦无→泪滴 / 新意图表）。完整历史见 docs/plans/changelog-history.md";
+    public const string Tag = "v0.2.907 / 2026-11-23 (**继续削弱疾风观：恐惧第 5/9 回合多打的那张改成防御**）—— 用户 2026-11-23 第四轮：「第5、9回合只在恐惧模式打出的2张打击改成防御」。恐惧模式第 5 / 9 回合 = 化体为空、疾风连击、警惕、疾风连击、**防御**（4 费）；普通模式不变（那两张「打击（没费）」仍留在手里）。v0.2.906 = 修观者 mod 遗物静默丢失（泪滴吊坠盒）；v0.2.905 = 削弱版（拦回手 / 力竭原图 / 斋戒免疫 / 苦无→泪滴 / 新意图表）。完整历史见 docs/plans/changelog-history.md";
 
     private static bool _logged;
 

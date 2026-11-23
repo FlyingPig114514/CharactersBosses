@@ -144,7 +144,8 @@ public static class WatcherFlurryScript
     /// **恐惧模式的回合覆盖**（用户 2026-11-23，第二版削弱后的口径）：
     /// 用户原话里带「（恐惧模式下打出）」的那几张，就是**恐惧模式才打得出来**的牌
     /// —— 恐惧模式下她自身免疫「能量降低」（`InstallFastingNoEnergyDown`），斋戒不再吞她那 1 点能量：
-    /// · 第 5 / 9 回合 → 多打一张 **打击**（4 费；普通模式 3 费、打击没费）；
+    /// · 第 5 / 9 回合 → 多打一张 **防御**（4 费；普通模式 3 费、打击没费留手）
+    ///   ★ 2026-11-23 第二次削弱：这一张原来是「打击」，用户改成「防御」；
     /// · 第 6 回合 → 两张 **防御** 都打出来（2 费；普通模式 1 费、第二张没费）；
     /// · 第 8 回合 → 两张 **打击** 都打出来（3 费；普通模式只打防御）。
     /// 返回 null ⇒ 交回静态回合表。
@@ -155,12 +156,14 @@ public static class WatcherFlurryScript
 
         if (turn == 5 || turn == 9)
         {
-            return Turn(4, $"{turn}.（恐惧）化体为空、疾风连击、警惕、疾风连击、打击",
+            // ★ 2026-11-23 用户第二次削弱：恐惧模式**多打出来的那一张由「打击」改成「防御」**
+            //   （普通模式那两张仍是「打击（没费）」留在手里）。能量 4 = 化体1 + 疾风0 + 警惕2 + 疾风0 + 防御1。
+            return Turn(4, $"{turn}.（恐惧）化体为空、疾风连击、警惕、疾风连击、防御",
                 Play(WatcherCards.EmptyBody),
                 Play(WatcherCards.FlurryOfBlows),
                 Play(WatcherCards.Vigilance),
                 Play(WatcherCards.FlurryOfBlows),
-                Play(WatcherCards.Strike));
+                Play(WatcherCards.Defend));
         }
 
         if (turn == 6)
