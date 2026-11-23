@@ -489,6 +489,22 @@ if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Force -Path $dir | Ou
 
 Write-Output ('OK: ' + $outPath)
 Write-Output ('  designs ' + $total + ' ; lines ' + (($sb.ToString() -split "`n").Count))
+# 待译清单落盘（下次直接照 list 翻，不用再猜）
+try {
+    $mm = New-Object System.Text.StringBuilder
+    foreach ($sec in @('names', 'notes', 'designs', 'reasons', 'info', 'chars')) {
+        $ks = @($Missing[$sec].Keys)
+        if ($ks.Count -eq 0) { continue }
+        [void]$mm.AppendLine('===== ' + $sec + ' (' + $ks.Count + ') =====')
+        foreach ($k in ($ks | Sort-Object)) { [void]$mm.AppendLine($k) }
+        [void]$mm.AppendLine('')
+    }
+    $missPath = Join-Path $Root 'tools\tmp\_en_work\missing.txt'
+    $md = Split-Path -Parent $missPath
+    if (-not (Test-Path $md)) { New-Item -ItemType Directory -Force -Path $md | Out-Null }
+    [System.IO.File]::WriteAllText($missPath, $mm.ToString(), (New-Object System.Text.UTF8Encoding($false)))
+} catch { }
+
 $missTotal = 0
 foreach ($sec in @('designs', 'notes', 'names', 'reasons', 'info', 'chars')) {
     $c = $Missing[$sec].Count
