@@ -139,9 +139,13 @@ function N([string]$zh) {
 
     # ⑤ 括号里带说明：「（二阶段：…）｜预判」这种：括号内也译名字，括号外照原样
     if ($raw -match '[（(]') {
+        # 括号里的补充说明：长名优先替换 + 短语表，尽量把整串也译成英文
         $out = $raw
-        foreach ($k in @($I18n['extra'].Keys)) { if ($out.Contains($k)) { $out = $out.Replace($k, $I18n['extra'][$k]) } }
-        foreach ($k in @($NameZhEn.Keys)) { if ($out.Contains($k)) { $out = $out.Replace($k, $NameZhEn[$k]) } }
+        foreach ($k in @($Script:NameKeysByLen)) { if ($out.Contains($k)) { $out = $out.Replace($k, (N $k)) } }
+        foreach ($k in @($Script:PhraseKeysByLen)) { if ($out.Contains($k)) { $out = $out.Replace($k, $I18n['phrases'][$k]) } }
+        $out = $out.Replace('（', ' (').Replace('）', ')').Replace('：', ': ').Replace('、', ', ')
+        while ($out.Contains('  ')) { $out = $out.Replace('  ', ' ') }
+        if ($out -match '[\u4e00-\u9fff]') { if (-not $Missing['names'].ContainsKey($raw)) { $Missing['names'][$raw] = 1 } }
         return $out
     }
 
@@ -163,11 +167,9 @@ function Extra-Text([string]$zh) {
     $s = $zh
     $s = $s.Replace('恐惧升级 ', 'Dread upgrade ')
     $s = [regex]::Replace($s, '进阶\s*(\d+)\s*[:：]', 'Ascension $1:')
-    foreach ($e in @($NameZhEn.Keys)) {
-        if ($s.Contains($e)) { $s = $s.Replace($e, $NameZhEn[$e]) }
-    }
-    foreach ($e in @($I18n['extra'].Keys)) {
-        if ($s.Contains($e)) { $s = $s.Replace($e, $I18n['extra'][$e]) }
+    # ⚠ 必须**长名优先**，否则「完美打击」会被先匹配到的「打击」拆成「完美Strike」。
+    foreach ($e in @($Script:NameKeysByLen)) {
+        if ($s.Contains($e)) { $s = $s.Replace($e, (N $e)) }
     }
     return $s
 }

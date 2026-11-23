@@ -37,8 +37,8 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 | Act | Boss | A8 | A9 | Other levels |
 |:---:|---|---|---|---|
-| Act 1 | DEFECT_DARK | Leap, Unsettling Lamp | 趁势Strike |  |
-| Act 1 | DEFECT_THUNDER | Buffer, Charge Battery | Sweeping Beam, FocusStrike |  |
+| Act 1 | DEFECT_DARK | Leap, Unsettling Lamp | Momentum Strike |  |
+| Act 1 | DEFECT_THUNDER | Buffer, Charge Battery | Sweeping Beam, Focused Strike |  |
 | Act 2 | DEFECT_CLAW | Charge Battery, Boot Sequence | One for All, Coolant, Hyperbeam |  |
 | Act 2 | DEFECT_RAINBOW | Boot Sequence, Coolant | Hailstorm, Thunder |  |
 | Act 3 | DEFECT_AI | Charge Battery, Ultimate Defend, Boost Away | Data Disk |  |
@@ -46,12 +46,12 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Act 3 | DEFECT_STATUS | Fight Through, Boost Away | Gunk Up, Data Disk |  |
 | Act 3 | FOOL_TAROT | Orichalcum, Oddly Smooth Stone | Vajra |  |
 | Act 1 | IRONCLAD_ANGER | True Grit, Gorget | Brand |  |
-| Act 1 | IRONCLAD_STRIKE | Stone Armor, Gorget | 完美Strike, 预备Strike |  |
+| Act 1 | IRONCLAD_STRIKE | Stone Armor, Gorget | Perfected Strike, Setup Strike |  |
 | Act 2 | IRONCLAD_BLOOD | Blood Wall | Brand |  |
-| Act 2 | IRONCLAD_JUGGLER | 无惧Pain, Evil Eye | 完美Strike, 彼岸Roar |  |
+| Act 2 | IRONCLAD_JUGGLER | Feel No Pain, Evil Eye | Perfected Strike, Howl from Beyond |  |
 | Act 3 | IRONCLAD_VULN | Stone Armor, Gorget | Dominate |  |
-| Act 3 | IRONCLAD_BOULDER | 无惧Pain, Orichalcum | 彼岸Roar, Vajra |  |
-| Act 1 | NECROBINDER_DOOM | Shroud, Undeath符文 | Friendship, No Escape, 荒疫Strike |  |
+| Act 3 | IRONCLAD_BOULDER | Feel No Pain, Orichalcum | Howl from Beyond, Vajra |  |
+| Act 1 | NECROBINDER_DOOM | Shroud, Undying Sigil | Friendship, No Escape, Blight Strike |  |
 | Act 1 | NECROBINDER_FLESH | Bodyguard, Pull Aggro | Debilitate |  |
 | Act 2 | NECROBINDER_SOUL | Danse Macabre, Defy | Severance, Death March |  |
 | Act 2 | NECROBINDER_ETHEREAL | Spirit of Ash, Defy | Friendship |  |
@@ -61,23 +61,23 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Act 1 | REGENT_BOMBARD | Cloak of Stars, Fisticuffs | Dying Star, Vajra |  |
 | Act 2 | REGENT_FORGE | I Am Invincible, Parry | Furnace |  |
 | Act 2 | REGENT_KING | Cosmic Indifference, Orichalcum | Summon Forth, Mr. Struggles |  |
-| Act 2 | REGENT_MINION | GUARDS!!!, Child of the Stars, Minion Sacrifice | BEGONE!, CHARGE!!, Quasar, Shockwave, Ultimate Defend, Minion Dive Bomb, 仆从Strike |  |
+| Act 2 | REGENT_MINION | GUARDS!!!, Child of the Stars, Minion Sacrifice | BEGONE!, CHARGE!!, Quasar, Shockwave, Ultimate Defend, Minion Dive Bomb, Minion Strike |  |
 | Act 3 | REGENT_COLORLESS | Regalite | The Bomb |  |
 | Act 3 | REGENT_STAR | Cloak of Stars, Galactic Dust | Salvo, Kingly Punch |  |
 | Act 3 | REGENT_CHOICE | Child of the Stars, Gather Light | Refine Blade, Shockwave |  |
 | Act 1 | SILENT_SLY | Neutralize | Flick-Flack, Ricochet |  |
 | Act 1 | SILENT_SNAKEBITE | Blur, Escape Plan | Backstab, Flechettes |  |
 | Act 2 | SILENT_ENVENOM | Neutralize | Noxious Fumes, Ricochet |  |
-| Act 2 | SILENT_SNECKO | Ultimate Defend, Dodge躲Roll Through | Dagger Spray, Dash |  |
+| Act 2 | SILENT_SNECKO | Ultimate Defend, Dodge and Roll | Dagger Spray, Dash |  |
 | Act 3 | SILENT_SHIV | Neutralize | Blade Dance, Cloak and Dagger, Hidden Daggers |  |
 | Act 3 | SILENT_BREWER | Neutralize | Precise Cut, Fisticuffs |  |
 | Act 3 | SILENT_GRAND_FINALE | Neutralize | Backstab, Storm of Steel, Hidden Daggers |  |
-| Act 1 | WATCHER_FORESIGHT | Nirvana, Mental Fortress | 碰撞Combo, Cut Through Fate |  |
+| Act 1 | WATCHER_FORESIGHT | Nirvana, Mental Fortress | Bowling Bash, Cut Through Fate |  |
 | Act 2 | WATCHER_CREATE | Pillar of Creation, Mental Fortress | Carve Reality, Consecrate, Indignation |  |
 | Act 2 | WATCHER_RETAIN | Mental Fortress, Deceive Reality | Carve Reality |  |
 | Act 3 | WATCHER_DIVINITY | Vigilance, Swivel, Deceive Reality | Damaru |  |
 | Act 3 | WATCHER_OMEGA | Like Water, Mental Fortress | Pressure Points（第 6 / 11 回合）, Strike |  |
-| Act 3 | WATCHER_RUSHDOWN | Mental Fortress, Vigilance | Indignation, 腰带Slap, Wallop, Consecrate |  |
+| Act 3 | WATCHER_RUSHDOWN | Mental Fortress, Vigilance | Indignation, Sash Whip, Wallop, Consecrate |  |
 
 > Blank cell = that boss has **no** extra upgrade/relic at that level. The full list also appears in each boss's own section
 > (the "Ascension / Dread changes" line) — both come from the same `tools/wiki-dump` export.
@@ -108,7 +108,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 - **Deck** (12 cards): Boot Sequence, Glacier, Strike, Leap, Go for the Eyes, Hotfix, Null, Clumsy, Defend, Genetic Algorithm, Rebound, Momentum Strike
 - **Deck note**: counted over the turns before the first shuffle (the script marks no shuffles; estimated from deck size ÷ cards drawn per turn: first shuffle on turn 5)
 - **Relics**: Cracked Core, Neow's Blessing, Bread, Symbiotic Virus, Data Disk
-- **Ascension / Dread changes**: Ascension 8: Leap; Ascension 9: 趁势Strike; Ascension 8: Unsettling Lamp
+- **Ascension / Dread changes**: Ascension 8: Leap; Ascension 9: Momentum Strike; Ascension 8: Unsettling Lamp
 
 **Special effect**
 
@@ -153,7 +153,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 - **Deck** (20 cards): Zap ×2, Defend ×3, Guilty, Sweeping Beam, Charge Battery, Focused Strike, Greed, Tempest, Strike ×2, Capacitor ×2, Hotfix+, Hologram, Double Energy+, Signal Boost, Buffer
 - **Deck note**: counted over the turns before the first shuffle (the script marks no shuffles; estimated from deck size ÷ cards drawn per turn: first shuffle on turn 7)
 - **Relics**: Cracked Core, Neow's Blessing, Permafrost, Horn Cleat
-- **Ascension / Dread changes**: Ascension 8: Buffer; Ascension 8: Charge Battery; Ascension 9: Sweeping Beam; Ascension 9: FocusStrike; Dread upgrade Tempest
+- **Ascension / Dread changes**: Ascension 8: Buffer; Ascension 8: Charge Battery; Ascension 9: Sweeping Beam; Ascension 9: Focused Strike; Dread upgrade Tempest
 
 **Special effect**
 
@@ -246,10 +246,10 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | AoE burst turns | None |
 | Special effect type | Single-target |
 
-- **Deck** (15 cards): Strike ×4, 完美Strike（王室认证） ×3, Stone Armor, Defend ×3, Bash, Setup Strike, Ashen Strike, Hellraiser
+- **Deck** (15 cards): Strike ×4, Perfected Strike (Royally Approved) ×3, Stone Armor, Defend ×3, Bash, Setup Strike, Ashen Strike, Hellraiser
 - **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 6)
 - **Relics**: Burning Blood, Neow's Blessing, Royal Stamp, Shuriken
-- **Ascension / Dread changes**: Ascension 8: Stone Armor; Ascension 9: 完美Strike; Ascension 9: 预备Strike; Ascension 8: Gorget
+- **Ascension / Dread changes**: Ascension 8: Stone Armor; Ascension 9: Perfected Strike; Ascension 9: Setup Strike; Ascension 8: Gorget
 
 **Special effect**
 
@@ -294,7 +294,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 - **Deck** (18 cards): Sow, Defend ×4, Deathbringer, Strike ×3, Scourge, Death's Door, Shroud, Blight Strike, Drain Power, No Escape, Friendship, Unleash, Bodyguard
 - **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 7)
 - **Relics**: Sparkling Rouge, Neow's Blessing, Horn Cleat
-- **Ascension / Dread changes**: Ascension 8: Shroud; Ascension 9: Friendship; Ascension 9: No Escape; Ascension 9: 荒疫Strike; Ascension 8: Undeath符文
+- **Ascension / Dread changes**: Ascension 8: Shroud; Ascension 9: Friendship; Ascension 9: No Escape; Ascension 9: Blight Strike; Ascension 8: Undying Sigil
 
 **Special effect**
 
@@ -580,7 +580,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 - **Deck** (21 cards): Nirvana, Strike ×5, Clumsy, Miracle, Mental Fortress, Vigilance, Third Eye, Weave ×3, Foresight, Foresight: discard, take damage / Defend; Follow-Up, Empty Body, Cut Through Fate, Defend, Bowling Bash, Tranquility
 - **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 6)
 - **Relics**: Neow's Blessing, Shuriken
-- **Ascension / Dread changes**: Ascension 8: Nirvana; Ascension 8: Mental Fortress; Ascension 9: 碰撞Combo; Ascension 9: Cut Through Fate
+- **Ascension / Dread changes**: Ascension 8: Nirvana; Ascension 8: Mental Fortress; Ascension 9: Bowling Bash; Ascension 9: Cut Through Fate
 
 **Special effect**
 
@@ -767,7 +767,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 - **Deck** (11 cards): Juggling+, Feel No Pain, Stampede+, Breakthrough, Strike ×7
 - **Deck note**: counted over the turns before the first shuffle (the script marks no shuffles; estimated from deck size ÷ cards drawn per turn: first shuffle on turn 4)
 - **Relics**: Burning Blood, Neow's Blessing, Lantern, Pael's Wing, Happy Flower, Ornamental Fan, Shuriken
-- **Ascension / Dread changes**: Ascension 8: 无惧Pain; Ascension 8: Evil Eye; Ascension 9: 完美Strike; Ascension 9: 彼岸Roar
+- **Ascension / Dread changes**: Ascension 8: Feel No Pain; Ascension 8: Evil Eye; Ascension 9: Perfected Strike; Ascension 9: Howl from Beyond
 
 **Special effect**
 
@@ -1001,7 +1001,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 - **Deck** (25 cards): Collision Course, BEGONE!, Minion Strike, Hidden Cache+, Defend ×4, Royal Gamble, Spectrum Shift+, CHARGE!!, Minion Dive Bomb ×2, Prowess, Resonance, Dark Shackles, Quasar, Shockwave, GUARDS!!!, Minion Sacrifice ×3, Rend, Child of the Stars, Clumsy
 - **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 7)
 - **Relics**: Divine Right, Neow's Blessing, Galactic Dust, Biiig Hug, Vitruvian Minion, Regalite
-- **Ascension / Dread changes**: Ascension 8: GUARDS!!!; Ascension 8: Child of the Stars; Ascension 9: BEGONE!; Ascension 9: CHARGE!!; Ascension 9: Quasar; Ascension 9: Shockwave; Ascension 9: Ultimate Defend; Ascension 9: Minion Dive Bomb; Ascension 9: 仆从Strike; Ascension 8: Minion Sacrifice
+- **Ascension / Dread changes**: Ascension 8: GUARDS!!!; Ascension 8: Child of the Stars; Ascension 9: BEGONE!; Ascension 9: CHARGE!!; Ascension 9: Quasar; Ascension 9: Shockwave; Ascension 9: Ultimate Defend; Ascension 9: Minion Dive Bomb; Ascension 9: Minion Strike; Ascension 8: Minion Sacrifice
 
 **Special effect**
 
@@ -1099,7 +1099,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 - **Deck** (28 cards): Backstab, Piercing Wail ×2, Bullet Time ×4, Leading Strike, Strike, Defend, Dagger Spray, Dash, Blade Dance, Slice, Sucker Punch, Tracking ×3, Anticipate, Dodge and Roll, Cloak and Dagger, Clumsy ×2, Injury, Distraction, Untouchable, Ultimate Defend, Murder
 - **Deck note**: counted over the turns before the first shuffle (the script marks no shuffles; estimated from deck size ÷ cards drawn per turn: first shuffle on turn 5)
 - **Relics**: Ring of the Snake, Neow's Blessing, Bread, Anchor, Snecko Eye, Mr. Struggles, Cloak Clasp
-- **Ascension / Dread changes**: Ascension 8: Ultimate Defend; Ascension 8: Dodge躲Roll Through; Ascension 9: Dagger Spray; Ascension 9: Dash
+- **Ascension / Dread changes**: Ascension 8: Ultimate Defend; Ascension 8: Dodge and Roll; Ascension 9: Dagger Spray; Ascension 9: Dash
 
 **Special effect**
 
@@ -1393,7 +1393,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 - **Deck** (3 cards): Mythic Form ×3
 - **Deck note**: Deck registered in code (the script plays nothing before the first shuffle — the tarot cards are all generated)
 - **Relics**: Song Bow, Neow's Blessing, Anchor, Ringing Triangle, Pael's Tears, Permafrost, Philosopher's Stone, Mercury Hourglass
-- **Ascension / Dread changes**: Ascension 8: Orichalcum; Ascension 8: Oddly Smooth Stone; Ascension 9: Vajra; Dread upgrade Mythic Form; Dread upgrade The Emperor; Dread upgrade Empress; Dread upgrade Strength; Dread upgrade Justice; Dread upgrade The Fool; Dread upgrade The Magician; Dread upgrade The High Priestess; Dread upgrade The Chariot; Dread upgrade The World; Dread upgrade Temperance; Dread upgrade Wheel of Fortune; Dread upgrade The Moon; Dread upgrade The Star; Dread upgrade 太Yang; Dread upgrade Death; Dread upgrade The Hermit; Dread upgrade The Lovers; Dread upgrade The Hanged Man; Dread upgrade 高The Tower; Dread upgrade Judgement; Dread upgrade The Devil; Dread upgrade The Hierophant; Dread upgrade Forgotten Ritual; Dread upgrade Wisp; Dread upgrade Demon Form; Dread upgrade Serpent Form; Dread upgrade Reaper Form; Dread upgrade Echo Form; Dread upgrade Void Form; Dread upgrade 精神Overload; Dread upgrade Inflame; Dread upgrade Footwork; Dread upgrade Pillar of Creation; Dread upgrade Sleight of Flesh; Dread upgrade Defragment; Dread upgrade Rolling Boulder; Dread upgrade Eternal Armor; Dread upgrade Shockwave; Dread upgrade Fasting; Dread upgrade Deva Form; Dread upgrade Brawl; Dread upgrade Eternity形态
+- **Ascension / Dread changes**: Ascension 8: Orichalcum; Ascension 8: Oddly Smooth Stone; Ascension 9: Vajra; Dread upgrade Mythic Form; Dread upgrade The Emperor; Dread upgrade Empress; Dread upgrade Strength; Dread upgrade Justice; Dread upgrade The Fool; Dread upgrade The Magician; Dread upgrade The High Priestess; Dread upgrade The Chariot; Dread upgrade The World; Dread upgrade Temperance; Dread upgrade Wheel of Fortune; Dread upgrade The Moon; Dread upgrade The Star; Dread upgrade The Sun; Dread upgrade Death; Dread upgrade The Hermit; Dread upgrade The Lovers; Dread upgrade The Hanged Man; Dread upgrade The Tower; Dread upgrade Judgement; Dread upgrade The Devil; Dread upgrade The Hierophant; Dread upgrade Forgotten Ritual; Dread upgrade Wisp; Dread upgrade Demon Form; Dread upgrade Serpent Form; Dread upgrade Reaper Form; Dread upgrade Echo Form; Dread upgrade Void Form; Dread upgrade Neurosurge; Dread upgrade Inflame; Dread upgrade Footwork; Dread upgrade Pillar of Creation; Dread upgrade Sleight of Flesh; Dread upgrade Defragment; Dread upgrade Rolling Boulder; Dread upgrade Eternal Armor; Dread upgrade Shockwave; Dread upgrade Fasting; Dread upgrade Deva Form; Dread upgrade Brawl; Dread upgrade Eternal Form
 
 **Special effect**
 
@@ -1448,7 +1448,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Special effect type | Single-target |
 | Team debuff power | Average |
 
-- **Deck** (15 cards): Stone Armor, Defend ×3, Tremble, Dismantle, Conflagration, Taunt, Impervious, Dominate（Soul）, Strike ×2, Bully, Thunderclap, Bash
+- **Deck** (15 cards): Stone Armor, Defend ×3, Tremble, Dismantle, Conflagration, Taunt, Impervious, Dominate (Soul), Strike ×2, Bully, Thunderclap, Bash
 - **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 6)
 - **Relics**: Burning Blood, Neow's Blessing, Oddly Smooth Stone, Pael's Legion, Orichalcum, Whispering Earring, Vambrace
 - **Ascension / Dread changes**: Ascension 8: Stone Armor; Ascension 9: Dominate; Ascension 8: Gorget
@@ -1496,7 +1496,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 - **Deck** (20 cards): Enthralled, Offering+, Corruption+, Armaments+, Primal Force+, Giant Rock+ ×4, Headbutt, Feel No Pain, Flame Barrier, Defend ×4, True Grit+, Howl from Beyond, Iron Wave, Strike
 - **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 6)
 - **Relics**: Burning Blood, Neow's Blessing, Gorget, Dusty Tome, Anchor, Blood-Soaked Rose, Permafrost, Royal Stamp
-- **Ascension / Dread changes**: Ascension 8: 无惧Pain; Ascension 9: 彼岸Roar; Ascension 8: Orichalcum; Ascension 9: Vajra
+- **Ascension / Dread changes**: Ascension 8: Feel No Pain; Ascension 9: Howl from Beyond; Ascension 8: Orichalcum; Ascension 9: Vajra
 
 **Special effect**
 
@@ -1720,7 +1720,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | AoE burst turns | 2, 6, 10, 12 |
 | Special effect type | Single-target |
 
-- **Deck** (21 cards): Child of the Stars, Venerate+, Royalties, Decisions, Decisions+（王室认证） ×4, Heavenly Drill, Sovereign Blade ×2, Big Bang, Glow, Gather Light, Radiate, Refine Blade, Parry, Stardust, Convergence+, Defend, Hidden Cache, Strike
+- **Deck** (21 cards): Child of the Stars, Venerate+, Royalties, Decisions, Decisions+ (Royally Approved) ×4, Heavenly Drill, Sovereign Blade ×2, Big Bang, Glow, Gather Light, Radiate, Refine Blade, Parry, Stardust, Convergence+, Defend, Hidden Cache, Strike
 - **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 5)
 - **Relics**: Divine Right, Neow's Blessing, Bag of Preparation, Burning Sticks, Glass Eye, Fencing Manual, Royal Stamp, Sai, Lantern
 - **Ascension / Dread changes**: Ascension 8: Child of the Stars; Ascension 8: Gather Light; Ascension 9: Refine Blade; Ascension 9: Shockwave
@@ -1821,7 +1821,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Team debuff power | Average |
 | Durability | Very high |
 
-- **Deck** (26 cards): Clarity Extract, Radiant Tincture, Dexterity Potion / Leg Sweep, Survivor, Piercing Wail, Precise Cut, Defend ×2, Shackling Potion, Explosive Ampoule / Nightmare, Alchemize+, Neutralize, Serpent Form, Alchemize+（Soul） ×3, Footwork, Burst, Blur, Block Potion, Fysh Oil, Entropic Brew / Anticipate, Duplicator, Toric Toughness ×2, Fisticuffs, Deflect
+- **Deck** (26 cards): Clarity Extract, Radiant Tincture, Dexterity Potion / Leg Sweep, Survivor, Piercing Wail, Precise Cut, Defend ×2, Shackling Potion, Explosive Ampoule / Nightmare, Alchemize+, Neutralize, Serpent Form, Alchemize+ (Soul) ×3, Footwork, Burst, Blur, Block Potion, Fysh Oil, Entropic Brew / Anticipate, Duplicator, Toric Toughness ×2, Fisticuffs, Deflect
 - **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 5)
 - **Relics**: Ring of the Snake, Neow's Blessing, Reptile Trinket, Alchemical Coffer, Potion Belt, White Beast Statue, Delicate Frond, Paper Krane, Lantern, Chandelier
 - **Ascension / Dread changes**: Ascension 8: Neutralize; Ascension 9: Precise Cut; Ascension 9: Fisticuffs; Dread upgrade Serpent Form
@@ -1852,7 +1852,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | 5 | Radiant Tincture, Dexterity Potion / Alchemize+, Leg Sweep, Precise Cut, Survivor | — | Shuffle. Clarity Extract, Radiant Tincture, Dexterity Potion \| Alchemize+ (brews a Block Potion), Sweeping Leg, Precise Cut, Survivor |
 | 6 | Alchemize+, Alchemize+, Defend | Decay (unplayable (curse / status)) | Shackling Potion ｜ Alchemize + (Ship in a Bottle), Alchemize + (Fysh Oil), Defend, Decay |
 | 7 | Ship in a Bottle, Ghost in a Jar, Explosive Ampoule / Neutralize, Alchemize+, Burst, Blur | — | Ship in a Bottle, Ghost in a Jar, Explosive Ampoule ｜ Neutralize, Alchemize + (Duplicator), Burst, Blur |
-| 8 | Block Potion, Fysh Oil, Entropic Brew, （二阶段：Chaos补出的Liquid Bronze → 她获得 3 层Thorns） / Anticipate, Duplicator, Toric Toughness ×2, Fisticuffs, Deflect | — | Block Potion, Fysh Oil, Chaos Potion, (phase 2: Liquid Bronze from Chaos ⇒ she gains 3 Thorns) \| Forethought, Duplication Potion, Ring of Fortitude ×2, Fisticuffs, Deflect |
+| 8 | Block Potion, Fysh Oil, Entropic Brew, (phase 2: the Liquid Bronze produced by Chaos ⇒ she gains 3 Thorns) / Anticipate, Duplicator, Toric Toughness ×2, Fisticuffs, Deflect | — | Block Potion, Fysh Oil, Chaos Potion, (phase 2: Liquid Bronze from Chaos ⇒ she gains 3 Thorns) \| Forethought, Duplication Potion, Ring of Fortitude ×2, Fisticuffs, Deflect |
 
 <a id="SILENT_GRAND_FINALE"></a>
 
@@ -2027,7 +2027,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 - **Deck** (36 cards): Rushdown ×2, Eruption+ ×2, Vigilance, Strike ×5, Defend ×3, Mental Fortress, Crescendo, Sash Whip, Tranquility, Purity+ ×4, Miracle ×4, Indignation, Consecrate, Bowling Bash ×2, Meditate, Play, Defend ×2, Wallop, Defend ×3, Inner Peace, Vault
 - **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 8)
 - **Relics**: Neow's Blessing, Runic Pyramid, Tuning Fork, Looming Fruit, Sturdy Clamp
-- **Ascension / Dread changes**: Ascension 8: Mental Fortress; Ascension 8: Vigilance; Ascension 9: Indignation; Ascension 9: 腰带Slap; Ascension 9: Wallop; Ascension 9: Consecrate
+- **Ascension / Dread changes**: Ascension 8: Mental Fortress; Ascension 8: Vigilance; Ascension 9: Indignation; Ascension 9: Sash Whip; Ascension 9: Wallop; Ascension 9: Consecrate
 
 **Special effect**
 
