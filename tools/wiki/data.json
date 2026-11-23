@@ -1,6 +1,6 @@
 {
   "generatedFrom": "CharacterBosses.Impl113.dll",
-  "generatedAt": "2026-11-23 17:49",
+  "generatedAt": "2026-11-23 17:57",
   "cardNameMisses": [],
   "bosses": [
     {
@@ -23057,7 +23057,7 @@
                 "疾风连击",
                 "防御",
                 "打击",
-                "打击",
+                "防御",
                 "防御",
                 "奇迹",
                 "奇迹",
@@ -23126,7 +23126,7 @@
                   "疾风连击",
                   "防御",
                   "打击",
-                  "打击",
+                  "防御",
                   "防御",
                   "奇迹",
                   "奇迹",
@@ -23184,7 +23184,7 @@
                     ]
                   },
                   {
-                    "note": "2. 打击、打击、防御、奇迹（不出）",
+                    "note": "2. 打击、防御、防御、奇迹（不出）",
                     "energy": 3,
                     "shuffle": false,
                     "cards": [
@@ -23200,10 +23200,10 @@
                         "played": true
                       },
                       {
-                        "name": "打击",
-                        "type": "WatcherStrike_P",
+                        "name": "防御",
+                        "type": "WatcherDefend_P",
                         "cost": 1,
-                        "cardType": "Attack",
+                        "cardType": "Skill",
                         "DamageOverride": 0,
                         "BlockOverride": 0,
                         "ExtraAoe": 0,
@@ -23481,7 +23481,7 @@
                     ]
                   },
                   {
-                    "note": "8. 防御、打击（没费）、打击（没费）",
+                    "note": "8. 防御、防御（没费）、打击（没费）",
                     "energy": 1,
                     "shuffle": false,
                     "cards": [
@@ -23497,10 +23497,10 @@
                         "played": true
                       },
                       {
-                        "name": "打击",
-                        "type": "WatcherStrike_P",
+                        "name": "防御",
+                        "type": "WatcherDefend_P",
                         "cost": 1,
-                        "cardType": "Attack",
+                        "cardType": "Skill",
                         "HoldInstead": true,
                         "CostThisTurn": 1,
                         "DamageOverride": 0,

@@ -11,13 +11,13 @@ namespace CharacterBosses.Core;
 /// 用户原话（逐字，2026-11-23 第三轮「削弱」定稿）：
 /// <code>
 /// 1.以手拒之、疾风连击、防御
-/// 2.打击、打击、防御、奇迹（不出）
+/// 2.打击、防御、防御、奇迹（不出）
 /// 3.奇迹、斋戒、心灵堡垒、防御（没费）
 /// 4.供奉、追击、腰带抽打
 /// 5.化体为空、疾风连击、警惕、疾风连击、防御（没费）（恐惧模式下打出）
 /// 6.洗牌、疾风连击、防御、防御（没费）（恐惧模式下打出）
 /// 7.供奉、追击、腰带抽打
-/// 8.防御、打击（没费）（恐惧模式下打出）、打击（没费）
+/// 8.防御、防御（没费）（恐惧模式下打出）、打击（没费）
 /// 9.化体为空、疾风连击、警惕、疾风连击、防御（没费）（恐惧模式下打出）
 /// 之后 6～9 循环
 /// </code>
@@ -25,6 +25,11 @@ namespace CharacterBosses.Core;
 /// ★ 2026-11-23 第四轮：「第 5、9 回合**只在恐惧模式打出**的那 2 张打击改成防御」，
 ///   随后又订正「**普通模式也改**，那两张留在手里的打击也改成防御（虽然效果没有区别，因为都不打出）」
 ///   ⇒ 现在第 5 / 9 回合无论哪个模式，第五张都是「防御」（恐惧模式真的打出去，普通模式没费留手）。
+///
+/// ★ 2026-11-23 第五轮（实机截图：恐惧第 8 回合的 2 费却打出了 1 防 2 打）：
+///   「2.打击、防御、防御、奇迹（不出）」「8.防御、防御（没费）（恐惧模式下打出）、打击（没费）」
+///   ⇒ 第 2 回合少一张打击、多一张防御（仍 3 费）；第 8 回合先在普通模式只打一张防御（1 费），
+///   恐惧模式两张都打（2 费）、打击永远没费。
 ///
 /// ## 卡费（反编译两份观者 mod 的构造函数 `: base(cost, …)` 逐个核过）
 /// | 牌 | 费 | | 牌 | 费 |
@@ -69,10 +74,10 @@ public static class WatcherFlurryScript
                 Play(WatcherCards.FlurryOfBlows),
                 Play(WatcherCards.Defend)),
 
-            // ── 2 ── 打击 / 打击 / 防御 / 奇迹（不出）   （3 费 = 1 + 1 + 1）
-            Turn(3, "2. 打击、打击、防御、奇迹（不出）",
+            // ── 2 ── 打击 / 防御 / 防御 / 奇迹（不出）   （3 费 = 1 + 1 + 1）
+            Turn(3, "2. 打击、防御、防御、奇迹（不出）",
                 Play(WatcherCards.Strike),
-                Play(WatcherCards.Strike),
+                Play(WatcherCards.Defend),
                 Play(WatcherCards.Defend),
                 Hold(WatcherCards.Miracle, cost: 0)),
 
@@ -110,10 +115,10 @@ public static class WatcherFlurryScript
                 Play(WatcherCards.FollowUp),
                 Play(WatcherCards.SashWhip)),
 
-            // ── 8 ── 防御 / 打击（没费）/ 打击（没费）    （1 费 = 1）
-            Turn(1, "8. 防御、打击（没费）、打击（没费）",
+            // ── 8 ── 防御 / 防御（没费）/ 打击（没费）    （1 费 = 1）
+            Turn(1, "8. 防御、防御（没费）、打击（没费）",
                 Play(WatcherCards.Defend),
-                Hold(WatcherCards.Strike),
+                Hold(WatcherCards.Defend),
                 Hold(WatcherCards.Strike)),
 
             // ── 9 ── 同第 5 回合                        （3 费）
@@ -147,7 +152,7 @@ public static class WatcherFlurryScript
     /// · 第 5 / 9 回合 → 多打一张 **防御**（4 费；普通模式 3 费、打击没费留手）
     ///   ★ 2026-11-23 第二次削弱：这一张原来是「打击」，用户改成「防御」；
     /// · 第 6 回合 → 两张 **防御** 都打出来（2 费；普通模式 1 费、第二张没费）；
-    /// · 第 8 回合 → 两张 **打击** 都打出来（3 费；普通模式只打防御）。
+    /// · 第 8 回合 → 两张 **防御** 都打出来（2 费；普通模式 1 费、只打一张防御），打击永远没费。
     /// 返回 null ⇒ 交回静态回合表。
     /// </summary>
     private static BossTurn? DreadTurnOverride(int turn)
@@ -176,10 +181,13 @@ public static class WatcherFlurryScript
 
         if (turn == 8)
         {
-            return Turn(3, "8.（恐惧）防御、打击、打击",
+            // ★ 2026-11-23 用户：「第 8 回合的 2 费应该只足以打出 1 防 1 打」→ 随后给了权威清单：
+            //   `8. 防御、防御（没费）（恐惧模式下打出）、打击（没费）`
+            //   ⇒ 恐惧模式 = 两张防御都打（2 费），打击没费；普通模式只打一张防御（1 费）。
+            return Turn(2, "8.（恐惧）防御、防御、打击（没费）",
                 Play(WatcherCards.Defend),
-                Play(WatcherCards.Strike),
-                Play(WatcherCards.Strike));
+                Play(WatcherCards.Defend),
+                Hold(WatcherCards.Strike));
         }
 
         return null;
