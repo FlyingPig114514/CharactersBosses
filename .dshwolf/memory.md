@@ -7039,3 +7039,12 @@ Chronological action log.
 | 2026-11-23 18:05 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/_tmp_patch_flurry.ps1` | ok | 0 |
 | 2026-11-23 18:05 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/_tmp_verify_flurry.ps1` | ok | 0 |
 | 2026-11-23 18:05 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/_tmp_verify_flurry.ps1` | ok | 0 |
+| 2026-11-23 18:15 | edit | `src/Hooks/Core/WatcherFlurryScript.cs` | ok | 0 |
+| 2026-11-23 18:15 | edit | `src/Hooks/Core/WatcherFlurryScript.cs` | ok | 0 |
+| 2026-11-23 18:15 | edit | `src/Hooks/Core/WatcherFlurryScript.cs` | ok | 0 |
+| 2026-11-23 18:15 | edit | `src/Hooks/Core/WatcherFlurryScript.cs` | ok | 0 |
+| 2026-11-23 18:15 | edit | `src/Hooks/Core/WatcherFlurryScript.cs` | ok | 0 |
+| 2026-11-23 18:15 | edit | `src/Hooks/Core/BossInfoTable.cs` | ok | 0 |
+| 2026-11-23 18:15 | edit | `src/Hooks/Core/BossInfoTable.cs` | ok | 0 |
+| 2026-11-23 18:16 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-23 18:16 | edit | `docs/plans/changelog-history.md` | ok | 0 |

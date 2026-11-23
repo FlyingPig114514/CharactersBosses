@@ -1,6 +1,6 @@
 {
   "generatedFrom": "CharacterBosses.Impl113.dll",
-  "generatedAt": "2026-11-23 18:08",
+  "generatedAt": "2026-11-23 18:17",
   "cardNameMisses": [],
   "bosses": [
     {
@@ -23060,18 +23060,19 @@
                 "防御",
                 "防御",
                 "奇迹",
+                "化体为空",
+                "疾风连击",
+                "警惕",
+                "疾风连击",
+                "打击",
+                "奇迹",
                 "奇迹",
                 "斋戒",
                 "心灵堡垒",
                 "防御",
                 "供奉",
                 "追击",
-                "腰带抽打",
-                "化体为空",
-                "疾风连击",
-                "警惕",
-                "疾风连击",
-                "打击"
+                "腰带抽打"
               ],
               "deckRegistered": [
                 "疾风连击",
@@ -23112,7 +23113,7 @@
               "ascensionDisplay": [
                 "8: 以手拒之, 8: 心灵堡垒, 9: 供奉, 9: 斋戒"
               ],
-              "info": "循环：6~9\n单体能力：强\n群攻能力：偏弱\n单体高压回合：4、5、7、9\n群体高压回合：无\n特殊效果类型：单体",
+              "info": "循环：6~9\n单体能力：强\n群攻能力：偏弱\n单体高压回合：3、5、7、9\n群体高压回合：无\n特殊效果类型：单体",
               "dreadUpgrades": [
                 "疾风连击"
               ],
@@ -23129,18 +23130,19 @@
                   "防御",
                   "防御",
                   "奇迹",
+                  "化体为空",
+                  "疾风连击",
+                  "警惕",
+                  "疾风连击",
+                  "打击",
+                  "奇迹",
                   "奇迹",
                   "斋戒",
                   "心灵堡垒",
                   "防御",
                   "供奉",
                   "追击",
-                  "腰带抽打",
-                  "化体为空",
-                  "疾风连击",
-                  "警惕",
-                  "疾风连击",
-                  "打击"
+                  "腰带抽打"
                 ],
                 "turns": [
                   {
@@ -23184,8 +23186,8 @@
                     ]
                   },
                   {
-                    "note": "2. 打击、防御、防御、奇迹（不出）",
-                    "energy": 3,
+                    "note": "2. 打击、防御、防御（没费）、奇迹（不出）",
+                    "energy": 2,
                     "shuffle": false,
                     "cards": [
                       {
@@ -23215,6 +23217,85 @@
                         "type": "WatcherDefend_P",
                         "cost": 1,
                         "cardType": "Skill",
+                        "HoldInstead": true,
+                        "CostThisTurn": 1,
+                        "DamageOverride": 0,
+                        "BlockOverride": 0,
+                        "ExtraAoe": 0,
+                        "UpgradeMinAscension": 0,
+                        "played": false,
+                        "reason": "留在手牌"
+                      },
+                      {
+                        "name": "奇迹",
+                        "type": "WatcherMiracle",
+                        "cost": 0,
+                        "cardType": "Skill",
+                        "HoldInstead": true,
+                        "CostThisTurn": 0,
+                        "DamageOverride": 0,
+                        "BlockOverride": 0,
+                        "ExtraAoe": 0,
+                        "UpgradeMinAscension": 0,
+                        "played": false,
+                        "reason": "留在手牌"
+                      }
+                    ]
+                  },
+                  {
+                    "note": "3. 化体为空、疾风连击、警惕、疾风连击、打击、奇迹（不出）",
+                    "energy": 4,
+                    "shuffle": false,
+                    "cards": [
+                      {
+                        "name": "化体为空",
+                        "type": "WatcherEmptyBody",
+                        "cost": 1,
+                        "cardType": "Skill",
+                        "DamageOverride": 0,
+                        "BlockOverride": 0,
+                        "ExtraAoe": 0,
+                        "UpgradeMinAscension": 0,
+                        "played": true
+                      },
+                      {
+                        "name": "疾风连击",
+                        "type": "WatcherFlurryOfBlows",
+                        "cost": 0,
+                        "cardType": "Attack",
+                        "DamageOverride": 0,
+                        "BlockOverride": 0,
+                        "ExtraAoe": 0,
+                        "UpgradeMinAscension": 0,
+                        "played": true
+                      },
+                      {
+                        "name": "警惕",
+                        "type": "WatcherVigilance",
+                        "cost": 2,
+                        "cardType": "Skill",
+                        "DamageOverride": 0,
+                        "BlockOverride": 0,
+                        "ExtraAoe": 0,
+                        "UpgradeMinAscension": 0,
+                        "played": true
+                      },
+                      {
+                        "name": "疾风连击",
+                        "type": "WatcherFlurryOfBlows",
+                        "cost": 0,
+                        "cardType": "Attack",
+                        "DamageOverride": 0,
+                        "BlockOverride": 0,
+                        "ExtraAoe": 0,
+                        "UpgradeMinAscension": 0,
+                        "played": true
+                      },
+                      {
+                        "name": "打击",
+                        "type": "WatcherStrike_P",
+                        "cost": 1,
+                        "cardType": "Attack",
                         "DamageOverride": 0,
                         "BlockOverride": 0,
                         "ExtraAoe": 0,
@@ -23238,7 +23319,7 @@
                     ]
                   },
                   {
-                    "note": "3. 奇迹、斋戒、心灵堡垒、防御（没费）",
+                    "note": "4. 奇迹、斋戒、心灵堡垒、防御（没费）",
                     "energy": 2,
                     "shuffle": false,
                     "cards": [
@@ -23293,7 +23374,7 @@
                     ]
                   },
                   {
-                    "note": "4. 供奉、追击、腰带抽打",
+                    "note": "5. 供奉、追击、腰带抽打",
                     "energy": 2,
                     "shuffle": false,
                     "cards": [
@@ -23329,71 +23410,6 @@
                         "ExtraAoe": 0,
                         "UpgradeMinAscension": 0,
                         "played": true
-                      }
-                    ]
-                  },
-                  {
-                    "note": "5. 化体为空、疾风连击、警惕、疾风连击、打击（没费）",
-                    "energy": 3,
-                    "shuffle": false,
-                    "cards": [
-                      {
-                        "name": "化体为空",
-                        "type": "WatcherEmptyBody",
-                        "cost": 1,
-                        "cardType": "Skill",
-                        "DamageOverride": 0,
-                        "BlockOverride": 0,
-                        "ExtraAoe": 0,
-                        "UpgradeMinAscension": 0,
-                        "played": true
-                      },
-                      {
-                        "name": "疾风连击",
-                        "type": "WatcherFlurryOfBlows",
-                        "cost": 0,
-                        "cardType": "Attack",
-                        "DamageOverride": 0,
-                        "BlockOverride": 0,
-                        "ExtraAoe": 0,
-                        "UpgradeMinAscension": 0,
-                        "played": true
-                      },
-                      {
-                        "name": "警惕",
-                        "type": "WatcherVigilance",
-                        "cost": 2,
-                        "cardType": "Skill",
-                        "DamageOverride": 0,
-                        "BlockOverride": 0,
-                        "ExtraAoe": 0,
-                        "UpgradeMinAscension": 0,
-                        "played": true
-                      },
-                      {
-                        "name": "疾风连击",
-                        "type": "WatcherFlurryOfBlows",
-                        "cost": 0,
-                        "cardType": "Attack",
-                        "DamageOverride": 0,
-                        "BlockOverride": 0,
-                        "ExtraAoe": 0,
-                        "UpgradeMinAscension": 0,
-                        "played": true
-                      },
-                      {
-                        "name": "打击",
-                        "type": "WatcherStrike_P",
-                        "cost": 1,
-                        "cardType": "Attack",
-                        "HoldInstead": true,
-                        "CostThisTurn": 1,
-                        "DamageOverride": 0,
-                        "BlockOverride": 0,
-                        "ExtraAoe": 0,
-                        "UpgradeMinAscension": 0,
-                        "played": false,
-                        "reason": "留在手牌"
                       }
                     ]
                   },
