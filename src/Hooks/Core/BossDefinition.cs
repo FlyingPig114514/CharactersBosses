@@ -346,7 +346,34 @@ public sealed class BossDefinition
 
     public List<Type>? DeckForAct(int act) => ActiveVariant(act)?.Deck ?? DeckByAct[Clamp(act, DeckByAct.Length)];
 
-    public List<Type>? RelicsForAct(int act) => ActiveVariant(act)?.Relics ?? RelicsByAct[Clamp(act, RelicsByAct.Length)];
+    /// <summary>
+    /// 这一幕的遗物。变体如果给了 <see cref="BossVariant.RelicsFactory"/>，就**在调用那一刻**求值 ——
+    /// 因为 `BossDefs` 是**静态初始化**，那时第三方模组（观者）可能还没加载，
+    /// `WatcherCards.T("Xxx")` 会返回 null 并被永久缓存 ⇒ 那些遗物会静默消失
+    /// （用户 2026-11-23 实测：疾风观只有 至纯之水/涅奥的祝福/手里剑，泪滴吊坠盒没上身）。
+    /// </summary>
+    public List<Type>? RelicsForAct(int act)
+    {
+        var v = ActiveVariant(act);
+        if (v != null)
+        {
+            try
+            {
+                var factory = v.RelicsFactory;
+                if (factory != null)
+                {
+                    var list = factory();
+                    if (list is { Count: > 0 }) return list;
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Log($"[CharBoss] 遗物运行期解析失败（退回静态表）: {e.Message}");
+            }
+            if (v.Relics is { Count: > 0 }) return v.Relics;
+        }
+        return RelicsByAct[Clamp(act, RelicsByAct.Length)];
+    }
 
     public BossScript? ScriptForAct(int act) => ActiveVariant(act)?.Script ?? ScriptByAct[Clamp(act, ScriptByAct.Length)];
 
@@ -486,6 +513,15 @@ public sealed class BossVariant
     public required Func<bool> Enabled { get; init; }
     public List<Type>? Deck { get; init; }
     public List<Type>? Relics { get; init; }
+
+    /// <summary>
+    /// **运行期求值的遗物表**（优先于 <see cref="Relics"/>）。
+    /// 为什么要它：`BossDefs` 是静态初始化，那一瞬间第三方模组（观者）可能还没加载 ⇒
+    /// 靠 `WatcherCards.T("PureWater"/"TeardropLocket")` 反射出来的遗物全是 null 且会被缓存，
+    /// 于是那几件遗物**静默不上身**（用户 2026-11-23 实测疾风观少了泪滴吊坠盒）。
+    /// 现在观者那几套设计的遗物走这个工厂：真正上身是在开打时（模组早已就绪）。
+    /// </summary>
+    public Func<List<Type>>? RelicsFactory { get; init; }
     public BossScript? Script { get; init; }
     public string? SpecialLoc { get; init; }
 

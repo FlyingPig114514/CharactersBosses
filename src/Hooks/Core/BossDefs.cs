@@ -1233,6 +1233,11 @@ public static class BossDefs
                     Enabled = Core.BossLineups.WatcherFlurryActive,
                     Deck = WatcherFlurryScript.Deck(),
                     Relics = WatcherFlurryScript.Relics(),
+                    // ★ v0.2.906（用户 2026-11-23 截图：「她的泪滴吊坠盒呢」）：
+                    //   遗物改成**运行期求值** —— 静态初始化那一瞬间观者模组可能还没加载，
+                    //   `WatcherCards.T("TeardropLocket")` 会是 null 并被缓存 ⇒ 这件遗物静默不上身
+                    //   （日志实证：v0.2.904 遗物=4，换成泪滴吊坠盒后 遗物=3）。
+                    RelicsFactory = WatcherFlurryScript.Relics,
                     Script = WatcherFlurryScript.Build(),
                     SpecialLoc = "WATCHER_FLURRY_BOSS.flurry",
                     SpecialLocDread = "WATCHER_FLURRY_BOSS.flurry_dread",

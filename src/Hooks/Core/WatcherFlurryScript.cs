@@ -272,9 +272,13 @@ public static class WatcherFlurryScript
     {
         var relics = new List<Type>();
         if (WatcherCards.PureWater is Type pure) relics.Add(pure);
+        else Logger.Log("[CharBoss] 疾风观遗物：至纯之水 未解析（观者模组没加载？）");
         relics.Add(typeof(CharacterBosses.Relics.NeowBlessing));
         if (WatcherCards.Shuriken is Type shuriken) relics.Add(shuriken);
         if (WatcherCards.TeardropLocket is Type locket) relics.Add(locket);
+        else Logger.Log("[CharBoss] 疾风观遗物：泪滴吊坠盒 未解析（观者模组没加载？）");
+        Logger.Log("[CharBoss] 疾风观遗物（本次解析）：[" +
+                   string.Join(", ", relics.ConvertAll(t => t.Name)) + "]");
         return relics;
     }
 

@@ -191,6 +191,22 @@ public static class ShadowPlayerFactory
 
         shadow.ActivateHooks();
 
+        // ★ v0.2.906（用户 2026-11-23「她的泪滴吊坠盒呢」）：把她**真正上身**的遗物打一行日志。
+        //   以前只记「加了几件」，看不出来是哪一件掉了（这次是观者 mod 的遗物在静态初始化时
+        //   `WatcherCards.T(...)` 返回 null ⇒ 泪滴吊坠盒静默消失）。有这一行下次一眼定位。
+        try
+        {
+            var list = shadow.Relics;
+            var names = new List<string>();
+            for (int i = 0; i < (list?.Count ?? 0); i++)
+            {
+                var r = list![i];
+                if (r != null) names.Add(r.Id?.Entry ?? r.GetType().Name);
+            }
+            Logger.Log($"[CharBoss] {def.Key} 遗物清单（{names.Count} 件）：[{string.Join(", ", names)}]");
+        }
+        catch (Exception e) { Logger.Log("[CharBoss] 遗物清单打印失败: " + e.Message); }
+
         // 「无礼之茶」（`TeaOfDiscourtesy`）：用户 2026-11-03 要在三层「事件机」身上挂一个
         // **已经失效的**（放在旺购客户感恩徽章的右侧）。反编译：它的状态就是 `CombatsLeft`，
         // `IsUsedUp => CombatsLeft <= 0` ⇒ 置 0 之后图标变灰、`BeforeCombatStart` 也不再塞晕眩。

@@ -37,6 +37,8 @@ internal static class WatcherCards
     internal enum Provider { None, Boninall, Lamali }
 
     private static bool _probed;
+    private static long _lastProbeMs = long.MinValue;
+    private static bool _loggedMissing;
     private static Assembly? _preferred;      // Boninall（优先）
     private static Assembly? _secondary;      // lamali
     private static Provider _provider = Provider.None;
@@ -86,7 +88,14 @@ internal static class WatcherCards
     private static void Probe()
     {
         if (_probed) return;
-        _probed = true;
+        // ★ v0.2.906（用户 2026-11-23「她的泪滴吊坠盒呢」）：**没探到就不锁**。
+        //   以前这里第一行就 `_probed = true` —— 只要有一次在观者模组还没加载时探过，
+        //   之后就永远认为「没装」，所有 `T(...)` 全返回 null（遗物静默消失，但是卡牌
+        //   因为后面还有别的入口看不出来）。和 v0.2.686 修 `WatcherModPresence.Probe` 是同一个坑。
+        //   现在：没探到不锁；为避免每帧都扫程序集，最快每 2 秒再探一次。
+        long nowMs = Environment.TickCount64;
+        if (_lastProbeMs != long.MinValue && nowMs - _lastProbeMs < 2000) return;
+        _lastProbeMs = nowMs;
         try
         {
             foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
@@ -109,10 +118,19 @@ internal static class WatcherCards
                         : _secondary != null ? Provider.Lamali
                         : Provider.None;
 
-            Logger.Log($"[CharBoss] 观者引用层：使用 {ProviderName}" +
-                       (_preferred != null && _secondary != null
-                           ? "（两个观者模组都在 ⇒ **优先 3747526116**）"
-                           : string.Empty));
+            if (_provider != Provider.None)
+            {
+                _probed = true;      // 真探到了才锁死
+                Logger.Log($"[CharBoss] 观者引用层：使用 {ProviderName}" +
+                           (_preferred != null && _secondary != null
+                               ? "（两个观者模组都在 ⇒ **优先 3747526116**）"
+                               : string.Empty));
+            }
+            else if (!_loggedMissing)
+            {
+                _loggedMissing = true;
+                Logger.Log("[CharBoss] 观者引用层：暂未发现观者模组（不锁死，最多每 2 秒再探一次）");
+            }
         }
         catch { _provider = Provider.None; }
     }
@@ -152,7 +170,9 @@ internal static class WatcherCards
             if (found != null) break;
         }
 
-        _types[shortName] = found;
+        // ★ v0.2.906：**只缓存「找到了」的结果**。以前连 null 一起缓存 ⇒ 观者模组晚加载时
+        //   那些名字就永久是 null（遗物静默消失）。现在没找到就下次再试（Probe 有 2 秒节流）。
+        if (found != null) _types[shortName] = found;
         return found;
     }
 

@@ -6996,3 +6996,14 @@ Chronological action log.
 | 2026-11-23 16:47 | edit | `src/Hooks/Core/BossInfoTable.cs` | ok | 0 |
 | 2026-11-23 16:48 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
 | 2026-11-23 16:48 | edit | `docs/plans/changelog-history.md` | ok | 0 |
+| 2026-11-23 17:37 | edit | `src/Hooks/Core/BossDefinition.cs` | ok | 0 |
+| 2026-11-23 17:37 | edit | `src/Hooks/Core/BossDefinition.cs` | ok | 0 |
+| 2026-11-23 17:37 | edit | `src/Hooks/Core/BossDefs.cs` | ok | 0 |
+| 2026-11-23 17:37 | edit | `src/Hooks/Core/WatcherCards.cs` | ok | 0 |
+| 2026-11-23 17:37 | edit | `src/Hooks/Core/WatcherCards.cs` | ok | 0 |
+| 2026-11-23 17:37 | edit | `src/Hooks/Core/WatcherCards.cs` | ok | 0 |
+| 2026-11-23 17:37 | edit | `src/Hooks/Core/WatcherCards.cs` | ok | 0 |
+| 2026-11-23 17:38 | edit | `src/Hooks/Core/WatcherFlurryScript.cs` | ok | 0 |
+| 2026-11-23 17:38 | edit | `src/Hooks/Core/ShadowPlayerFactory.cs` | ok | 0 |
+| 2026-11-23 17:38 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-23 17:38 | edit | `docs/plans/changelog-history.md` | ok | 0 |
