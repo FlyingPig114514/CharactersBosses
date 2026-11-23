@@ -14,11 +14,11 @@
 
 ## Contents
 
-**Act 1** (11): [Dark-Orb Machine](#DEFECT_DARK) · [Lightning-Orb Machine](#DEFECT_THUNDER) · [Anger War](#IRONCLAD_ANGER) · [Strike War](#IRONCLAD_STRIKE) · [Doom Bone](#NECROBINDER_DOOM) · [Flesh Bone](#NECROBINDER_FLESH) · [Debris Regent](#REGENT_DEBRIS) · [Bombard Regent](#REGENT_BOMBARD) · [Sly Huntress](#SILENT_SLY) · [Snakebite Huntress](#SILENT_SNAKEBITE) · [Foresight Watcher](#WATCHER_FORESIGHT)
+**Act 1** (11): [DEFECT_DARK](#DEFECT_DARK) · [DEFECT_THUNDER](#DEFECT_THUNDER) · [IRONCLAD_ANGER](#IRONCLAD_ANGER) · [IRONCLAD_STRIKE](#IRONCLAD_STRIKE) · [NECROBINDER_DOOM](#NECROBINDER_DOOM) · [NECROBINDER_FLESH](#NECROBINDER_FLESH) · [REGENT_DEBRIS](#REGENT_DEBRIS) · [REGENT_BOMBARD](#REGENT_BOMBARD) · [SILENT_SLY](#SILENT_SLY) · [SILENT_SNAKEBITE](#SILENT_SNAKEBITE) · [WATCHER_FORESIGHT](#WATCHER_FORESIGHT)
 
-**Act 2** (13): [Claw Machine](#DEFECT_CLAW) · [Rainbow Machine](#DEFECT_RAINBOW) · [Bloodletting War](#IRONCLAD_BLOOD) · [Juggler War](#IRONCLAD_JUGGLER) · [Soul Bone](#NECROBINDER_SOUL) · [Void Bone](#NECROBINDER_ETHEREAL) · [Forge Regent](#REGENT_FORGE) · [Crown Prince](#REGENT_KING) · [Minion Regent](#REGENT_MINION) · [Envenom Huntress](#SILENT_ENVENOM) · [Snecko Huntress](#SILENT_SNECKO) · [Create Watcher](#WATCHER_CREATE) · [Retain Watcher](#WATCHER_RETAIN)
+**Act 2** (13): [DEFECT_CLAW](#DEFECT_CLAW) · [DEFECT_RAINBOW](#DEFECT_RAINBOW) · [IRONCLAD_BLOOD](#IRONCLAD_BLOOD) · [IRONCLAD_JUGGLER](#IRONCLAD_JUGGLER) · [NECROBINDER_SOUL](#NECROBINDER_SOUL) · [NECROBINDER_ETHEREAL](#NECROBINDER_ETHEREAL) · [REGENT_FORGE](#REGENT_FORGE) · [REGENT_KING](#REGENT_KING) · [REGENT_MINION](#REGENT_MINION) · [SILENT_ENVENOM](#SILENT_ENVENOM) · [SILENT_SNECKO](#SILENT_SNECKO) · [WATCHER_CREATE](#WATCHER_CREATE) · [WATCHER_RETAIN](#WATCHER_RETAIN)
 
-**Act 3** (17): [Power Machine](#DEFECT_AI) · [Event Machine](#DEFECT_EVENT) · [Status Machine](#DEFECT_STATUS) · [Tarot Fool](#FOOL_TAROT) · [Vulnerable War](#IRONCLAD_VULN) · [Boulder War](#IRONCLAD_BOULDER) · [Eradicate Bone](#NECROBINDER_ERADICATE) · [Osty Bone](#NECROBINDER_OSTY) · [Colorless Regent](#REGENT_COLORLESS) · [Star Regent](#REGENT_STAR) · [Choice Regent](#REGENT_CHOICE) · [Shiv Huntress](#SILENT_SHIV) · [Brewer Huntress](#SILENT_BREWER) · [Grand Finale Huntress](#SILENT_GRAND_FINALE) · [Divinity Watcher](#WATCHER_DIVINITY) · [Omega Watcher](#WATCHER_OMEGA) · [Red-Blue Watcher](#WATCHER_RUSHDOWN)
+**Act 3** (17): [DEFECT_AI](#DEFECT_AI) · [DEFECT_EVENT](#DEFECT_EVENT) · [DEFECT_STATUS](#DEFECT_STATUS) · [FOOL_TAROT](#FOOL_TAROT) · [IRONCLAD_VULN](#IRONCLAD_VULN) · [IRONCLAD_BOULDER](#IRONCLAD_BOULDER) · [NECROBINDER_ERADICATE](#NECROBINDER_ERADICATE) · [NECROBINDER_OSTY](#NECROBINDER_OSTY) · [REGENT_COLORLESS](#REGENT_COLORLESS) · [REGENT_STAR](#REGENT_STAR) · [REGENT_CHOICE](#REGENT_CHOICE) · [SILENT_SHIV](#SILENT_SHIV) · [SILENT_BREWER](#SILENT_BREWER) · [SILENT_GRAND_FINALE](#SILENT_GRAND_FINALE) · [WATCHER_DIVINITY](#WATCHER_DIVINITY) · [WATCHER_OMEGA](#WATCHER_OMEGA) · [WATCHER_RUSHDOWN](#WATCHER_RUSHDOWN)
 
 **Dominions** (Dread mode): [Dominion of each character](#dominions)
 
@@ -37,47 +37,47 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 | Act | Boss | A8 | A9 | Other levels |
 |:---:|---|---|---|---|
-| Act 1 | Dark-Orb Machine | Leap, Unsettling Lamp | 趁势Strike |  |
-| Act 1 | Lightning-Orb Machine | Buffer, Charge Battery | Sweeping Beam, FocusStrike |  |
-| Act 2 | Claw Machine | Charge Battery, Boot Sequence | One for All, Coolant, Hyperbeam |  |
-| Act 2 | Rainbow Machine | Boot Sequence, Coolant | Hailstorm, Thunder |  |
-| Act 3 | Power Machine | Charge Battery, Ultimate Defend, Boost Away | Data Disk |  |
-| Act 3 | Event Machine | Defend | Feeding Frenzy |  |
-| Act 3 | Status Machine | Fight Through, Boost Away | Gunk Up, Data Disk |  |
-| Act 3 | Tarot Fool | Orichalcum, Oddly Smooth Stone | Vajra |  |
-| Act 1 | Anger War | True Grit, Gorget | Brand |  |
-| Act 1 | Strike War | Stone Armor, Gorget | 完美Strike, 预备Strike |  |
-| Act 2 | Bloodletting War | Blood Wall | Brand |  |
-| Act 2 | Juggler War | 无惧Pain, Evil Eye | 完美Strike, 彼岸Roar |  |
-| Act 3 | Vulnerable War | Stone Armor, Gorget | Dominate |  |
-| Act 3 | Boulder War | 无惧Pain, Orichalcum | 彼岸Roar, Vajra |  |
-| Act 1 | Doom Bone | Shroud, Undeath符文 | Friendship, No Escape, 荒疫Strike |  |
-| Act 1 | Flesh Bone | Bodyguard, Pull Aggro | Debilitate |  |
-| Act 2 | Soul Bone | Danse Macabre, Defy | Severance, Death March |  |
-| Act 2 | Void Bone | Spirit of Ash, Defy | Friendship |  |
-| Act 3 | Eradicate Bone | Danse Macabre, Intimidating Helmet | Friendship, Calcify |  |
-| Act 3 | Osty Bone | Danse Macabre, Afterlife, Intimidating Helmet | Lethality |  |
-| Act 1 | Debris Regent | Galactic Dust, Child of the Stars | Collision Course |  |
-| Act 1 | Bombard Regent | Cloak of Stars, Fisticuffs | Dying Star, Vajra |  |
-| Act 2 | Forge Regent | I Am Invincible, Parry | Furnace |  |
-| Act 2 | Crown Prince | Cosmic Indifference, Orichalcum | Summon Forth, Mr. Struggles |  |
-| Act 2 | Minion Regent | GUARDS!!!, Child of the Stars, Minion Sacrifice | BEGONE!, CHARGE!!, Quasar, Shockwave, Ultimate Defend, Minion Dive Bomb, 仆从Strike |  |
-| Act 3 | Colorless Regent | Regalite | The Bomb |  |
-| Act 3 | Star Regent | Cloak of Stars, Galactic Dust | Salvo, Kingly Punch |  |
-| Act 3 | Choice Regent | Child of the Stars, Gather Light | Refine Blade, Shockwave |  |
-| Act 1 | Sly Huntress | Neutralize | Flick-Flack, Ricochet |  |
-| Act 1 | Snakebite Huntress | Blur, Escape Plan | Backstab, Flechettes |  |
-| Act 2 | Envenom Huntress | Neutralize | Noxious Fumes, Ricochet |  |
-| Act 2 | Snecko Huntress | Ultimate Defend, Dodge躲Roll Through | Dagger Spray, Dash |  |
-| Act 3 | Shiv Huntress | Neutralize | Blade Dance, Cloak and Dagger, Hidden Daggers |  |
-| Act 3 | Brewer Huntress | Neutralize | Precise Cut, Fisticuffs |  |
-| Act 3 | Grand Finale Huntress | Neutralize | Backstab, Storm of Steel, Hidden Daggers |  |
-| Act 1 | Foresight Watcher | Nirvana, Mental Fortress | 碰撞Combo, Cut Through Fate |  |
-| Act 2 | Create Watcher | Pillar of Creation, Mental Fortress | Carve Reality, Consecrate, Indignation |  |
-| Act 2 | Retain Watcher | Mental Fortress, Deceive Reality | Carve Reality |  |
-| Act 3 | Divinity Watcher | Vigilance, Swivel, Deceive Reality | Damaru |  |
-| Act 3 | Omega Watcher | Like Water, Mental Fortress | Pressure Points（第 6 / 11 回合）, Strike |  |
-| Act 3 | Red-Blue Watcher | Mental Fortress, Vigilance | Indignation, 腰带Slap, Wallop, Consecrate |  |
+| Act 1 | DEFECT_DARK | Leap, Unsettling Lamp | 趁势Strike |  |
+| Act 1 | DEFECT_THUNDER | Buffer, Charge Battery | Sweeping Beam, FocusStrike |  |
+| Act 2 | DEFECT_CLAW | Charge Battery, Boot Sequence | One for All, Coolant, Hyperbeam |  |
+| Act 2 | DEFECT_RAINBOW | Boot Sequence, Coolant | Hailstorm, Thunder |  |
+| Act 3 | DEFECT_AI | Charge Battery, Ultimate Defend, Boost Away | Data Disk |  |
+| Act 3 | DEFECT_EVENT | Defend | Feeding Frenzy |  |
+| Act 3 | DEFECT_STATUS | Fight Through, Boost Away | Gunk Up, Data Disk |  |
+| Act 3 | FOOL_TAROT | Orichalcum, Oddly Smooth Stone | Vajra |  |
+| Act 1 | IRONCLAD_ANGER | True Grit, Gorget | Brand |  |
+| Act 1 | IRONCLAD_STRIKE | Stone Armor, Gorget | 完美Strike, 预备Strike |  |
+| Act 2 | IRONCLAD_BLOOD | Blood Wall | Brand |  |
+| Act 2 | IRONCLAD_JUGGLER | 无惧Pain, Evil Eye | 完美Strike, 彼岸Roar |  |
+| Act 3 | IRONCLAD_VULN | Stone Armor, Gorget | Dominate |  |
+| Act 3 | IRONCLAD_BOULDER | 无惧Pain, Orichalcum | 彼岸Roar, Vajra |  |
+| Act 1 | NECROBINDER_DOOM | Shroud, Undeath符文 | Friendship, No Escape, 荒疫Strike |  |
+| Act 1 | NECROBINDER_FLESH | Bodyguard, Pull Aggro | Debilitate |  |
+| Act 2 | NECROBINDER_SOUL | Danse Macabre, Defy | Severance, Death March |  |
+| Act 2 | NECROBINDER_ETHEREAL | Spirit of Ash, Defy | Friendship |  |
+| Act 3 | NECROBINDER_ERADICATE | Danse Macabre, Intimidating Helmet | Friendship, Calcify |  |
+| Act 3 | NECROBINDER_OSTY | Danse Macabre, Afterlife, Intimidating Helmet | Lethality |  |
+| Act 1 | REGENT_DEBRIS | Galactic Dust, Child of the Stars | Collision Course |  |
+| Act 1 | REGENT_BOMBARD | Cloak of Stars, Fisticuffs | Dying Star, Vajra |  |
+| Act 2 | REGENT_FORGE | I Am Invincible, Parry | Furnace |  |
+| Act 2 | REGENT_KING | Cosmic Indifference, Orichalcum | Summon Forth, Mr. Struggles |  |
+| Act 2 | REGENT_MINION | GUARDS!!!, Child of the Stars, Minion Sacrifice | BEGONE!, CHARGE!!, Quasar, Shockwave, Ultimate Defend, Minion Dive Bomb, 仆从Strike |  |
+| Act 3 | REGENT_COLORLESS | Regalite | The Bomb |  |
+| Act 3 | REGENT_STAR | Cloak of Stars, Galactic Dust | Salvo, Kingly Punch |  |
+| Act 3 | REGENT_CHOICE | Child of the Stars, Gather Light | Refine Blade, Shockwave |  |
+| Act 1 | SILENT_SLY | Neutralize | Flick-Flack, Ricochet |  |
+| Act 1 | SILENT_SNAKEBITE | Blur, Escape Plan | Backstab, Flechettes |  |
+| Act 2 | SILENT_ENVENOM | Neutralize | Noxious Fumes, Ricochet |  |
+| Act 2 | SILENT_SNECKO | Ultimate Defend, Dodge躲Roll Through | Dagger Spray, Dash |  |
+| Act 3 | SILENT_SHIV | Neutralize | Blade Dance, Cloak and Dagger, Hidden Daggers |  |
+| Act 3 | SILENT_BREWER | Neutralize | Precise Cut, Fisticuffs |  |
+| Act 3 | SILENT_GRAND_FINALE | Neutralize | Backstab, Storm of Steel, Hidden Daggers |  |
+| Act 1 | WATCHER_FORESIGHT | Nirvana, Mental Fortress | 碰撞Combo, Cut Through Fate |  |
+| Act 2 | WATCHER_CREATE | Pillar of Creation, Mental Fortress | Carve Reality, Consecrate, Indignation |  |
+| Act 2 | WATCHER_RETAIN | Mental Fortress, Deceive Reality | Carve Reality |  |
+| Act 3 | WATCHER_DIVINITY | Vigilance, Swivel, Deceive Reality | Damaru |  |
+| Act 3 | WATCHER_OMEGA | Like Water, Mental Fortress | Pressure Points（第 6 / 11 回合）, Strike |  |
+| Act 3 | WATCHER_RUSHDOWN | Mental Fortress, Vigilance | Indignation, 腰带Slap, Wallop, Consecrate |  |
 
 > Blank cell = that boss has **no** extra upgrade/relic at that level. The full list also appears in each boss's own section
 > (the "Ascension / Dread changes" line) — both come from the same `tools/wiki-dump` export.
@@ -88,7 +88,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="DEFECT_DARK"></a>
 
-### Dark-Orb Machine　`DEFECT_BOSS`
+### DEFECT_DARK
 
 - **Character / Act**: Defect · Act 1
 - **Console**: `fight DEFECT_DARK_BOSS_ENCOUNTER`
@@ -134,7 +134,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="DEFECT_THUNDER"></a>
 
-### Lightning-Orb Machine　`DEFECT_THUNDER`
+### DEFECT_THUNDER
 
 - **Character / Act**: Defect · Act 1
 - **Console**: `fight DEFECT_THUNDER_BOSS_ENCOUNTER`
@@ -181,7 +181,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="IRONCLAD_ANGER"></a>
 
-### Anger War　`IRONCLAD_BOSS`
+### IRONCLAD_ANGER
 
 - **Character / Act**: Ironclad · Act 1
 - **Console**: `fight IRONCLAD_ANGER_BOSS_ENCOUNTER`
@@ -230,7 +230,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="IRONCLAD_STRIKE"></a>
 
-### Strike War　`IRONCLAD_STRIKE`
+### IRONCLAD_STRIKE
 
 - **Character / Act**: Ironclad · Act 1
 - **Console**: `fight IRONCLAD_STRIKE_BOSS_ENCOUNTER`
@@ -275,7 +275,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="NECROBINDER_DOOM"></a>
 
-### Doom Bone　`NECROBINDER_BOSS`
+### NECROBINDER_DOOM
 
 - **Character / Act**: Necrobinder · Act 1
 - **Console**: `fight NECROBINDER_DOOM_BOSS_ENCOUNTER`
@@ -324,7 +324,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="NECROBINDER_FLESH"></a>
 
-### Flesh Bone　`NECROBINDER_FLESH`
+### NECROBINDER_FLESH
 
 - **Character / Act**: Necrobinder · Act 1
 - **Console**: `fight NECROBINDER_FLESH_BOSS_ENCOUNTER`
@@ -376,7 +376,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="REGENT_DEBRIS"></a>
 
-### Debris Regent　`REGENT_BOSS`
+### REGENT_DEBRIS
 
 - **Character / Act**: Regent · Act 1
 - **Console**: `fight REGENT_DEBRIS_BOSS_ENCOUNTER`
@@ -423,7 +423,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="REGENT_BOMBARD"></a>
 
-### Bombard Regent　`REGENT_BOMBARD`
+### REGENT_BOMBARD
 
 - **Character / Act**: Regent · Act 1
 - **Console**: `fight REGENT_BOMBARD_BOSS_ENCOUNTER`
@@ -467,7 +467,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="SILENT_SLY"></a>
 
-### Sly Huntress　`SILENT_BOSS`
+### SILENT_SLY
 
 - **Character / Act**: Silent · Act 1
 - **Console**: `fight SILENT_SLY_BOSS_ENCOUNTER`
@@ -512,7 +512,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="SILENT_SNAKEBITE"></a>
 
-### Snakebite Huntress　`SILENT_SNAKEBITE`
+### SILENT_SNAKEBITE
 
 - **Character / Act**: Silent · Act 1
 - **Console**: `fight SILENT_SNAKEBITE_BOSS_ENCOUNTER`
@@ -561,7 +561,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="WATCHER_FORESIGHT"></a>
 
-### Foresight Watcher　`WATCHER_FORESIGHT`
+### WATCHER_FORESIGHT
 
 - **Character / Act**: Watcher · Act 1
 - **Console**: `fight WATCHER_FORESIGHT_BOSS_ENCOUNTER`
@@ -607,7 +607,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="DEFECT_CLAW"></a>
 
-### Claw Machine　`DEFECT_BOSS`
+### DEFECT_CLAW
 
 - **Character / Act**: Defect · Act 2
 - **Console**: `fight DEFECT_CLAW_BOSS_ENCOUNTER`
@@ -654,7 +654,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="DEFECT_RAINBOW"></a>
 
-### Rainbow Machine　`DEFECT_RAINBOW`
+### DEFECT_RAINBOW
 
 - **Character / Act**: Defect · Act 2
 - **Console**: `fight DEFECT_RAINBOW_BOSS_ENCOUNTER`
@@ -704,7 +704,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="IRONCLAD_BLOOD"></a>
 
-### Bloodletting War　`IRONCLAD_BOSS`
+### IRONCLAD_BLOOD
 
 - **Character / Act**: Ironclad · Act 2
 - **Console**: `fight IRONCLAD_BLOOD_BOSS_ENCOUNTER`
@@ -748,7 +748,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="IRONCLAD_JUGGLER"></a>
 
-### Juggler War　`IRONCLAD_JUGGLER`
+### IRONCLAD_JUGGLER
 
 - **Character / Act**: Ironclad · Act 2
 - **Console**: `fight IRONCLAD_JUGGLER_BOSS_ENCOUNTER`
@@ -792,7 +792,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="NECROBINDER_SOUL"></a>
 
-### Soul Bone　`NECROBINDER_BOSS`
+### NECROBINDER_SOUL
 
 - **Character / Act**: Necrobinder · Act 2
 - **Console**: `fight NECROBINDER_SOUL_BOSS_ENCOUNTER`
@@ -837,7 +837,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="NECROBINDER_ETHEREAL"></a>
 
-### Void Bone　`NECROBINDER_ETHEREAL`
+### NECROBINDER_ETHEREAL
 
 - **Character / Act**: Necrobinder · Act 2
 - **Console**: `fight NECROBINDER_ETHEREAL_BOSS_ENCOUNTER`
@@ -883,7 +883,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="REGENT_FORGE"></a>
 
-### Forge Regent　`REGENT_BOSS`
+### REGENT_FORGE
 
 - **Character / Act**: Regent · Act 2
 - **Console**: `fight REGENT_FORGE_BOSS_ENCOUNTER`
@@ -930,7 +930,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="REGENT_KING"></a>
 
-### Crown Prince　`REGENT_KING`
+### REGENT_KING
 
 - **Character / Act**: Regent · Act 2
 - **Console**: `fight REGENT_KING_BOSS_ENCOUNTER`
@@ -980,7 +980,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="REGENT_MINION"></a>
 
-### Minion Regent　`REGENT_MINION`
+### REGENT_MINION
 
 - **Character / Act**: Regent · Act 2
 - **Console**: `fight REGENT_MINION_BOSS_ENCOUNTER`
@@ -1031,7 +1031,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="SILENT_ENVENOM"></a>
 
-### Envenom Huntress　`SILENT_BOSS`
+### SILENT_ENVENOM
 
 - **Character / Act**: Silent · Act 2
 - **Console**: `fight SILENT_ENVENOM_BOSS_ENCOUNTER`
@@ -1080,7 +1080,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="SILENT_SNECKO"></a>
 
-### Snecko Huntress　`SILENT_SNECKO`
+### SILENT_SNECKO
 
 - **Character / Act**: Silent · Act 2
 - **Console**: `fight SILENT_SNECKO_BOSS_ENCOUNTER`
@@ -1132,7 +1132,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="WATCHER_CREATE"></a>
 
-### Create Watcher　`WATCHER_CREATE`
+### WATCHER_CREATE
 
 - **Character / Act**: Watcher · Act 2
 - **Console**: `fight WATCHER_CREATE_BOSS_ENCOUNTER`
@@ -1177,7 +1177,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="WATCHER_RETAIN"></a>
 
-### Retain Watcher　`WATCHER_RETAIN`
+### WATCHER_RETAIN
 
 - **Character / Act**: Watcher · Act 2
 - **Console**: `fight WATCHER_RETAIN_BOSS_ENCOUNTER`
@@ -1224,7 +1224,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="DEFECT_AI"></a>
 
-### Power Machine　`DEFECT_BOSS`
+### DEFECT_AI
 
 - **Character / Act**: Defect · Act 3
 - **Console**: `fight DEFECT_AI_BOSS_ENCOUNTER`
@@ -1275,7 +1275,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="DEFECT_EVENT"></a>
 
-### Event Machine　`DEFECT_EVENT`
+### DEFECT_EVENT
 
 - **Character / Act**: Defect · Act 3
 - **Console**: `fight DEFECT_EVENT_BOSS_ENCOUNTER`
@@ -1324,7 +1324,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="DEFECT_STATUS"></a>
 
-### Status Machine　`DEFECT_STATUS`
+### DEFECT_STATUS
 
 - **Character / Act**: Defect · Act 3
 - **Console**: `fight DEFECT_STATUS_BOSS_ENCOUNTER`
@@ -1373,7 +1373,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="FOOL_TAROT"></a>
 
-### Tarot Fool　`FOOL_BOSS`
+### FOOL_TAROT
 
 - **Character / Act**: Fool · Act 3
 - **Console**: `fight FOOL_TAROT_BOSS_ENCOUNTER`
@@ -1431,7 +1431,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="IRONCLAD_VULN"></a>
 
-### Vulnerable War　`IRONCLAD_BOSS`
+### IRONCLAD_VULN
 
 - **Character / Act**: Ironclad · Act 3
 - **Console**: `fight IRONCLAD_VULN_BOSS_ENCOUNTER`
@@ -1477,7 +1477,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="IRONCLAD_BOULDER"></a>
 
-### Boulder War　`IRONCLAD_BOULDER`
+### IRONCLAD_BOULDER
 
 - **Character / Act**: Ironclad · Act 3
 - **Console**: `fight IRONCLAD_BOULDER_BOSS_ENCOUNTER`
@@ -1524,7 +1524,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="NECROBINDER_ERADICATE"></a>
 
-### Eradicate Bone　`NECROBINDER_BOSS`
+### NECROBINDER_ERADICATE
 
 - **Character / Act**: Necrobinder · Act 3
 - **Console**: `fight NECROBINDER_ERADICATE_BOSS_ENCOUNTER`
@@ -1568,7 +1568,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="NECROBINDER_OSTY"></a>
 
-### Osty Bone　`NECROBINDER_OSTY`
+### NECROBINDER_OSTY
 
 - **Character / Act**: Necrobinder · Act 3
 - **Console**: `fight NECROBINDER_OSTY_BOSS_ENCOUNTER`
@@ -1610,7 +1610,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="REGENT_COLORLESS"></a>
 
-### Colorless Regent　`REGENT_BOSS`
+### REGENT_COLORLESS
 
 - **Character / Act**: Regent · Act 3
 - **Console**: `fight REGENT_COLORLESS_BOSS_ENCOUNTER`
@@ -1658,7 +1658,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="REGENT_STAR"></a>
 
-### Star Regent　`REGENT_STAR`
+### REGENT_STAR
 
 - **Character / Act**: Regent · Act 3
 - **Console**: `fight REGENT_STAR_BOSS_ENCOUNTER`
@@ -1704,7 +1704,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="REGENT_CHOICE"></a>
 
-### Choice Regent　`REGENT_CHOICE`
+### REGENT_CHOICE
 
 - **Character / Act**: Regent · Act 3
 - **Console**: `fight REGENT_CHOICE_BOSS_ENCOUNTER`
@@ -1756,7 +1756,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="SILENT_SHIV"></a>
 
-### Shiv Huntress　`SILENT_BOSS`
+### SILENT_SHIV
 
 - **Character / Act**: Silent · Act 3
 - **Console**: `fight SILENT_SHIV_BOSS_ENCOUNTER`
@@ -1803,7 +1803,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="SILENT_BREWER"></a>
 
-### Brewer Huntress　`SILENT_BREWER`
+### SILENT_BREWER
 
 - **Character / Act**: Silent · Act 3
 - **Console**: `fight SILENT_BREWER_BOSS_ENCOUNTER`
@@ -1856,7 +1856,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="SILENT_GRAND_FINALE"></a>
 
-### Grand Finale Huntress　`SILENT_GRAND_FINALE`
+### SILENT_GRAND_FINALE
 
 - **Character / Act**: Silent · Act 3
 - **Console**: `fight SILENT_GRAND_FINALE_BOSS_ENCOUNTER`
@@ -1906,7 +1906,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="WATCHER_DIVINITY"></a>
 
-### Divinity Watcher　`WATCHER_DIVINITY`
+### WATCHER_DIVINITY
 
 - **Character / Act**: Watcher · Act 3
 - **Console**: `fight WATCHER_DIVINITY_BOSS_ENCOUNTER`
@@ -1956,7 +1956,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="WATCHER_OMEGA"></a>
 
-### Omega Watcher　`WATCHER_OMEGA`
+### WATCHER_OMEGA
 
 - **Character / Act**: Watcher · Act 3
 - **Console**: `fight WATCHER_OMEGA_BOSS_ENCOUNTER`
@@ -2008,7 +2008,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 <a id="WATCHER_RUSHDOWN"></a>
 
-### Red-Blue Watcher　`WATCHER_RUSHDOWN`
+### WATCHER_RUSHDOWN
 
 - **Character / Act**: Watcher · Act 3
 - **Console**: `fight WATCHER_RUSHDOWN_BOSS_ENCOUNTER`

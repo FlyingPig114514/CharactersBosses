@@ -421,7 +421,7 @@ $sb = New-Object System.Text.StringBuilder
 foreach ($a in @(1, 2, 3)) {
     $inAct = @($designs | Where-Object { $_.Act -eq $a })
     if ($inAct.Count -eq 0) { continue }
-    [void]$sb.AppendLine('**' + $actNames[$a] + '** (' + $inAct.Count + '): ' + (($inAct | ForEach-Object { '[' + (T $_.Name 'designs') + '](#' + $_.Encounter + ')' }) -join ' · '))
+    [void]$sb.AppendLine('**' + $actNames[$a] + '** (' + $inAct.Count + '): ' + (($inAct | ForEach-Object { '[' + $_.Encounter + '](#' + $_.Encounter + ')' }) -join ' · '))
     [void]$sb.AppendLine('')
 }
 [void]$sb.AppendLine('**Dominions** (Dread mode): [Dominion of each character](#dominions)')
@@ -480,7 +480,7 @@ foreach ($d in $designs) {
         $other += ('A' + $k + ': ' + (@($byLevel[$k]) -join ', '))
     }
     $ascRows += [pscustomobject]@{
-        Act = $d.Act; Name = (T $d.Name 'designs')
+        Act = $d.Act; Name = $d.Encounter
         Lv8 = ((@($byLevel['8']) | Where-Object { $_ } | Select-Object -Unique) -join ', ')
         Lv9 = ((@($byLevel['9']) | Where-Object { $_ } | Select-Object -Unique) -join ', ')
         Other = ($other -join '; ')
@@ -507,7 +507,7 @@ foreach ($a in @(1, 2, 3)) {
         $dn = T $d.Name 'designs'
         [void]$sb.AppendLine('<a id="' + $d.Encounter + '"></a>')
         [void]$sb.AppendLine('')
-        [void]$sb.AppendLine('### ' + $dn + '　`' + $d.Key + '`')
+        [void]$sb.AppendLine('### ' + $d.Encounter)
         [void]$sb.AppendLine('')
         [void]$sb.AppendLine('- **Character / Act**: ' + (T $d.Char 'chars') + ' · Act ' + $d.Act)
         [void]$sb.AppendLine('- **Console**: `fight ' + $d.Encounter + '_BOSS_ENCOUNTER`')
