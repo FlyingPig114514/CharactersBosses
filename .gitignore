@@ -99,3 +99,5 @@ mod_log*.txt
 characterbosses_trace.txt
 mod_log*.txt
 godot*.log
+# 本地私有笔记（社区运营 / 群公告这类，不进公开仓库）
+.private/
