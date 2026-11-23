@@ -922,11 +922,11 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | 2 | Furnace, Venerate, Know Thy Place | — | — |
 | 3 | Crush Under, Parry, Falling Star | — | — |
 | 4 | Seeking Edge, Convergence | Sword Sage+ (intent only) | Tracking Blade, Confluence; Sword Saint+ cannot be played (no energy) — Confluence retains it, it is played on turn 5, and **only once** |
-| 5 | Sword Sage+, Strike | Beat into Shape (no energy), Defend (no energy), I Am Invincibleauto (intent only) | Sword Sage +, Strike, Beat into Shape; Defend no energy (energy 2+1=3). I Am Invincible 在他 turn 结束时正好在 Draw Pile 顶 → free-played |
+| 5 | Sword Sage+, Strike | Beat into Shape (no energy), Defend (no energy), I Am Invincibleauto (intent only) | Sword Saint+, Strike, Forged Form; Defend has no energy (2+1 = 3 energy). Invincible lands on top of the draw pile right at the end of his turn ⇒ free-played |
 | 6 | Crush Under, Defend | Defend (no energy) | Shuffle.: Crush Under, Defend; 2nd cards Defend no energy |
 | 7 | Sovereign Blade, Cloak of Stars | Defend (no energy) | Sovereign Blade (Forge already stacked high), Cloak of Stars (+1 Strength); Defend has no energy |
 | 8 | Venerate, Convergence, Falling Star | — | — |
-| 9 | Strike, Strike, Beat into Shape | I Am Invincibleauto (intent only) | Strike, Strike, Beat into Shape. I Am Invincible 在他 turn 结束时正好在 Draw Pile 顶 → free-played |
+| 9 | Strike, Strike, Beat into Shape | I Am Invincibleauto (intent only) | Strike, Strike, Forged Form. Invincible lands on top of the draw pile right at the end of his turn ⇒ free-played |
 
 <a id="REGENT_KING"></a>
 
@@ -1167,13 +1167,13 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | Turn | Plays | Not played | Note |
 |:---:|---|---|---|
 | 1 | Arsenal+, Master Reality+, Carve Reality | Smite+ (no energy) | — |
-| 2 | Miracle, Mental Fortress, Vigilance | Strike (no energy), Smite+ (no energy) | Miracle, Mental Fortress (ascension 8起 Level Up), Vigilance, Strike (no energy), Smite+ (no energy) |
-| 3 | Indignation, Smite+, Pillar of Creation | — | Indignation (ascension 9起 Level Up), Smite+, Pillar of Creation (ascension 8起 Level Up) |
-| 4 | Consecrate, Eruption+, Inner Peace | — | Consecrate (ascension 9起 Level Up), Eruption+, Inner Peace |
+| 2 | Miracle, Mental Fortress, Vigilance | Strike (no energy), Smite+ (no energy) | Miracle, Mental Fortress (upgraded from Ascension 8), Vigilance, Strike (no energy), Smite+ (no energy) |
+| 3 | Indignation, Smite+, Pillar of Creation | — | Indignation (upgraded from Ascension 9), Smite+, Pillar of Creation (upgraded from Ascension 8) |
+| 4 | Consecrate, Eruption+, Inner Peace | — | Consecrate (upgraded from Ascension 9), Eruption+, Inner Peace |
 | 5 | Deceive Reality, Safety+, Know Thy Place | Empty Body (no energy) | — |
-| 6 | Carve Reality, Empty Body, Vigilance | Smite+ (no energy) | Shuffle. (she reshuffles), Carve Reality (ascension 9起 Level Up), Empty Body, Vigilance, Smite+ (no energy) |
+| 6 | Carve Reality, Empty Body, Vigilance | Smite+ (no energy) | Shuffle (she reshuffles), Carve Reality (upgraded from Ascension 9), Empty Body, Vigilance, Smite+ (no energy) |
 | 7 | Eruption+, Deceive Reality, Smite+, Safety+ | Strike (no energy) | — |
-| 8 | Consecrate, Indignation, Inner Peace | — | Consecrate (ascension 9起 Level Up), Indignation (ascension 9起 Level Up), Inner Peace |
+| 8 | Consecrate, Indignation, Inner Peace | — | Consecrate (upgraded from Ascension 9), Indignation (upgraded from Ascension 9), Inner Peace |
 
 <a id="WATCHER_RETAIN"></a>
 
@@ -1366,7 +1366,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | 3 | Rocket Punch (0 energy), Defend, Compact | Doubt (unplayable (curse / status)) | — |
 | 4 | Overclock, TURBO, Hologram, Flak Cannon | Defend (no energy), Defend (no energy) | — |
 | 5 | Chill, Zap, Hotfix | — | — |
-| 6 | Gunk Up, Fight Through, Defend | — | **Shuffle.** (Biiig Hug ⇒ Soot into 她的 Draw Pile, 并 gives 你也塞 1 cards), Gunk Up, Fight Through, Defend (no energy) |
+| 6 | Gunk Up, Fight Through, Defend | — | **Shuffle** (Biiig Hug ⇒ Coal Ash into her draw pile and 1 into yours), Filthy Attack, Brace, Defend (no energy) |
 | 7 | Zap, Boost Away, Defend | — | — |
 | 8 | Rocket Punch (0 energy), Defend, Compact | Doubt (unplayable (curse / status)) | — |
 | 9 | Overclock, TURBO, Hologram, Boost Away, Flak Cannon | Defend (no energy) | — |
@@ -1996,13 +1996,13 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 | 1 | Alpha+, Pressure Points | Defend (no energy) | Alpha+, Pressure Points, Defend (the original draft said "Defend (no energy)"; with 3 energy all three are playable) |
 | 2 | Establishment, Meditate, Clumsy | Miracle (kept in hand) | — |
 | 3 | Empty Body, Pressure Points, Like Water, Beta | Miracle (kept in hand) | — |
-| 4 | Eruption+, Strike, Vigilance | Miracle (kept in hand) | Eruption+, Strike (ascension 9起 Level Up), Vigilance, Miracle (not played) |
+| 4 | Eruption+, Strike, Vigilance | Miracle (kept in hand) | Eruption+, Strike (upgraded from Ascension 9), Vigilance, Miracle (not played) |
 | 5 | Miracle, Omega, Greed | Play (no energy) | — |
-| 6 | Pressure Points, Mental Fortress | Deceive Reality (no energy) | Pressure Points, Mental Fortress (ascension 8起 Level Up), Deceive Reality (no energy) |
-| 7 | Crescendo, Strike, Tranquility | — | Crescendo, Strike (ascension 9起 Level Up), Tranquility |
+| 6 | Pressure Points, Mental Fortress | Deceive Reality (no energy) | Pressure Points, Mental Fortress (upgraded from Ascension 8), Deceive Reality (no energy) |
+| 7 | Crescendo, Strike, Tranquility | — | Crescendo, Strike (upgraded from Ascension 9), Tranquility |
 | 8 | Pressure Points, Eruption+, Play | — | Shuffle. (she reshuffles), Pressure Points, Eruption+, Play |
-| 9 | Strike, Meditate | Defend (no energy) | Strike (ascension 9起 Level Up), Meditate, Defend (no energy) |
-| 10 | Pressure Points, Pressure Points, Vigilance | Strike (no energy) | Pressure Points (0 energy), Pressure Points (0 energy), Vigilance, Strike (no energy, ascension 9起 Level Up) |
+| 9 | Strike, Meditate | Defend (no energy) | Strike (upgraded from Ascension 9), Meditate, Defend (no energy) |
+| 10 | Pressure Points, Pressure Points, Vigilance | Strike (no energy) | Pressure Points (0 energy), Pressure Points (0 energy), Vigilance, Strike (no energy, upgraded from Ascension 9) |
 | 11 | Empty Body, Deceive Reality, Safety | Greed (kept in hand) | — |
 | 12 | Pressure Points, Eruption, Play | — | Shuffle. (she reshuffles), Pressure Points (0 energy), Eruption, Play |
 

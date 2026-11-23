@@ -225,7 +225,20 @@
                   "羽化(2)：把 0 费的万物一心 / 冰之长枪 / 超能光束印进抽牌堆并展示；飞跃(1，选择悖论印的，带保留)":  "Feather (2): prints 0-cost One for All / Glacier Spear / Hyperbeam into the draw pile and reveals them; Leap (1, the one printed by Choices Paradox, with Retain)",
                   "招架、星尘（花光所有星）、汇流+、防御；抉择抉择+ 不出":  "Parry, Stardust (spends all Stars), Confluence+, Defend; Decisions, Decisions+ not played",
                   "追踪之刃、汇流；剑圣+ 没费打不出（被汇流保留，第 5 回合才打，**只打一次**）":  "Tracking Blade, Confluence; Sword Saint+ cannot be played (no energy) — Confluence retains it, it is played on turn 5, and **only once**",
-                  "子程序（能力牌 → 之后每张能力牌 +1 费）、冰雹风暴；双重释放激发电球两次（意图显示 14×2）":  "Subroutine (Power card ⇒ every Power afterwards costs +1), Hailstorm; Dualcast evokes the lightning orb twice (the intent shows 14×2)"
+                  "子程序（能力牌 → 之后每张能力牌 +1 费）、冰雹风暴；双重释放激发电球两次（意图显示 14×2）":  "Subroutine (Power card ⇒ every Power afterwards costs +1), Hailstorm; Dualcast evokes the lightning orb twice (the intent shows 14×2)",
+                  "**洗牌**（大抱抱 ⇒ 煤灰进她的抽牌堆，并给你也塞 1 张）、污秽攻击、强撑、防御（没费）":  "**Shuffle** (Biiig Hug ⇒ Coal Ash into her draw pile and 1 into yours), Filthy Attack, Brace, Defend (no energy)",
+                  "暴怒+、打击（进阶9起升级）、警惕、奇迹（不出）":  "Eruption+, Strike (upgraded from Ascension 9), Vigilance, Miracle (not played)",
+                  "打击（进阶9起升级）、冥想、防御（没费）":  "Strike (upgraded from Ascension 9), Meditate, Defend (no energy)",
+                  "打击、打击、锻打成型。所向无敌在他回合结束时正好在抽牌堆顶 → 免费打出":  "Strike, Strike, Forged Form. Invincible lands on top of the draw pile right at the end of his turn ⇒ free-played",
+                  "点穴（0费）、点穴（0费）、警惕、打击（没费，进阶9起升级）":  "Pressure Points (0 energy), Pressure Points (0 energy), Vigilance, Strike (no energy, upgraded from Ascension 9)",
+                  "点穴、心灵堡垒（进阶8起升级）、欺瞒现实（没费）":  "Pressure Points, Mental Fortress (upgraded from Ascension 8), Deceive Reality (no energy)",
+                  "供奉（进阶9起升级）、暴怒+、内心宁静":  "Consecrate (upgraded from Ascension 9), Eruption+, Inner Peace",
+                  "供奉（进阶9起升级）、义愤填膺（进阶9起升级）、内心宁静":  "Consecrate (upgraded from Ascension 9), Indignation (upgraded from Ascension 9), Inner Peace",
+                  "剑圣+、打击、锻打成型；防御没费（能量 2+1=3）。所向无敌在他回合结束时正好在抽牌堆顶 → 免费打出":  "Sword Saint+, Strike, Forged Form; Defend has no energy (2+1 = 3 energy). Invincible lands on top of the draw pile right at the end of his turn ⇒ free-played",
+                  "渐强、打击（进阶9起升级）、安宁":  "Crescendo, Strike (upgraded from Ascension 9), Tranquility",
+                  "奇迹、心灵堡垒（进阶8起升级）、警惕、打击（没费）、惩恶+（没费）":  "Miracle, Mental Fortress (upgraded from Ascension 8), Vigilance, Strike (no energy), Smite+ (no energy)",
+                  "洗牌（她重新洗牌）、改造现实（进阶9起升级）、化体为空、警惕、惩恶+（没费）":  "Shuffle (she reshuffles), Carve Reality (upgraded from Ascension 9), Empty Body, Vigilance, Smite+ (no energy)",
+                  "义愤填膺（进阶9起升级）、惩恶+、创世之柱（进阶8起升级）":  "Indignation (upgraded from Ascension 9), Smite+, Pillar of Creation (upgraded from Ascension 8)"
               },
     "phrases":  {
                     "次":  "times",
