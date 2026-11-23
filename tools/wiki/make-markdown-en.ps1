@@ -47,6 +47,18 @@ foreach ($t in @('cards', 'relics', 'powers', 'potions')) {
     Add-Pairs $NameZhEn (Join-Path $locDir "zhs_$t.json") (Join-Path $locDir "eng_$t.json")
     Add-Pairs $NameZhEn (Join-Path $Root "content\localization\zhs\$t.json") (Join-Path $Root "content\localization\eng\$t.json")
 }
+# Downfall.pck 里**各角色分包**（Snecko / Hermit / Champ / Collector / …）的官方中英表，
+# 由 `tools\loc-dump\dump_loc.gd --all` 一次导出到 tools\tmp\loc-all\<前缀>_<lang>_<表>.json
+$allDir = Join-Path $Root 'tools\tmp\loc-all'
+if (Test-Path $allDir) {
+    # ⚠ 文件名是 <前缀>_<lang>_<表>.json（例如 Downfall_zhs_cards.json），
+    #   所以按 *_zhs_*.json 匹配，再把 _zhs_ 换成 _eng_ 找英文对。
+    foreach ($z in (Get-ChildItem $allDir -Filter '*_zhs_*.json' -File)) {
+        $ePath = Join-Path $allDir ($z.Name.Replace('_zhs_', '_eng_'))
+        if (-not (Test-Path $ePath)) { continue }
+        Add-Pairs $NameZhEn $z.FullName $ePath
+    }
+}
 # 创意工坊那**两个观者模组**（3747492505 / 3747526116）的官方中英表 —— 观者卡名以它们为准
 foreach ($w in @('loc-w1', 'loc-w2')) {
     $wDir = Join-Path $Root ('tools\tmp\' + $w)
