@@ -6978,3 +6978,6 @@ Chronological action log.
 | 2026-11-23 16:09 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
 | 2026-11-23 16:12 | edit | `tools/wiki/make-markdown.ps1` | ok | 0 |
 | 2026-11-23 16:12 | edit | `tools/wiki/make-markdown-en.ps1` | ok | 0 |
+| 2026-11-23 16:19 | edit | `src/Hooks/Core/WatcherFlurryScript.cs` | ok | 0 |
+| 2026-11-23 16:19 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-23 16:20 | edit | `docs/plans/changelog-history.md` | ok | 0 |

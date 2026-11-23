@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.903 / 2026-11-23 (**疾风观订正：斋戒不再扣她的能量**）—— 用户 2026-11-23 第二轮订正。① 第 6 回合意图改成「洗牌、疾风连击、防御、打击（没费）」，第 8 回合改成「打击、打击（没费）、防御（没费）」；② 能力面板：单体高压回合加上第 1 回合（1、4、5、7、9），群体高压回合改成「无」；③ 恐惧强化 = 升级**疾风连击**；④ **斋戒不再使她（观者）在回合开始时失去能量** —— 两份观者 mod 的斋戒都会给自己叠一层 `EnergyDownPower`（`AfterEnergyReset` → `PlayerCmd.LoseEnergy`），而那个钩子对我们的 Boss **是派发的**，于是她第 3 回合打出斋戒后每回合都被扣 1 能量、第 6/8 回合全变「没费」。现在由 `WatcherRuntimePatches.InstallFastingNoEnergyDown` 对她那一次压掉（真人玩家的斋戒不变），描述里也补了这一句（16 语言）。v0.2.902 是新 Boss 本体。完整历史见 docs/plans/changelog-history.md";
+    public const string Tag = "v0.2.904 / 2026-11-23 (**疾风观：恐惧模式的第 5 / 8 回合单独一套**）—— 用户实机截图后订正。恐惧模式下：① 第 5 回合意图改成「心灵堡垒、化体为空、疾风连击、安宁、疾风连击」（心灵堡垒提到最前，她随后退出姿态才有格挡）；② 第 8 回合改成「打击、打击、防御（没费）」，本回合 2 费 —— 因为她在恐惧模式下**自身免疫「能量降低」**（`WatcherRuntimePatches.InstallFastingNoEnergyDown` 压掉她斋戒叠的 `EnergyDownPower`），斋戒不再吞她 1 点能量，所以第二张打击真的打得出来。实现走 `BossScript.Resolve`（静态初始化时 `DreadMode.IsActive` 恒 false，不能在 `Build()` 里分支）。v0.2.903 = 6/8 回合意图 + 能力面板 + 恐惧升级疾风连击 + 斋戒不扣能量；v0.2.902 = 新 Boss 本体。完整历史见 docs/plans/changelog-history.md";
 
     private static bool _logged;
 

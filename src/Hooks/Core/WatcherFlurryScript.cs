@@ -133,7 +133,48 @@ public static class WatcherFlurryScript
             // 用户：「之后 6～9 循环」；`LoopFrom` 是 **1 起**的回合号
             LoopFrom = 6,
             LoopLength = 4,
+            // ★ v0.2.904（用户 2026-11-23，实机截图后订正）：恐惧模式有两回合和普通不一样
+            //   —— 第 5 回合换顺序（心灵堡垒先落地，后面的「化体为空」退姿态才算得上格挡），
+            //   第 8 回合多 1 费、多打一张打击。
+            //   为什么走 `Resolve` 而不在 `Build()` 里判 `DreadMode.IsActive`：`BossDefs` 是
+            //   **静态初始化**，那时 `DreadMode.IsActive` 恒为 false（同养手骨 / 华丽猎 / 轰击储的先例）。
+            Resolve = DreadTurnOverride,
         };
+    }
+
+    /// <summary>
+    /// **恐惧模式的回合覆盖**（用户 2026-11-23）：
+    /// · 第 5 回合 → `心灵堡垒、化体为空、疾风连击、安宁、疾风连击`
+    ///   （普通模式是「化体为空、疾风连击、心灵堡垒、安宁、疾风连击」；
+    ///    恐惧版把心灵堡垒提到最前，于是她随后「化体为空」退出姿态时会因为有心灵堡垒而拿到格挡）；
+    /// · 第 8 回合 → `打击、打击、防御（没费）`，本回合 **2 费**（普通模式 1 费、只打一张打击）。
+    ///   —— 恐惧模式下她**自身免疫「能量降低」**（见 `WatcherRuntimePatches.InstallFastingNoEnergyDown`），
+    ///   斋戒不再吞掉她那 1 点能量，所以这一回合真的打得出第二张打击。
+    /// 返回 null ⇒ 交回静态回合表。
+    /// </summary>
+    private static BossTurn? DreadTurnOverride(int turn)
+    {
+        if (!Core.DreadMode.IsActive) return null;
+
+        if (turn == 5)
+        {
+            return Turn(3, "5.（恐惧）心灵堡垒、化体为空、疾风连击、安宁、疾风连击",
+                Play(WatcherCards.MentalFortress),
+                Play(WatcherCards.EmptyBody),
+                Play(WatcherCards.FlurryOfBlows),
+                Play(WatcherCards.Tranquility),
+                Play(WatcherCards.FlurryOfBlows));
+        }
+
+        if (turn == 8)
+        {
+            return Turn(2, "8.（恐惧）打击、打击、防御（没费）",
+                Play(WatcherCards.Strike),
+                Play(WatcherCards.Strike),
+                Hold(WatcherCards.Defend));
+        }
+
+        return null;
     }
 
     // ── 剧本小工具 ─────────────────────────────────────────────────────────
