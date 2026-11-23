@@ -56,10 +56,10 @@ foreach ($w in @('loc-w1', 'loc-w2')) {
 }
 
 # ── 人工英译表 ────────────────────────────────────────────────────────
-$I18n = @{ designs = @{}; info = @{}; reasons = @{}; notes = @{}; chars = @{}; extra = @{} }
+$I18n = @{ designs = @{}; info = @{}; reasons = @{}; notes = @{}; chars = @{}; extra = @{}; phrases = @{} }
 if (Test-Path $i18nPath) {
     $loaded = ConvertFrom-Json ([System.IO.File]::ReadAllText($i18nPath, [System.Text.Encoding]::UTF8))
-    foreach ($sec in @('designs', 'info', 'reasons', 'notes', 'chars', 'extra')) {
+    foreach ($sec in @('designs', 'info', 'reasons', 'notes', 'chars', 'extra', 'phrases')) {
         $prop = $loaded.PSObject.Properties[$sec]
         if (-not $prop -or -not $prop.Value) { continue }
         foreach ($p in $prop.Value.PSObject.Properties) { $I18n[$sec][$p.Name] = [string]$p.Value }
@@ -76,6 +76,9 @@ foreach ($t in @('monsters', 'powers', 'cards', 'ascension')) {
 }
 
 $Missing = @{ designs = @{}; notes = @{}; names = @{}; reasons = @{}; info = @{} }
+
+$Script:NameKeysByLen = @($NameZhEn.Keys + $I18n['extra'].Keys | Sort-Object -Unique | Sort-Object Length -Descending)
+$Script:PhraseKeysByLen = @($I18n['phrases'].Keys | Sort-Object Length -Descending)
 
 # 单个名字（不含组合语法）：extra（人工补）优先，其次官方 zh→en 表
 function N1([string]$zh) {
@@ -302,7 +305,29 @@ function Note-Text([string]$note, $cards) {
         }
     }
     if (-not $keep) { return '—' }
-    return (MdText (T $clean 'notes'))
+    return (MdText (Note-En $clean))
+}
+
+# 备注英译：
+#   ① 整句命中 notes 表 → 直接用；
+#   ② 否则做「名字替换 + 短语表替换 + 标点本地化」，残留中文记进 Missing['notes']。
+# 这样以后新增剧本备注**不用逐条手译**，没覆盖到的短语会在运行结束时列出来，补进 phrases 即可。
+function Note-En([string]$zh) {
+    if ([string]::IsNullOrEmpty($zh)) { return '' }
+    $k = $zh.Trim()
+    if ($I18n['notes'].ContainsKey($k)) { return $I18n['notes'][$k] }
+
+    $s = $k
+    foreach ($n in @($Script:NameKeysByLen)) { if ($s.Contains($n)) { $s = $s.Replace($n, (N $n)) } }
+    foreach ($ph in @($Script:PhraseKeysByLen)) {
+        if ($s.Contains($ph)) { $s = $s.Replace($ph, $I18n['phrases'][$ph]) }
+    }
+    $s = $s.Replace('、', ', ').Replace('（', ' (').Replace('）', ')').Replace('：', ': ').Replace('；', '; ')
+    $s = $s.Replace('，', ', ').Replace('。', '. ').Replace('×', '×').Replace('～', '~')
+    $s = $s.Trim()
+    while ($s.Contains('  ')) { $s = $s.Replace('  ', ' ') }
+    if ($s -match '[\u4e00-\u9fff]') { if (-not $Missing['notes'].ContainsKey($k)) { $Missing['notes'][$k] = 1 } }
+    return $s
 }
 
 # ── 收集设计 ──────────────────────────────────────────────────────────
