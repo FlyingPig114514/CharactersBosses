@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.900 / 2026-11-23 (**按 F8 一键导出「最近 3000 行日志」**）—— 用户 2026-11-23 问「报 bug 模板里为什么没有 mod_log」。原因是整份 mod_log 有两个硬伤：一局能写 20 万行 / 几十 MB（玩家的累计到 96 MB），且崩溃时后台缓冲的尾巴会丢。但非崩溃类问题（数值/意图/不同步）恰恰只能靠它，所以正确做法是「发得小」而不是不发：`SafeLogPatch` 现在额外维护最近 3000 行的环形缓冲，按 **F8**（新增 `Core/RecentLogDumper`）导出到 `%APPDATA%\\SlayTheSpire2\\logs\\characterbosses_recent.txt` —— 几十 KB、WriteThrough 落盘、开头带构建串与导出时间、正文已脱敏。与 F9（场景树）同一套挂载方式。完整历史见 docs/plans/changelog-history.md";
+    public const string Tag = "v0.2.901 / 2026-11-23 (**F8 导出改成「最近一小时」**）—— 用户 2026-11-23 定口径：「改成大概最近一个小时吧，一局最长大概也就这么久」。v0.2.900 我按「最近 3000 行」设的，按实测密度（≈15 行/秒）只有 3 分钟 ⇒ 玩家打完了再按 F8 早就滚出去了。现在 `SafeLogPatch` 改成**按时间窗裁剪**（60 分钟；行数只留 90000 行内存兜底，每 64 行扫一次），F8 导出的 `characterbosses_recent.txt` 开头会写**覆盖时段**（HH:mm:ss → HH:mm:ss）+ 行数，正文仍已脱敏。顺带把报 bug 模板里的「几十 KB」改成「最近 1 小时，约 5~8 MB」。完整历史见 docs/plans/changelog-history.md";
 
     private static bool _logged;
 

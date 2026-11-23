@@ -6,7 +6,7 @@ using Godot;
 namespace CharacterBosses.Core;
 
 /// <summary>
-/// **按 F8 一键导出「最近 3000 行日志」**（v0.2.900）。
+/// **按 F8 一键导出「最近约一小时的日志」**（v0.2.900 起；v0.2.901 从「最近 3000 行」改成按时间）。
 ///
 /// 为什么需要（用户 2026-11-23 问：「报 bug 模板里为什么没有 mod_log」）：
 ///   非崩溃类问题（数值不对 / 意图不对 / 联机不同步）**恰恰只能靠 mod_log 定位** ——
@@ -14,12 +14,15 @@ namespace CharacterBosses.Core;
 ///   但整份 `mod_log.txt` 有两个硬问题：
 ///     · **体积**：一局 3 小时能写 20 万行 / 几十 MB（玩家的那份累积到 96 MB）；
 ///     · **崩溃时尾巴会丢**：`SafeLogPatch` 是后台线程缓冲落盘（最多 200 ms），硬崩就没了尾巴。
-///   ⇒ 正确做法不是「不发」，而是「**发得小**」：按一下 F8，把内存里最近的 3000 行
-///   （几十 KB）写成单独一个文件，玩家直接拖进群里就行。
+///   ⇒ 正确做法不是「不发」，而是「**发得小**」。
+///
+/// ★ 用户 2026-11-23 定口径：「改成大概最近一个小时吧，一局最长大概也就这么久」
+///   ⇒ 按**时间**留最近 60 分钟（日志密度约 15 行/秒，≈5.4 万行 / 5～8 MB），
+///     刚好覆盖一整局，玩家不用「打完了才发现不对、再回头找」。
 ///
 /// 输出：`%APPDATA%\SlayTheSpire2\logs\characterbosses_recent.txt`
-///   · 开头写构建串（`BuildInfo.Tag`）+ 导出时间 + 一句「已脱敏」说明；
-///   · 正文是最近 3000 行（**已经过 `Redact` 脱敏**，不含 SteamID / NetId / 昵称 / 用户名）。
+///   · 开头写构建串（`BuildInfo.Tag`）+ 导出时间 + **覆盖时段** + 一句「已脱敏」说明；
+///   · 正文是最近 60 分钟的日志（**已经过 `Redact` 脱敏**，不含 SteamID / NetId / 昵称 / 用户名）。
 ///
 /// 与 F9（`SceneTreeDumper`，导场景树）同一套挂载方式：挂在 root 上、只吃 unhandled key input。
 /// </summary>
@@ -62,18 +65,20 @@ internal sealed partial class RecentLogDumper : Node
         }
     }
 
-    /// <summary>把内存里的最近若干行写成文件（幂等、可重复按）。</summary>
+    /// <summary>把内存里的最近约一小时日志写成文件（幂等、可重复按）。</summary>
     internal static void Dump()
     {
         try
         {
-            var lines = Patches.SafeLogPatch.SnapshotRecent();
+            var lines = Patches.SafeLogPatch.SnapshotRecent(out var first, out var last);
 
             var sb = new StringBuilder();
             sb.AppendLine("===== 玩家角色Boss · 最近日志（游戏内按 F8 导出）=====");
             try { sb.AppendLine("构建：" + BuildInfo.Tag); } catch { /* 忽略 */ }
             sb.AppendLine("导出时间：" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-            sb.AppendLine("行数：" + lines.Length + "（只含本模组日志的最近 3000 行）");
+            sb.AppendLine("覆盖时段：" + first.ToString("HH:mm:ss") + " → " + last.ToString("HH:mm:ss") +
+                          "（最多最近 60 分钟）");
+            sb.AppendLine("行数：" + lines.Length + "（只含本模组日志）");
             sb.AppendLine("隐私：SteamID / NetId / 玩家昵称 / 路径里的用户名已替换成局内代号（P#xxxxxx）");
             sb.AppendLine("提示：崩溃/卡死时更该发 characterbosses_trace.txt（逐行落盘，崩得再快也留得住）");
             sb.AppendLine();

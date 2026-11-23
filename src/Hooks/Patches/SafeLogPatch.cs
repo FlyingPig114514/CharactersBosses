@@ -42,17 +42,61 @@ public static class SafeLogPatch
     private static readonly List<string> Pending = new();
     private const int MaxPendingLines = 20000;      // 兜底上限，写盘长期失败时也不会吃爆内存
 
-    // ── 「最近 N 行」环形缓冲（v0.2.900） ────────────────────────────────
-    // 玩家报 bug 时按 **F8** 就把这 3000 行导出成 characterbosses_recent.txt（几十 KB），
-    // 不用再让人发几十上百 MB 的整份 mod_log（玩家 2026-11-23 问「模板里为什么没有 mod_log」）。
-    private const int RecentLimit = 3000;
+    // ── 「最近 N 分钟」环形缓冲（v0.2.900 起，v0.2.901 改按时间） ──────────────
+    // 玩家报 bug 时按 **F8** 就把这段导出成 characterbosses_recent.txt。
+    // ★ 用户 2026-11-23：「改成大概最近一个小时吧，一局最长大概也就这么久」
+    //   ⇒ 按**时间**裁剪（60 分钟），行数只做内存上限兜底。
+    //   实测日志密度 ≈ 15 行/秒（`LogLoudness` 里记的：3h40m 写了 203,646 行）
+    //   ⇒ 1 小时约 5.4 万行、约 5~8 MB，QQ 群里发完全没问题。
+    private const int RecentWindowMinutes = 60;
+    private const int RecentHardCap = 90000;        // 内存兜底（≈100 分钟的量），正常碰不到
     private static readonly List<string> Recent = new();
+    private static readonly List<DateTime> RecentAt = new();
+    private static int _recentSweep;
 
-    /// <summary>取「最近若干行」的快照（供 <c>RecentLogDumper</c> 一键导出）。</summary>
-    internal static string[] SnapshotRecent()
+    /// <summary>把超出时间窗 / 超过内存上限的旧行裁掉（每 64 行做一次，别每行都算）。</summary>
+    private static void SweepRecent()
     {
-        try { lock (Gate) return Recent.ToArray(); }
-        catch { return Array.Empty<string>(); }
+        bool due = ((++_recentSweep & 63) == 0) || Recent.Count > RecentHardCap;
+        if (!due) return;
+
+        var cut = DateTime.Now.AddMinutes(-RecentWindowMinutes);
+        int drop = 0;
+        while (drop < Recent.Count)
+        {
+            bool tooOld = RecentAt[drop] < cut;
+            bool tooMany = (Recent.Count - drop) > RecentHardCap;
+            if (!tooOld && !tooMany) break;
+            drop++;
+        }
+        if (drop <= 0) return;
+
+        try
+        {
+            Recent.RemoveRange(0, drop);
+            RecentAt.RemoveRange(0, drop);
+        }
+        catch { /* 忽略：裁不掉也只是多占点内存 */ }
+    }
+
+    /// <summary>取「最近约一小时」的快照（供 <c>RecentLogDumper</c> 一键导出）。</summary>
+    internal static string[] SnapshotRecent(out DateTime first, out DateTime last)
+    {
+        try
+        {
+            lock (Gate)
+            {
+                if (Recent.Count == 0) { first = last = DateTime.Now; return Array.Empty<string>(); }
+                first = RecentAt[0];
+                last = RecentAt[RecentAt.Count - 1];
+                return Recent.ToArray();
+            }
+        }
+        catch
+        {
+            first = last = DateTime.Now;
+            return Array.Empty<string>();
+        }
     }
 
     // ── 后台写手（唯一碰文件句柄的线程） ──────────────────────────────────
@@ -107,7 +151,8 @@ public static class SafeLogPatch
             }
             Pending.Add(line);
             Recent.Add(line);
-            if (Recent.Count > RecentLimit) Recent.RemoveRange(0, Recent.Count - RecentLimit);
+            RecentAt.Add(DateTime.Now);
+            SweepRecent();
         }
 
         EnsureWorker();

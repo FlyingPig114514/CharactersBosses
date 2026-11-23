@@ -21,7 +21,7 @@
 · GitHub（源码 + 更新日志）：
 
 三、日志怎么拿（都是小文件，不要发几十 MB 的整份日志）
-· **游戏里按 F8** → 自动生成 characterbosses_recent.txt（最近 3000 行，几十 KB），直接发这个
+· **游戏里按 F8** → 自动生成 characterbosses_recent.txt（**最近 1 小时**，约 5～8 MB），直接发这个
   路径：%APPDATA%\SlayTheSpire2\logs\
 · 崩溃 / 卡死 → 再补 characterbosses_trace.txt（逐行落盘，崩得再快也留得住）
 · 按不了 F8 的备用办法：Win + R 打开 %APPDATA%\SlayTheSpire2\logs\ ，先把 mod_log.txt 改名，
@@ -66,7 +66,7 @@
 · 说清楚：卡死前你在做什么（点了结束回合？谁在出牌？有没有激发充能球？）
 
 ▍B. 数值 / 机制不对（伤害、层数、意图、卡牌效果）
-· **必发：游戏里按 F8 导出的 characterbosses_recent.txt**（最近 3000 行，几十 KB）
+· **必发：游戏里按 F8 导出的 characterbosses_recent.txt**（最近 1 小时，覆盖一整局）
   路径：%APPDATA%\SlayTheSpire2\logs\characterbosses_recent.txt
 · 截图（带意图栏和血量）优先，比文字有用十倍
 · 补充：第几回合、那只 Boss 身上有哪些 buff、你自己有哪些 buff
@@ -78,7 +78,7 @@
 · 若有「不同步」提示，截图那条提示
 
 【不用发的】
-· 整个 mod_log.txt（可能几十上百 MB）—— 上面那份 F8 导出的小文件就够
+· 整个 mod_log.txt（可能几十上百 MB）—— 上面那份 F8 导出的就够（它本身就是 mod_log 的最近 1 小时）
 · 整份 godot.log（只要最后 100 行）
 · 电脑配置、帧数（除非你怀疑是卡顿）
 ```
