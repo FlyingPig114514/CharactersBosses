@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Powers;
@@ -17,19 +18,20 @@ namespace CharacterBosses.Powers;
 
 /// <summary>
 /// 一层 2 号观者 Boss「**疾风观**」（设计 Key `WATCHER_FLURRY`）的特殊效果「**疾风连击**」
-/// （用户 2026-11-23 原话）：
-/// > 「疾风连击：每当观者的疾风连击对你造成未被格挡的伤害时，你在下回合失去 1 能量」
+/// —— 2026-11-23 **第四版**（用户：「削弱，修改特殊效果」）：
 ///
-/// 挂在**观者自己身上**当载体（`BossVariant.SpecialPower`），真正生效的判定在
-/// <see cref="AfterDamageGiven"/>：`dealer == 她`、来源牌是「疾风连击」、目标是真的玩家、
-/// 且这一段伤害**没有被格挡**（`DamageResult.UnblockedDamage &gt; 0`）⇒ 给该玩家 1 层
-/// <see cref="FlurryDrainedPower"/>。
+/// > 「每当观者将疾风连击返回手牌时，**你**也将弃牌堆中的一张随机牌返回手牌。」
+/// > PS（用户补的触发时机）：「观者疾风连击的返回手牌时机：**当观者打出警惕或化体为空的时候**」
 ///
-/// ★ 用户订正（2026-11-23）：「疾风连击是单端伤害，自然是**单张 1 层**」——
-///   疾风连击是单体单段攻击 ⇒ 一次伤害事件 = 一张牌 ⇒ 正好 1 层；不做「每段叠一层」的处理。
+/// 所以触发点 = **她打出「警惕」或「化体为空」**（这两张都是姿态切换牌，正是她卡面上
+/// 「每次转换姿态时把弃牌堆的疾风连击放回手牌」的时机）。每次触发，**每位真人玩家**
+/// 从自己的弃牌堆随机拿回 1 张牌到手上。
 ///
-/// 写法完全照 <see cref="BossPrimalForcePower"/>（三层「原始力量」的「巨石造成未格挡伤害」那一条），
-/// 那条已经在实机上验证过对她生效。
+/// ★ 这是**对玩家有利**的效果（削弱 Boss）。之前那版「疾风连击造成未被格挡伤害 ⇒ 你下回合少 1 能量」
+///   已经撤掉 —— `FlurryDrainedPower` 现在没有任何地方施加它，只保留类本身（随时能改回去）。
+///
+/// ⚠ 随机取牌走 <c>RunState.Rng.CombatCardSelection</c>（联机时两端同一条随机流、调用顺序一致），
+///   所以客人端拿到的牌和房主完全一样。
 /// </summary>
 public sealed class BossFlurryPower : PowerModel
 {
@@ -39,66 +41,110 @@ public sealed class BossFlurryPower : PowerModel
 
     public override bool ShouldPlayVfx => false;
 
-    /// <summary>每次「疾风连击」造成未被格挡伤害时，给该玩家的力竭层数（用户口径：1）。</summary>
-    private const int DrainedPerPlay = 1;
-
     private int _logs;
 
-    public override async Task AfterDamageGiven(PlayerChoiceContext choiceContext, Creature dealer,
-                                                DamageResult result, ValueProp props, Creature target,
-                                                CardModel? cardSource)
+    /// <summary>她打出「警惕」/「化体为空」时，每位真人玩家从弃牌堆随机捞回 1 张。</summary>
+    public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
         try
         {
             var self = Owner;
             if (self == null || !self.IsAlive) return;
-            if (dealer == null || !ReferenceEquals(dealer, self)) return;   // 必须是她的伤害
-            if (target == null || target.Monster != null) return;           // 只认真人玩家
-            if (!IsFlurryOfBlows(cardSource)) return;
+            if (cardPlay?.Card == null) return;
+            if (!ReferenceEquals(cardPlay.Card.Owner?.Creature, self)) return;   // 必须是她自己打的牌
+            if (!IsStanceChangeCard(cardPlay.Card)) return;
 
-            int unblocked = 0;
-            try { unblocked = result.UnblockedDamage; } catch { unblocked = 0; }
-            if (unblocked <= 0) return;                                    // 全被格挡 ⇒ 不叠
-
-            if (target.Player == null) return;
-
+            var combat = self.CombatState;
+            if (combat == null) return;
             var ctx = choiceContext ?? new BlockingPlayerChoiceContext();
-            await PowerCmd.Apply<FlurryDrainedPower>(ctx, target, DrainedPerPlay, self, cardSource);
+
+            string source = SafeEntry(cardPlay.Card);
+            int given = 0;
+
+            foreach (var player in BossLockOn.RealPlayers(combat))
+            {
+                try
+                {
+                    var pile = player?.PlayerCombatState?.DiscardPile;
+                    if (pile == null) continue;
+                    int count = pile.Cards.Count;
+                    if (count <= 0) continue;
+
+                    int index = RandomIndex(combat, count);
+                    var card = pile.Cards[index];
+                    if (card == null) continue;
+
+                    await CardPileCmd.Add(card, PileType.Hand, CardPilePosition.Top, null, false);
+                    given++;
+                }
+                catch (Exception e)
+                {
+                    Logger.Log("[CharBoss] 疾风连击（玩家捞牌）单次失败: " + e.Message);
+                }
+            }
 
             if (_logs++ < 20)
             {
-                Logger.Log($"[CharBoss] 疾风连击：对 {target.Name} 造成 {unblocked} 点未被格挡伤害 " +
-                           $"→ 下回合失去 {DrainedPerPlay} 点能量");
+                Logger.Log($"[CharBoss] 疾风连击：她打出 {source} ⇒ 给 {given} 位玩家各捞回 1 张弃牌");
             }
         }
         catch (Exception e)
         {
-            Logger.Log("[CharBoss] 疾风连击（叠力竭）结算失败: " + e.Message);
+            Logger.Log("[CharBoss] 疾风连击（玩家捞牌）结算失败: " + e.Message);
         }
     }
 
     /// <summary>
-    /// 这张牌是不是「疾风连击」。先按**类型**认（两份观者 mod 的类名不同：
-    /// `WatcherMod.WatcherFlurryOfBlows` / `Watcher.Code.Cards.Common.FlurryOfBlows`），
-    /// 再按模型 id 兜底（`WATCHER_FLURRY_OF_BLOWS` / `WATCHER-FLURRY_OF_BLOWS`）。
+    /// 弃牌堆里的随机下标：走 **本局战斗的卡牌选择随机流**
+    /// （`RunState.Rng.CombatCardSelection`）—— 联机两端同一条流、调用顺序也一致 ⇒ 拿到同一张。
+    /// 取不到就退回「本场触发次数 + 种子」的确定性散列，仍然两端一致。
     /// </summary>
-    private static bool IsFlurryOfBlows(CardModel? card)
+    private static int RandomIndex(ICombatState combat, int count)
     {
-        if (card == null) return false;
+        if (count <= 1) return 0;
         try
         {
-            var type = WatcherCards.FlurryOfBlows;
-            if (type != null && type.IsInstanceOfType(card)) return true;
+            var rng = combat.RunState?.Rng?.CombatCardSelection;
+            if (rng != null) return Math.Max(0, Math.Min(count - 1, rng.NextInt(count)));
         }
-        catch { /* 类型认不出就按 id */ }
+        catch { /* 退回散列 */ }
 
         try
         {
-            string entry = card.Id.Entry;
-            return string.Equals(entry, "WATCHER_FLURRY_OF_BLOWS", StringComparison.Ordinal)
-                || string.Equals(entry, "WATCHER-FLURRY_OF_BLOWS", StringComparison.Ordinal);
+            ulong seed = unchecked((ulong)(combat.RunState?.Rng?.Seed ?? 0UL));
+            return (int)(seed % (ulong)count);
         }
-        catch { return false; }
+        catch { return 0; }
+    }
+
+    /// <summary>
+    /// 这张牌是不是「警惕」或「化体为空」（用户口径里的两个姿态切换时机）。
+    /// 先按**类型**认（A 版 `WatcherVigilance` / B 版 `Vigilance`），再按模型 id 兜底
+    /// （两份实现的 id 前缀不同：`WATCHER_VIGILANCE` / `WATCHER-VIGILANCE`）。
+    /// </summary>
+    private static bool IsStanceChangeCard(CardModel? card)
+    {
+        if (card == null) return false;
+
+        try
+        {
+            foreach (var type in new[] { WatcherCards.Vigilance, WatcherCards.EmptyBody })
+            {
+                if (type != null && type.IsInstanceOfType(card)) return true;
+            }
+        }
+        catch { /* 类型认不出就按 id */ }
+
+        string entry = SafeEntry(card);
+        if (entry.Length == 0) return false;
+        string norm = entry.Replace("-", string.Empty).Replace("_", string.Empty).ToUpperInvariant();
+        return norm.EndsWith("VIGILANCE", StringComparison.Ordinal)
+            || norm.EndsWith("EMPTYBODY", StringComparison.Ordinal);
+    }
+
+    private static string SafeEntry(CardModel? card)
+    {
+        try { return card?.Id.Entry ?? string.Empty; } catch { return string.Empty; }
     }
 }
 
@@ -109,9 +155,9 @@ public sealed class BossFlurryPower : PowerModel
 /// `AfterEnergyReset(Player)` 里 `PlayerCmd.LoseEnergy(Amount, player)` 然后 `PowerCmd.Remove(this)`。
 /// 也就是说：**只在下一个回合的能量结算时扣一次、扣完就消失**（层数可叠）。
 ///
-/// 文案（`FLURRY_DRAINED_POWER.description`）里的能量用**观者的能量图标**
-/// （`res://images/packed/sprite_fonts/watcher_energy_icon.png`），与用户要求一致。
-/// 图标本身走 <c>Patches.BossSpecialPowerIconPatch</c> ⇒ 借观者 mod「少获得能量」那张图。
+/// ⚠ 2026-11-23 起**特殊效果改成对玩家有利的版本**（「她返回疾风连击时你也捞回一张弃牌」），
+///   `BossFlurryPower` 不再施加这一层 ⇒ 这个类目前**没有任何地方在用**，保留是为了随时改回去
+///   （`FLURRY_DRAINED_POWER.*` 的本地化也一起留着）。
 /// </summary>
 public sealed class FlurryDrainedPower : PowerModel
 {

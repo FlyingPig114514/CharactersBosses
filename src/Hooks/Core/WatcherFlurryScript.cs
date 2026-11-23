@@ -14,17 +14,19 @@ namespace CharacterBosses.Core;
 /// 2.打击、防御、防御、奇迹（不出）
 /// 3.奇迹、斋戒、心灵堡垒、防御（没费）
 /// 4.供奉、追击、腰带抽打
-/// 5.化体为空、疾风连击、警惕、疾风连击、防御（没费）（恐惧模式下打出）
+/// 5.化体为空、疾风连击、警惕、疾风连击、打击（没费）（恐惧模式下打出）
 /// 6.洗牌、疾风连击、防御、防御（没费）（恐惧模式下打出）
 /// 7.供奉、追击、腰带抽打
 /// 8.防御、防御（没费）（恐惧模式下打出）、打击（没费）
-/// 9.化体为空、疾风连击、警惕、疾风连击、防御（没费）（恐惧模式下打出）
+/// 9.化体为空、疾风连击、警惕、疾风连击、打击（没费）（恐惧模式下打出）
 /// 之后 6～9 循环
 /// </code>
 ///
 /// ★ 2026-11-23 第四轮：「第 5、9 回合**只在恐惧模式打出**的那 2 张打击改成防御」，
-///   随后又订正「**普通模式也改**，那两张留在手里的打击也改成防御（虽然效果没有区别，因为都不打出）」
-///   ⇒ 现在第 5 / 9 回合无论哪个模式，第五张都是「防御」（恐惧模式真的打出去，普通模式没费留手）。
+///   随后又订正「**普通模式也改**……」——
+///   ⚠ 这一轮在**第六轮已被推翻**：特殊效果改成对玩家有利的版本之后，用户要求
+///   「第 5 和 9 回合的意图**改回**：化体为空、疾风连击、警惕、疾风连击、打击（没费）（恐惧模式下打出）」
+///   ⇒ 现在第 5 / 9 回合第五张是「打击」（普通模式没费留手、恐惧模式打出去）。
 ///
 /// ★ 2026-11-23 第五轮（实机截图：恐惧第 8 回合的 2 费却打出了 1 防 2 打）：
 ///   「2.打击、防御、防御、奇迹（不出）」「8.防御、防御（没费）（恐惧模式下打出）、打击（没费）」
@@ -94,14 +96,15 @@ public static class WatcherFlurryScript
                 Play(WatcherCards.FollowUp),
                 Play(WatcherCards.SashWhip)),
 
-            // ── 5 ── 化体为空 / 疾风连击 / 警惕 / 疾风连击 / 防御（没费）   （3 费 = 1 + 0 + 2 + 0）
-            // ★ 2026-11-23 用户：「那两张留在手里的打击也改成防御（虽然效果没有区别，因为都不打出）」。
-            Turn(3, "5. 化体为空、疾风连击、警惕、疾风连击、防御（没费）",
+            // ── 5 ── 化体为空 / 疾风连击 / 警惕 / 疾风连击 / 打击（没费）   （3 费 = 1 + 0 + 2 + 0）
+            // ★ 2026-11-23 第五轮（特殊效果改成对玩家有利之后）：改回「打击（没费）」留手，
+            //   恐惧模式才真的打出去（见 `DreadTurnOverride`）。
+            Turn(3, "5. 化体为空、疾风连击、警惕、疾风连击、打击（没费）",
                 Play(WatcherCards.EmptyBody),
                 Play(WatcherCards.FlurryOfBlows),
                 Play(WatcherCards.Vigilance),
                 Play(WatcherCards.FlurryOfBlows),
-                Hold(WatcherCards.Defend)),
+                Hold(WatcherCards.Strike)),
 
             // ── 6 ── 洗牌 / 疾风连击 / 防御 / 防御（没费）   ← 6~9 循环起点   （1 费 = 0 + 1）
             TurnEnergy(1, true, "6. 洗牌、疾风连击、防御、防御（没费）",
@@ -122,12 +125,12 @@ public static class WatcherFlurryScript
                 Hold(WatcherCards.Strike)),
 
             // ── 9 ── 同第 5 回合                        （3 费）
-            Turn(3, "9. 化体为空、疾风连击、警惕、疾风连击、防御（没费）",
+            Turn(3, "9. 化体为空、疾风连击、警惕、疾风连击、打击（没费）",
                 Play(WatcherCards.EmptyBody),
                 Play(WatcherCards.FlurryOfBlows),
                 Play(WatcherCards.Vigilance),
                 Play(WatcherCards.FlurryOfBlows),
-                Hold(WatcherCards.Defend)),
+                Hold(WatcherCards.Strike)),
         };
 
         return new BossScript
@@ -149,8 +152,7 @@ public static class WatcherFlurryScript
     /// **恐惧模式的回合覆盖**（用户 2026-11-23，第二版削弱后的口径）：
     /// 用户原话里带「（恐惧模式下打出）」的那几张，就是**恐惧模式才打得出来**的牌
     /// —— 恐惧模式下她自身免疫「能量降低」（`InstallFastingNoEnergyDown`），斋戒不再吞她那 1 点能量：
-    /// · 第 5 / 9 回合 → 多打一张 **防御**（4 费；普通模式 3 费、打击没费留手）
-    ///   ★ 2026-11-23 第二次削弱：这一张原来是「打击」，用户改成「防御」；
+    /// · 第 5 / 9 回合 → 多打一张 **打击**（4 费；普通模式 3 费、打击没费留手）；
     /// · 第 6 回合 → 两张 **防御** 都打出来（2 费；普通模式 1 费、第二张没费）；
     /// · 第 8 回合 → 两张 **防御** 都打出来（2 费；普通模式 1 费、只打一张防御），打击永远没费。
     /// 返回 null ⇒ 交回静态回合表。
@@ -161,14 +163,14 @@ public static class WatcherFlurryScript
 
         if (turn == 5 || turn == 9)
         {
-            // ★ 2026-11-23 用户第二次削弱：恐惧模式**多打出来的那一张由「打击」改成「防御」**
-            //   （普通模式那两张仍是「打击（没费）」留在手里）。能量 4 = 化体1 + 疾风0 + 警惕2 + 疾风0 + 防御1。
-            return Turn(4, $"{turn}.（恐惧）化体为空、疾风连击、警惕、疾风连击、防御",
+            // ★ 2026-11-23 第五轮：改回「多打一张打击」（4 费 = 化体1 + 疾风0 + 警惕2 + 疾风0 + 打击1）；
+            //   普通模式那张是「打击（没费）」留手。
+            return Turn(4, $"{turn}.（恐惧）化体为空、疾风连击、警惕、疾风连击、打击",
                 Play(WatcherCards.EmptyBody),
                 Play(WatcherCards.FlurryOfBlows),
                 Play(WatcherCards.Vigilance),
                 Play(WatcherCards.FlurryOfBlows),
-                Play(WatcherCards.Defend));
+                Play(WatcherCards.Strike));
         }
 
         if (turn == 6)

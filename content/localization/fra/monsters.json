@@ -224,6 +224,6 @@
     "WATCHER_FLURRY_BOSS.name":  "Veilleur de la Rafale",
     "WATCHER_FLURRY_BOSS.title":  "Veilleur de la Rafale",
     "WATCHER_FLURRY_BOSS.moves.CHARBOSS_PLAY.title":  "Jouer",
-    "WATCHER_FLURRY_BOSS.flurry":  "Chaque fois que la [gold]Rafale de coups[/gold] de la gardienne vous inflige des dégâts non bloqués, vous perdez [img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img] au tour suivant. Son Jeûne ne lui fait pas perdre d\u0027énergie au début de son tour.",
-    "WATCHER_FLURRY_BOSS.flurry_dread":  "Chaque fois que la [gold]Rafale de coups[/gold] de la gardienne vous inflige des dégâts non bloqués, vous perdez [img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img] au tour suivant.\nSon Jeûne ne lui fait pas perdre d\u0027énergie au début de son tour."
+    "WATCHER_FLURRY_BOSS.flurry":  "Chaque fois que la gardienne renvoie [gold]Rafale de coups[/gold] dans sa Main, vous renvoyez aussi une carte aléatoire de votre Défausse dans votre Main. Son Jeûne ne lui fait pas perdre d\u0027énergie au début de son tour.",
+    "WATCHER_FLURRY_BOSS.flurry_dread":  "Chaque fois que la gardienne renvoie [gold]Rafale de coups[/gold] dans sa Main, vous renvoyez aussi une carte aléatoire de votre Défausse dans votre Main.\nSon Jeûne ne lui fait pas perdre d\u0027énergie au début de son tour."
 }

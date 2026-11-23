@@ -224,6 +224,6 @@
     "WATCHER_FLURRY_BOSS.name":  "疾风观",
     "WATCHER_FLURRY_BOSS.title":  "疾风观",
     "WATCHER_FLURRY_BOSS.moves.CHARBOSS_PLAY.title":  "出牌",
-    "WATCHER_FLURRY_BOSS.flurry":  "每当观者的[gold]疾风连击[/gold]对你造成未被格挡的伤害时，你在下回合失去[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]。她的「斋戒」不会使她在回合开始时失去能量。",
-    "WATCHER_FLURRY_BOSS.flurry_dread":  "每当观者的[gold]疾风连击[/gold]对你造成未被格挡的伤害时，你在下回合失去[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]。\n她的「斋戒」不会使她在回合开始时失去能量。"
+    "WATCHER_FLURRY_BOSS.flurry":  "每当观者将[gold]疾风连击[/gold]返回手牌时，你也将弃牌堆中的一张随机牌返回手牌。她的「斋戒」不会使她在回合开始时失去能量。",
+    "WATCHER_FLURRY_BOSS.flurry_dread":  "每当观者将[gold]疾风连击[/gold]返回手牌时，你也将弃牌堆中的一张随机牌返回手牌。\n她的「斋戒」不会使她在回合开始时失去能量。"
 }

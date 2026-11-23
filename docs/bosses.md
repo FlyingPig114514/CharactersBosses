@@ -23,7 +23,7 @@
 | 铁甲 2 号 | 打击战 | `IRONCLAD_STRIKE` | 痛击 | `fight IRONCLAD_STRIKE_BOSS_ENCOUNTER` |
 | 观者 1 号 | （本幕主设计） | `WATCHER_DIVINITY` | - | `fight WATCHER_DIVINITY_BOSS_ENCOUNTER` |
 | 观者 2 号 | 预见观 | `WATCHER_FORESIGHT` | 每当观者触发[gold]先见之明[/… | `fight WATCHER_FORESIGHT_BOSS_ENCOUNTER` |
-| 观者 3 号 | 疾风观 | `WATCHER_FLURRY` | 每当观者的[gold]疾风连击[/g… | `fight WATCHER_FLURRY_BOSS_ENCOUNTER` |
+| 观者 3 号 | 疾风观 | `WATCHER_FLURRY` | 每当观者将[gold]疾风连击[/g… | `fight WATCHER_FLURRY_BOSS_ENCOUNTER` |
 
 ## 二层（14 个）
 

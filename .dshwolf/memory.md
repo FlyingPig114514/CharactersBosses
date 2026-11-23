@@ -7026,3 +7026,16 @@ Chronological action log.
 | 2026-11-23 17:56 | edit | `src/Hooks/Core/WatcherFlurryScript.cs` | ok | 0 |
 | 2026-11-23 17:57 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
 | 2026-11-23 17:57 | edit | `docs/plans/changelog-history.md` | ok | 0 |
+| 2026-11-23 18:03 | write | `src/Hooks/Powers/BossFlurryPower.cs` | ok | 0 |
+| 2026-11-23 18:03 | edit | `src/Hooks/Core/WatcherFlurryScript.cs` | ok | 0 |
+| 2026-11-23 18:03 | edit | `src/Hooks/Core/WatcherFlurryScript.cs` | ok | 0 |
+| 2026-11-23 18:03 | edit | `src/Hooks/Core/WatcherFlurryScript.cs` | ok | 0 |
+| 2026-11-23 18:03 | edit | `src/Hooks/Core/WatcherFlurryScript.cs` | ok | 0 |
+| 2026-11-23 18:03 | edit | `src/Hooks/Core/WatcherFlurryScript.cs` | ok | 0 |
+| 2026-11-23 18:03 | edit | `src/Hooks/Core/WatcherFlurryScript.cs` | ok | 0 |
+| 2026-11-23 18:04 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
+| 2026-11-23 18:04 | edit | `docs/plans/changelog-history.md` | ok | 0 |
+| 2026-11-23 18:05 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/_tmp_flurry_patch_data.json` | ok | 0 |
+| 2026-11-23 18:05 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/_tmp_patch_flurry.ps1` | ok | 0 |
+| 2026-11-23 18:05 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/_tmp_verify_flurry.ps1` | ok | 0 |
+| 2026-11-23 18:05 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/_tmp_verify_flurry.ps1` | ok | 0 |
