@@ -12,7 +12,7 @@
 > Card, relic and potion names are taken from the game's own English localization tables (not re-translated).
 >
 > **Death message** = the line the game shows when you die to that boss; `{character}` is replaced by the name of the character you were playing.
-> Every boss has exactly one; **only two special cases** exist (the Omega Watcher's Pressure Points, the Fool's tarot cards) — see [Death message special cases](#loss-special).
+> Every boss has one; a few swap in a different line under a condition (two of them are **low-chance easter eggs**) — see [Death message special cases](#loss-special).
 > Chinese edition: [boss-table.md](boss-table.md)
 
 ## Contents
@@ -581,7 +581,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Watcher · Act 1
 - **Console**: `fight WATCHER_FORESIGHT_BOSS_ENCOUNTER`
-- **Death message**: {character} was crushed by **The Watcher**'s **Omniscience**.
+- **Death message**: **The Watcher** foresaw the fate of {character}.
 - **HP**: **192** ｜ **Energy**: 3 ｜ **Hand**: 5 ｜ **Loop**: turns 6–8 loop
 **Ability panel**
 
@@ -624,7 +624,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Watcher · Act 1
 - **Console**: `fight WATCHER_FLURRY_BOSS_ENCOUNTER`
-- **Death message**: {character} was crushed by **The Watcher**'s **Flurry of Blows**.
+- **Death message**: {character} could not withstand **The Watcher**'s relentless flurry.
 - **HP**: **192** ｜ **Energy**: 3 ｜ **Hand**: 5 ｜ **Loop**: turns 6–9 loop
 **Ability panel**
 
@@ -1563,6 +1563,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 - **Character / Act**: Ironclad · Act 3
 - **Console**: `fight IRONCLAD_BOULDER_BOSS_ENCOUNTER`
 - **Death message**: {character} was ground to dust by the boulders of the **Ironclad**.
+- **Death message** (**Easter egg**: 1-in-20 chance, otherwise the line above): **The Ironclad** discovered that {character} is allergic to rocks.
 - **HP**: **560** ｜ **Energy**: 4 ｜ **Hand**: 6 ｜ **Loop**: turns 5–7 loop
 **Ability panel**
 
@@ -1794,7 +1795,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Regent · Act 3
 - **Console**: `fight REGENT_CHOICE_BOSS_ENCOUNTER`
-- **Death message**: {character}was outplayed by **the Regent**'s decisions.
+- **Death message**: **The Regent** made {character} lose themselves in choice after choice.
 - **HP**: **555** ｜ **Energy**: 3 ｜ **Hand**: 6 ｜ **Loop**: turns 9–13 loop
 **Ability panel**
 
@@ -1896,6 +1897,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 - **Character / Act**: Silent · Act 3
 - **Console**: `fight SILENT_BREWER_BOSS_ENCOUNTER`
 - **Death message**: {character} could not break through the potion-wrought barrier of the **Silent**.
+- **Death message** (**Easter egg**: 1-in-20 chance, otherwise the line above): {character} failed to crack **The Silent**'s shell.
 - **HP**: **550** ｜ **Energy**: 3 ｜ **Hand**: 6 ｜ **Loop**: turns 5–8 loop
 **Ability panel**
 
@@ -2106,7 +2108,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Watcher · Act 3
 - **Console**: `fight WATCHER_RUSHDOWN_BOSS_ENCOUNTER`
-- **Death message**: {character} was flattened by the Watcher's red and blue palms.
+- **Death message**: {character} was no match for **The Watcher**'s red-and-blue infinite.
 - **HP**: **583** ｜ **Energy**: 3 ｜ **Hand**: 6 ｜ **Loop**: turns 12–12 loop
 **Ability panel**
 
@@ -2174,14 +2176,17 @@ In Dread mode each act carries the dominion of **that act's main boss character*
 
 ## Death message special cases
 
-All bosses have exactly **one** death message (shown in their own section). Only two of them swap in another line under a condition:
+All bosses have exactly **one** death message (shown in their own section). These few swap in a different line under a condition (two of them are low-chance easter eggs) — everything else always uses the one line:
 
 > In multiplayer with several bosses on the field, the line shown is the one belonging to **the boss that actually killed you** (not the encounter's main boss) — every line names its own boss anyway.
 
-| Boss | Condition | Line used instead |
+| Encounter | Condition | Line used instead |
 |---|---|---|
-| Omega Watcher (`WATCHER_OMEGA`) | you were killed by her **Pressure Points** | {character} was picked apart, point by point, by **The Watcher**'s **Pressure Points**. |
-| The Fool (`FOOL_TAROT`) | the character you died as **maps to a tarot card** (table below) | {character} became the new **{Card}** in the **Fool**'s deck. |
+| `FOOL_TAROT` | died to the Fool, and that character maps to a tarot card | {character} became the new **{Card}** in the **Fool**'s deck. |
+| `IRONCLAD_BOULDER` | **Easter egg**: 1-in-20 chance, otherwise the line above | **The Ironclad** discovered that {character} is allergic to rocks. |
+| `SILENT_BREWER` | **Easter egg**: 1-in-20 chance, otherwise the line above | {character} failed to crack **The Silent**'s shell. |
+| `WATCHER_OMEGA` | killed by her Pressure Points | {character} was picked apart, point by point, by **The Watcher**'s **Pressure Points**. |
+
 
 `{Card}` in the Fool's line is picked by the character you were playing (same table as `src\Hooks\Core\FoolTarotDeaths.cs`, read from there automatically):
 

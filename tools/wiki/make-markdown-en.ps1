@@ -43,6 +43,7 @@ if (Test-Path $LossPath) {
 $LossLabels = @{
     'loss_tarot'    = 'died to the Fool, and that character maps to a tarot card'
     'loss_pressure' = 'killed by her Pressure Points'
+    'loss_egg'      = '**Easter egg**: 1-in-20 chance, otherwise the line above'
 }
 
 function Loss-Of([string]$encounter) {
@@ -486,7 +487,7 @@ $sb = New-Object System.Text.StringBuilder
 [void]$sb.AppendLine('> Card, relic and potion names are taken from the game''s own English localization tables (not re-translated).')
 [void]$sb.AppendLine('>')
 [void]$sb.AppendLine('> **Death message** = the line the game shows when you die to that boss; `{character}` is replaced by the name of the character you were playing.')
-[void]$sb.AppendLine('> Every boss has exactly one; **only two special cases** exist (the Omega Watcher''s Pressure Points, the Fool''s tarot cards) — see [Death message special cases](#loss-special).')
+[void]$sb.AppendLine('> Every boss has one; a few swap in a different line under a condition (two of them are **low-chance easter eggs**) — see [Death message special cases](#loss-special).')
 [void]$sb.AppendLine('> Chinese edition: [boss-table.md](boss-table.md)')
 [void]$sb.AppendLine('')
 [void]$sb.AppendLine('## Contents')
@@ -702,14 +703,25 @@ $foolText  = if ($foolExtra.Count  -gt 0) { [string]$foolExtra[0].Text }  else {
 [void]$sb.AppendLine('')
 [void]$sb.AppendLine('## Death message special cases')
 [void]$sb.AppendLine('')
-[void]$sb.AppendLine('All bosses have exactly **one** death message (shown in their own section). Only two of them swap in another line under a condition:')
+[void]$sb.AppendLine('All bosses have exactly **one** death message (shown in their own section). These few swap in a different line under a condition (two of them are low-chance easter eggs) — everything else always uses the one line:')
 [void]$sb.AppendLine('')
 [void]$sb.AppendLine('> In multiplayer with several bosses on the field, the line shown is the one belonging to **the boss that actually killed you** (not the encounter''s main boss) — every line names its own boss anyway.')
 [void]$sb.AppendLine('')
-[void]$sb.AppendLine('| Boss | Condition | Line used instead |')
-[void]$sb.AppendLine('|---|---|---|')
-[void]$sb.AppendLine('| Omega Watcher (`WATCHER_OMEGA`) | you were killed by her **Pressure Points** | ' + (MdText $omegaText) + ' |')
-[void]$sb.AppendLine('| The Fool (`FOOL_TAROT`) | the character you died as **maps to a tarot card** (table below) | ' + (MdText $foolText) + ' |')
+$specialRows = @()
+foreach ($d in $designs) {
+    foreach ($lm in @($d.LossMessages)) {
+        if (-not $lm.Label) { continue }
+        $specialRows += [pscustomobject]@{ Enc = $d.Encounter; Label = $lm.Label; Text = $lm.Text }
+    }
+}
+if ($specialRows.Count -gt 0) {
+    [void]$sb.AppendLine('| Encounter | Condition | Line used instead |')
+    [void]$sb.AppendLine('|---|---|---|')
+    foreach ($r in $specialRows) {
+        [void]$sb.AppendLine('| `' + $r.Enc + '` | ' + (MdText $r.Label) + ' | ' + (MdText $r.Text) + ' |')
+    }
+    [void]$sb.AppendLine('')
+}
 [void]$sb.AppendLine('')
 if ($TarotRows.Count -gt 0) {
     [void]$sb.AppendLine('`{Card}` in the Fool''s line is picked by the character you were playing (same table as `src\Hooks\Core\FoolTarotDeaths.cs`, read from there automatically):')

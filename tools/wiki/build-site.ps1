@@ -288,6 +288,7 @@ if ($null -ne $encObj) {
             $label = switch -Regex ($suffix) {
                 'loss_pressure' { '被「点穴」打死时'; break }
                 'loss_tarot'    { '死于塔罗愚、且死者角色对应某张塔罗牌时'; break }
+                'loss_egg'      { '彩蛋：低概率（1/20）遇到'; break }
                 default           { $suffix }
             }
             $lossMap[$encId].extra = @($lossMap[$encId].extra) + @([ordered]@{ label = $label; text = $text })

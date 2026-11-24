@@ -34,6 +34,7 @@ if (Test-Path $LossPath) {
 $LossLabels = @{
     'loss_tarot'    = '死于塔罗愚、且死者角色对应某张塔罗牌时'
     'loss_pressure' = '被「点穴」打死时'
+    'loss_egg'      = '**彩蛋**：低概率（1/20）遇到，其余情况用上面那句'
 }
 
 function Loss-Of([string]$encounter) {
@@ -312,7 +313,7 @@ $sb = New-Object System.Text.StringBuilder
 [void]$sb.AppendLine('> 牌打到最后没费的那几张仍列在「打出」里，每回合的**备注**会写明是哪几张没费。')
 [void]$sb.AppendLine('>')
 [void]$sb.AppendLine('> **死亡提示** = 玩家死在这只 Boss 手里时，结算 / 历史界面显示的那一句话；`{character}` 会替换成玩家所用角色的名字。')
-[void]$sb.AppendLine('> 每只 Boss 各有一句，**只有两处特例**（欧米伽观的「点穴」、愚者的塔罗牌），见[死亡提示的特殊情况](#loss-special)。')
+[void]$sb.AppendLine('> 每只 Boss 各有一句；少数几只会在特定条件下换一句（含两只**低概率彩蛋**），汇总见[死亡提示的特殊情况](#loss-special)。')
 [void]$sb.AppendLine('')
 [void]$sb.AppendLine('## 目录')
 [void]$sb.AppendLine('')
@@ -524,18 +525,25 @@ foreach ($a in @(1, 2, 3)) {
 [void]$sb.AppendLine('')
 [void]$sb.AppendLine('## 死亡提示的特殊情况')
 [void]$sb.AppendLine('')
-[void]$sb.AppendLine('全部 42 只 Boss 都是**一句**死亡提示（写在各自那一节里）。只有两处会在特定条件下换一句：')
+[void]$sb.AppendLine('全部 42 只 Boss 都是**一句**死亡提示（写在各自那一节里）。下面这几只有**条件分支**（含两只低概率彩蛋），其余情况一律用那一句：')
 [void]$sb.AppendLine('')
 [void]$sb.AppendLine('> 多人同场有多只 Boss 时，死亡提示按**打死你的那一只**的文案显示（不是这一场的主 Boss）—— 每句文案里写的本来就是那只 Boss 的名字。')
 [void]$sb.AppendLine('')
-$omegaExtra = @(Loss-Of 'WATCHER_OMEGA' | Where-Object { $_.Label } | Select-Object -First 1)
-$foolExtra  = @(Loss-Of 'FOOL_TAROT'    | Where-Object { $_.Label } | Select-Object -First 1)
-$omegaText = if ($omegaExtra.Count -gt 0) { [string]$omegaExtra[0].Text } else { '' }
-$foolText  = if ($foolExtra.Count  -gt 0) { [string]$foolExtra[0].Text }  else { '' }
-[void]$sb.AppendLine('| Boss | 条件 | 换成的那一句 |')
-[void]$sb.AppendLine('|---|---|---|')
-[void]$sb.AppendLine('| 欧米伽观（`WATCHER_OMEGA`） | 玩家是**被她用「点穴」打死**的 | ' + (MdText $omegaText) + ' |')
-[void]$sb.AppendLine('| 塔罗愚（`FOOL_TAROT`） | 死者所用角色**对应某张塔罗牌**时（见下表） | ' + (MdText $foolText) + ' |')
+$specialRows = @()
+foreach ($d in $designs) {
+    foreach ($lm in @($d.LossMessages)) {
+        if (-not $lm.Label) { continue }
+        $specialRows += [pscustomobject]@{ Name = $d.Name; Enc = $d.Encounter; Label = $lm.Label; Text = $lm.Text }
+    }
+}
+if ($specialRows.Count -gt 0) {
+    [void]$sb.AppendLine('| Boss | 遭遇 | 条件 | 换成的那一句 |')
+    [void]$sb.AppendLine('|---|---|---|---|')
+    foreach ($r in $specialRows) {
+        [void]$sb.AppendLine('| ' + (MdText $r.Name) + ' | `' + $r.Enc + '` | ' + (MdText $r.Label) + ' | ' + (MdText $r.Text) + ' |')
+    }
+    [void]$sb.AppendLine('')
+}
 [void]$sb.AppendLine('')
 if ($TarotRows.Count -gt 0) {
     [void]$sb.AppendLine('「塔罗愚」那句里的 `{Card}` 按**死者所用角色**取（同一张表在 `src\Hooks\Core\FoolTarotDeaths.cs`，本表从那里自动读出）：')
