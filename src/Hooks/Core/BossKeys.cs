@@ -464,17 +464,20 @@ internal static class BossKeys
     }
 
     /// <summary>
-    /// 候选表里「按运行期条件才加入」的那几只（目前只有观者占位）。
-    /// 装了观者 mod 才返回 `["WATCHER_DIVINITY"]`，否则空数组 —— 没装时行为和以前一模一样。
+    /// 候选表里「按运行期条件才加入」的那几只（目前是 7 只观者）。
+    /// 本机真的**用得了**观者 mod 才进候选表，否则空数组 —— 没装时行为和以前一模一样。
     /// </summary>
     /// <summary>
     /// **观者 Boss 的「缺模组就换人」兜底**（用户 2026-11-15）：
     /// > 「如果玩家在一局游戏中遇到观者 boss，但他退出游戏并关闭了观者 mod，
     /// >   用一个别的 boss 替换原本的观者 boss，保证游戏能正常进行（多人时要保持同步）」
     ///
-    /// 判据：这一局记下/正在生成 `WATCHER_BOSS`，但**现在**探测不到观者模组。
-    /// 替换目标**写死** `FOOL_BOSS`（同为三层、同为 0.113 独占）—— 不用随机数、不看本地设置，
+    /// 判据：这只 Key 是观者的，但**现在**本机用不了观者模组（见 <see cref="Core.WatcherModPresence.Usable"/>）。
+    /// 替换目标**写死、按幕**（一层愤怒战 / 二层放血战 / 三层塔罗愚）—— 不用随机数、不看本地设置，
     /// 多人两端各跑一遍得到的也是同一只 ⇒ 不会分叉。
+    ///
+    /// ★ v0.2.922：以前一律换三层 1 号塔罗愚，而塔罗愚是**钉死第三幕**的 Boss ⇒
+    ///   一层/二层的观者一旦兜底就是「三层 Boss 打低层玩家」，实测表现是不出牌。
     /// </summary>
     internal static string SubstituteIfUnavailable(string? key)
     {
@@ -485,23 +488,79 @@ internal static class BossKeys
             if (key == null) return string.Empty;
             if (!key.StartsWith("WATCHER_", StringComparison.Ordinal)) return key;
 #if STS2_111
-            if (Core.WatcherModPresence.Installed) return key!;
+            if (Core.WatcherModPresence.Usable) return key!;
 #else
             return key!;                    // 107 里根本不会有观者 Boss
 #endif
-            Logger.Log("[CharBoss] 观者 Boss：这一局是装过观者模组时开的，但现在探测不到它 ⇒ 换成塔罗愚继续");
-            // ★★ v0.2.806（用户 2026-11-19：「不开启观者 mod 时也有可能碰到观者 boss，然后变成占位愚者」）：
-            //   这里以前写的是 `"FOOL_BOSS"` —— 而 `EncounterOf` 的 switch 里**根本没有这个 Key**
-            //   （塔罗愚叫 `FOOL_TAROT`）⇒ 落到 `default: return null` ⇒ 调用方把 null 当成「没有替换」
-            //   ⇒ 观者遭遇原样保留：立绘退化成占位愚者、名字显示成 `Characterbosses`、
-            //   特殊效果却是「斋戒」（截图实证）。改成真正的 Key。
-#if STS2_113
-            return "FOOL_TAROT";
-#else
-            return key!;                    // 0.111 正式版没有愚者遭遇，别硬换
-#endif
+            // ★★ v0.2.922（用户 2026-11-24 玩家报的 bug：「2 层没装观者 mod 却遇到保留观，
+            //   然后变成不出牌占位的愚者」）：
+            //   ① 闸门从 `Installed`（只看有没有名字含 Watcher 的程序集）换成 `Usable`
+            //      （卡牌层 + 实现身份 + 角色类型都得解析得到，缺一样就算「用不了」）。
+            //   ② 替补**按幕**挑同幕的普通 Boss —— 以前固定 `FOOL_TAROT`，而塔罗愚是**三层** Boss，
+            //      塞进一层/二层就是「三层 Boss 打二层玩家」，也是那段「不出牌」的一半原因。
+            int act = ActOf(key);
+            if (act < 0) act = 2;
+            string substitute = SubstituteKeyForAct(act);
+            Logger.Log($"[CharBoss] 观者 Boss：这一局是装过观者模组时开的，但现在**用不了**它" +
+                       $"（{key}）⇒ 换成同幕的 {substitute} 继续");
+            return substitute;
         }
         catch { return key ?? string.Empty; }
+    }
+
+    /// <summary>
+    /// 「观者 Boss 用不了」时的**替补 Key**（按幕写死 ⇒ 不看随机数、不看本地设置，
+    /// 多人两端各跑一遍得到的也是同一只），以及撞车时用的第二选择。
+    ///
+    /// ★ v0.2.922：为什么要「按幕」——以前一律换三层 1 号「塔罗愚」，
+    ///   可塔罗愚的遭遇/怪物是**钉死第三幕**的 ⇒ 一层、二层的观者 Boss 一旦兜底，
+    ///   玩家就会在二层遇到三层的 Boss（血量/牌序/脚本全按三层算），实测表现就是**不出牌**。
+    /// </summary>
+    private static (string First, string Second) SubstituteKeysForAct(int act)
+    {
+        switch (act)
+        {
+            case 0: return ("IRONCLAD_ANGER", "IRONCLAD_STRIKE");      // 一层：愤怒战 / 打击战
+            case 1: return ("IRONCLAD_BLOOD", "IRONCLAD_JUGGLER");     // 二层：放血战 / 杂耍战
+            default:
+#if STS2_113
+                return ("FOOL_TAROT", "IRONCLAD_VULN");               // 三层：塔罗愚 / 易伤战
+#else
+                return ("IRONCLAD_VULN", "IRONCLAD_BOULDER");         // 0.111 没有愚者 ⇒ 两只铁甲
+#endif
+        }
+    }
+
+    /// <summary>「观者 Boss 用不了」时换成的那只 Key（按幕）。</summary>
+    internal static string SubstituteKeyForAct(int act) => SubstituteKeysForAct(act < 0 ? 2 : act).First;
+
+    /// <summary>
+    /// 观者遭遇用不了 ⇒ 换成**同幕**的替补遭遇（`actModel` 给了就顺手避开本幕另一槽那一只）。
+    /// </summary>
+    private static EncounterModel? SubstituteEncounterForAct(int act, ActModel? actModel)
+    {
+        try
+        {
+            var (first, second) = SubstituteKeysForAct(act < 0 ? 2 : act);
+            var pick = EncounterOf(first);
+            try
+            {
+                // 进阶 ≥ 10 的第三幕有两场：替补千万别和另一槽撞成同一只
+                var other = actModel?.BossEncounter;
+                if (pick != null && other != null && pick.Id == other.Id)
+                {
+                    var alt = EncounterOf(second);
+                    if (alt != null)
+                    {
+                        Logger.Log($"[CharBoss] 观者 Boss 缺模组：替补 {first} 与本幕另一槽重复 ⇒ 改用 {second}");
+                        return alt;
+                    }
+                }
+            }
+            catch { /* 忽略 */ }
+            return pick;
+        }
+        catch { return null; }
     }
 
     /// <summary>
@@ -512,23 +571,33 @@ internal static class BossKeys
     /// 而真正的 Boss 房走 `ActModel.PullNextEncounter`，它的「**沿用地图上那只**」分支会
     /// **原样返回存档槽里那个遭遇**（那一局是装过观者 mod 时开的）⇒ 观者 mod 不在时观者 Boss 照样上场：
     /// 立绘退化成占位愚者、名字显示成 `Characterbosses`、特殊效果却是「斋戒」。
-    /// 这里按**遭遇**再兜一次：观者的遭遇 + 本机没有观者 mod ⇒ 换成塔罗愚（与按 Key 那条同一个目标）。
+    /// 这里按**遭遇**再兜一次：观者的遭遇 + 本机用不了观者 mod ⇒ 换成**同幕**的普通 Boss。
+    ///
+    /// ★ v0.2.922：闸门从 `Installed` 换成 `Usable`，替补也从「固定三层塔罗愚」改成「按幕」。
     /// </summary>
-    internal static EncounterModel? FixUnavailableEncounter(EncounterModel? encounter)
+    internal static EncounterModel? FixUnavailableEncounter(EncounterModel? encounter, ActModel? actModel = null)
     {
 #if STS2_111
         try
         {
             if (encounter == null) return encounter;
-            if (Core.WatcherModPresence.Installed) return encounter;
+            if (Core.WatcherModPresence.Usable) return encounter;
             string? key = KeyOfEncounter(encounter);
             if (key == null || !key.StartsWith("WATCHER_", StringComparison.Ordinal)) return encounter;
 #if STS2_113
-            Logger.Log($"[CharBoss] 观者 Boss：这一场是 {key}（存档槽里留着的），但本机探测不到观者 mod " +
-                       "⇒ 换成塔罗愚（占位愚者不上场）");
-            return ModelDb.Encounter<FoolTarotBossEncounter>();
+            int act = -1;
+            try { act = actModel?.Index ?? -1; } catch { act = -1; }
+            if (act < 0) act = ActOf(key);
+            var substitute = SubstituteEncounterForAct(act, actModel);
+            if (substitute != null)
+            {
+                Logger.Log($"[CharBoss] 观者 Boss：这一场是 {key}（存档槽/地图里留着的），但本机**用不了**观者 mod " +
+                           $"⇒ 换成同幕的 {substitute.Id}（占位愚者不上场）");
+                return substitute;
+            }
+            return encounter;
 #else
-            return encounter;               // 0.111 正式版没有愚者遭遇，保持原样
+            return encounter;               // 0.111 正式版没有愚者遭遇：替补遭遇可能造不出来，保持原样
 #endif
         }
         catch { return encounter; }
@@ -538,15 +607,38 @@ internal static class BossKeys
     }
 
     /// <summary>
+    /// 观者 Boss **这一局能不能进候选表** = 本机真的**用得了**观者模组
+    /// （<see cref="Core.WatcherModPresence.Usable"/>：卡牌层 + 实现身份 + 角色类型三样齐）
+    /// **且**联机时所有玩家装的都是同一份实现（<see cref="Core.BossPicksSync.WatcherAllowedHere"/>）。
+    ///
+    /// ★ v0.2.922（用户 2026-11-24 玩家 bug：「2 层没装观者 mod 却遇到保留观」）：
+    ///   以前只问 `WatcherModPresence.Installed`（= 有没有名字含 `Watcher` 的程序集）——
+    ///   程序集在、但卡牌/角色解析不出来时，观者 Boss 照样被抽中 ⇒ 上场就是
+    ///   「名字是保留观、立绘是占位愚者、一张牌都不出」。
+    /// </summary>
+    private static bool WatcherBossReady()
+    {
+#if STS2_111
+        try
+        {
+            return Core.WatcherModPresence.Usable && Core.BossPicksSync.WatcherAllowedHere();
+        }
+        catch { return false; }
+#else
+        return false;
+#endif
+    }
+
+    /// <summary>
     /// **第一幕**的观者候补（用户 2026-11-17：一层 1 号「预见观」；
-    /// 2026-11-23 追加一层 2 号「疾风观」）。闸门与另外两幕完全相同（装了观者 mod + 全端同一实现）。
+    /// 2026-11-23 追加一层 2 号「疾风观」）。闸门与另外两幕完全相同（用得了观者 mod + 全端同一实现）。
     /// </summary>
     private static string[] WatcherRosterAct1()
     {
 #if STS2_111
         try
         {
-            if (Core.WatcherModPresence.Installed && Core.BossPicksSync.WatcherAllowedHere())
+            if (WatcherBossReady())
                 return new[] { "WATCHER_FORESIGHT", "WATCHER_FLURRY" };
         }
         catch { /* 探测失败就当没装 */ }
@@ -554,12 +646,16 @@ internal static class BossKeys
         return Array.Empty<string>();
     }
 
+    /// <summary>
+    /// **第二幕**的观者候补（2026-11-16：二层 1 号「印牌观」；2026-11-17 追加二层 2 号「保留观」）。
+    /// 闸门与另外两幕完全相同（用得了观者 mod + 全端同一实现）。
+    /// </summary>
     private static string[] WatcherRosterAct2()
     {
 #if STS2_111
         try
         {
-            if (Core.WatcherModPresence.Installed && Core.BossPicksSync.WatcherAllowedHere())
+            if (WatcherBossReady())
                 return new[] { "WATCHER_CREATE", "WATCHER_RETAIN" };
         }
         catch { /* 探测失败就当没装 */ }
@@ -575,7 +671,7 @@ internal static class BossKeys
         //   「只有当所有玩家都装了相同的观者 mod（指统一为 A 或 B 版）时才让观者有可能作为 boss 出现」。
         //   为什么必须加这一条：候补表的**条数**会随观者进出一变，而阵容是
         //   `(种子, 幕, 场, 候补表)` 的纯函数 ⇒ 一端有观者、一端没有，第三幕两场的阵容都可能分叉；
-        //   而且客人那边解不出观者时 `SubstituteIfUnavailable` 只会换成塔罗愚 ⇒ 两端仍然打不同的 Boss。
+        //   而且客人那边解不出观者时 `SubstituteIfUnavailable` 只会换成**同幕的普通 Boss** ⇒ 两端仍然打不同的 Boss。
         //   判定在 `BossPicksSync.WatcherAllowedHere()`：单人只看本机；多人要「玩家数 − 1」份客人上报、
         //   且每份的观者实现都跟房主一致（客人则用房主广播下来的结论，没收到就保守地不放）。
 #if STS2_111
@@ -583,7 +679,7 @@ internal static class BossKeys
         {
             // 三层两只观者设计：1 号神格观 / 2 号 Ω观（用户 2026-11-16）。
             // 顺序 = 配置界面同一列里的行序（见 BossConfigModConfig 的 PickColumns）。
-            if (Core.WatcherModPresence.Installed && Core.BossPicksSync.WatcherAllowedHere())
+            if (WatcherBossReady())
                 return new[] { "WATCHER_DIVINITY", "WATCHER_OMEGA" };
         }
         catch { /* 探测失败就当没装 */ }

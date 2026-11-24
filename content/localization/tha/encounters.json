@@ -15,6 +15,7 @@
     "SILENT_SLY_BOSS_ENCOUNTER.loss":  "{character} ถูก[gold]นักฆ่าแห่งความเงียบ[/gold]โยนลง[gold]กองทิ้ง[/gold]",
     "SILENT_BREWER_BOSS_ENCOUNTER.title":  "นักฆ่าแห่งความเงียบ",
     "SILENT_BREWER_BOSS_ENCOUNTER.loss":  "{character} ทลายกำแพงที่ก่อขึ้นจากขวดยาของ[gold]นักฆ่าแห่งความเงียบ[/gold]ไม่สำเร็จ",
+    "SILENT_BREWER_BOSS_ENCOUNTER.loss_egg":  "{character} เจาะเปลือกของ[gold]นักฆ่าแห่งความเงียบ[/gold]ไม่สำเร็จ",
     "DEFECT_BOSS_ENCOUNTER.title":  "นักเวทแปรพักตร์",
     "DEFECT_BOSS_ENCOUNTER.loss":  "{character} ถูก[gold]นักเวทแปรพักตร์[/gold]วิเคราะห์แล้วลบทิ้ง",
     "DEFECT_AI_BOSS_ENCOUNTER.title":  "นักเวทแปรพักตร์",
@@ -49,6 +50,7 @@
     "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss":  "{character} ถูก[gold]นักรบเกราะเหล็ก[/gold]เล่นเหมือนโยนรับส่ง ก่อนจมอยู่ใต้สำเนาของตัวเอง",
     "IRONCLAD_BOULDER_BOSS_ENCOUNTER.title":  "นักรบเกราะเหล็ก",
     "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss":  "{character} ถูก[gold]หินยักษ์[/gold]ของ[gold]นักรบเกราะเหล็ก[/gold]บดเป็นชิ้น",
+    "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss_egg":  "[gold]นักรบเกราะเหล็ก[/gold]พบว่า {character} แพ้หิน",
     "DEFECT_DARK_BOSS_ENCOUNTER.title":  "นักเวทแปรพักตร์",
     "DEFECT_DARK_BOSS_ENCOUNTER.loss":  "{character} ถูกกลืนโดยลูกแก้วความมืดของ[gold]นักเวทแปรพักตร์[/gold]",
     "IRONCLAD_BOSS_NORMAL_ENCOUNTER.title":  "นักรบเกราะเหล็ก",
@@ -82,7 +84,7 @@
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "ทุกตารางนิ้วของเลือดเนื้อ{character} ถูก[gold]นักปลุกผีผูกจิต[/gold]ถักทอเป็น[gold]Sleight of Flesh[/gold]",
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.title":  "Necrobinder",
     "REGENT_CHOICE_BOSS_ENCOUNTER.title":  "The Regent",
-    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions.",
+    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "[gold]Regent[/gold]ทำให้{character}หลงลืมตัวเองไปในการตัดสินใจครั้งแล้วครั้งเล่า",
     "DEFECT_THUNDER_BOSS_ENCOUNTER.loss":  "{character} ถูกเผาเป็นถ่านใน[gold]มรสุม[/gold]ของ[gold]นักเวทแปรพักตร์[/gold]",
     "REGENT_BOMBARD_BOSS_ENCOUNTER.loss":  "{character} ถูกถล่มจนเป็นดินเผาไหม้ด้วย[gold]ระเบิดทำลายล้าง[/gold]ของ[gold]The Regent[/gold]",
     "IRONCLAD_STRIKE_BOSS_ENCOUNTER.loss":  "[gold]นักรบเกราะเหล็ก[/gold]ส่ง{character}ลงนรกด้วย[gold]จู่โจมสมบูรณ์แบบ[/gold]",
@@ -116,9 +118,10 @@
     "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "การ์ดทุกใบที่{character}สร้าง ถูก[gold]นักพรตเฝ้าการณ์[/gold]เขียนใหม่เป็นอาวุธเพื่อฆ่าเจ้าตัว",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "นักพรตเฝ้าการณ์",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "[gold]นักพรตเฝ้าการณ์[/gold]เก็บการ์ดในมือของ{character}ไว้ทีละใบจนถึงที่สุด",
-    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "นักพรตเฝ้าการณ์",     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "{character} ถูกบดขยี้โดย[gold]สัพพัญญู[/gold]ของ[gold]นักพรตเฝ้าการณ์[/gold]",
+    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "นักพรตเฝ้าการณ์",
+    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "[gold]นักพรตเฝ้าการณ์[/gold]มองเห็นชะตากรรมของ{character}ล่วงหน้า",
 "WATCHER_RUSHDOWN_BOSS_ENCOUNTER.title": "Watcher",
-"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} was flattened by the Watcher's red and blue palms.",
+"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss":  "{character} หยุด[gold]ลูปแดงน้ำเงินไม่สิ้นสุด[/gold]ของ[gold]นักพรตเฝ้าการณ์[/gold]ไม่ได้เลย",
     "WATCHER_FLURRY_BOSS_ENCOUNTER.title":  "นักพรตเฝ้าการณ์",
-    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character} ถูกบดขยี้โดย[gold]Flurry of Blows[/gold]ของ[gold]นักพรตเฝ้าการณ์[/gold]"
+    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character} ทน[gold]การโจมตีต่อเนื่อง[/gold]ของ[gold]นักพรตเฝ้าการณ์[/gold]ไม่ไหว"
 }

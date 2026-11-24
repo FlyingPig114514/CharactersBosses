@@ -15,6 +15,7 @@
     "SILENT_SLY_BOSS_ENCOUNTER.loss":  "{character} was thrown into the discard pile by the [gold]Silent[/gold].",
     "SILENT_BREWER_BOSS_ENCOUNTER.title":  "The Silent",
     "SILENT_BREWER_BOSS_ENCOUNTER.loss":  "{character} could not break through the potion-wrought barrier of the [gold]Silent[/gold].",
+    "SILENT_BREWER_BOSS_ENCOUNTER.loss_egg":  "{character} failed to crack [gold]The Silent[/gold]'s shell.",
     "DEFECT_BOSS_ENCOUNTER.title":  "The Defect",
     "DEFECT_BOSS_ENCOUNTER.loss":  "{character} was analyzed and deleted by the [gold]Defect[/gold].",
     "DEFECT_AI_BOSS_ENCOUNTER.title":  "The Defect",
@@ -49,6 +50,7 @@
     "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss":  "{character} was juggled to death by the [gold]Ironclad[/gold]\u0027s endless copies.",
     "IRONCLAD_BOULDER_BOSS_ENCOUNTER.title":  "The Ironclad",
     "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss":  "{character} was ground to dust by the boulders of the [gold]Ironclad[/gold].",
+    "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss_egg":  "[gold]The Ironclad[/gold] discovered that {character} is allergic to rocks.",
     "DEFECT_DARK_BOSS_ENCOUNTER.title":  "The Defect",
     "DEFECT_DARK_BOSS_ENCOUNTER.loss":  "{character} was swallowed by the [gold]Defect[/gold]\u0027s Dark orbs.",
     "IRONCLAD_BOSS_NORMAL_ENCOUNTER.title":  "The Ironclad",
@@ -86,7 +88,7 @@
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "Every inch of {character}\u0027s flesh was woven into the [gold]Necrobinder[/gold]\u0027s sleight of hand.",
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.title":  "Necrobinder",
     "REGENT_CHOICE_BOSS_ENCOUNTER.title":  "The Regent",
-    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions.",
+    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "[gold]The Regent[/gold] made {character} lose themselves in choice after choice.",
     "DEFECT_THUNDER_BOSS_ENCOUNTER.loss":  "{character} was reduced to cinders in the [gold]Defect[/gold]\u0027s [gold]storm[/gold].",
     "REGENT_BOMBARD_BOSS_ENCOUNTER.loss":  "{character} was flattened into scorched earth by the [gold]Regent[/gold]\u0027s [gold]bombardment[/gold].",
     "REGENT_MINION_BOSS_ENCOUNTER.loss":  "{character} was beaten to death by the [gold]Regent[/gold] and his [gold]minions[/gold].",
@@ -116,9 +118,9 @@
     "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "Every card {character} generated was rewritten by [gold]The Watcher[/gold] into a weapon against them.",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "The Watcher",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "[gold]The Watcher[/gold] kept {character}'s hand, card by card, until the very end.",
-    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "The Watcher",     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "{character} was crushed by [gold]The Watcher[/gold]'s [gold]Omniscience[/gold].",
+    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "The Watcher",     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "[gold]The Watcher[/gold] foresaw the fate of {character}.",
 "WATCHER_RUSHDOWN_BOSS_ENCOUNTER.title": "Watcher",
-"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} was flattened by the Watcher's red and blue palms.",
+"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} was no match for [gold]The Watcher[/gold]'s red-and-blue infinite.",
     "WATCHER_FLURRY_BOSS_ENCOUNTER.title":  "The Watcher",
-    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character} was crushed by [gold]The Watcher[/gold]'s [gold]Flurry of Blows[/gold]."
+    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character} could not withstand [gold]The Watcher[/gold]'s relentless flurry."
 }

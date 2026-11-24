@@ -15,6 +15,7 @@
     "SILENT_SLY_BOSS_ENCOUNTER.loss":  "{character}は[gold]サイレント[/gold]に捨て札へ放り込まれた。",
     "SILENT_BREWER_BOSS_ENCOUNTER.title":  "サイレント",
     "SILENT_BREWER_BOSS_ENCOUNTER.loss":  "{character}は[gold]サイレント[/gold]のポーションで築かれた障壁を打ち破れなかった。",
+    "SILENT_BREWER_BOSS_ENCOUNTER.loss_egg":  "{character}は[gold]サイレント[/gold]の甲羅を打ち破れなかった。",
     "DEFECT_BOSS_ENCOUNTER.title":  "ディフェクト",
     "DEFECT_BOSS_ENCOUNTER.loss":  "{character}は[gold]ディフェクト[/gold]に分析され、削除された。",
     "DEFECT_AI_BOSS_ENCOUNTER.title":  "ディフェクト",
@@ -49,6 +50,7 @@
     "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss":  "{character}は[gold]アイアンクラッド[/gold]に弄ばれ、最後は自分のコピーに埋め尽くされた。",
     "IRONCLAD_BOULDER_BOSS_ENCOUNTER.title":  "アイアンクラッド",
     "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss":  "{character}は[gold]アイアンクラッド[/gold]の[gold]巨大な岩[/gold]に粉々にされた。",
+    "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss_egg":  "[gold]アイアンクラッド[/gold]は{character}が石にアレルギーだと気づいた。",
     "DEFECT_DARK_BOSS_ENCOUNTER.title":  "ディフェクト",
     "DEFECT_DARK_BOSS_ENCOUNTER.loss":  "{character}は[gold]ディフェクト[/gold]のダークオーブに呑み込まれた。",
     "IRONCLAD_BOSS_NORMAL_ENCOUNTER.title":  "アイアンクラッド",
@@ -82,7 +84,7 @@
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "{character}の血肉の一片一片が[gold]ネクロバインダー[/gold]の[gold]呪肉の奇術[/gold]に編み込まれた。",
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.title":  "Necrobinder",
     "REGENT_CHOICE_BOSS_ENCOUNTER.title":  "The Regent",
-    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions.",
+    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "[gold]リージェント[/gold]は{character}を幾度もの決断の中で自分自身を見失わせた。",
     "DEFECT_THUNDER_BOSS_ENCOUNTER.loss":  "{character}は[gold]ディフェクト[/gold]の[gold]ストーム[/gold]で黒焦げにされた。",
     "REGENT_BOMBARD_BOSS_ENCOUNTER.loss":  "{character}は[gold]リージェント[/gold]の[gold]爆撃[/gold]で焦土と化した。",
     "IRONCLAD_STRIKE_BOSS_ENCOUNTER.loss":  "[gold]アイアンクラッド[/gold]の[gold]パーフェクトストライク[/gold]で{character}は地獄へ叩き込まれた。",
@@ -116,9 +118,10 @@
     "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character}が生成したカードはすべて、[gold]ウォッチャー[/gold]によって自分を討つ武器に書き換えられた。",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "ウォッチャー",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "{character}の手札は[gold]ウォッチャー[/gold]に一枚ずつ抱えられたまま、終わりを迎えた。",
-    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "ウォッチャー",     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "{character}は[gold]ウォッチャー[/gold]の[gold]全知[/gold]に砕かれた。",
+    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "ウォッチャー",
+    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "[gold]ウォッチャー[/gold]は{character}の運命を見通していた。",
 "WATCHER_RUSHDOWN_BOSS_ENCOUNTER.title": "Watcher",
-"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} was flattened by the Watcher's red and blue palms.",
+"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss":  "{character}は[gold]ウォッチャー[/gold]の赤青無限を到底止められなかった。",
     "WATCHER_FLURRY_BOSS_ENCOUNTER.title":  "ウォッチャー",
-    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character}は[gold]ウォッチャー[/gold]の[gold]連打[/gold]に砕かれた。"
+    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character}は[gold]ウォッチャー[/gold]の絶え間ない連撃に耐えきれなかった。"
 }

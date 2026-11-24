@@ -15,6 +15,7 @@
     "SILENT_SLY_BOSS_ENCOUNTER.loss":  "La [gold]Silencieuse[/gold] a jeté {character} à la [gold]Défausse[/gold].",
     "SILENT_BREWER_BOSS_ENCOUNTER.title":  "La Silencieuse",
     "SILENT_BREWER_BOSS_ENCOUNTER.loss":  "{character} n\u0027a pas pu percer la barrière de potions de la [gold]Silencieuse[/gold].",
+    "SILENT_BREWER_BOSS_ENCOUNTER.loss_egg":  "{character} n'a pas réussi à briser la carapace de la [gold]Silencieuse[/gold].",
     "DEFECT_BOSS_ENCOUNTER.title":  "Le Défectueux",
     "DEFECT_BOSS_ENCOUNTER.loss":  "Le [gold]Défectueux[/gold] a analysé puis supprimé {character}.",
     "DEFECT_AI_BOSS_ENCOUNTER.title":  "Le Défectueux",
@@ -49,6 +50,7 @@
     "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss":  "Le [gold]Soldat de Fer[/gold] a fait jongler {character} jusqu\u0027à ce que ses propres copies l\u0027engloutissent.",
     "IRONCLAD_BOULDER_BOSS_ENCOUNTER.title":  "Le Soldat de Fer",
     "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss":  "Les [gold]Rochers gigantesques[/gold] du [gold]Soldat de Fer[/gold] ont réduit {character} en miettes.",
+    "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss_egg":  "Le [gold]Soldat de Fer[/gold] a découvert que {character} est allergique aux pierres.",
     "DEFECT_DARK_BOSS_ENCOUNTER.title":  "Le Défectueux",
     "DEFECT_DARK_BOSS_ENCOUNTER.loss":  "Les [gold]Orbes ténébreux[/gold] du [gold]Défectueux[/gold] ont englouti {character}.",
     "IRONCLAD_BOSS_NORMAL_ENCOUNTER.title":  "Le Soldat de Fer",
@@ -82,7 +84,7 @@
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "Chaque parcelle de chair de {character} a été tissée par la [gold]Tisse-Mort[/gold] dans son [gold]Tour de chair[/gold].",
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.title":  "Necrobinder",
     "REGENT_CHOICE_BOSS_ENCOUNTER.title":  "The Regent",
-    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions.",
+    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "Le [gold]Régent[/gold] a fait perdre à {character} jusqu'au sens de soi-même.",
     "DEFECT_THUNDER_BOSS_ENCOUNTER.loss":  "{character} a été réduit en cendres dans l\u0027[gold]Orage[/gold] du [gold]Défectueux[/gold].",
     "REGENT_BOMBARD_BOSS_ENCOUNTER.loss":  "{character} a été changé en terre brûlée par le [gold]Bombardement[/gold] du [gold]Régent[/gold].",
     "IRONCLAD_STRIKE_BOSS_ENCOUNTER.loss":  "Le [gold]Soldat de Fer[/gold] a envoyé {character} en enfer d\u0027une [gold]Frappe perfectionnée[/gold].",
@@ -116,9 +118,10 @@
     "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "Chaque carte générée par {character} a été réécrite par [gold]La gardienne[/gold] en arme contre lui.",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "La gardienne",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "[gold]La gardienne[/gold] a retenu la main de {character}, carte après carte, jusqu'à la fin.",
-    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "La gardienne",     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "{character} a été écrasé par l'[gold]Omniscience[/gold] de [gold]la gardienne[/gold].",
+    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "La gardienne",
+    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "[gold]la gardienne[/gold] a vu le destin de {character} à l'avance.",
 "WATCHER_RUSHDOWN_BOSS_ENCOUNTER.title": "Watcher",
-"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} was flattened by the Watcher's red and blue palms.",
+"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss":  "{character} n'avait visiblement aucune chance contre l'infinie rouge et bleue de [gold]la gardienne[/gold].",
     "WATCHER_FLURRY_BOSS_ENCOUNTER.title":  "La gardienne",
-    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character} a été écrasé par la [gold]Rafale de coups[/gold] de [gold]la gardienne[/gold]."
+    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character} n'a pas pu encaisser la rafale incessante de [gold]la gardienne[/gold]."
 }

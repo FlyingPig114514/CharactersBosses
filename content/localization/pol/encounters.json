@@ -15,6 +15,7 @@
     "SILENT_SLY_BOSS_ENCOUNTER.loss":  "[gold]Zjawa[/gold] wrzuciła {character} do stosu kart odrzuconych.",
     "SILENT_BREWER_BOSS_ENCOUNTER.title":  "Zjawa",
     "SILENT_BREWER_BOSS_ENCOUNTER.loss":  "{character} nie zdołał przebić bariery wzniesionej miksturami [gold]Zjawy[/gold].",
+    "SILENT_BREWER_BOSS_ENCOUNTER.loss_egg":  "{character} nie zdołał przebić skorupy [gold]Zjawy[/gold].",
     "DEFECT_BOSS_ENCOUNTER.title":  "Defekt",
     "DEFECT_BOSS_ENCOUNTER.loss":  "{character} został przeanalizowany i usunięty przez [gold]Defekta[/gold].",
     "DEFECT_AI_BOSS_ENCOUNTER.title":  "Defekt",
@@ -49,6 +50,7 @@
     "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss":  "[gold]Pancernik[/gold] żonglował {character}, aż w końcu zasypały go własne kopie.",
     "IRONCLAD_BOULDER_BOSS_ENCOUNTER.title":  "Pancernik",
     "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss":  "{character} został starty na proch przez skały [gold]Pancernika[/gold].",
+    "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss_egg":  "[gold]Pancernik[/gold] odkrył, że {character} jest uczulony na kamienie.",
     "DEFECT_DARK_BOSS_ENCOUNTER.title":  "Defekt",
     "DEFECT_DARK_BOSS_ENCOUNTER.loss":  "{character} został pochłonięty przez Sfery Ciemności [gold]Defekta[/gold].",
     "IRONCLAD_BOSS_NORMAL_ENCOUNTER.title":  "Pancernik",
@@ -82,7 +84,7 @@
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "Każdy cal ciała {character} został wpleciony przez [gold]Nekromantkę[/gold] w jej [gold]Maltretowanie[/gold].",
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.title":  "Necrobinder",
     "REGENT_CHOICE_BOSS_ENCOUNTER.title":  "The Regent",
-    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions.",
+    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "[gold]Monarcha[/gold] sprawił, że {character} zagubił się w kolejnych decyzjach.",
     "DEFECT_THUNDER_BOSS_ENCOUNTER.loss":  "{character} spłonął na popiół w [gold]Burzy[/gold] zesłanej przez [gold]Defekta[/gold].",
     "REGENT_BOMBARD_BOSS_ENCOUNTER.loss":  "{character} został zmieciony w spaloną ziemię przez [gold]Bombardowanie[/gold] [gold]Monarchy[/gold].",
     "IRONCLAD_STRIKE_BOSS_ENCOUNTER.loss":  "[gold]Pancernik[/gold] posłał {character} do piekła [gold]Perfekcyjnym uderzeniem[/gold].",
@@ -116,9 +118,10 @@
     "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "Każda karta wygenerowana przez {character} została przepisana przez [gold]Obserwatorkę[/gold] na broń przeciw niemu.",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "Obserwatorka",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "[gold]Obserwatorka[/gold] zatrzymywała rękę {character} karta po karcie aż do końca.",
-    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "Obserwatorka",     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "{character} został zmiażdżony przez [gold]Wszechwiedzę[/gold] [gold]Obserwatorki[/gold].",
+    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "Obserwatorka",
+    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "[gold]Obserwatorka[/gold] przewidziała los {character}.",
 "WATCHER_RUSHDOWN_BOSS_ENCOUNTER.title": "Watcher",
-"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} was flattened by the Watcher's red and blue palms.",
+"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss":  "{character} najwyraźniej nie miał szans z czerwono-niebieskim infinite [gold]Obserwatorki[/gold].",
     "WATCHER_FLURRY_BOSS_ENCOUNTER.title":  "Obserwatorka",
-    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character} został zmiażdżony przez [gold]Lawinę ciosów[/gold] [gold]Obserwatorki[/gold]."
+    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character} nie zdołał znieść nieustannej lawiny ciosów [gold]Obserwatorki[/gold]."
 }

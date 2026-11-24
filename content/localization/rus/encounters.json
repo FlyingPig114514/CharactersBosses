@@ -15,6 +15,7 @@
     "SILENT_SLY_BOSS_ENCOUNTER.loss":  "[gold]Безмолвная[/gold] отправила {character} в стопку сброса.",
     "SILENT_BREWER_BOSS_ENCOUNTER.title":  "Безмолвная",
     "SILENT_BREWER_BOSS_ENCOUNTER.loss":  "{character} не смог пробить барьер, возведенный зельями [gold]Безмолвной[/gold].",
+    "SILENT_BREWER_BOSS_ENCOUNTER.loss_egg":  "{character} не смог пробить панцирь [gold]Безмолвной[/gold].",
     "DEFECT_BOSS_ENCOUNTER.title":  "Дефект",
     "DEFECT_BOSS_ENCOUNTER.loss":  "{character} был проанализирован и удален [gold]Дефектом[/gold].",
     "DEFECT_AI_BOSS_ENCOUNTER.title":  "Дефект",
@@ -49,6 +50,7 @@
     "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss":  "[gold]Латоносец[/gold] жонглировал {character}, пока того не погребли его собственные копии.",
     "IRONCLAD_BOULDER_BOSS_ENCOUNTER.title":  "Латоносец",
     "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss":  "{character} был растерт в крошку булыжниками [gold]Латоносца[/gold].",
+    "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss_egg":  "[gold]Латоносец[/gold] обнаружил, что у {character} аллергия на камни.",
     "DEFECT_DARK_BOSS_ENCOUNTER.title":  "Дефект",
     "DEFECT_DARK_BOSS_ENCOUNTER.loss":  "{character} был поглощен сферами тьмы [gold]Дефекта[/gold].",
     "IRONCLAD_BOSS_NORMAL_ENCOUNTER.title":  "Латоносец",
@@ -82,7 +84,7 @@
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "Каждый кусочек плоти {character} был вплетён [gold]Призывающей[/gold] в её [gold]Податливую плоть[/gold].",
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.title":  "Necrobinder",
     "REGENT_CHOICE_BOSS_ENCOUNTER.title":  "The Regent",
-    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions.",
+    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "[gold]Наследник[/gold] заставил {character} потерять себя среди одного решения за другим.",
     "DEFECT_THUNDER_BOSS_ENCOUNTER.loss":  "{character} обратился в пепел в [gold]Шторме[/gold] [gold]Дефекта[/gold].",
     "REGENT_BOMBARD_BOSS_ENCOUNTER.loss":  "{character} был стёрт в выжженную землю [gold]Бомбардировкой[/gold] [gold]Наследника[/gold].",
     "IRONCLAD_STRIKE_BOSS_ENCOUNTER.loss":  "[gold]Латоносец[/gold] отправил {character} в ад [gold]Отточенным ударом[/gold].",
@@ -116,9 +118,10 @@
     "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "Каждая карта, созданная {character}, была переписана [gold]Созерцающей[/gold] в оружие против него.",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "Созерцающая",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "[gold]Созерцающая[/gold] удерживала руку {character} карту за картой до самого конца.",
-    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "Созерцающая",     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "{character} был раздавлен [gold]Всеведением[/gold] [gold]Созерцающей[/gold].",
+    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "Созерцающая",
+    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "[gold]Созерцающая[/gold] предвидела судьбу {character}.",
 "WATCHER_RUSHDOWN_BOSS_ENCOUNTER.title": "Watcher",
-"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} was flattened by the Watcher's red and blue palms.",
+"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss":  "{character}, очевидно, не мог сдержать красно-синий бесконечный цикл [gold]Созерцающей[/gold].",
     "WATCHER_FLURRY_BOSS_ENCOUNTER.title":  "Созерцающая",
-    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character} был раздавлен [gold]Натиском[/gold] [gold]Созерцающей[/gold]."
+    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character} не выдержал непрерывного натиска [gold]Созерцающей[/gold]."
 }

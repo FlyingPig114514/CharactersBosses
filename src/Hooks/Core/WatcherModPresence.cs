@@ -36,6 +36,46 @@ internal static class WatcherModPresence
         }
     }
 
+    /// <summary>
+    /// 观者 **Boss 到底能不能用**（= 能不能放进候选表 / 能不能原样上场）。
+    ///
+    /// ★★ v0.2.922（用户 2026-11-24 玩家报的 bug：「在 2 层未装载观者 mod 时遇到了**保留观**，
+    ///   然后变成了**不出牌占位的愚者**」）：
+    ///   以前闸门只问 <see cref="Installed"/> —— 它的判据只是「有没有一个名字里含 `Watcher` 的程序集」。
+    ///   可 Boss 真正需要的是三件东西：
+    ///     · 卡牌/遗物引用层 `<see cref="WatcherCards.ModAssembly"/>`（认得出 A / B 哪一份实现）；
+    ///     · <see cref="WatcherCards.ProviderId"/> 非空（联机时用来核对两端是不是同一份实现）；
+    ///     · 观者的角色类型 <see cref="CharacterType"/>（拿不到 ⇒ 立绘退回**占位愚者** `fool.tscn`）。
+    ///   三样缺一样就会变成玩家截图那样：名字是「保留观」、立绘是愚者、牌一张也出不来
+    ///   （卡组全部来自观者 mod ⇒ 空）。
+    ///   现在统一问这一个属性：**少了任何一样就当没装**，退回「换成同幕的普通 Boss」那条兜底。
+    /// </summary>
+    internal static bool Usable
+    {
+        get
+        {
+            if (!Installed) return false;
+            try
+            {
+                if (Core.WatcherCards.ModAssembly() == null)
+                {
+                    LogOnce("[CharBoss] 观者 Boss：探测到名字含 Watcher 的程序集，" +
+                            "但认不出它是 A（3747526116）/ B（3747492505）哪一份实现 ⇒ 按「没装」处理");
+                    return false;
+                }
+                if (Core.WatcherCards.ProviderId.Length == 0) return false;
+                if (CharacterType() == null)
+                {
+                    LogOnce("[CharBoss] 观者 Boss：卡牌层认出来了，但解析不到观者的角色类型 ⇒ 按「没装」处理" +
+                            "（否则立绘会退化成占位愚者）");
+                    return false;
+                }
+                return true;
+            }
+            catch { return false; }
+        }
+    }
+
     /// <summary>观者的 `CharacterModel` 子类（拿不到返回 null）。</summary>
     internal static Type? CharacterType()
     {
@@ -50,7 +90,10 @@ internal static class WatcherModPresence
         try
         {
             long nowMs = Environment.TickCount64;
-            if (!_installed && nowMs - _lastProbeMs < 2000) return;
+            // ★ v0.2.922：**无论装没装**都限流（以前只有「没装」才限流）。
+            //   因为「程序集在、但角色类型解析不到」这种情况现在不算探完（见文件末尾的 _probed），
+            //   不限流的话会每帧全量扫一遍程序集类型。
+            if (_lastProbeMs != 0 && nowMs - _lastProbeMs < 2000) return;
             _lastProbeMs = nowMs;
         }
         catch { /* 忽略 */ }
@@ -91,7 +134,9 @@ internal static class WatcherModPresence
         }
         if (!_installed) LogOnce("[CharBoss] 没装观者 mod ⇒ 第三幕候选里不会有观者 Boss");
         // 只有真的探测到观者 mod 才锁死；没找到就保持未锁，下一帧再试（慢车道会反复调 Installed）
-        if (_installed) _probed = true;
+        // ★ v0.2.922：**还要真的解析到角色类型**才锁（否则「程序集在、类型还没就绪」会被永久缓存成
+        //   「没角色类型」⇒ 立绘一直是占位愚者，和 v0.2.686 那个坑同一类）。
+        if (_installed && _characterType != null) _probed = true;
     }
 
     /// <summary>同一句话只打一次（v0.2.805：以前「没装观者 / 探测到」在手机上一局能刷两千多行）。</summary>

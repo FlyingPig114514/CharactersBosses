@@ -1563,7 +1563,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 - **Character / Act**: Ironclad · Act 3
 - **Console**: `fight IRONCLAD_BOULDER_BOSS_ENCOUNTER`
 - **Death message**: {character} was ground to dust by the boulders of the **Ironclad**.
-- **Death message** (**Easter egg**: 1-in-20 chance, otherwise the line above): **The Ironclad** discovered that {character} is allergic to rocks.
+- **Death message** (**Easter egg**: 10% chance, otherwise the line above): **The Ironclad** discovered that {character} is allergic to rocks.
 - **HP**: **560** ｜ **Energy**: 4 ｜ **Hand**: 6 ｜ **Loop**: turns 5–7 loop
 **Ability panel**
 
@@ -1897,7 +1897,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 - **Character / Act**: Silent · Act 3
 - **Console**: `fight SILENT_BREWER_BOSS_ENCOUNTER`
 - **Death message**: {character} could not break through the potion-wrought barrier of the **Silent**.
-- **Death message** (**Easter egg**: 1-in-20 chance, otherwise the line above): {character} failed to crack **The Silent**'s shell.
+- **Death message** (**Easter egg**: 10% chance, otherwise the line above): {character} failed to crack **The Silent**'s shell.
 - **HP**: **550** ｜ **Energy**: 3 ｜ **Hand**: 6 ｜ **Loop**: turns 5–8 loop
 **Ability panel**
 
@@ -2183,8 +2183,8 @@ All bosses have exactly **one** death message (shown in their own section). Thes
 | Encounter | Condition | Line used instead |
 |---|---|---|
 | `FOOL_TAROT` | died to the Fool, and that character maps to a tarot card | {character} became the new **{Card}** in the **Fool**'s deck. |
-| `IRONCLAD_BOULDER` | **Easter egg**: 1-in-20 chance, otherwise the line above | **The Ironclad** discovered that {character} is allergic to rocks. |
-| `SILENT_BREWER` | **Easter egg**: 1-in-20 chance, otherwise the line above | {character} failed to crack **The Silent**'s shell. |
+| `IRONCLAD_BOULDER` | **Easter egg**: 10% chance, otherwise the line above | **The Ironclad** discovered that {character} is allergic to rocks. |
+| `SILENT_BREWER` | **Easter egg**: 10% chance, otherwise the line above | {character} failed to crack **The Silent**'s shell. |
 | `WATCHER_OMEGA` | killed by her Pressure Points | {character} was picked apart, point by point, by **The Watcher**'s **Pressure Points**. |
 
 

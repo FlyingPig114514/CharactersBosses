@@ -73,6 +73,13 @@ public static class BossKillerTracker
     }
 
     /// <summary>
+    /// **当前战斗的身份**（换一场战斗就换一个对象）。
+    /// 用途：死亡提示彩蛋那种「一次死亡只掷一次骰子」的场景拿它做键 —— 同一个 token 内结果稳定，
+    /// 结算界面与历史界面看到的是同一句（见 <c>Patches/BossLossMessagePatches.BossLossEggPatch</c>）。
+    /// </summary>
+    internal static object? CombatToken => _combatKey;
+
+    /// <summary>
     /// **这条死亡提示对应的就是「记录凶手的那一场战斗」吗？**
     ///
     /// ★ v0.2.788（用户 2026-11-19：「这不同的几局怎么都显示灵魂被亡灵契约师收走了（只有最后一局是死于灵魂骨的）」）

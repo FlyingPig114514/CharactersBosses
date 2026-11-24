@@ -15,6 +15,7 @@
     "SILENT_SLY_BOSS_ENCOUNTER.loss":  "[gold]La Silenciosa[/gold] arrojó a {character} a la pila de descarte.",
     "SILENT_BREWER_BOSS_ENCOUNTER.title":  "La Silenciosa",
     "SILENT_BREWER_BOSS_ENCOUNTER.loss":  "{character} no logró atravesar la barrera de pociones de [gold]La Silenciosa[/gold].",
+    "SILENT_BREWER_BOSS_ENCOUNTER.loss_egg":  "{character} no logró romper el caparazón de [gold]La Silenciosa[/gold].",
     "DEFECT_BOSS_ENCOUNTER.title":  "El Defectuoso",
     "DEFECT_BOSS_ENCOUNTER.loss":  "{character} fue analizado y borrado por [gold]El Defectuoso[/gold].",
     "DEFECT_AI_BOSS_ENCOUNTER.title":  "El Defectuoso",
@@ -49,6 +50,7 @@
     "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss":  "[gold]El Blindado[/gold] tuvo a {character} dando vueltas hasta ahogarlo bajo sus propias copias.",
     "IRONCLAD_BOULDER_BOSS_ENCOUNTER.title":  "El Blindado",
     "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss":  "[gold]El Blindado[/gold] redujo a {character} a pedazos con sus rocas.",
+    "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss_egg":  "[gold]El Blindado[/gold] descubrió que {character} es alérgico a las rocas.",
     "DEFECT_DARK_BOSS_ENCOUNTER.title":  "El Defectuoso",
     "DEFECT_DARK_BOSS_ENCOUNTER.loss":  "{character} fue devorado por los orbes de [gold]oscuridad[/gold] de [gold]El Defectuoso[/gold].",
     "IRONCLAD_BOSS_NORMAL_ENCOUNTER.title":  "El Blindado",
@@ -82,7 +84,7 @@
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "Cada centímetro de la carne de {character} fue tejido por [gold]La Necrodescarte[/gold] en su [gold]Libra de carne[/gold].",
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.title":  "Necrobinder",
     "REGENT_CHOICE_BOSS_ENCOUNTER.title":  "The Regent",
-    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions.",
+    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "[gold]El Monarca[/gold] hizo que {character} se perdiera a sí mismo entre decisión y decisión.",
     "DEFECT_THUNDER_BOSS_ENCOUNTER.loss":  "{character} quedó reducido a cenizas en la [gold]Tormenta[/gold] de [gold]El Defectuoso[/gold].",
     "REGENT_BOMBARD_BOSS_ENCOUNTER.loss":  "{character} fue arrasado hasta convertirse en tierra quemada por el [gold]Asedio[/gold] de [gold]El Monarca[/gold].",
     "IRONCLAD_STRIKE_BOSS_ENCOUNTER.loss":  "[gold]El Blindado[/gold] mandó a {character} al infierno con su [gold]Golpe perfeccionado[/gold].",
@@ -116,9 +118,10 @@
     "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "Cada carta que {character} generó fue reescrita por [gold]La Vigilante[/gold] en un arma en su contra.",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "La Vigilante",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "[gold]La Vigilante[/gold] retuvo la mano de {character} carta a carta hasta el final.",
-    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "La Vigilante",     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "{character} fue aplastado por la [gold]Omnisciencia[/gold] de [gold]La Vigilante[/gold].",
+    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "La Vigilante",
+    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "[gold]La Vigilante[/gold] previó el destino de {character}.",
 "WATCHER_RUSHDOWN_BOSS_ENCOUNTER.title": "Watcher",
-"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} was flattened by the Watcher's red and blue palms.",
+"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss":  "{character} no tuvo ninguna opción contra el infinito rojo y azul de [gold]La Vigilante[/gold].",
     "WATCHER_FLURRY_BOSS_ENCOUNTER.title":  "La Vigilante",
-    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character} fue aplastado por la [gold]Flurry of Blows[/gold] de [gold]La Vigilante[/gold]."
+    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character} no pudo resistir la andanada incesante de [gold]La Vigilante[/gold]."
 }

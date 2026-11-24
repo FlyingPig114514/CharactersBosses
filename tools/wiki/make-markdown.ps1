@@ -34,7 +34,7 @@ if (Test-Path $LossPath) {
 $LossLabels = @{
     'loss_tarot'    = '死于塔罗愚、且死者角色对应某张塔罗牌时'
     'loss_pressure' = '被「点穴」打死时'
-    'loss_egg'      = '**彩蛋**：低概率（1/20）遇到，其余情况用上面那句'
+    'loss_egg'      = '**彩蛋**：低概率（10%）遇到，其余情况用上面那句'
 }
 
 function Loss-Of([string]$encounter) {

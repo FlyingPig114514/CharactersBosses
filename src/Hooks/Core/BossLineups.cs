@@ -333,7 +333,7 @@ internal static class BossLineups
             try { roster = BossKeys.RosterFor(act).Length; } catch { /* 忽略 */ }
             bool watcher = false;
 #if STS2_111
-            try { watcher = Core.WatcherModPresence.Installed; } catch { /* 忽略 */ }
+            try { watcher = Core.WatcherModPresence.Usable; } catch { /* 忽略 */ }
 #endif
             int cand = 0;
             try { cand = Core.BossSelection.AvailableFor(act, mapEntry).Length; } catch { /* 忽略 */ }

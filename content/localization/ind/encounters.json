@@ -15,6 +15,7 @@
     "SILENT_SLY_BOSS_ENCOUNTER.loss":  "{character} dilempar ke [gold]Tumpukan Singkir[/gold] oleh [gold]Si Silent[/gold].",
     "SILENT_BREWER_BOSS_ENCOUNTER.title":  "Si Silent",
     "SILENT_BREWER_BOSS_ENCOUNTER.loss":  "{character} tidak bisa menembus benteng ramuan milik [gold]Si Silent[/gold].",
+    "SILENT_BREWER_BOSS_ENCOUNTER.loss_egg":  "{character} gagal menembus cangkang [gold]Si Silent[/gold].",
     "DEFECT_BOSS_ENCOUNTER.title":  "Si Defect",
     "DEFECT_BOSS_ENCOUNTER.loss":  "{character} dianalisis lalu dihapus oleh [gold]Si Defect[/gold].",
     "DEFECT_AI_BOSS_ENCOUNTER.title":  "Si Defect",
@@ -49,6 +50,7 @@
     "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss":  "{character} dipermainkan [gold]Si Ironclad[/gold] bagai lempar tangkap, lalu terkubur oleh salinannya sendiri.",
     "IRONCLAD_BOULDER_BOSS_ENCOUNTER.title":  "Si Ironclad",
     "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss":  "{character} dihancurkan menjadi serpihan oleh [gold]Batu Raksasa[/gold] milik [gold]Si Ironclad[/gold].",
+    "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss_egg":  "[gold]Si Ironclad[/gold] menemukan bahwa {character} alergi terhadap batu.",
     "DEFECT_DARK_BOSS_ENCOUNTER.title":  "Si Defect",
     "DEFECT_DARK_BOSS_ENCOUNTER.loss":  "{character} ditelan oleh Bola [gold]Kegelapan[/gold] milik [gold]Si Defect[/gold].",
     "IRONCLAD_BOSS_NORMAL_ENCOUNTER.title":  "Si Ironclad",
@@ -82,7 +84,7 @@
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "Setiap inci daging {character} ditenun oleh [gold]Si Necrobinder[/gold] menjadi bagian dari [gold]Kemahiran Kedagingan[/gold].",
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.title":  "Necrobinder",
     "REGENT_CHOICE_BOSS_ENCOUNTER.title":  "The Regent",
-    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions.",
+    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "[gold]Si Regent[/gold] membuat {character} kehilangan jati dirinya dalam keputusan demi keputusan.",
     "DEFECT_THUNDER_BOSS_ENCOUNTER.loss":  "{character} hangus menjadi arang dalam [gold]Badai[/gold] milik [gold]Si Defect[/gold].",
     "REGENT_BOMBARD_BOSS_ENCOUNTER.loss":  "{character} diratakan menjadi tanah hangus oleh [gold]Pengeboman[/gold] [gold]Si Regent[/gold].",
     "IRONCLAD_STRIKE_BOSS_ENCOUNTER.loss":  "[gold]Si Ironclad[/gold] menghempaskan {character} ke neraka dengan [gold]Tebasan Sempurna[/gold].",
@@ -116,9 +118,10 @@
     "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "Setiap kartu yang dihasilkan {character} ditulis ulang [gold]Watcher[/gold] menjadi senjata untuk melawannya.",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "Watcher",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "[gold]Watcher[/gold] menahan kartu {character}, satu per satu, sampai akhir.",
-    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "Watcher",     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "{character} dihancurkan oleh [gold]Mahatahu[/gold] milik [gold]Watcher[/gold].",
+    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "Watcher",
+    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "[gold]Watcher[/gold] telah meramalkan takdir {character}.",
 "WATCHER_RUSHDOWN_BOSS_ENCOUNTER.title": "Watcher",
-"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} was flattened by the Watcher's red and blue palms.",
+"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss":  "{character} jelas tidak bisa menahan infinite merah-biru milik [gold]Watcher[/gold].",
     "WATCHER_FLURRY_BOSS_ENCOUNTER.title":  "Watcher",
-    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character} dihancurkan oleh [gold]Flurry of Blows[/gold] milik [gold]Watcher[/gold]."
+    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character} tidak mampu menahan hantaman tanpa henti dari [gold]Watcher[/gold]."
 }

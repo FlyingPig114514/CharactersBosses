@@ -15,6 +15,7 @@
     "SILENT_SLY_BOSS_ENCOUNTER.loss":  "{character}, [gold]Sessiz[/gold] tarafından [gold]Atık Deste[/gold]\u0027ye atıldı.",
     "SILENT_BREWER_BOSS_ENCOUNTER.title":  "Sessiz",
     "SILENT_BREWER_BOSS_ENCOUNTER.loss":  "{character}, [gold]Sessiz[/gold]\u0027in iksirlerle ördüğü bariyeri aşamadı.",
+    "SILENT_BREWER_BOSS_ENCOUNTER.loss_egg":  "{character}, [gold]Sessiz[/gold]'in kabuğunu kıramadı.",
     "DEFECT_BOSS_ENCOUNTER.title":  "Arıza",
     "DEFECT_BOSS_ENCOUNTER.loss":  "{character}, [gold]Arıza[/gold] tarafından analiz edilip silindi.",
     "DEFECT_AI_BOSS_ENCOUNTER.title":  "Arıza",
@@ -49,6 +50,7 @@
     "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss":  "{character}, [gold]Demirkaplı[/gold] tarafından hokkabazlık edilir gibi oynatıldı ve sonunda kendi kopyaları altında kaldı.",
     "IRONCLAD_BOULDER_BOSS_ENCOUNTER.title":  "Demirkaplı",
     "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss":  "{character}, [gold]Demirkaplı[/gold]\u0027nın [gold]Devasa Kaya[/gold]\u0027larıyla toz haline getirildi.",
+    "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss_egg":  "[gold]Demirkaplı[/gold], {character}'in taşa alerjisi olduğunu keşfetti.",
     "DEFECT_DARK_BOSS_ENCOUNTER.title":  "Arıza",
     "DEFECT_DARK_BOSS_ENCOUNTER.loss":  "{character}, [gold]Arıza[/gold]\u0027nın [gold]Karanlık[/gold] küreleri tarafından yutuldu.",
     "IRONCLAD_BOSS_NORMAL_ENCOUNTER.title":  "Demirkaplı",
@@ -82,7 +84,7 @@
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "{character}\u0027ın teninin her santimi [gold]Ölübağlayan[/gold] tarafından [gold]Bedensel Manipülasyon[/gold]a dokundu.",
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.title":  "Necrobinder",
     "REGENT_CHOICE_BOSS_ENCOUNTER.title":  "The Regent",
-    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions.",
+    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "[gold]Naip[/gold], {character}'in karar üstüne karar verirken kendini kaybetmesine neden oldu.",
     "DEFECT_THUNDER_BOSS_ENCOUNTER.loss":  "{character}, [gold]Arıza[/gold]\u0027nın [gold]Fırtına[/gold]sında küle döndü.",
     "REGENT_BOMBARD_BOSS_ENCOUNTER.loss":  "{character}, [gold]Naip[/gold]\u0027in [gold]Bombardıman[/gold]ıyla küle dönmüş toprağa çevrildi.",
     "IRONCLAD_STRIKE_BOSS_ENCOUNTER.loss":  "[gold]Demirkaplı[/gold], [gold]Kusursuz Saldırı[/gold]sıyla {character}\u0027ı cehenneme yolladı.",
@@ -116,9 +118,10 @@
     "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character}'in ürettiği her kart [gold]Gözlemci[/gold] tarafından kendisine karşı bir silaha dönüştürüldü.",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "Gözlemci",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "[gold]Gözlemci[/gold], {character}'in elini kart kart sonuna kadar tuttu.",
-    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "Gözlemci",     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "{character}, [gold]Gözlemci[/gold]'nin [gold]Herşeyi Bilme[/gold] yeteneğiyle ezildi.",
+    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "Gözlemci",
+    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "[gold]Gözlemci[/gold], {character}'in kaderini önceden gördü.",
 "WATCHER_RUSHDOWN_BOSS_ENCOUNTER.title": "Watcher",
-"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} was flattened by the Watcher's red and blue palms.",
+"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss":  "{character}, [gold]Gözlemci[/gold]'nin kırmızı-mavi sonsuz döngüsünü açıkça durduramadı.",
     "WATCHER_FLURRY_BOSS_ENCOUNTER.title":  "Gözlemci",
-    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character}, [gold]Gözlemci[/gold]'nin [gold]Flurry of Blows[/gold] yeteneğiyle ezildi."
+    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character}, [gold]Gözlemci[/gold]'nin bitmek bilmeyen seri vuruşlarına dayanamadı."
 }

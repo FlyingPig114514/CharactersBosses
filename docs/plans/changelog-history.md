@@ -1,8 +1,85 @@
-# 构建日志（BuildInfo.Tag 历史）
+﻿# 构建日志（BuildInfo.Tag 历史）
 
 > 2026-11-22 从 `BuildInfo.Tag` 搬出来单独保存（Tag 里只留最近一条 + 指向本文件）。
 > 旧条目逐字来自 `git show HEAD:src/Hooks/Core/BuildInfo.cs` 的 Tag 常量（v0.2.871 及其之前，共 236 条）。
 > 最新版本（0.2.889）是当前 Tag，同时在各条 `workshop/changenote.txt` 里也有面向玩家的摘要。
+
+## v0.2.925（2026-11-24）：彩蛋死亡提示概率 5% ⇒ 10%
+
+用户：「彩蛋死亡提示的出现概率上调至10%」。只改一个数：`BossLossEggPatch.Chance` 0.05 ⇒ 0.10
+（1/20 ⇒ 1/10）；其余逻辑不动（一次死亡只掷一次、只改真正死掉的那一场）。
+百科（中英 md + Pages 页）里「彩蛋」那一行的措辞也改成「低概率（10%）遇到」。
+
+> 由于近期 Steam 模组投毒事件导致创意工坊投稿普遍卡审核，**这一版不上传创意工坊**，
+> 只做「打包（`tools\pack-dist.ps1` ⇒ `.dist\CharacterBosses-v0.2.925.zip`）+ 传 GitHub」。
+## v0.2.924（2026-11-24）：死亡提示改 4 句 + 加 2 个彩蛋
+
+用户给的新文案（`content/localization/<16 种语言>/encounters.json` 全部改，百科同步）：
+
+| Boss | 新死亡提示（中文） |
+|---|---|
+| 疾风观 `WATCHER_FLURRY` | `{character} 没能承受住观者不停的连击。` |
+| 预见观 `WATCHER_FORESIGHT` | `观者预见了{character}的命运。` |
+| 抉择储 `REGENT_CHOICE` | `储君让{character}在一次次抉择中迷失了自我。` |
+| 红蓝观 `WATCHER_RUSHDOWN` | `{character} 显然无法抵挡观者的红蓝无限。` |
+
+> **四句全部翻成 16 种语言**（`tools\check-localization.ps1` 全绿）。顺带发现 `REGENT_CHOICE` / `WATCHER_RUSHDOWN` 这两句在多数语言里本来是**英文占位**，这次一并翻掉了；`WATCHER_FORESIGHT` 的 `.title` 原本与 `.loss` 挤在同一行，整行改写时差点被吃掉（已补回，并用检查脚本验证 16/16 全绿）。
+> 红蓝无限 = 「1 张平静 + 1 张愤怒 + 猛虎下山」那套无限，英文社区叫 **Infinite Stance Dance**；
+> 英文版写成 `red-and-blue infinite`。
+
+**彩蛋死亡提示**（用户：「低概率遇到，大概率遇到的还是原本的提示」）：
+新增 `Patches/BossLossMessagePatches.BossLossEggPatch`——
+
+- **纯数据驱动**：只要某个遭遇在 `encounters` 表里有 `<遭遇>_BOSS_ENCOUNTER.loss_egg` 键，
+  死亡提示就有 **1/20** 的概率换成彩蛋那句，其余情况原样（= 原本那句）。目前两只：
+  - 巨石战 `IRONCLAD_BOULDER`：`铁甲战士发现{character}对石头过敏。`（英：`The Ironclad discovered that {character} is allergic to rocks.`）
+  - 炼药猎 `SILENT_BREWER`：`{character}没能击穿静默猎手的龟壳。`（英：`{character} failed to crack The Silent's shell.`）
+- 两条护栏：①只改**真正死掉的那一场**（`BossKillerTracker.IsDeathCombat`——否则结算/历史界面会给本局
+  每一场战斗各问一次，历史里每一格都会变成彩蛋）；②**一次死亡只掷一次骰子**
+  （按新增的 `BossKillerTracker.CombatToken` 缓存），结算界面与历史界面看到的是同一句。
+- 以后想给别的 Boss 加彩蛋：只在 `encounters.json` 里补一个 `.loss_egg` 即可（代码不用动，
+  彩蛋文案 16 种语言全齐）。
+
+## v0.2.923（2026-11-24）：蛇咬猎「群蛇形态」塞的蛇咬总在抽牌堆最底下
+
+用户：「蛇咬猎的特殊效果『群蛇形态』洗牌时给玩家抽牌堆中洗的蛇咬似乎固定在抽牌堆底部。
+我怀疑你是洗牌之后才把他们放到抽牌堆里的，但我希望是随机洗的（普通和恐惧模式都是）」——
+**猜得完全对**。
+
+- 根因：`CardPileCmd.AddGeneratedCardToCombat(card, PileType.Draw, player)` 的 `position`
+  参数**默认是 `CardPilePosition.Bottom`**。我们的钩子本身是 `AfterShuffle`（洗完之后触发），
+  于是"洗牌已经洗完 → 再把蛇咬**追加到牌堆末尾**" ⇒ 每次都是洗完之后垫在最下面，
+  玩家要抽到它得先把上面整堆牌过一遍。
+- 修法：照原版遗物「**大～抱抱（Biiig Hug）**」的写法（它同样是在 `AfterShuffle` 里塞牌）——
+  `AddGeneratedCardToCombat(soot, PileType.Draw, Owner, CardPilePosition.Random)`。
+  `CardPileCmd.Add` 里 `Random` 的实现是
+  `card.Owner.RunState.Rng.Shuffle.NextInt(cardPile.Cards.Count + 1)`：
+  **随机插到牌堆任意位置**，而且走的是联机同步的 `Shuffle` 随机源（多人两端一致）。
+  普通模式 1 张、恐惧模式 3 张都走这条。
+- 不动的地方：她**自己**洗牌时给自己牌堆加的那张仍固定进**牌堆顶**
+  （剧本口径：第 9 回合手牌里要能多一张蛇咬，见 `AddSnakebiteToHer`）。
+
+## v0.2.922（2026-11-24）：没装观者 mod 时冒出「不出牌占位的愚者」
+
+玩家报：「在 2 层**未装载观者 mod** 时遇到了**保留观**，然后变成了**不出牌占位的愚者**」。
+两个原因一起修：
+
+1. **闸门太松**：`WatcherModPresence.Installed` 的判据只是「AppDomain 里有没有一个名字含
+   `Watcher` 的程序集」。而观者 Boss 真正需要三样东西：
+   `WatcherCards.ModAssembly()`（认得出 A 3747526116 / B 3747492505 哪一份实现）、
+   `WatcherCards.ProviderId`（联机核对两端实现是否一致）、
+   `WatcherModPresence.CharacterType()`（拿不到 ⇒ 立绘退回**占位愚者** `fool.tscn`）。
+   缺任何一样，观者 Boss 照样被抽中：卡组全部来自观者 mod ⇒ **空**、立绘是愚者、名字还是「保留观」
+   ⇒ 上场就是「站桩不出牌」。
+   ⇒ 新增 `WatcherModPresence.Usable`（三样齐才算装），候选表 `RosterFor` 的三处闸门、
+   `BossKeys.SubstituteIfUnavailable`、`BossKeys.FixUnavailableEncounter`、阵容诊断日志
+   全部改问它；`Probe()` 也改成「**真的解析到角色类型**才锁」，避免早期探测把结果焊死。
+2. **兜底替补换错幕**：以前一律换成三层 1 号「塔罗愚」，而塔罗愚的遭遇/怪物是**钉死第三幕**的
+   ⇒ 一层、二层的观者 Boss 一旦兜底，玩家就会在低层遇到三层 Boss（血量/脚本全按三层算，
+   这也是「不出牌」的另一半原因）。
+   ⇒ 按幕换**同幕**普通 Boss：一层 `IRONCLAD_ANGER`（愤怒战）/ 二层 `IRONCLAD_BLOOD`（放血战）/
+   三层 `FOOL_TAROT`（塔罗愚；0.111 没有愚者 ⇒ `IRONCLAD_VULN` 易伤战），
+   并与本幕另一槽去重（进阶 ≥10 的两场不会撞成同一只）。仍然写死、不看随机数与本地设置 ⇒ 多人两端一致。
 
 ## v0.2.921（2026-11-24）：用 MLM 启动器启动时「致命错误」—— 真正的原因
 

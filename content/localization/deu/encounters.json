@@ -15,6 +15,7 @@
     "SILENT_SLY_BOSS_ENCOUNTER.loss":  "{character} wurde von der [gold]Stillen[/gold] in den [gold]Abwurfstapel[/gold] geworfen.",
     "SILENT_BREWER_BOSS_ENCOUNTER.title":  "Die Stille",
     "SILENT_BREWER_BOSS_ENCOUNTER.loss":  "{character} konnte die aus Tränken gewobene Barriere der [gold]Stillen[/gold] nicht durchbrechen.",
+    "SILENT_BREWER_BOSS_ENCOUNTER.loss_egg":  "{character} konnte den Panzer der [gold]Stillen[/gold] nicht knacken.",
     "DEFECT_BOSS_ENCOUNTER.title":  "Das Defekte",
     "DEFECT_BOSS_ENCOUNTER.loss":  "{character} wurde vom [gold]Defekten[/gold] analysiert und gelöscht.",
     "DEFECT_AI_BOSS_ENCOUNTER.title":  "Das Defekte",
@@ -49,6 +50,7 @@
     "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss":  "{character} wurde vom [gold]Eisernen[/gold] herumgewirbelt und schließlich von seinen eigenen Kopien begraben.",
     "IRONCLAD_BOULDER_BOSS_ENCOUNTER.title":  "Der Eiserne",
     "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss":  "{character} wurde vom [gold]Riesigen Fels[/gold] des [gold]Eisernen[/gold] zu Splittern zermalmt.",
+    "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss_egg":  "[gold]Der Eiserne[/gold] entdeckte, dass {character} allergisch auf Steine ist.",
     "DEFECT_DARK_BOSS_ENCOUNTER.title":  "Das Defekte",
     "DEFECT_DARK_BOSS_ENCOUNTER.loss":  "{character} wurde von den [gold]Schatten[/gold]-Orbs des [gold]Defekten[/gold] verschlungen.",
     "IRONCLAD_BOSS_NORMAL_ENCOUNTER.title":  "Der Eiserne",
@@ -82,7 +84,7 @@
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "Jeder Zoll von {character}s Fleisch wurde von der [gold]Totenbinderin[/gold] zu einem Teil ihres [gold]Leibeszerfalls[/gold] gewoben.",
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.title":  "Necrobinder",
     "REGENT_CHOICE_BOSS_ENCOUNTER.title":  "The Regent",
-    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions.",
+    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "Der [gold]Regent[/gold] ließ {character} in einer Entscheidung nach der anderen sich selbst verlieren.",
     "DEFECT_THUNDER_BOSS_ENCOUNTER.loss":  "{character} wurde im [gold]Sturm[/gold] des [gold]Defekten[/gold] zu Asche verbrannt.",
     "REGENT_BOMBARD_BOSS_ENCOUNTER.loss":  "{character} wurde von der [gold]Bombardierung[/gold] des [gold]Regenten[/gold] zu verbranntem Boden gemacht.",
     "IRONCLAD_STRIKE_BOSS_ENCOUNTER.loss":  "{character} wurde vom [gold]Eisernen[/gold] mit einem [gold]Perfekten Schlag[/gold] in die Hölle geschleudert.",
@@ -116,9 +118,10 @@
     "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "Jede von {character} erzeugte Karte wurde von [gold]Die Seherin[/gold] in eine Waffe verwandelt.",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "Die Seherin",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "[gold]Die Seherin[/gold] behielt {character}s Hand Karte für Karte bis zum Ende.",
-    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "Die Seherin",     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "{character} wurde von der [gold]Allwissenheit[/gold] der [gold]Seherin[/gold] zermalmt.",
+    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "Die Seherin",
+    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "Die [gold]Seherin[/gold] sah das Schicksal von {character} voraus.",
 "WATCHER_RUSHDOWN_BOSS_ENCOUNTER.title": "Watcher",
-"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} was flattened by the Watcher's red and blue palms.",
+"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss":  "{character} hatte dem rot-blauen Infinite der [gold]Seherin[/gold] offensichtlich nichts entgegenzusetzen.",
     "WATCHER_FLURRY_BOSS_ENCOUNTER.title":  "Die Seherin",
-    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character} wurde vom [gold]Hiebregen[/gold] der [gold]Seherin[/gold] zermalmt."
+    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character} konnte dem unablässigen Hiebregen der [gold]Seherin[/gold] nicht standhalten."
 }

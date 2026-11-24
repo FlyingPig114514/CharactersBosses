@@ -15,6 +15,7 @@
     "SILENT_SLY_BOSS_ENCOUNTER.loss":  "{character} 被[gold]静默猎手[/gold]丢进了弃牌堆。",
     "SILENT_BREWER_BOSS_ENCOUNTER.title":  "静默猎手",
     "SILENT_BREWER_BOSS_ENCOUNTER.loss":  "{character}没能击穿[gold]静默猎手[/gold]用药水构筑的屏障。",
+    "SILENT_BREWER_BOSS_ENCOUNTER.loss_egg":  "{character}没能击穿[gold]静默猎手[/gold]的龟壳。",
     "DEFECT_BOSS_ENCOUNTER.title":  "故障机器人",
     "DEFECT_BOSS_ENCOUNTER.loss":  "{character} 被[gold]故障机器人[/gold]分析并删除了。",
     "DEFECT_AI_BOSS_ENCOUNTER.title":  "故障机器人",
@@ -49,6 +50,7 @@
     "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss":  "{character} 被[gold]铁甲战士[/gold]耍得团团转，最后被自己的复制品淹没。",
     "IRONCLAD_BOULDER_BOSS_ENCOUNTER.title":  "铁甲战士",
     "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss":  "{character} 被[gold]铁甲战士[/gold]用巨石碾成了碎片。",
+    "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss_egg":  "[gold]铁甲战士[/gold]发现{character}对石头过敏。",
     "DEFECT_DARK_BOSS_ENCOUNTER.title":  "故障机器人",
     "DEFECT_DARK_BOSS_ENCOUNTER.loss":  "{character} 被[gold]故障机器人[/gold]的暗黑充能球吞噬了。",
     "IRONCLAD_BOSS_NORMAL_ENCOUNTER.title":  "铁甲战士",
@@ -86,7 +88,7 @@
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "{character}的每一寸血肉都被[gold]亡灵契约师[/gold]编织成了戏法的一部分。",
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.title":  "亡灵契约师",
     "REGENT_CHOICE_BOSS_ENCOUNTER.title":  "储君",
-    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}被[gold]储君[/gold]的抉择玩弄至死。",
+    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "[gold]储君[/gold]让{character}在一次次抉择中迷失了自我。",
     "DEFECT_THUNDER_BOSS_ENCOUNTER.loss":  "{character} 在[gold]故障机器人[/gold]的[gold]雷暴[/gold]里化成了焦炭。",
     "REGENT_BOMBARD_BOSS_ENCOUNTER.loss":  "{character} 被[gold]储君[/gold]的[gold]轰击[/gold]碾成了焦土。",
     "REGENT_MINION_BOSS_ENCOUNTER.loss":  "{character} 被[gold]储君[/gold]和他的[gold]仆从们[/gold]围殴致死。",
@@ -116,9 +118,9 @@
     "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character} 生成的每一张牌都被[gold]观者[/gold]改写成了对付自己的武器。",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "观者",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "{character} 的手牌被[gold]观者[/gold]一张张留到了死。",
-    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "观者",     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "{character} 被[gold]观者[/gold]的[gold]通晓万物[/gold]碾碎。",
+    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "观者",     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "[gold]观者[/gold]预见了{character}的命运。",
 "WATCHER_RUSHDOWN_BOSS_ENCOUNTER.title": "观者",
-"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} 被[gold]观者[/gold]的红蓝双掌拍成了齑粉。",
+"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} 显然无法抵挡[gold]观者[/gold]的红蓝无限。",
     "WATCHER_FLURRY_BOSS_ENCOUNTER.title":  "观者",
-    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character} 被[gold]观者[/gold]的[gold]疾风连击[/gold]碾碎。"
+    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character} 没能承受住[gold]观者[/gold]不停的连击。"
 }

@@ -43,7 +43,7 @@ if (Test-Path $LossPath) {
 $LossLabels = @{
     'loss_tarot'    = 'died to the Fool, and that character maps to a tarot card'
     'loss_pressure' = 'killed by her Pressure Points'
-    'loss_egg'      = '**Easter egg**: 1-in-20 chance, otherwise the line above'
+    'loss_egg'      = '**Easter egg**: 10% chance, otherwise the line above'
 }
 
 function Loss-Of([string]$encounter) {

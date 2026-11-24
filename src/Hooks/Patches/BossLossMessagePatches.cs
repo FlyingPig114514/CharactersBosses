@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Hooks;
@@ -109,5 +110,82 @@ public static class BossLossMessageKillerPatch
 
         result = message;
         Logger.Log($"[CharBoss] 塔罗死亡提示：{entry} + {card}（角色 {character?.Id.Entry}）");
+    }
+}
+
+/// <summary>
+/// **死亡提示彩蛋**（用户 2026-11-24）：
+/// > 「为部分 boss 添加彩蛋死亡提示（低概率遇到，大概率遇到的还是原本的提示）
+/// >   巨石战：铁甲战士发现{character} 对石头过敏。
+/// >   炼药猎：{character}没能击穿静默猎手的龟壳。」
+///
+/// 机制：**纯数据驱动** —— 只要某个遭遇在 `encounters` 表里有 `<遭遇>_BOSS_ENCOUNTER.loss_egg`
+/// 这个键（目前只有巨石战 `IRONCLAD_BOULDER` 与炼药猎 `SILENT_BREWER`），就有
+/// <see cref="Chance"/>（10%）的概率把死亡提示换成彩蛋那句；其余情况原样返回（= 原本那句）。
+///
+/// 两条护栏：
+///   · 只改**真正死掉的那一场**（<see cref="BossKillerTracker.IsDeathCombat"/>）——
+///     结算 / 历史界面会给本局每一场战斗各问一次，不全挡住的话历史里每一格都会变成彩蛋；
+///   · **一次死亡只掷一次骰子**：同一个战斗（<see cref="BossKillerTracker.CombatToken"/>）
+///     里的结果会被缓存，结算界面与历史界面看到的是同一句（否则两边会显示不同的话）。
+/// </summary>
+[HarmonyPatch(typeof(EncounterModel), nameof(EncounterModel.GetLossMessageFor))]
+public static class BossLossEggPatch
+{
+    /// <summary>彩蛋出现概率（10%）。要调就改这一个数。</summary>
+    private const double Chance = 0.10;
+
+    /// <summary>上次掷骰子时那一场战斗；换战斗就清缓存。</summary>
+    private static object? _token;
+
+    /// <summary>「这一场这一位玩家」的掷骰结果（键 = 遭遇 + 角色）。</summary>
+    private static readonly Dictionary<string, bool> Rolls = new(StringComparer.Ordinal);
+
+    private static int _logs;
+
+    [HarmonyPriority(Priority.Last)]        // 排在「按凶手换文案」之后：彩蛋优先级最高
+    [HarmonyPostfix]
+    public static void Postfix(EncounterModel __instance, CharacterModel character, ref LocString __result)
+    {
+        try
+        {
+            string? entry = __instance?.Id.Entry;
+            if (string.IsNullOrEmpty(entry)) return;
+
+            string key = entry + ".loss_egg";
+            if (!LocString.Exists("encounters", key)) return;        // 没写彩蛋的 Boss 直接放过
+            if (!BossKillerTracker.IsDeathCombat(__instance!.Id)) return;
+
+            object? token = BossKillerTracker.CombatToken;
+            if (!ReferenceEquals(token, _token)) { _token = token; Rolls.Clear(); }
+
+            string rollKey = entry + "|" + (character?.Id.Entry ?? "?");
+            if (!Rolls.TryGetValue(rollKey, out bool egg))
+            {
+                egg = RollOnce();
+                Rolls[rollKey] = egg;
+                if (_logs++ < 12)
+                    Logger.Log($"[CharBoss] 死亡提示彩蛋掷骰：{entry}（角色 {character?.Id.Entry}）⇒ " +
+                               (egg ? "**中了**" : "没中，用原本那句"));
+            }
+            if (!egg) return;
+
+            var loc = new LocString("encounters", key);
+            try { character?.AddDetailsTo(loc); } catch { /* 忽略 */ }
+            try { loc.Add("encounter", __instance!.Title); } catch { /* 忽略 */ }
+            __result = loc;
+
+            if (_logs++ < 12) Logger.Log("[CharBoss] 死亡提示彩蛋：" + key);
+        }
+        catch (Exception e)
+        {
+            if (_logs++ < 4) Logger.Log("[CharBoss] 死亡提示彩蛋失败（忽略）: " + e.Message);
+        }
+    }
+
+    private static bool RollOnce()
+    {
+        try { return Random.Shared.NextDouble() < Chance; }
+        catch { return false; }
     }
 }

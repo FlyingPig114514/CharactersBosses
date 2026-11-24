@@ -15,6 +15,7 @@
     "SILENT_SLY_BOSS_ENCOUNTER.loss":  "{character}는 [gold]사일런트[/gold]에게 버린 카드 더미로 던져졌습니다.",
     "SILENT_BREWER_BOSS_ENCOUNTER.title":  "사일런트",
     "SILENT_BREWER_BOSS_ENCOUNTER.loss":  "{character}는 [gold]사일런트[/gold]가 포션으로 쌓아 올린 장벽을 뚫지 못했습니다.",
+    "SILENT_BREWER_BOSS_ENCOUNTER.loss_egg":  "{character}는 [gold]사일런트[/gold]의 껍질을 뚫지 못했습니다.",
     "DEFECT_BOSS_ENCOUNTER.title":  "디펙트",
     "DEFECT_BOSS_ENCOUNTER.loss":  "{character}는 [gold]디펙트[/gold]에게 분석되어 삭제되었습니다.",
     "DEFECT_AI_BOSS_ENCOUNTER.title":  "디펙트",
@@ -49,6 +50,7 @@
     "IRONCLAD_JUGGLER_BOSS_ENCOUNTER.loss":  "{character}는 [gold]아이언클래드[/gold]에게 농락당하다가 마지막에는 자신의 복사본에 파묻혔습니다.",
     "IRONCLAD_BOULDER_BOSS_ENCOUNTER.title":  "아이언클래드",
     "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss":  "{character}는 [gold]아이언클래드[/gold]의 바위에 산산조각 났습니다.",
+    "IRONCLAD_BOULDER_BOSS_ENCOUNTER.loss_egg":  "[gold]아이언클래드[/gold]는 {character}가 돌 알레르기가 있다는 것을 알아냈습니다.",
     "DEFECT_DARK_BOSS_ENCOUNTER.title":  "디펙트",
     "DEFECT_DARK_BOSS_ENCOUNTER.loss":  "{character}는 [gold]디펙트[/gold]의 암흑 구체에 삼켜졌습니다.",
     "IRONCLAD_BOSS_NORMAL_ENCOUNTER.title":  "아이언클래드",
@@ -82,7 +84,7 @@
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.loss":  "{character}의 살점 한 조각 한 조각이 [gold]네크로바인더[/gold]의 [gold]살점 재주[/gold]로 엮여 들어갔습니다.",
     "NECROBINDER_FLESH_BOSS_ENCOUNTER.title":  "Necrobinder",
     "REGENT_CHOICE_BOSS_ENCOUNTER.title":  "The Regent",
-    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "{character}was outplayed by [gold]the Regent[/gold]\u0027s decisions.",
+    "REGENT_CHOICE_BOSS_ENCOUNTER.loss":  "[gold]리젠트[/gold]는 {character}가 수많은 선택 속에서 자신을 잃게 만들었습니다.",
     "DEFECT_THUNDER_BOSS_ENCOUNTER.loss":  "{character}는 [gold]디펙트[/gold]의 [gold]폭풍[/gold] 속에서 숯덩이가 되었습니다.",
     "REGENT_BOMBARD_BOSS_ENCOUNTER.loss":  "{character}는 [gold]리젠트[/gold]의 [gold]포격[/gold]에 초토화되었습니다.",
     "IRONCLAD_STRIKE_BOSS_ENCOUNTER.loss":  "[gold]아이언클래드[/gold]의 [gold]완벽한 타격[/gold]에 {character}는 지옥으로 처박혔습니다.",
@@ -116,9 +118,10 @@
     "WATCHER_CREATE_BOSS_ENCOUNTER.loss":  "{character}이(가) 생성한 모든 카드는 [gold]와쳐[/gold]에 의해 자신을 치는 무기로 다시 쓰였다.",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.title":  "와쳐",
     "WATCHER_RETAIN_BOSS_ENCOUNTER.loss":  "{character}의 패는 [gold]와쳐[/gold]에게 한 장씩 붙잡힌 채 끝을 맞았다.",
-    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "와쳐",     "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "{character}은(는) [gold]와쳐[/gold]의 [gold]전지[/gold]에 짓밟혔다.",
+    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.title":  "와쳐",
+    "WATCHER_FORESIGHT_BOSS_ENCOUNTER.loss":  "[gold]와쳐[/gold]는 {character}의 운명을 미리 보았습니다.",
 "WATCHER_RUSHDOWN_BOSS_ENCOUNTER.title": "Watcher",
-"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss": "{character} was flattened by the Watcher's red and blue palms.",
+"WATCHER_RUSHDOWN_BOSS_ENCOUNTER.loss":  "{character}은(는) [gold]와쳐[/gold]의 적청 무한을 도저히 막을 수 없었습니다.",
     "WATCHER_FLURRY_BOSS_ENCOUNTER.title":  "와쳐",
-    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character}은(는) [gold]와쳐[/gold]의 [gold]일진광풍[/gold]에 짓밟혔다."
+    "WATCHER_FLURRY_BOSS_ENCOUNTER.loss":  "{character}은(는) [gold]와쳐[/gold]의 끊임없는 연격을 견디지 못했습니다."
 }

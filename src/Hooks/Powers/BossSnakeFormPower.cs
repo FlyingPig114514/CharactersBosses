@@ -93,8 +93,18 @@ public sealed class BossSnakeFormPower : PowerModel
                 var card = combat.CreateCard(canonical, player);
                 if (card == null) break;
 
+                // ★★ v0.2.923（用户 2026-11-24：「蛇咬似乎固定在抽牌堆底部 —— 你是不是洗牌之后才放进去的？
+                //   我希望是随机洗的」）：**猜得完全对**。以前这里没传 `position`，而
+                //   `CardPileCmd.AddGeneratedCardToCombat(card, PileType.Draw, player)` 的默认值是
+                //   `CardPilePosition.Bottom` ⇒ 洗牌已经洗完，新牌再**追加到牌堆末尾**，
+                //   所以每次都是「洗完之后垫在最底下」，玩家抽到它之前那一整堆牌都得先过一遍。
+                //   原版「大～抱抱（Biiig Hug）」同样是「洗牌时塞牌」，它的写法就是
+                //   `AddGeneratedCardToCombat(soot, PileType.Draw, Owner, CardPilePosition.Random)`
+                //   ⇒ 现在照抄：`Random` 在 `CardPileCmd.Add` 里是
+                //   `card.Owner.RunState.Rng.Shuffle.NextInt(pile.Cards.Count + 1)`（**随机插到牌堆任意位置**，
+                //   走的是联机同步的 Shuffle 随机源，多人两端一致）。普通模式 1 张、恐惧模式 3 张都走这条。
                 var added = await MegaCrit.Sts2.Core.Commands.CardPileCmd.AddGeneratedCardToCombat(
-                    card, PileType.Draw, player);
+                    card, PileType.Draw, player, MegaCrit.Sts2.Core.Entities.Cards.CardPilePosition.Random);
                 try { MegaCrit.Sts2.Core.Commands.CardCmd.PreviewCardPileAdd(added); }
                 catch { /* 忽略：动画失败不影响塞牌 */ }
             }
