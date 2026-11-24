@@ -164,6 +164,10 @@ main{flex:1 1 auto;min-width:0}
 }
 .design.variant .dmeta .badge{color:#c68f86;border-color:#432a24}
 .keyline{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:9px 0 0}
+.losswrap{margin:8px 0 0;padding:7px 10px;border-left:3px solid #b9a37e;background:rgba(185,163,126,.10);border-radius:0 6px 6px 0}
+.losswrap .klabel{letter-spacing:.12em}
+.losstext{font:400 12.5px/1.5 var(--sans);color:#3a332b}
+.losscond{font:400 11.5px/1.4 var(--sans);color:#7b6f61;margin-top:2px}
 .klabel{font:600 10px/1 var(--sans);letter-spacing:.16em;color:#6f6559;text-transform:uppercase}
 .code{
   padding:3px 7px;border-radius:6px;background:#0d0b09;border:1px solid var(--line-2);
@@ -410,6 +414,7 @@ footer.page code{color:#a2968a}
 <script>
 window.BOSS_DATA = /*__BOSS_DATA__*/;
 window.BOSS_HP = /*__BOSS_HP__*/;
+window.BOSS_LOSS = /*__BOSS_LOSS__*/;
 </script>
 
 <script id="renderer">
@@ -848,6 +853,16 @@ window.BOSS_HP = /*__BOSS_HP__*/;
     return h.join('');
   }
 
+  /* 本地化标记里的 [gold]X[/gold] → 加粗；其余标签删掉 */
+  function bb(s) {
+    if (!s) { return ''; }
+    var out = esc(String(s));
+    out = out.replace(/\[(gold|red|green|blue|purple|orange|yellow)\]([\s\S]*?)\[\/\1\]/g, '<b>$2</b>');
+    out = out.replace(/\[img\][\s\S]*?\[\/img\]/g, '');
+    out = out.replace(/\[\/?(gold|red|green|blue|purple|orange|yellow|img)\]/g, '');
+    return out;
+  }
+
   function renderDesign(design) {
     var h = [];
     var title = design.name;
@@ -866,6 +881,18 @@ window.BOSS_HP = /*__BOSS_HP__*/;
     h.push('<button class="copy" type="button" data-copy="fight ' + esc(fight) + '">复制</button>');
     h.push('<span class="klabel">key</span><code class="code dim">' + esc(design.key) + '</code>');
     h.push('</div>');
+
+    /* 死亡提示：玩家死在这只 Boss 手里时，结算 / 历史界面显示的那一句（数据来自模组自己的 encounters 本地化表） */
+    var lw = (window.BOSS_LOSS && design.encounter) ? window.BOSS_LOSS[design.encounter] : null;
+    if (lw && lw.loss) {
+      h.push('<div class="losswrap">');
+      h.push('<div><span class="klabel">死亡提示</span> <span class="losstext">' + bb(lw.loss) + '</span></div>');
+      var lossExtra = lw.extra || [];
+      for (var li = 0; li < lossExtra.length; li++) {
+        h.push('<div class="losscond">（' + esc(lossExtra[li].label) + '）<span class="losstext">' + bb(lossExtra[li].text) + '</span></div>');
+      }
+      h.push('</div>');
+    }
 
     /* 血量 */
     var hpText = design.hp === null ? '—' : String(design.hp);

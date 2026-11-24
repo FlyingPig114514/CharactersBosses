@@ -27,6 +27,71 @@ $i18nPath = Join-Path $Root 'tools\wiki\i18n-en.json'
 
 $data = ConvertFrom-Json ([System.IO.File]::ReadAllText($dataPath, [System.Text.Encoding]::UTF8))
 
+# ── Death message (the line the game shows when the player dies to that boss) ──────────
+# Source = the mod's own English `encounters` localization table, key `<ENCOUNTER>_BOSS_ENCOUNTER.loss`
+# (the same table the game runs); `{character}` is replaced by the player's character name.
+# Only two special cases exist (checked against every key on 2026-11-24):
+#   · `.loss_pressure` — Omega Watcher: the player died to her Pressure Points;
+#   · `.loss_tarot`    — the Fool (FOOL_BOSS / FOOL_TAROT): the dead character maps to a tarot card
+#                        ⇒ "became the new {Card} in the Fool's deck" (see the table at the end).
+$LossMsg = @{}
+$LossPath = Join-Path $Root 'content\localization\eng\encounters.json'
+if (Test-Path $LossPath) {
+    $locDoc = ConvertFrom-Json ([System.IO.File]::ReadAllText($LossPath, [System.Text.Encoding]::UTF8))
+    foreach ($p in $locDoc.PSObject.Properties) { $LossMsg[$p.Name] = [string]$p.Value }
+}
+$LossLabels = @{
+    'loss_tarot'    = 'died to the Fool, and that character maps to a tarot card'
+    'loss_pressure' = 'killed by her Pressure Points'
+}
+
+function Loss-Of([string]$encounter) {
+    $out = @()
+    if (-not $encounter) { return $out }
+    $entry = $encounter + '_BOSS_ENCOUNTER'
+    $k = $entry + '.loss'
+    if ($LossMsg.ContainsKey($k)) { $out += [pscustomobject]@{ Label = ''; Text = $LossMsg[$k] } }
+    foreach ($name in @($LossMsg.Keys | Sort-Object)) {
+        if (-not $name.StartsWith($entry + '.loss_')) { continue }
+        $suffix = $name.Substring($entry.Length + 1)
+        $lbl = $suffix
+        if ($LossLabels.ContainsKey($suffix)) { $lbl = $LossLabels[$suffix] }
+        $out += [pscustomobject]@{ Label = $lbl; Text = $LossMsg[$name] }
+    }
+    return $out
+}
+
+# "dead character → tarot card" table for the Fool: read straight out of the C# source that defines it
+$TarotRows = @()
+try {
+    $tarotSrc = Join-Path $Root 'src\Hooks\Core\FoolTarotDeaths.cs'
+    $cardLoc = Join-Path $Root 'tools\tmp\loc\eng_cards.json'
+    if ((Test-Path $tarotSrc) -and (Test-Path $cardLoc)) {
+        $cardTitles = @{}
+        $cj = ConvertFrom-Json ([System.IO.File]::ReadAllText($cardLoc, [System.Text.Encoding]::UTF8))
+        foreach ($p in $cj.PSObject.Properties) { if ($p.Name.EndsWith('.title')) { $cardTitles[$p.Name.Substring(0, $p.Name.Length - 6)] = [string]$p.Value } }
+        $src = [System.IO.File]::ReadAllText($tarotSrc, [System.Text.Encoding]::UTF8)
+        # 角色英文名优先取游戏自己的 characters 表（`IRONCLAD.title = The Ironclad`），查不到就把 token 首字母大写
+        $charTitles = @{}
+        $charLoc = Join-Path $Root 'tools\tmp\eng_characters.json'
+        if (Test-Path $charLoc) {
+            $cc = ConvertFrom-Json ([System.IO.File]::ReadAllText($charLoc, [System.Text.Encoding]::UTF8))
+            foreach ($p in $cc.PSObject.Properties) { if ($p.Name.EndsWith('.title')) { $charTitles[$p.Name.Substring(0, $p.Name.Length - 6)] = [string]$p.Value } }
+        }
+        foreach ($m in [regex]::Matches($src, '\("([A-Z_]+)"\s*,\s*new\[\]\s*\{([^}]*)\}\)')) {
+            $card = $m.Groups[1].Value
+            $toks = @([regex]::Matches($m.Groups[2].Value, '"([^"]*)"') | ForEach-Object { $_.Groups[1].Value })
+            $id = $toks[0].ToUpperInvariant()
+            $who = if ($charTitles.ContainsKey($id) -and $charTitles[$id]) { $charTitles[$id] }
+                   elseif ($card -eq 'THE_FOOL') { 'The Fool' }
+                   elseif ($card -eq 'JUDGEMENT') { 'The Watcher' }
+                   else { (Get-Culture).TextInfo.ToTitleCase($toks[0]) }
+            $cardName = if ($cardTitles.ContainsKey($card)) { $cardTitles[$card] } else { $card }
+            $TarotRows += [pscustomobject]@{ Who = $who; Card = $cardName }
+        }
+    }
+} catch { /* no table then */ }
+
 # ── 官方中英名字表（卡 / 遗物 / 能力；游戏本体 + 本模组）────────────────
 $NameZhEn = @{}
 function Add-Pairs([hashtable]$h, [string]$zPath, [string]$ePath) {
@@ -382,6 +447,7 @@ foreach ($boss in $data.bosses) {
                 Deck = $act.deck; Relics = $act.relics; Special = $act.special; SpecialDread = $act.specialDread
                 SpecialKey = [string]$act.specialKey; SpecialDreadKey = [string]$act.specialDreadKey
                 Extras = $mainExtras; Script = $act.script; Info = $(if ($act.info) { [string]$act.info } else { [string]$boss.info })
+                LossMessages = (Loss-Of ([string]$act.encounter))
             }
         }
         foreach ($v in $act.variants) {
@@ -397,6 +463,7 @@ foreach ($boss in $data.bosses) {
                 Deck = $v.deck; Relics = $v.relics; Special = $v.special; SpecialDread = $v.specialDread
                 SpecialKey = [string]$v.specialKey; SpecialDreadKey = [string]$v.specialDreadKey
                 Extras = $extras; Script = $v.script; Info = $(if ($v.info) { [string]$v.info } else { [string]$boss.info })
+                LossMessages = (Loss-Of ([string]$v.encounter))
             }
         }
     }
@@ -417,6 +484,9 @@ $sb = New-Object System.Text.StringBuilder
 [void]$sb.AppendLine('> keeps unplayed or merely shows an intent for. Cards she runs out of energy for stay in "Plays"; the per-turn **Note** says which ones.')
 [void]$sb.AppendLine('>')
 [void]$sb.AppendLine('> Card, relic and potion names are taken from the game''s own English localization tables (not re-translated).')
+[void]$sb.AppendLine('>')
+[void]$sb.AppendLine('> **Death message** = the line the game shows when you die to that boss; `{character}` is replaced by the name of the character you were playing.')
+[void]$sb.AppendLine('> Every boss has exactly one; **only two special cases** exist (the Omega Watcher''s Pressure Points, the Fool''s tarot cards) — see [Death message special cases](#loss-special).')
 [void]$sb.AppendLine('> Chinese edition: [boss-table.md](boss-table.md)')
 [void]$sb.AppendLine('')
 [void]$sb.AppendLine('## Contents')
@@ -431,6 +501,8 @@ foreach ($a in @(1, 2, 3)) {
 [void]$sb.AppendLine('**Dominions** (Dread mode): [Dominion of each character](#dominions)')
 [void]$sb.AppendLine('')
 [void]$sb.AppendLine('**Ascension**: [Ascension upgrades at a glance](#ascension)')
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine('**Death message**: [Death message special cases](#loss-special)')
 [void]$sb.AppendLine('')
 
 # ── Ascension overview ────────────────────────────────────────────────
@@ -515,6 +587,10 @@ foreach ($a in @(1, 2, 3)) {
         [void]$sb.AppendLine('')
         [void]$sb.AppendLine('- **Character / Act**: ' + (T $d.Char 'chars') + ' · Act ' + $d.Act)
         [void]$sb.AppendLine('- **Console**: `fight ' + $d.Encounter + '_BOSS_ENCOUNTER`')
+        foreach ($lm in @($d.LossMessages)) {
+            if ($lm.Label) { [void]$sb.AppendLine('- **Death message** (' + $lm.Label + '): ' + (MdText $lm.Text)) }
+            else { [void]$sb.AppendLine('- **Death message**: ' + (MdText $lm.Text)) }
+        }
         [void]$sb.AppendLine('- **HP**: **' + $d.Hp + '** ｜ **Energy**: ' + $d.Energy + ' ｜ **Hand**: ' + $d.Hand + ' ｜ **Loop**: ' + (Loop-Text $d.Script))
         if ($d.Info) {
             [void]$sb.AppendLine('**Ability panel**')
@@ -616,6 +692,33 @@ foreach ($a in @(1, 2, 3)) {
 [void]$sb.AppendLine('')
 [void]$sb.AppendLine('> A dominion is **not** a boss''s "special effect": a special effect only applies inside that boss''s own fight, a dominion only in normal combats of that act. The two never overlap.')
 [void]$sb.AppendLine('')
+
+# ── Death message special cases ───────────────────────────────────────
+$omegaExtra = @(Loss-Of 'WATCHER_OMEGA' | Where-Object { $_.Label } | Select-Object -First 1)
+$foolExtra  = @(Loss-Of 'FOOL_TAROT'    | Where-Object { $_.Label } | Select-Object -First 1)
+$omegaText = if ($omegaExtra.Count -gt 0) { [string]$omegaExtra[0].Text } else { '' }
+$foolText  = if ($foolExtra.Count  -gt 0) { [string]$foolExtra[0].Text }  else { '' }
+[void]$sb.AppendLine('<a id="loss-special"></a>')
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine('## Death message special cases')
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine('All bosses have exactly **one** death message (shown in their own section). Only two of them swap in another line under a condition:')
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine('| Boss | Condition | Line used instead |')
+[void]$sb.AppendLine('|---|---|---|')
+[void]$sb.AppendLine('| Omega Watcher (`WATCHER_OMEGA`) | you were killed by her **Pressure Points** | ' + (MdText $omegaText) + ' |')
+[void]$sb.AppendLine('| The Fool (`FOOL_TAROT`) | the character you died as **maps to a tarot card** (table below) | ' + (MdText $foolText) + ' |')
+[void]$sb.AppendLine('')
+if ($TarotRows.Count -gt 0) {
+    [void]$sb.AppendLine('`{Card}` in the Fool''s line is picked by the character you were playing (same table as `src\Hooks\Core\FoolTarotDeaths.cs`, read from there automatically):')
+    [void]$sb.AppendLine('')
+    [void]$sb.AppendLine('| Character | Becomes the tarot card |')
+    [void]$sb.AppendLine('|---|---|')
+    foreach ($t in $TarotRows) { [void]$sb.AppendLine('| ' + (MdText $t.Who) + ' | ' + (MdText $t.Card) + ' |') }
+    [void]$sb.AppendLine('')
+    [void]$sb.AppendLine('> Characters outside this list (e.g. other modded characters) match nothing and keep the Fool''s default line.')
+    [void]$sb.AppendLine('')
+}
 
 # ── Notes ─────────────────────────────────────────────────────────────
 [void]$sb.AppendLine('## Notes')

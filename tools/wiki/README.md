@@ -1,4 +1,4 @@
-# 百科页（GitHub Pages）与数据导出工具
+﻿# 百科页（GitHub Pages）与数据导出工具
 
 这个目录放的是**从模组本体自动导出数据**、再生成「Boss 百科页 / Excel 表」的工具链。
 页面地址（启用 GitHub Pages 后）：<https://flyingpig114514.github.io/CharactersBosses/>
@@ -96,3 +96,11 @@ bosses[]                      每个「角色定义」（7 个：铁甲战士/�
   `不出` = 被标记为「被她自己烧掉 / 丢弃 / 保留没打 / 只显示意图」的牌。
   牌打到最后**没费**的那几张仍列在「打出」里（剧本会尝试并按顺序停下），每回合的 `note` 备注里写明了是哪几张没费。
 - 数据不含卡牌的具体数值（伤害/格挡/费用），那部分仍以游戏内卡面为准；表里只有剧本显式覆盖过的地方（如「遗传算法 16 格挡」）才带数字。
+## 八、死亡提示（2026-11-24 追加）
+
+每个 Boss 那一节里都多了一行 **死亡提示**（`docs/wiki/boss-table.md` / `.en.md` / `index.html` 三处同源）：
+
+- **数据源**：`content/localization/{zhs,eng}/encounters.json` 里 `<遭遇>_BOSS_ENCOUNTER.loss` —— 就是游戏里玩家死在该 Boss 手里时显示的那一句，`{character}` 由游戏替换成玩家所用角色的名字（两版各取自己的语言表，md 生成器直接读这两个文件，不经过 `data.json`）。
+- **全表只有两处特例**（2026-11-24 逐键核对）：欧米伽观的 `.loss_pressure`（玩家被「点穴」打死）、愚者的 `.loss_tarot`（死者所用角色对应某张塔罗牌 ⇒「成为了愚者牌组中新的 XX」）。其余 40 只 Boss 各一句。
+- 愚者那张「死者角色 → 塔罗牌」对照表由生成器**直接从 `src/Hooks/Core/FoolTarotDeaths.cs` 解析**（牌名取 `tools/tmp/loc/{zhs,eng}_cards.json`），改代码后重跑生成器即可，不用手抄。
+- 网页版把这两处特例画成同一个小框里的「条件行」；`build-site.ps1` 负责把 `<遭遇>` → 文案的映射以 `window.BOSS_LOSS` 注入 `index.html`。

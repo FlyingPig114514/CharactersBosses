@@ -10,6 +10,9 @@
 > keeps unplayed or merely shows an intent for. Cards she runs out of energy for stay in "Plays"; the per-turn **Note** says which ones.
 >
 > Card, relic and potion names are taken from the game's own English localization tables (not re-translated).
+>
+> **Death message** = the line the game shows when you die to that boss; `{character}` is replaced by the name of the character you were playing.
+> Every boss has exactly one; **only two special cases** exist (the Omega Watcher's Pressure Points, the Fool's tarot cards) — see [Death message special cases](#loss-special).
 > Chinese edition: [boss-table.md](boss-table.md)
 
 ## Contents
@@ -23,6 +26,8 @@
 **Dominions** (Dread mode): [Dominion of each character](#dominions)
 
 **Ascension**: [Ascension upgrades at a glance](#ascension)
+
+**Death message**: [Death message special cases](#loss-special)
 
 <a id="ascension"></a>
 
@@ -93,6 +98,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Defect · Act 1
 - **Console**: `fight DEFECT_DARK_BOSS_ENCOUNTER`
+- **Death message**: {character} was swallowed by the **Defect**'s Dark orbs.
 - **HP**: **195** ｜ **Energy**: 3 ｜ **Hand**: 5 ｜ **Loop**: turns 5–7 loop
 **Ability panel**
 
@@ -139,6 +145,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Defect · Act 1
 - **Console**: `fight DEFECT_THUNDER_BOSS_ENCOUNTER`
+- **Death message**: {character} was reduced to cinders in the **Defect**'s **storm**.
 - **HP**: **195** ｜ **Energy**: 3 ｜ **Hand**: 5 ｜ **Loop**: turns 7–10 loop
 **Ability panel**
 
@@ -186,6 +193,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Ironclad · Act 1
 - **Console**: `fight IRONCLAD_ANGER_BOSS_ENCOUNTER`
+- **Death message**: {character} was burned to ash by the **Ironclad**'s rage.
 - **HP**: **200** ｜ **Energy**: 3 ｜ **Hand**: 5 ｜ **Loop**: turns 8–9 loop
 **Ability panel**
 
@@ -235,6 +243,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Ironclad · Act 1
 - **Console**: `fight IRONCLAD_STRIKE_BOSS_ENCOUNTER`
+- **Death message**: {character} was smashed into hell by the **Ironclad**'s **most perfect card**.
 - **HP**: **200** ｜ **Energy**: 3 ｜ **Hand**: 5 ｜ **Loop**: turns 6–9 loop
 **Ability panel**
 
@@ -280,6 +289,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Necrobinder · Act 1
 - **Console**: `fight NECROBINDER_DOOM_BOSS_ENCOUNTER`
+- **Death message**: The **Necrobinder** beckoned {character} to the bitter end of calamity.
 - **HP**: **186** ｜ **Energy**: 3 ｜ **Hand**: 5 ｜ **Loop**: turns 7–11 loop
 **Ability panel**
 
@@ -329,6 +339,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Necrobinder · Act 1
 - **Console**: `fight NECROBINDER_FLESH_BOSS_ENCOUNTER`
+- **Death message**: Every inch of {character}'s flesh was woven into the **Necrobinder**'s sleight of hand.
 - **HP**: **186** ｜ **Energy**: 3 ｜ **Hand**: 5 ｜ **Loop**: turns 7–11 loop
 **Ability panel**
 
@@ -381,6 +392,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Regent · Act 1
 - **Console**: `fight REGENT_DEBRIS_BOSS_ENCOUNTER`
+- **Death message**: {character} was buried under the **Regent**'s debris.
 - **HP**: **195** ｜ **Energy**: 3 ｜ **Hand**: 6 ｜ **Loop**: turns 5–8 loop
 **Ability panel**
 
@@ -428,6 +440,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Regent · Act 1
 - **Console**: `fight REGENT_BOMBARD_BOSS_ENCOUNTER`
+- **Death message**: {character} was flattened into scorched earth by the **Regent**'s **bombardment**.
 - **HP**: **195** ｜ **Energy**: 3 ｜ **Hand**: 6 ｜ **Loop**: no loop (stops on the last turn)
 **Ability panel**
 
@@ -472,6 +485,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Silent · Act 1
 - **Console**: `fight SILENT_SLY_BOSS_ENCOUNTER`
+- **Death message**: {character} was thrown into the discard pile by the **Silent**.
 - **HP**: **190** ｜ **Energy**: 3 ｜ **Hand**: 5 ｜ **Loop**: turns 6–9 loop
 **Ability panel**
 
@@ -517,6 +531,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Silent · Act 1
 - **Console**: `fight SILENT_SNAKEBITE_BOSS_ENCOUNTER`
+- **Death message**: {character} was swallowed by **The Silent**'s serpents.
 - **HP**: **190** ｜ **Energy**: 3 ｜ **Hand**: 5 ｜ **Loop**: turns 6–9 loop
 **Ability panel**
 
@@ -566,6 +581,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Watcher · Act 1
 - **Console**: `fight WATCHER_FORESIGHT_BOSS_ENCOUNTER`
+- **Death message**: {character} was crushed by **The Watcher**'s **Omniscience**.
 - **HP**: **192** ｜ **Energy**: 3 ｜ **Hand**: 5 ｜ **Loop**: turns 6–8 loop
 **Ability panel**
 
@@ -608,6 +624,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Watcher · Act 1
 - **Console**: `fight WATCHER_FLURRY_BOSS_ENCOUNTER`
+- **Death message**: {character} was crushed by **The Watcher**'s **Flurry of Blows**.
 - **HP**: **192** ｜ **Energy**: 3 ｜ **Hand**: 5 ｜ **Loop**: turns 6–9 loop
 **Ability panel**
 
@@ -656,6 +673,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Defect · Act 2
 - **Console**: `fight DEFECT_CLAW_BOSS_ENCOUNTER`
+- **Death message**: {character} was annihilated by the **Defect**'s Hyper Beam.
 - **HP**: **375** ｜ **Energy**: 4 ｜ **Hand**: 5 ｜ **Loop**: turns 7–10 loop
 **Ability panel**
 
@@ -703,6 +721,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Defect · Act 2
 - **Console**: `fight DEFECT_RAINBOW_BOSS_ENCOUNTER`
+- **Death message**: The **Defect** melted {character} into its rainbow.
 - **HP**: **375** ｜ **Energy**: 4 ｜ **Hand**: 5 ｜ **Loop**: turns 8–12 loop
 **Ability panel**
 
@@ -753,6 +772,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Ironclad · Act 2
 - **Console**: `fight IRONCLAD_BLOOD_BOSS_ENCOUNTER`
+- **Death message**: Every last drop of {character}'s blood was poured into the **Ironclad**'s body.
 - **HP**: **380** ｜ **Energy**: 3 ｜ **Hand**: 5 ｜ **Loop**: turns 5–7 loop
 **Ability panel**
 
@@ -797,6 +817,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Ironclad · Act 2
 - **Console**: `fight IRONCLAD_JUGGLER_BOSS_ENCOUNTER`
+- **Death message**: {character} was juggled to death by the **Ironclad**'s endless copies.
 - **HP**: **380** ｜ **Energy**: 3 ｜ **Hand**: 5 ｜ **Loop**: turns 2–7 loop
 **Ability panel**
 
@@ -841,6 +862,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Necrobinder · Act 2
 - **Console**: `fight NECROBINDER_SOUL_BOSS_ENCOUNTER`
+- **Death message**: {character}'s soul was claimed by the **Necrobinder**.
 - **HP**: **366** ｜ **Energy**: 3 ｜ **Hand**: 5 ｜ **Loop**: turns 6–8 loop
 **Ability panel**
 
@@ -886,6 +908,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Necrobinder · Act 2
 - **Console**: `fight NECROBINDER_ETHEREAL_BOSS_ENCOUNTER`
+- **Death message**: {character} was dragged into the depths of the void by the **Necrobinder**.
 - **HP**: **366** ｜ **Energy**: 3 ｜ **Hand**: 5 ｜ **Loop**: turns 7–10 loop
 **Ability panel**
 
@@ -932,6 +955,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Regent · Act 2
 - **Console**: `fight REGENT_FORGE_BOSS_ENCOUNTER`
+- **Death message**: {character} became a notch on the **Regent**'s blade.
 - **HP**: **375** ｜ **Energy**: 3 ｜ **Hand**: 5 ｜ **Loop**: turns 6–9 loop
 **Ability panel**
 
@@ -979,6 +1003,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Regent · Act 2
 - **Console**: `fight REGENT_KING_BOSS_ENCOUNTER`
+- **Death message**: {character} was crushed beneath the **Regent**'s crown.
 - **HP**: **375** ｜ **Energy**: 3 ｜ **Hand**: 5 ｜ **Loop**: turns 7–10 loop
 **Ability panel**
 
@@ -1029,6 +1054,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Regent · Act 2
 - **Console**: `fight REGENT_MINION_BOSS_ENCOUNTER`
+- **Death message**: {character} was beaten to death by the **Regent** and his **minions**.
 - **HP**: **375** ｜ **Energy**: 3 ｜ **Hand**: 5 ｜ **Loop**: turns 7–9 loop
 **Ability panel**
 
@@ -1080,6 +1106,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Silent · Act 2
 - **Console**: `fight SILENT_ENVENOM_BOSS_ENCOUNTER`
+- **Death message**: {character} was worn down by the **Silent**'s poison.
 - **HP**: **370** ｜ **Energy**: 3 ｜ **Hand**: 5 ｜ **Loop**: turns 8–10 loop
 **Ability panel**
 
@@ -1129,6 +1156,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Silent · Act 2
 - **Console**: `fight SILENT_SNECKO_BOSS_ENCOUNTER`
+- **Death message**: {character} was sent to the grave by the **Silent**'s dice.
 - **HP**: **370** ｜ **Energy**: 3 ｜ **Hand**: 5 ｜ **Loop**: turns 10–12 loop
 **Ability panel**
 
@@ -1181,6 +1209,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Watcher · Act 2
 - **Console**: `fight WATCHER_CREATE_BOSS_ENCOUNTER`
+- **Death message**: Every card {character} generated was rewritten by **The Watcher** into a weapon against them.
 - **HP**: **372** ｜ **Energy**: 3 ｜ **Hand**: 5 ｜ **Loop**: turns 6–8 loop
 **Ability panel**
 
@@ -1226,6 +1255,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Watcher · Act 2
 - **Console**: `fight WATCHER_RETAIN_BOSS_ENCOUNTER`
+- **Death message**: **The Watcher** kept {character}'s hand, card by card, until the very end.
 - **HP**: **372** ｜ **Energy**: 3 ｜ **Hand**: 5 ｜ **Loop**: turns 6–9 loop
 **Ability panel**
 
@@ -1273,6 +1303,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Defect · Act 3
 - **Console**: `fight DEFECT_AI_BOSS_ENCOUNTER`
+- **Death message**: Every card {character} played was folded into the **Defect**'s model.
 - **HP**: **555** ｜ **Energy**: 3 ｜ **Hand**: 6 ｜ **Loop**: turns 8–11 loop
 **Ability panel**
 
@@ -1324,6 +1355,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Defect · Act 3
 - **Console**: `fight DEFECT_EVENT_BOSS_ENCOUNTER`
+- **Death message**: {character} was pulled back out of the discard pile by **the Defect**.
 - **HP**: **575** ｜ **Energy**: 3 ｜ **Hand**: 6 ｜ **Loop**: turns 6–9 loop
 **Ability panel**
 
@@ -1373,6 +1405,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Defect · Act 3
 - **Console**: `fight DEFECT_STATUS_BOSS_ENCOUNTER`
+- **Death message**: {character} was burned away by the **Defect**'s **flak cannon**, status cards and all.
 - **HP**: **555** ｜ **Energy**: 3 ｜ **Hand**: 6 ｜ **Loop**: turns 6–9 loop
 **Ability panel**
 
@@ -1422,6 +1455,8 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Fool · Act 3
 - **Console**: `fight FOOL_TAROT_BOSS_ENCOUNTER`
+- **Death message**: {character} was dealt the wrong card by the **Fool**.
+- **Death message** (died to the Fool, and that character maps to a tarot card): {character} became the new **{Card}** in the **Fool**'s deck.
 - **HP**: **555** ｜ **Energy**: 3 ｜ **Hand**: 6 ｜ **Loop**: turns 10–16 loop
 **Ability panel**
 
@@ -1480,6 +1515,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Ironclad · Act 3
 - **Console**: `fight IRONCLAD_VULN_BOSS_ENCOUNTER`
+- **Death message**: {character} was cut open, layer by layer, by the **Ironclad**.
 - **HP**: **560** ｜ **Energy**: 4 ｜ **Hand**: 6 ｜ **Loop**: turns 6–9 loop
 **Ability panel**
 
@@ -1526,6 +1562,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Ironclad · Act 3
 - **Console**: `fight IRONCLAD_BOULDER_BOSS_ENCOUNTER`
+- **Death message**: {character} was ground to dust by the boulders of the **Ironclad**.
 - **HP**: **560** ｜ **Energy**: 4 ｜ **Hand**: 6 ｜ **Loop**: turns 5–7 loop
 **Ability panel**
 
@@ -1573,6 +1610,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Necrobinder · Act 3
 - **Console**: `fight NECROBINDER_ERADICATE_BOSS_ENCOUNTER`
+- **Death message**: {character} was eradicated, memories and all, by the **Necrobinder**.
 - **HP**: **577** ｜ **Energy**: 4 ｜ **Hand**: 6 ｜ **Loop**: turns 5–7 loop
 **Ability panel**
 
@@ -1617,6 +1655,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Necrobinder · Act 3
 - **Console**: `fight NECROBINDER_OSTY_BOSS_ENCOUNTER`
+- **Death message**: {character} was smashed to pieces by the **Necrobinder**'s **Osty**.
 - **HP**: **546** ｜ **Energy**: 4 ｜ **Hand**: 6 ｜ **Loop**: turns 7–9 loop
 **Ability panel**
 
@@ -1659,6 +1698,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Regent · Act 3
 - **Console**: `fight REGENT_COLORLESS_BOSS_ENCOUNTER`
+- **Death message**: {character} was stripped of all color by the **Regent**.
 - **HP**: **555** ｜ **Energy**: 3 ｜ **Hand**: 6 ｜ **Loop**: turns 7–9 loop
 **Ability panel**
 
@@ -1707,6 +1747,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Regent · Act 3
 - **Console**: `fight REGENT_STAR_BOSS_ENCOUNTER`
+- **Death message**: {character} was ground into dust by the **Regent**'s glittering stars.
 - **HP**: **555** ｜ **Energy**: 3 ｜ **Hand**: 6 ｜ **Loop**: turns 4–7 loop
 **Ability panel**
 
@@ -1753,6 +1794,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Regent · Act 3
 - **Console**: `fight REGENT_CHOICE_BOSS_ENCOUNTER`
+- **Death message**: {character}was outplayed by **the Regent**'s decisions.
 - **HP**: **555** ｜ **Energy**: 3 ｜ **Hand**: 6 ｜ **Loop**: turns 9–13 loop
 **Ability panel**
 
@@ -1805,6 +1847,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Silent · Act 3
 - **Console**: `fight SILENT_SHIV_BOSS_ENCOUNTER`
+- **Death message**: {character} was buried in the **Silent**'s blades.
 - **HP**: **550** ｜ **Energy**: 3 ｜ **Hand**: 6 ｜ **Loop**: turns 7–11 loop
 **Ability panel**
 
@@ -1852,6 +1895,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Silent · Act 3
 - **Console**: `fight SILENT_BREWER_BOSS_ENCOUNTER`
+- **Death message**: {character} could not break through the potion-wrought barrier of the **Silent**.
 - **HP**: **550** ｜ **Energy**: 3 ｜ **Hand**: 6 ｜ **Loop**: turns 5–8 loop
 **Ability panel**
 
@@ -1905,6 +1949,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Silent · Act 3
 - **Console**: `fight SILENT_GRAND_FINALE_BOSS_ENCOUNTER`
+- **Death message**: {character} was the final act of the **Silent**'s **grand finale**.
 - **HP**: **550** ｜ **Energy**: 3 ｜ **Hand**: 6 ｜ **Loop**: turns 8–10 loop
 **Ability panel**
 
@@ -1955,6 +2000,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Watcher · Act 3
 - **Console**: `fight WATCHER_DIVINITY_BOSS_ENCOUNTER`
+- **Death message**: {character} was sent on the instant **The Watcher** stepped into Divinity.
 - **HP**: **552** ｜ **Energy**: 3 ｜ **Hand**: 6 ｜ **Loop**: turns 7–11 loop
 **Ability panel**
 
@@ -2006,6 +2052,8 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Watcher · Act 3
 - **Console**: `fight WATCHER_OMEGA_BOSS_ENCOUNTER`
+- **Death message**: {character} never made it past **The Watcher**'s Alpha, Beta and Omega.
+- **Death message** (killed by her Pressure Points): {character} was picked apart, point by point, by **The Watcher**'s **Pressure Points**.
 - **HP**: **552** ｜ **Energy**: 3 ｜ **Hand**: 6 ｜ **Loop**: turns 9–12 loop
 **Ability panel**
 
@@ -2058,6 +2106,7 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 
 - **Character / Act**: Watcher · Act 3
 - **Console**: `fight WATCHER_RUSHDOWN_BOSS_ENCOUNTER`
+- **Death message**: {character} was flattened by the Watcher's red and blue palms.
 - **HP**: **583** ｜ **Energy**: 3 ｜ **Hand**: 6 ｜ **Loop**: turns 12–12 loop
 **Ability panel**
 
@@ -2120,6 +2169,46 @@ In Dread mode each act carries the dominion of **that act's main boss character*
 | Watcher | At the start of combat every enemy gains **2 stacks** of Devotion; at the start of your turn each of them gains **2 Mantra**; at 10 Mantra it spends 10 and enters Divinity, tripling its attack damage that turn | No |
 
 > A dominion is **not** a boss's "special effect": a special effect only applies inside that boss's own fight, a dominion only in normal combats of that act. The two never overlap.
+
+<a id="loss-special"></a>
+
+## Death message special cases
+
+All bosses have exactly **one** death message (shown in their own section). Only two of them swap in another line under a condition:
+
+| Boss | Condition | Line used instead |
+|---|---|---|
+| Omega Watcher (`WATCHER_OMEGA`) | you were killed by her **Pressure Points** | {character} was picked apart, point by point, by **The Watcher**'s **Pressure Points**. |
+| The Fool (`FOOL_TAROT`) | the character you died as **maps to a tarot card** (table below) | {character} became the new **{Card}** in the **Fool**'s deck. |
+
+`{Card}` in the Fool's line is picked by the character you were playing (same table as `src\Hooks\Core\FoolTarotDeaths.cs`, read from there automatically):
+
+| Character | Becomes the tarot card |
+|---|---|
+| The Fool | The Fool |
+| The Defect | The Magician |
+| Norupēpu | The High Priestess |
+| Queen | The Empress |
+| Architect | The Emperor |
+| Merchant | The Hierophant |
+| Orobos | The Lovers |
+| Dafu | The Chariot |
+| Tanks | Strength |
+| Hermit | The Hermit |
+| Hourglass | Wheel of Fortune |
+| Ritualbeast | Justice |
+| The Ironclad | The Hanged Man |
+| The Necrobinder | Death |
+| Pael | Temperance |
+| Vaku | The Devil |
+| Spire | The Tower |
+| The Regent | The Star |
+| The Silent | The Moon |
+| Tezkatkala | The Sun |
+| The Watcher | Judgement |
+| Neow | The World |
+
+> Characters outside this list (e.g. other modded characters) match nothing and keep the Fool's default line.
 
 ## Notes
 

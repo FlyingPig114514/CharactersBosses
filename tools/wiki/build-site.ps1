@@ -27,6 +27,7 @@ $ErrorActionPreference = 'Stop'
 $Utf8NoBom = New-Object System.Text.UTF8Encoding -ArgumentList $false
 $MarkerData = '/*__BOSS_DATA__*/'
 $MarkerHp = '/*__BOSS_HP__*/'
+$MarkerLoss = '/*__BOSS_LOSS__*/'
 
 function Fail([string]$Message) {
     Write-Host ('ERROR: ' + $Message) -ForegroundColor Red
@@ -119,6 +120,10 @@ if ($template.IndexOf($MarkerData, $idx + 1) -ge 0) { Fail ('template contains t
 $idx = $template.IndexOf($MarkerHp)
 if ($idx -lt 0) { Fail ('template is missing the hp marker ' + $MarkerHp) }
 if ($template.IndexOf($MarkerHp, $idx + 1) -ge 0) { Fail ('template contains the hp marker more than once') }
+
+$idx = $template.IndexOf($MarkerLoss)
+if ($idx -lt 0) { Fail ('template is missing the death-message marker ' + $MarkerLoss) }
+if ($template.IndexOf($MarkerLoss, $idx + 1) -ge 0) { Fail ('template contains the death-message marker more than once') }
 
 # ------------------------------------------------------- hp table + maths ----
 # in-game max HP = character base HP
@@ -262,6 +267,38 @@ foreach ($boss in $bosses) {
 
 $hpJson = '{' + ($entries -join ',') + '}'
 
+
+# ------------------------------------------------- death messages ----
+# 玩家死在该 Boss 手里时游戏显示的那一句 = encounters 表里的 "<遭遇>_BOSS_ENCOUNTER.loss"。
+# 只有两处特例（2026-11-24 核对）：`.loss_pressure`（欧米伽观 = 被点穴打死）、
+# `.loss_tarot`（愚者 = 死者角色对应某张塔罗牌）。其余每个 Boss 只有一句。
+$lossMap = [ordered]@{}
+if ($null -ne $encObj) {
+    $lossKeys = @($encObj.PSObject.Properties | ForEach-Object { [string]$_.Name } | Where-Object { $_ -match '\.loss(_[a-z_]+)?$' })
+    foreach ($lk in ($lossKeys | Sort-Object)) {
+        $mm = [regex]::Match($lk, '^(.+)_BOSS_ENCOUNTER\.(loss(?:_([a-z_]+))?)$')
+        if (-not $mm.Success) { continue }
+        $encId = $mm.Groups[1].Value
+        $suffix = $mm.Groups[2].Value
+        $text = [string]$encObj.$lk
+        if (-not $lossMap.Contains($encId)) { $lossMap[$encId] = [ordered]@{ loss = ''; extra = @() } }
+        if ($suffix -eq 'loss') {
+            $lossMap[$encId].loss = $text
+        } else {
+            $label = switch -Regex ($suffix) {
+                'loss_pressure' { '被「点穴」打死时'; break }
+                'loss_tarot'    { '死于塔罗愚、且死者角色对应某张塔罗牌时'; break }
+                default           { $suffix }
+            }
+            $lossMap[$encId].extra = @($lossMap[$encId].extra) + @([ordered]@{ label = $label; text = $text })
+        }
+    }
+}
+$lossJson = (ConvertTo-Json -InputObject $lossMap -Depth 6 -Compress)
+if ([string]::IsNullOrWhiteSpace($lossJson)) { $lossJson = '{}' }
+$lossJson = $lossJson.Replace('<', '\u003c')
+Info ('death messages: ' + $lossMap.Count + ' encounters')
+
 foreach ($miss in $encMisses) {
     $warnings.Add('encounter key ' + $miss + ' is not in encounters.json') | Out-Null
 }
@@ -274,6 +311,7 @@ $safeJson = $rawJson.Replace('<', '\u003c')
 
 $html = $template.Replace($MarkerData, $safeJson)
 $html = $html.Replace($MarkerHp, $hpJson)
+$html = $html.Replace($MarkerLoss, $lossJson)
 
 [System.IO.File]::WriteAllText($OutputPath, $html, $Utf8NoBom)
 

@@ -18,6 +18,61 @@ $outPath = Join-Path $Root 'docs\wiki\boss-table.md'
 
 $data = ConvertFrom-Json ([System.IO.File]::ReadAllText($dataPath, [System.Text.Encoding]::UTF8))
 
+# ── 死亡提示（玩家死在该 Boss 手里时，结算 / 历史界面显示的那一句）────────────
+# 数据源 = 本模组**自己的** encounters 本地化表，键是 `<遭遇>_BOSS_ENCOUNTER.loss`，
+# 和游戏里跑的是同一份；`{character}` 由游戏替换成玩家所用角色的名字。
+# 特例（2026-11-24 全表核对过，只有这两处，其余每个 Boss 都只有一句）：
+#   · `.loss_pressure` —— 欧米伽观：玩家被「点穴」打死时换这一句；
+#   · `.loss_tarot`    —— 愚者（FOOL_BOSS / FOOL_TAROT）：死者所用角色对应某张塔罗牌时
+#                         换成「成为了愚者牌组中新的 XX」（对照表见文末）。
+$Loss = @{}
+$LossPath = Join-Path $Root 'content\localization\zhs\encounters.json'
+if (Test-Path $LossPath) {
+    $locDoc = ConvertFrom-Json ([System.IO.File]::ReadAllText($LossPath, [System.Text.Encoding]::UTF8))
+    foreach ($p in $locDoc.PSObject.Properties) { $Loss[$p.Name] = [string]$p.Value }
+}
+$LossLabels = @{
+    'loss_tarot'    = '死于塔罗愚、且死者角色对应某张塔罗牌时'
+    'loss_pressure' = '被「点穴」打死时'
+}
+
+function Loss-Of([string]$encounter) {
+    $out = @()
+    if (-not $encounter) { return $out }
+    $entry = $encounter + '_BOSS_ENCOUNTER'
+    $k = $entry + '.loss'
+    if ($Loss.ContainsKey($k)) { $out += [pscustomobject]@{ Label = ''; Text = $Loss[$k] } }
+    foreach ($name in @($Loss.Keys | Sort-Object)) {
+        if (-not $name.StartsWith($entry + '.loss_')) { continue }
+        $suffix = $name.Substring($entry.Length + 1)
+        $lbl = $suffix
+        if ($LossLabels.ContainsKey($suffix)) { $lbl = $LossLabels[$suffix] }
+        $out += [pscustomobject]@{ Label = $lbl; Text = $Loss[$name] }
+    }
+    return $out
+}
+
+# 愚者的「死者角色 → 塔罗牌」对照表：**直接从写这张表的 C# 源码里读**（避免手抄两份对不上）
+$TarotRows = @()
+try {
+    $tarotSrc = Join-Path $Root 'src\Hooks\Core\FoolTarotDeaths.cs'
+    $cardLoc = Join-Path $Root 'tools\tmp\loc\zhs_cards.json'
+    if ((Test-Path $tarotSrc) -and (Test-Path $cardLoc)) {
+        $cardTitles = @{}
+        $cj = ConvertFrom-Json ([System.IO.File]::ReadAllText($cardLoc, [System.Text.Encoding]::UTF8))
+        foreach ($p in $cj.PSObject.Properties) { if ($p.Name.EndsWith('.title')) { $cardTitles[$p.Name.Substring(0, $p.Name.Length - 6)] = [string]$p.Value } }
+        $src = [System.IO.File]::ReadAllText($tarotSrc, [System.Text.Encoding]::UTF8)
+        foreach ($m in [regex]::Matches($src, '\("([A-Z_]+)"\s*,\s*new\[\]\s*\{([^}]*)\}\)')) {
+            $card = $m.Groups[1].Value
+            $toks = @([regex]::Matches($m.Groups[2].Value, '"([^"]*)"') | ForEach-Object { $_.Groups[1].Value })
+            $zh = @($toks | Where-Object { $_ -match '[\u4e00-\u9fff]' })
+            $who = if ($zh.Count -gt 0) { $zh[0] } else { $toks[0] }
+            $cardName = if ($cardTitles.ContainsKey($card)) { $cardTitles[$card] } else { $card }
+            $TarotRows += [pscustomobject]@{ Who = $who; Card = $cardName }
+        }
+    }
+} catch { /* 解析失败就不出这张表 */ }
+
 # 角色基础血量（与 make-xlsx.ps1 / build-site.ps1 保持一致）
 $StartHp = @{
     'IRONCLAD_BOSS' = 80; 'SILENT_BOSS' = 70; 'DEFECT_BOSS' = 75; 'NECROBINDER_BOSS' = 66
@@ -219,6 +274,7 @@ foreach ($boss in $data.bosses) {
                 DeckNote = $act.deckNote; DeckRegistered = $act.deckRegistered
                 Special = $act.special; SpecialDread = $act.specialDread
                 Extras = $mainExtras; Script = $act.script; Info = $(if ($act.info) { [string]$act.info } else { [string]$boss.info })
+                LossMessages = (Loss-Of ([string]$act.encounter))
             }
         }
 
@@ -236,6 +292,7 @@ foreach ($boss in $data.bosses) {
                 DeckNote = $v.deckNote; DeckRegistered = $v.deckRegistered
                 Special = $v.special; SpecialDread = $v.specialDread
                 Extras = $extras; Script = $v.script; Info = $(if ($v.info) { [string]$v.info } else { [string]$boss.info })
+                LossMessages = (Loss-Of ([string]$v.encounter))
             }
         }
     }
@@ -243,7 +300,7 @@ foreach ($boss in $data.bosses) {
 
 # ── 写 Markdown ─────────────────────────────────────────
 $sb = New-Object System.Text.StringBuilder
-[void]$sb.AppendLine('# 玩家角色当Boss · Boss 意图表（41 套设计）')
+[void]$sb.AppendLine('# 玩家角色当Boss · Boss 意图表（' + $designs.Count + ' 套设计）')
 [void]$sb.AppendLine('')
 [void]$sb.AppendLine('> 本表**由脚本从模组本体自动导出**（`tools/wiki-dump` 反射编译好的模组 DLL 里的 BossDefs/BossScript），')
 [void]$sb.AppendLine('> 和游戏里实际跑的那一份完全同源，不存在手抄过期。导出时间：**' + $data.generatedAt + '**（' + $data.generatedFrom + '）。')
@@ -253,6 +310,9 @@ $sb = New-Object System.Text.StringBuilder
 [void]$sb.AppendLine('>')
 [void]$sb.AppendLine('> **读法**：「打出」= 剧本排队要打的牌（顺序即真实出牌顺序）；「不出」= 被她自己烧掉 / 丢弃 / 保留没打 / 只显示意图的牌。')
 [void]$sb.AppendLine('> 牌打到最后没费的那几张仍列在「打出」里，每回合的**备注**会写明是哪几张没费。')
+[void]$sb.AppendLine('>')
+[void]$sb.AppendLine('> **死亡提示** = 玩家死在这只 Boss 手里时，结算 / 历史界面显示的那一句话；`{character}` 会替换成玩家所用角色的名字。')
+[void]$sb.AppendLine('> 每只 Boss 各有一句，**只有两处特例**（欧米伽观的「点穴」、愚者的塔罗牌），见[死亡提示的特殊情况](#loss-special)。')
 [void]$sb.AppendLine('')
 [void]$sb.AppendLine('## 目录')
 [void]$sb.AppendLine('')
@@ -270,6 +330,8 @@ foreach ($a in @(1, 2, 3)) {
 
 # ★ 用户 2026-11-22：「github 的 wiki 上好像没有写进阶增强」⇒ 目录里加一条，并单独出一节
 [void]$sb.AppendLine('**进阶**：[进阶增强一览](#ascension)')
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine('**死亡提示**：[死亡提示的特殊情况](#loss-special)')
 [void]$sb.AppendLine('')
 
 # ── 进阶增强一览（从各设计的 ascensionUpgrades / ascensionRelics 聚合）─────
@@ -369,6 +431,10 @@ foreach ($a in @(1, 2, 3)) {
         [void]$sb.AppendLine('')
         [void]$sb.AppendLine('- **角色 / 幕**：' + $d.Char + ' · 第 ' + $d.Act + ' 幕 · ' + $d.NumberLabel)
         [void]$sb.AppendLine('- **控制台**：`fight ' + $d.Encounter + '_BOSS_ENCOUNTER`')
+        foreach ($lm in @($d.LossMessages)) {
+            if ($lm.Label) { [void]$sb.AppendLine('- **死亡提示**（' + $lm.Label + '）：' + (MdText $lm.Text)) }
+            else { [void]$sb.AppendLine('- **死亡提示**：' + (MdText $lm.Text)) }
+        }
         [void]$sb.AppendLine('- **血量**：**' + $d.Hp + '** ｜ **能量**：' + $d.Energy + ' ｜ **手牌**：' + $d.Hand + ' ｜ **循环**：' + (Loop-Text $d.Script))
         if ($d.Info) {
         # ★ v0.2.883：能力面板按「标签：值」渲染成两列表（与设置界面同一份数据）
@@ -452,6 +518,33 @@ foreach ($a in @(1, 2, 3)) {
 [void]$sb.AppendLine('')
 [void]$sb.AppendLine('> 支配不是 Boss 的「特殊效果」—— 特殊效果只在该 Boss 的 Boss 战里生效，支配只在本幕的普通战斗里生效，两者互不重叠。')
 [void]$sb.AppendLine('')
+
+# ── 死亡提示的特殊情况（2026-11-24 用户：「除了欧米伽观应该都是每个 boss 只有一个」）─────
+[void]$sb.AppendLine('<a id="loss-special"></a>')
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine('## 死亡提示的特殊情况')
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine('全部 42 只 Boss 都是**一句**死亡提示（写在各自那一节里）。只有两处会在特定条件下换一句：')
+[void]$sb.AppendLine('')
+$omegaExtra = @(Loss-Of 'WATCHER_OMEGA' | Where-Object { $_.Label } | Select-Object -First 1)
+$foolExtra  = @(Loss-Of 'FOOL_TAROT'    | Where-Object { $_.Label } | Select-Object -First 1)
+$omegaText = if ($omegaExtra.Count -gt 0) { [string]$omegaExtra[0].Text } else { '' }
+$foolText  = if ($foolExtra.Count  -gt 0) { [string]$foolExtra[0].Text }  else { '' }
+[void]$sb.AppendLine('| Boss | 条件 | 换成的那一句 |')
+[void]$sb.AppendLine('|---|---|---|')
+[void]$sb.AppendLine('| 欧米伽观（`WATCHER_OMEGA`） | 玩家是**被她用「点穴」打死**的 | ' + (MdText $omegaText) + ' |')
+[void]$sb.AppendLine('| 塔罗愚（`FOOL_TAROT`） | 死者所用角色**对应某张塔罗牌**时（见下表） | ' + (MdText $foolText) + ' |')
+[void]$sb.AppendLine('')
+if ($TarotRows.Count -gt 0) {
+    [void]$sb.AppendLine('「塔罗愚」那句里的 `{Card}` 按**死者所用角色**取（同一张表在 `src\Hooks\Core\FoolTarotDeaths.cs`，本表从那里自动读出）：')
+    [void]$sb.AppendLine('')
+    [void]$sb.AppendLine('| 死者角色 | 变成的塔罗牌 |')
+    [void]$sb.AppendLine('|---|---|')
+    foreach ($t in $TarotRows) { [void]$sb.AppendLine('| ' + (MdText $t.Who) + ' | ' + (MdText $t.Card) + ' |') }
+    [void]$sb.AppendLine('')
+    [void]$sb.AppendLine('> 名单外的角色（例如别的模组角色）匹配不上 ⇒ 保持「塔罗愚」的默认那一句。')
+    [void]$sb.AppendLine('')
+}
 [void]$sb.AppendLine('## 说明')
 [void]$sb.AppendLine('')
 [void]$sb.AppendLine('- 本文件由 `tools/wiki/make-markdown.ps1` 从 `tools/wiki/data.json` 生成，**请勿手改**；')
