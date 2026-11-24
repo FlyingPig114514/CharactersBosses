@@ -7101,3 +7101,4 @@ Chronological action log.
 | 2026-11-24 13:26 | edit | `src/CharacterBosses.json` | ok | 0 |
 | 2026-11-24 13:28 | edit | `src/Hooks/Core/BuildInfo.cs` | ok | 0 |
 | 2026-11-24 13:28 | edit | `docs/plans/changelog-history.md` | ok | 0 |
+| 2026-11-24 13:34 | write | `workshop/changenote.txt` | ok | 0 |
