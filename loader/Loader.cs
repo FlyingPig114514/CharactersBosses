@@ -68,6 +68,28 @@ public static class LoaderEntry
                       ?? AssemblyLoadContext.Default;
             alc.Resolving += (ctx, name) => ResolveFromDisk(ctx, name, dir);
 
+            // ★★ v0.2.920（用户 2026-11-23：玩家装了「MLM-模组启动管理器」后启动崩「致命错误」）：
+            //   MLM（`ModLaunchManager`，工坊 3788556097）会把每个模组的 DLL 装进它自己那个
+            //   **collectible（可卸载）** 的 `AssemblyLoadContext` 里（反编译
+            //   `ModLaunchManager.CollectibleModAssemblyLoader` 实证：`base(name, isCollectible: true)`），
+            //   以便运行期热开关模组。我们跟着它进同一个 ALC（v0.2.588 那条「必须同一个 ALC」的规矩
+            //   仍然成立）⇒ 它一旦卸载这个 ALC，我们挂上去的**上百个 Harmony 补丁就全成了悬空引用**，
+            //   之后游戏一走到被补的方法就是
+            //     `InvalidOperationException: Operation is not valid due to the current state of the object.
+            //      at System.Reflection.MemberInfo.get_MetadataToken()`
+            //   这类崩溃（玩家 trace 里 5 次「致命错误」前都是它）。
+            //   对策：只要发现自己在**可卸载的 ALC** 里，就注册一个 `Unloading` 回调 ——
+            //   在 MLM 真正卸载之前把本模组的补丁**全部撤掉**（`Harmony.UnpatchAll(ModId)`），
+            //   卸载之后就只是「模组没生效」，而不是把游戏带崩。
+            if (alc.IsCollectible)
+            {
+                Log("双版本外壳：检测到**可卸载的加载上下文**（多半是 MLM「模组启动管理器」）" +
+                    "⇒ 注册卸载回调：卸载前先撤掉本模组的全部 Harmony 补丁，避免悬空补丁把游戏带崩");
+                BootTrace.Mark("宿主持有可卸载 ALC（MLM？）⇒ 已注册卸载清补丁回调");
+                try { alc.Unloading += OnHostUnloading; }
+                catch (Exception e) { Log("双版本外壳：注册卸载回调失败: " + e.Message); }
+            }
+
             Assembly asm;
             try { asm = alc.LoadFromAssemblyPath(path); }
             catch (Exception e)
@@ -150,9 +172,69 @@ public static class LoaderEntry
     }
 
     /// <summary>
-    /// 按「.dll → .dll.bin」的顺序找实现文件（v0.2.588 起默认是后者）。
-    /// `LoadFromAssemblyPath` 不看扩展名，所以 `.bin` 照样能加载。
+    /// 宿主（MLM 之类的启动管理器）要卸载我们这个可卸载 ALC 时的收尾：
+    /// **把本模组的 Harmony 补丁全部撤掉**，再让它卸载。
+    ///
+    /// 不动手的话，补丁里的方法引用会指向一个正在被卸载的程序集 —— 之后游戏一调到那个方法，
+    /// 就是 `MemberInfo.get_MetadataToken` 那类 `InvalidOperationException`，
+    /// 玩家那边看到的就是启动或进战斗时弹「致命错误」。
+    /// 撤销之后最坏的结果是「本模组这一局没生效」，不会连累原版和其它模组。
     /// </summary>
+    private static void OnHostUnloading(AssemblyLoadContext ctx)
+    {
+        try
+        {
+            Log($"双版本外壳：宿主正在卸载 ALC「{ctx.Name}」⇒ 先撤掉本模组的全部 Harmony 补丁");
+            BootTrace.Mark("宿主卸载 ALC ⇒ 撤销全部 Harmony 补丁");
+        }
+        catch { /* 忽略 */ }
+
+        try
+        {
+            // ⚠ 外壳**不能**在编译期引用 0Harmony（它只引用两版都有的 sts2 API，手机端也不带 Harmony）
+            //   ⇒ 反射拿 `HarmonyLib.Harmony`，再反射调 `UnpatchAll(string)`。
+            var harmonyType = Type.GetType("HarmonyLib.Harmony, 0Harmony")
+                              ?? FindTypeInLoadedAssemblies("HarmonyLib.Harmony");
+            if (harmonyType == null)
+            {
+                Log("双版本外壳：找不到 HarmonyLib.Harmony ⇒ 无法撤销补丁（卸载时可能留悬空补丁）");
+                return;
+            }
+            var instance = Activator.CreateInstance(harmonyType, new object[] { ModId });
+            var unpatchAll = harmonyType.GetMethod("UnpatchAll", new[] { typeof(string) });
+            if (instance == null || unpatchAll == null)
+            {
+                Log("双版本外壳：Harmony.UnpatchAll(string) 取不到 ⇒ 无法撤销补丁");
+                return;
+            }
+            unpatchAll.Invoke(instance, new object[] { ModId });
+            Log("双版本外壳：本模组的 Harmony 补丁已全部撤销（卸载安全）");
+        }
+        catch (Exception e)
+        {
+            try { Log("双版本外壳：撤销 Harmony 补丁失败: " + e.GetType().Name + ": " + e.Message); } catch { }
+        }
+    }
+
+    /// <summary>在已加载的程序集里按全名找类型（反射兜底，找不到返回 null）。</summary>
+    private static Type? FindTypeInLoadedAssemblies(string fullName)
+    {
+        try
+        {
+            foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                try
+                {
+                    var t = asm.GetType(fullName, throwOnError: false);
+                    if (t != null) return t;
+                }
+                catch { /* 这个程序集不能扫就跳过 */ }
+            }
+        }
+        catch { /* 忽略 */ }
+        return null;
+    }
+
     /// <summary>
     /// 把「实现程序集」登记到本模组名下 —— 走官方的 `ModManager.AssociateAssemblyWithMod(modId, assembly)`。
     /// 用反射调用：107 那份引用里未必有这个 API，缺了也只是跳过（单机不受影响）。

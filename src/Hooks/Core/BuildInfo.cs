@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.919 / 2026-11-23 (**修：黑暗充能球被动必抛异常（Dark orbs cannot target creatures）**）—— 玩家崩溃 trace 里反复出现 `!! 未观察的任务异常 ⇒ (Dark orbs cannot target creatures.) ← InvalidOperationException`。根因是我们自己挂的 `DarkOrbBossTargetPatch`：反编译实证 `DarkOrb.Passive(ctx, target)` 只要 `target != null` 就 `throw new InvalidOperationException(\"Dark orbs cannot target creatures.\")`（黑暗球的被动只是给自己攒伤害，本来就没有目标），而我们那个前缀把 null 的 target **改写成被锁定的玩家** ⇒ 黑球机每触发一次黑暗球被动就必抛，且是「未观察的任务异常」（finalizer 线程重抛 ⇒ 整个进程被打掉）。现在**整个补丁删掉**（黑暗球不需要选靶，伤害在激发时才落到生命值最低的敌人身上）。v0.2.918 是疾风观发布版。完整历史见 docs/plans/changelog-history.md";
+    public const string Tag = "v0.2.920 / 2026-11-24 (**兼容 MLM「模组启动管理器」：卸载前自动撤掉补丁**）—— 玩家反馈装了「MLM-模组启动管理器」（工坊 3788556097）后启动崩「致命错误」。反编译 `ModLaunchManager.CollectibleModAssemblyLoader` 实证：MLM 把每个模组的 DLL 装进它自己那个 **collectible（可卸载）** 的 `AssemblyLoadContext`（`base(name, isCollectible: true)`），以便运行期热开关模组；我们跟着进同一个 ALC（v0.2.588 那条「必须同一个 ALC」的规矩不变）⇒ 它一旦卸载这个 ALC，我们那上百个 Harmony 补丁就全成悬空引用，之后游戏一走到被补的方法就抛 `InvalidOperationException: … at System.Reflection.MemberInfo.get_MetadataToken()`（玩家 trace 里 5 次「致命错误」前都是它）。对策：外壳 `Loader` 发现自己在**可卸载的 ALC** 里就注册 `alc.Unloading` 回调，**卸载前先 `Harmony.UnpatchAll(ModId)`**（反射调用，外壳不编译期引用 0Harmony）⇒ 最坏结果只是「本模组这一局没生效」，不会再连累原版与其它模组。另外 v0.2.919 修了黑暗球必崩（`Dark orbs cannot target creatures.`）。完整历史见 docs/plans/changelog-history.md";
 
     private static bool _logged;
 

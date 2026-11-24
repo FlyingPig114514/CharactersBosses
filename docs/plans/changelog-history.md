@@ -4,6 +4,33 @@
 > 旧条目逐字来自 `git show HEAD:src/Hooks/Core/BuildInfo.cs` 的 Tag 常量（v0.2.871 及其之前，共 236 条）。
 > 最新版本（0.2.889）是当前 Tag，同时在各条 `workshop/changenote.txt` 里也有面向玩家的摘要。
 
+## v0.2.920（2026-11-24）：兼容 MLM「模组启动管理器」
+
+玩家反馈：装了 **MLM-模组启动管理器**（工坊 `3788556097` / `ModLaunchManager` 0.4.11）后，
+启动就弹「致命错误」。trace 里每次崩之前都是：
+
+```
+FileNotFoundException: …\SlayTheSpire2\ModLaunchManager\mod_launch_translations   (×12)   ← MLM 自己的
+InvalidOperationException: Operation is not valid due to the current state of the object.
+   at System.Reflection.MemberInfo.get_MetadataToken()
+!!! NGame.GameStartupError 进入 ⇒ 游戏即将弹「致命错误」对话框
+```
+
+反编译 MLM 实证：`ModLaunchManager.CollectibleModAssemblyLoader` 给每个模组建一个
+**collectible（可卸载）** 的 `AssemblyLoadContext`（`base($"MLM:{name}:{guid}", isCollectible: true)`），
+共享 sts2 / GodotSharp / 0Harmony 等宿主契约程序集，以便**运行期热开关模组**。
+我们跟着进同一个 ALC（v0.2.588 那条「实现必须装进外壳所在 ALC」的规矩不变）⇒
+MLM 一旦卸载这个 ALC，我们那上百个 Harmony 补丁就全部指向一个正在被卸载的程序集
+⇒ 之后游戏走到被补的方法就抛 `MetadataToken` 那类异常，进程被打掉。
+
+修法（`loader/Loader.cs`）：外壳发现自己的 ALC **是可卸载的**（`alc.IsCollectible`）时，
+注册 `alc.Unloading` 回调，在宿主卸载之前
+**`Harmony.UnpatchAll("CharacterBosses")`** 把本模组的补丁全部撤掉
+（反射调用 —— 外壳只引用两版都有的 sts2 API，不编译期依赖 0Harmony）。
+最坏结果变成「本模组这一局没生效」，不会再连累原版和其它模组。
+日志/`characterbosses_trace.txt` 会留下
+`检测到可卸载的加载上下文（多半是 MLM）⇒ 注册卸载回调` / `宿主卸载 ALC ⇒ 撤销全部 Harmony 补丁`。
+
 ## v0.2.919（2026-11-23）：修「Dark orbs cannot target creatures.」崩溃
 
 玩家崩溃 trace（`characterbosses_trace.txt`）里反复出现：
