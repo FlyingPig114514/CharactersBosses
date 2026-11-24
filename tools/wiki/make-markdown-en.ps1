@@ -704,6 +704,8 @@ $foolText  = if ($foolExtra.Count  -gt 0) { [string]$foolExtra[0].Text }  else {
 [void]$sb.AppendLine('')
 [void]$sb.AppendLine('All bosses have exactly **one** death message (shown in their own section). Only two of them swap in another line under a condition:')
 [void]$sb.AppendLine('')
+[void]$sb.AppendLine('> In multiplayer with several bosses on the field, the line shown is the one belonging to **the boss that actually killed you** (not the encounter''s main boss) — every line names its own boss anyway.')
+[void]$sb.AppendLine('')
 [void]$sb.AppendLine('| Boss | Condition | Line used instead |')
 [void]$sb.AppendLine('|---|---|---|')
 [void]$sb.AppendLine('| Omega Watcher (`WATCHER_OMEGA`) | you were killed by her **Pressure Points** | ' + (MdText $omegaText) + ' |')

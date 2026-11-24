@@ -2176,6 +2176,8 @@ In Dread mode each act carries the dominion of **that act's main boss character*
 
 All bosses have exactly **one** death message (shown in their own section). Only two of them swap in another line under a condition:
 
+> In multiplayer with several bosses on the field, the line shown is the one belonging to **the boss that actually killed you** (not the encounter's main boss) — every line names its own boss anyway.
+
 | Boss | Condition | Line used instead |
 |---|---|---|
 | Omega Watcher (`WATCHER_OMEGA`) | you were killed by her **Pressure Points** | {character} was picked apart, point by point, by **The Watcher**'s **Pressure Points**. |

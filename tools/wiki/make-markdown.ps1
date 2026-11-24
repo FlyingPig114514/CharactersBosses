@@ -526,6 +526,8 @@ foreach ($a in @(1, 2, 3)) {
 [void]$sb.AppendLine('')
 [void]$sb.AppendLine('全部 42 只 Boss 都是**一句**死亡提示（写在各自那一节里）。只有两处会在特定条件下换一句：')
 [void]$sb.AppendLine('')
+[void]$sb.AppendLine('> 多人同场有多只 Boss 时，死亡提示按**打死你的那一只**的文案显示（不是这一场的主 Boss）—— 每句文案里写的本来就是那只 Boss 的名字。')
+[void]$sb.AppendLine('')
 $omegaExtra = @(Loss-Of 'WATCHER_OMEGA' | Where-Object { $_.Label } | Select-Object -First 1)
 $foolExtra  = @(Loss-Of 'FOOL_TAROT'    | Where-Object { $_.Label } | Select-Object -First 1)
 $omegaText = if ($omegaExtra.Count -gt 0) { [string]$omegaExtra[0].Text } else { '' }
