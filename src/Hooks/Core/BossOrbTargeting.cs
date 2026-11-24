@@ -148,7 +148,7 @@ internal static class BossOrbTargeting
 
 /// <summary>
 /// 闪电充能球的被动目标（见 <see cref="BossOrbTargeting"/>）。
-/// ⚠ 这两个 `Passive` 都是**在具体球类上声明的**（不在 `OrbModel` 上）⇒ 必须分别挂，
+/// ⚠ 这个 `Passive` 是**在具体球类上声明**的（不在 `OrbModel` 上）⇒ 必须单独挂，
 ///   并且显式写死参数类型（本仓库踩过重载 ⇒ Harmony 抛 AmbiguousMatchException 的坑）。
 /// </summary>
 [HarmonyPatch(typeof(LightningOrb), nameof(LightningOrb.Passive),
@@ -170,22 +170,19 @@ internal static class LightningOrbBossTargetPatch
     }
 }
 
-/// <summary>黑暗充能球的被动目标（同上）。</summary>
-[HarmonyPatch(typeof(DarkOrb), nameof(DarkOrb.Passive),
-    new[] { typeof(PlayerChoiceContext), typeof(Creature) })]
-internal static class DarkOrbBossTargetPatch
-{
-    [HarmonyPrefix]
-    public static void Prefix(DarkOrb __instance, ref Creature target)
-    {
-        try
-        {
-            var want = BossOrbTargeting.Rewrite(__instance, target);
-            // ★ v0.2.891（玩家反馈「鸡煲的球不打自己了，但游戏卡死」）：只接受**还活着且仍在战斗里**的目标。
-            //   以前只要非 null 就塞给原版；万一那个生物已经被移出战斗（召唤物死了/离场），
-            //   原版 `ApplyLightningDamage` 会对着一个不在战斗里的对象 await 伤害 ⇒ 看起来就是「卡死」。
-            if (want != null && want.IsAlive && !want.IsDead && want.CombatState != null) target = want;
-        }
-        catch { /* 绝不影响战斗 */ }
-    }
-}
+// ── 黑暗充能球**不能**这样改（v0.2.919 删除）────────────────────────────────
+// 用户 2026-11-23 转来的玩家崩溃 trace 里反复出现：
+//   `!! 未观察的任务异常 ⇒ AggregateException … (Dark orbs cannot target creatures.)`
+//   `← InvalidOperationException: Dark orbs cannot target creatures.`
+// 反编译实证（`MegaCrit.Sts2.Core.Models.Orbs.DarkOrb.Passive`）：
+// <code>
+// public override Task Passive(PlayerChoiceContext choiceContext, Creature? target)
+// {
+//     if (target != null) throw new InvalidOperationException("Dark orbs cannot target creatures.");
+//     ...   // 黑暗球的被动只是给自己攒伤害，本来就没有目标
+// }
+// </code>
+// 而这里以前挂了一个 `DarkOrbBossTargetPatch`，**把 null 的 target 改写成「被锁定的玩家」**
+// ⇒ 每次黑暗球被动触发都必抛，而且是「未观察的任务异常」——它会在 finalizer 线程上重抛，
+// 在 Godot/Mono 里就是**整个进程被打掉**。
+// 黑暗球不需要任何选靶（它的伤害在激发时才落到「生命值最低的敌人」身上），所以这个补丁整个删掉。

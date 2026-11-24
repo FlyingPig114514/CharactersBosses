@@ -4,6 +4,33 @@
 > 旧条目逐字来自 `git show HEAD:src/Hooks/Core/BuildInfo.cs` 的 Tag 常量（v0.2.871 及其之前，共 236 条）。
 > 最新版本（0.2.889）是当前 Tag，同时在各条 `workshop/changenote.txt` 里也有面向玩家的摘要。
 
+## v0.2.919（2026-11-23）：修「Dark orbs cannot target creatures.」崩溃
+
+玩家崩溃 trace（`characterbosses_trace.txt`）里反复出现：
+
+```
+!! 未观察的任务异常 ⇒ AggregateException … (Dark orbs cannot target creatures.)
+   ← InvalidOperationException: Dark orbs cannot target creatures.
+```
+
+根因在我们自己挂的 `DarkOrbBossTargetPatch`。反编译实证：
+
+```csharp
+// MegaCrit.Sts2.Core.Models.Orbs.DarkOrb
+public override Task Passive(PlayerChoiceContext choiceContext, Creature? target)
+{
+    if (target != null) throw new InvalidOperationException("Dark orbs cannot target creatures.");
+    …   // 黑暗球的被动只是给自己攒伤害，本来就没有目标
+}
+```
+
+而那个前缀把 **null 的 target 改写成「被锁定的玩家」** ⇒ 黑球机每触发一次黑暗球被动就必抛；
+而且它是**未观察的任务异常**（`Task` 没人 await 到它的 exception）⇒ finalizer 线程重抛
+⇒ 在 Godot/Mono 里就是**整个进程被打掉**（玩家看到的「崩溃」）。
+
+修法：**整个补丁删除**。黑暗球不需要任何选靶 —— 它的伤害在**激发**时才落到「生命值最低的敌人」身上。
+闪电球的选靶补丁保留（它确实需要目标，而且有 v0.2.891 的「目标必须还活着且在战斗中」护栏）。
+
 ## v0.2.918（2026-11-23）：再修「2 张奇迹」—— 改成她第 1 回合期间每帧兜底修剪
 
 v0.2.917 的两个修剪时机（我们注入时 / 她的回合开始）**都太早**：

@@ -1,0 +1,535 @@
+===== 外壳入口 pid=12872 =====
+[21:55:03.997] [外壳] Initialize 开始
+[21:55:04.006] [外壳] 游戏版本=0.1.0+d09d48e516cfd24314c1781f662787904f894aa8，探测 beta=True
+[21:55:04.019] [外壳] 已载入实现 CharacterBosses.Impl113 1.0.0.0
+[21:55:04.028] [外壳] 归属登记=True
+[21:55:04.039] [外壳] 跳过手动模型注册（交给游戏扫）
+[21:55:04.047] [外壳] 调用 ModEntry.Initialize：CharacterBosses.Impl113.dll
+===== 新进程 pid=12872 =====
+[21:55:04.373] · Install（进程 pid=12872）
+[21:55:04.382] · BuildInfo.LogOnce 开始（第一帧）
+[21:55:04.386] · 启动阶段 1/5
+[21:55:04.389] · 启动阶段 2/5
+[21:55:04.392] · 启动阶段 3/5
+[21:55:04.395] · 启动阶段 4/5
+[21:55:04.420] · 启动阶段 5/5
+[21:55:04.430] [外壳] ModEntry.Initialize 已返回：CharacterBosses.Impl113.dll
+===== 外壳入口 pid=5876 =====
+[21:57:48.506] [外壳] Initialize 开始
+[21:57:48.511] [外壳] 游戏版本=0.1.0+d09d48e516cfd24314c1781f662787904f894aa8，探测 beta=True
+[21:57:48.516] [外壳] 已载入实现 CharacterBosses.Impl113 1.0.0.0
+[21:57:48.520] [外壳] 归属登记=True
+[21:57:48.523] [外壳] 跳过手动模型注册（交给游戏扫）
+[21:57:48.526] [外壳] 调用 ModEntry.Initialize：CharacterBosses.Impl113.dll
+===== 新进程 pid=5876 =====
+[21:57:48.822] · Install（进程 pid=5876）
+[21:57:48.827] · BuildInfo.LogOnce 开始（第一帧）
+[21:57:48.830] · 启动阶段 1/5
+[21:57:48.834] · 启动阶段 2/5
+[21:57:48.837] · 启动阶段 3/5
+[21:57:48.841] · 启动阶段 4/5
+[21:57:48.862] · 启动阶段 5/5
+[21:57:48.866] [外壳] ModEntry.Initialize 已返回：CharacterBosses.Impl113.dll
+[21:58:08.109] · BaseLib 配置：RegisterCore 开始
+[21:58:08.112] · BaseLib 配置：RegisterCore 完成
+===== 外壳入口 pid=28688 =====
+[21:58:38.558] [外壳] Initialize 开始
+[21:58:38.563] [外壳] 游戏版本=0.1.0+d09d48e516cfd24314c1781f662787904f894aa8，探测 beta=True
+[21:58:38.569] [外壳] 已载入实现 CharacterBosses.Impl113 1.0.0.0
+[21:58:38.572] [外壳] 归属登记=True
+[21:58:38.576] [外壳] 跳过手动模型注册（交给游戏扫）
+[21:58:38.579] [外壳] 调用 ModEntry.Initialize：CharacterBosses.Impl113.dll
+===== 新进程 pid=28688 =====
+[21:58:38.879] · Install（进程 pid=28688）
+[21:58:38.884] · BuildInfo.LogOnce 开始（第一帧）
+[21:58:38.888] · 启动阶段 1/5
+[21:58:38.891] · 启动阶段 2/5
+[21:58:38.895] · 启动阶段 3/5
+[21:58:38.899] · 启动阶段 4/5
+[21:58:38.921] · 启动阶段 5/5
+[21:58:38.925] [外壳] ModEntry.Initialize 已返回：CharacterBosses.Impl113.dll
+[21:58:57.335] · BaseLib 配置：RegisterCore 开始
+[21:58:57.339] · BaseLib 配置：RegisterCore 完成
+[21:59:19.104] · 启动期异常#1: InvalidOperationException: Sequence contains no matching element | at System.Linq.ThrowHelper.ThrowNoMatchException()
+[21:59:31.138] · 启动期异常#2: InvalidOperationException: Sequence contains no matching element | at System.Linq.ThrowHelper.ThrowNoMatchException()
+===== 外壳入口 pid=12292 =====
+[23:11:20.645] [外壳] Initialize 开始
+[23:11:20.648] [外壳] 游戏版本=0.1.0+d09d48e516cfd24314c1781f662787904f894aa8，探测 beta=True
+[23:11:20.652] [外壳] 已载入实现 CharacterBosses.Impl113 1.0.0.0
+[23:11:20.654] [外壳] 归属登记=True
+[23:11:20.657] [外壳] 跳过手动模型注册（交给游戏扫）
+[23:11:20.659] [外壳] 调用 ModEntry.Initialize：CharacterBosses.Impl113.dll
+===== 新进程 pid=12292 =====
+[23:11:20.953] · Install（进程 pid=12292）
+[23:11:20.956] · BuildInfo.LogOnce 开始（第一帧）
+[23:11:20.958] · 启动阶段 1/5
+[23:11:20.961] · 启动阶段 2/5
+[23:11:20.963] · 启动阶段 3/5
+[23:11:20.965] · 启动阶段 4/5
+[23:11:20.986] · 启动阶段 5/5
+[23:11:20.989] [外壳] ModEntry.Initialize 已返回：CharacterBosses.Impl113.dll
+[23:11:24.461] · 启动期异常#1: InvalidOperationException: 缺少英文卡面映射：手牌中的攻击牌在打出前耗能减少3。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.470] · 启动期异常#2: InvalidOperationException: 缺少英文卡面映射：造成3点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.472] · 启动期异常#3: InvalidOperationException: 缺少英文卡面映射：造成2点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.474] · 启动期异常#4: InvalidOperationException: 缺少英文卡面映射：造成2点伤害1次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.480] · 启动期异常#5: InvalidOperationException: 缺少英文卡面映射：该敌人在本回合失去3点力量。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.485] · 启动期异常#6: InvalidOperationException: 缺少英文卡面映射：手牌中的攻击牌在打出前耗能减少3。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.497] · 启动期异常#7: InvalidOperationException: 缺少英文卡面映射：造成3点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.500] · 启动期异常#8: InvalidOperationException: 缺少英文卡面映射：造成2点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.502] · 启动期异常#9: InvalidOperationException: 缺少英文卡面映射：造成2点伤害1次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.509] · 启动期异常#10: InvalidOperationException: 缺少英文卡面映射：该敌人在本回合失去3点力量。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.578] · 启动期异常#11: InvalidOperationException: 缺少英文卡面映射：手牌中的攻击牌在打出前耗能减少3。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.586] · 启动期异常#12: InvalidOperationException: 缺少英文卡面映射：造成3点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.588] · 启动期异常#13: InvalidOperationException: 缺少英文卡面映射：造成2点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.591] · 启动期异常#14: InvalidOperationException: 缺少英文卡面映射：造成2点伤害1次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.594] · 启动期异常#15: InvalidOperationException: 缺少英文卡面映射：该敌人在本回合失去3点力量。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.598] · 启动期异常#16: InvalidOperationException: 缺少英文卡面映射：手牌中的攻击牌在打出前耗能减少3。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.603] · 启动期异常#17: InvalidOperationException: 缺少英文卡面映射：造成3点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.605] · 启动期异常#18: InvalidOperationException: 缺少英文卡面映射：造成2点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.607] · 启动期异常#19: InvalidOperationException: 缺少英文卡面映射：造成2点伤害1次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.610] · 启动期异常#20: InvalidOperationException: 缺少英文卡面映射：该敌人在本回合失去3点力量。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.616] · 启动期异常#21: InvalidOperationException: 缺少英文卡面映射：手牌中的攻击牌在打出前耗能减少3。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.628] · 启动期异常#22: InvalidOperationException: 缺少英文卡面映射：造成3点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.631] · 启动期异常#23: InvalidOperationException: 缺少英文卡面映射：造成2点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.633] · 启动期异常#24: InvalidOperationException: 缺少英文卡面映射：造成2点伤害1次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.636] · 启动期异常#25: InvalidOperationException: 缺少英文卡面映射：该敌人在本回合失去3点力量。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.641] · 启动期异常#26: InvalidOperationException: 缺少英文卡面映射：手牌中的攻击牌在打出前耗能减少3。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.645] · 启动期异常#27: InvalidOperationException: 缺少英文卡面映射：造成3点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.648] · 启动期异常#28: InvalidOperationException: 缺少英文卡面映射：造成2点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.650] · 启动期异常#29: InvalidOperationException: 缺少英文卡面映射：造成2点伤害1次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.653] · 启动期异常#30: InvalidOperationException: 缺少英文卡面映射：该敌人在本回合失去3点力量。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.659] · 启动期异常#31: InvalidOperationException: 缺少英文卡面映射：手牌中的攻击牌在打出前耗能减少3。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.663] · 启动期异常#32: InvalidOperationException: 缺少英文卡面映射：造成3点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.666] · 启动期异常#33: InvalidOperationException: 缺少英文卡面映射：造成2点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.669] · 启动期异常#34: InvalidOperationException: 缺少英文卡面映射：造成2点伤害1次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.672] · 启动期异常#35: InvalidOperationException: 缺少英文卡面映射：该敌人在本回合失去3点力量。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.678] · 启动期异常#36: InvalidOperationException: 缺少英文卡面映射：手牌中的攻击牌在打出前耗能减少3。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.683] · 启动期异常#37: InvalidOperationException: 缺少英文卡面映射：造成3点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.685] · 启动期异常#38: InvalidOperationException: 缺少英文卡面映射：造成2点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.689] · 启动期异常#39: InvalidOperationException: 缺少英文卡面映射：造成2点伤害1次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:24.692] · 启动期异常#40: InvalidOperationException: 缺少英文卡面映射：该敌人在本回合失去3点力量。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:11:46.741] · BaseLib 配置：RegisterCore 开始
+[23:11:46.745] · BaseLib 配置：RegisterCore 完成
+===== 外壳入口 pid=11160 =====
+[23:15:59.606] [外壳] Initialize 开始
+[23:15:59.611] [外壳] 游戏版本=0.1.0+d09d48e516cfd24314c1781f662787904f894aa8，探测 beta=True
+[23:15:59.616] [外壳] 已载入实现 CharacterBosses.Impl113 1.0.0.0
+[23:15:59.620] [外壳] 归属登记=True
+[23:15:59.623] [外壳] 跳过手动模型注册（交给游戏扫）
+[23:15:59.626] [外壳] 调用 ModEntry.Initialize：CharacterBosses.Impl113.dll
+===== 新进程 pid=11160 =====
+[23:15:59.921] · Install（进程 pid=11160）
+[23:15:59.926] · BuildInfo.LogOnce 开始（第一帧）
+[23:15:59.929] · 启动阶段 1/5
+[23:15:59.932] · 启动阶段 2/5
+[23:15:59.936] · 启动阶段 3/5
+[23:15:59.939] · 启动阶段 4/5
+[23:15:59.961] · 启动阶段 5/5
+[23:15:59.965] [外壳] ModEntry.Initialize 已返回：CharacterBosses.Impl113.dll
+[23:16:03.300] · 启动期异常#1: InvalidOperationException: 缺少英文卡面映射：手牌中的攻击牌在打出前耗能减少3。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.312] · 启动期异常#2: InvalidOperationException: 缺少英文卡面映射：造成3点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.316] · 启动期异常#3: InvalidOperationException: 缺少英文卡面映射：造成2点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.319] · 启动期异常#4: InvalidOperationException: 缺少英文卡面映射：造成2点伤害1次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.327] · 启动期异常#5: InvalidOperationException: 缺少英文卡面映射：该敌人在本回合失去3点力量。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.333] · 启动期异常#6: InvalidOperationException: 缺少英文卡面映射：手牌中的攻击牌在打出前耗能减少3。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.343] · 启动期异常#7: InvalidOperationException: 缺少英文卡面映射：造成3点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.347] · 启动期异常#8: InvalidOperationException: 缺少英文卡面映射：造成2点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.351] · 启动期异常#9: InvalidOperationException: 缺少英文卡面映射：造成2点伤害1次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.357] · 启动期异常#10: InvalidOperationException: 缺少英文卡面映射：该敌人在本回合失去3点力量。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.425] · 启动期异常#11: InvalidOperationException: 缺少英文卡面映射：手牌中的攻击牌在打出前耗能减少3。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.435] · 启动期异常#12: InvalidOperationException: 缺少英文卡面映射：造成3点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.439] · 启动期异常#13: InvalidOperationException: 缺少英文卡面映射：造成2点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.442] · 启动期异常#14: InvalidOperationException: 缺少英文卡面映射：造成2点伤害1次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.447] · 启动期异常#15: InvalidOperationException: 缺少英文卡面映射：该敌人在本回合失去3点力量。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.453] · 启动期异常#16: InvalidOperationException: 缺少英文卡面映射：手牌中的攻击牌在打出前耗能减少3。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.458] · 启动期异常#17: InvalidOperationException: 缺少英文卡面映射：造成3点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.462] · 启动期异常#18: InvalidOperationException: 缺少英文卡面映射：造成2点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.465] · 启动期异常#19: InvalidOperationException: 缺少英文卡面映射：造成2点伤害1次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.469] · 启动期异常#20: InvalidOperationException: 缺少英文卡面映射：该敌人在本回合失去3点力量。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.476] · 启动期异常#21: InvalidOperationException: 缺少英文卡面映射：手牌中的攻击牌在打出前耗能减少3。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.489] · 启动期异常#22: InvalidOperationException: 缺少英文卡面映射：造成3点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.493] · 启动期异常#23: InvalidOperationException: 缺少英文卡面映射：造成2点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.497] · 启动期异常#24: InvalidOperationException: 缺少英文卡面映射：造成2点伤害1次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.501] · 启动期异常#25: InvalidOperationException: 缺少英文卡面映射：该敌人在本回合失去3点力量。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.507] · 启动期异常#26: InvalidOperationException: 缺少英文卡面映射：手牌中的攻击牌在打出前耗能减少3。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.512] · 启动期异常#27: InvalidOperationException: 缺少英文卡面映射：造成3点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.516] · 启动期异常#28: InvalidOperationException: 缺少英文卡面映射：造成2点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.519] · 启动期异常#29: InvalidOperationException: 缺少英文卡面映射：造成2点伤害1次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.524] · 启动期异常#30: InvalidOperationException: 缺少英文卡面映射：该敌人在本回合失去3点力量。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.530] · 启动期异常#31: InvalidOperationException: 缺少英文卡面映射：手牌中的攻击牌在打出前耗能减少3。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.536] · 启动期异常#32: InvalidOperationException: 缺少英文卡面映射：造成3点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.539] · 启动期异常#33: InvalidOperationException: 缺少英文卡面映射：造成2点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.543] · 启动期异常#34: InvalidOperationException: 缺少英文卡面映射：造成2点伤害1次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.547] · 启动期异常#35: InvalidOperationException: 缺少英文卡面映射：该敌人在本回合失去3点力量。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.554] · 启动期异常#36: InvalidOperationException: 缺少英文卡面映射：手牌中的攻击牌在打出前耗能减少3。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.560] · 启动期异常#37: InvalidOperationException: 缺少英文卡面映射：造成3点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.563] · 启动期异常#38: InvalidOperationException: 缺少英文卡面映射：造成2点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.568] · 启动期异常#39: InvalidOperationException: 缺少英文卡面映射：造成2点伤害1次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:03.572] · 启动期异常#40: InvalidOperationException: 缺少英文卡面映射：该敌人在本回合失去3点力量。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[23:16:24.869] · BaseLib 配置：RegisterCore 开始
+[23:16:24.874] · BaseLib 配置：RegisterCore 完成
+===== 外壳入口 pid=4820 =====
+[10:22:05.754] [外壳] Initialize 开始
+[10:22:05.756] [外壳] 游戏版本=0.1.0+d09d48e516cfd24314c1781f662787904f894aa8，探测 beta=True
+[10:22:05.760] [外壳] 已载入实现 CharacterBosses.Impl113 1.0.0.0
+[10:22:05.763] [外壳] 归属登记=True
+[10:22:05.764] [外壳] 跳过手动模型注册（交给游戏扫）
+[10:22:05.766] [外壳] 调用 ModEntry.Initialize：CharacterBosses.Impl113.dll
+===== 新进程 pid=4820 =====
+[10:22:06.062] · Install（进程 pid=4820）
+[10:22:06.066] · BuildInfo.LogOnce 开始（第一帧）
+[10:22:06.068] · 启动阶段 1/5
+[10:22:06.070] · 启动阶段 2/5
+[10:22:06.073] · 启动阶段 3/5
+[10:22:06.074] · 启动阶段 4/5
+[10:22:06.094] · 启动阶段 5/5
+[10:22:06.099] [外壳] ModEntry.Initialize 已返回：CharacterBosses.Impl113.dll
+[10:22:09.343] · 启动期异常#1: InvalidOperationException: 缺少英文卡面映射：手牌中的攻击牌在打出前耗能减少3。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.351] · 启动期异常#2: InvalidOperationException: 缺少英文卡面映射：造成3点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.354] · 启动期异常#3: InvalidOperationException: 缺少英文卡面映射：造成2点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.356] · 启动期异常#4: InvalidOperationException: 缺少英文卡面映射：造成2点伤害1次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.362] · 启动期异常#5: InvalidOperationException: 缺少英文卡面映射：该敌人在本回合失去3点力量。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.366] · 启动期异常#6: InvalidOperationException: 缺少英文卡面映射：手牌中的攻击牌在打出前耗能减少3。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.371] · 启动期异常#7: InvalidOperationException: 缺少英文卡面映射：造成3点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.373] · 启动期异常#8: InvalidOperationException: 缺少英文卡面映射：造成2点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.376] · 启动期异常#9: InvalidOperationException: 缺少英文卡面映射：造成2点伤害1次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.382] · 启动期异常#10: InvalidOperationException: 缺少英文卡面映射：该敌人在本回合失去3点力量。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.454] · 启动期异常#11: InvalidOperationException: 缺少英文卡面映射：手牌中的攻击牌在打出前耗能减少3。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.461] · 启动期异常#12: InvalidOperationException: 缺少英文卡面映射：造成3点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.464] · 启动期异常#13: InvalidOperationException: 缺少英文卡面映射：造成2点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.466] · 启动期异常#14: InvalidOperationException: 缺少英文卡面映射：造成2点伤害1次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.469] · 启动期异常#15: InvalidOperationException: 缺少英文卡面映射：该敌人在本回合失去3点力量。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.473] · 启动期异常#16: InvalidOperationException: 缺少英文卡面映射：手牌中的攻击牌在打出前耗能减少3。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.478] · 启动期异常#17: InvalidOperationException: 缺少英文卡面映射：造成3点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.480] · 启动期异常#18: InvalidOperationException: 缺少英文卡面映射：造成2点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.482] · 启动期异常#19: InvalidOperationException: 缺少英文卡面映射：造成2点伤害1次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.485] · 启动期异常#20: InvalidOperationException: 缺少英文卡面映射：该敌人在本回合失去3点力量。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.491] · 启动期异常#21: InvalidOperationException: 缺少英文卡面映射：手牌中的攻击牌在打出前耗能减少3。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.495] · 启动期异常#22: InvalidOperationException: 缺少英文卡面映射：造成3点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.497] · 启动期异常#23: InvalidOperationException: 缺少英文卡面映射：造成2点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.510] · 启动期异常#24: InvalidOperationException: 缺少英文卡面映射：造成2点伤害1次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.514] · 启动期异常#25: InvalidOperationException: 缺少英文卡面映射：该敌人在本回合失去3点力量。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.519] · 启动期异常#26: InvalidOperationException: 缺少英文卡面映射：手牌中的攻击牌在打出前耗能减少3。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.523] · 启动期异常#27: InvalidOperationException: 缺少英文卡面映射：造成3点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.526] · 启动期异常#28: InvalidOperationException: 缺少英文卡面映射：造成2点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.528] · 启动期异常#29: InvalidOperationException: 缺少英文卡面映射：造成2点伤害1次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.531] · 启动期异常#30: InvalidOperationException: 缺少英文卡面映射：该敌人在本回合失去3点力量。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.537] · 启动期异常#31: InvalidOperationException: 缺少英文卡面映射：手牌中的攻击牌在打出前耗能减少3。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.542] · 启动期异常#32: InvalidOperationException: 缺少英文卡面映射：造成3点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.544] · 启动期异常#33: InvalidOperationException: 缺少英文卡面映射：造成2点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.547] · 启动期异常#34: InvalidOperationException: 缺少英文卡面映射：造成2点伤害1次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.551] · 启动期异常#35: InvalidOperationException: 缺少英文卡面映射：该敌人在本回合失去3点力量。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.558] · 启动期异常#36: InvalidOperationException: 缺少英文卡面映射：手牌中的攻击牌在打出前耗能减少3。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.563] · 启动期异常#37: InvalidOperationException: 缺少英文卡面映射：造成3点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.565] · 启动期异常#38: InvalidOperationException: 缺少英文卡面映射：造成2点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.568] · 启动期异常#39: InvalidOperationException: 缺少英文卡面映射：造成2点伤害1次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:09.571] · 启动期异常#40: InvalidOperationException: 缺少英文卡面映射：该敌人在本回合失去3点力量。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:22:30.689] · BaseLib 配置：RegisterCore 开始
+[10:22:30.691] · BaseLib 配置：RegisterCore 完成
+[10:36:29.395] !! 未观察的任务异常 ⇒ AggregateException: A Task's exception(s) were not observed either by Waiting on the Task or accessing its Exception property. As a result, the unobserved exception was rethrown by the finalizer thread. (Dark orbs cannot target creatures.) ← InvalidOperationException: Dark orbs cannot target creatures.
+[10:36:57.746] !! 未观察的任务异常 ⇒ AggregateException: A Task's exception(s) were not observed either by Waiting on the Task or accessing its Exception property. As a result, the unobserved exception was rethrown by the finalizer thread. (Dark orbs cannot target creatures.) ← InvalidOperationException: Dark orbs cannot target creatures.
+[10:37:54.190] !! 未观察的任务异常 ⇒ AggregateException: A Task's exception(s) were not observed either by Waiting on the Task or accessing its Exception property. As a result, the unobserved exception was rethrown by the finalizer thread. (Dark orbs cannot target creatures.) ← InvalidOperationException: Dark orbs cannot target creatures.
+[10:39:01.665] !! 未观察的任务异常 ⇒ AggregateException: A Task's exception(s) were not observed either by Waiting on the Task or accessing its Exception property. As a result, the unobserved exception was rethrown by the finalizer thread. (Dark orbs cannot target creatures.) ← InvalidOperationException: Dark orbs cannot target creatures.
+[10:39:30.256] !! 未观察的任务异常 ⇒ AggregateException: A Task's exception(s) were not observed either by Waiting on the Task or accessing its Exception property. As a result, the unobserved exception was rethrown by the finalizer thread. (Dark orbs cannot target creatures.) ← InvalidOperationException: Dark orbs cannot target creatures.
+===== 外壳入口 pid=19124 =====
+[10:42:34.811] [外壳] Initialize 开始
+[10:42:34.814] [外壳] 游戏版本=0.1.0+d09d48e516cfd24314c1781f662787904f894aa8，探测 beta=True
+[10:42:34.818] [外壳] 已载入实现 CharacterBosses.Impl113 1.0.0.0
+[10:42:34.820] [外壳] 归属登记=True
+[10:42:34.822] [外壳] 跳过手动模型注册（交给游戏扫）
+[10:42:34.823] [外壳] 调用 ModEntry.Initialize：CharacterBosses.Impl113.dll
+===== 新进程 pid=19124 =====
+[10:42:35.102] · Install（进程 pid=19124）
+[10:42:35.104] · BuildInfo.LogOnce 开始（第一帧）
+[10:42:35.106] · 启动阶段 1/5
+[10:42:35.108] · 启动阶段 2/5
+[10:42:35.111] · 启动阶段 3/5
+[10:42:35.113] · 启动阶段 4/5
+[10:42:35.155] · 启动阶段 5/5
+[10:42:35.158] [外壳] ModEntry.Initialize 已返回：CharacterBosses.Impl113.dll
+[10:42:35.957] · 启动期异常#1: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager'. | at System.IO.FileSystem.GetAttributeData(String fullPath, Boolean returnErrorOnNotFound)
+[10:42:35.960] · 启动期异常#2: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager'. | at System.IO.FileSystem.GetAttributeData(String fullPath, Boolean returnErrorOnNotFound)
+[10:42:35.962] · 启动期异常#3: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager'. | at System.IO.FileSystem.GetAttributeData(String fullPath, Boolean returnErrorOnNotFound)
+[10:42:35.965] · 启动期异常#4: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager'. | at System.IO.FileSystem.GetAttributeData(String fullPath, Boolean returnErrorOnNotFound)
+[10:42:35.967] · 启动期异常#5: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager'. | at System.IO.FileSystem.GetAttributeData(String fullPath, Boolean returnErrorOnNotFound)
+[10:42:35.969] · 启动期异常#6: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager'. | at System.IO.FileSystem.GetAttributeData(String fullPath, Boolean returnErrorOnNotFound)
+[10:42:35.971] · 启动期异常#7: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager'. | at System.IO.FileSystem.GetAttributeData(String fullPath, Boolean returnErrorOnNotFound)
+[10:42:35.973] · 启动期异常#8: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager'. | at System.IO.FileSystem.GetAttributeData(String fullPath, Boolean returnErrorOnNotFound)
+[10:42:35.976] · 启动期异常#9: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager'. | at System.IO.FileSystem.GetAttributeData(String fullPath, Boolean returnErrorOnNotFound)
+[10:42:35.981] · 启动期异常#10: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager'. | at System.IO.FileSystem.GetAttributeData(String fullPath, Boolean returnErrorOnNotFound)
+[10:42:35.984] · 启动期异常#11: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager'. | at System.IO.FileSystem.GetAttributeData(String fullPath, Boolean returnErrorOnNotFound)
+[10:42:35.986] · 启动期异常#12: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager'. | at System.IO.FileSystem.GetAttributeData(String fullPath, Boolean returnErrorOnNotFound)
+[10:42:35.988] · 启动期异常#13: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager'. | at System.IO.FileSystem.GetAttributeData(String fullPath, Boolean returnErrorOnNotFound)
+[10:42:35.991] · 启动期异常#14: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager'. | at System.IO.FileSystem.GetAttributeData(String fullPath, Boolean returnErrorOnNotFound)
+[10:42:35.993] · 启动期异常#15: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_organization.json'. | at System.IO.FileSystem.GetAttributeData(String fullPath, Boolean returnErrorOnNotFound)
+[10:42:36.042] · 启动期异常#16: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_manager_settings.json'. | at System.IO.FileSystem.GetAttributeData(String fullPath, Boolean returnErrorOnNotFound)
+[10:42:36.045] · 启动期异常#17: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_manager_settings.json'. | at System.IO.FileSystem.GetAttributeData(String fullPath, Boolean returnErrorOnNotFound)
+[10:42:36.048] · 启动期异常#18: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_manager_settings.json'. | at System.IO.FileSystem.GetAttributeData(String fullPath, Boolean returnErrorOnNotFound)
+[10:42:36.050] · 启动期异常#19: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_manager_settings.json'. | at System.IO.FileSystem.GetAttributeData(String fullPath, Boolean returnErrorOnNotFound)
+[10:42:38.446] · 启动期异常#20: InvalidOperationException: 缺少英文卡面映射：手牌中的攻击牌在打出前耗能减少3。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:42:38.454] · 启动期异常#21: InvalidOperationException: 缺少英文卡面映射：造成3点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:42:38.456] · 启动期异常#22: InvalidOperationException: 缺少英文卡面映射：造成2点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:42:38.464] · 启动期异常#23: InvalidOperationException: 缺少英文卡面映射：造成2点伤害1次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:42:38.472] · 启动期异常#24: InvalidOperationException: 缺少英文卡面映射：该敌人在本回合失去3点力量。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:42:38.476] · 启动期异常#25: InvalidOperationException: 缺少英文卡面映射：手牌中的攻击牌在打出前耗能减少3。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:42:38.481] · 启动期异常#26: InvalidOperationException: 缺少英文卡面映射：造成3点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:42:38.483] · 启动期异常#27: InvalidOperationException: 缺少英文卡面映射：造成2点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:42:38.485] · 启动期异常#28: InvalidOperationException: 缺少英文卡面映射：造成2点伤害1次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:42:38.488] · 启动期异常#29: InvalidOperationException: 缺少英文卡面映射：该敌人在本回合失去3点力量。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:42:38.548] · 启动期异常#30: InvalidOperationException: 缺少英文卡面映射：手牌中的攻击牌在打出前耗能减少3。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:42:38.553] · 启动期异常#31: InvalidOperationException: 缺少英文卡面映射：造成3点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:42:38.555] · 启动期异常#32: InvalidOperationException: 缺少英文卡面映射：造成2点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:42:38.557] · 启动期异常#33: InvalidOperationException: 缺少英文卡面映射：造成2点伤害1次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:42:38.560] · 启动期异常#34: InvalidOperationException: 缺少英文卡面映射：该敌人在本回合失去3点力量。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:42:38.565] · 启动期异常#35: InvalidOperationException: 缺少英文卡面映射：手牌中的攻击牌在打出前耗能减少3。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:42:38.578] · 启动期异常#36: InvalidOperationException: 缺少英文卡面映射：造成3点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:42:38.581] · 启动期异常#37: InvalidOperationException: 缺少英文卡面映射：造成2点伤害2次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:42:38.583] · 启动期异常#38: InvalidOperationException: 缺少英文卡面映射：造成2点伤害1次。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:42:38.586] · 启动期异常#39: InvalidOperationException: 缺少英文卡面映射：该敌人在本回合失去3点力量。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:42:38.591] · 启动期异常#40: InvalidOperationException: 缺少英文卡面映射：手牌中的攻击牌在打出前耗能减少3。 | at ChaosCardGenerator.EnglishCardDescriptionRenderer.ToEnglish(String chinese)
+[10:42:58.168] · BaseLib 配置：RegisterCore 开始
+[10:42:58.170] · BaseLib 配置：RegisterCore 完成
+===== 外壳入口 pid=13444 =====
+[10:45:05.926] [外壳] Initialize 开始
+[10:45:05.930] [外壳] 游戏版本=0.1.0+d09d48e516cfd24314c1781f662787904f894aa8，探测 beta=True
+[10:45:05.933] [外壳] 已载入实现 CharacterBosses.Impl113 1.0.0.0
+[10:45:05.936] [外壳] 归属登记=True
+[10:45:05.938] [外壳] 跳过手动模型注册（交给游戏扫）
+[10:45:05.940] [外壳] 调用 ModEntry.Initialize：CharacterBosses.Impl113.dll
+===== 新进程 pid=13444 =====
+[10:45:06.225] · Install（进程 pid=13444）
+[10:45:06.229] · BuildInfo.LogOnce 开始（第一帧）
+[10:45:06.231] · 启动阶段 1/5
+[10:45:06.233] · 启动阶段 2/5
+[10:45:06.236] · 启动阶段 3/5
+[10:45:06.238] · 启动阶段 4/5
+[10:45:06.258] · 启动阶段 5/5
+[10:45:06.261] [外壳] ModEntry.Initialize 已返回：CharacterBosses.Impl113.dll
+[10:45:06.269] · 启动期异常#1: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.271] · 启动期异常#2: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.274] · 启动期异常#3: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.276] · 启动期异常#4: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.278] · 启动期异常#5: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.280] · 启动期异常#6: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.284] · 启动期异常#7: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.286] · 启动期异常#8: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.317] · 启动期异常#9: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.322] · 启动期异常#10: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.324] · 启动期异常#11: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.326] · 启动期异常#12: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.329] · 启动期异常#13: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.331] · 启动期异常#14: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.334] · 启动期异常#15: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.337] · 启动期异常#16: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.474] · 启动期异常#17: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.478] · 启动期异常#18: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.481] · 启动期异常#19: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.483] · 启动期异常#20: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.485] · 启动期异常#21: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.487] · 启动期异常#22: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.491] · 启动期异常#23: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.493] · 启动期异常#24: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.944] · 启动期异常#25: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.948] · 启动期异常#26: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.951] · 启动期异常#27: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.953] · 启动期异常#28: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.956] · 启动期异常#29: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.958] · 启动期异常#30: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.962] · 启动期异常#31: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.964] · 启动期异常#32: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.968] · 启动期异常#33: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.970] · 启动期异常#34: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.972] · 启动期异常#35: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:06.974] · 启动期异常#36: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[10:45:19.454] · BaseLib 配置：RegisterCore 开始
+[10:45:19.458] · BaseLib 配置：RegisterCore 完成
+[10:46:51.050] · 启动期异常#37（栈里有我们）: TaskCanceledException: A task was canceled. | at MegaCrit.Sts2.Core.Combat.CombatManager.AwaitTurnEndAndSwitchSides(CombatTurnState turnState) | at CharacterBosses.Patches.VanillaTurnEndTimingPatch.Await(Task task, Stopwatch sw, String name) | at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+[10:46:51.053] · 启动期异常#38（栈里有我们）: TaskCanceledException: A task was canceled. | at MegaCrit.Sts2.Core.Combat.CombatManager.AwaitTurnEndAndSwitchSides(CombatTurnState turnState) | at CharacterBosses.Patches.VanillaTurnEndTimingPatch.Await(Task task, Stopwatch sw, String name) | at MegaCrit.Sts2.Core.Combat.CombatManager.StartCombatInternal(CombatTurnState turnState) | at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+[10:46:51.055] · 启动期异常#39（栈里有我们）: TaskCanceledException: A task was canceled. | at MegaCrit.Sts2.Core.Combat.CombatManager.AwaitTurnEndAndSwitchSides(CombatTurnState turnState) | at CharacterBosses.Patches.VanillaTurnEndTimingPatch.Await(Task task, Stopwatch sw, String name) | at MegaCrit.Sts2.Core.Combat.CombatManager.StartCombatInternal(CombatTurnState turnState) | at MegaCrit.Sts2.Core.Combat.CombatManager.RunTurnLoopAfter(Task previousTurnLoopTask)
+[10:46:51.057] · 启动期异常#40（栈里有我们）: TaskCanceledException: A task was canceled. | at MegaCrit.Sts2.Core.Combat.CombatManager.AwaitTurnEndAndSwitchSides(CombatTurnState turnState) | at CharacterBosses.Patches.VanillaTurnEndTimingPatch.Await(Task task, Stopwatch sw, String name) | at MegaCrit.Sts2.Core.Combat.CombatManager.StartCombatInternal(CombatTurnState turnState) | at MegaCrit.Sts2.Core.Combat.CombatManager.RunTurnLoopAfter(Task previousTurnLoopTask) | at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+[10:52:33.310] !! 未观察的任务异常 ⇒ AggregateException: A Task's exception(s) were not observed either by Waiting on the Task or accessing its Exception property. As a result, the unobserved exception was rethrown by the finalizer thread. (One or more errors occurred. (Dark orbs cannot target creatures.)) ← AggregateException: One or more errors occurred. (Dark orbs cannot target creatures.)
+[10:52:33.317] !! 未观察的任务异常 ⇒ AggregateException: A Task's exception(s) were not observed either by Waiting on the Task or accessing its Exception property. As a result, the unobserved exception was rethrown by the finalizer thread. (Dark orbs cannot target creatures.) ← InvalidOperationException: Dark orbs cannot target creatures.
+[10:52:43.529] !! 未观察的任务异常 ⇒ AggregateException: A Task's exception(s) were not observed either by Waiting on the Task or accessing its Exception property. As a result, the unobserved exception was rethrown by the finalizer thread. (One or more errors occurred. (Dark orbs cannot target creatures.)) ← AggregateException: One or more errors occurred. (Dark orbs cannot target creatures.)
+===== 外壳入口 pid=12632 =====
+[21:27:57.205] [外壳] Initialize 开始
+[21:27:57.209] [外壳] 游戏版本=0.1.0+d09d48e516cfd24314c1781f662787904f894aa8，探测 beta=True
+[21:27:57.214] [外壳] 已载入实现 CharacterBosses.Impl113 1.0.0.0
+[21:27:57.216] [外壳] 归属登记=True
+[21:27:57.218] [外壳] 跳过手动模型注册（交给游戏扫）
+[21:27:57.220] [外壳] 调用 ModEntry.Initialize：CharacterBosses.Impl113.dll
+===== 新进程 pid=12632 =====
+[21:27:57.515] · Install（进程 pid=12632）
+[21:27:57.519] · BuildInfo.LogOnce 开始（第一帧）
+[21:27:57.521] · 启动阶段 1/5
+[21:27:57.523] · 启动阶段 2/5
+[21:27:57.525] · 启动阶段 3/5
+[21:27:57.527] · 启动阶段 4/5
+[21:27:57.556] · 启动阶段 5/5
+[21:27:57.559] [外壳] ModEntry.Initialize 已返回：CharacterBosses.Impl113.dll
+[21:27:57.576] · 启动期异常#1: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:27:57.578] · 启动期异常#2: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:27:57.581] · 启动期异常#3: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:27:57.583] · 启动期异常#4: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:27:57.586] · 启动期异常#5: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:27:57.588] · 启动期异常#6: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:27:57.592] · 启动期异常#7: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:27:57.594] · 启动期异常#8: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:27:57.597] · 启动期异常#9: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:27:57.599] · 启动期异常#10: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:27:57.602] · 启动期异常#11: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:27:57.604] · 启动期异常#12: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:27:57.831] · 启动期异常#13: InvalidOperationException: Operation is not valid due to the current state of the object. | at System.Reflection.MemberInfo.get_MetadataToken()
+[21:27:58.113] · !!! NGame.GameStartupError 进入 ⇒ 游戏即将弹「致命错误」对话框
+[21:27:58.114] · （这条之前的最后一行 `!!` 就是被吞掉的异常；没有 `!!` 说明它不是托管异常）
+[21:27:59.003] · 启动期异常#14: InvalidOperationException: Operation is not valid due to the current state of the object. | at System.Reflection.MemberInfo.get_MetadataToken()
+[21:27:59.006] · 启动期异常#15: InvalidOperationException: Operation is not valid due to the current state of the object. | at System.Reflection.MemberInfo.get_MetadataToken()
+[21:27:59.008] · 启动期异常#16: InvalidOperationException: Operation is not valid due to the current state of the object. | at System.Reflection.MemberInfo.get_MetadataToken()
+[21:27:59.010] · 启动期异常#17: InvalidOperationException: Operation is not valid due to the current state of the object. | at System.Reflection.MemberInfo.get_MetadataToken()
+[21:28:03.576] · 启动期异常#18: InvalidOperationException: Steamworks is not initialized. | at Steamworks.InteropHelp.TestIfAvailableClient()
+===== 外壳入口 pid=14856 =====
+[21:28:38.958] [外壳] Initialize 开始
+[21:28:38.960] [外壳] 游戏版本=0.1.0+d09d48e516cfd24314c1781f662787904f894aa8，探测 beta=True
+[21:28:38.964] [外壳] 已载入实现 CharacterBosses.Impl113 1.0.0.0
+[21:28:38.966] [外壳] 归属登记=True
+[21:28:38.968] [外壳] 跳过手动模型注册（交给游戏扫）
+[21:28:38.970] [外壳] 调用 ModEntry.Initialize：CharacterBosses.Impl113.dll
+===== 新进程 pid=14856 =====
+[21:28:39.271] · Install（进程 pid=14856）
+[21:28:39.274] · BuildInfo.LogOnce 开始（第一帧）
+[21:28:39.276] · 启动阶段 1/5
+[21:28:39.277] · 启动阶段 2/5
+[21:28:39.280] · 启动阶段 3/5
+[21:28:39.282] · 启动阶段 4/5
+[21:28:39.306] · 启动阶段 5/5
+[21:28:39.309] [外壳] ModEntry.Initialize 已返回：CharacterBosses.Impl113.dll
+[21:28:39.325] · 启动期异常#1: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:28:39.327] · 启动期异常#2: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:28:39.330] · 启动期异常#3: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:28:39.332] · 启动期异常#4: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:28:39.335] · 启动期异常#5: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:28:39.337] · 启动期异常#6: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:28:39.341] · 启动期异常#7: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:28:39.343] · 启动期异常#8: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:28:39.347] · 启动期异常#9: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:28:39.349] · 启动期异常#10: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:28:39.352] · 启动期异常#11: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:28:39.354] · 启动期异常#12: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:28:39.571] · 启动期异常#13: InvalidOperationException: Operation is not valid due to the current state of the object. | at System.Reflection.MemberInfo.get_MetadataToken()
+[21:28:39.825] · !!! NGame.GameStartupError 进入 ⇒ 游戏即将弹「致命错误」对话框
+[21:28:39.827] · （这条之前的最后一行 `!!` 就是被吞掉的异常；没有 `!!` 说明它不是托管异常）
+[21:28:40.591] · 启动期异常#14: InvalidOperationException: Operation is not valid due to the current state of the object. | at System.Reflection.MemberInfo.get_MetadataToken()
+[21:28:40.594] · 启动期异常#15: InvalidOperationException: Operation is not valid due to the current state of the object. | at System.Reflection.MemberInfo.get_MetadataToken()
+[21:28:40.596] · 启动期异常#16: InvalidOperationException: Operation is not valid due to the current state of the object. | at System.Reflection.MemberInfo.get_MetadataToken()
+[21:28:40.598] · 启动期异常#17: InvalidOperationException: Operation is not valid due to the current state of the object. | at System.Reflection.MemberInfo.get_MetadataToken()
+[21:28:43.774] · 启动期异常#18: InvalidOperationException: Steamworks is not initialized. | at Steamworks.InteropHelp.TestIfAvailableClient()
+===== 外壳入口 pid=30708 =====
+[21:44:56.034] [外壳] Initialize 开始
+[21:44:56.039] [外壳] 游戏版本=0.1.0+d09d48e516cfd24314c1781f662787904f894aa8，探测 beta=True
+[21:44:56.042] [外壳] 已载入实现 CharacterBosses.Impl113 1.0.0.0
+[21:44:56.044] [外壳] 归属登记=True
+[21:44:56.046] [外壳] 跳过手动模型注册（交给游戏扫）
+[21:44:56.048] [外壳] 调用 ModEntry.Initialize：CharacterBosses.Impl113.dll
+===== 新进程 pid=30708 =====
+[21:44:56.398] · Install（进程 pid=30708）
+[21:44:56.402] · BuildInfo.LogOnce 开始（第一帧）
+[21:44:56.404] · 启动阶段 1/5
+[21:44:56.406] · 启动阶段 2/5
+[21:44:56.409] · 启动阶段 3/5
+[21:44:56.411] · 启动阶段 4/5
+[21:44:56.433] · 启动阶段 5/5
+[21:44:56.436] [外壳] ModEntry.Initialize 已返回：CharacterBosses.Impl113.dll
+[21:44:56.452] · 启动期异常#1: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:44:56.454] · 启动期异常#2: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:44:56.457] · 启动期异常#3: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:44:56.459] · 启动期异常#4: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:44:56.462] · 启动期异常#5: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:44:56.464] · 启动期异常#6: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:44:56.468] · 启动期异常#7: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:44:56.470] · 启动期异常#8: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:44:56.474] · 启动期异常#9: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:44:56.476] · 启动期异常#10: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:44:56.479] · 启动期异常#11: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:44:56.481] · 启动期异常#12: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:44:56.545] · 启动期异常#13: InvalidOperationException: Operation is not valid due to the current state of the object. | at System.Reflection.MemberInfo.get_MetadataToken()
+[21:44:56.755] · !!! NGame.GameStartupError 进入 ⇒ 游戏即将弹「致命错误」对话框
+[21:44:56.759] · （这条之前的最后一行 `!!` 就是被吞掉的异常；没有 `!!` 说明它不是托管异常）
+[21:44:57.406] · 启动期异常#14: InvalidOperationException: Operation is not valid due to the current state of the object. | at System.Reflection.MemberInfo.get_MetadataToken()
+[21:44:57.409] · 启动期异常#15: InvalidOperationException: Operation is not valid due to the current state of the object. | at System.Reflection.MemberInfo.get_MetadataToken()
+[21:44:57.411] · 启动期异常#16: InvalidOperationException: Operation is not valid due to the current state of the object. | at System.Reflection.MemberInfo.get_MetadataToken()
+[21:44:57.413] · 启动期异常#17: InvalidOperationException: Operation is not valid due to the current state of the object. | at System.Reflection.MemberInfo.get_MetadataToken()
+===== 外壳入口 pid=27384 =====
+[21:48:59.940] [外壳] Initialize 开始
+[21:48:59.945] [外壳] 游戏版本=0.1.0+d09d48e516cfd24314c1781f662787904f894aa8，探测 beta=True
+[21:48:59.950] [外壳] 已载入实现 CharacterBosses.Impl113 1.0.0.0
+[21:48:59.954] [外壳] 归属登记=True
+[21:48:59.957] [外壳] 跳过手动模型注册（交给游戏扫）
+[21:48:59.960] [外壳] 调用 ModEntry.Initialize：CharacterBosses.Impl113.dll
+===== 新进程 pid=27384 =====
+[21:49:00.354] · Install（进程 pid=27384）
+[21:49:00.359] · BuildInfo.LogOnce 开始（第一帧）
+[21:49:00.362] · 启动阶段 1/5
+[21:49:00.365] · 启动阶段 2/5
+[21:49:00.369] · 启动阶段 3/5
+[21:49:00.372] · 启动阶段 4/5
+[21:49:00.412] · 启动阶段 5/5
+[21:49:00.416] [外壳] ModEntry.Initialize 已返回：CharacterBosses.Impl113.dll
+[21:49:00.422] · 启动期异常#1: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:49:00.425] · 启动期异常#2: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:49:00.429] · 启动期异常#3: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:49:00.433] · 启动期异常#4: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:49:00.437] · 启动期异常#5: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:49:00.440] · 启动期异常#6: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:49:00.445] · 启动期异常#7: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:49:00.449] · 启动期异常#8: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:49:00.455] · 启动期异常#9: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:49:00.459] · 启动期异常#10: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:49:00.463] · 启动期异常#11: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:49:00.467] · 启动期异常#12: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[21:49:00.630] · !!! NGame.GameStartupError 进入 ⇒ 游戏即将弹「致命错误」对话框
+[21:49:00.633] · （这条之前的最后一行 `!!` 就是被吞掉的异常；没有 `!!` 说明它不是托管异常）
+[21:49:01.303] · 启动期异常#13: InvalidOperationException: Operation is not valid due to the current state of the object. | at System.Reflection.MemberInfo.get_MetadataToken()
+[21:49:01.306] · 启动期异常#14: InvalidOperationException: Operation is not valid due to the current state of the object. | at System.Reflection.MemberInfo.get_MetadataToken()
+[21:49:01.309] · 启动期异常#15: InvalidOperationException: Operation is not valid due to the current state of the object. | at System.Reflection.MemberInfo.get_MetadataToken()
+[21:49:01.429] · 启动期异常#16: InvalidOperationException: Operation is not valid due to the current state of the object. | at System.Reflection.MemberInfo.get_MetadataToken()
+[21:49:01.434] · 启动期异常#17: InvalidOperationException: Operation is not valid due to the current state of the object. | at System.Reflection.MemberInfo.get_MetadataToken()
+[21:49:01.437] · 启动期异常#18: InvalidOperationException: Operation is not valid due to the current state of the object. | at System.Reflection.MemberInfo.get_MetadataToken()
+[21:49:01.442] !! 未观察的任务异常（内层） ⇒ ReflectionTypeLoadException: Unable to load one or more of the requested types.
+Could not load file or assembly 'BaseLib, Version=3.4.7.0, Culture=neutral, PublicKeyToken=null'. Operation is not supported. (0x80131515)
+Could not load file or assembly 'BaseLib, Version=3.4.7.0, Culture=neutral, PublicKeyToken=null'. Operation is not supported. (0x80131515) | at System.Reflection.RuntimeModule.GetDefinedTypes() | at System.Reflection.RuntimeModule.GetTypes() | at MegaCrit.Sts2.Core.Helpers.ReflectionHelper.<>c.<get_ModTypes>b__8_1(Assembly a) | at System.Linq.Enumerable.SelectManySingleSelectorIterator`2.ToArray() | at MegaCrit.Sts2.Core.Helpers.ReflectionHelper.get_ModTypes() | at BaseLib.A…(截断)
+===== 外壳入口 pid=27100 =====
+[12:42:58.523] [外壳] Initialize 开始
+[12:42:58.528] [外壳] 游戏版本=0.1.0+d09d48e516cfd24314c1781f662787904f894aa8，探测 beta=True
+[12:42:58.534] [外壳] 已载入实现 CharacterBosses.Impl113 1.0.0.0
+[12:42:58.536] [外壳] 归属登记=True
+[12:42:58.538] [外壳] 跳过手动模型注册（交给游戏扫）
+[12:42:58.540] [外壳] 调用 ModEntry.Initialize：CharacterBosses.Impl113.dll
+===== 新进程 pid=27100 =====
+[12:42:58.887] · Install（进程 pid=27100）
+[12:42:58.890] · BuildInfo.LogOnce 开始（第一帧）
+[12:42:58.892] · 启动阶段 1/5
+[12:42:58.894] · 启动阶段 2/5
+[12:42:58.897] · 启动阶段 3/5
+[12:42:58.899] · 启动阶段 4/5
+[12:42:58.984] · 启动阶段 5/5
+[12:42:58.987] [外壳] ModEntry.Initialize 已返回：CharacterBosses.Impl113.dll
+[12:42:59.004] · 启动期异常#1: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[12:42:59.006] · 启动期异常#2: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[12:42:59.009] · 启动期异常#3: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[12:42:59.011] · 启动期异常#4: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[12:42:59.014] · 启动期异常#5: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[12:42:59.015] · 启动期异常#6: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[12:42:59.019] · 启动期异常#7: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[12:42:59.021] · 启动期异常#8: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[12:42:59.024] · 启动期异常#9: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[12:42:59.026] · 启动期异常#10: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[12:42:59.029] · 启动期异常#11: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[12:42:59.031] · 启动期异常#12: FileNotFoundException: Could not find file 'C:\Users\ASUS\AppData\Roaming\SlayTheSpire2\ModLaunchManager\mod_launch_translations'. | at ModLaunchManager.LauncherDataMigration.IsLink(String path)
+[12:42:59.108] · 启动期异常#13: InvalidOperationException: Operation is not valid due to the current state of the object. | at System.Reflection.MemberInfo.get_MetadataToken()
+[12:42:59.258] · !!! NGame.GameStartupError 进入 ⇒ 游戏即将弹「致命错误」对话框
+[12:42:59.260] · （这条之前的最后一行 `!!` 就是被吞掉的异常；没有 `!!` 说明它不是托管异常）
+[12:43:00.132] · 启动期异常#14: InvalidOperationException: Operation is not valid due to the current state of the object. | at System.Reflection.MemberInfo.get_MetadataToken()
+[12:43:00.136] · 启动期异常#15: InvalidOperationException: Operation is not valid due to the current state of the object. | at System.Reflection.MemberInfo.get_MetadataToken()
+[12:43:00.138] · 启动期异常#16: InvalidOperationException: Operation is not valid due to the current state of the object. | at System.Reflection.MemberInfo.get_MetadataToken()
+[12:43:00.139] · 启动期异常#17: InvalidOperationException: Operation is not valid due to the current state of the object. | at System.Reflection.MemberInfo.get_MetadataToken()
+[12:43:01.117] · 启动期异常#18: InvalidOperationException: Steamworks is not initialized. | at Steamworks.InteropHelp.TestIfAvailableClient()
+[12:43:01.758] · 启动期异常#19: InvalidOperationException: Steamworks is not initialized. | at Steamworks.InteropHelp.TestIfAvailableClient()

@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.918 / 2026-11-23 (**再修 2 张奇迹：改成她第 1 回合期间每帧兜底修剪**）—— 用户 2026-11-23 截图「A 版还是 2 张」。v0.2.917 的两个修剪时机（我们注入时 / 她的回合开始）都太早：模组那次印牌是**异步**的、落手时间不定，而玩家在第 1 回合就能看到她的手牌 ⇒ 那个窗口里就是 2 张。现在在 `BossFrameTick.Tick` 里加 `WatcherRuntimePatches.TrimDuplicateMiraclesTick()`：**她的第 1 回合期间每帧**检查一次，观者 Boss 手牌里「奇迹」超过 1 张就摘掉多余的（`TurnNumber > 1` 直接早退 ⇒ 平时零开销）。日志会打 `至纯之水：她手里有 2 张「奇迹」⇒ 摘掉多余的 1 张（只留 1 张）`。v0.2.917 = 注入时/她回合开始各修剪一次。完整历史见 docs/plans/changelog-history.md";
+    public const string Tag = "v0.2.919 / 2026-11-23 (**修：黑暗充能球被动必抛异常（Dark orbs cannot target creatures）**）—— 玩家崩溃 trace 里反复出现 `!! 未观察的任务异常 ⇒ (Dark orbs cannot target creatures.) ← InvalidOperationException`。根因是我们自己挂的 `DarkOrbBossTargetPatch`：反编译实证 `DarkOrb.Passive(ctx, target)` 只要 `target != null` 就 `throw new InvalidOperationException(\"Dark orbs cannot target creatures.\")`（黑暗球的被动只是给自己攒伤害，本来就没有目标），而我们那个前缀把 null 的 target **改写成被锁定的玩家** ⇒ 黑球机每触发一次黑暗球被动就必抛，且是「未观察的任务异常」（finalizer 线程重抛 ⇒ 整个进程被打掉）。现在**整个补丁删掉**（黑暗球不需要选靶，伤害在激发时才落到生命值最低的敌人身上）。v0.2.918 是疾风观发布版。完整历史见 docs/plans/changelog-history.md";
 
     private static bool _logged;
 
