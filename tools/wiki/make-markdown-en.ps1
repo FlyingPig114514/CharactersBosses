@@ -618,6 +618,20 @@ foreach ($a in @(1, 2, 3)) {
         [void]$sb.AppendLine('- **Deck** (' + $d.Deck.Count + ' cards): ' + (Merge-Counts $d.Deck))
         if ($d.DeckNote) { [void]$sb.AppendLine('- **Deck note**: ' + (MdText (Note-En ([string]$d.DeckNote)))) }
         [void]$sb.AppendLine('- **Relics**: ' + (Merge-Counts $d.Relics))
+        # ★ v0.2.931: the three minions of the Minion Regent (values mirror src/Hooks/Monsters/MinionMonsters.cs).
+        if ($d.Key -eq 'REGENT_MINION') {
+            [void]$sb.AppendLine('- **Minions** (3 kinds): they stand left of the Regent and **act before him**; they do **not** absorb damage for him; they carry "Minion" (they die when the Regent dies); **their HP does not scale with player count** (same as the boss)')
+            [void]$sb.AppendLine('')
+            [void]$sb.AppendLine('| Minion | HP (normal / A8+) | HP in Dread mode | Action each turn |')
+            [void]$sb.AppendLine('|---|---|---|---|')
+            [void]$sb.AppendLine('| Strike Minion | 27 / 30 | 32 / 35 | Strike: **6** damage (A9+: **9**), repeats the same intent every turn |')
+            [void]$sb.AppendLine('| Dive Minion | 17 / 19 | 22 / 24 | Dive: **13** damage (A9+: **16**), repeats every turn (**does not self-destruct**) |')
+            [void]$sb.AppendLine('| Sacrifice Minion | 20 / 22 | 25 / 27 | Sacrifice: gives the Regent **7** Block (A9+: **10**), repeats every turn |')
+            [void]$sb.AppendLine('')
+            [void]$sb.AppendLine('> Minions are **real enemy units** summoned by Call to Arms (not pets): they act on their own and never take damage in the Regent''s place; when he dies, they die too.')
+            [void]$sb.AppendLine('> When the Collector (Downfall) uses Brain Drain on a minion, it steals that minion''s card: Strike Minion → **Minion Strike**, Dive Minion → **Minion Dive Bomb**, Sacrifice Minion → **Minion Sacrifice**.')
+            [void]$sb.AppendLine('')
+        }
         if ($d.Extras.Count -gt 0) { [void]$sb.AppendLine('- **Ascension / Dread changes**: ' + (MdText ($d.Extras -join '; '))) }
         [void]$sb.AppendLine('')
 

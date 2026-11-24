@@ -1072,6 +1072,17 @@ Unlike vanilla bosses (where ascension only adds HP), bosses in this mod get **e
 - **Deck** (25 cards): Collision Course, BEGONE!, Minion Strike, Hidden Cache+, Defend ×4, Royal Gamble, Spectrum Shift+, CHARGE!!, Minion Dive Bomb ×2, Prowess, Resonance, Dark Shackles, Quasar, Shockwave, GUARDS!!!, Minion Sacrifice ×3, Rend, Child of the Stars, Clumsy
 - **Deck note**: counted over the turns before the first shuffle (the script notes: first shuffle on turn 7)
 - **Relics**: Divine Right, Neow's Blessing, Galactic Dust, Biiig Hug, Vitruvian Minion, Regalite
+- **Minions** (3 kinds): they stand left of the Regent and **act before him**; they do **not** absorb damage for him; they carry "Minion" (they die when the Regent dies); **their HP does not scale with player count** (same as the boss)
+
+| Minion | HP (normal / A8+) | HP in Dread mode | Action each turn |
+|---|---|---|---|
+| Strike Minion | 27 / 30 | 32 / 35 | Strike: **6** damage (A9+: **9**), repeats the same intent every turn |
+| Dive Minion | 17 / 19 | 22 / 24 | Dive: **13** damage (A9+: **16**), repeats every turn (**does not self-destruct**) |
+| Sacrifice Minion | 20 / 22 | 25 / 27 | Sacrifice: gives the Regent **7** Block (A9+: **10**), repeats every turn |
+
+> Minions are **real enemy units** summoned by Call to Arms (not pets): they act on their own and never take damage in the Regent's place; when he dies, they die too.
+> When the Collector (Downfall) uses Brain Drain on a minion, it steals that minion's card: Strike Minion → **Minion Strike**, Dive Minion → **Minion Dive Bomb**, Sacrifice Minion → **Minion Sacrifice**.
+
 - **Ascension / Dread changes**: Ascension 8: GUARDS!!!; Ascension 8: Child of the Stars; Ascension 9: BEGONE!; Ascension 9: CHARGE!!; Ascension 9: Quasar; Ascension 9: Shockwave; Ascension 9: Ultimate Defend; Ascension 9: Minion Dive Bomb; Ascension 9: Minion Strike; Ascension 8: Minion Sacrifice
 
 **Special effect**

@@ -463,6 +463,21 @@ foreach ($a in @(1, 2, 3)) {
             [void]$sb.AppendLine('- **卡组备注**：' + (MdText ([string]$d.DeckExtraNote)))
         }
         [void]$sb.AppendLine('- **遗物**：' + (Merge-Counts $d.Relics))
+        # ★ v0.2.931（用户 2026-11-24）：「在 wiki 上把 3 个仆从的数据也写在仆从储那里」
+        #   数值与 `src/Hooks/Monsters/MinionMonsters.cs` 一致（普通 +5 / 恐惧再 +5，多人不涨）。
+        if ($d.Key -eq 'REGENT_MINION') {
+            [void]$sb.AppendLine('- **仆从**（3 种）：站在储君左边、**先于储君行动**；不会替储君承受伤害；带「爪牙」（储君死亡时一并死亡）；**多人时血量不涨**（与 Boss 一致）')
+            [void]$sb.AppendLine('')
+            [void]$sb.AppendLine('| 仆从 | 生命值（普通 / 进阶 8+） | 恐惧模式生命值 | 每回合行动 |')
+            [void]$sb.AppendLine('|---|---|---|---|')
+            [void]$sb.AppendLine('| 打击仆从 | 27 / 30 | 32 / 35 | 打击：造成 **6** 点伤害（进阶 9 起 **9**），每回合复读同一意图 |')
+            [void]$sb.AppendLine('| 俯冲仆从 | 17 / 19 | 22 / 24 | 俯冲：造成 **13** 点伤害（进阶 9 起 **16**），每回合复读（**不自爆**） |')
+            [void]$sb.AppendLine('| 捐躯仆从 | 20 / 22 | 25 / 27 | 捐躯：给储君 **7** 点格挡（进阶 9 起 **10**），每回合复读 |')
+            [void]$sb.AppendLine('')
+            [void]$sb.AppendLine('> 仆从是「征召上前」召唤出来的**真敌方单位**（不是宠物）：它们自己行动、不替储君承伤；储君一死它们跟着死。')
+            [void]$sb.AppendLine('> 收藏家（崩坠）用「思维抽取」打仆从时，抽走的是它对应的那张牌：打击仆从 → **仆从打击**、俯冲仆从 → **仆从俯冲**、捐躯仆从 → **仆从捐躯**。')
+            [void]$sb.AppendLine('')
+        }
         if ($d.Extras.Count -gt 0) {
             [void]$sb.AppendLine('- **进阶 / 恐惧改动**：' + (MdText ($d.Extras -join '；')))
         }
