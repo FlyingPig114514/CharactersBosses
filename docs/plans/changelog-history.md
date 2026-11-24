@@ -4,6 +4,46 @@
 > 旧条目逐字来自 `git show HEAD:src/Hooks/Core/BuildInfo.cs` 的 Tag 常量（v0.2.871 及其之前，共 236 条）。
 > 最新版本（0.2.889）是当前 Tag，同时在各条 `workshop/changenote.txt` 里也有面向玩家的摘要。
 
+## v0.2.921（2026-11-24）：用 MLM 启动器启动时「致命错误」—— 真正的原因
+
+本机复现，`godot.log` 里的真相（不是我们栈里的问题）：
+
+```
+System.IO.FileLoadException: Could not load file or assembly 'BaseLib, Version=3.4.7.0' …
+ ---> System.NotSupportedException: A non-collectible assembly may not reference a collectible assembly.
+   at MegaCrit.Sts2.Core.Helpers.ReflectionHelper.get_ModTypes()
+   at MegaCrit.Sts2.Core.DevConsole..ctor_Patch1(...)
+   at MegaCrit.Sts2.Core.Nodes.Debug.NDevConsole._Ready()
+   …
+   at ModLaunchManager.StartupGate.ReleaseCompletion()
+```
+
+即：
+
+1. MLM 的加载策略把**其它模组（含 BaseLib）**装进它自己的 **collectible（可卸载）ALC**；
+2. 它按 IL preflight 把**我们**放进了**游戏本体上下文**
+   （日志：`loading CharacterBosses in the game's context: preflight: loads assemblies outside its
+   owning context at Initialize IL_0240` —— 它看见了我们外壳里的 `LoadFromAssemblyPath`）；
+3. 而我们程序集里有**两个 BaseLib 类型**：`BossConfigModConfig : SimpleModConfig`、
+   `BossPicksMessage : ICustomMessage`；
+4. 游戏创建 DevConsole 时枚举模组类型（`ReflectionHelper.ModTypes`）⇒ 解析到我们的类型就要把
+   BaseLib 载进**本体上下文**，可它已经在可卸载上下文里 ⇒ CLR 直接拒绝
+   （`A non-collectible assembly may not reference a collectible assembly`）⇒ `GameStartupError`。
+
+**修法（清单两行）**：
+
+```json
+"dependencies": [ { "id": "BaseLib", "min_version": "3.3.5" } ],
+"mod_launch_manager": { "load_context": "game" }
+```
+
+- 第一条让 MLM 的加载策略**沿依赖图把 BaseLib 一并提到本体上下文**
+  （反编译实证：`ModAssemblyLoadingPolicy.Build` 会把 game-context 模组的 dependencies 逐个入队提升）；
+- 第二条用 MLM 自己的清单开关把「本模组必须在游戏上下文」钉死
+  （反编译实证：`ReadRequirement` 读 `mod_launch_manager.load_context`，`"game"` ⇒ 本体上下文），
+  以后 MLM 改 preflight 规则也不会把我们放错上下文。
+- 游戏本体解析清单时用的是 `JsonNode` + 源生成 `JsonSerializerContext`，**未知字段会被忽略** ⇒ 两行都安全。
+
 ## v0.2.920（2026-11-24）：兼容 MLM「模组启动管理器」
 
 玩家反馈：装了 **MLM-模组启动管理器**（工坊 `3788556097` / `ModLaunchManager` 0.4.11）后，
