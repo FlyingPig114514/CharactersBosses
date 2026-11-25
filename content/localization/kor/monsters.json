@@ -194,7 +194,7 @@
     "FOOL_BOSS.title":  "풀",
     "FOOL_BOSS.moves.CHARBOSS_PLAY.title":  "플레이",
     "FOOL_BOSS.fool":  "풀\n풀의 덱에는 [gold]신비의 형상[/gold] 3장뿐이며, 거의 모든 전투를 타로 카드로 합니다.\n당신이 [gold]종말[/gold]을 얻을 때 [gold]방어도[/gold]가 있다면, 그 [gold]방어도[/gold]를 소모해 같은 양의 [gold]종말[/gold]을 먼저 상쇄합니다 (이미 지니고 있는 [gold]종말[/gold]은 영향을 받지 않습니다).\n[red]경고:[/red] 12턴 전에 풀을 처치하십시오. 그렇지 않으면 책임지지 않습니다.",
-    "FOOL_BOSS.fool_dread":  "풀\n풀의 덱에는 [gold]신비의 형상[/gold] 3장뿐이며, 거의 모든 전투를 타로 카드로 합니다.\n당신이 [gold]종말[/gold]을 얻을 때 [gold]방어도[/gold]가 있다면, 그 [gold]방어도[/gold]를 소모해 같은 양의 [gold]종말[/gold]을 먼저 상쇄합니다 (이미 지니고 있는 [gold]종말[/gold]은 영향을 받지 않습니다).\n공포 모드: 풀이 사용하는 무색이 아닌 카드는 모두 업그레이드되며, [gold]마술사[/gold]는 대신 전기 구체 2개와 유리 구체 1개를 생성하고, [gold]기쁨의 선물[/gold]과 [gold]교황[/gold]은 [gold]기량[/gold]을 1장 더 만듭니다.\n[red]경고:[/red] 12턴 전에 풀을 처치하십시오. 그렇지 않으면 책임지지 않습니다.",
+    "FOOL_BOSS.fool_dread":  "풀\n풀의 덱에는 [gold]신비의 형상[/gold] 3장뿐이며, 거의 모든 전투를 타로 카드로 합니다.\n당신이 [gold]종말[/gold]을 얻을 때 [gold]방어도[/gold]가 있다면, 그 [gold]방어도[/gold]를 소모해 같은 양의 [gold]종말[/gold]을 먼저 상쇄합니다 (이미 지니고 있는 [gold]종말[/gold]은 영향을 받지 않습니다).\n공포 모드: 풀이 사용하는 무색이 아닌 카드는 모두 업그레이드됩니다.\n[red]경고:[/red] 12턴 전에 풀을 처치하십시오. 그렇지 않으면 책임지지 않습니다.",
     "WATCHER_BOSS.name":  "신격관",
     "WATCHER_BOSS.title":  "신격관",
     "WATCHER_BOSS.moves.CHARBOSS_PLAY.title":  "카드 사용",

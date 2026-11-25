@@ -24,15 +24,17 @@ public static class TarotFoolScript
     {
         var turns = new List<BossTurn>
         {
-            T("1. 神话形态、神话形态、神话形态", C<MythicForm>(), C<MythicForm>(), C<MythicForm>()),
+            T("1. 神话形态、神话形态、神话形态（三张都是升级版）", C<MythicForm>(true), C<MythicForm>(true), C<MythicForm>(true)),
 
-            T("2. 皇帝、神话形态、神话形态", C<TheEmperor>(), C<MythicForm>(), C<MythicForm>()),
+            T("2. 皇帝、神话形态、神话形态（升级版）", C<TheEmperor>(), C<MythicForm>(true), C<MythicForm>(true)),
 
-            T("3. 女祭司（无效果）、正义、女皇", C<TheHighPriestess>(), C<Justice>(), C<TheEmpress>()),
+            // ★ 2026-11-25（用户：削弱，第 3 回合的魔术师换成星星）。
+            T("3. 女祭司、星星、月亮", C<TheHighPriestess>(), C<TheStar>(), C<TheMoon>()),
 
-            T("4. 愚者（自动打出后面 2 张）、魔术师（1 电 1 冰 1 玻璃）、女祭司（无效果）", C<TheFool>(), C<TheMagician>(), C<TheHighPriestess>()),
+            T("4. 战车、世界、皇后", C<TheChariot>(), C<TheWorld>(), C<TheEmpress>()),
 
-            T("5. 战车、世界、恶魔（无效果）", C<TheChariot>(), C<TheWorld>(), C<TheDevil>()),
+            // ★ 2026-11-25（用户：第 5 回合意图改成「正义、女祭司、恶魔」）。
+            T("5. 正义、女祭司、恶魔", C<Justice>(), C<TheHighPriestess>(), C<TheDevil>()),
 
             T("6. 节制、魔术师（1 电 1 冰 1 玻璃）、命运之轮（无效果）", C<Temperance>(), C<TheMagician>(), C<WheelOfFortune>()),
 
@@ -77,7 +79,7 @@ public static class TarotFoolScript
 
             T("15. 星星（2 次）、太阳（无效果）、月亮（塞 10 把小刀）", C<TheStar>(), C<TheSun>(), C<TheMoon>()),
 
-            T("16. 审判（生命 ≤30 秒杀；恐惧模式升级版 ≤40）（2 次）、世界（无效果）、恶魔、煤灰（被消耗）", C<Judgement>(), C<TheWorld>(), C<TheDevil>(), Discard<Soot>()),
+            T("16. 审判、世界、恶魔、煤灰 ×2（被消耗）", C<Judgement>(), C<TheWorld>(), C<TheDevil>(), Discard<Soot>(), Discard<Soot>()),
         };
 
         return new BossScript
@@ -105,6 +107,7 @@ public static class TarotFoolScript
         typeof(Permafrost),         // 永冻冰晶
         typeof(PhilosophersStone),  // 贤者之石
         typeof(MercuryHourglass),   // 水银沙漏
+        typeof(IceCream),           // 冰激凌（用户 2026-11-25：全进阶全模式都带）
     };
 
     /// <summary>

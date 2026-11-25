@@ -194,7 +194,7 @@
     "FOOL_BOSS.title":  "愚者",
     "FOOL_BOSS.moves.CHARBOSS_PLAY.title":  "出牌",
     "FOOL_BOSS.fool":  "愚者\n愚者的卡组中只有 3 张[gold]神话形态[/gold]，杝主要靠塔罗牌战斗。\n每当你获得[gold]灾厄[/gold]时，若你有[gold]格挡[/gold]，[gold]格挡[/gold]会先抵消等量[gold]灾厄[/gold]（你已经拥有的[gold]灾厄[/gold]不受影响）。\n[red]警告：[/red]请在第12回合前击杀愚者，否则后果自负。",
-    "FOOL_BOSS.fool_dread":  "愚者\n愚者的卡组中只有 3 张[gold]神话形态[/gold]，杝主要靠塔罗牌战斗。\n每当你获得[gold]灾厄[/gold]时，若你有[gold]格挡[/gold]，[gold]格挡[/gold]会先抵消等量[gold]灾厄[/gold]（你已经拥有的[gold]灾厄[/gold]不受影响）。\n恐惧模式：杝打出的所有非无色牌都已升级，[gold]魔术师[/gold]改为生成 2 个闪电充能球和 1 个玻璃充能球，[gold]新生之喜[/gold]与[gold]教皇[/gold]会多印 1 张[gold]非凡技艺[/gold]。\n[red]警告：[/red]请在第12回合前击杀愚者，否则后果自负。",
+    "FOOL_BOSS.fool_dread":  "愚者\n愚者的卡组中只有 3 张[gold]神话形态[/gold]，杝主要靠塔罗牌战斗。\n每当你获得[gold]灾厄[/gold]时，若你有[gold]格挡[/gold]，[gold]格挡[/gold]会先抵消等量[gold]灾厄[/gold]（你已经拥有的[gold]灾厄[/gold]不受影响）。\n恐惧模式：杝打出的所有非无色牌都已升级。\n[red]警告：[/red]请在第12回合前击杀愚者，否则后果自负。",
     "WATCHER_BOSS.name":  "神格观",
     "WATCHER_BOSS.title":  "神格观",
     "WATCHER_BOSS.moves.CHARBOSS_PLAY.title":  "出牌",

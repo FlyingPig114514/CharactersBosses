@@ -219,6 +219,10 @@ public static class BossFrameTick
         //   ⇒ `TryInstall` 直接 return，之后**再也没有人调它**（`_tried` 也一直是 false）。
         //   现在每帧都试一次（内部 `_tried` 命中后就是一次 bool 判断，零开销）。
         try { Core.WatcherRuntimePatches.TryInstall(); } catch { /* 忽略 */ }
+        // ★ v0.2.936：神格特效的兜底清理（生物死了 / 离场时把眼睛与紫雾收掉）
+        try { Core.WatcherDivinityVfx.StopIfDead(); } catch { /* 忽略 */ }
+        // ★ v0.2.927：收藏家（崩坠）兼容的安装也放慢车道重试（它自己 2 秒限流、没装崩坠就不锁死）
+        try { Core.DownfallCollectibleCompat.TryInstall(); } catch { /* 忽略 */ }
         // ★ v0.2.918（用户 2026-11-23 第二次：「A 版还是 2 张」奇迹）：
         //   至纯之水的奇迹有两个来源，模组那次是**异步**的、可能在我们注入之后才落手；
         //   而玩家第 1 回合就能看到她的手牌 ⇒ 在她的第 1 回合期间每帧兜底修剪一次
@@ -1008,6 +1012,10 @@ public static class BossFrameTick
 #if STS2_111
             // 「许愿」固定选「永生不死」：观者模组可能比我们晚加载 ⇒ 放慢车道里重试（幂等）
             try { Core.WatcherRuntimePatches.TryInstall(); } catch { /* 忽略 */ }
+        // ★ v0.2.936：神格特效的兜底清理（生物死了 / 离场时把眼睛与紫雾收掉）
+        try { Core.WatcherDivinityVfx.StopIfDead(); } catch { /* 忽略 */ }
+        // ★ v0.2.927：收藏家（崩坠）兼容的安装也放慢车道重试（它自己 2 秒限流、没装崩坠就不锁死）
+        try { Core.DownfallCollectibleCompat.TryInstall(); } catch { /* 忽略 */ }
             // Ω观的三处接管（欧米伽隔回合触发 / 点穴可被格挡 / 不惧妖邪进平静）：同样幂等、同样要重试
             try { Core.WatcherOmegaMechanics.TryInstall(); } catch { /* 忽略 */ }
             // ★ v0.2.686（用户实测：「怎么tm是愚者，这是观者boss」）：

@@ -1,9 +1,408 @@
-﻿# 构建日志（BuildInfo.Tag 历史）
+# 构建日志（BuildInfo.Tag 历史）
 
 > 2026-11-22 从 `BuildInfo.Tag` 搬出来单独保存（Tag 里只留最近一条 + 指向本文件）。
 > 旧条目逐字来自 `git show HEAD:src/Hooks/Core/BuildInfo.cs` 的 Tag 常量（v0.2.871 及其之前，共 236 条）。
 > 最新版本（0.2.889）是当前 Tag，同时在各条 `workshop/changenote.txt` 里也有面向玩家的摘要。
 
+## v0.2.942（2026-11-25）：塔罗愚恐惧模式说明精简（只留「非无色牌都已升级」）
+
+用户口径：恐惧模式的额外说明**只保留「杝的所有非无色牌都已升级」**，
+魔术师生成什么充能球、新生之喜与教皇印什么都删掉 —— **效果一律不改，只删文案**。
+
+改了 16 语言 × 2 处（`content/localization/<lang>/monsters.json` 的 `FOOL_BOSS.fool_dread`
+与 `powers.json` 的 `BOSS_FOOL_POWER.description_dread`，两处文字本来就一致）：
+
+- zhs：`恐惧模式：杝打出的所有非无色牌都已升级。`
+- zht：`恐懼模式：杝打出的所有非無色牌都已升級。`
+- eng：`On Dread: every card it plays that is not colorless is upgraded.`
+- 其余 13 语言逐句手工截断，**按各语言语法收尾**（不是简单删到逗号）：
+  jpn `…アップグレードされる。` / kor `…업그레이드됩니다.` / jpn·kor 的动词变形要跟着改，
+  tha 原句本身没有句号 ⇒ 照旧不加。
+- 改完 16 个 JSON 全部 `ConvertFrom-Json` 通过；`tools\wiki\data.json` 与
+  `docs\wiki\boss-table(.en).md` / `index.html` / `docs\bosses.md` / xlsx 一并重新生成，
+  百科里「恐惧模式加强」那段现在只剩一句。
+
+三个目标（111 / 113 / 111+PhoneBuild）**全部 0 错误**，`install-mod.bat` 已装机（verify-deploy 报 v0.2.942 OK）。
+
+## v0.2.941（2026-11-25）：塔罗愚削弱（第 3 / 5 回合）+ 能力面板高压回合订正
+
+用户口径原话：「削弱，第三回合的魔术师换成星星 / 第五回合意图改为：正义、女祭司、恶魔 /
+能力面板中的单体高压回合改为 3、5、7、9、12～16；群体高压回合改为 4、12」。
+
+1. **剧本** `src\Hooks\Core\TarotFoolScript.cs`：
+   - 第 3 回合：女祭司、~~魔术师~~ → **星星**、月亮 ⇒「3. 女祭司、星星、月亮」；
+   - 第 5 回合：~~力量~~ → **正义、女祭司、恶魔**（力量整张拿掉，女祭司进来）。
+   - 第 6 / 8 / 10 回合的魔术师（恐惧模式 2 电 1 玻璃）不受影响，说明框文案照旧。
+2. **能力面板** `src\Hooks\Core\BossInfoTable.cs` 的 `FOOL_TAROT` 行：
+   - 单体高压回合：`7、9、12~16` → **`3、5、7、9、12~16`**；
+   - 群体高压回合：`5、12` → **`4、12`**。
+3. 文档 / 翻译：`tools\wiki\i18n-en.json` 的第 3、5 回合说明英文件名同步改键；
+   `docs\plans\boss-fool-tarot.md` 的 16 回合剧本表按**当前代码**重写（旧表还停在 11-14 的初稿，
+   第 3~8 回合早就调过两轮，这次一并对齐）。
+
+三个目标（111 / 113 / 111+PhoneBuild）**全部 0 错误**，`install-mod.bat` 已装到游戏目录（verify-deploy 报 v0.2.941 OK）。
+
+## v0.2.940（2026-11-26）：真正对着 v0.114.0 编译（刷新参考程序集 + 修 LoseHpInternal）
+
+⚠ 先纠正 v0.2.939 里的一个错误结论：那次我说「v0.114 没破坏 API」是错的 ——
+`src\CharacterBosses.csproj` 引用的是 **`.refs\sts2_113.dll` 快照**（不是游戏目录里的实时 dll），
+所以那次编译其实还是对着 **0.113.1** 的 API，看不见 v0.114 的改动。
+
+把 `.refs\sts2_113.dll` 换成游戏新的 `sts2.dll`（旧的留 `.refs\sts2_113_v0.113.1.bak`）后，
+立刻暴露三处真破坏：
+
+1. **`Creature.LoseHpInternal` 签名变了**：`(decimal amount, ValueProp props)` →
+   `(decimal amount, bool dryRun = false)`，**返回类型**也从 `DamageResult` 换成 **`HpLossResult`**
+   （字段 `hpLost / killed / overkillAmount`）。受影响：
+   - `BrewerBossBlockableHpLossPatch`（炼药猎「格挡能吃失去生命」）—— 不再有 props 可判，
+     改用**等价闸门 `Block > 0`**：`LoseHpInternal` 拿到的是**过完格挡之后**的剩余量，
+     普通攻击走到这里时 Block 已被扣成 0，只有「不可格挡的失去生命」才会 Block > 0；
+   - `ShadowPetDamageProbePatch`（诊断）—— 改读 `HpLossResult.hpLost / killed`，
+     并 `#if STS2_113` 与 0.111 老签名各留一份；
+   - `LoseHpTracePatch`（诊断）—— 去掉 props 参数。
+2. `BossOsty` 两处直接调用 `LoseHpInternal(amount, Unpowered|Unblockable)` ⇒ 113 目标改成 `(amount, false)`。
+3. `DesyncEffectTracePatch` 同上（去掉 props）。
+
+三个目标（113 新快照 / 111 旧快照 / phone）**全部 0 错误**。
+
+**本次启动「致命错误」的责任方**（用户问「是本模组还是别的模组」）：**不是本模组**。
+`godot.log` 的栈是：
+
+```
+at Loadout.MainFile.<>c__DisplayClass8_0.<AfterLocManagerInitialized>b__2()
+at HarmonyLib.Harmony.PatchAll(Assembly assembly)
+HarmonyException: Patching exception in method … Creature::LoseHpInternal(System.Decimal amount, System.Boolean dryRun)
+ ---> System.Exception: Parameter "props" not found in method …
+```
+
+即 **Loadout（模组）没适配 v0.114.0**（它的补丁还在找 `props` 参数）。另外
+**RitsuLib**（RitsuLib 框架）有 3 个补丁失败、其中 2 个 critical ⇒ 它自己「block mod loading」。
+本模组在那一局里正常加载并报了 `0.2.939`，没有补丁失败。
+## v0.2.939（2026-11-25）：适配游戏 v0.114.0 + 塔罗愚按新版塔罗调整 + wiki 意图修正
+
+游戏今天更新到 **v0.114.0**（commit `a7b9a9c0`）。三个构建目标对着新的 `sts2.dll` **全部 0 错误**（没有 API 破坏）。
+
+**塔罗愚调整**（用户 2026-11-25）：
+
+1. `神话形态`（`MythicForm`）在新版是「未升级带**虚无**、升级后**移除虚无**」⇒
+   **全进阶全模式都用升级版**（剧本三张 `C<MythicForm>(true)`）。第 1 回合「3 费只打得起 1 张」依旧成立。
+2. **全进阶全模式带遗物「冰激凌」**（`IceCream`：没花完的能量留到下回合）——这也解释了后面回合为什么都打得出来。
+3. **部分回合的意图改了**：
+
+   | 回合 | 现在的意图 |
+   |---|---|
+   | 3 | 女祭司、魔术师、月亮 |
+   | 4 | 战车、世界、皇后 |
+   | 5 | 力量、正义、恶魔 |
+   | 16 | 审判、世界、恶魔、**煤灰 ×2**（被消耗） |
+
+   第 1、2 与 6~15 回合不变。
+
+**wiki 意图错误**（用户：「大量卡牌被错误的标注成了没费」）：`tools/wiki-dump` 的判定以前
+「一遇到没费的牌就 `broke = true`」⇒ **后面所有牌（哪怕是 0 费）全被标成没费**。现在：
+
+- 逐张判定，0 费牌照常算打得出；
+- 把塔罗能量牌算进账：**皇帝 +3（升级 +4）、太阳 +2（升级 +3）、星星 下回合 +3（升级 +4）**；
+- **冰激凌结转**：没花完的能量带到下一回合（两条：`RelicsByAct` 与 `Relics` 都查）；
+- 塔罗愚从第 2 回合起**直接不判费用**（她的能量来自塔罗牌自己 + 冰激凌，静态账算不准，
+  用户口径就是「只有第 1 回合后两张神话形态是没费，其余都打得出」）。
+
+**恐惧模式：轰击储多带「灯笼」**（用户：「恐惧模式下轰击储获得灯笼，其它不变」）——
+`RegentBombardScript.Relics()` 拆出 `RelicsNormal()`，恐惧模式追加 `Lantern`，
+并在 `BossDefs` 的 `REGENT_BOMBARD` 上挂 `RelicsFactory`（运行期求值才能读到 `DreadMode.IsActive`）。
+## v0.2.938（2026-11-25）：三层 Boss 现在也掉收藏家藏品
+
+用户：「113 版本更新后，3 层 boss 也会掉落部分战利品（如猎人的狩猎、亡灵契约师的禁忌魔典），
+收藏家的魂萃也会掉落。所以，现在让 3 层 boss 也能掉落他们的藏品」。
+
+以前有两道闸门把三层挡住了（都是用户 2026-10-23 的旧口径「3 层 boss 的藏品卡不作弊进不了藏品堆」）：
+
+1. `OnBossDefeated` 里 `if (act >= 3) { 记日志; return; }`
+2. `AfterCollectorModelCombatEnd` 里 `if (act >= 3) continue;`
+
+⇒ 现在三层 Boss 房**有结算奖励**了，两处闸门都去掉：三层与 1/2 层走**完全相同**的通道
+（记进 `Defeated` → `CollectorModel.AfterCombatEnd` 把藏品挂成结算界面的藏品奖励）。
+⚠ 依然**不**直接 `AddCollectible`（那才是白送）。
+## v0.2.937（2026-11-25）：神格特效删掉手画版，改用观者 mod 原版素材
+
+用户：「你这画的什么玩意，不要自己乱画，用原本的素材」。
+
+v0.2.936 我用 `Sprite2D` 手搓的「一圈紫眼睛 + 雾」**全部删除**。现在只用两个观者 mod 自己的原件：
+
+| 实现 | 用的原件 |
+|---|---|
+| **A 版（Boninall，3747526116，优先）** | `WatcherMod.StanceVfxHelper.CreateDivinityVfx()` —— 它返回的 `Node2D` 里就是观者神格那两层紫色 `CpuParticles2D`（雾 + 上升粒子）；另外仍会调 `StartDivinityEye(owner)` |
+| **B 版（lamali，3747492505）** | 直接实例化它 `DivinityStance.VfxConfig` 里写的场景原件 `res://Watcher/scenes/watcher_mod/vfx/divinity_aura.tscn`，外加眼睛节点 `Watcher.Code.Stances.Vfx.DivinityEyeSpawner` |
+
+挂到生物节点上，**只按体型做一次整体缩放**（原件是按玩家身高设计的，机甲骑士这种大怪不放大就贴在身上看不见），
+退神格 / 生物死亡时收掉。日志会写明用的是哪一版、套数、缩放值。
+## v0.2.936（2026-11-25）：神格紫眼改成自己画（美术仍取观者 mod 的贴图）
+
+用户：「还是没看到。是不是因为机甲骑士太大了」。
+
+上一版的日志已经说明 A 版那条路**调用成功**：
+
+```
+[08:54:09] 神格特效：用 A 版（Boninall）观者的神格爆发 + 紫色眼睛（机甲骑士）
+```
+
+但画面上什么也没有 —— 它内部的 `DivinityEyeDriver` 是按**玩家**摆位的（观者自己那颗角色），
+挂到一只大怪物身上既没有可见节点、也不会跟着动。
+
+**改法：自己画，但美术仍然用观者 mod 自己的贴图。**
+
+`Core/WatcherDivinityVfx` 重写为纯原生节点方案（不依赖自定义脚本类、不占每帧 tick）：
+
+- **一圈紫色眼睛**：6 只 `Sprite2D`，整体缓慢公转（7 秒一圈）+ 上下起伏，每只自己呼吸（缩放）；
+- **紫雾**：两层放大、低透明度的贴图 + 紫色 `Modulate`，循环明暗；
+- **尺寸自适应**：按 `NCreature.Visuals.Bounds` 算直径 ⇒ 大怪物（机甲骑士这种）眼睛环半径自动放大，
+  不会再「因为体型太大而看不见」；
+- **贴图来源**：A 版 `res://images/vfx/sts1_eye/eye0..6.png` 优先 → 其次 B 版同名路径 →
+  最后问 A 版 helper 的 `EyeFrame(index)`；A 版「进神格爆发」`PlayDivinityStanceChange` 仍会顺手调一次；
+- **收尾**：退神格时 `QueueFree`；生物死亡 / 离场由慢车道的 `StopIfDead()` 兜底。
+## v0.2.935（2026-11-25）：神格特效对普通敌人没生效
+
+用户截图：「如图，它并没有浮现神格紫色眼睛的特效」。
+
+**根因**（日志实证，v0.2.934 那版的 `Play` 一次都没跑）：神格在这个模组里有**两个来源** ——
+
+1. 观者 Boss 自己的「虔信」（`BossDevotionPower`）；
+2. **恐惧模式的「观者的支配」**（`WatcherDominionDevotionPower`）—— 它给的是**本幕所有敌人**
+   （普通怪物也算）。日志：`观者的支配·虔信：机甲骑士 真言满 10 ⇒ 消耗 10 层，进入神格`。
+
+而 `WatcherDivinityVfx.Play/Stop` 当时的入口是 `CharBossMonster?` ⇒
+`me.Monster as CharBossMonster` 为 null ⇒ **直接 return**（连日志都没打）。
+
+**修法**：`WatcherDivinityVfx` 的 `Play`/`Stop` 与内部登记表统统改成按 **`Creature`**（任何生物），
+调用点直接传 `me`。实现本身不变（A 版 Boninall 优先，B 版 lamali 兜底）。
+## v0.2.934（2026-11-24）：神格图标同真言 + 进神格播观者的紫雾/紫眼特效
+
+用户两条：
+
+1. **「把神格 buff 的图标改成和真言相同」**
+   ⇒ `BossSpecialPowerIconPatch.WatcherConceptIconOf` 里给 `DominionDivinityPower`
+   也指到 `res://CharacterBosses/images/powers/watcher_mantra.png`
+   （和真言同一个文件；来源是观者 mod 的 `mantra.png`，早就随我们的 PCK 发布）。
+2. **「让怪物进入神格时周围也浮现观者处于神格的特效（周围有紫雾、紫色眼睛）」+
+   「装了哪个观者 mod 就用哪个 mod 的对应美术，同时装就 A 版优先」**
+   ⇒ 新增 `Core/WatcherDivinityVfx`，**不自己画**，直接调观者 mod 自己的实现（反射）：
+
+   | 实现 | 调用 |
+   |---|---|
+   | **A 版（Boninall，3747526116，优先）** | `WatcherMod.WatcherAttackVfxHelper.PlayDivinityStanceChange(Creature)`（进神格的紫雾爆发）+ `StartDivinityEye(Creature)` / `StopDivinityEye(Creature)`（周围那些紫色眼睛） |
+   | **B 版（lamali，3747492505）** | `Watcher.Code.Stances.Vfx.DivinityActivationBurst` / `DivinityEyeSpawner` 两个节点 `new` 出来挂到她的生物节点上；退神格时先 `StopSpawning()` 再 `QueueFree()` |
+
+   调用点：`WatcherDominionDevotionPower` 里 `Apply<DominionDivinityPower>` 之后 `Play(...)`、
+   `DominionDivinityPower.AfterSideTurnEnd` 退神格时 `Stop(...)`。
+   两个观者 mod 都没装 / 都调不动 ⇒ **静默跳过**（零影响），日志会说明用的是哪一版。
+## v0.2.933（2026-11-24）：失衡生效一次后没有清除
+
+用户：「储君的失衡没有在生效一次后被『盛碗虫（石）』buff 正常清除」（截图里失衡叠到 **4 层**）。
+
+**反编译对照**（两边都查了，差别就是根因）：
+
+```csharp
+// ① 原版 ImbalancedPower.AfterDamageGiven —— 对任何持有者都**不**移除自己
+if (dealer == Owner && result.WasFullyBlocked) {
+    Flash();
+    if (Owner.Monster is BowlbugRock rock) rock.IsOffBalance = true;   // 原版虫子：走「晕一手」那条状态机
+    else await CreatureCmd.Stun(Owner);                                // 其它人：只击晕
+}
+// ② 崩坠自己的 Collector.CollectorCode.Powers.BowlbugRockPower.AfterDamageGiven
+if (dealer == Owner && result.WasFullyBlocked) {
+    Flash();
+    if (Owner.Monster is not BowlbugRock) {
+        await PowerCmd.Remove(Owner.GetPower<ImbalancedPower>());      // ← 「生效后移除」其实在这里
+    } else rock.IsOffBalance = true;
+}
+```
+
+也就是说「失衡在生效后移除」这条是**崩坠那份 power** 的语义（收藏家藏品的说明也是这么写的），
+而它只作用在**持有它的那个角色**身上；失衡被挂到我们的 Boss 头上之后，没有任何人替她移除
+⇒ 层数越叠越高，每次攻击被完全格挡都再击晕一次。
+
+**修法**：新增 `BossImbalancedOncePatch`（`ImbalancedPower.AfterDamageGiven` 后置）——
+持有者是我们的 Boss、`dealer` 是她自己、且 `result.WasFullyBlocked` ⇒ 按崩坠同口径
+`PowerCmd.Remove` 把**整条失衡**移除（`StackType.Single`，只有一条，不是减层）。
+日志：`XXX 的「失衡」生效（攻击被完全格挡）⇒ 按崩坠口径整条移除`。
+## v0.2.932（2026-11-24）：她在自己回合里被击晕（失衡）后，后续回合全都没有意图
+
+用户：「在 boss 因为拥有失衡（通过收藏家的盛碗虫（石）藏品给予）在回合内击晕时，后续回合都没有意图。
+让 boss 因为在回合内被击晕时，仍打出当回合的所有卡牌，但下回合被击晕」。
+
+**根因**（反编译 + 日志双证）：
+
+```csharp
+// ImbalancedPower.AfterDamageGiven
+if (dealer == Owner && result.WasFullyBlocked) {
+    if (Owner.Monster is BowlbugRock rock) rock.IsOffBalance = true;
+    else await CreatureCmd.Stun(Owner);      // ← 她自己打出的伤害被完全格挡 ⇒ 当场把她自己打晕
+}
+```
+
+这一下发生在**她的回合中途**：`Creature.StunInternal` 把移动状态机切到 `STUNNED`，
+`FollowUpStateId` = 当时状态栈最后一个 = **`CHARBOSS_PLAY`** ⇒ 晕完之后**不再经过 `CHARBOSS_THINK`**
+⇒ `PrepareTurn`（造手牌 / 排计划）再也不会被调用。而她这一回合的牌早已打光：
+
+```
+击晕：跳过本回合的规划重建（待执行计划保留 0 张，TurnNumber 停在 3，PlanReady=False）
+击晕解除：恢复意图显示，补打待执行计划 0 张
+```
+
+⇒ 一份**空计划**被永久保留 ⇒ 屏幕上从此没有意图。
+
+**修法两条**：
+
+1. 新增 `Patches/BossStunWhileExecutingPatch`（前缀 `CreatureCmd.Stun`）：
+   她正在执行自己的回合（`CharBossMonster.TurnExecuting`）时收到击晕 ⇒ **先压住**、记 `PendingStun`，
+   **这一回合的牌照常全部打完**；回合结束（`PlayPlannedCards` 的 finally）由
+   `ApplyPendingStunIfAny()` 补上这次击晕，并**显式 `nextMoveId = CHARCOSS_THINK`**
+   ⇒ 晕完回到 `BossThinkState`，重新规划、重新出意图。
+2. `PrepareTurn` 的击晕闸门只在**真的有牌可补打**（`Plan.Count > 0`）时才保留计划，
+   否则照常规划 —— 杜绝「空计划被永久保留」这个死角。
+
+对用户两句口径的对应：**本回合照常打完**（击晕被推迟）+ **下回合被击晕**（回合结束时补上，那一回合她不出牌）。
+## v0.2.931（2026-11-24）：仆从储四条（仆从藏品 / +5 血 / 恐惧再 +5 / 恐惧意图修正）
+
+用户四条：
+
+1. **「让仆从储的 3 个仆从的藏品分别是它们对应的卡牌」**
+   ⇒ `DownfallCollectibleCompat.AfterBrainDrainOnPlay` 现在也接管**仆从**目标
+   （新增 `BossMinionMonster.MinionCardType`）：打击仆从 → **仆从打击**、
+   俯冲仆从 → **仆从俯冲**、捐躯仆从 → **仆从捐躯**。日志：`收藏家藏品判定：仆从 MINION_… ⇒ …`。
+2. **「增强仆从储，它所有仆从的最大生命值增加 5（全难度）」**
+3. **「新增仆从储的恐惧模式增强：所有仆从的最大生命值增加 5（恐惧共 +10，不改原本的增强）」**
+   ⇒ `MinionMonsters.HpByAscension()` 统一 `+5`，`DreadMode.IsActive` 时再 `+5`：
+
+   | 仆从 | 普通 / 进阶 8+ | 恐惧模式 |
+   |---|---|---|
+   | 打击仆从 | 27 / 30 | 32 / 35 |
+   | 俯冲仆从 | 17 / 19 | 22 / 24 |
+   | 捐躯仆从 | 20 / 22 | 25 / 27 |
+
+4. **「如图，恐惧模式下，由于还有一个仆从存活，这里的两个仆从俯冲都应该显示为攻势」**
+   根因：`BossIntentBuilder` 那条**每帧兜底**的仆从牌判定用的是**普通模式阈值 `MinionCap` = 2**，
+   而恐惧模式的阈值是 `MinionCapNow` = **1** ⇒ 场上 1 只仆从时被判成「还会召唤」⇒ 画成强化（蓝箭头）。
+   现在两处都读 `MinionCapNow`，与「真的召唤 / 真的打」那条路（`MinionSummonPatch`）一致。
+
+**多人不涨血**：早在 v0.2.794 就修过 —— `BossNoMultiplayerHpScalePatch` 在 `playerCount >= 2` 时
+对 `BossMinionMonster` 跳过 `Creature.ScaleMonsterHpForMultiplayer`，日志会打
+`多人(N 人)：跳过仆从 … 的血量缩放`。本轮只在该文件补了注释说明，逻辑未改。
+
+**百科**（中英 md + Pages 页）在「仆从储」那一节新增 3 个仆从的表：血量（普通 / 进阶 8+ / 恐惧）、
+每回合行动、以及「思维抽取打仆从会抽走哪张牌」。
+## v0.2.930（2026-11-24）：场上的设计身份和遭遇 / 藏品对不上（王储 vs 仆从储）
+
+用户：「还是护驾」。v0.2.929 的诊断日志给了铁证：
+
+```
+[21:50:50] 藏品判定：REGENT_BOSS act2 变体=REGENT_MINION ⇒ Guards
+```
+
+也就是说 `SpawnVariantKey` 确实是 `REGENT_MINION`（= 本场遭遇是**仆从储**），
+可**场上打的那只全是王储**：`剧本手牌 [PHOTON_CUT,KINGLY_PUNCH,KINGLY_KICK,DEFEND_REGENT,STRIKE_REGENT]`、
+`MONARCHS_GAZE`、`BOSS_CONQUEROR_POWER`、还带着抱抱先生（王储进阶 9 专属遗物）。
+
+**根因**：`CharBossMonster.Def` 只用 `PinnedVariantKey` —— 那是**暴露类**（`RegentKingBoss` 之类）写死的死值；
+而正常流程造怪用的是**角色基类**（`RegentBoss`）+ 造怪后写上去的 `SpawnVariantKey`
+（`CharBossEncounterBase.GenerateMonsters`：`main = ModelDb.Monster<TMonster>().ToMutable()`，
+`TMonster` 永远是基类）。`Def` 拿不到 pin ⇒ `ActiveVariant` 退回「按 `Enabled()`（种子 + 遭遇推断）判定」
+⇒ 判成兄弟设计时就出现「打的是王储、身份 / 藏品是仆从储」。
+
+**修法**：
+
+1. `Def` 改成 `PinnedVariantKey ?? SpawnVariantKey`（后者 = 本场遭遇，最权威）；
+   钉的 Key 在本幕找不到变体时（= 钉的就是主设计本身）自动退回主定义。
+2. `SpawnVariantKey` 从字段改成属性，**赋值时清掉 `Def` 缓存** —— 否则 `Def` 会在造怪之前
+   就被缓存成主设计（`Descriptor.cs` 的 `_defCache` 顺势改名 `DefCache` 以便清）。
+
+修完后同一场会**真的按遭遇打**：那一档是仆从储 ⇒ 打仆从牌 / 召唤仆从 / 特殊效果「征召上前」，
+藏品自然是「护驾！！！」。身份、卡组、特殊效果、藏品四处终于一致。
+## v0.2.929（2026-11-24）：思维抽取从王储身上抽到了仆从储的藏品
+
+用户：「我使用思维抽取从王储身上获得了仆从储的藏品」（截图里拿到的是「护驾！！！」）。
+日志：`思维抽取从 REGENT_BOSS act2 抽到了藏品牌「护驾！！！」` —— 王储应该是「王之凝视」。
+
+**根因**：和 v0.2.333 那次（炼药猎掉成刀猎）是同一类问题。**同角色同幕的兄弟设计**落在同一格：
+王储 / 仆从储（还有铁甲 4 只、静默 3 只、故障 3 只、储君 5 只…）。掉落判定的第二条链是
+「先 `BossKeys.EncounterOf(SpawnVariantKey)` 拿遭遇名 → 再按遭遇名 switch」，
+这一环只要给出的 entry 不是预期那只，就会发成兄弟设计的牌。
+
+**修法**：把这一整批变体 key **直接点名**（`boss.SpawnVariantKey` 是造怪时钉死的，最可靠），
+新增 12 条分支 —— 放血战 / 巨石战 / 杂耍战 / 打击战 / 王储 / 仆从储 / 辉星储 / 抉择储 /
+轰击储 / 电球机 / 彩虹机 / 状态机，卡牌与原来按遭遇名那条逐字一致。
+
+另加一行诊断日志，以后「发错牌 / 没发牌」一眼可查：
+
+```
+收藏家藏品判定：REGENT_BOSS act2 变体=REGENT_KING ⇒ MonarchsGaze
+```
+## v0.2.928（2026-11-24）：收藏家那条链路补两条诊断日志
+
+用户装机 v0.2.927 后仍报「还是没有」。补丁这次确实挂上了（日志五条 `已挂上 …` 全在），
+所以这一版**只加可观测性、不动逻辑**：
+
+- `AfterCollectorModelCombatEnd` 入口一行：`AfterCombatEnd 后置已触发（本场记下 N 条；补丁已挂=True/False）`
+  —— 判断结算奖励钩子到底有没有被游戏调用；
+- `OnBossDefeated` 里「本机没有收藏家玩家」以前是**静默 return**，现在打一行（含 Boss Key 与幕）。
+
+配合原有的 `收藏家藏品：X → Y` / `记下「Y」` / `已作为藏品奖励加到结算界面`，
+下次日志能直接分辨：钩子没被调用 / 被调用但没记下掉落 / 记下了但界面没挂上。
+## v0.2.927（2026-11-24）：收藏家藏品根本没发出去 —— `TryInstall` 没有调用点
+
+用户：「我刚刚玩，蛇咬猎不掉藏品」。
+
+**日志铁证**（21:23:59，单人、一层、`SILENT_SNAKEBITE_BOSS_ENCOUNTER`）：
+
+```
+P#5f76ea藏品：蛇咬猎 → 群蛇形态
+P#5f76ea兼容：SILENT_BOSS act1 掉落「群蛇形态」需要 3 精华，当前只有 0 ⇒ 这次不白送（和它自己的 CANT_AFFORD 一致）
+```
+
+也就是说走的是**兜底分支**（`_patched == false`），而不是正常的「结算界面藏品奖励」。
+
+**根因**：`Core.DownfallCollectibleCompat.TryInstall()`（挂 `CollectorModel.AfterCombatEnd` 后置、
+`CollectiblesModel.GetCollectibles` 后置、遗传算法成长钩子、祸不单行……）**全仓一个调用点都没有** ——
+和 v0.2.533 / v0.2.903 记的那两次是同一个毛病（手写 Harmony 的 `TryInstall` 忘了接线）。
+于是 `_patched` 恒为 false ⇒ 每个 Boss 都掉进「按收藏家的 3 点精华代价 `SyncAdd`」分支
+⇒ 精华不够（前两层常常 0 点）就**静默什么都不发**。也就是说这**不是蛇咬猎一只的问题，是所有 Boss 都不发**。
+
+**修法**：
+1. `BuildInfo.LogOnce()` 与 `BossFrameTick` 的慢车道都调 `TryInstall()`；
+2. `TryInstall()` 自己改成「**没找到崩坠就不锁死**、最多每 2 秒重探一次，只有真的挂上才 `_installed = true`」
+   —— 模组被 MLM 延迟加载时也能补上。
+
+已核对当前工坊版 `Downfall.dll` 的补丁目标仍在：`Collector.CollectorCode.Core.CollectorModel.AfterCombatEnd(CombatRoom) : Task`、
+`CollectiblesModel.GetCollectibles(Player)` / `SyncAdd(Player, CardModel, int)`。
+## v0.2.926（2026-11-24）：疾风观特殊效果改名「碰撞连击」+ 三只 Boss 补收藏家藏品
+
+用户：「藏品：疾风观=机械降神、神格观=聚能成刃、塔罗愚=神话形态；
+更改疾风观特殊效果的名称，改为碰撞连击，但效果不变」。
+
+**① 改名（效果一个字没改）**
+
+- 只改 `content/localization/<16 种语言>/powers.json` 的 `BOSS_FLURRY_POWER.title` ——
+  这就是游戏里「跟踪锁定」悬浮提示显示的那个特殊效果名（见 `LockOnPower.SpecialEffectName` ①
+  优先读 `<POWER_ID>.title`）。
+- 16 种语言都用**观者模组那张「碰撞连击 / Bowling Bash」的官方译名**：
+  zhs 碰撞连击 / zht 碰撞連擊 / eng Bowling Bash / jpn ボウリングバッシュ / kor 충돌 강타 /
+  rus Куча мала / pol Lawinowe grzmotnięcie / deu Kegeln / fra Jeu de quille / ita Effetto Bowling /
+  esp·spa Pleno / ptb Pancada de Boliche / tur Bovling Cümbüşü / ind Hantaman Bowling / tha กระแทกหมู่
+  （译名不是编的：新写了 `tools\art\dump_card_titles.gd`，直接从 `Watcher.pck` 的
+  `localization/<lang>/cards.json` 里把 `WATCHER_BOWLING_BASH.title` 读出来）。
+- `WATCHER_FLURRY_BOSS.flurry` / `.flurry_dread` 描述里那两处「疾风连击」**保持原样** ——
+  那指的是她手里那张牌，不是效果名。
+
+**② 收藏家藏品（`DownfallCollectibleCompat.ResolveLoot` 的变体 key 分支）**
+
+| Boss | 遭遇 | 藏品 |
+|---|---|---|
+| 疾风观 | `WATCHER_FLURRY` | **机械降神**（新增 `WatcherCards.DeusExMachina`） |
+| 神格观 | `WATCHER_DIVINITY` | **聚能成刃**（`WatcherCards.ConjureBlade`） |
+| 塔罗愚 | `FOOL_TAROT` | **神话形态**（`Cards.MythicForm`，0.113 独占 ⇒ `#if STS2_113`） |
+
+至此 **42 套设计全部有藏品**（复查脚本：变体 key 点名 / 遭遇名点名 / `LootTable[(角色,幕)]`
+三张表逐一对上，缺口 0）。观者那三只仍走 `WatcherCards` 反射，没装观者模组时静默跳过。
 ## v0.2.925（2026-11-24）：彩蛋死亡提示概率 5% ⇒ 10%
 
 用户：「彩蛋死亡提示的出现概率上调至10%」。只改一个数：`BossLossEggPatch.Chance` 0.05 ⇒ 0.10

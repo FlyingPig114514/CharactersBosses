@@ -1081,6 +1081,20 @@ public static class AoeAttackNotNarrowedPatch
 [HarmonyPatch(typeof(Creature), nameof(Creature.LoseHpInternal))]
 public static class ShadowPetDamageProbePatch
 {
+    // ★ v0.2.940（游戏 v0.114.0）：`LoseHpInternal` 的返回类型从 `DamageResult` 变成了 **`HpLossResult`**
+    //   （`decimal amount, bool dryRun`），字段也换成了 `hpLost / killed / overkillAmount` ⇒ 探针按新类型改。
+    //   ⚠ 0.111 目标（稳定分支）还是老签名 ⇒ 两个版本各写一份。
+#if STS2_113
+    [HarmonyPostfix]
+    public static void Postfix(Creature __instance, decimal amount,
+                               MegaCrit.Sts2.Core.Entities.Creatures.HpLossResult __result)
+    {
+        try
+        {
+            if (!CharacterBosses.Core.BossShadowPets.IsShadowPet(__instance)) return;
+            Logger.Log($"[CharBoss] ⚠ {__instance.Name} 受到了伤害 {amount}" +
+                       $"（实际掉血={__result.hpLost}，致死={__result.killed}）" +
+#else
     [HarmonyPostfix]
     public static void Postfix(Creature __instance, decimal amount, DamageResult __result)
     {
@@ -1089,6 +1103,7 @@ public static class ShadowPetDamageProbePatch
             if (!CharacterBosses.Core.BossShadowPets.IsShadowPet(__instance)) return;
             Logger.Log($"[CharBoss] ⚠ {__instance.Name} 受到了伤害 {amount}" +
                        $"（未格挡={__result?.UnblockedDamage}，props={__result?.Props}）" +
+#endif
                        " —— 有路径绕过了「不可命中」，请对照上一行的 BeforeCardPlayed");
         }
         catch { /* 忽略 */ }

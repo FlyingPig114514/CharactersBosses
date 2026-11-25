@@ -42,26 +42,32 @@ public static class BrewerBossBlockableHpLossPatch
     /// <summary>日志上限（法力灼烧这类每打一张牌就触发一次，别刷屏）。</summary>
     private static int _logs;
 
+    // ★ v0.2.940（游戏 v0.114.0）：`Creature.LoseHpInternal` 的 **`ValueProp props` 参数被删掉**了
+    //   （现在是 `LoseHpInternal(decimal amount, bool dryRun)`）—— 再声明 `props` 会让 Harmony
+    //   整类补丁挂不上（`Parameter "props" not found in method`）。
+    //   好在这条补丁**本来就不需要 props**：它想做的只是「炼药猎的格挡也能吃掉『失去生命』」。
+    //   而 `LoseHpInternal` 拿到的是**过完格挡之后**的剩余量 ——
+    //     · 普通攻击：格挡已经在 `DamageBlockInternal` 里扣光 ⇒ 走到这里时 `Block == 0` ⇒ 下面的闸门自然跳过；
+    //     · 不可格挡的「失去生命」：格挡一点没扣 ⇒ `Block > 0` ⇒ 正是我们要接管的那一类。
+    //   所以把 props 判定换成「Block > 0」这个等价闸门即可。
     [HarmonyPrefix]
-    public static void Prefix(Creature __instance, ref decimal amount, ValueProp props)
+    public static void Prefix(Creature __instance, ref decimal amount)
     {
         try
         {
             if (amount <= 0m) return;
-            // 只处理「本来不可格挡」的那一类；普通伤害的剩余量走原版（那时格挡已经扣成 0 了）
-            if ((props & ValueProp.Unblockable) == 0) return;
             if (!IsBrewerBoss(__instance)) return;
             if (__instance.Block <= 0) return;
 
-            // 让**原版**去吃掉格挡：把 Unblockable 这一位去掉再问它一次
-            decimal absorbed = __instance.DamageBlockInternal(amount, props & ~ValueProp.Unblockable);
+            // 让**原版**去吃掉格挡（用「无属性」问它，等价于把 Unblockable 那一位去掉）
+            decimal absorbed = __instance.DamageBlockInternal(amount, ValueProp.Unpowered);
             if (absorbed <= 0m) return;
 
             amount -= absorbed;
             if (_logs++ < 60)
             {
                 Logger.Log($"[CharBoss] 炼药猎：格挡挡下 {absorbed} 点「失去生命」" +
-                           $"（{SafeEntry(props)}；还剩 {amount} 点直接扣血，格挡余 {__instance.Block}）");
+                           $"（还剩 {amount} 点直接扣血，格挡余 {__instance.Block}）");
             }
         }
         catch (Exception e)

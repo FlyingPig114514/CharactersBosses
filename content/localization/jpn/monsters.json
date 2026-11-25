@@ -194,7 +194,7 @@
     "FOOL_BOSS.title":  "フール",
     "FOOL_BOSS.moves.CHARBOSS_PLAY.title":  "プレイ",
     "FOOL_BOSS.fool":  "フール\nフールのデッキには[gold]神話化[/gold]が3枚しかなく、ほとんどをタロットカードで戦う。\nあなたが[gold]破滅[/gold]を得る時、[gold]ブロック[/gold]があればその[gold]ブロック[/gold]を消費して同量の[gold]破滅[/gold]を先に相殺する（すでに持っている[gold]破滅[/gold]は影響を受けない）。\n[red]警告：[/red]第12ターンまでにフールを倒せ。さもなくば自業自得だ。",
-    "FOOL_BOSS.fool_dread":  "フール\nフールのデッキには[gold]神話化[/gold]が3枚しかなく、ほとんどをタロットカードで戦う。\nあなたが[gold]破滅[/gold]を得る時、[gold]ブロック[/gold]があればその[gold]ブロック[/gold]を消費して同量の[gold]破滅[/gold]を先に相殺する（すでに持っている[gold]破滅[/gold]は影響を受けない）。\n恐怖モード：杝が使う無色以外のカードはすべてアップグレードされ、[gold]魔術師[/gold]は代わりにライトニングオーブ2個とグラスオーブ1個を生成し、[gold]思いがけぬ贈り物[/gold]と[gold]教皇[/gold]は[gold]武勇[/gold]をさらに1枚刷る。\n[red]警告：[/red]第12ターンまでにフールを倒せ。さもなくば自業自得だ。",
+    "FOOL_BOSS.fool_dread":  "フール\nフールのデッキには[gold]神話化[/gold]が3枚しかなく、ほとんどをタロットカードで戦う。\nあなたが[gold]破滅[/gold]を得る時、[gold]ブロック[/gold]があればその[gold]ブロック[/gold]を消費して同量の[gold]破滅[/gold]を先に相殺する（すでに持っている[gold]破滅[/gold]は影響を受けない）。\n恐怖モード：杝が使う無色以外のカードはすべてアップグレードされる。\n[red]警告：[/red]第12ターンまでにフールを倒せ。さもなくば自業自得だ。",
     "WATCHER_BOSS.name":  "神格観",
     "WATCHER_BOSS.title":  "神格観",
     "WATCHER_BOSS.moves.CHARBOSS_PLAY.title":  "カードプレイ",

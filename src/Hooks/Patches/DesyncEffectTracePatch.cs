@@ -144,8 +144,11 @@ internal static class Trace
 [HarmonyPatch(typeof(Creature), nameof(Creature.LoseHpInternal))]
 internal static class LoseHpTracePatch
 {
+    // ★ v0.2.940（游戏 v0.114.0）：`Creature.LoseHpInternal` 的 `ValueProp props` 参数被**删掉**了
+    //   （现在签名是 `LoseHpInternal(decimal amount, bool dryRun)`）⇒ 这里再声明 props 会让整类补丁挂不上
+    //   （Harmony：`Parameter "props" not found in method`）。纯诊断补丁，直接按新签名收窄。
     [HarmonyPrefix]
-    public static void Prefix(Creature __instance, decimal amount, ValueProp props)
+    public static void Prefix(Creature __instance, decimal amount)
     {
         try
         {
@@ -153,7 +156,7 @@ internal static class LoseHpTracePatch
             if (!Trace.OurFight()) return;
 
             Trace.Log($"HP  {Trace.NameOf(__instance)} −{amount:0.##}" +
-                      $"（格挡 {__instance.Block} HP {__instance.CurrentHp}/{__instance.MaxHp} props={props}）" +
+                      $"（格挡 {__instance.Block} HP {__instance.CurrentHp}/{__instance.MaxHp}）" +
                       $"← {Trace.Hint()}");
         }
         catch { /* 忽略 */ }

@@ -566,6 +566,8 @@ public sealed class WatcherDominionDevotionPower : PowerModel
                 if (cur == null) break;
                 now = await PowerCmd.ModifyAmount(ctx, cur, -Threshold, me, null, false);
                 await PowerCmd.Apply<DominionDivinityPower>(ctx, me, 1m, me, null, false);
+                // 用户 2026-11-24：进神格时周围也浮现观者那套神格特效（紫雾 + 紫色眼睛；A 版优先）
+                try { Core.WatcherDivinityVfx.Play(me); } catch { /* 纯表现 */ }
                 Logger.Log($"[CharBoss] 观者的支配·虔信：{me.Name} 真言满 {Threshold} ⇒ 消耗 {Threshold} 层，" +
                            $"进入神格（它这一回合的攻击三倍伤害，执行完意图后退出），剩余真言 {now}");
             }
@@ -650,6 +652,7 @@ public sealed class DominionDivinityPower : PowerModel
             if (!mine) return;
 
             Logger.Log($"[CharBoss] 观者的支配·神格：{me.Name} 的意图已执行完 ⇒ 退出神格");
+            try { Core.WatcherDivinityVfx.Stop(me); } catch { /* 纯表现 */ }
             await PowerCmd.Remove(this);
         }
         catch (Exception e)

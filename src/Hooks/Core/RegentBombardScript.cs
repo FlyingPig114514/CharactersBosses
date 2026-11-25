@@ -116,7 +116,20 @@ public static class RegentBombardScript
     };
 
     /// <summary>遗物（用户清单）：天赋君权 / 涅奥的祝福 / 红面具 / 烛台。</summary>
-    public static List<Type> Relics() => new()
+    /// <summary>
+    /// 轰击储的遗物。★ v0.2.939（用户 2026-11-25）：
+    /// > 「恐惧模式下轰击储获得灯笼，其它不变」
+    /// ⇒ 普通模式原样；恐惧模式**多一件「灯笼」**（第 1 回合 +1 能量）。
+    /// 走 `RelicsFactory`（运行期求值）才能读到 `DreadMode.IsActive` —— 静态初始化那一刻恒为 false。
+    /// </summary>
+    public static List<Type> Relics()
+    {
+        var relics = RelicsNormal();
+        if (Core.DreadMode.IsActive) relics.Add(typeof(Lantern));   // 灯笼：第一回合 +1 能量
+        return relics;
+    }
+
+    private static List<Type> RelicsNormal() => new()
     {
         typeof(DivineRight),         // 天赋君权（起始）：战斗开始获得辉星
         typeof(NeowBlessing),        // 涅奥的祝福（第 2 件，所有 Boss 都一样）

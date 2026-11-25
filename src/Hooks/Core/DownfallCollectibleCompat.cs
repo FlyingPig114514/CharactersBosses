@@ -27,7 +27,9 @@ namespace CharacterBosses.Core;
 /// ## 实现口径
 /// - 1/2 层的 Boss：战斗胜利后按收藏家的正常代价（**3 点精华**）走 `SyncAdd`；
 ///   精华不够就**不白送**（和它自己的 `COLLECTIBLE_REWARD_CANT_AFFORD` 一致），只记一条日志。
-/// - 3 层的 Boss：直接 `AddCollectible`（绑定进藏品册，不扣精华）。
+/// - 3 层的 Boss：★ v0.2.938 起**和 1/2 层走同一条路**（0.113 更新后三层 Boss 房也有结算奖励了：
+///   猎人的狩猎、亡灵契约师的禁忌魔典、收藏家的魂萃都会掉），所以一律「记进 `Defeated` →
+///   `CollectorModel.AfterCombatEnd` 挂成藏品奖励」。**不**直接 `AddCollectible`（那等于白送）。
 /// - 全部**反射调用**（我们的 csproj 不引用 Downfall.dll），找不到类型/方法就静默跳过 ⇒ 没装崩坠时零影响。
 /// </summary>
 public static class DownfallCollectibleCompat
@@ -47,9 +49,22 @@ public static class DownfallCollectibleCompat
     /// <summary>「祸不单行」叠的那层 power（`Collector.CollectorCode.Powers.DoubleTroublePower`）。</summary>
     private const string DoubleTroublePowerFullName = "Collector.CollectorCode.Powers.DoubleTroublePower";
 
+    /// <summary>
+    /// ★★ v0.2.927（用户 2026-11-24：「蛇咬猎不掉藏品」）：
+    ///   这个方法的**调用点曾经整个消失了**（全仓只剩 `OnBossDefeated` 一个引用）——
+    ///   于是 `CollectorModel.AfterCombatEnd` 的后置**从来没挂上** ⇒ `_patched` 恒为 false
+    ///   ⇒ 每次都掉进「3 点精华兜底」分支 ⇒ 精华不够（前两层常常是 0 点）就**什么都不发**。
+    ///   日志铁证（21:23:59，单人一层打蛇咬猎）：`掉落「群蛇形态」需要 3 精华，当前只有 0 ⇒ 这次不白送`。
+    ///   现在：① 在 `BuildInfo.LogOnce` 与 `BossFrameTick` 里都调 <see cref="TryInstall"/>；
+    ///   ② 没找到 Downfall 时**不锁死**（最多每 2 秒重试一次，和观者探测同一套做法）——
+    ///   模组被 MLM 延迟加载时也能补上。
+    /// </summary>
     private static bool _installed;
     private static bool _patched;
     private static bool _loggedMissing;
+
+    /// <summary>上一次探测的时间戳（毫秒）：没找到 Downfall 时用来限流。</summary>
+    private static long _lastProbeMs;
 
     /// <summary>本场战斗里被我们打死的 Boss（Key、幕、藏品牌类型、是否升级版）——给 `AfterCombatEnd` 补奖励用。</summary>
     private static readonly List<(string Key, int Act, Type Card, bool Upgraded)> Defeated =
@@ -90,7 +105,14 @@ public static class DownfallCollectibleCompat
     internal static void TryInstall()
     {
         if (_installed) return;
-        _installed = true;
+        // ★ v0.2.927：**没找到就不锁死**（2 秒最多探一次）；只有真的挂上才 `_installed = true`。
+        try
+        {
+            long nowMs = Environment.TickCount64;
+            if (_lastProbeMs != 0 && nowMs - _lastProbeMs < 2000) return;
+            _lastProbeMs = nowMs;
+        }
+        catch { /* 忽略 */ }
         try
         {
             var type = FindType(CollectorModelFullName);
@@ -120,6 +142,7 @@ public static class DownfallCollectibleCompat
                         System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)!));
             Logger.Log("[CharBoss] 收藏家兼容：已挂上 CollectorModel.AfterCombatEnd → 我们的 Boss 也会掉藏品牌");
             _patched = true;
+            _installed = true;      // ★ v0.2.927：真的挂上了才锁
 
             // **让藏品册里我们的牌也显示「虚无 / 消耗」**（用户 2026-10-23 实测：别的藏品牌都有，只有我们的没有）。
             //
@@ -282,6 +305,24 @@ public static class DownfallCollectibleCompat
         {
             if (__result == null || cardPlay?.Target == null) return;
 
+            // ★★ v0.2.931（用户 2026-11-24：「让仆从储的 3 个仆从的藏品分别是它们对应的卡牌」）：
+            //   打的是**仆从储的仆从**（打击 / 俯冲 / 捐躯）时，抽走的就是它对应的那张牌
+            //   （`MinionStrike` / `MinionDiveBomb` / `MinionSacrifice`）。
+            if (cardPlay.Target.Monster is Monsters.BossMinionMonster minion)
+            {
+                var minionPlayer = CharacterBosses.Core.GameCompat.ActorOf(cardPlay);
+                if (minionPlayer == null) return;
+                bool minionUpgraded = false;
+                try { minionUpgraded = (__instance as MegaCrit.Sts2.Core.Models.CardModel)?.IsUpgraded ?? false; }
+                catch { /* 取不到就按未升级发 */ }
+                var minionCard = minion.MinionCardType;
+                if (minionCard == null) return;
+                Logger.Log($"[CharBoss] 收藏家藏品判定：仆从 {minion.Id.Entry} ⇒ {minionCard.Name}");
+                __result = GrantStolenCollectibleAsync(__result, minionPlayer, null, 0, minionCard, minionUpgraded,
+                                                       minion.Id.Entry);
+                return;
+            }
+
             // 只有「打的是我们的角色 Boss」才接管（原版 Boss 照旧走它自己的藏品牌池）
             if (cardPlay.Target.Monster is not CharBossMonster boss) return;
 
@@ -309,10 +350,11 @@ public static class DownfallCollectibleCompat
     private static async System.Threading.Tasks.Task GrantStolenCollectibleAsync(
         System.Threading.Tasks.Task original,
         Player player,
-        CharBossMonster boss,
+        CharBossMonster? boss,
         int act,
         Type cardType,
-        bool upgraded)
+        bool upgraded,
+        string? label = null)
     {
         try
         {
@@ -352,7 +394,7 @@ public static class DownfallCollectibleCompat
                 player,
                 MegaCrit.Sts2.Core.Entities.Cards.CardPilePosition.Bottom);
 
-            Logger.Log($"[CharBoss] 收藏家兼容：思维抽取从 {boss.Def.Key} act{act} 抽到了藏品牌" +
+            Logger.Log($"[CharBoss] 收藏家兼容：思维抽取从 {(label ?? boss?.Def?.Key ?? "?")} act{act} 抽到了藏品牌" +
                        $"「{card.Title}」{((upgraded) ? "（已升级）" : string.Empty)}");
         }
         catch (Exception e)
@@ -373,11 +415,13 @@ public static class DownfallCollectibleCompat
         {
             if (room?.CombatState == null) return;
 
+            // ★ v0.2.928（用户 2026-11-24：「还是没有」）：这行是判断「补丁到底有没有被调用」的唯一证据。
+            Logger.Log($"[CharBoss] 收藏家兼容：AfterCombatEnd 后置已触发（本场记下 {Defeated.Count} 条；补丁已挂={_patched}）");
+
             var seen = new HashSet<(string Key, int Act)>();
             foreach (var (key, act, cardType, upgraded) in Defeated.ToArray())
             {
-                // 3 层没有战斗奖励（藏品牌挂不上）→ OnBossDefeated 里已经直接绑定进藏品册
-                if (act >= 3) continue;
+                // ★ v0.2.938：0.113 起三层 Boss 房也有结算奖励 ⇒ 三层照样挂藏品奖励（不再跳过）
                 // 同一只 Boss 只发一次（两只 Boss 各一条，这是设计）
                 if (!seen.Add((key, act))) continue;
 
@@ -810,7 +854,24 @@ public static class DownfallCollectibleCompat
     /// 用户 2026-10-26 的一层「奇巧猎」：**藏品 = 余像（单人）/ 鬼祟+（多人）** ——
     /// 同一只 Boss 在两种人数下掉不同的藏品牌，所以不能只查静态表。
     /// </summary>
+    /// <summary>
+    /// ★ v0.2.929（诊断）：包一层只为**把判定过程打进日志**，以后「发错牌 / 没发牌」一眼就能看出来：
+    /// `收藏家藏品判定：REGENT_BOSS act2 变体=REGENT_KING ⇒ MonarchsGaze`。
+    /// </summary>
     private static bool ResolveLoot(CharBossMonster boss, int act, out Type cardType, out bool upgraded)
+    {
+        bool ok = ResolveLootCore(boss, act, out cardType, out upgraded);
+        try
+        {
+            Logger.Log($"[CharBoss] 收藏家藏品判定：{boss?.Def?.Key} act{act} " +
+                       $"变体={boss?.SpawnVariantKey ?? "<null>"} ⇒ " +
+                       (ok ? cardType.Name : "表里没有 / 造不出"));
+        }
+        catch { /* 忽略 */ }
+        return ok;
+    }
+
+    private static bool ResolveLootCore(CharBossMonster boss, int act, out Type cardType, out bool upgraded)
     {
         cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.Afterimage);
         upgraded = false;
@@ -864,7 +925,96 @@ public static class DownfallCollectibleCompat
                     upgraded = false;
                     Logger.Log("[CharBoss] 收藏家藏品：红蓝观 → 腾越");
                     return cardType != null;
+                // 一层 2 号 疾风观（用户 2026-11-24）：藏品 = **机械降神**
+                // （和同层「预见观」落在同一格 ⇒ 必须按变体 key 点名，否则会掉成通晓万物）
+                case "WATCHER_FLURRY":
+                    cardType = Core.WatcherCards.DeusExMachina;
+                    upgraded = false;
+                    Logger.Log("[CharBoss] 收藏家藏品：疾风观 → 机械降神");
+                    return cardType != null;
+                // 三层 1 号 神格观（用户 2026-11-24）：藏品 = **聚能成刃**
+                // （三层是主设计本身，但同幕还有 Ω观/红蓝观 两个变体 ⇒ 同样按变体 key 点名最稳）
+                case "WATCHER_DIVINITY":
+                    cardType = Core.WatcherCards.ConjureBlade;
+                    upgraded = false;
+                    Logger.Log("[CharBoss] 收藏家藏品：神格观 → 聚能成刃");
+                    return cardType != null;
 #endif
+#if STS2_113
+                // 三层 1 号 塔罗愚（愚者，用户 2026-11-24）：藏品 = **神话形态**
+                // （0.113 才有的牌 ⇒ 只在 113 构建里出现；107/111 没有这张牌，静默跳过）
+                case "FOOL_TAROT":
+                    cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.MythicForm);
+                    upgraded = false;
+                    Logger.Log("[CharBoss] 收藏家藏品：塔罗愚 → 神话形态");
+                    return true;
+#endif
+                // ★★ v0.2.929（用户 2026-11-24：「我使用思维抽取从王储身上获得了仆从储的藏品」）：
+                //   以前这些**同角色同幕的兄弟设计**只靠下面那个「按遭遇名」的 switch 兜底，一旦
+                //   `BossKeys.EncounterOf(SpawnVariantKey)` 这一环给出的 entry 不是预期那只
+                //   （王储 → 结果拿到仆从储的「护驾！！！」），就会发错牌。
+                //   `SpawnVariantKey` 是**造怪时钉死的**，最可靠 ⇒ 这里给每一个「有兄弟设计」的
+                //   变体 key 都补一条点名分支（卡牌与下面遭遇名那条完全一致）。
+                case "IRONCLAD_BLOOD":       // 二层 放血战
+                    cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.CrimsonMantle);   // 绯红披风
+                    upgraded = false;
+                    Logger.Log("[CharBoss] 收藏家藏品：放血战 → 绯红披风");
+                    return true;
+                case "IRONCLAD_BOULDER":     // 三层 巨石战
+                    cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.PrimalForce);     // 原始力量
+                    upgraded = false;
+                    Logger.Log("[CharBoss] 收藏家藏品：巨石战 → 原始力量");
+                    return true;
+                case "IRONCLAD_JUGGLER":     // 二层 杂耍战
+                    cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.PactsEnd);        // 契约终结
+                    upgraded = false;
+                    Logger.Log("[CharBoss] 收藏家藏品：杂耍战 → 契约终结");
+                    return true;
+                case "IRONCLAD_STRIKE":      // 一层 打击战
+                    cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.Hellraiser);      // 地狱狂徒
+                    upgraded = false;
+                    Logger.Log("[CharBoss] 收藏家藏品：打击战 → 地狱狂徒");
+                    return true;
+                case "REGENT_KING":          // 二层 王储
+                    cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.MonarchsGaze);    // 王之凝视
+                    upgraded = false;
+                    Logger.Log("[CharBoss] 收藏家藏品：王储 → 王之凝视");
+                    return true;
+                case "REGENT_MINION":        // 二层 仆从储
+                    cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.Guards);          // 护驾！！！
+                    upgraded = false;
+                    Logger.Log("[CharBoss] 收藏家藏品：仆从储 → 护驾！！！");
+                    return true;
+                case "REGENT_STAR":          // 三层 辉星储
+                    cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.VoidForm);        // 虚空形态
+                    upgraded = false;
+                    Logger.Log("[CharBoss] 收藏家藏品：辉星储 → 虚空形态");
+                    return true;
+                case "REGENT_CHOICE":        // 三层 抉择储
+                    cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.HeavenlyDrill);   // 天际钻头
+                    upgraded = false;
+                    Logger.Log("[CharBoss] 收藏家藏品：抉择储 → 天际钻头");
+                    return true;
+                case "REGENT_BOMBARD":       // 一层 轰击储
+                    cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.Bombardment);     // 轰击
+                    upgraded = false;
+                    Logger.Log("[CharBoss] 收藏家藏品：轰击储 → 轰击");
+                    return true;
+                case "DEFECT_THUNDER":       // 一层 电球机
+                    cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.SignalBoost);     // 信号增强
+                    upgraded = false;
+                    Logger.Log("[CharBoss] 收藏家藏品：电球机 → 信号增强");
+                    return true;
+                case "DEFECT_RAINBOW":       // 二层 彩虹机
+                    cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.MeteorStrike);    // 陨石打击
+                    upgraded = false;
+                    Logger.Log("[CharBoss] 收藏家藏品：彩虹机 → 陨石打击");
+                    return true;
+                case "DEFECT_STATUS":        // 三层 状态机
+                    cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.FlakCannon);      // 散射炮
+                    upgraded = false;
+                    Logger.Log("[CharBoss] 收藏家藏品：状态机 → 散射炮");
+                    return true;
                 case "SILENT_SNAKEBITE":     // 一层 蛇咬猎（用户 2026-11-11：藏品 = 群蛇形态）
                     // 她和同层「奇巧猎」落在同一格（掉落表按「角色 + 幕」索引 ⇒ 会掉余像）⇒ 必须点名。
                     cardType = typeof(MegaCrit.Sts2.Core.Models.Cards.SerpentForm);   // 群蛇形态
@@ -1055,7 +1205,11 @@ case "REGENT_STAR_BOSS_ENCOUNTER":         // 三层 辉星储
             if (!ResolveLoot(boss, act, out var cardType, out var lootUpgraded)) return;
 
             var player = FindCollectorPlayer(boss);
-            if (player == null) return;                                     // 本机不是收藏家：不管
+            if (player == null)
+            {
+                Logger.Log($"[CharBoss] 收藏家兼容：本机没有收藏家玩家 ⇒ 这次不发（{boss.Def.Key} act{act}）");   // ★ v0.2.928：以前是静默 return
+                return;                                     // 本机不是收藏家：不管
+            }
 
             var card = CreateCard(player, cardType, lootUpgraded);
             if (card == null)
@@ -1064,15 +1218,13 @@ case "REGENT_STAR_BOSS_ENCOUNTER":         // 三层 辉星储
                 return;
             }
 
-            // 3 层：**没有战斗奖励就进不了藏品堆**（用户 2026-10-23 订正：
-            // 「3 层 boss 的藏品卡不作弊进不了藏品堆」）⇒ 这里**什么都不做**，只记日志，
-            // 绝对不能直接 AddCollectible（那等于白送）。
-            if (act >= 3)
-            {
-                Logger.Log($"[CharBoss] 收藏家兼容：{boss.Def.Key} act{act} 是三层，没有战斗奖励 ⇒ " +
-                           $"「{card.Title}」不发放（三层藏品只能靠正常途径，不作弊）");
-                return;
-            }
+            // ★★ v0.2.938（用户 2026-11-25）：「113 版本更新后，3 层 boss 也会掉落部分战利品
+            //   （如猎人的狩猎、亡灵契约师的禁忌魔典），收藏家的魂萃也会掉落。所以，现在让 3 层 boss
+            //   也能掉落他们的藏品」。
+            //   以前这里直接 return（用户 2026-10-23 的旧口径：「3 层 boss 的藏品卡不作弊进不了藏品堆」），
+            //   但现在三层 Boss 房**也有结算奖励**了 ⇒ 和 1/2 层走**完全相同**的通道
+            //   （记进 `Defeated`，等 `CollectorModel.AfterCombatEnd` 挂成藏品奖励）。
+            //   ⚠ 依然**不**直接 `AddCollectible`（那才是白送）。
 
             // 1/2 层：记下来，等 `CollectorModel.AfterCombatEnd` 那一刻挂成**结算界面的藏品奖励**
             if (_patched)

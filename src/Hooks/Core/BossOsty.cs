@@ -1362,9 +1362,16 @@ internal static class BossOsty
                 try
                 {
                     if (killPets && pet.IsAlive)
+                    {
+#if STS2_113
+                        // ★ 游戏 v0.114.0：`LoseHpInternal` 去掉了 `ValueProp` 参数（现在只有 `(amount, dryRun)`）
+                        pet.LoseHpInternal(pet.CurrentHp, false);
+#else
                         pet.LoseHpInternal(pet.CurrentHp,
                             MegaCrit.Sts2.Core.ValueProps.ValueProp.Unpowered
                             | MegaCrit.Sts2.Core.ValueProps.ValueProp.Unblockable);
+#endif
+                    }
                     // ⚠ **不要在这里 DetachFromCombat**：战斗结束时引擎自己还要按 `_enemies`/`_allies`
                     //   列表做清理（`CombatState.RemoveCreature`），我们先把它摘掉会让它找不到生物：
                     //   `KeyNotFoundException: Removed creature 佩尔的士兵 was not found`
@@ -1408,9 +1415,14 @@ internal static class BossOsty
                 if (osty == null || !osty.IsAlive) continue;
                 try
                 {
+#if STS2_113
+                    // ★ 游戏 v0.114.0：`LoseHpInternal` 去掉了 `ValueProp` 参数（现在只有 `(amount, dryRun)`）
+                    osty.LoseHpInternal(osty.CurrentHp, false);
+#else
                     osty.LoseHpInternal(osty.CurrentHp,
                         MegaCrit.Sts2.Core.ValueProps.ValueProp.Unblockable
                         | MegaCrit.Sts2.Core.ValueProps.ValueProp.Unpowered);
+#endif
                     killed++;
                     // 每只都记一行：万一哪天误伤了队友的奥斯提，日志能直接看出来
                     Logger.Log($"[CharBoss] 爪牙随主人死亡：带走 {SafeId(osty)}" +

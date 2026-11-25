@@ -208,6 +208,8 @@ internal static class WatcherCards
     internal static Type? Worship => Card("WatcherWorship", "Worship", "WATCHER_WORSHIP", "WATCHER-WORSHIP");
     internal static Type? Miracle => Card("WatcherMiracle", "Miracle", "WATCHER_MIRACLE", "WATCHER-MIRACLE");
     internal static Type? ConjureBlade => Card("WatcherConjureBlade", "ConjureBlade", "WATCHER_CONJURE_BLADE", "WATCHER-CONJURE_BLADE");
+    /// <summary>机械降神（`DeusExMachina`，不可打出：抽到时生成 2 张奇迹）。疾风观的收藏家藏品（用户 2026-11-24）。</summary>
+    internal static Type? DeusExMachina => Card("WatcherDeusExMachina", "DeusExMachina", "WATCHER_DEUS_EX_MACHINA", "WATCHER-DEUS_EX_MACHINA");
     internal static Type? Consecrate => Card("WatcherConsecrate", "Consecrate", "WATCHER_CONSECRATE", "WATCHER-CONSECRATE");
     internal static Type? EmptyFist => Card("WatcherEmptyFist", "EmptyFist", "WATCHER_EMPTY_FIST", "WATCHER-EMPTY_FIST");
     internal static Type? WaveOfTheHand => Card("WatcherWaveOfTheHand", "WaveOfTheHand", "WATCHER_WAVE_OF_THE_HAND", "WATCHER-WAVE_OF_THE_HAND");

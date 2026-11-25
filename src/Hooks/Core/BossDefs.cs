@@ -926,6 +926,8 @@ public static class BossDefs
                 Enabled = Core.BossLineups.BombardActive,
                 Deck = Core.RegentBombardScript.Deck(),
                 Relics = Core.RegentBombardScript.Relics(),
+                // ★ v0.2.939：运行期求值 —— 恐惧模式要多带一件「灯笼」（见 RegentBombardScript.Relics）
+                RelicsFactory = Core.RegentBombardScript.Relics,
                 Script = Core.RegentBombardScript.Build(),
                 SpecialLoc = "REGENT_BOSS.orbital",           // 特殊效果「环绕轨道」
                 // 2026-11-13（恐惧模式）：同名「环绕轨道」+ **第 1 回合**就打轰击（正常是第 2 回合）

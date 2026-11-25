@@ -7151,3 +7151,22 @@ Chronological action log.
 | 2026-11-24 20:41 | write | `workshop/changenote.txt` | ok | 0 |
 | 2026-11-24 20:47 | edit | `workshop/changenote.txt` | ok | 0 |
 | 2026-11-24 20:48 | write | `workshop/changenote.txt` | ok | 0 |
+| 2026-11-24 21:08 | write | `tools/art/dump_card_titles.gd` | ok | 0 |
+| 2026-11-24 21:10 | edit | `src/Hooks/Core/DownfallCollectibleCompat.cs` | ok | 0 |
+| 2026-11-24 21:13 | write | `workshop/changenote.txt` | error | 0 |
+| 2026-11-24 21:13 | write | `workshop/changenote.txt` | ok | 0 |
+| 2026-11-24 22:27 | write | `src/Hooks/Patches/BossStunWhileExecutingPatch.cs` | ok | 0 |
+| 2026-11-24 22:48 | write | `src/Hooks/Core/WatcherDivinityVfx.cs` | ok | 0 |
+| 2026-11-25 08:55 | write | `src/Hooks/Core/WatcherDivinityVfx.cs` | error | 0 |
+| 2026-11-25 08:56 | write | `src/Hooks/Core/WatcherDivinityVfx.cs` | ok | 0 |
+| 2026-11-25 09:03 | write | `src/Hooks/Core/WatcherDivinityVfx.cs` | error | 0 |
+| 2026-11-25 09:03 | write | `src/Hooks/Core/WatcherDivinityVfx.cs` | ok | 0 |
+| 2026-11-25 13:41 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/TarotFoolScript.cs` | ok | 0 |
+| 2026-11-25 13:41 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/TarotFoolScript.cs` | ok | 0 |
+| 2026-11-25 13:42 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossInfoTable.cs` | ok | 0 |
+| 2026-11-25 13:42 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/wiki/i18n-en.json` | error | 0 |
+| 2026-11-25 13:42 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/wiki/i18n-en.json` | error | 0 |
+| 2026-11-25 13:42 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/boss-fool-tarot.md` | ok | 0 |
+| 2026-11-25 13:42 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/boss-fool-tarot.md` | ok | 0 |
+| 2026-11-25 13:44 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/changelog-history.md` | ok | 0 |
+| 2026-11-25 13:54 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/changelog-history.md` | ok | 0 |

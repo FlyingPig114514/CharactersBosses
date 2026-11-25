@@ -105,6 +105,15 @@ public abstract class BossMinionMonster : MonsterModel
     protected abstract int HpLow { get; }
     protected abstract int HpHigh { get; }
 
+    /// <summary>
+    /// ★★ v0.2.931（用户 2026-11-24）：「增强仆从储，它所有仆从的最大生命值增加 5（全难度）」
+    /// + 「新增仆从储的恐惧模式增强：所有仆从的最大生命值增加 5（加上前面的增强，
+    ///    现在恐惧模式下仆从的血量比原来多 10）」。
+    /// ⇒ 普通模式 = 原值 + <see cref="HpBuff"/>；恐惧模式 = 原值 + <see cref="HpBuff"/> + <see cref="HpBuffDread"/>。
+    /// </summary>
+    private const int HpBuff = 5;
+    private const int HpBuffDread = 5;
+
     public override int MinInitialHp => HpByAscension();
     public override int MaxInitialHp => HpByAscension();
 
@@ -112,8 +121,16 @@ public abstract class BossMinionMonster : MonsterModel
     {
         int asc = 0;
         try { asc = Core.BossLineups.Ascension(); } catch { asc = 0; }
-        return asc >= 8 ? HpHigh : HpLow;
+        int hp = asc >= 8 ? HpHigh : HpLow;
+        hp += HpBuff;
+        try { if (Core.DreadMode.IsActive) hp += HpBuffDread; } catch { /* 判不出恐惧就当普通模式 */ }
+        return hp;
     }
+
+    // ★ 多人不涨血：这一层**早就修过**（v0.2.794，见 `Patches/BossMultiplayerHpScalePatch`
+    //   的 `BossNoMultiplayerHpScalePatch`：`playerCount >= 2` 时对 `BossMinionMonster`
+    //   直接跳过 `Creature.ScaleMonsterHpForMultiplayer`）。这里不再重复声明，
+    //   只把「设计值 = 单人值」写在这里提醒后来的人。
 
     public override LocString Title => new LocString("monsters", Id.Entry + ".name");
 
@@ -125,6 +142,13 @@ public abstract class BossMinionMonster : MonsterModel
 
     /// <summary>立绘用的**卡牌**（用户 2026-11-05：「先直接用这三张牌当对应仆从的立绘」）。</summary>
     protected abstract Type SourceCardType { get; }
+
+    /// <summary>
+    /// **这只仆从对应的那张卡**（对外暴露）。
+    /// 用途（用户 2026-11-24）：「让仆从储的 3 个仆从的藏品分别是它们对应的卡牌」
+    /// —— 收藏家的「思维抽取」打到仆从身上时，就抽走这张牌（见 `DownfallCollectibleCompat`）。
+    /// </summary>
+    internal Type MinionCardType => SourceCardType;
 
     /// <summary>
     /// 进房间后把**卡面图**盖到仆从身上（原版没有独立立绘）。

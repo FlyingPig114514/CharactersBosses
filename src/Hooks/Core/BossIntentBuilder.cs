@@ -182,13 +182,19 @@ public static class BossIntentBuilder
                                     if (planned2.Id.Entry != "MINION_STRIKE"
                                         && planned2.Id.Entry != "MINION_DIVE_BOMB"
                                         && planned2.Id.Entry != "MINION_SACRIFICE") continue;
-                                    if (planned >= Powers.BossCallToArmsPower.MinionCap) break;
+                                    // ★★ v0.2.931（用户 2026-11-24 截图：「恐惧模式下，由于还有一个仆从存活，
+                                    //   这里的两个仆从俯冲都应该显示为攻势」）：这里原来写的是**普通模式的 2**
+                                    //   （`MinionCap`），而恐惧模式的阈值是 **1**（`MinionCapNow`）
+                                    //   ⇒ 场上 1 只仆从时，明明已经够数、会真的打出伤害，却被算成「还会召唤」
+                                    //   ⇒ 意图画成强化（蓝箭头）。改成读同一个 `MinionCapNow`，
+                                    //   和「真的召唤/真的打」那条路（`MinionSummonPatch` / 规划器）保持一致。
+                                    if (planned >= Powers.BossCallToArmsPower.MinionCapNow) break;
                                     planned++;
                                 }
                             }
                         }
                         catch { /* 忽略 */ }
-                        summon = planned < Powers.BossCallToArmsPower.MinionCap;
+                        summon = planned < Powers.BossCallToArmsPower.MinionCapNow;
                     }
                 }
                 if (summon) return new List<AbstractIntent> { new SummonIntent() };

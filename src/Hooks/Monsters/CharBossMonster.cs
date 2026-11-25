@@ -283,7 +283,30 @@ public abstract partial class CharBossMonster : MonsterModel
     /// （炼药猎 → 刀猎、王储 → 铸剑储君、杂耍战 → 放血战…）。
     /// 记在实例上就没有这个问题：它跟着这只 Boss 出生，永不重算。
     /// </summary>
-    internal string? SpawnVariantKey;
+    private string? _spawnVariantKey;
+
+    /// <summary>
+    /// 这只 Boss **出生时钉下的设计 Key**（来自本场遭遇，见 `CharBossEncounterBase.GenerateMonsters`）。
+    ///
+    /// ★★ v0.2.930（用户 2026-11-24：「我使用思维抽取从王储身上获得了仆从储的藏品」，
+    ///   日志：`藏品判定：REGENT_BOSS act2 变体=REGENT_MINION ⇒ Guards`，而**场上打的却是王储**）：
+    ///   以前 `Def` 只看 `PinnedVariantKey`（那是 `XxxBoss` 暴露类自己钉的死值），
+    ///   而**正常流程造怪用的是角色基类**（`RegentBoss` 等）+ 这个 `SpawnVariantKey`
+    ///   ⇒ `Def` 拿不到 pin，`ActiveVariant` 退回「按 `Enabled()` 判定」（种子 + 遭遇推断），
+    ///   一旦那一层判成兄弟设计（王储 / 仆从储、刀猎 / 炼药猎…），**打的那只**和
+    ///   **归档身份（遭遇 / 藏品 / 死亡提示）**就对不上了。
+    ///   现在赋值时清掉 `Def` 缓存，让 `Def` 跟着它走（见 `Descriptor.cs` 的 `Def`）。
+    /// </summary>
+    internal string? SpawnVariantKey
+    {
+        get => _spawnVariantKey;
+        set
+        {
+            if (string.Equals(_spawnVariantKey, value, StringComparison.Ordinal)) return;
+            _spawnVariantKey = value;
+            DefCache = null;     // ★ Def 依赖它 ⇒ 一变就重算（以前缓存的可能是主设计）
+        }
+    }
 
     /// <summary>这场战斗的药水栏位/初始药水是否已经处理过（只做一次）。</summary>
     internal bool PotionsPrepared;
@@ -427,6 +450,41 @@ public abstract partial class CharBossMonster : MonsterModel
     /// 这就是「下回合补打」所需要的全部前提（详见 `docs/plans/stun-behavior.md`）。
     /// 唯一需要自己拦的是 `PrepareTurn`（见那里的闸门）。
     /// </summary>
+    /// <summary>
+    /// ★★ v0.2.932（用户 2026-11-24）：「boss 因为失衡在回合内被击晕时，后续回合都没有意图」。
+    /// 详见 <c>Patches/BossStunWhileExecutingPatch</c>：
+    ///   · <see cref="TurnExecuting"/> = 此刻正在执行自己回合的那只 Boss（同一时间只有一只）；
+    ///   · <see cref="PendingStun"/>   = 「她在自己回合里被击晕，等这回合打完再补」的待办。
+    /// </summary>
+    internal static CharBossMonster? TurnExecuting;
+
+    internal bool PendingStun;
+
+    /// <summary>
+    /// 把这回合打完时补上被推迟的那次击晕（见 <see cref="PendingStun"/>）。
+    ///
+    /// ⚠ 必须显式把 `nextMoveId` 指定成 <see cref="ThinkStateId"/>：`CreatureCmd.Stun(creature)`
+    /// 默认拿「状态栈最后一个」当后续状态，而她那会儿正在跑 `CHARBOSS_PLAY` ⇒ 晕完之后直接回到 PLAY
+    /// （不经过 THINK）⇒ 再也没有人替她排计划、屏幕上永远没有意图。
+    /// 指定成 THINK 之后：晕完 → THINK → `PrepareTurn` 重新规划 ⇒ 一切照常。
+    /// </summary>
+    internal void ApplyPendingStunIfAny()
+    {
+        if (!PendingStun) return;
+        PendingStun = false;
+        try
+        {
+            var creature = Creature;
+            if (creature == null || !creature.IsAlive) return;
+            Logger.Log($"[CharBoss] {SafeEntryName()} 回合结束 ⇒ 补上回合内那次击晕（下一个回合不行动，之后回到正常规划）");
+            _ = MegaCrit.Sts2.Core.Commands.CreatureCmd.Stun(creature, ThinkStateId);
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 补击晕失败（忽略）: " + e.Message);
+        }
+    }
+
     internal bool Stunned
     {
         get
@@ -933,6 +991,10 @@ public abstract partial class CharBossMonster : MonsterModel
     /// </summary>
     private async Task PlayPlannedCards(IReadOnlyList<Creature> targets)
     {
+        // ★ v0.2.932（用户 2026-11-24）：标记「她正在执行自己的回合」——
+        //   `BossStunWhileExecutingPatch` 靠它把「回合内的击晕」（失衡那类：她打出的伤害被完全格挡
+        //   ⇒ 原版当场把她自己打晕）推迟到下一个回合，保证这一回合的牌照常打完。
+        TurnExecuting = this;
         try
         {
             await PlayPlannedCardsCoreAsync(targets);
@@ -945,6 +1007,12 @@ public abstract partial class CharBossMonster : MonsterModel
             {
                 Logger.Log("[CharBoss] ⚠ 她这一手整体抛异常（已吞掉，避免把原版的敌方回合任务打挂）: " + e);
             }
+        }
+        finally
+        {
+            if (ReferenceEquals(TurnExecuting, this)) TurnExecuting = null;
+            // 这回合的牌打完了 ⇒ 补上被推迟的那次击晕（下个回合不行动，之后回到正常规划）
+            if (PendingStun) ApplyPendingStunIfAny();
         }
     }
 

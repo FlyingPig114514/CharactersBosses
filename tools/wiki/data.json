@@ -1,6 +1,6 @@
 {
   "generatedFrom": "CharacterBosses.Impl113.dll",
-  "generatedAt": "2026-11-25 13:14",
+  "generatedAt": "2026-11-25 13:54",
   "cardNameMisses": [],
   "bosses": [
     {
@@ -4822,7 +4822,7 @@
           "specialKey": "FOOL_BOSS.fool",
           "special": "愚者\n愚者的卡组中只有 3 张[gold]神话形态[/gold]，杝主要靠塔罗牌战斗。\n每当你获得[gold]灾厄[/gold]时，若你有[gold]格挡[/gold]，[gold]格挡[/gold]会先抵消等量[gold]灾厄[/gold]（你已经拥有的[gold]灾厄[/gold]不受影响）。\n[red]警告：[/red]请在第12回合前击杀愚者，否则后果自负。",
           "specialDreadKey": "FOOL_BOSS.fool_dread",
-          "specialDread": "愚者\n愚者的卡组中只有 3 张[gold]神话形态[/gold]，杝主要靠塔罗牌战斗。\n每当你获得[gold]灾厄[/gold]时，若你有[gold]格挡[/gold]，[gold]格挡[/gold]会先抵消等量[gold]灾厄[/gold]（你已经拥有的[gold]灾厄[/gold]不受影响）。\n恐惧模式：杝打出的所有非无色牌都已升级，[gold]魔术师[/gold]改为生成 2 个闪电充能球和 1 个玻璃充能球，[gold]新生之喜[/gold]与[gold]教皇[/gold]会多印 1 张[gold]非凡技艺[/gold]。\n[red]警告：[/red]请在第12回合前击杀愚者，否则后果自负。",
+          "specialDread": "愚者\n愚者的卡组中只有 3 张[gold]神话形态[/gold]，杝主要靠塔罗牌战斗。\n每当你获得[gold]灾厄[/gold]时，若你有[gold]格挡[/gold]，[gold]格挡[/gold]会先抵消等量[gold]灾厄[/gold]（你已经拥有的[gold]灾厄[/gold]不受影响）。\n恐惧模式：杝打出的所有非无色牌都已升级。\n[red]警告：[/red]请在第12回合前击杀愚者，否则后果自负。",
           "deck": [
             "神话形态",
             "神话形态",
@@ -4898,7 +4898,7 @@
             "9: 金刚杵"
           ],
           "ascensionDisplay": [],
-          "info": "循环：10~16\n单体能力：极强\n群攻能力：强\n单体高压回合：7、9、12~16\n群体高压回合：5、12\n特殊效果类型：单体\n群体减益能力：强",
+          "info": "循环：10~16\n单体能力：极强\n群攻能力：强\n单体高压回合：3、5、7、9、12~16\n群体高压回合：4、12\n特殊效果类型：单体\n群体减益能力：强",
           "script": {
             "loopFrom": 10,
             "loopLength": 7,
@@ -4994,7 +4994,7 @@
                 ]
               },
               {
-                "note": "3. 女祭司、魔术师、月亮",
+                "note": "3. 女祭司、星星、月亮",
                 "energy": 3,
                 "shuffle": false,
                 "cards": [
@@ -5010,8 +5010,8 @@
                     "played": true
                   },
                   {
-                    "name": "魔术师",
-                    "type": "TheMagician",
+                    "name": "星星",
+                    "type": "TheStar",
                     "cost": 0,
                     "cardType": "Skill",
                     "DamageOverride": 0,
@@ -5035,7 +5035,7 @@
               },
               {
                 "note": "4. 战车、世界、皇后",
-                "energy": 6,
+                "energy": 9,
                 "shuffle": false,
                 "cards": [
                   {
@@ -5074,15 +5074,15 @@
                 ]
               },
               {
-                "note": "5. 力量、正义、恶魔",
-                "energy": 9,
+                "note": "5. 正义、女祭司、恶魔",
+                "energy": 12,
                 "shuffle": false,
                 "cards": [
                   {
-                    "name": "力量",
-                    "type": "Strength",
+                    "name": "正义",
+                    "type": "Justice",
                     "cost": 0,
-                    "cardType": "Skill",
+                    "cardType": "Attack",
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
@@ -5090,10 +5090,10 @@
                     "played": true
                   },
                   {
-                    "name": "正义",
-                    "type": "Justice",
+                    "name": "女祭司",
+                    "type": "TheHighPriestess",
                     "cost": 0,
-                    "cardType": "Attack",
+                    "cardType": "Skill",
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
@@ -5115,7 +5115,7 @@
               },
               {
                 "note": "6. 节制、魔术师（1 电 1 冰 1 玻璃）、命运之轮（无效果）",
-                "energy": 12,
+                "energy": 15,
                 "shuffle": false,
                 "cards": [
                   {
@@ -5155,7 +5155,7 @@
               },
               {
                 "note": "7. 死亡、力量、隐者（无效果）",
-                "energy": 15,
+                "energy": 18,
                 "shuffle": false,
                 "cards": [
                   {
@@ -5195,7 +5195,7 @@
               },
               {
                 "note": "8. 星星、星星、魔术师（1 电 1 冰 1 玻璃）",
-                "energy": 18,
+                "energy": 21,
                 "shuffle": false,
                 "cards": [
                   {
@@ -5235,7 +5235,7 @@
               },
               {
                 "note": "9. 皇帝、皇帝、恋人、被遗忘的仪式、鬼火、恶魔形态、群蛇形态、死神形态、回响形态、天人形态、永恒形态、新生之喜、黑暗镣铐、非凡技艺、应急按钮、虚空形态",
-                "energy": 27,
+                "energy": 30,
                 "shuffle": false,
                 "cards": [
                   {
@@ -5418,7 +5418,7 @@
               },
               {
                 "note": "10. 愚者（回响形态 ⇒ 打 2 次；按剧本顺序先打女祭司）、女祭司、魔术师",
-                "energy": 12,
+                "energy": 15,
                 "shuffle": false,
                 "cards": [
                   {
@@ -5458,7 +5458,7 @@
               },
               {
                 "note": "11. 女皇（2 次）、皇帝、教皇（印滚石/永恒铠甲/震荡波）、滚石、永恒铠甲、震荡波",
-                "energy": 15,
+                "energy": 18,
                 "shuffle": false,
                 "cards": [
                   {
@@ -5531,7 +5531,7 @@
               },
               {
                 "note": "12. 力量（2 次）、战车、恋人、精神过载 ×2、燃烧、灵动步法、创世之柱、血肉戏法、碎片整理、斋戒、斗殴、新生之喜、黑暗镣铐、应急按钮、神气制胜",
-                "energy": 13,
+                "energy": 16,
                 "shuffle": false,
                 "cards": [
                   {
@@ -5714,7 +5714,7 @@
               },
               {
                 "note": "13. 正义（2 次）、隐者（无效果）、命运之轮（无效果）",
-                "energy": 5,
+                "energy": 8,
                 "shuffle": false,
                 "cards": [
                   {
@@ -5754,7 +5754,7 @@
               },
               {
                 "note": "14. 节制（2 次）、倒吊人、死神 ⇒【倒吊人的额外回合】高塔（2 次）、星星、恶魔（无效果）",
-                "energy": 8,
+                "energy": 11,
                 "shuffle": false,
                 "cards": [
                   {
@@ -5827,7 +5827,7 @@
               },
               {
                 "note": "15. 星星（2 次）、太阳（无效果）、月亮（塞 10 把小刀）",
-                "energy": 14,
+                "energy": 17,
                 "shuffle": false,
                 "cards": [
                   {
@@ -5867,7 +5867,7 @@
               },
               {
                 "note": "16. 审判、世界、恶魔、煤灰 ×2（被消耗）",
-                "energy": 22,
+                "energy": 25,
                 "shuffle": false,
                 "cards": [
                   {

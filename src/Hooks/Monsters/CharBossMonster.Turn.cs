@@ -40,11 +40,23 @@ public abstract partial class CharBossMonster
         // 被晕时 vanilla 已经替我们跳过了她的出牌（`PerformMove` 跑的是 STUNNED 的空 Task，
         // `PlayPlannedCards` 根本不会进），所以这里什么都不做就是正确行为：
         // `Plan` / `PlanReady` / `TurnNumber` / 手牌 全部保持「被打断的那一回合」的样子。
+        // ★★ v0.2.932（用户 2026-11-24：「boss 因为失衡在回合内被击晕时，后续回合都没有意图」）：
+        //   这道闸门以前**无条件** return —— 而她可能在自己回合里被晕（失衡：她打出的伤害被完全格挡
+        //   ⇒ 原版当场给她自己上 STUNNED），那时这一回合的牌已经打光（`Plan.Count == 0`）
+        //   ⇒ 一份**空计划**被原样保留，屏幕上从此再没有意图。
+        //   现在只在「**真的有牌可补打**」时才保留；否则照常规划（她这一回合仍然会因为 STUNNED 不行动，
+        //   但下一回合就有正常意图了）。回合内那次击晕本身也已经由 `BossStunWhileExecutingPatch`
+        //   推迟到下一个回合，所以正常流程根本走不到「空计划」这一步。
         if (Stunned)
         {
-            Logger.Log($"[CharBoss] 击晕：跳过本回合的规划重建（待执行计划保留 {Plan.Count} 张，" +
-                       $"TurnNumber 停在 {TurnNumber}，PlanReady={PlanReady}）");
-            return;
+            if (Plan.Count > 0)
+            {
+                Logger.Log($"[CharBoss] 击晕：跳过本回合的规划重建（待执行计划保留 {Plan.Count} 张，" +
+                           $"TurnNumber 停在 {TurnNumber}，PlanReady={PlanReady}）");
+                return;
+            }
+            Logger.Log($"[CharBoss] 击晕：没有可补打的计划（Plan 空、PlanReady={PlanReady}）⇒ " +
+                       "照常规划，避免后续回合一直显示不出意图");
         }
 
         // ★ v0.2.848（用户 2026-11-21：「装了『小姐姐』之后，boss 第一回合的意图变成第七回合的」）

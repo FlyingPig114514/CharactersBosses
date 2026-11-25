@@ -17,7 +17,11 @@ public abstract partial class CharBossMonster
     /// <summary>这个怪物类对应的**原始**设计（5 个基类各自返回 <c>BossDefs.Xxx</c>）。</summary>
     public abstract BossDefinition DefSource { get; }
 
-    private BossDefinition? _defCache;
+    /// <summary>
+    /// `Def` 的缓存。★ v0.2.930：改名成可见字段，好让 `SpawnVariantKey` 的 setter 在
+    /// 「造怪时把设计身份钉上来」的那一刻把它清掉（否则会永久缓存成主设计）。
+    /// </summary>
+    internal BossDefinition? DefCache;
 
     /// <summary>
     /// 实际生效的设计。基类 = <see cref="DefSource"/> 本身（行为与以前完全一致）；
@@ -25,7 +29,29 @@ public abstract partial class CharBossMonster
     /// 这里给它一份只改 pin 的副本并缓存（定义是全局单例，不能就地改）。
     /// </summary>
     public BossDefinition Def
-        => _defCache ??= PinnedVariantKey is { Length: > 0 } key ? DefSource.WithVariantPin(key) : DefSource;
+        => DefCache ??= ResolveDef();
+
+    /// <summary>
+    /// ★★ v0.2.930（用户 2026-11-24：思维抽取从王储身上抽到仆从储的藏品）：
+    /// 设计身份**优先取这只 Boss 出生时钉下的 `SpawnVariantKey`**（= 本场遭遇），
+    /// 其次才是暴露类写死的 `PinnedVariantKey`，都没有就用主定义。
+    /// 这样「打的是哪套设计」和「遭遇 / 藏品 / 死亡提示 / 地图徽章」永远是同一个答案。
+    /// 钉的 Key 在本幕找不到对应变体时（= 钉的就是主设计本身）会自动退回主定义。
+    /// </summary>
+    private BossDefinition ResolveDef()
+    {
+        string? key = null;
+        try
+        {
+            key = PinnedVariantKey is { Length: > 0 } pin ? pin
+                : SpawnVariantKey is { Length: > 0 } spawn ? spawn
+                : null;
+        }
+        catch { key = null; }
+        if (key == null) return DefSource;
+        try { return DefSource.WithVariantPin(key); }
+        catch { return DefSource; }
+    }
 
     /// <summary>
     /// 本类钉死的**设计 Key**（`BossKeys.All` 里的那 29 个之一）；null = 按遭遇/种子正常判定。

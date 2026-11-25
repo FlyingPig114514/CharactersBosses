@@ -159,6 +159,8 @@ public static class BossSpecialPowerIconPatch
             // 恐惧模式「观者的支配」的两层仿制版（只在 113 构建里存在）
             else if (power is Powers.WatcherDominionDevotionPower) file = "watcher_devotion";   // 虔信
             else if (power is Powers.DominionMantraPower) file = "watcher_mantra";              // 真言
+            // ★ v0.2.934（用户 2026-11-24：「把神格 buff 的图标改成和真言相同」）
+            else if (power is Powers.DominionDivinityPower) file = "watcher_mantra";          // 神格（与真言同图标）
 #endif
 
             if (file == null) return null;
