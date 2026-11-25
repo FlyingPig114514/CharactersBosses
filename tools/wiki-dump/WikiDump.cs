@@ -359,7 +359,11 @@ internal static class WikiDump
         {
             // 先算出代码登记的卡组：剧本没标洗牌时要用「卡组张数 ÷ 每回合抽牌」推算首次洗牌回合
             var deck = TypeNames(ArrayAt(deckByAct, act));
-            var script = DumpScript(ArrayAt(scriptByAct, act), IntAt(energy, act), IntAt(handSize, act), deck.Count);
+            // ★ v0.2.939：塔罗愚的遗物登记在 `RelicsByAct[2]`（不是 `Relics`）⇒ 两处都要看
+            bool hasIceCream = false;
+            foreach (var rn in TypeNames(Prop<object>(def, "Relics"))) if (rn.IndexOf("IceCream", StringComparison.Ordinal) >= 0) hasIceCream = true;
+            foreach (var rn in TypeNames(ArrayAt(relicsByAct, act))) if (rn.IndexOf("IceCream", StringComparison.Ordinal) >= 0) hasIceCream = true;
+            var script = DumpScript(ArrayAt(scriptByAct, act), IntAt(energy, act), IntAt(handSize, act), deck.Count, hasIceCream);
             var variants = new List<object>();
             foreach (var v in CallEnumerable(def, "VariantsForAct", act))
             {
@@ -440,7 +444,9 @@ internal static class WikiDump
     }
     private static Dictionary<string, object> DumpVariant(object v, int actEnergy, int actHandSize)
     {
-        var script = DumpScript(Prop<object>(v, "Script"), actEnergy, actHandSize, TypeNames(Prop<object>(v, "Deck")).Count);
+        bool hasIceCream = false;
+        foreach (var rn in TypeNames(Prop<object>(v, "Relics"))) if (rn.IndexOf("IceCream", StringComparison.Ordinal) >= 0) hasIceCream = true;
+        var script = DumpScript(Prop<object>(v, "Script"), actEnergy, actHandSize, TypeNames(Prop<object>(v, "Deck")).Count, hasIceCream);
         return new Dictionary<string, object>
         {
             ["key"] = Prop<string>(v, "Key"),
@@ -465,12 +471,13 @@ internal static class WikiDump
         };
     }
 
-    private static Dictionary<string, object> DumpScript(object script, int actEnergy, int handSize, int registeredCount)
+    private static Dictionary<string, object> DumpScript(object script, int actEnergy, int handSize, int registeredCount, bool iceCream = false)
     {
         if (script == null) return null;
         var turns = new List<object>();
         int shuffleTurn = 0;      // 首次洗牌发生在第几回合（0 = 剧本里没标）
         var subroutine = new bool[1];   // 整份剧本共享：「子程序」是否已经打出来过
+        int carry = 0;            // 上一回合结转到这一回合的能量（冰激凌 / 星星）
         foreach (var turn in AsEnumerable(Prop<object>(script, "Turns")))
         {
             if (turn == null) continue;
@@ -503,9 +510,12 @@ internal static class WikiDump
             int turnEnergy = Prop<int>(turn, "Energy");
             bool forceZero = Prop<bool>(turn, "ForceZeroEnergy");
             int energy = forceZero ? 0 : (turnEnergy > 0 ? turnEnergy : actEnergy);
+            int carriedIn = carry;
+            energy += carriedIn;
 
             // 按「队列顺序 + 费用」走一遍，标出每张牌到底打不打得出
-            AnnotatePlayed(cards, energy, subroutine);
+            carry = 0;
+            AnnotatePlayed(cards, energy, subroutine, ref carry, iceCream, iceCream && turns.Count > 0);
 
             string noteText = Prop<string>(turn, "Note") ?? "";
             bool shuffles = Prop<bool>(turn, "ShuffleDrawPile")
@@ -689,9 +699,11 @@ internal static class WikiDump
             yield return card;
         }
     }
-    private static void AnnotatePlayed(List<object> cards, int energy, bool[] subroutine)
+    private static void AnnotatePlayed(List<object> cards, int energy, bool[] subroutine,
+                                       ref int carry, bool iceCream, bool ignoreEnergy = false)
     {
         int remaining = Math.Max(0, energy);
+        int nextTurn = 0;                 // 「星星」这类是**下回合**给能量
         bool broke = false;
         foreach (var o in cards)
         {
@@ -738,11 +750,14 @@ internal static class WikiDump
                 continue;
             }
 
-            if (broke || cost > remaining)
+            // ★ v0.2.939：以前这里一遇「没费」就 `broke = true` ⇒ **后面所有牌（哪怕是 0 费）全被标成没费**，
+            //   这就是用户说的「大量卡牌被错误标注成没费」。现在逐张判定，0 费牌照常算打得出。
+            //   `ignoreEnergy`（塔罗愚专用，见下）为真时干脆不判费用 —— 她的能量来自塔罗牌自己 + 冰激凌结转，
+            //   静态账算不准，用户口径是「除第 1 回合后两张神话形态，其余都打得出」。
+            if (!ignoreEnergy && cost > remaining)
             {
                 card["played"] = false;
                 card["reason"] = "没费";
-                broke = true;
                 continue;
             }
 
@@ -755,11 +770,25 @@ internal static class WikiDump
             //   会被错标成「没费」（疾风观第 3 回合的「心灵堡垒」就是这么被标错的，实测她打得出）。
             if (string.Equals(card["name"] as string, "奇迹", StringComparison.Ordinal)) remaining += 1;
 
+            // ★ v0.2.939（用户 2026-11-25：「wiki 中塔罗愚的意图有误，大量卡牌被错误标注成没费」）：
+            //   塔罗牌里有三张自己给能量，账要记上（否则后面所有牌都会被算成「没费」）：
+            //   · 皇帝 `TheEmperor` 打出时立刻 +3（升级 +4）；
+            //   · 太阳 `TheSun`   打出时立刻 +2（升级 +3）；
+            //   · 星星 `TheStar`  给的是**下回合** +3（升级 +4）⇒ 记进 nextTurn。
+            bool up = card.ContainsKey("Upgraded");
+            string nm2 = card["name"] as string ?? "";
+            if (string.Equals(nm2, "皇帝", StringComparison.Ordinal)) remaining += up ? 4 : 3;
+            else if (string.Equals(nm2, "太阳", StringComparison.Ordinal)) remaining += up ? 3 : 2;
+            else if (string.Equals(nm2, "星星", StringComparison.Ordinal)) nextTurn += up ? 4 : 3;
+
             // 「子程序」：每打出一张**能力牌** +1 能量（下一张牌用得上）——能力机那套的能量就靠它
             string ct = card.ContainsKey("cardType") ? Convert.ToString(card["cardType"]) : null;
             if (subroutine != null && subroutine.Length > 0 && subroutine[0] && ct == "Power") remaining += 1;
             if (string.Equals(card["name"] as string, "子程序", StringComparison.Ordinal) && subroutine != null) subroutine[0] = true;
         }
+
+        // 收尾：冰激凌（`IceCream`）把没花完的能量留到下一回合；「星星」的下回合能量也一起带上。
+        carry = nextTurn + (iceCream ? Math.Max(0, remaining) : 0);
     }
     /// <summary>
     /// 某只 Boss 在**某一幕**的进阶增强（升级牌 / 额外遗物），格式与变体那边一致：`"8: 缓冲"`。
