@@ -135,6 +135,59 @@ internal static class DreadMode
     {
         try
         {
+            // ★★ v0.2.948（2026-11-25 联机不同步，客人 mod_log 实证）：
+            //   客人侧 21:27:51 在**我们的 Boss 战**里给 4 只刚召唤出来的奥斯提挂了「恶魔形态」：
+            //     `铁甲战士的支配：给一只敌人挂恶魔形态失败: This creature has no form holder to put this form vfx`
+            //     `恐惧模式·铁甲战士的支配：后加入战斗的敌人补挂恶魔形态 ⇒ 失败（幂等检查后仍没有）`
+            //   而房主侧一行都没有（判定成功、正确地跳过了）⇒ 第 3 回合快照第一处不同就是
+            //   `E:OSTY=…[DEMON_FORM_POWER:1,…]`（客人有、房主没有）⇒ 恶魔形态每回合加力量 ⇒ 校验和分叉。
+            //
+            //   根因：`AfterEnemiesEnteredCombat` 拿到的是**刚创建的召唤物**，它身上的
+            //   `CombatState` / `RunState.CurrentRoom` 这时可能都还是 null（客人端更常见）
+            //   ⇒ 下面按生物逐个判 Boss 战会**判不出来** ⇒ 「不生效」被绕过。
+            //
+            //   现在先用**两端都有、且一定同步**的全局战斗状态判一次：
+            //     ① `CombatManager` 里的这一场战斗的 `Encounter.RoomType == Boss`；
+            //     ② 或者这场战斗里**有我们的角色 Boss**（`CharBossMonster`）—— 有它就是我们的 Boss 战。
+            //   这两条都不依赖「召唤物自己有没有 CombatState」，所以两端结论必然一致。
+            var combat = MegaCrit.Sts2.Core.Combat.CombatManager.Instance?.DebugOnlyGetState();
+            if (combat != null)
+            {
+                bool bossRoom = false;
+                try { bossRoom = combat.Encounter?.RoomType == MegaCrit.Sts2.Core.Rooms.RoomType.Boss; }
+                catch { bossRoom = false; }
+
+                bool hasOurBoss = false;
+                if (!bossRoom)
+                {
+                    try
+                    {
+                        var all = combat.Creatures;
+                        if (all != null)
+                        {
+                            for (int i = 0; i < all.Count; i++)
+                            {
+                                if (all[i]?.Monster is Monsters.CharBossMonster) { hasOurBoss = true; break; }
+                            }
+                        }
+                    }
+                    catch { hasOurBoss = false; }
+                }
+
+                if (bossRoom || hasOurBoss)
+                {
+                    try
+                    {
+                        if (_bossCombatLogged.Add(who))
+                            Logger.Log($"[CharBoss] 恐惧模式·{who}：这场战斗是 **Boss 战**" +
+                                       $"（{(bossRoom ? "CombatState.Encounter" : "场上有我们的角色 Boss")}）⇒ 不生效");
+                    }
+                    catch { /* 纯日志 */ }
+                    return true;
+                }
+            }
+
+            // 兜底：按这批生物自己的 CombatState 再判一次（全局拿不到时）
             if (creatures == null) return false;
             foreach (var c in creatures)
             {
@@ -256,17 +309,26 @@ public sealed class IroncladDominion : MegaCrit.Sts2.Core.Models.Dread.DominionM
             if (DreadMode.SkipBecauseCombatIsBoss(enemies, "铁甲战士的支配（发放时兜底）")) return;
 
             var targets = new List<Creature>();
-            int skippedBosses = 0, already = 0;
+            int skippedBosses = 0, already = 0, skippedMinions = 0;
             foreach (var c in enemies)
             {
                 if (c == null || !c.IsAlive) continue;
                 if (c.Side != CombatSide.Enemy) continue;
                 // ★ 用户 2026-11-19：Boss 不吃支配
                 if (c.Monster is Monsters.CharBossMonster) { skippedBosses++; continue; }
+                // ★★ v0.2.948：**爪牙（我们的召唤物）一律不挂**。
+                //   原版 `DemonFormPower` 应用时会去找「形态特效挂点」，爪牙没有 ⇒ 抛
+                //   `This creature has no form holder to put this form vfx`，
+                //   而 power 有时已经被塞进去了（半成功）⇒ 两端状态不一致的直接来源。
+                try { if (c.GetPower<MegaCrit.Sts2.Core.Models.Powers.MinionPower>() != null) { skippedMinions++; continue; } }
+                catch { /* 判不出来就按老路 */ }
                 // 幂等：进房那条路与「后加入」那条路都覆盖到同一只时不叠成 2 层
                 if (c.GetPower<MegaCrit.Sts2.Core.Models.Powers.DemonFormPower>() != null) { already++; continue; }
                 targets.Add(c);
             }
+
+            if (skippedMinions > 0)
+                Logger.Log($"[CharBoss] 恐惧模式·铁甲战士的支配（{why}）：跳过 {skippedMinions} 只爪牙（召唤物挂不了形态特效）");
 
             if (skippedBosses > 0)
                 Logger.Log($"[CharBoss] 恐惧模式·铁甲战士的支配：跳过 {skippedBosses} 只角色 Boss（Boss 不受支配影响）");
@@ -304,6 +366,9 @@ public sealed class IroncladDominion : MegaCrit.Sts2.Core.Models.Dread.DominionM
             if (c == null || !c.IsAlive) return false;
             if (c.Side != CombatSide.Enemy) return false;
             if (c.Monster is Monsters.CharBossMonster) return false;
+            // ★★ v0.2.948：爪牙不挂（原版形态特效找不到挂点会抛异常，而且可能「半成功」）
+            try { if (c.GetPower<MegaCrit.Sts2.Core.Models.Powers.MinionPower>() != null) return false; }
+            catch { /* 按老路 */ }
             if (c.GetPower<MegaCrit.Sts2.Core.Models.Powers.DemonFormPower>() != null) return true;
 
             await MegaCrit.Sts2.Core.Commands.PowerCmd.Apply<MegaCrit.Sts2.Core.Models.Powers.DemonFormPower>(

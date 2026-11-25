@@ -45,6 +45,14 @@ public sealed partial class DeviationPower : PowerModel
     // 图标由本地化资源决定（原版按 model id 找贴图）；我们自己的状态栏图标另外走 BossSpecialChip。
 
     /// <summary>效果 1：玩家打出能力牌 → Boss +1 集中（随后力量会同步）。</summary>
+    ///
+    /// ★★ v0.2.944（用户 2026-11-25：「削弱能力机」）—— **两种模式从此完全不同**：
+    ///   · **恐惧模式** = 原来普通模式那一套：每打出 1 张**非衍生的**能力牌 ⇒ 她 +1 集中。
+    ///     取消 v0.2.6xx 的两条恐惧加强（衍生牌也算、免疫「偏差认知」）。
+    ///   · **普通模式** = 新效果：你在**一回合内打出过能力牌** ⇒ 她**当回合的「偏差认知」不生效**
+    ///     （她回合开始不扣集中 —— 拦截在 `Patches/BiasedCognitionShieldPatch`；
+    ///      当回合的伤害预览也要把那笔「会掉集中」的修正去掉 —— 见 `BossIntentBuilder.PendingDrop`）。
+    ///   两种模式都保留「力量与集中数值始终相等」（那部分在 `DeviationPower.Mirror.cs`）。
     public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
         try
@@ -56,41 +64,33 @@ public sealed partial class DeviationPower : PowerModel
             if (card == null || card.Type != CardType.Power) return;
             if (card.Owner?.Creature == owner) return;   // Boss 自己打的能力牌不算
 
-            // ★ v0.2.249（用户 2026-10-30）：**衍生的能力牌不算**。
-            //   用户原话：「你每打出 1 张**非衍生的**能力牌……」；衍生牌不止觉醒者的
-            //   祭仪 `Ceremony` / 火热研究 `BurningStudy`，还包括**收藏家的藏品牌**、
-            //   异蛇的蛇之精髓 `ViperEssence` 等等（原版也有君王之剑之类的衍生牌，
-            //   但似乎没有「衍生的能力牌」，所以这条对原版等于无影响）。
-            //
-            //   判定优先用原版自己的稀有度 **`CardRarity.Token`** —— 那就是「衍生牌」：
-            //   反编译确认 `Snecko...Cards.Token.ViperEssence` 构造里就是 `(CardRarity)7` = Token，
-            //   崩坠那批 `*.Cards.Token.*` 同理；再叠两条保险：
-            //     · 模型命名空间里带 `.Token`（有些模组会漏填稀有度）；
-            //     · 所在卡池是 `*Collectible*` 之类（收藏家藏品牌）。
-            //
-            // ★ 2026-11-13（恐惧模式「偏差认知」）：用户 PS 原文
-            //   「并且现在即使打出的是**衍生能力**，也会为它增加集中」
-            //   ⇒ 恐惧模式下**跳过**这道衍生牌闸门（正常模式仍然不算）。
-            if (IsDerivedCard(card) && !Core.DreadMode.IsActive)
+            // **对应型**（多人）：只有「锁定这只 Boss」的真人玩家打出的能力牌才算
+            // （单人时 SpecialEffectAppliesTo 恒为 true，行为不变）。
+            if (!Core.BossLockOn.SpecialEffectAppliesTo(owner.Monster as CharBossMonster, card.Owner)) return;
+
+            // ── 普通模式（v0.2.944 新效果）：不再白拿集中，改成「这一回合她的偏差认知失效」 ──
+            if (!Core.DreadMode.IsActive)
+            {
+                _biasShieldArmed = true;
+                Logger.Log($"[CharBoss] 偏差认知（普通模式）：你打出了能力牌 {SafeEntry(card)} ⇒ " +
+                           "她**当回合的「偏差认知」不生效**（她回合开始不扣集中，伤害预览也不再减这一笔）");
+                // 她身上那笔「回合开始要掉 N 点集中」的预补要立刻撤掉（意图是按「已经掉过」算的）
+                try { if (owner.Monster is CharBossMonster armed) armed.IntentsDirty = true; } catch { /* 纯显示 */ }
+                return;
+            }
+
+            // ── 恐惧模式：与「以前的普通模式」相同 —— 只有**非衍生的**能力牌才给集中 ──
+            // 判定见 IsDerivedCard（原版稀有度 Token / 命名空间 .Token / 卡池 Token·Collectible）。
+            if (IsDerivedCard(card))
             {
                 string entry = SafeEntry(card);
                 if (DerivedLogged.Add(entry))
                 {
                     Logger.Log($"[CharBoss] 偏差认知：{entry} 是**衍生牌** ⇒ 不给 Boss 集中" +
-                               "（衍生牌不算「非衍生的能力牌」）");
+                               "（衍生牌不算「非衍生的能力牌」；恐惧模式也一样）");
                 }
                 return;
             }
-
-            // ⚠ 用户 2026-10-29：**取消**对崩坠「觉醒者」两张衍生能力牌
-            // （祭仪 `Ceremony` / 火热研究 `BurningStudy`）的特判 ——
-            // 也就是说现在**任何**能力牌都算（描述已改成「你每打出一张能力牌…」）。
-            // 历史原因见 git 之外的 STATUS v0.2.189 一节：那两张本质是「加力量」的产物，
-            // 早先怕白送 Boss 集中所以豁免；用户评估后决定不再例外。
-
-            // **对应型**（多人）：只有「锁定这只 Boss」的真人玩家打出的能力牌才算
-            // （单人时 SpecialEffectAppliesTo 恒为 true，行为不变）。
-            if (!Core.BossLockOn.SpecialEffectAppliesTo(owner.Monster as CharBossMonster, card.Owner)) return;
 
             Logger.Log($"[CharBoss] 偏差认知：玩家打出能力牌 {card.Id.Entry} → Boss +1 集中");
             await PowerCmd.Apply<FocusPower>(choiceContext, owner, 1m, owner, null, false);
@@ -102,33 +102,44 @@ public sealed partial class DeviationPower : PowerModel
         }
     }
 
-    /// <summary>2026-11-13（恐惧模式）：她**免疫「偏差认知」**——任何来源给她的那层都立刻移除。</summary>
-    private async Task StripBiasedCognitionDread(Creature owner)
+    /// <summary>
+    /// 普通模式：她这一回合的「偏差认知」是否**已被玩家的能力牌挡掉**。
+    /// 由 `Patches/BiasedCognitionShieldPatch` 在她回合开始时消费（消费掉就恢复正常衰减）。
+    /// </summary>
+    private bool _biasShieldArmed;
+
+    /// <summary>预览侧用：这一回合的偏差认知是不是不会生效（恐惧模式恒 false —— 那一版没有这个机制）。</summary>
+    internal static bool BiasShieldArmed(Creature? owner)
     {
         try
         {
-            if (!Core.DreadMode.IsActive || owner == null) return;
-            var biased = owner.GetPower<MegaCrit.Sts2.Core.Models.Powers.BiasedCognitionPower>();
-            if (biased == null) return;
-            Logger.Log("[CharBoss] 偏差认知（恐惧模式）：她免疫「偏差认知」⇒ 立刻移除那层");
-            await PowerCmd.Remove(biased);
+            var power = owner?.GetPower<DeviationPower>();
+            return power != null && power._biasShieldArmed && !Core.DreadMode.IsActive;
         }
-        catch (System.Exception e)
-        {
-            Logger.Log("[CharBoss] 免疫偏差认知失败: " + e.Message);
-        }
+        catch { return false; }
     }
+
+    /// <summary>她回合开始时消费一次：返回 true = 这一次的「偏差认知」扣集中被跳过。</summary>
+    internal bool TryConsumeBiasShield()
+    {
+        if (Core.DreadMode.IsActive) return false;
+        if (!_biasShieldArmed) return false;
+        _biasShieldArmed = false;
+        return true;
+    }
+
     public override async Task AfterSideTurnStart(CombatSide side, IReadOnlyList<Creature> participants,
                                                   ICombatState combatState)
     {
-        await StripBiasedCognitionDread(Owner);
+        // 新的一轮开始（玩家侧回合开始）⇒ 上一轮那个「挡掉偏差认知」的标记作废
+        //（正常情况下它已经在她回合开始被消费掉了；这里只是防止她身上没有那层 power 时残留）
+        if (side == CombatSide.Player) _biasShieldArmed = false;
         await ReconcileAsync(null);
     }
 
     public override async Task BeforeSideTurnEnd(PlayerChoiceContext choiceContext, CombatSide side,
                                                  IEnumerable<Creature> participants)
     {
-        await StripBiasedCognitionDread(Owner);
         await ReconcileAsync(choiceContext);
     }
 

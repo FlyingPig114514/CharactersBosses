@@ -173,6 +173,50 @@ internal static class BossPicksSync
         {
             if (raw <= 0) return _stableLive > 0 ? _stableLive : raw;
 
+            // ★★ v0.2.949（2026-11-25 用户「联机时敌方只有 3 个人，我们 4 个」，房主 `mod_log (67)`）：
+            //   日志实证 `[22:01:20] 第 3 层第 2 场阵容：（3 人局…）[3 只 Boss]`，
+            //   而同一秒的 `跟踪锁定：… 存活 4 人`、以及 `[22:18:41] 阵容人数：4 人已连续稳定 5 秒 ⇒ 确认为 4 人`
+            //   ⇒ **人数被冻在上一场的 3 上十几分钟**，于是这一场只造了 3 只 Boss（4 打 3）。
+            //
+            //   根因：下面那条「战斗中不改人数」的闸门是**全局**的 —— 而 Boss 阵容恰恰是在
+            //   **战斗开始流程里**算的（`CombatManager.IsInProgress` 那时已经是 true），
+            //   于是「这一场该造几只」永远拿不到新鲜人数，只能用上一场冻住的旧值。
+            //
+            //   改成**按战斗实例锁定**：同一场战斗内人数不变（避免中途抖动），
+            //   但**新的一场从它自己的第一次取值开始**（那一次直接采信原始人数，不再被旧值卡住）。
+            bool inCombat = false;
+            try { inCombat = MegaCrit.Sts2.Core.Combat.CombatManager.Instance?.IsInProgress ?? false; }
+            catch { inCombat = false; }
+
+            if (inCombat)
+            {
+                object? token = null;
+                try { token = Core.BossKillerTracker.CombatToken; } catch { token = null; }
+
+                if (token != null && ReferenceEquals(token, _lockedToken) && _lockedCount > 0)
+                    return _lockedCount;                       // 本场已经锁过 ⇒ 中途一律不变
+
+                // 本场的**第一次**取值：直接采信（战斗刚开，两端都还没造阵容）
+                if (token != null)
+                {
+                    _lockedToken = token;
+                    _lockedCount = raw;
+                    int prev = _stableLive;
+                    _stableLive = raw;
+                    _pendingLive = raw;
+                    _pendingSince = DateTime.UtcNow;
+                    if (prev != raw)
+                    {
+                        Logger.Log($"[CharBoss] 阵容人数：本场第一次取值 = {raw} 人 ⇒ 锁定为 {raw} 人" +
+                                   $"（上一场是 {prev} 人；以前这里是全局冻结 ⇒ 会用旧值造少一只 Boss）");
+                    }
+                    return raw;
+                }
+
+                // 拿不到战斗标识 ⇒ 退回老行为（战斗中不改）
+                if (_stableLive > 0) return _stableLive;
+            }
+
             // 第一次拿到数 ⇒ 直接认（不拖延开局）
             if (_stableLive <= 0)
             {
@@ -198,20 +242,18 @@ internal static class BossPicksSync
             }
             if ((DateTime.UtcNow - _pendingSince).TotalSeconds < LiveStableSeconds) return _stableLive;
 
-            // ★ 战斗中不改（阵容已经造好，改人数只会两端分叉）
-            bool inCombat = false;
-            try { inCombat = MegaCrit.Sts2.Core.Combat.CombatManager.Instance?.IsInProgress ?? false; }
-            catch { inCombat = false; }
-            if (inCombat) return _stableLive;
-
             int before = _stableLive;
             _stableLive = raw;
             Logger.Log($"[CharBoss] 阵容人数：{raw} 人已连续稳定 {LiveStableSeconds:0} 秒 ⇒ 确认为 {raw} 人" +
-                       $"（此前 {before} 人；战斗中锁定的那几次不算）");
+                       $"（此前 {before} 人）");
             return _stableLive;
         }
         catch { return raw; }
     }
+
+    /// <summary>本场战斗锁定的阵容人数，以及「是哪一场」（`BossKillerTracker.CombatToken`）。</summary>
+    private static int _lockedCount = -1;
+    private static object? _lockedToken;
 
     /// <summary>
     /// 对外入口：原始判定 + 上面那两道闸门（**战斗中锁定 / 稳定 5 秒才认**）。

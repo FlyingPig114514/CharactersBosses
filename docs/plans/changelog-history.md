@@ -4,6 +4,249 @@
 > 旧条目逐字来自 `git show HEAD:src/Hooks/Core/BuildInfo.cs` 的 Tag 常量（v0.2.871 及其之前，共 236 条）。
 > 最新版本（0.2.889）是当前 Tag，同时在各条 `workshop/changenote.txt` 里也有面向玩家的摘要。
 
+## v0.2.950（2026-11-25）：多人三条（覆甲被人数加成 / 刀扇·万象斩预览不算群攻 / 仆从捐躯不召唤）
+
+### ① 有护喉甲的 Boss 覆甲层数被人数加成（已修）
+
+`PlatingPower` 与 `SlipperyPower` 各有**两个** `GetScaledAmountForMultiplayer`
+（实例版 `(ICombatState, Creature, decimal, Creature, CardModel)` 与静态版 `(int, decimal)`）。
+`BossNoScalePlatingPatch` / `BossNoScaleSlipperyPatch` 以前只写 `nameof(...)` ⇒ Harmony 报
+`Ambiguous match` ⇒ **整个补丁类挂载失败**（每次启动的日志里都有那行「挂载失败」），
+于是覆甲照样按人数翻倍：2 人局护喉甲的 4 层变成 `((2-1)*2+1)*4 = 12` 层。
+现在显式指定参数类型，收窄到**实例版**。
+
+### ② 刀扇 / 万象斩的伤害预览不算群攻（已修）
+
+`IsAoE(card)` 以前只认 `TargetType.AllEnemies`，而这两张都是「**单体牌但实际打全体**」：
+
+- **万象斩**（`Omnislice`）反编译 `OnPlay`：先对目标造成伤害，再把
+  `damageResult.TotalDamage + OverkillDamage`（**实际打出的那个数**，含目标身上的易伤/力量/虚弱）
+  原样溅射给目标的**所有队友**。用户口径：「万象斩的群攻不是一般的群攻，只要目标有易伤，
+  对其他目标也要显示有易伤的伤害」——`IsAoE` 返回 true 后，各端显示的数字正是
+  `FinalDamage(card, base, 计划目标)` 那一份，天然满足。
+- **刀扇**（`FanOfKnives`）之后的小刀：`FanOfKnivesPower` 让小刀改打全体，但以前只在
+  「生成刀的牌」那条支路判了 `ShivsHitAll`，**真正打出去的小刀卡**没判 ⇒ 非锁定玩家看到 0。
+
+### ③ 仆从储不召唤「捐躯仆从」（未改行为，加了诊断）
+
+按当前规则这是**正常**的：「仆从数达到上限就不再召唤，改为原版效果」，
+上限是**普通 2 / 恐惧 1**（恐惧版口径是用户 2026-11-13 定的），
+而第 1 回合「仆从打击」、第 3 回合「仆从俯冲×2」很早就把位置占满
+⇒ 第 5 回合「仆从捐躯×3」通常只结算格挡，永远看不到捐躯仆从。
+这一版把「为什么没召唤（当前几只 / 上限几只）」写进日志，等用户确认期望后再改规则。
+
+三个目标（111 / 113 / 111+PhoneBuild）**全部 0 错误**，已装机（verify-deploy 报 v0.2.950 OK）。
+
+## v0.2.949（2026-11-25）：修「4 人联机只有 3 只 Boss」——阵容人数不再被上一场冻住
+
+用户：「刚刚联机的时候敌方只有 3 个人（我们有 4 个）」。房主 `mod_log (67)` 实证：
+
+```
+[22:01:20] 第 3 层第 2 场阵容：（3 人局，进阶 10，种子 …，指纹 B2600D34）[3 只 Boss]
+[22:01:22] 跟踪锁定：SILENT_BOSS → Silent（多人局=True，**存活 4 人**）        ← 同一秒明明是 4 个人
+[22:01:22] 阵容人数变成 3 人 ⇒ 房主立即重播勾选 / 玩法设置（含 pc=3），客人按同一个数排阵容
+[22:18:41] 阵容人数：4 人已连续稳定 5 秒 ⇒ 确认为 4 人（此前 3 人；战斗中锁定的那几次不算）
+```
+
+也就是**人数被冻在上一场的 3 上将近 18 分钟**，这一场只造了 3 只 Boss ⇒ 4 打 3。
+
+根因：`BossPicksSync.GateLive` 里「战斗中一律锁定人数」那条闸门是**全局**的；
+而 Boss 阵容恰恰是在**战斗开始流程**里算的（那时 `CombatManager.IsInProgress` 已经是 true）
+⇒ 「这一场该造几只」永远拿不到新鲜人数，只能用上一场冻住的旧值。
+
+改法：**按战斗实例锁定**（用 `BossKillerTracker.CombatToken` 当这一场的标识）：
+
+- 同一场战斗内人数一律不变（中途有人退也不改，避免两端分叉）；
+- **新的一场从它自己的第一次取值开始直接采信原始人数**，并打一行
+  `阵容人数：本场第一次取值 = N 人 ⇒ 锁定为 N 人（上一场是 M 人）` 便于核对；
+- 拿不到战斗标识时退回老行为（战斗中不改 + 5 秒去抖）。
+
+三个目标（111 / 113 / 111+PhoneBuild）**全部 0 错误**，已装机（verify-deploy 报 v0.2.949 OK）。
+
+## v0.2.948（2026-11-25）：联机不同步真凶 —— 客人端在 Boss 战里给召唤的奥斯提挂了「恶魔形态」
+
+用户又给了两台机器的日志（本机是客机）。两份摘要（21:27:58 / 21:28:00，都是轮次 3，
+`NECROBINDER_ERADICATE_BOSS_ENCOUNTER` 4 人局）**逐字 diff 只剩一处**：
+
+```
+客人: E:OSTY=7/7+0[DEMON_FORM_POWER:1,DIE_FOR_YOU_POWER:1,MINION_POWER:1]  ×4
+房主: E:OSTY=7/7+0[DIE_FOR_YOU_POWER:1,MINION_POWER:1]                      ×4
+```
+
+即 **客人侧 4 只奥斯提身上多了一层「恶魔形态」**，房主侧一只都没有。恶魔形态每回合加力量 ⇒ 后面所有伤害都不同 ⇒ 校验和分叉。
+（同一对摘要里其余全部一致：4 只 Boss 的 HP/格挡/牌堆、4 名玩家牌堆/能量/星、锁定分配、快照 #1~#4 逐字相同。）
+
+客人日志实证：
+
+```
+[21:27:51] 铁甲战士的支配：给一只敌人挂恶魔形态失败: This creature has no form holder to put this form vfx
+[21:27:51] 恐惧模式·铁甲战士的支配：后加入战斗的敌人补挂恶魔形态 ⇒ 失败（幂等检查后仍没有）   ×3
+[21:27:55] 铁甲战士的支配：奥斯提 的恶魔形态在**玩家回合开始**加力量（1 层）                ×4
+```
+
+房主侧一行都没有（正确地判成 Boss 战、跳过了）。根因：`IroncladDominion`（恐惧模式支配）
+的 `AfterEnemiesEnteredCombat` 拿到的是**刚创建的召唤物**，它身上的 `CombatState` /
+`RunState.CurrentRoom` 这时候可能都还是 null（客人端更常见）⇒
+`SkipBecauseCombatIsBoss` 按生物逐个判「是不是 Boss 战」判不出来 ⇒「Boss 战不生效」被绕过；
+再加上原版 `DemonFormPower` 应用时要找「形态特效挂点」，爪牙没有 ⇒ 抛异常、还可能**半成功**
+（power 已经塞进去、日志却写失败）。
+
+改动：
+
+1. `DreadMode.SkipBecauseCombatIsBoss` 改成**先用两端同步的全局战斗状态判**：
+   `CombatManager` 里这一场的 `Encounter.RoomType == Boss`，或者**场上存在我们的
+   `CharBossMonster`** ⇒ 任一成立就判定为 Boss 战并跳过（不再依赖「召唤物自己有没有 CombatState」）。
+   原来按生物逐个判的那条保留作兜底。
+2. `IroncladDominion.GiveDemonFormAsync` / `ApplyOneAsync` 一律**跳过爪牙（`MinionPower`）**：
+   召唤物挂不了形态特效（会抛 `has no form holder`），跳过既避免异常、也杜绝「半成功」。
+
+三个目标（111 / 113 / 111+PhoneBuild）**全部 0 错误**，已装机（verify-deploy 报 v0.2.948 OK）。
+
+## v0.2.947（2026-11-25）：两份联机日志逐行比对 → 分叉点锁定「炼药猎的失去生命次数」
+
+用户给了**两台机器**各一份日志（`godot (41)/(42).log` + `mod_log (63)/(64).txt`）。
+v0.2.946 的新摘要（带原版分叉点 + 单独落盘）立刻见效 —— 同一秒（20:07:40）、同一场
+`DEFECT_AI_BOSS_ENCOUNTER`（4 人局第 3 层，阵容指纹两端一致 `03498C82/6393FF65`）的两份摘要**逐字比对只剩一行不同**：
+
+| 项 | 房主（63） | 客人（64） |
+|---|---|---|
+| `Boss SILENT_BOSS` HP | **499**/550 | **536**/550 |
+| 其余（4 只 Boss 的格挡/牌堆/计划、4 名玩家的手/抽/弃/耗/能量/星、锁定分配、快照 #1~#3） | 完全一致 | 完全一致 |
+
+再对上各自的日志：**房主多了一条**
+
+```
+[20:07:39] 炼药猎：格挡挡下 12.5 点「失去生命」（还剩 0.0 点直接扣血，格挡余 13）   ← 两端都有
+[20:07:40] 炼药猎：格挡挡下 13 点「失去生命」（还剩 11.5 点直接扣血，格挡余 0）     ← 只有房主有
+```
+
+⇒ 分叉点 = **炼药猎（`SILENT_BOSS`）的「失去生命」结算次数两端不同**（客人侧 20:07:41 直接把这场按「战斗中断」收掉）。
+**与加速模组无关**：同一动作在一端结算两次、另一端一次，不是时间流速错位。
+（顺带确认两端 `CharacterBosses` 都是 0.2.946、握手 `Hash: 930113629` 一致；房主本地版覆盖了工坊的 0.2.918。）
+
+改动（`Patches/BrewerBossBlockableHpLossPatch.cs`）：
+
+1. **跳过 `dryRun`**：0.114 的签名是 `LoseHpInternal(decimal amount, bool dryRun)`，
+   `dryRun = true` 是「只问一下会掉多少」的预测调用 —— 原版不动任何状态，而我们以前在这里**真的扣了格挡**。
+2. 同一条日志补**调用者三层栈**（跳过 Harmony 帧）⇒ 下次复现能直接看出「是同一个效果被结算两次，
+   还是两个不同来源各来一次」。
+3. `IsBrewerBoss` 的兜底判据③（按遭遇认人）**必须同时带着「调制」那层 power**：
+   以前只看遭遇 ⇒ 4 人局里同一场遭遇下的**其它 Boss** 也会被当成炼药猎、格挡也能吃「失去生命」，
+   既不符合「只改她」的口径，也会随两端遭遇解析不同而产生差异。
+
+三个目标（111 / 113 / 111+PhoneBuild）**全部 0 错误**，已装机（verify-deploy 报 v0.2.947 OK）。
+
+## v0.2.946（2026-11-25）：联机不同步诊断升级（摘要带原版分叉点 + 单独落盘）
+
+用户报「和朋友联机发生了 2 次不同步」，只给了**房主**的 `godot (40).log` 与 `mod_log (62).txt`。
+从房主日志能确定的只有：
+
+| | 时间（godot 里是 UTC，mod_log 是本地 UTC+8） | 分叉上下文 | 校验和 |
+|---|---|---|---|
+| 第 1 次 | 11:41:50Z / 19:41:50 | `finished action execution PlayCardAction card: CARD.FISTICUFFS index 217 targetid 5`（玩家 `76561199074363039` 用**拳斗**打**故障机器人**，结算完立刻分叉） | `Local: 1666027031 / Remote: 722295827`（对端 `76561198830124068`） |
+| 第 2 次 | 11:42:48Z / 19:42:48 | `After player turn start`（校验和 **ID 0**），同一刻房主正在跑 `GenericHookGameAction … RELIC.TOASTY_MITTENS`（烘焙手套）的**选牌** | `Local: 927910809 / Remote: 3060939235`（对端 `76561199074363039`） |
+
+`11:42:20Z` 还有一条 `Disconnecting peer 76561199832429423, reason: StateDivergence`（第 1 次之后有人被踢）。
+我们自己的 `不同步状态摘要` 当次确实打出来了（19:41:50，`轮次 4`，遭遇 `FOOL_TAROT_BOSS_ENCOUNTER`，
+第 3 层 4 人阵容、场上 Boss `DEFECT_BOSS/IRONCLAD_BOSS/FOOL_BOSS`），但**只有本机一侧**，
+没法逐行对齐 ⇒ 这一版先把诊断做成一发即中：
+
+1. `DivergenceStateProbe` 的 Prefix 改成收 `object[] __args`，把原版 `LogStateDivergence` 收到的
+   `Context / Local / Remote / 客户端 id` 一起写进摘要（**以前这一行只写在 `godot.log` 里**，
+   玩家往往只发 `mod_log`，于是最关键的一行永远拿不到）。
+2. 摘要同时**追加写一份独立小文件**：
+   `%APPDATA%/SlayTheSpire2/logs/characterbosses_desync.txt`（带时间戳与「客人/房主」标记）。
+   联机一晚的 `mod_log.txt` 能到 90 MB，让朋友发这个小文件即可；**两端各发一份**就能逐行 diff，
+   按摘要里「最近回合快照」那一节找第一处不同。
+
+三个目标（111 / 113 / 111+PhoneBuild）**全部 0 错误**，已装机（verify-deploy 报 v0.2.946 OK）。
+
+## v0.2.945（2026-11-25）：塔罗愚再削弱（第 3 回合 月亮 → 正义）
+
+用户口径：「削弱塔罗愚，第三回合的月亮替换为正义」。
+
+- `src\Hooks\Core\TarotFoolScript.cs` 第 3 回合：「女祭司、星星、~~月亮~~」→ **「女祭司、星星、正义」**
+  （这一回合至此换过两次牌：魔术师 → 星星，再把月亮换掉）。
+- 同步：`tools\wiki\i18n-en.json`（`3. 女祭司、星星、正义` → `3. The High Priestess, The Star, Justice`）、
+  `docs\plans\boss-fool-tarot.md` 的 16 回合表；
+  `tools\wiki\data.json` 与 `docs\wiki\boss-table(.en).md` / `index.html` / `docs\bosses.md` / xlsx 已重新生成并核对。
+
+三个目标（111 / 113 / 111+PhoneBuild）**全部 0 错误**，已装机（verify-deploy 报 v0.2.945 OK）。
+
+## v0.2.944（2026-11-25）：削弱能力机（两种模式的「偏差认知」重新分工）
+
+用户口径：
+
+> 削弱能力机，它恐惧模式下的特殊效果改成与现在普通的相同，普通模式的特殊效果改为：
+> 如果你在一回合打出一张能力牌，故障机器人当回合的偏差认知不会生效。（警告保留）
+> PS：即那个回合开始时故障机器人不会扣集中，所以如果触发了的话，当回合要把偏差认知的那个伤害预览修正给去掉。
+
+确认过的边界（用户选「①删掉、②保留」）：普通模式**不再**靠玩家打能力牌白拿集中，
+但**保留**「它的力量与集中数值始终相等」。
+
+| | 改之前 | 现在 |
+|---|---|---|
+| **普通模式** | 每打出 1 张**非衍生**能力牌 ⇒ 她 +1 集中（力量同步） | 在一回合里打出过能力牌 ⇒ **她当回合的「偏差认知」不生效**（回合开始不扣集中）；力量=集中照旧 |
+| **恐惧模式** | 任何能力牌都算 +1 集中，且**免疫**「偏差认知」 | **与「改之前的普通模式」相同**（只有非衍生能力牌 +1 集中、不再免疫） |
+
+落地：
+
+1. `Powers/DeviationPower.AfterCardPlayed` 按模式分叉：恐惧模式走老逻辑（衍生牌闸门恢复对两种模式都生效），
+   普通模式置 `_biasShieldArmed` 并把该 Boss 的 `IntentsDirty` 打上（下一帧按「不会掉集中」重算意图）。
+2. **新增 `Patches/BiasedCognitionShieldPatch`**：前缀拦原版
+   `BiasedCognitionPower.AfterSideTurnStart`（反编译：持有者自己那一侧回合开始时
+   `PowerCmd.Apply<FocusPower>(owner, -Amount)`），命中 shield 就整段跳过（不掉集中、不 Flash）并消费标记；
+   恐惧模式直接放行（那一版没有这个机制）。
+3. `BossIntentBuilder.PendingDrop` 在 shield 挂着时返回 **0** ⇒ 意图/薄荷尖塔不再预扣那 N 点集中
+   （= 用户 PS 里的「当回合把偏差认知的那个伤害预览修正去掉」）。三种重算路径
+   （规划期 / `BladesGrowth` / 有球 Boss 的 `RefreshPlannedIntents`）共用这一个出口。
+4. 删掉 `StripBiasedCognitionDread`（恐惧模式的「免疫偏差认知」）。
+5. 16 语言 × 2 处文案（`DEFECT_BOSS.special(_dread)` 与 `DEVIATION_POWER.description(_dread)`）全部改写：
+   恐惧版**逐字沿用旧的普通文本**；普通版只换效果句（「力量=集中相等」与警告原样保留）。
+   32 个 JSON 全部 `ConvertFrom-Json` 通过；百科（`data.json` / `boss-table(.en).md` / `index.html` / `bosses.md` / xlsx）已重新生成。
+
+三个目标（111 / 113 / 111+PhoneBuild）**全部 0 错误**，已装机（verify-deploy 报 v0.2.944 OK）。
+
+## v0.2.943（2026-11-25）：修「没装观者却遇到观者 boss」（旧档里的观者遭遇 + 观者的支配）
+
+玩家反馈（截图：恐惧模式普通房间的工具箱里写着「观者的支配」，3 只史莱姆各拿 2 层虔信）：
+**观者模组已经卸掉了，却还在被观者的支配影响**。
+
+日志证据（同一局，`mod_log.txt`）：
+
+```
+[14:08:26] Boss 替换判定：模式=Dread · 第 1 幕 · 结果=NECROBINDER_FLESH_BOSS_ENCOUNTER
+           · 存档槽=WATCHER_FLURRY_BOSS_ENCOUNTER（是我们=True）      ← 槽里还是观者
+[14:08:27] 地图徽章：WATCHER_FLURRY_BOSS_ENCOUNTER 生成角色剪影失败（角色=null）⇒ 保持原版占位图
+[14:09:06] 恐惧模式·观者的支配（进房时）：3 个敌人各获得 2 层虔信
+[14:09:07] 观者的支配·虔信：树枝史莱姆（小）/树叶史莱姆（中）/树叶史莱姆（小） 真言 +2
+```
+
+**根因两条**（都是「存档里已经落盘的东西没人再管」）：
+
+1. `BossSlotReplacer.ReplaceOne` 有一条「**槽里已经是我们的一律跳过**」的早退
+   （`if (CharBossEncounters.IsOurs(vanilla) && !secondBoss) return;`）。
+   这一局的 Boss 槽是**装过观者模组时**滚出来的，卸掉观者之后它照样是 `WATCHER_*`
+   ⇒ 早退把它们原样留着。以前观者闸门只装在 `PullNextEncounter`（真正进 Boss 房那一刻）
+   ⇒ 地图徽章、顶栏/结算图标来不及修（都退回 TheKin 占位图）。
+2. 恐惧模式的「本幕支配」**只在真的发生了替换时**才对齐（`ReplaceOne` 里那次调用）。
+   槽位没换 ⇒ 支配一直停在**观者的支配** ⇒ 整幕每一场普通战斗都给敌人塞虔信/真言。
+
+**改法**（`src/Hooks/Patches/BossSlotPatches.cs`）：
+
+- `ReplaceOne` 一开始先过 `BossKeys.FixUnavailableEncounter(vanilla, act)`：
+  观者模组用不了 + 槽里是观者遭遇 ⇒ **在读档校验 / 生成房间这两个切点上就换掉**，
+  换成同幕替补（一层 愤怒战 `IRONCLAD_ANGER` / 二层 放血战 `IRONCLAD_BLOOD` / 三层 塔罗愚 `FOOL_TAROT`，
+  撞本幕另一槽时用第二选择），观者可用时一行不变；客人端仍按老规矩**不写**同步状态。
+- `ReplaceAll` 末尾**无论如何**都调一次 `DreadDominionSync.EnsureCurrentAct`（幂等、只比类型；
+  Boss 房与客人端内部各有自己的护栏）⇒ 旧档里那份观者的支配会换回当前 Boss 的支配。
+
+三个目标（111 / 113 / 111+PhoneBuild）**全部 0 错误**，已装到游戏目录（verify-deploy 报 v0.2.943 OK）。
+
+> 注：这一局**已经**发下去的虔信/真言收不回来（power 已经挂在史莱姆身上），
+> 但读档后本幕支配会换成当前 Boss 的，之后的房间不会再出现观者的支配；
+> 地图那颗 Boss 徽章/顶栏图标也会跟着变成真正的本幕 Boss。
+
 ## v0.2.942（2026-11-25）：塔罗愚恐惧模式说明精简（只留「非无色牌都已升级」）
 
 用户口径：恐惧模式的额外说明**只保留「杝的所有非无色牌都已升级」**，

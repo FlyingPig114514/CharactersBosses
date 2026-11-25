@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.942 / 2026-11-25 (**塔罗愚恐惧模式说明精简：只保留「非无色牌都已升级」**)—— 用户口径：恐惧模式的额外说明只留那一句，魔术师生成什么充能球、新生之喜与教皇印什么都删掉（**效果一律不改，只删文案**）。16 语言 × 2 处（`monsters.json` 的 `FOOL_BOSS.fool_dread` 与 `powers.json` 的 `BOSS_FOOL_POWER.description_dread`）逐条手工改句子，句号/语序按各语言语法收尾（jpn「アップグレードされる。」kor「업그레이드됩니다.」tha 原句无句号照旧），改完 16 个文件全部 JSON 可解析。v0.2.941 = 塔罗愚削弱（第 3 回合魔术师换星星 / 第 5 回合正义·女祭司·恶魔 / 能力面板高压回合订正）。完整历史见 docs/plans/changelog-history.md";
+    public const string Tag = "v0.2.950 / 2026-11-25 (**多人三条：覆甲按人数加成 / 刀扇·万象斩的预览不算群攻 / 仆从捐躯不召唤**)—— ①**覆甲被人数加成**：`PlatingPower` 与 `SlipperyPower` 各有两个 `GetScaledAmountForMultiplayer` 重载，`BossNoScalePlatingPatch` / `BossNoScaleSlipperyPatch` 以前只写 `nameof(...)` ⇒ Harmony 报 `Ambiguous match` ⇒ **整个补丁类挂载失败**（日志里一直有「挂载失败」那行），于是 2 人局护喉甲的 4 层覆甲被放大成 ((2-1)*2+1)*4 = 12 层。现在显式指定参数类型收窄到实例版。②**刀扇 / 万象斩的伤害预览不算群攻**：`IsAoE` 只认 `TargetType.AllEnemies`，而这两张都是「单体牌但实际打全体」——万象斩反编译 = 先打目标、再把 `TotalDamage + OverkillDamage`（含目标易伤/力量）溅射给目标的所有队友；刀扇之后的小刀是 `FanOfKnivesPower` 让每把刀打全体。现在 `IsAoE` 对 `OMNISLICE` 与「刀扇生效中的 SHIV」也返回 true ⇒ 每个玩家都看到真实伤害（万象斩按主目标那份算，符合用户「目标有易伤时其它人也要显示带易伤的伤害」）。③**仆从捐躯不召唤**：按当前规则这属于**正常**——仆从数达到上限就不召唤，而普通模式上限 2 / **恐惧模式上限 1**（用户 2026-11-13 口径），第 1、3 回合早已占满；这一版把「为什么没召唤（当前几只/上限几只）」写进日志便于确认。v0.2.949 = 阵容人数按战斗实例锁定。完整历史见 docs/plans/changelog-history.md";
 
     private static bool _logged;
 

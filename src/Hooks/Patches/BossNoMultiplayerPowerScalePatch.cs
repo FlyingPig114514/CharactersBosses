@@ -69,7 +69,14 @@ public static class BossNoScalePowerBasePatch
         => BossPowerNoMultiplayerScale.Revert(target, amount, ref __result, "Power");
 }
 
-[HarmonyPatch(typeof(PlatingPower), nameof(PlatingPower.GetScaledAmountForMultiplayer))]
+// ★★ v0.2.950（2026-11-25 用户「有护喉甲的 boss 在战斗开始时获得的覆甲层数被多人人数加成了」）：
+//   `PlatingPower` / `SlipperyPower` 各有**两个** `GetScaledAmountForMultiplayer` 重载
+//   （实例版 `(ICombatState, Creature, decimal, Creature, CardModel)` 与静态版 `(int, decimal)`），
+//   以前只写 `nameof(...)` ⇒ Harmony 报 `Ambiguous match` ⇒ **整个补丁类挂载失败**
+//   （日志里一直有 `补丁类 BossNoScalePlatingPatch 挂载失败`），于是覆甲照样按人数翻倍：
+//   2 人局护喉甲的 4 层变成 ((2-1)*2+1)*4 = 12 层。现在显式指定参数类型收窄到**实例版**。
+[HarmonyPatch(typeof(PlatingPower), nameof(PlatingPower.GetScaledAmountForMultiplayer),
+    new[] { typeof(ICombatState), typeof(Creature), typeof(decimal), typeof(Creature), typeof(CardModel) })]
 public static class BossNoScalePlatingPatch
 {
     [HarmonyPostfix]
@@ -101,7 +108,8 @@ public static class BossNoScaleSkittishPatch
         => BossPowerNoMultiplayerScale.Revert(target, amount, ref __result, "Skittish");
 }
 
-[HarmonyPatch(typeof(SlipperyPower), nameof(SlipperyPower.GetScaledAmountForMultiplayer))]
+[HarmonyPatch(typeof(SlipperyPower), nameof(SlipperyPower.GetScaledAmountForMultiplayer),
+    new[] { typeof(ICombatState), typeof(Creature), typeof(decimal), typeof(Creature), typeof(CardModel) })]
 public static class BossNoScaleSlipperyPatch
 {
     [HarmonyPostfix]

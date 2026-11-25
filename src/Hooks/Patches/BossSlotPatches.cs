@@ -27,6 +27,15 @@ internal static class BossSlotReplacer
             ReplaceOne(act, act.BossEncounter, "Boss", reason);
             ReplaceOne(act, act.SecondBossEncounter, "第二个 Boss", reason, secondBoss: true);
 
+            // ★ v0.2.943（用户 2026-11-25「没装观者遇到了观者boss」）：**槽位没动也要对齐一次支配**。
+            //   观者模组被卸掉后，旧档里留下的「观者的支配」不会自己消失 —— 它挂在 `RunState.Dominion`
+            //   上，整幕每一场普通战斗都会给敌人塞虔信/真言（日志实证 14:09:06「观者的支配·虔信：
+            //   树枝史莱姆 +2」「树叶史莱姆 +2」，而本幕 Boss 早就是亡灵契约师了）。
+            //   `EnsureCurrentAct` 是幂等的、只比类型，且 Boss 房/客人端内部都有各自的护栏。
+#if STS2_113
+            try { Core.DreadDominionSync.EnsureCurrentAct($"Boss 槽校验({reason})"); } catch { /* 忽略 */ }
+#endif
+
             // ⚠ 2026-10 实测：**不要**在这里强行 `SetSecondBossEncounter` 补建第二槽。
             // 试过之后的表现是「第一、二幕也变成两个 Boss，且第三幕第二槽仍然是储君」——
             // 说明原版对那个字段的写入有自己的时机/校验，我们从这里写会被覆盖或造成多余的 Boss。
@@ -57,6 +66,39 @@ internal static class BossSlotReplacer
                                    bool secondBoss = false)
     {
         if (vanilla == null) return;
+
+        // ★ v0.2.943（用户 2026-11-25：「没装观者遇到了观者boss」）——
+        //   **存档槽里留着的观者遭遇要真的换掉**。
+        //
+        //   这一局的 Boss 槽是「装过观者模组时」滚出来的（日志实证：
+        //   `Boss 替换判定 … 存档槽=WATCHER_FLURRY_BOSS_ENCOUNTER（是我们=True）`），
+        //   观者模组卸掉之后它照样留在槽里；而下面那条「已经是我们的一律跳过」会直接 return
+        //   ⇒ 三处一起坏：
+        //     · 地图 Boss 徽章解析不出角色（`地图徽章：WATCHER_FLURRY_BOSS_ENCOUNTER 生成角色剪影失败`）；
+        //     · 顶栏/结算图标退回占位图；
+        //     · 恐惧模式的「本幕支配」还停在**观者的支配** ⇒ 整幕普通战斗被塞虔信/真言。
+        //   以前只有 `PullNextEncounter`（真正进 Boss 房那一刻）过这道闸，地图/支配都来不及修。
+        //   现在在读档校验 / 生成房间这两个切点上就先换成本幕的替补（按幕写死，多人两端同结果）。
+        var substituted = Core.BossKeys.FixUnavailableEncounter(vanilla, act);
+        if (substituted != null && substituted.Id != vanilla.Id)
+        {
+            if (Core.NetRole.IsGuest)
+            {
+                if (_guestWatcherLogged.Add((act.Index, secondBoss)))
+                {
+                    Logger.Log($"[Hook] act {act.Index} {label}槽：本机用不了观者模组 ⇒ 客人端**不写**同步状态" +
+                               $"（房主的结论会自己同步过来）；本机算得 {substituted.Id.Entry}");
+                }
+                return;
+            }
+
+            if (label == "Boss") act.SetBossEncounter(substituted);
+            else act.SetSecondBossEncounter(substituted);
+
+            Logger.Log($"[Hook] act {act.Index} {label}槽替换({reason})：{vanilla.Id.Entry} → {substituted.Id.Entry}" +
+                       "（这一局是装过观者模组时开的，现在用不了 ⇒ 换成同幕的普通 Boss）");
+            return;
+        }
 
         var replacement = CharBossEncounters.ForVanillaBoss(act, vanilla, secondBoss);
         if (replacement == null) return;
@@ -97,6 +139,9 @@ internal static class BossSlotReplacer
 
     /// <summary>「客人端不写同步状态」这条日志每 (幕, 是不是第二槽) 只打一次。</summary>
     private static readonly HashSet<(int Act, bool Second)> _guestMirrorLogged = new();
+
+    /// <summary>「观者模组用不了 ⇒ 客人端不写」这条日志每 (幕, 是不是第二槽) 只打一次。</summary>
+    private static readonly HashSet<(int Act, bool Second)> _guestWatcherLogged = new();
 }
 
 /// <summary>

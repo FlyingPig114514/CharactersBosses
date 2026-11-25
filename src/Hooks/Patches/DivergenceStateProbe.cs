@@ -54,17 +54,44 @@ internal static class DivergenceStateProbe
     private static MethodBase? TargetMethod() => Target();
 
     [HarmonyPrefix]
-    public static void Prefix()
+    public static void Prefix(object[] __args)
     {
         try
         {
             if (_logged++ > 12) return;
-            Dump("检测到不同步");
+            Dump("检测到不同步", DescribeGameContext(__args));
         }
         catch (Exception e)
         {
             Logger.Log("[CharBoss] 不同步状态摘要失败（忽略）: " + e.Message);
         }
+    }
+
+    /// <summary>
+    /// 把原版 `LogStateDivergence` 收到的参数（`TrackedChecksum` / `StateDivergenceMessage` / 客户端 id / 校验和 id）
+    /// 拼成一行：**这条就是「哪一侧、哪个校验点、两个数字各是多少」**。
+    ///
+    /// ★ v0.2.946（用户 2026-11-25 联机两次不同步）：以前摘要里没有这一行，
+    /// 只知道「不同步了」，不知道是**哪个上下文**（`After player turn start` / 某张牌结算完…）分叉的
+    /// —— 而原版的 `Local:`/`Remote:` 只写在 `godot.log` 里，玩家往往只发 `mod_log`。
+    /// </summary>
+    private static string DescribeGameContext(object[]? args)
+    {
+        try
+        {
+            if (args == null || args.Length == 0) return string.Empty;
+            var parts = new List<string>();
+            foreach (var a in args)
+            {
+                string s;
+                try { s = a?.ToString() ?? "null"; } catch { s = "?"; }
+                if (string.IsNullOrWhiteSpace(s) || s == "null") continue;
+                if (s.Length > 500) s = s.Substring(0, 500) + "…";
+                parts.Add(s);
+            }
+            return parts.Count == 0 ? string.Empty : string.Join(" | ", parts);
+        }
+        catch { return string.Empty; }
     }
 
     /// <summary>
@@ -206,7 +233,7 @@ internal static class DivergenceStateProbe
     }
 
     /// <summary>把「我们关心的状态」打一行（多行文本，前缀统一便于 grep）。</summary>
-    internal static void Dump(string reason)
+    internal static void Dump(string reason, string gameContext = "")
     {
         try
         {
@@ -219,6 +246,10 @@ internal static class DivergenceStateProbe
 
             var sb = new StringBuilder();
             sb.Append($"[CharBoss] ⚠ 不同步状态摘要（{reason}）：轮次 {combat.RoundNumber}");
+
+            // ★ v0.2.946：原版那个「哪个上下文 / 两个校验和数字」也一起带上
+            if (!string.IsNullOrEmpty(gameContext))
+                sb.Append($"\n  原版分叉点：{gameContext}");
 
             // ── 这一场到底是什么遭遇 + 本机是房主还是客人（v0.2.237 追加）──
             // 联机分叉最常见的一种就是「两端根本不是同一场战斗」（客人打了原版 Boss、房主打角色 Boss），
@@ -397,11 +428,36 @@ internal static class DivergenceStateProbe
             AppendHistory(sb);
 
             Logger.Log(sb.ToString());
+
+            // ★ v0.2.946（用户 2026-11-25）：**同时写一份独立小文件**。
+            //   为什么：`mod_log.txt` 联机一晚能到 90 MB，让朋友「把日志发来」很不现实，
+            //   而我们真正需要的只是这十几行。文件：`%APPDATA%\SlayTheSpire2\logs\characterbosses_desync.txt`
+            //   （追加写；两端各发这一份就能逐行 diff）。
+            AppendToFile(sb.ToString());
         }
         catch (Exception e)
         {
             Logger.Log("[CharBoss] 不同步状态摘要生成失败: " + e.Message);
         }
+    }
+
+    /// <summary>把摘要追加进 `characterbosses_desync.txt`（失败一律忽略，绝不影响游戏）。</summary>
+    private static void AppendToFile(string text)
+    {
+        try
+        {
+            string dir = System.IO.Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "SlayTheSpire2", "logs");
+            System.IO.Directory.CreateDirectory(dir);
+            string path = System.IO.Path.Combine(dir, "characterbosses_desync.txt");
+            string role;
+            try { role = Core.NetRole.IsGuest ? "客人" : "房主"; } catch { role = "?"; }
+            string head = $"\n===== {DateTime.Now:yyyy-MM-dd HH:mm:ss}（{role}）=====\n";
+            System.IO.File.AppendAllText(path, head + text + "\n", Encoding.UTF8);
+            Logger.Log($"[CharBoss] 不同步摘要已写入 {path}（报 bug 时把这个文件发出来就行，不用发整份 mod_log）");
+        }
+        catch { /* 忽略 */ }
     }
 
     /// <summary>

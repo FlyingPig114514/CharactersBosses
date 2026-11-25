@@ -51,11 +51,20 @@ public static class BrewerBossBlockableHpLossPatch
     //     · 不可格挡的「失去生命」：格挡一点没扣 ⇒ `Block > 0` ⇒ 正是我们要接管的那一类。
     //   所以把 props 判定换成「Block > 0」这个等价闸门即可。
     [HarmonyPrefix]
-    public static void Prefix(Creature __instance, ref decimal amount)
+    public static void Prefix(Creature __instance, ref decimal amount, bool dryRun)
     {
         try
         {
             if (amount <= 0m) return;
+
+            // ★★ v0.2.947（2026-11-25 联机两次不同步的两份摘要实证）：
+            //   **dryRun 必须直接放行**。0.114 的签名是 `LoseHpInternal(decimal amount, bool dryRun)`，
+            //   `dryRun = true` 是「只是问一下会掉多少血」的预测调用 —— 原版不动任何状态，
+            //   而我们以前在这里**真的扣了格挡** ⇒ 谁跑预测、跑几次，两端就错开。
+            //   （实证：房主 20:07:39/40 对炼药猎处理了**两次**「失去生命」，客人只有一次；
+            //     两端摘要逐字比对，唯一不同的就是 `SILENT_BOSS` 的 HP：房主 499 / 客人 536。）
+            if (dryRun) return;
+
             if (!IsBrewerBoss(__instance)) return;
             if (__instance.Block <= 0) return;
 
@@ -67,7 +76,8 @@ public static class BrewerBossBlockableHpLossPatch
             if (_logs++ < 60)
             {
                 Logger.Log($"[CharBoss] 炼药猎：格挡挡下 {absorbed} 点「失去生命」" +
-                           $"（还剩 {amount} 点直接扣血，格挡余 {__instance.Block}）");
+                           $"（还剩 {amount} 点直接扣血，格挡余 {__instance.Block}）" +
+                           $" 调用者={CallerHint()}");
             }
         }
         catch (Exception e)
@@ -75,6 +85,30 @@ public static class BrewerBossBlockableHpLossPatch
             // 任何意外都退化成原版行为（绝不因为这条让战斗卡住）
             try { Logger.Log("[CharBoss] 炼药猎格挡「失去生命」失败，按原版执行: " + e.Message); } catch { }
         }
+    }
+
+    /// <summary>
+    /// 这条「失去生命」是谁发起的（取 3 层调用栈，跳过 Harmony 自己的帧）。
+    /// ★ v0.2.947：两份联机日志里「房主两次、客人一次」，只有调用者能告诉我们
+    ///   到底是同一个效果被结算了两次，还是两个不同来源各结算了一次。
+    /// </summary>
+    private static string CallerHint()
+    {
+        try
+        {
+            var st = new System.Diagnostics.StackTrace(2, false);
+            var parts = new System.Collections.Generic.List<string>();
+            for (int i = 0; i < st.FrameCount && parts.Count < 3; i++)
+            {
+                var m = st.GetFrame(i)?.GetMethod();
+                if (m == null) continue;
+                string type = m.DeclaringType?.Name ?? "?";
+                if (type.Contains("Harmony") || type.Contains("Patches") || type.Contains("BrewerBoss")) continue;
+                parts.Add($"{type}.{m.Name}");
+            }
+            return parts.Count > 0 ? string.Join(" < ", parts) : "?";
+        }
+        catch { return "?"; }
     }
 
     /// <summary>
@@ -95,8 +129,14 @@ public static class BrewerBossBlockableHpLossPatch
             if (string.Equals(boss.SpawnVariantKey, "SILENT_BREWER", StringComparison.Ordinal)) return true;
 
             // ③ 兜底：本场战斗的遭遇就是炼药猎（含「以房间遭遇为准」那条判定链）
+            //
+            // ★ v0.2.947：**必须同时带着「调制」那层 power** 才算。
+            //   以前只看遭遇 ⇒ 4 人局里同一场遭遇下的**其它 Boss**（这一场的 `DEFECT_AI` 阵容里
+            //   还有 NECROBINDER/REGENT/DEFECT 三只）也会被当成炼药猎、格挡也能吃「失去生命」——
+            //   既不符合用户「只改她」的口径，也会让「谁被吸收」随两端遭遇解析不同而不同。
             var key = BossKeys.KeyOfEncounter(creature.CombatState?.Encounter);
-            return string.Equals(key, "SILENT_BREWER", StringComparison.Ordinal);
+            if (!string.Equals(key, "SILENT_BREWER", StringComparison.Ordinal)) return false;
+            try { return creature.GetPower<Powers.BrewModPower>() != null; } catch { return false; }
         }
         catch { return false; }
     }

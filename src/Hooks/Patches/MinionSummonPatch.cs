@@ -35,6 +35,7 @@ namespace CharacterBosses.Patches;
 public static class MinionSummonPatch
 {
     private static int _logs;
+    private static int _capLogs;
 
     // ── 三张牌各挂一个前缀（都走同一个实现） ──
     [HarmonyPatch(typeof(MinionStrike), "OnPlay",
@@ -70,7 +71,22 @@ public static class MinionSummonPatch
             if (boss.Creature?.GetPower<BossCallToArmsPower>() == null) return true;   // 不是仆从储
 
             int alive = BossMinionMonster.CountAlive(boss);
-            if (alive >= BossCallToArmsPower.MinionCapNow) return true;                  // 已经够 2 只 ⇒ 走原版
+            if (alive >= BossCallToArmsPower.MinionCapNow)
+            {
+                // ★ v0.2.950（用户 2026-11-25：「仆从储好像不会召唤捐躯仆从」）：
+                //   按当前规则这就是**正常**的 —— 「仆从数不足上限才改成召唤」，
+                //   而第 1 回合（仆从打击）与第 3 回合（仆从俯冲×2）很早就把上限占满了：
+                //   普通模式上限 2、恐惧模式上限 **1**（用户 2026-11-13 的恐惧版口径）。
+                //   所以到第 5 回合「仆从捐躯×3」时通常已经没有空位 ⇒ 只结算原版效果（格挡），
+                //   玩家就「永远见不到捐躯仆从」。这行日志把「为什么没召唤」写清楚，方便确认是不是这个原因。
+                if (_capLogs++ < 20)
+                {
+                    Logger.Log($"[CharBoss] 征召上前：打出 {SafeEntry(card)} 但场上已有 {alive} 只仆从" +
+                               $"（上限 {BossCallToArmsPower.MinionCapNow}；恐惧模式上限=1、普通=2）" +
+                               "⇒ 按原版效果结算、**不召唤**");
+                }
+                return true;
+            }
 
             var combat = boss.CombatState;
             if (combat == null) return true;

@@ -1650,6 +1650,20 @@
       "error_message": "手机版四人联机「卡顿明显，耗电也明显」（玩家「季节」工坊反馈 2026-11-19）",
       "fix": "实测帧回调只有 avg=0.05~0.08ms（不是逻辑慢），真开销是日志 I/O：一局 3h40m 203,646 行 / 27.8MB（≈15 行/秒），而 SafeLogPatch 每行都 Directory.CreateDirectory + 新建 FileStream + 关闭。四处改：①日志改长开文件 + 缓冲写（32 行或 0.5s flush，关键行立刻 flush，5 分钟换句柄，帧驱动 FlushIfDue 兜底）；②新增 Core.LogLoudness，手机(Android/iOS)上纯诊断行一律不打（帧回调耗时只在单帧>20ms 时留一行），PC 行为不变；③进战斗房那一帧原本同帧重建所有 Boss 面板（实测 131ms 尖峰）⇒ 改成排队每帧只重建 1 只；④BossHandUi.RefreshForce 加同帧去重。v0.2.805。",
       "at": "2026-11-19T01:38:02.555Z"
+    },
+    {
+      "id": "bug-253-mwvpr1in",
+      "error_message": "上传工坊时报 \"Exception thrown while parsing the workshop config! Double-check that the format is correct.\"（sts2-mod-uploader 退出码 1）",
+      "fix": "用 PowerShell 写 workshop.json 的 changeNote 时只做了 .Replace(\"`r`n\",'\\n')，而脚本正文若以 LF 换行进入，CRLF 就匹配不到 ⇒ 字符串里留下裸换行 ⇒ JSON 非法（System.Text.Json 直接 JsonException，而 ConvertFrom-Json 反而放行，所以自检会漏）。修法：先 ($s -replace \"`r`n\",\"`n\") 归一化再 .Replace(\"`n\",'\\n')，并用正则 '\"changeNote\":\\s*\"[^\"\\r\\n]*\"' 断言没有裸换行。",
+      "file": "workshop/workshop.json",
+      "at": "2026-11-25T05:59:08.399Z"
+    },
+    {
+      "id": "bug-254-mwvq9sjk",
+      "error_message": "卸掉观者模组后，旧档里仍出现「观者的支配」，普通房间敌人被塞虔信/真言；地图 Boss 徽章退回占位图（日志：存档槽=WATCHER_FLURRY_BOSS_ENCOUNTER（是我们=True）、地图徽章生成角色剪影失败）",
+      "fix": "BossSlotReplacer.ReplaceOne 有「槽里已经是我们的一律跳过」的早退，观者模组卸掉后槽里留下的 WATCHER_* 永远不会被换掉；而恐惧模式的本幕支配只在「真的发生替换」时才对齐。修法：ReplaceOne 开头先过 BossKeys.FixUnavailableEncounter(vanilla, act) 换成本幕替补（读档校验/生成房间两个切点生效），ReplaceAll 末尾无条件调 DreadDominionSync.EnsureCurrentAct 重算支配。",
+      "file": "src/Hooks/Patches/BossSlotPatches.cs",
+      "at": "2026-11-25T06:13:43.232Z"
     }
   ]
 }

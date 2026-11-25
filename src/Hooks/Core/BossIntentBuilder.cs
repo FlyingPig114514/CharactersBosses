@@ -1673,7 +1673,15 @@ public static class BossIntentBuilder
     public static int PendingDrop(Creature? boss)
     {
         if (boss == null) return 0;
-        try { return Math.Max(0, boss.GetPower<BiasedCognitionPower>()?.Amount ?? 0); }
+        try
+        {
+            // ★ v0.2.944（用户 2026-11-25）：普通模式下，只要你在本回合打出过能力牌，
+            //   她那一次「偏差认知」就不生效 ⇒ 这里**不再预扣**这 N 点集中，
+            //   意图/伤害预览也不再显示被削过的那一份（用户 PS：「如果触发了的话，
+            //   当回合要把偏差认知的那个伤害预览修正给去掉」）。
+            if (Powers.DeviationPower.BiasShieldArmed(boss)) return 0;
+            return Math.Max(0, boss.GetPower<BiasedCognitionPower>()?.Amount ?? 0);
+        }
         catch { return 0; }
     }
 
@@ -2607,11 +2615,40 @@ public static class BossIntentBuilder
     private static int _shivLogs;
 
     /// <summary>
-    /// 这张牌是不是**群攻**（对所有敌人）—— 群攻打到每个人，所以「意图按人清零」不能作用在它身上。
+    /// 这张牌是不是**群攻**（打到所有人）—— 群攻打到每个人，所以「意图按人清零」不能作用在它身上。
+    ///
+    /// ★★ v0.2.950（2026-11-25 用户「刀扇、万象斩的伤害预览不被显示为群攻」）：
+    ///   `TargetType.AllEnemies` **不足以**描述这两张牌，它们都是「单体牌但实际打所有人」：
+    ///
+    ///   · **万象斩**（`Omnislice`，`TargetType.AnyEnemy`）：反编译 `Omnislice.OnPlay` ——
+    ///     先对目标造成伤害，再把 `damageResult.TotalDamage + OverkillDamage`（**实际打出的那个数**，
+    ///     含目标身上的易伤/力量/虚弱）原样溅射给目标的**所有队友**。
+    ///     所以对**其它玩家**应当显示「照主目标算出来的那一笔」，而不是 0
+    ///     （用户原话：「万象斩的群攻不是一般的群攻，只要目标有易伤，对其他目标也要显示有易伤的伤害」；
+    ///     本函数返回 true 后，各端显示的数字正是 `FinalDamage(card, base, 计划目标)` 算出来的那一份）。
+    ///
+    ///   · **刀扇**（`FanOfKnives`）之后的小刀：她身上有 `FanOfKnivesPower` 时小刀改打全体 ⇒ 同样按群攻显示。
+    ///     （`Shiv` 本身是 `AnyEnemy`，以前只在「生成刀的牌」那条支路判了 `ShivsHitAll`，
+    ///      真正打出去的**小刀卡**没判 ⇒ 非锁定玩家看到 0。）
     /// </summary>
     private static bool IsAoE(CardModel card)
     {
-        try { return card.TargetType == TargetType.AllEnemies; }
+        try
+        {
+            if (card == null) return false;
+            if (card.TargetType == TargetType.AllEnemies) return true;
+
+            string entry = string.Empty;
+            try { entry = card.Id.Entry ?? string.Empty; } catch { entry = string.Empty; }
+
+            // 万象斩：单体起手 + 溅射给目标的所有队友（= 所有其它玩家）
+            if (string.Equals(entry, "OMNISLICE", StringComparison.Ordinal)) return true;
+
+            // 小刀 + 刀扇已生效 ⇒ 每一把刀都打全体
+            if (string.Equals(entry, "SHIV", StringComparison.Ordinal) && ShivsHitAll(card)) return true;
+
+            return false;
+        }
         catch { return false; }
     }
 

@@ -28,8 +28,8 @@ public static class TarotFoolScript
 
             T("2. 皇帝、神话形态、神话形态（升级版）", C<TheEmperor>(), C<MythicForm>(true), C<MythicForm>(true)),
 
-            // ★ 2026-11-25（用户：削弱，第 3 回合的魔术师换成星星）。
-            T("3. 女祭司、星星、月亮", C<TheHighPriestess>(), C<TheStar>(), C<TheMoon>()),
+            // ★ 2026-11-25（用户：削弱，第 3 回合的魔术师换成星星；再削弱，第 3 回合的月亮换成正义）。
+            T("3. 女祭司、星星、正义", C<TheHighPriestess>(), C<TheStar>(), C<Justice>()),
 
             T("4. 战车、世界、皇后", C<TheChariot>(), C<TheWorld>(), C<TheEmpress>()),
 
