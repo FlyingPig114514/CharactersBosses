@@ -168,11 +168,39 @@ public static class FleshBone
                     try { value = (int)Math.Round((double)planned.DynamicVars["SleightOfFleshPower"].BaseValue); }
                     catch { value = 0; }
                 }
+                value = ApplyDreadUpgradeIfPending(boss, planned, value);
                 if (value > 0) return value;
             }
         }
         catch { /* 忽略 */ }
         return 0;
+    }
+
+    /// <summary>
+    /// ★★ v0.2.952（用户 2026-11-25：「恐惧模式下血肉戏法会被升级，不能只按 9」）：
+    /// 规划期那一手读的是**还没升级**的那张卡（恐惧模式的升级走 `DreadUpgrades` 运行期通道，
+    /// 真到打出时才生效）⇒ 预览会一直按 9 算。这里按「这一档在恐惧模式下会不会把这张牌升级」补上差值。
+    ///
+    /// 血肉戏法：`CanonicalVars = PowerVar&lt;SleightOfFleshPower&gt;(9)`、`OnUpgrade()` 里 **+4**
+    /// （反编译核对）⇒ 恐惧版是 **13**。
+    /// </summary>
+    private static int ApplyDreadUpgradeIfPending(CharBossMonster? boss, CardModel planned, int value)
+    {
+        try
+        {
+            if (value <= 0 || boss == null || planned == null) return value;
+            if (planned.IsUpgraded) return value;                       // 已经是升级版：读到的就是升级值
+            if (!DreadMode.IsActive) return value;                      // 非恐惧模式：原样
+
+            var def = boss.Def;
+            if (def == null) return value;
+            var list = def.DreadUpgradeTypesFor(boss.ActIndex);
+            if (list == null) return value;
+            if (!list.Contains(typeof(MegaCrit.Sts2.Core.Models.Cards.SleightOfFlesh))) return value;
+
+            return value + 4;                                           // 血肉戏法升级 = +4（9 → 13）
+        }
+        catch { return value; }
     }
 
     /// <summary>

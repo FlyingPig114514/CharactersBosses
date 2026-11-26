@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.950 / 2026-11-25 (**多人三条：覆甲按人数加成 / 刀扇·万象斩的预览不算群攻 / 仆从捐躯不召唤**)—— ①**覆甲被人数加成**：`PlatingPower` 与 `SlipperyPower` 各有两个 `GetScaledAmountForMultiplayer` 重载，`BossNoScalePlatingPatch` / `BossNoScaleSlipperyPatch` 以前只写 `nameof(...)` ⇒ Harmony 报 `Ambiguous match` ⇒ **整个补丁类挂载失败**（日志里一直有「挂载失败」那行），于是 2 人局护喉甲的 4 层覆甲被放大成 ((2-1)*2+1)*4 = 12 层。现在显式指定参数类型收窄到实例版。②**刀扇 / 万象斩的伤害预览不算群攻**：`IsAoE` 只认 `TargetType.AllEnemies`，而这两张都是「单体牌但实际打全体」——万象斩反编译 = 先打目标、再把 `TotalDamage + OverkillDamage`（含目标易伤/力量）溅射给目标的所有队友；刀扇之后的小刀是 `FanOfKnivesPower` 让每把刀打全体。现在 `IsAoE` 对 `OMNISLICE` 与「刀扇生效中的 SHIV」也返回 true ⇒ 每个玩家都看到真实伤害（万象斩按主目标那份算，符合用户「目标有易伤时其它人也要显示带易伤的伤害」）。③**仆从捐躯不召唤**：按当前规则这属于**正常**——仆从数达到上限就不召唤，而普通模式上限 2 / **恐惧模式上限 1**（用户 2026-11-13 口径），第 1、3 回合早已占满；这一版把「为什么没召唤（当前几只/上限几只）」写进日志便于确认。v0.2.949 = 阵容人数按战斗实例锁定。完整历史见 docs/plans/changelog-history.md";
+    public const string Tag = "v0.2.953 / 2026-11-25 (**修：蛇眼猎第 5 回合开「追踪」那一手，带虚弱的被锁玩家伤害预览没提前 ×1.5**)—— 用户：「蛇眼猎第五回合开跟踪的时候，如果被她锁定的玩家身上有虚弱，该玩家的伤害预览并不会提前增加 50%（正常情况下是不会的，但多人时仆从储会在第四回合打震荡波给玩家上虚弱）」。反编译核对：`Tracking.OnPlay` ⇒ `PowerCmd.Apply<TrackingPower>(owner, 50)`；`TrackingPower.ModifyDamageMultiplicative` = 她的攻击（`IsPoweredAttack` + dealer 是她或她的宠物）打**带虚弱**的目标 ⇒ `1 + 层数/100` = **×1.5**。问题同「致死性/血肉戏法」那一类：意图在玩家回合算，那时追踪本回合还没打出去 ⇒ `FinalDamage` 里没有这一乘。改法：①新增 `PendingTrackingPct`（计划里排在当前牌前面的 `TRACKING`、且她身上还没有 TrackingPower ⇒ 50）；②`ViewDamage` 里对**带虚弱的受害者**提前乘 `1+pct/100`（已有 power 时不补，避免双份）；③默认分支在「追踪待上身」时改走 ViewDamage（不能交给意图节点自己算）。v0.2.952 = 恐惧模式血肉戏法按 13 计。完整历史见 docs/plans/changelog-history.md";
 
     private static bool _logged;
 

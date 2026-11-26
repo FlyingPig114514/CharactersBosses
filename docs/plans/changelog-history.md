@@ -4,6 +4,82 @@
 > 旧条目逐字来自 `git show HEAD:src/Hooks/Core/BuildInfo.cs` 的 Tag 常量（v0.2.871 及其之前，共 236 条）。
 > 最新版本（0.2.889）是当前 Tag，同时在各条 `workshop/changenote.txt` 里也有面向玩家的摘要。
 
+## v0.2.953（2026-11-25）：修「追踪那一手，带虚弱的被锁玩家伤害预览没提前 ×1.5」
+
+用户：「蛇眼猎第五回合开跟踪的时候，如果被她锁定的玩家身上有虚弱，该玩家的伤害预览并不会
+提前增加 50%（正常情况下是不会的，但多人时仆从储会在第四回合打震荡波给玩家上虚弱）」。
+
+反编译核对：
+
+```csharp
+// Tracking.OnPlay
+await PowerCmd.Apply<TrackingPower>(owner, 50m, owner, this);
+
+// TrackingPower.ModifyDamageMultiplicative
+if (!props.IsPoweredAttack()) return 1m;
+if (dealer != Owner && !Owner.Pets.Contains(dealer)) return 1m;
+if (target == null || !target.HasPower<WeakPower>()) return 1m;
+return 1m + Amount / 100m;              // 50 层 ⇒ ×1.5
+```
+
+问题与「致死性 / 血肉戏法」同一类：意图是在**玩家回合**算的，那时「追踪」这一回合还没打出去
+（她身上没有 `TrackingPower`）⇒ `FinalDamage` 走的原版管道里自然没有这一乘。
+
+改法（`BossIntentBuilder`）：
+
+1. 新增 `PendingTrackingPct(boss, card)`：计划里排在**这张牌前面**的 `TRACKING`、且她身上
+   **还没有** `TrackingPower` ⇒ 返回 50；已经有那层 power 时返回 0（管道会自己算，避免双份）。
+2. `ViewDamage` 里对**带虚弱的受害者**提前乘 `1 + pct/100`（只乘被锁的那位，因为只有他带虚弱）。
+3. 默认分支（`LiveSingleAttackIntent(card, damage)` 那条，数值由意图节点自己算）在
+   「追踪待上身」时改走 `ViewDamage` 的 delegate，否则那条路径永远看不到提前的那 1.5。
+
+三个目标（111 / 113 / 111+PhoneBuild）**全部 0 错误**，已装机（verify-deploy 报 v0.2.953 OK）。
+
+## v0.2.952（2026-11-25）：血肉戏法在恐惧模式下按**升级值 13** 计入预览（不再按 9）
+
+用户：「注意，恐惧模式下血肉戏法会被升级，不能只按 9」。
+
+反编译核对 `SleightOfFlesh`：`CanonicalVars = PowerVar<SleightOfFleshPower>(9m)`、
+`OnUpgrade()` 里 `UpgradeValueBy(4m)` ⇒ **9 → 13**（与 `BossDefs` 里
+`DreadUpgrades = { typeof(SleightOfFlesh) }   // 恐惧模式：血肉戏法升到 13` 一致）。
+
+问题在于：恐惧模式的升级走 `DreadUpgrades` **运行期通道**，而意图是在**玩家回合**算的 ——
+那时她身上还没有那层 power，计划里那张「血肉戏法」也还没升级 ⇒ `SleightPerHit` 的计划分支
+读到的是 9 ⇒ 苦难（以及所有减益牌的「血肉戏法补刀」）预览一直偏小 4 点。
+
+改法（`FleshBone.SleightPerHit` 的计划分支）：新增 `ApplyDreadUpgradeIfPending`——
+恐惧模式 + 这一档的 `DreadUpgradeTypesFor(act)` 含 `SleightOfFlesh` + 那张计划牌还没升级 ⇒ **+4**。
+已经在身上（直接读层数）或已经是升级版的，不重复加。
+
+三个目标（111 / 113 / 111+PhoneBuild）**全部 0 错误**，已装机（verify-deploy 报 v0.2.952 OK）。
+
+## v0.2.951（2026-11-25）：修「多人时血肉骨的苦难对没被锁定的玩家显示 0 伤害」
+
+用户口径：「多人时血肉骨的苦难对不被她锁定的玩家显示为 0 伤害，并没有显示『传染』被她锁定的玩家的
+负面效果而使血肉戏法造成的伤害。注意，也不能只按被她锁定的玩家**当前**的负面效果种类，
+因为她出苦难之前还会出别的施加 debuff 的牌，比如违逆」。
+
+**根因**：`BossIntentBuilder` 里那条「意图按人清零」先执行：
+
+```csharp
+if (damage > 0 && aimedElsewhere) { intents.Add(new RawAttackIntent(0)); }
+```
+
+而苦难是**单体牌**（反编译 `Misery`：`TargetType.AnyEnemy`，7 点伤害只打被锁定的那位）⇒
+没被锁的玩家在这一步就被清成 0，后面那个专门算「牌面 + 负面种类 × 血肉戏法」的分支根本没机会跑。
+
+而苦难的实际效果是：打完目标后，把目标身上的**每一种负面**（`TypeForCurrentAmount == Debuff`，
+临时能力还按 `ITemporaryPower` 合并）`ModifyAmount` 复制给 `HittableEnemies` 里除目标外的所有人
+⇒ 每个被传染的玩家各触发一次血肉戏法（`AfterPowerAmountChanged`）⇒ 他们实际会挨「种类数 × 血肉戏法」。
+
+**改法**：把 `miseryPerHit` / `miseryContagion` 提到清零判定之前算好 ——
+苦难 + 血肉戏法在身时**不参与「按人清零」**，直接走那个「合并成一个数」的分支
+（被锁玩家只显示牌面，其余玩家显示 `牌面 + 种类数 × 血肉戏法`）。
+种类数仍由 `FleshBone.LockedPlayerDebuffKinds(boss, card)` 给出：它除了读被锁玩家**当前**的负面，
+还会把「她本回合**还没打出、但排在苦难前面**的那些牌（违逆 / 摧残 / 恐惧 …）按类型」算进去。
+
+三个目标（111 / 113 / 111+PhoneBuild）**全部 0 错误**，已装机（verify-deploy 报 v0.2.951 OK）。
+
 ## v0.2.950（2026-11-25）：多人三条（覆甲被人数加成 / 刀扇·万象斩预览不算群攻 / 仆从捐躯不召唤）
 
 ### ① 有护喉甲的 Boss 覆甲层数被人数加成（已修）

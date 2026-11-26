@@ -644,7 +644,16 @@ public static class BossIntentBuilder
             }
             catch { /* 忽略：算不出就按不加成 */ }
         }
-        if (damage > 0 && aimedElsewhere)
+        // ★★ v0.2.951（2026-11-25 用户：「多人时血肉骨的苦难对不被她锁定的玩家显示为 0 伤害，
+        //   并没有显示『传染』被她锁定的玩家的负面效果而使血肉戏法造成的伤害」）：
+        //   苦难（MISERY）是**单体牌**（反编译 `TargetType.AnyEnemy`，伤害只打被锁定的那位），
+        //   但它随后会把被锁玩家身上的负面**逐种复制**给其它所有可命中敌人
+        //   （`foreach (enemy in HittableEnemies) foreach (debuff in 目标身上的负面) ModifyAmount(...)`）
+        //   ⇒ 每个被传染的玩家各触发一次血肉戏法 ⇒ 没被锁的玩家实际会挨「种类数 × 血肉戏法」。
+        //   所以**不能**走下面这条「按人清零」，否则他们那边永远显示 0。
+        int miseryPerHit = MiserySleightPerHit(card);
+        bool miseryContagion = miseryPerHit > 0;
+        if (damage > 0 && aimedElsewhere && !miseryContagion)
         {
             intents.Add(new RawAttackIntent(0));
             Logger.Log($"[CharBoss] 意图按人清零：{entry} 打的是别人 → 对本地玩家显示 0");
@@ -761,15 +770,18 @@ public static class BossIntentBuilder
                         }));
                     }
                 }
-                else if (MiserySleightPerHit(card) is int miseryPer && miseryPer > 0 && totalHits <= 1)
+                else if (miseryContagion && totalHits <= 1)
                 {
                     // ★ 2026-11-12（用户）：苦难（MISERY）被血肉骨的「血肉戏法」放大时，
                     //   要显示成**一个数**：`苦难基础伤害 + 被锁定玩家的负面种类数 × 9`。
                     //   只有「没被她锁定的玩家」才加这一笔 —— 苦难是把被锁玩家的负面**复制给其他人**，
                     //   被锁那位自己不会因此多挂负面 ⇒ 他只挨苦难的牌面伤害。
-                    //   种类数走 `LockedPlayerDebuffKinds(boss, card)`（含本回合前面那些牌即将上的负面）。
+                    //   种类数走 `LockedPlayerDebuffKinds(boss, card)`：它把「她本回合还没打出、
+                    //   但排在苦难前面的那些牌即将上的负面」（违逆 / 摧残 / 恐惧 …）也按类型算进去。
+                    //   ★ v0.2.951：`miseryContagion` / `miseryPerHit` 提到上面统一算（那条「按人清零」
+                    //   要用它来决定放不放行）。
                     int miseryBase = damage;
-                    int miseryExtra = miseryPer;
+                    int miseryExtra = miseryPerHit;
                     intents.Add(new LiveDelegateSingleAttackIntent((liveTargets, liveOwner) =>
                     {
                         var viewer = FirstPlayerTarget(liveTargets) ?? liveOwner;
@@ -787,6 +799,22 @@ public static class BossIntentBuilder
                     }));
                     Logger.Log($"[CharBoss] 苦难意图：牌面 {miseryBase} + 被锁玩家负面种类 × {miseryExtra}" +
                                "（只对没被锁定的玩家显示）");
+                }
+                else if (PendingTrackingPct(card.Owner?.Creature?.Monster as Monsters.CharBossMonster, card) > 0)
+                {
+                    // ★ v0.2.953：「追踪」本回合还没上身 ⇒ 不能让意图节点自己算（它读不到那层 power），
+                    //   必须走 `ViewDamage`（那里会把「对虚弱目标 ×1.5」提前补进去）。
+                    intents.Add(totalHits > 1
+                        ? new LiveMultiAttackIntent((targets, owner) =>
+                        {
+                            var victim = FirstPlayerTarget(targets) ?? owner;
+                            return (Math.Max(0, ViewDamage(card, damage, victim)), totalHits);
+                        })
+                        : new LiveDelegateSingleAttackIntent((targets, owner) =>
+                        {
+                            var victim = FirstPlayerTarget(targets) ?? owner;
+                            return ViewDamage(card, damage, victim);
+                        }));
                 }
                 else intents.Add(totalHits > 1
                     ? new LiveMultiAttackIntent((targets, owner) =>
@@ -2660,7 +2688,64 @@ public static class BossIntentBuilder
     /// 没人在拦截时这个函数就是原样返回 `FinalDamage` 的结果（零回归）。
     /// </summary>
     private static int ViewDamage(CardModel? card, int baseDamage, Creature? victim)
-        => Core.InterceptPreview.ViewDamage(card, baseDamage, victim, card != null && IsAoE(card));
+    {
+        int v = Core.InterceptPreview.ViewDamage(card, baseDamage, victim, card != null && IsAoE(card));
+
+        // ★★ v0.2.953（2026-11-25 用户：「蛇眼猎第五回合开跟踪的时候，如果被她锁定的玩家身上有虚弱，
+        //   该玩家的伤害预览并不会提前增加 50%」）：
+        //   反编译 `Tracking.OnPlay` ⇒ `PowerCmd.Apply<TrackingPower>(owner, 50)`；
+        //   `TrackingPower.ModifyDamageMultiplicative` = 「她的攻击（`IsPoweredAttack` + dealer 是她或她的宠物）
+        //   打**带虚弱**的目标 ⇒ ×(1 + 层数/100)」⇒ 50 层 = **×1.5**。
+        //   而意图是在**玩家回合**算的，那时「追踪」这一回合还没打出去（她身上没这层 power）
+        //   ⇒ `FinalDamage` 里当然没有这一乘。这里按「计划里排在这张牌前面的 TRACKING」提前补上：
+        //   只对**带虚弱的那个受害者**乘，且她身上**已经有** TrackingPower 时不再补（管道已经算过，避免双份）。
+        try
+        {
+            if (v > 0 && victim != null)
+            {
+                var boss = card?.Owner?.Creature?.Monster as Monsters.CharBossMonster;
+                int pct = PendingTrackingPct(boss, card);
+                if (pct > 0)
+                {
+                    bool weak = false;
+                    try { weak = victim.GetPower<MegaCrit.Sts2.Core.Models.Powers.WeakPower>() != null; }
+                    catch { weak = false; }
+                    if (weak) v = (int)Math.Floor(v * (1m + pct / 100m));
+                }
+            }
+        }
+        catch { /* 算不出来就按原样 */ }
+
+        return v;
+    }
+
+    /// <summary>
+    /// 「追踪」（`Tracking` / `TrackingPower`）这一回合是不是**还没上身**、但排在 <paramref name="card"/> 前面。
+    /// 返回它会给的百分比（50），0 = 不用补。见 <see cref="ViewDamage"/> 里的说明。
+    /// </summary>
+    private static int PendingTrackingPct(Monsters.CharBossMonster? boss, CardModel? card)
+    {
+        try
+        {
+            var creature = boss?.Creature;
+            if (creature == null) return 0;
+            if (creature.GetPower<MegaCrit.Sts2.Core.Models.Powers.TrackingPower>() != null) return 0;   // 已上身：管道会算
+            var plan = boss!.Plan;
+            if (plan == null) return 0;
+
+            foreach (var play in plan)
+            {
+                var planned = play?.Card;
+                if (planned == null) continue;
+                if (card != null && ReferenceEquals(planned, card)) break;      // 只算排在它前面的
+                string entry = string.Empty;
+                try { entry = planned.Id.Entry ?? string.Empty; } catch { continue; }
+                if (string.Equals(entry, "TRACKING", StringComparison.Ordinal)) return 50;
+            }
+        }
+        catch { /* 忽略 */ }
+        return 0;
+    }
 
     /// <summary>
     /// 「铭记死亡」（0.113.0 重做版）对**本地观看者**来说是不是「打到别人身上」。
@@ -2690,7 +2775,10 @@ public static class BossIntentBuilder
     /// 这张牌是不是**苦难（MISERY）+ 她身上有血肉戏法**，返回血肉戏法每下几点（0 = 不适用）。
     ///
     /// 苦难是唯一需要把血肉戏法**并进牌面伤害**的牌：它会把被锁定玩家身上的负面逐种复制给其他玩家，
-    /// 每复制一种就触发一次血肉戏法 ⇒ 其他玩家实际挨的是「苦难牌面 + 种类数 × 9」。
+    /// 每复制一种就触发一次血肉戏法 ⇒ 其他玩家实际挨的是「苦难牌面 + 种类数 × 血肉戏法每下」。
+    /// ⚠ 每下**不是写死的 9**：血肉戏法升级后是 13（`SleightOfFlesh` 的 `OnUpgrade` +4），
+    ///   而恐惧模式会把这张牌升级 ⇒ 走 `FleshBone.SleightPerHit`（它读她身上的层数 / 计划里那张牌，
+    ///   并对恐惧模式补上升级差值）。
     /// </summary>
     private static int MiserySleightPerHit(CardModel? card)
     {
