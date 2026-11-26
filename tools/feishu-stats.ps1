@@ -14,6 +14,11 @@
 #   ... -VanillaChars                   # 只算玩家用原版角色的对局（pCharMod 全是 vanilla）
 #   ... -Asc10                          # 只算**进阶 10** 的对局（用户 2026-11-01 要求）
 #   ... -Ascension 9,10                 # 进阶筛选的通用写法（单个也行：-Ascension 10）
+#   ... -Mode dread                     # 只算指定**游戏模式**（v0.2.960）：standard / daily / dread / blitz / custom，
+#                                       #   也认中文别名：标准 / 每日 / 恐惧 / 极速（快速） / 自定义；
+#                                       #   多个用逗号：-Mode dread,blitz
+#   ... -Dread                          # 只算恐惧模式（= -Mode dread）
+#   ... -Blitz                          # 只算极速·快速模式（= -Mode blitz）
 #   ... -By charmod                     # 按「玩家角色所属模组」分组（看模组角色有没有把数据拉偏）
 #
 # 默认 -By variant：分组键取自 lineup（第 0 位 = 主 Boss）/ bossList（多人局全部），
@@ -59,6 +64,19 @@ param(
     [switch]$Asc10,
     # 进阶筛选的通用写法：单个（9）或多个（9,10）都行；行里读不到进阶的会被排除
     [string]$Ascension = '',
+
+    # 只要**指定游戏模式**的对局（用户 2026-11-26：「能不能筛选恐惧模式」「把快速模式也加入统计」）
+    #   取值来自模组上传的 `mode` 列（= `RunState.GameMode` 的小写枚举名）：
+    #     standard（标准）/ daily（每日挑战）/ dread（恐惧）/ blitz（极速，即快速模式）/ custom（自定义）
+    #   也认中文别名：标准 / 每日 / 恐惧 / 极速 / 快速 / 自定义
+    #   多个用逗号：-Mode dread,blitz
+    #   ⚠ 读不到 `mode` 的老行一律排除（先跑 tools\feishu-add-columns.ps1 把 `mode` 列建出来，
+    #     再让装了 v0.2.960+ 的客户端打几局，新行才带模式）
+    [string]$Mode = '',
+    # 只要恐惧模式（= -Mode dread 的简写）
+    [switch]$Dread,
+    # 只要极速/快速模式（= -Mode blitz 的简写）
+    [switch]$Blitz,
 
     # 只要**指定人数**的对局（用户 2026-11-11：「计算多人胜率，分 2/3/4 人」）：
     #   写 `-Players 2,3,4` / `-Players 2` / `-Players 2 3 4` 都行；
@@ -145,6 +163,32 @@ if ($Players) {
 $playersWanted = @($playersWanted | Select-Object -Unique)
 $usePlayersFilter = $playersWanted.Count -gt 0
 
+# -Mode dread,blitz / -Dread / -Blitz —— 只要这些游戏模式（v0.2.960）
+#   `mode` 列写的是 `RunState.GameMode` 的小写枚举名，这里把中英文别名都归一成那个名字。
+$modeAlias = @{
+    'standard' = 'standard'; '标准' = 'standard'; '普通' = 'standard'
+    'daily'    = 'daily';    '每日' = 'daily';    '每日挑战' = 'daily'
+    'dread'    = 'dread';    '恐惧' = 'dread';    '恐惧模式' = 'dread'; '恐惧症' = 'dread'
+    'blitz'    = 'blitz';    '极速' = 'blitz';    '快速' = 'blitz';     '快速模式' = 'blitz'; '极速模式' = 'blitz'
+    'custom'   = 'custom';   '自定义' = 'custom'; '自定模式' = 'custom'
+    'none'     = 'none';     '?' = '?'
+}
+$modeWanted = @()
+if ($Mode) {
+    foreach ($part in ($Mode -split '[,;\s]+')) {
+        $p = $part.Trim()
+        if (-not $p) { continue }
+        $k = $p.ToLowerInvariant()
+        if ($modeAlias.ContainsKey($k)) { $modeWanted += $modeAlias[$k] }
+        elseif ($modeAlias.ContainsKey($p)) { $modeWanted += $modeAlias[$p] }
+        else { $modeWanted += $k }          # 未知的就按原样比对（以后游戏加了新模式也不用改脚本）
+    }
+}
+if ($Dread -and -not ($modeWanted -contains 'dread')) { $modeWanted += 'dread' }
+if ($Blitz -and -not ($modeWanted -contains 'blitz')) { $modeWanted += 'blitz' }
+$modeWanted = @($modeWanted | Select-Object -Unique)
+$useModeFilter = $modeWanted.Count -gt 0
+
 # ── HTTP（和其它 feishu-*.ps1 一样走 curl，避免 PS 的 TLS 老问题）───────────
 $base = 'https://open.feishu.cn/open-apis'
 $Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
@@ -174,12 +218,12 @@ function Invoke-Curl {
 }
 
 $rows = New-Object System.Collections.ArrayList
-$skipped = @{ diag = 0; aborted = 0; console = 0; old = 0; noresult = 0; multi = 0; modchar = 0; nocharmod = 0 }
+$skipped = @{ diag = 0; aborted = 0; console = 0; old = 0; noresult = 0; multi = 0; modchar = 0; nocharmod = 0; noasc = 0; nomode = 0 }
 if ($SelfTest) {
     Write-Host '[自检] 不连飞书，用假数据验证统计与排版 ...' -ForegroundColor Yellow
-    $skipped = @{ diag = 2; aborted = 1; console = 1; old = 3; noresult = 0; multi = 0; modchar = 0; nocharmod = 0; noasc = 0 }
+    $skipped = @{ diag = 2; aborted = 1; console = 1; old = 3; noresult = 0; multi = 0; modchar = 0; nocharmod = 0; noasc = 0; nomode = 0 }
     $fakeRows = @(
-        @{ boss = 'SILENT_BOSS';   variant = 'SILENT_SLY';      variants = @('SILENT_SLY');      players = 1; charMod = 'vanilla'; result = 'win';  turns = 7;  pMaxHp = 70; pDmg = 18; pHpEnd = 52; hpTotal = 0;   maxHpTotal = 220; killed = 1; bossTotal = 1; asc = 10 },
+        @{ boss = 'SILENT_BOSS';   variant = 'SILENT_SLY';      variants = @('SILENT_SLY');      players = 1; charMod = 'vanilla'; result = 'win';  turns = 7;  pMaxHp = 70; pDmg = 18; pHpEnd = 52; hpTotal = 0;   maxHpTotal = 220; killed = 1; bossTotal = 1; asc = 10; mode = 'dread' },
         @{ boss = 'SILENT_BOSS';   variant = 'SILENT_SLY';      variants = @('SILENT_SLY');      players = 1; charMod = 'vanilla'; result = 'win';  turns = 9;  pMaxHp = 70; pDmg = 34; pHpEnd = 21; hpTotal = 0;   maxHpTotal = 220; killed = 1; bossTotal = 1; asc = 10.0 },
         @{ boss = 'SILENT_BOSS';   variant = 'SILENT_SLY';      variants = @('SILENT_SLY');      players = 1; charMod = 'vanilla'; result = 'lose'; turns = 12; pMaxHp = 70; pDmg = 71; pHpEnd = 0;  hpTotal = 96;  maxHpTotal = 220; killed = 0; bossTotal = 1; asc = 10 },
         @{ boss = 'SILENT_BOSS';   variant = 'SILENT_BREWER';   variants = @('SILENT_BREWER');   players = 1; charMod = 'vanilla'; result = 'win';  turns = 6;  pMaxHp = 70; pDmg = 12; pHpEnd = 58; hpTotal = 0;   maxHpTotal = 220; killed = 1; bossTotal = 1; asc = 5 },
@@ -193,6 +237,8 @@ if ($SelfTest) {
             result = $r.result; turns = $r.turns; pMaxHp = $r.pMaxHp; pDmg = $r.pDmg; pHpEnd = $r.pHpEnd
             hpTotal = $r.hpTotal; maxHpTotal = $r.maxHpTotal; killed = $r.killed; bossTotal = $r.bossTotal
             ascension = $r.asc
+            # v0.2.960：自检也带模式（有 mode 用 mode，没有就按标准模式）
+            mode = $(if ($r.mode) { [string]$r.mode } else { 'standard' })
         })
     }
 }
@@ -242,7 +288,7 @@ function Fld($fields, $name) {
 
 Write-Host '[2/3] 拉取记录 ...'
 $rows = New-Object System.Collections.ArrayList
-$skipped = @{ diag = 0; aborted = 0; console = 0; old = 0; noresult = 0; multi = 0; modchar = 0; nocharmod = 0; noasc = 0 }
+$skipped = @{ diag = 0; aborted = 0; console = 0; old = 0; noresult = 0; multi = 0; modchar = 0; nocharmod = 0; noasc = 0; nomode = 0 }
 $pageToken = ''
 $page = 0
 while ($true) {
@@ -304,6 +350,7 @@ while ($true) {
             killed    = AsNum (Fld $f 'bossesKilled')
             bossTotal = AsNum (Fld $f 'bossTotal')
             ascension = AsNum (Fld $f 'ascension')
+            mode      = (AsText (Fld $f 'mode')).Trim().ToLowerInvariant()
         })
     }
     Write-Host ("      第 {0} 页：{1} 条（已收 {2}）" -f $page, @($res.data.items).Count, $rows.Count)
@@ -312,8 +359,8 @@ while ($true) {
 
 }
 
-# ── 过滤：只要单人 / 只要指定人数 / 只要原版角色 / 只要某个进阶（对「联网拉到的」和「自检假数据」都生效）──
-if ($SoloOnly -or $usePlayersFilter -or $VanillaChars -or $useAscFilter) {
+# ── 过滤：只要单人 / 只要指定人数 / 只要原版角色 / 只要某个进阶 / 只要某个游戏模式（对「联网拉到的」和「自检假数据」都生效）──
+if ($SoloOnly -or $usePlayersFilter -or $VanillaChars -or $useAscFilter -or $useModeFilter) {
     $kept = New-Object System.Collections.ArrayList
     foreach ($r in $rows) {
         if ($SoloOnly) {
@@ -334,6 +381,13 @@ if ($SoloOnly -or $usePlayersFilter -or $VanillaChars -or $useAscFilter) {
             if ($null -eq $r.ascension) { $skipped.noasc++; continue }
             if (-not ($ascWanted -contains [int]$r.ascension)) { $skipped.noasc++; continue }
         }
+        if ($useModeFilter) {
+            # ⚠ 同理：v0.2.960 之前上传的行没有 `mode` ⇒ 一律排除
+            #   （先跑 tools\feishu-add-columns.ps1 加列，再用 v0.2.960+ 打几局）
+            $m = ([string]$r.mode).Trim().ToLowerInvariant()
+            if ([string]::IsNullOrWhiteSpace($m)) { $skipped.nomode++; continue }
+            if (-not ($modeWanted -contains $m)) { $skipped.nomode++; continue }
+        }
         [void]$kept.Add($r)
     }
     $rows = $kept
@@ -344,9 +398,10 @@ if ($SoloOnly) { $filterNote += '只要单人' }
 if ($usePlayersFilter) { $filterNote += ('只要 ' + (($playersWanted | Sort-Object) -join '/') + ' 人局') }
 if ($VanillaChars) { $filterNote += '只要原版角色' }
 if ($useAscFilter) { $filterNote += ('只要进阶 ' + (($ascWanted | Sort-Object) -join '/')) }
-Write-Host ("      跳过：非对局 {0}、未打完 {1}、控制台 {2}、无结果 {3}、旧版本 {4}、人数不符 {5}、模组角色 {6}、读不到角色模组 {7}、进阶不符 {8}" -f `
+if ($useModeFilter) { $filterNote += ('只要模式 ' + (($modeWanted | Sort-Object) -join '/')) }
+Write-Host ("      跳过：非对局 {0}、未打完 {1}、控制台 {2}、无结果 {3}、旧版本 {4}、人数不符 {5}、模组角色 {6}、读不到角色模组 {7}、进阶不符 {8}、模式不符 {9}" -f `
     $skipped.diag, $skipped.aborted, $skipped.console, $skipped.noresult, $skipped.old,
-    $skipped.multi, $skipped.modchar, $skipped.nocharmod, $skipped.noasc) -ForegroundColor DarkGray
+    $skipped.multi, $skipped.modchar, $skipped.nocharmod, $skipped.noasc, $skipped.nomode) -ForegroundColor DarkGray
 if ($filterNote.Count -gt 0) {
     Write-Host ("      过滤条件：" + ($filterNote -join ' + ')) -ForegroundColor DarkGray
 }
@@ -518,6 +573,8 @@ if (-not $NoCsv) {
     $out = foreach ($g in $ordered) {
         [pscustomobject]@{
             Group    = $g.Key
+            # v0.2.960：把模式口径写进 CSV，免得「这份数据到底筛的是恐惧还是标准」事后说不清
+            Mode     = $(if ($useModeFilter) { ($modeWanted | Sort-Object) -join '+' } else { 'all' })
             Fights   = $g.Fights
             Wins     = $g.Wins
             Losses   = $g.Losses

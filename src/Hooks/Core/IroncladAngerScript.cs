@@ -39,19 +39,19 @@ public static class IroncladAngerScript
             Turn("好勇斗狠、烙印、打击（被烙印烧掉）", 3,
                 C<Aggression>(), C<Brand>(), Burn<StrikeIronclad>()),
 
-            Turn("洗牌。烙印、愤怒+（洗牌前好勇斗狠捞的）、打击、打击（被烧）", 4,
+            Turn("洗牌。愤怒+是洗牌前好勇斗狠捞的", 4,
                 C<Brand>(), C<Anger>(true), C<StrikeIronclad>(), Burn<StrikeIronclad>()),
 
             Turn("愤怒+（好勇斗狠捞）、坚毅、突破（群攻）、愤怒（被烧）", 5,
                 C<Anger>(true), C<TrueGrit>(), C<Breakthrough>(), Burn<Anger>()),
 
-            Turn("洗牌。愤怒+（捞）、坚毅、愤怒+、打击（被烧）", 6,
+            Turn("洗牌。愤怒+是洗牌前好勇斗狠捞的", 6,
                 C<Anger>(true), C<TrueGrit>(), C<Anger>(true), Burn<StrikeIronclad>()),
 
             Turn("烙印、愤怒+（捞）、突破（群攻）、愤怒+（被烧）", 7,
                 C<Brand>(), C<Anger>(true), C<Breakthrough>(), Burn<Anger>(true)),
 
-            Turn("洗牌。愤怒+（捞）、愤怒+、坚毅、愤怒+（被烧）", 8,
+            Turn("洗牌。愤怒+是洗牌前好勇斗狠捞的", 8,
                 C<Anger>(true), C<Anger>(true), C<TrueGrit>(), Burn<Anger>(true)),
 
             Turn("烙印、愤怒+（捞）、突破（群攻）、愤怒+（被烧）", 9,
@@ -100,7 +100,7 @@ public static class IroncladAngerScript
     public static Type AscensionRelic() => typeof(Gorget);
 
     private static BossTurn Turn(string note, int turnIndex, params ScriptCard[] cards)
-        => new() { Note = $"{turnIndex}. {note}", Cards = new List<ScriptCard>(cards) };
+        => new() { Note = string.IsNullOrWhiteSpace(note) ? string.Empty : $"{turnIndex}. {note}", Cards = new List<ScriptCard>(cards) };
 
     private static ScriptCard C<T>(bool upgraded = false)
         where T : MegaCrit.Sts2.Core.Models.CardModel

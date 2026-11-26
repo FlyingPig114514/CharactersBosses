@@ -884,11 +884,15 @@ public static class BossDefs
         // 进阶加成（用户设计）：
         //   · 第一幕：进阶 8 获得遗物「星系尘埃」+ 群星之子升级；进阶 9 第一张碰撞轨迹、太阳打击升级
         //     （按张升级写在剧本里：ScriptCard.UpgradeMinAscension）
+        //     ★ 2026-11-26（用户：「进阶8 的群星之子升级不应该只写在剧本里，而应该和其他的一样，
+        //       写在进阶升级那里」）⇒ 群星之子挪进下面的 `AscensionUpgradesByAct`（(8, 1, ChildOfTheStars)），
+        //       剧本里那张不再带 `UpgradeMinAscension`。
         //   · 第二幕：进阶 8 招架+、所向无敌+；进阶 9 熔炉+
         //   · 第三幕：进阶 8 = 升级第 1 回合那张「创世之柱」（写在剧本里：`UpgradeMinAscension = 8`）
         //     + 获得遗物「君王矿石」；进阶 9 炸弹+
         AscensionUpgradesByAct = new List<(int, int, Type)>
         {
+            (8, 1, typeof(ChildOfTheStars)),   // 第一幕：群星之子（2026-11-26 从剧本挪到这里）
             (8, 2, typeof(Parry)),
             (8, 2, typeof(IAmInvincible)),
             (9, 2, typeof(Furnace)),

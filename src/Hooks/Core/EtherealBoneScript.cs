@@ -57,7 +57,7 @@ public static class EtherealBoneScript
             // 2：打击、恐惧、领域（没费）
             new BossTurn
             {
-                Note = "2. 打击、恐惧；领域（没费）",
+                Note = "",
                 Energy = 2,
                 Cards = new List<ScriptCard>
                 {
@@ -149,7 +149,7 @@ public static class EtherealBoneScript
             // 10：弱化之触、打击、恐惧
             new BossTurn
             {
-                Note = "10. 弱化之触、打击、恐惧",
+                Note = "",
                 Energy = 3,
                 Cards = new List<ScriptCard>
                 {

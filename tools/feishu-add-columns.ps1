@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   给已有的 CharacterBosses 数据表补齐「一场战斗一行」需要的新列。
 
@@ -131,8 +131,14 @@ $want = @(
     # 2026-11-01（用户：「为这个表格再增加一个筛选条件：进阶为10」）：
     # 模组一直在写 `ascension`，但表里没这一列 ⇒ 上传时被跳过。补上之后
     # `tools\feishu-stats.ps1 -Asc10` 才筛得出来。
-    @{ name = 'ascension';     type = 2 }
-    # 注：v0.2.277 曾加过 `mode`（solo/mp），用户 2026-10-31 说「直接看玩家人数就行」⇒ v0.2.278 起不再写
+    @{ name = 'ascension';     type = 2 },
+    # v0.2.960（用户 2026-11-26：「能不能筛选恐惧模式」「把快速模式也加入统计」）：
+    # 游戏模式，取值 = `RunState.GameMode` 的小写枚举名：
+    #   standard（标准）/ daily（每日挑战）/ dread（恐惧）/ blitz（极速·即快速模式）/ custom（自定义）
+    # 补上这一列之后 `tools\feishu-stats.ps1 -Mode dread` 才筛得出来；旧行这一列为空。
+    @{ name = 'mode';          type = 1 }
+    # 注：v0.2.277 曾加过 `mode`（值 solo/mp），用户 2026-10-31 说「直接看玩家人数就行」⇒ v0.2.278 起不写；
+    #     v0.2.960 起这一列复用成「游戏模式」（不再是 solo/mp），含义完全不同，别混。
 )
 
 Write-Host '[3/3] 补缺失的列 ...'

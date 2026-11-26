@@ -77,7 +77,7 @@ public static class SnakeBiteSilentScript
             // 6：洗牌；投掷匕首（弃翻越撑击）、翻越撑击（奇巧）、防御；防御（没费）
             new BossTurn
             {
-                Note = "6. 洗牌；投掷匕首（弃翻越撑击）、翻越撑击（奇巧）、防御；防御（没费）",
+                Note = "6. 洗牌。",
                 ShuffleDrawPile = true,
                 Cards = new List<ScriptCard>
                 {
@@ -166,7 +166,7 @@ public static class SnakeBiteSilentScript
     private static BossTurn Turn(string note, int turnIndex, params ScriptCard[] cards)
         => new()
         {
-            Note = $"{turnIndex}. {note}",
+            Note = string.IsNullOrWhiteSpace(note) ? string.Empty : $"{turnIndex}. {note}",
             Cards = new List<ScriptCard>(cards),
             Energy = TurnEnergy,
         };

@@ -41,7 +41,7 @@ public static class SoulBoneScript
         {
             Turn("拖延+、自动化+、挽歌；切断、防御没费", 1,
                 C<Delay>(true), C<Automation>(true), C<Dirge>(),
-                C<Severance>(), C<DefendNecrobinder>()),
+                C<Severance>(wouldPlay: false), C<DefendNecrobinder>(wouldPlay: false)),   // 第 1 回合：用户要保留「没费」
 
             Turn("守墓人+、死者苏生、死亡行军", 2,
                 C<GraveWarden>(true), C<Reanimate>(), C<DeathMarch>()),
@@ -57,7 +57,7 @@ public static class SoulBoneScript
                 C<DevourLife>(true), C<Soul>(), C<Soul>(), C<Spur>(),
                 C<DanseMacabre>(), C<Unleash>(), C<DefendNecrobinder>()),
 
-            Turn("洗牌。切断（印灵魂）、灵魂、死亡行军、忧郁、防御、羞耻", 6,
+            Turn("洗牌。", 6,
                 C<Severance>(), C<Soul>(), C<DeathMarch>(), C<Melancholy>(),
                 C<DefendNecrobinder>(), C<Shame>()),
 
@@ -104,12 +104,24 @@ public static class SoulBoneScript
     private static BossTurn Turn(string note, int turnIndex, params ScriptCard[] cards)
         => new()
         {
-            Note = $"{turnIndex}. {note}",
+            Note = string.IsNullOrWhiteSpace(note) ? string.Empty : $"{turnIndex}. {note}",
             Cards = new List<ScriptCard>(cards),
             Energy = turnIndex >= 1 && turnIndex <= TurnEnergy.Length ? TurnEnergy[turnIndex - 1] : 0,
         };
 
-    private static ScriptCard C<T>(bool upgraded = false, string from = "deck", int damage = 0)
+    /// <summary>
+    /// 卡牌。★ 2026-11-26（用户：「灵魂骨除了第一回合外，所有不出的牌的备注都不应该是没费
+    /// （除了羞耻这张诅咒），而应该是（有费就打）」）：
+    /// 这个 Boss 的牌**都是想打的**，打不出只是因为这一回合的钱不够 ⇒ 除第 1 回合那两张显式关掉外，
+    /// 一律打上 `WouldPlayIfEnergy`（wiki 的「不出」列显示成「有费就打」；诅咒走 `cost &lt; 0` 那条，
+    /// 仍然显示「打不出·诅咒或状态」）。对游戏逻辑没有任何影响。
+    /// </summary>
+    private static ScriptCard C<T>(bool upgraded = false, string from = "deck", int damage = 0,
+                                   bool wouldPlay = true)
         where T : MegaCrit.Sts2.Core.Models.CardModel
-        => new() { Card = typeof(T), Upgraded = upgraded, From = from, DamageOverride = damage };
+        => new()
+        {
+            Card = typeof(T), Upgraded = upgraded, From = from, DamageOverride = damage,
+            WouldPlayIfEnergy = wouldPlay,
+        };
 }

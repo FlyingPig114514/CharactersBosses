@@ -62,13 +62,21 @@ public static class RegentBombardScript
 
         var script = new BossScript
         {
-            // 只放静态回合表（给「没有 Resolve 也能工作」兜底：1 = 被击晕、2 = 轰击、3 = 唤醒 A）
+            // 只放静态回合表（给「没有 Resolve 也能工作」兜底：1 = 被击晕、2 = 轰击、3 = 唤醒 A、4 = 唤醒 B）
+            // ★ 2026-11-26（用户：「轰击储的意图被你漏了一回合（x+1 回合）」）：
+            //   原来这张表只到「唤醒后 A」⇒ 百科／意图表里**少了 B 那一回合**，看起来像只打一回合就停。
+            //   现在把 wakeB 补成第 4 回合，并标 `LoopFrom=3 / LoopLength=2`（A、B 交替）——
+            //   这份静态表只在 `Resolve` 取不到时才用（真实回合仍由下面那个 `Resolve` 决定），
+            //   所以这么写只影响展示，不影响战斗。
             Turns = new List<BossTurn>
             {
                 new() { Note = "1. 被击晕（环绕轨道）", Cards = new List<ScriptCard>() },
                 turnBombard,
                 wakeA,
+                wakeB,
             },
+            LoopFrom = 3,
+            LoopLength = 2,
             // ★ 真正的回合选择走这里：被击晕的回合数由玩家决定 ⇒ 长度不固定。
             //   2026-11-13（恐惧模式，用户当轮口径）：「轰击储**第一回合就打轰击**，而不是第二回合」
             //   ⇒ 恐惧模式下打轰击的那一回合是第 1 回合，之后立刻进入被击晕状态。

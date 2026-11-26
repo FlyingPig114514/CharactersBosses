@@ -62,6 +62,44 @@ public abstract class BossMinionMonster : MonsterModel
         try
         {
             if (summoner == null) return 0;
+
+            // ★★ v0.2.954（2026-11-25 用户截图：「仆从储没有仆从，但他的仆从打击还是显示为攻击而非召唤」）：
+            //   **以战斗里真实存在的生物为准**，不再只看 `Registry`。
+            //   原因：`Registry` 是一份我们自己维护的名单，仆从被打死 / 被带走 / 大战结算时只要有一条路径
+            //   没清干净（或清理晚于意图重算），`CountAlive` 就会报「还有 1 只」⇒
+            //   `BossScriptPlanner.IsMinionSummonHere` 认为已达上限 ⇒ 仆从牌被预测成「攻击/格挡」，
+            //   而场上其实一只都没有（玩家看到的就是「没有仆从，但显示为攻击」）。
+            //   `CombatState.Creatures` 是两端同步的权威列表，活没活一眼就能看出来。
+            var combat = summoner.CombatState;
+            if (combat != null)
+            {
+                int live = 0;
+                try
+                {
+                    var all = combat.Creatures;
+                    if (all != null)
+                    {
+                        for (int i = 0; i < all.Count; i++)
+                        {
+                            var c = all[i];
+                            if (c == null) continue;
+                            if (c.Monster is not BossMinionMonster) continue;
+                            if (!c.IsAlive) continue;
+                            live++;
+                        }
+                    }
+                }
+                catch { /* 读不到就退回 Registry */ }
+
+                if (live > 0) return live;
+
+                // 战斗里一只活的都没有 ⇒ 就是 0（顺手把过期名单清掉）
+                try { if (Registry.TryGetValue(summoner, out var stale)) stale.RemoveAll(m => m == null || m.Creature == null || !m.Creature.IsAlive); }
+                catch { /* 忽略 */ }
+                return 0;
+            }
+
+            // 兜底：拿不到战斗状态时，仍然按 Registry 数（并剔除已死的）
             if (!Registry.TryGetValue(summoner, out var list)) return 0;
             list.RemoveAll(m => m?.Creature == null || !m.Creature.IsAlive);
             return list.Count;

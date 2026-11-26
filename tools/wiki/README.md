@@ -1,4 +1,4 @@
-﻿# 百科页（GitHub Pages）与数据导出工具
+# 百科页（GitHub Pages）与数据导出工具
 
 这个目录放的是**从模组本体自动导出数据**、再生成「Boss 百科页 / Excel 表」的工具链。
 页面地址（启用 GitHub Pages 后）：<https://flyingpig114514.github.io/CharactersBosses/>
@@ -34,8 +34,12 @@ tools\dotnet\dotnet.exe build src\CharacterBosses.csproj -c Release -p:Sts2Targe
 
 # 2) 导出数据（需要游戏本体目录里的托管 DLL 来解析 sts2 类型）
 $game = "D:\SteamLibrary\steamapps\common\Slay the Spire 2\data_sts2_windows_x86_64"
+# ⚠ 观者那几套 Boss 要把观者模组一起预加载（第 5 个位置参数 = 那个 mod 的工坊目录）。
+#   不传的话 `WatcherCards`（运行期反射）取不到牌，导出脚本会退化成「从回合备注文字里反解卡牌」
+#   （data.json 里会看到 "fromNote": true）—— 备注一改短，那一回合的卡牌列就空了。
+$watcher = "D:\SteamLibrary\steamapps\workshop\content\2868840\3747526116"   # Boninall 版（优先）
 tools\dotnet\dotnet.exe run --project tools\wiki-dump -c Release -- `
-    src\bin\Release-113\CharacterBosses.Impl113.dll $game tools\wiki\data.json $PWD
+    src\bin\Release-113\CharacterBosses.Impl113.dll $game tools\wiki\data.json $PWD $watcher
 
 # 3) 生成页面 + Excel
 powershell -ExecutionPolicy Bypass -File tools\wiki\build-site.ps1

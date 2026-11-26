@@ -132,7 +132,7 @@ public static class SilentScript
 
     /// <summary>带能量覆盖的回合（<paramref name="energy"/> 为空 = 用默认的 2 费）。</summary>
     private static BossTurn Turn(string note, int turnIndex, int? energy, params ScriptCard[] cards)
-        => new() { Note = $"{turnIndex}. {note}", Cards = new List<ScriptCard>(cards), Energy = energy ?? TurnEnergy };
+        => new() { Note = string.IsNullOrWhiteSpace(note) ? string.Empty : $"{turnIndex}. {note}", Cards = new List<ScriptCard>(cards), Energy = energy ?? TurnEnergy };
 
     private static ScriptCard C<T>(bool upgraded = false, string from = "deck", bool discardInstead = false)
         where T : MegaCrit.Sts2.Core.Models.CardModel

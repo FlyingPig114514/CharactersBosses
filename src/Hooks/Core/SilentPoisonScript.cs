@@ -30,7 +30,7 @@ public static class SilentPoisonScript
     {
         var turns = new List<BossTurn>
         {
-            Turn("涂毒+（2 费：之后每次攻击的未格挡伤害各给 1 层中毒）、背刺、偏折；打击被烘焙手套烧掉，防御没费", 1,
+            Turn("", 1,
                 C<Envenom>(true), C<Backstab>(), C<Deflect>(),
                 C<StrikeSilent>(burned: true), C<DefendSilent>()),
 
@@ -52,16 +52,16 @@ public static class SilentPoisonScript
             Turn("毒雾（每回合给玩家上毒）、尖啸；防御被烧掉", 4,
                 C<NoxiousFumes>(), C<PiercingWail>(), C<DefendSilent>(burned: true)),
 
-            Turn("打击、回响斩击（全体 10）；第三张打击被烧掉", 5,
+            Turn("", 5,
                 C<StrikeSilent>(), C<EchoingSlash>(), C<StrikeSilent>(burned: true)),
 
             Turn("无尽刀刃（之后每回合 1 刀）、狩猎（10 伤，斩杀加成）；打击被烧掉", 6,
                 C<InfiniteBlades>(), C<TheHunt>(), C<StrikeSilent>(burned: true)),
 
-            Turn("小刀、中和、刀刃之舞（3 刀）；防御被烧掉。到此累计烧掉 打击×4、防御×3", 7,
+            Turn("", 7,
                 C<Shiv>(), C<Neutralize>(), C<BladeDance>(), C<DefendSilent>(burned: true)),
 
-            Turn("洗牌：小刀被烧掉；带毒刺击、回响斩击、偏折", 8,
+            Turn("洗牌。", 8,
                 C<Shiv>(burned: true), C<PoisonedStab>(), C<EchoingSlash>(), C<Deflect>()),
 
             Turn("小刀被烧掉；生存者、连续反弹（奇巧免费打出）、防御", 9,
@@ -103,7 +103,7 @@ public static class SilentPoisonScript
     };
 
     private static BossTurn Turn(string note, int turnIndex, params ScriptCard[] cards)
-        => new() { Note = $"{turnIndex}. {note}", Cards = new List<ScriptCard>(cards), Energy = TurnEnergy };
+        => new() { Note = string.IsNullOrWhiteSpace(note) ? string.Empty : $"{turnIndex}. {note}", Cards = new List<ScriptCard>(cards), Energy = TurnEnergy };
 
     private static ScriptCard C<T>(bool upgraded = false, bool burned = false, int costOverride = -1,
                                    bool discardInstead = false, string from = "deck")

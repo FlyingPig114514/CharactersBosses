@@ -106,7 +106,7 @@ public static class StatusDefectScript
     private static BossTurn Turn(string note, int turnIndex, bool shuffle, params ScriptCard[] cards)
         => new()
         {
-            Note = $"{turnIndex}. {note}",
+            Note = string.IsNullOrWhiteSpace(note) ? string.Empty : $"{turnIndex}. {note}",
             Cards = new List<ScriptCard>(cards),
             Energy = TurnEnergy,
             ShuffleDrawPile = shuffle,

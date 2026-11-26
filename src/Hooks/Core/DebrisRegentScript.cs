@@ -43,9 +43,12 @@ public static class DebrisRegentScript
                 // 末尾这张防御是「亮在手里但没费打」的那张（和其它回合的「防御没费」同一个写法）
                 C<DefendRegent>()),
 
-            T("群星之子（进阶8升级）、下砸（群攻）、碰撞轨迹（进阶9升级）", 2,
+            T("这张碰撞轨迹会在进阶9升级", 2,
                 // 用户 2026-10-30：**太阳打击 → 下砸（CRUSH_UNDER）**，1 费打全体 8 伤（群攻增强）
-                At(8, typeof(ChildOfTheStars)), C<CrushUnder>(), At(9, typeof(CollisionCourse))),
+                // ★ 2026-11-26（用户：「进阶8 的群星之子升级不应该只写在剧本里，而应该和其他的一样，
+                //   写在进阶升级那里」）⇒ 群星之子改为在 `BossDefs.Regent` 的 `AscensionUpgradesByAct`
+                //   里登记（(8, 1, ChildOfTheStars)），这里只剩进阶 9 那张碰撞轨迹按张标。
+                C<ChildOfTheStars>(), C<CrushUnder>(), At(9, typeof(CollisionCourse))),
 
             T("彗星、笨拙、贪婪（两张都是诅咒，出不了）", 3,
                 C<Comet>(), C<Clumsy>(), C<Greed>()),
@@ -56,7 +59,7 @@ public static class DebrisRegentScript
                 // ⇒ 从那回合起攻击 −25%，比纯占位的伤口更难受。结算走 RunCurseTurnEndHooks）
                 C<DefendRegent>(), C<DefendRegent>(), C<Doubt>()),
 
-            T("洗牌 → 碰撞轨迹（进阶9不升）、下砸（群攻）、碰撞轨迹（进阶9升级）", 5,
+            T("洗牌。第二张碰撞轨迹会在进阶9升级", 5,
                 C<CollisionCourse>(), C<CrushUnder>(), At(9, typeof(CollisionCourse))),
 
             T("隐秘藏品+、防御、防御（第三张防御 1 费，没费打不了）", 6,
@@ -101,7 +104,7 @@ public static class DebrisRegentScript
     };
 
     private static BossTurn T(string note, int turnIndex, params ScriptCard[] cards)
-        => new() { Note = $"{turnIndex}. {note}", Cards = new List<ScriptCard>(cards) };
+        => new() { Note = string.IsNullOrWhiteSpace(note) ? string.Empty : $"{turnIndex}. {note}", Cards = new List<ScriptCard>(cards) };
 
     private static ScriptCard C<T>(bool upgraded = false, string from = "deck")
         where T : CardModel

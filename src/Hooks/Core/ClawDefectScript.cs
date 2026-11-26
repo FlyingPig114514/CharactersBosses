@@ -40,7 +40,7 @@ public static class ClawDefectScript
     {
         var turns = new List<BossTurn>
         {
-            Turn("暴涨（失去 2 个充能球栏位、+2 力量 +2 敏捷）、冰寒（玩家方每有一个单位生成 1 个冰霜球）、启动流程（10 格挡）", 1,
+            Turn("冰寒只计算玩家数量", 1,
                 C<BulkUp>(), C<Chill>(), C<BootSequence>()),
 
             Turn("爪击、打击、防御", 2,
@@ -49,7 +49,7 @@ public static class ClawDefectScript
             Turn("野性（之后每回合第一张 0 费攻击牌回手）、爪击、爪击（野性捞回来的那张）、热修复（本回合 +2 集中；原第 6 回合那张换到这里）", 3,
                 C<Feral>(), C<Claw>(), C<Claw>(false, "feral"), C<Hotfix>()),
 
-            Turn("冷却剂（单人）/一心化万（多人）、超越光速、超越光速（野性捞）、充电（下回合 +1 费）、螺旋钻机（超越光速抽上来的）、打击（抽上来的，没费）", 4,
+            Turn("多人时将冷却剂替换为一心化万", 4,
                 C<Coolant>(), C<Ftl>(), C<Ftl>(false, "feral"), C<ChargeBattery>(),
                 C<HelixDrill>(false, "ftl-draw"), C<StrikeDefect>(false, "ftl-draw")),
 
@@ -59,10 +59,10 @@ public static class ClawDefectScript
             Turn("打击（原第 3 回合那张换到这里）、打击、防御（2 费只够两张打击，防御没费）", 6,
                 C<StrikeDefect>(), C<StrikeDefect>(), C<DefendDefect>()),
 
-            Turn("洗牌。爪击、爪击（野性捞）、打击、防御", 7,
+            Turn("洗牌。", 7,
                 C<Claw>(), C<Claw>(false, "feral"), C<StrikeDefect>(), C<DefendDefect>()),
 
-            Turn("超越光速、超越光速（野性捞）、充电、防御、螺旋钻机（抽上来的）、打击（抽上来的，没费）", 8,
+            Turn("", 8,
                 C<Ftl>(), C<Ftl>(false, "feral"), C<ChargeBattery>(), C<DefendDefect>(),
                 C<HelixDrill>(false, "ftl-draw"), C<StrikeDefect>(false, "ftl-draw")),
 
@@ -108,7 +108,7 @@ public static class ClawDefectScript
     };
 
     private static BossTurn Turn(string note, int turnIndex, params ScriptCard[] cards)
-        => new() { Note = $"{turnIndex}. {note}", Cards = new List<ScriptCard>(cards), Energy = TurnEnergy };
+        => new() { Note = string.IsNullOrWhiteSpace(note) ? string.Empty : $"{turnIndex}. {note}", Cards = new List<ScriptCard>(cards), Energy = TurnEnergy };
 
     private static ScriptCard C<T>(bool upgraded = false, string from = "deck")
         where T : MegaCrit.Sts2.Core.Models.CardModel

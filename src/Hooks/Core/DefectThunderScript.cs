@@ -62,7 +62,7 @@ public static class DefectThunderScript
             // 6：双倍能量+（能量翻倍）+ 信号增强 ⇒ 缓冲由「信号增强」自己复制一份，剧本里**只写一张**
             new BossTurn
             {
-                Note = "6. 双倍能量+、信号增强、缓冲（信号增强会自己复制一次）",
+                Note = "6. 缓冲会被信号增强打出两次",
                 Cards = new List<ScriptCard>
                 {
                     C<DoubleEnergy>(true), C<SignalBoost>(),
@@ -142,7 +142,7 @@ public static class DefectThunderScript
     private static BossTurn Turn(string note, int turnIndex, params ScriptCard[] cards)
         => new()
         {
-            Note = $"{turnIndex}. {note}",
+            Note = string.IsNullOrWhiteSpace(note) ? string.Empty : $"{turnIndex}. {note}",
             Cards = new List<ScriptCard>(cards),
             Energy = TurnEnergy,
         };

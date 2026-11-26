@@ -100,7 +100,7 @@ public static class WatcherForesightScript
                 Hold(WatcherCards.Strike, cost: 1)),
 
             // ── 6 ── 洗牌（美琅脂弃 暴怒·迂回）/（先见之明弃 贪婪）/ 迂回 / 天眼（弃 打击·防御）/ 迂回 / 防御 / 打击（没费）   ← 6~8 循环起点   （2 费）
-            TurnEnergy(2, true, "6. 洗牌（美琅脂弃 暴怒·迂回）；先见之明弃 贪婪；迂回、天眼（弃 打击·防御）、迂回、防御、打击（没费）",
+            TurnEnergy(2, true, "6. 洗牌。",
                 Scried(WatcherCards.Eruption), Scried(WatcherCards.Weave),
                 Scried(WatcherCards.Greed),
                 Play(WatcherCards.Weave),

@@ -4,6 +4,298 @@
 > 旧条目逐字来自 `git show HEAD:src/Hooks/Core/BuildInfo.cs` 的 Tag 常量（v0.2.871 及其之前，共 236 条）。
 > 最新版本（0.2.889）是当前 Tag，同时在各条 `workshop/changenote.txt` 里也有面向玩家的摘要。
 
+## v0.2.963（2026-11-26）：百科订正 —— 二层 13 套 Boss 的回合备注 + 三处意图/费用纠正
+
+用户逐条给的订正（承接 v0.2.962 的一层那批），全部改在**剧本源码**里，之后重跑导出 + 五个生成器：
+
+| Boss | 改动 |
+|---|---|
+| 物理机 | 第 1 回合 → 「冰寒只计算玩家数量」；第 4 回合 → 「多人时将冷却剂替换为一心化万」；第 7 回合 → 「洗牌。」；**移除第 8 回合备注** |
+| 彩虹机 | 第 1 回合 → 「多人时将碎片整理替换为模仿学习」 |
+| 放血战 | 第 1 回合**意图纠正**：全身撞击+ 是 0 费，本来就能打出（见下面「工具修复 ①」） |
+| 杂耍战 | **意图纠正**：杂耍/惊逃会打出的牌以前没进「打出」列（工具修复 ②） |
+| 灵魂骨 | 除第 1 回合外，所有「不出」的牌改显示「**有费就打**」（羞耻仍按诅咒）；第 6 回合 → 「洗牌。」 |
+| 虚无骨 | 移除第 2、10 回合备注 |
+| 铸剑储 | 移除第 1、4 回合备注；第 5 回合 → 「所向无敌在他回合结束时正好在抽牌堆顶，免费打出。」；第 6 回合 → 「洗牌。」 |
+| 王储 | 第 3、10 回合 → 同上那句所向无敌；第 7 回合 → 「洗牌。」 |
+| 仆从储 | 移除第 4、9 回合备注；第 7 回合 → 「洗牌。」 |
+| 涂毒猎 | 移除第 1、5、7 回合备注；第 8 回合 → 「洗牌。」 |
+| 蛇眼猎 | 移除第 3 回合备注 |
+| 印牌观 | 移除第 2、3、4、8 回合备注；第 6 回合 → 「洗牌。」 |
+| 保留观 | 第 6 回合 → 「洗牌。」；移除第 7 回合备注 |
+
+**顺带修掉的三处工具问题**（都在 `tools/wiki-dump`，影响整张百科，不只是这 13 套）：
+
+1. **升级后的费用一直按未升级算** ⇒ 全身撞击+（1→0）、惊逃+（2→1）这类在 wiki 里被错标成「没费」。
+   为什么难修：`CardModel` 上**没有** `Upgrade()`；`UpgradeInternal(bool)` / `EnergyCost.UpgradeBy()`
+   都会先 `AssertMutable()`，而 `Activator` 造出来的是 **canonical（模板）实例**、不可变；
+   `ToMutable()` 又要 ModelDb（离线 dump 直接抛 `ModelNotFoundException: Model id=CARD.BODY_SLAM not found`）。
+   → 最后改成**读这张牌自己的 `OnUpgrade()` IL**：扫到 `EnergyCost.UpgradeBy(...)` 就按「升级降 1 费」记。
+2. `StampedePlay`（惊逃在回合结束替她打出的那张）现在算「本回合打出」⇒ 杂耍战的「打出」列补全了。
+3. 回合的卡牌列表改成「**一张都解析不出来**时才用备注文字兜底」，且**单张牌导出失败不清空整列**。
+   以前是「备注里列的比真卡多就以备注为准」⇒ 备注多写一个词就能把真卡顶掉，
+   物理机第 5/9 回合那个假牌名「失去 3 集中）」就是这么来的。
+
+另：`ScriptCard` 新增 `WouldPlayIfEnergy`（标注「这张是想打的，只是这回合钱不够」），wiki 的「不出」列
+据此显示「有费就打」；空备注不再残留「8. 」这种只有序号的前缀（19 个剧本的 `Turn(...)` 辅助一起改了）。
+
+三个目标（111 / 113 / 111+PhoneBuild）**全部 0 错误**，已装机（verify-deploy 报 v0.2.963 OK），
+产物 `index.html` / `boss-table.md` / `boss-table.en.md` / `bosses.md` / xlsx 全部重新生成
+（英文版 **all strings translated**），并已提交推送到 GitHub。
+
+## v0.2.962（2026-11-26）：百科订正 —— 一层 12 套 Boss 的回合备注 + 两处进阶/剧本
+
+用户逐条给的订正（「你先把这些 1 层的问题改一下」）。全部改在**剧本源码**里（备注文字不再手抄进 wiki），
+改完重跑 `tools\wiki-dump` + 五个生成器：
+
+| Boss | 改动 |
+|---|---|
+| 电球机 | 第 6 回合备注 → 「缓冲会被信号增强打出两次」 |
+| 愤怒战 | 第 4 / 6 / 8 回合备注统一 → 「洗牌。愤怒+是洗牌前好勇斗狠捞的」 |
+| 打击战 | 第 6 回合备注 → 「洗牌。由于地狱狂徒，这回合截肢后的打击牌都会被地狱狂徒自动打出」 |
+| 灾厄骨 | 第 3 回合 → 「闪亮口红触发；鞭打抽上来的打击没费」 |
+| 灾厄骨 | 第 5 / 11 回合的**能量汲取备注按代码订正**（详见下） |
+| 血肉骨 | 「不出」里 9 张 `HoldInstead` 改成正常排队；第 1 回合鬼火回的那 1 点显式入账；第 3 / 9 回合备注移除；第 4 / 10 回合加多人苦难备注 |
+| 碎屑储 | 进阶 8 的**群星之子升级从剧本挪进 `AscensionUpgradesByAct`**；第 2 回合 → 「这张碰撞轨迹会在进阶9升级」；第 5 回合 → 「洗牌。第二张碰撞轨迹会在进阶9升级」 |
+| 轰击储 | 静态回合表补上**唤醒后 B**（以前只到 A ⇒ 意图表少一回合），并标 `LoopFrom=3 / LoopLength=2` |
+| 奇巧猎 | 第 2 回合备注只留多人分支；第 6 回合 → 「洗牌。」 |
+| 蛇咬猎 / 预见观 / 疾风观 | 第 6 回合备注 → 「洗牌。」 |
+
+**灾厄骨「能量汲取」到底升哪两张**（查的是 `CharBossMonster.DrainUpgradeOrder`）：
+第 1 次 鞭打 + **死亡之门** ／ 第 2 次 无处可逃 + 荒疫打击（**进阶 9 起整对剔掉**，因为战斗开始就预升级了）
+／ 第 3 次 出击 + 护卫 ／ 第 4 次 播种 + **死亡使者**，之后每次升一对打击/防御。
+⇒ 旧备注里「第 5 回合升级死亡使者」「第 8 回合要等第 11 回合才升级」两处都是错的，已按上表改。
+
+**血肉骨为什么「不出」那么多**：那 9 张标的是 `HoldInstead`（wiki 显示成「留在手牌」），但它们其实只是**没费**
+—— 现在和其它 Boss 一样正常排队，能量不够时规划器自己停下（`reason` 变成「没费」）。
+第 1 回合另有一处真问题：规划期只按 `BossTurn.Energy` 记账，**不知道鬼火回的那 1 点** ⇒ 2−2−0=0 把防御判成没费；
+现在 `Energy = TurnEnergy + 1` 显式补进去，防御真的打得出来。
+
+**工具侧顺带修的一件事**：`tools\wiki-dump` 其实早就支持「第 5 个位置参数 = 预加载某个 mod 的目录」，
+但 README 的导出命令没传 ⇒ 观者那几套的卡牌一直是**从备注文字反解**的（`data.json` 里 `"fromNote": true`），
+备注一改短那一回合的卡牌列就空了。现在 README 的命令带上观者工坊目录
+（`...\workshop\content\2868840\3747526116`），观者卡牌改为读真实剧本，备注可以放心写短。
+另把 13 条新备注补进 `tools\wiki\i18n-en.json`，英文版重新生成后 **「all strings translated」**。
+
+产物：`docs/wiki/index.html`、`docs/wiki/boss-table.md`、`docs/wiki/boss-table.en.md`、`docs/bosses.md`、
+`玩家角色当Boss——Boss意图表.v2.xlsx` 全部基于最新 `data.json` 重新生成。
+
+三个目标（111 / 113 / 111+PhoneBuild）**全部 0 错误**，已装机（verify-deploy 报 v0.2.962 OK）。
+
+## v0.2.961（2026-11-26）：兼容修复 —— AI 陪玩在 0.114 上「宝箱选不了遗物」
+
+用户：「我刚刚在玩AI陪玩模组，到了宝箱处选不了遗物。你能帮忙修一下吗（应该和本模组无关）」——
+确实与本模组无关，坏的是 **AI 陪玩 2.0.3**（工坊 3828244042，作者 huang，最后更新 2026/11/19）。
+
+**铁证**（`godot.log`，玩家每点一次遗物刷一条）：
+
+```
+System.MissingMethodException: Method not found:
+  'Void ...TreasureRoomRelicSynchronizer.OnPicked(Player, Nullable`1<Int32>)'
+    at AICompanion.RoomFixes.TryCompanionVote(TreasureRoomRelicSynchronizer sync, int? excludeIndex, bool random)
+    at TreasureRoomRelicSynchronizer.PickRelicLocally_Patch1(TreasureRoomRelicSynchronizer this, int? index)
+    at NTreasureRoomRelicCollection.PickRelic(NTreasureRoomRelicHolder holder)
+```
+
+**根因**：AI 陪玩在 `PickRelicLocally` 上挂了 Prefix（替陪玩投票），调用 0.113 的两参数
+`OnPicked(Player, int?)`；游戏 **0.114.0 改成三参数** `OnPicked(Player, int?, int roundIndex)`
+⇒ 那条 `callvirt` 在 **JIT 阶段**就抛 `MissingMethodException`，把它所在的 Prefix 整段打断，
+于是**玩家自己那次点击也没走完**（点遗物没反应）。`SkipRelicLocally` 的 Prefix 里有同一处调用。
+
+**试过但走不通的路**（已实测，写下来免得下次重走）：Harmony **transpiler / prefix 都不行** ——
+`PatchProcessor.GetOriginalInstructions(TryCompanionVote)` 和
+`harmony.Patch(TryCompanionVote, prefix:…)` 都直接抛同一个 `MissingMethodException`
+（`.tmp\compat-test` 里的离线验证程序用真 DLL 复现；它同时确认了运行时 `OnPicked` 是三参数）。
+
+**最终做法**（新增 `src/Hooks/Compat/AiCompanionTreasureCompat.cs`，不碰第三方 DLL）：
+**只在「装了 AI 陪玩」且「游戏是三参数 OnPicked」时才动手**，其余情况完全静默。
+
+1. **卸坏补丁**：宝箱房开始投票时（`BeginRelicPicking` 后置）读
+   `PickRelicLocally` / `SkipRelicLocally` 的补丁列表，**只卸掉「补丁方法来自 AICompanion 程序集」**的那几个
+   （用 `PatchMethod.DeclaringType.Assembly` 判定，别人的补丁一律不动）⇒ 玩家的点击恢复正常。
+2. **替陪玩投票**：本模组在同一位置挂 Prefix，用**新签名** `OnPicked(Player, int?, _currentRound)`
+   替陪玩投一票（幂等：已投过就跳过）。选牌优先复用它的 `PickBestRelicIndex`（反射），
+   取不到就随机且**避开玩家已选的那张**；玩家放弃时陪玩跟着放弃，避免宝箱一直等票。
+   反射取的是 `AICompanion.Entry.CompanionPlayer`（静态属性）。
+
+日志：`AI 陪玩兼容：已卸掉 N 个会抛 MissingMethodException 的宝箱补丁 ⇒ …` /
+`AI 陪玩兼容：替陪玩投宝箱遗物 index=x/N`。
+
+离线验证（`.tmp\compat-test`，真 DLL）：`CompanionPlayer=OK、PickBestRelicIndex=OK`、
+运行时 `OnPicked` 三参数、安装无异常。
+
+三个目标（111 / 113 / 111+PhoneBuild）**全部 0 错误**，已装机（verify-deploy 报 v0.2.961 OK）。
+⚠ 顺带发现（与本 bug 无关、只影响设置界面日志）：`STS2_MCP` 的 `InstantModeHoverTipPatch`
+在 0.114 上给 `NFastModeHoverTip` 设了一个已经没有 setter 的属性 ⇒ 进设置界面会刷一条
+`ArgumentException: Property set method not found`，功能不受影响。
+
+## v0.2.960（2026-11-26）：统计数据新增「游戏模式」—— 恐惧 / 极速（快速）也能分开统计
+
+用户：「能不能筛选恐惧模式」→「加，把快速模式也加入统计」。
+
+**为什么以前筛不了**：上传的战斗行里只有 `players`（人数），**没有模式列**；
+恐惧局和普通局在飞书多维表格里长得一模一样（`core/Telemetry.cs` 里当年还写着
+「人数即单人/多人的判据（用户 2026-10-31：不需要额外的 mode 列）」）⇒ 分不开。
+
+三处改动：
+
+1. **`src/Hooks/Core/Telemetry.cs`**：boss_fight 行新增 `mode` 字段，
+   取值 = `RunState.GameMode` 的**小写枚举名**（`standard` / `daily` / `dread` / `blitz` / `custom` / `none`）。
+   - 用 `RunManager.Instance?.DebugOnlyGetState()?.GameMode.ToString().ToLowerInvariant()` 取，
+     **不写死枚举成员** ⇒ `Dread` / `Blitz` 只有 0.113+ 才有，这样同一份代码 107/111/113 三条构建都编得过。
+   - 同时把 `mode` 加进上传字段顺序表（跟在 `players` 后面）。
+   - 表里没有这一列时上传会被跳过（既有行为），所以线上老版本不受影响。
+2. **`tools/feishu-add-columns.ps1`**：待建列表加 `mode`（文本列，幂等）。
+   已在线上执行：`现有 31 列 … ✔ mode（type=1）  新增 1 列`。
+3. **`tools/feishu-stats.ps1`**：新增筛选
+   - `-Mode dread`（多个用逗号：`-Mode dread,blitz`），中英文别名都认：
+     `standard/标准/普通`、`daily/每日`、`dread/恐惧/恐惧模式`、`blitz/极速/快速/快速模式`、`custom/自定义`；
+   - 快捷开关 `-Dread`（= `-Mode dread`）、`-Blitz`（= `-Mode blitz`）；
+   - **读不到 `mode` 的旧行一律排除**（和 `-SoloOnly` / `-Asc10` 同一口径），跳过统计里多一项「模式不符」；
+   - CSV 多一列 `Mode`，写明这份数据筛的是哪个模式（`all` = 不筛）。
+   - `-SelfTest` 假数据里放了一条 `dread` 局，已验证 `-Dread` / `-Mode 恐惧` / `-Blitz` / `-Asc10 -Mode dread`
+     四种组合都筛得对（`-Blitz` 因为假数据里没有极速局，正确输出「没有可统计的对局数据」）。
+
+⚠ **历史数据补不回来**：v0.2.960 之前的行 `mode` 为空，按上面的口径会被排除；
+要等线上客户端升到 v0.2.960+ 打几局，才有可筛的恐惧 / 极速数据。
+
+三个目标（111 / 113 / 111+PhoneBuild）**全部 0 错误**，已装机（verify-deploy 报 v0.2.960 OK）。
+
+## v0.2.959（2026-11-26）：蛇咬猎地图图标 —— 两个蛇头内侧贴住猎人头像
+
+用户：「让蛇头内侧贴着猎人的头像」。
+
+只改**位移**，其余不动（头像正中 `(0.50,0.48)`、飞镖 ±45° 交叉垫在后面、蛇头左右两侧纵向 0.48、张口朝外）：
+
+- 蛇头中心 `0.15 → 0.24`（宽仍是 0.26 ⇒ 内缘越过头像轮廓约 15px）。
+- 重叠**不是**把两张白图叠在一起：既有流程是先画蛇/飞镖 → 用头像**实心轮廓** `Mask-Out` 掉
+  → 最后再把头像盖回去 ⇒ 蛇头内缘**沿头像轮廓被裁掉**，正好与下巴/脸颊严丝合缝地贴住，
+  而头像自己的内部线条一根不少（重叠区整块挖掉，不会糊）。
+- 成品 = `tools/art/_snakebite_candidates5/B_snakesonly.png`（同目录 `A_behind` 是内缘还留一道缝的、
+  `C_deep` 是蛇头更大更挤的、`D_tilt` 是无飞镖的，都在 `compare.png` 里）。
+  上一版（内缘留缝）备份 `_snakebite_candidates5/deployed_0958.png`。
+- `make-outline.ps1 -Band 7` 重生成 `_outline.png`（环 44892 px），`register-map-icon.ps1` 重跑 Godot 导入
+  （`.ctex` 刷新 12:09:43），`install-mod.bat` 重打 PCK。
+
+三个目标（111 / 113 / 111+PhoneBuild）**全部 0 错误**，已装机（verify-deploy 报 v0.2.959 OK）。
+
+## v0.2.958（2026-11-26）：蛇咬猎地图图标 —— 两个蛇头改为张口朝外
+
+用户：「让两个蛇头朝外」。
+
+只改**朝向**，布局不动（头像正中 `(0.50,0.48)`、飞镖 ±45° 交叉垫在头像后面、两个蛇头在**左右两侧**纵向 0.48）：
+
+- `make-snakebite-icon4.ps1` 新增 `-FlipSnake`：把**蛇头元素本身**先水平镜像再摆放，
+  再按老规矩由同一次渲染镜像出右侧那条 ⇒ 左右两条仍然严格对称，只是**獠牙朝外**。
+- 成品 = `tools/art/_snakebite_candidates4/A_behind.png`；朝内那版备份在
+  `tools/art/_snakebite_candidates4/deployed_0957_jawsIn.png`。
+- `make-outline.ps1 -Band 7` 重生成 `_outline.png`（环 48871 px），`register-map-icon.ps1` 重跑 Godot 导入
+  （`.ctex` 刷新 12:03:09），`install-mod.bat` 重打 PCK。
+
+三个目标（111 / 113 / 111+PhoneBuild）**全部 0 错误**，已装机（verify-deploy 报 v0.2.958 OK）。
+
+## v0.2.957（2026-11-26）：蛇咬猎地图图标第三次订正（蛇头挪到左右两侧 / 蛇头改用蛇咬卡图线稿）
+
+用户看图后订正：「boss 头像永远要是在正中间的，我都说了把蛇头放在**左侧和右侧**，在**飞镖的上端和下端中间**，而且你这个蛇头**不是蛇咬图中的蛇头**」。
+
+上一版（v0.2.956）两处都不对：①蛇头放在**下方两侧**（`(0.29, 0.82)`）；②蛇头取自原版「群蛇形态」**能力图标**，不是蛇咬卡图。
+
+现在（`tools/art/make-snakebite-icon4.ps1` 参数改一下就是新布局）：
+
+1. **头像固定在正中** `(0.50, 0.48)`。
+2. **飞镖**仍 ±45° 交叉在头像**后面**（遮挡式，脸上一笔不压），长度 0.86 ⇒ 上端落在**上左/上右**、下端落在**下左/下右**。
+3. **两个蛇头落在左右两侧**，纵向 `0.48` —— 正好是飞镖上端与下端之间；张口朝内（`-FlipSnake` 可换朝向）。
+4. **蛇头素材换成蛇咬卡图本体**：新增 `tools/art/extract-snake-ink.ps1`，从 1000×760 的原版卡图
+   （`tools/art/_orig/card_snakebite_hires.png`，用 `dump_texture_png.gd` 从游戏 PCK 的
+   `res://images/packed/card_portraits/silent/snakebite.png` 导出）里取**黑色线稿**——
+   `亮度 ≤ 85 且排除绿色背景`，再外扩 1.5px 加粗 ⇒ `refs/snake_head_ink3.png`（294×300）。
+   这批 sibling 图标（`silent_poison` / `silent_shiv` / `silent_mirror_image`）本来就是这种**线稿**风格，
+   现在蛇头也是同一套来源和风格。
+
+候选图（`tools/art/_snakebite_candidates3/compare.png`）：`A_behind`（已采用）、`C_deep`（短刀）、
+`D_tilt`（无飞镖）、`B_snakesonly`（蛇头更大）。上一版成品备份 `_snakebite_candidates3/deployed_0956.png`。
+v0.2.956 的成品（蛇头在下）已弃用。
+
+`make-outline.ps1 -Band 7` 重生成 `_outline.png`（环 48484 px），`register-map-icon.ps1` 重跑 Godot 导入
+（`.ctex` 刷新 12:00:02），`install-mod.bat` 重打 PCK。三个目标（111 / 113 / 111+PhoneBuild）**全部 0 错误**，
+已装机（verify-deploy 报 v0.2.957 OK）。
+
+## v0.2.956（2026-11-26）：蛇咬猎地图图标重做（飞镖垫到头像后面 + 蛇头改用原版「群蛇形态」图标本体）
+
+用户贴图后三条纠错：「为什么飞镖在猎人头像上面？为什么蛇头不是原版中的素材？为什么飞镖下面的部分就全是纯白，这是你从飞镖贴图中提取出来的吗？」
+
+**三个问题的根因（都成立，是我的实现问题）**：
+
+1. **飞镖压在脸上**：v3 把两根飞镖的交点放在 `(0.50, 0.40)`，而头像中心是 `(0.50, 0.50)`
+   ⇒ X 正好横穿面部；更关键的是所有图层都是用 `max(alpha)` **平铺叠加**（`Merge-Layer`），
+   根本没有遮挡关系 ⇒ 飞镖看上去就是"画在头像上面"。
+2. **蛇头不像原版素材**：v2/v3 的"蛇"是从 `refs/card_snakebite.png`（250×190 的蛇咬**卡图**）
+   按「暖色键 `R−G ≥ 14 且 R > 40` + 最大连通块」抠出来的 —— 卡图上那条蛇的**黑鳞线、口腔、暗部全是洞**，
+   最大连通块只剩**113×103 的一弯月牙 + 一根倒刺**，再缩到画布 40% 宽 ⇒ 成品里那几个"爪子"就是它。
+   素材确实是原版卡图，但**抠图把它抠得认不出来了**。
+3. **飞镖下面全是纯白**：同上，平铺叠加让「头像 + 两条蛇 + 两把刀」在**下面连成一整片**，
+   而头像自身是实心剪影（`refs/avatar_silent.png`）⇒ 那片区域没有任何内部线，看着就像从飞刀贴图里剥出来的。
+
+**重做（`tools/art/make-snakebite-icon4.ps1`）**：
+
+1. **遮挡关系**：先画蛇、再画飞镖，最后用头像的**实心轮廓把它们挖掉**（`Mask-Out`）
+   ⇒ 飞镖只在**上左/上右露出蛇头柄、下左/下右露出刀尖**，脸上一笔不压。
+2. **蛇头换成真正的原版蛇**：从游戏本体 PCK 导出 `res://images/powers/serpent_form_power.png`
+   （256×256，**原版「群蛇形态」能力图标本体**）→ `tools/art/extract-snake-power.ps1` 转成白+alpha 掩膜
+   （挖掉**褐色口腔 + 黑眼珠** ⇒ 张开的嘴 + 獠牙在剪影里可读）。左右**镜像对称**、张口朝内咬向头像下巴。
+   导出用的是既有工具 `list_pck_pngs.gd` / `dump_texture_png.gd`（`godot --headless --path tools\art --script dump_texture_png.gd -- <pck> <res://路径> <输出.png>`）。
+3. **严格对称**：两条蛇由**同一次渲染**镜像得到（`Mirror-Mask`），不再分别摆两次。
+4. 另新增 `tools/art/extract-snake-head.ps1`（从卡图抠蛇头，**只填小洞、保留最大的洞=张开的嘴**），
+   以及 `tools/art/_snakebite_candidates/`、`_snakebite_candidates2/` 两套候选图（含 `compare.png` 对照图）：
+   `A_behind`（已采用：飞镖垫在后面 + 两个蛇头在下）、`B_snakesonly`（无飞镖）、`C_deep`（刀更长）、`D_tilt`（短刀）。
+   v3 的成品备份在 `tools/art/_snakebite_candidates/v3_deployed.png`。
+
+出图后 `make-outline.ps1 -Only silent_snakebite -Band 7` 重生成 `_outline.png`（环 41633 px），
+`register-map-icon.ps1` 重跑 Godot 导入（`.ctex` 已刷新 11:22:45），`install-mod.bat` 重打 PCK（154 个 extra 文件）。
+
+三个目标（111 / 113 / 111+PhoneBuild）**全部 0 错误**，已装机（verify-deploy 报 v0.2.956 OK）。
+
+## v0.2.955（2026-11-25）：蛇咬猎地图图标改版（飞镖 ±45° 交叉 / 蛇头挪到左右中间）
+
+用户：「把飞镖的角度改成 45 度倾斜，让这两个飞镖 90 度垂直，然后把两个蛇头放在左侧和右侧的中间」。
+
+新增 `tools/art/make-snakebite-icon3.ps1`（抠图逻辑照抄 v2，只改摆放）：
+
+1. **飞镖**：两张 ref（`dart_tip45` / `dart_tip135`）的轴本来就量出来是 +44.98° / −45.02°，
+   但 v2 把它们**各自摆在上半外侧**，成品看起来是两根近乎水平的刀；
+   现在两根都以 `(DartCx, DartCy) = (0.50, 0.36)` 为**同一个交点**摆放，长度 0.62
+   ⇒ 天然 **90° 垂直**、组成一个 X。
+2. **蛇**：v2 摆的是「蛇身中心」(`SnakeX, SnakeY=0.80`) —— 蛇头就挤在下方中间。
+   现在改成**按蛇头落点摆**：量出蛇头在这条剪影包围盒里的相对位置 (0.84, 0.10)，
+   再用 `SnakeHeadX/SnakeHeadY` 反推蛇身中心 ⇒ 两个蛇头正好落在**左侧 / 右侧的中间**
+   （0.30 / 0.70，纵向 0.52），蛇身朝下外侧铺开。
+3. `make-outline.ps1 -Only silent_snakebite -Band 7` 重新生成 `_outline.png`；
+   `register-map-icon.ps1 -Names silent_snakebite` 重新跑 Godot 导入（`.ctex` 已刷新），
+   `install-mod.bat` 重打 PCK。
+
+三个目标（111 / 113 / 111+PhoneBuild）**全部 0 错误**，已装机（verify-deploy 报 v0.2.955 OK）。
+
+## v0.2.954（2026-11-25）：修「仆从储场上没有仆从，仆从牌却显示为攻击」
+
+用户截图：「仆从储没有仆从，但他的**仆从打击还是显示为攻击而非召唤**」。
+
+**根因**：`BossMinionMonster.CountAlive` 只数我们自己维护的 `Registry` 名单。
+仆从被打死 / 被带走 / 大战结算时，只要有一条路径没把它从名单里清干净
+（或者清理晚于意图重算），`CountAlive` 就会报「还有 1 只」⇒
+`BossScriptPlanner.IsMinionSummonHere` 认为已达上限 ⇒ 仆从牌被预测成「攻击/格挡」，
+而场上其实一只都没有；`MinionSummonPatch` 用的是同一个数 ⇒ 真正的召唤也会被挡住。
+
+**改法**：`CountAlive` 改成**以 `CombatState.Creatures` 里真实存在的 `BossMinionMonster` 为准**
+（两端同步、活没活一眼可见）：
+
+- 有活的 ⇒ 按活的数；
+- 一只活的都没有 ⇒ 就是 0（顺手把 `Registry` 里的过期条目剔除）；
+- 拿不到战斗状态时，才退回 `Registry`（并剔除已死的）。
+
+这样「预告召唤」与「真的召唤」用的是同一个、且来自权威列表的数。
+
+三个目标（111 / 113 / 111+PhoneBuild）**全部 0 错误**，已装机（verify-deploy 报 v0.2.954 OK）。
+
 ## v0.2.953（2026-11-25）：修「追踪那一手，带虚弱的被锁玩家伤害预览没提前 ×1.5」
 
 用户：「蛇眼猎第五回合开跟踪的时候，如果被她锁定的玩家身上有虚弱，该玩家的伤害预览并不会

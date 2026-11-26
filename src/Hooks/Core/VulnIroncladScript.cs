@@ -90,7 +90,7 @@ public static class VulnIroncladScript
     };
 
     private static BossTurn Turn(string note, int turnIndex, params ScriptCard[] cards)
-        => new() { Note = $"{turnIndex}. {note}", Cards = new List<ScriptCard>(cards), Energy = TurnEnergy };
+        => new() { Note = string.IsNullOrWhiteSpace(note) ? string.Empty : $"{turnIndex}. {note}", Cards = new List<ScriptCard>(cards), Energy = TurnEnergy };
 
     private static ScriptCard C<T>(bool upgraded = false, string from = "deck")
         where T : MegaCrit.Sts2.Core.Models.CardModel

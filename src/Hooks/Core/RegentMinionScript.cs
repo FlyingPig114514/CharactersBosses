@@ -51,7 +51,7 @@ public static class RegentMinionScript
                 C<MinionDiveBomb>(), C<MinionDiveBomb>(), C<Prowess>(), C<Resonance>()),
 
             // 4：暗黑镣铐、类星体（印震荡波；进阶 9 类星体已升级 ⇒ 震荡波也是升级版）、震荡波、防御×2（没费）
-            Turn("暗黑镣铐、类星体（印震荡波）、震荡波、防御×2（没费）", 4,
+            Turn("", 4,
                 C<DarkShackles>(), C<Quasar>(), C<Shockwave>(), C<DefendRegent>(), C<DefendRegent>()),
 
             // 5：护驾！！！、仆从捐躯×3（不够 2 只则召唤，够 2 只才给格挡）
@@ -63,7 +63,7 @@ public static class RegentMinionScript
                 C<Rend>(), C<ChildOfTheStars>(), C<Clumsy>(), C<DefendRegent>()),
 
             // 7：**洗牌** + 闪亮登场、碰撞轨迹、下去！、仆从打击（同上）、隐秘藏品+、防御（没费）
-            Turn("**洗牌**、闪亮登场、碰撞轨迹（印碎屑）、下去！（变碎屑）、仆从打击、隐秘藏品+、防御（没费）", 7, true,
+            Turn("洗牌。", 7, true,
                 C<DramaticEntrance>(), C<CollisionCourse>(), C<Begone>(), C<MinionStrike>(),
                 C<HiddenCache>(true), C<DefendRegent>()),
 
@@ -72,7 +72,7 @@ public static class RegentMinionScript
                 C<MinionDiveBomb>(), C<MinionDiveBomb>(), C<Prowess>(), C<Resonance>()),
 
             // 9：撕碎（无色牌）、类星体（印亮剑 / 进阶 9 起印究极防御+）、究极防御、大奖（没费）、防御×2（没费）
-            Turn("撕碎（无色牌）、类星体（印亮剑）、究极打击、大奖（没费）、防御×2（没费）", 9,
+            Turn("", 9,
                 C<Rend>(), C<Quasar>(), C<UltimateDefend>(), C<Jackpot>(),
                 C<DefendRegent>(), C<DefendRegent>()),
         };
@@ -133,7 +133,7 @@ public static class RegentMinionScript
     private static BossTurn Turn(string note, int turnIndex, params ScriptCard[] cards)
         => new()
         {
-            Note = $"{turnIndex}. {note}",
+            Note = string.IsNullOrWhiteSpace(note) ? string.Empty : $"{turnIndex}. {note}",
             Cards = new List<ScriptCard>(cards),
             Energy = TurnEnergy,
         };
@@ -142,7 +142,7 @@ public static class RegentMinionScript
     private static BossTurn Turn(string note, int turnIndex, bool shuffle, params ScriptCard[] cards)
         => new()
         {
-            Note = $"{turnIndex}. {note}",
+            Note = string.IsNullOrWhiteSpace(note) ? string.Empty : $"{turnIndex}. {note}",
             Cards = new List<ScriptCard>(cards),
             Energy = TurnEnergy,
             ShuffleDrawPile = shuffle,

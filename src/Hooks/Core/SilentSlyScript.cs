@@ -44,8 +44,9 @@ public static class SilentSlyScript
             //   多人 = 鬼祟+（余像换来的）与翻越撑击都被丢（都靠奇巧免费打出），然后打打击(1) + 防御(1) = 2 费
             //   ⚠ 用户 2026-10-31 第二次改稿：**翻越撑击排在余像/鬼祟之前**（回到 2026-10-29 那次订正），
             //     单人末尾多一张「防御（没费）」。
-            Turn("单人：早有准备+（丢翻越撑击与防御）、翻越撑击（奇巧）、余像、打击、防御（没费）；" +
-                 "多人：早有准备+（丢鬼祟+与翻越撑击）、鬼祟+（奇巧）、翻越撑击、打击、防御", 2,
+            // ★ 2026-11-26（用户：「第二回合的备注中移除单人部分，保留多人部分」）：
+            //   备注只留多人那一支，单人分支的牌序仍在下面的 Cards 里（`DiscardInsteadSingleOnly` 等标记照旧）。
+            Turn("多人：早有准备+（丢鬼祟+与翻越撑击）、鬼祟+（奇巧）、翻越撑击、打击、防御", 2,
                 C<Prepared>(upgraded: true),
                 C<FlickFlack>(discardInstead: true, costOverride: 0, upgradeMinAscension: 9),   // 奇巧：被丢弃后自动打出
                 C<Afterimage>(discardInsteadWhenMultiplayer: true),
@@ -80,7 +81,7 @@ public static class SilentSlyScript
                 C<HiddenDaggers>()),
 
             // 6：洗牌。早有准备+ 丢翻越撑击与触不可及（两张奇巧）+ 防御(1) + 打击(1)
-            Turn("洗牌。早有准备+（丢翻越撑击、触不可及）、翻越撑击（奇巧）、触不可及（奇巧）、防御、打击", 6,
+            Turn("洗牌。", 6,
                 C<Prepared>(upgraded: true),
                 C<FlickFlack>(discardInstead: true, costOverride: 0, upgradeMinAscension: 9),
                 C<Untouchable>(discardInstead: true, costOverride: 0),
@@ -144,7 +145,7 @@ public static class SilentSlyScript
 
     // ── 小工具 ────────────────────────────────────────────────────────────────
     private static BossTurn Turn(string note, int turnIndex, params ScriptCard[] cards)
-        => new() { Note = $"{turnIndex}. {note}", Cards = new List<ScriptCard>(cards), Energy = TurnEnergy };
+        => new() { Note = string.IsNullOrWhiteSpace(note) ? string.Empty : $"{turnIndex}. {note}", Cards = new List<ScriptCard>(cards), Energy = TurnEnergy };
 
     /// <summary>
     /// 剧本里的一张牌。

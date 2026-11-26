@@ -104,7 +104,7 @@ public static class WatcherFlurryScript
                 Play(WatcherCards.SashWhip)),
 
             // ── 6 ── 洗牌 / 疾风连击 / 防御 / 防御（没费）   ← 6~9 循环起点   （1 费 = 0 + 1）
-            TurnEnergy(1, true, "6. 洗牌、疾风连击、防御、防御（没费）",
+            TurnEnergy(1, true, "6. 洗牌。",
                 Play(WatcherCards.FlurryOfBlows),
                 Play(WatcherCards.Defend),
                 Hold(WatcherCards.Defend)),

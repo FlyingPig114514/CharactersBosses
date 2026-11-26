@@ -1,4 +1,4 @@
-// wiki-dump：从编译好的模组 DLL 里把「每个 Boss 的真实数据」导成百科用的 JSON。
+﻿// wiki-dump：从编译好的模组 DLL 里把「每个 Boss 的真实数据」导成百科用的 JSON。
 //
 // 为什么要这样：BossDefs.All / BossVariant / BossScript 都是运行时对象，剧本每一回合的
 // Note（作者手写的说明）+ ScriptCard 的 Card/Upgraded/Burned/… 全在对象里 —— 反射读出来
@@ -485,7 +485,16 @@ internal static class WikiDump
             var cards = new List<object>();
             foreach (var c in AsEnumerable(Prop<object>(turn, "Cards")))
             {
-                if (c != null) cards.Add(DumpCard(c));
+                if (c == null) continue;
+                // ★ 2026-11-26：单张牌导出失败**不要**把整回合的卡列清空（以前会静默变成空表，
+                //   于是那一回合退化成「从 Note 文字反解」⇒ wiki 里出现「失去 3 集中）」这种假牌名）。
+                try { cards.Add(DumpCard(c)); }
+                catch (Exception cardEx)
+                {
+                    Console.Error.WriteLine("[WARN] 导出卡牌失败（已跳过这张）: "
+                        + (c.GetType().GetProperty("Card")?.GetValue(c) as Type)?.Name
+                        + " : " + cardEx.GetBaseException().Message);
+                }
             }
             // 观者那几套剧本的牌是用运行期反射拿的 Type（没装观者模组/离线都是 null）⇒ Cards 是空的，
             // 只能从作者手写的 Note 里反解出来（格式固定：`1. 许愿+（永生不死）、打击（有费就打）、…`）。
@@ -497,7 +506,11 @@ internal static class WikiDump
                     foreach (var nc in ParseNoteCards(noteForParse)) fromNote.Add(nc);
                     // 观者那几套的牌只有一部分能离线解析出来（其余是运行期反射的 Type）⇒
                     // Note 里列得更全时以 Note 为准。
-                    if (fromNote.Count > cards.Count)
+                    // ⚠ 2026-11-26：以前是「Note 里列的比真卡多就以 Note 为准」⇒ 只要备注里多写一个词
+                    //   （例如物理机第 5 回合「超能光束（24 群攻、失去 3 集中）」被按「、」切出假牌名），
+                    //   真卡就被整段顶掉。现在只在**真卡一张都解析不出来**时才用 Note 兜底
+                    //   （观者模组没预加载时才是这种情况）。
+                    if (cards.Count == 0 && fromNote.Count > 0)
                     {
                         cards.Clear();
                         cards.AddRange(fromNote);
@@ -589,7 +602,11 @@ internal static class WikiDump
         };
         {
             var cardType = t.GetProperty("Card")?.GetValue(c) as Type;
-            var (baseCost, xCost) = CardCost(cardType, false);
+            // ★ 2026-11-26（用户：「放血战第一回合的意图有误，全身撞击+ 是 0 费可以打出」）：
+            //   这里以前**恒按未升级**取费用 ⇒ 升级后降费的牌（全身撞击 1→0、热修复 2→0…）被算成没费。
+            //   现在按这张 ScriptCard 自己的 `Upgraded` 取。
+            bool upCost = t.GetProperty("Upgraded")?.GetValue(c) is bool ub && ub;
+            var (baseCost, xCost) = CardCost(cardType, upCost);
             card["cost"] = baseCost;
             if (xCost) card["xCost"] = true;
             try
@@ -607,7 +624,7 @@ internal static class WikiDump
             "Sly", "Retain", "HoldInstead", "DisplayOnly", "NotDrawn", "AutoPlayed", "FreeThisTurn",
             "ToolsDiscard", "HellraiserFree", "EnchantSpiral", "EnchantSouls", "EnchantRoyallyApproved",
             "ShowsDrillGain", "SpendsAllEnergy", "ForceDebuffIntent", "JugglingCopy", "StampedePlay",
-            "EmptyDrawPileFirst", "ScriedFromDraw",
+            "EmptyDrawPileFirst", "ScriedFromDraw", "WouldPlayIfEnergy",
         })
         {
             var p = t.GetProperty(flag);
@@ -727,9 +744,11 @@ internal static class WikiDump
             }
 
             // 自动打出 / 免费 / 奇巧（被丢弃后自动打出）：不消耗能量
+            // ★ 2026-11-26（用户：「杂耍战的意图有误，没有把杂耍会打出的牌放到打出那里」）：
+            //   `StampedePlay`（惊逃在回合结束替她打出去的那张）也算「本回合会打出」，不吃她的能量。
             bool free = card.ContainsKey("AutoPlayed") || card.ContainsKey("FreeThisTurn")
                         || card.ContainsKey("Sly") || card.ContainsKey("HellraiserFree")
-                        || card.ContainsKey("ToolsDiscard");
+                        || card.ContainsKey("ToolsDiscard") || card.ContainsKey("StampedePlay");
             if (free)
             {
                 card["played"] = true;
@@ -757,7 +776,9 @@ internal static class WikiDump
             if (!ignoreEnergy && cost > remaining)
             {
                 card["played"] = false;
-                card["reason"] = "没费";
+                // ★ 2026-11-26（用户：「灵魂骨除了第一回合外，所有不出的牌的备注都不应该是没费…
+                //   而应该是（有费就打）」）：剧本可以标 `WouldPlayIfEnergy` ⇒ 这一列写「有费就打」。
+                card["reason"] = card.ContainsKey("WouldPlayIfEnergy") ? "有费就打" : "没费";
                 continue;
             }
 
@@ -917,7 +938,22 @@ internal static class WikiDump
 
     // 卡牌费用缓存：key = (类型, 是否升级) ⇒ (费用, 是否 X 费)
     private static readonly Dictionary<(Type, bool), (int Cost, bool XCost)> CostCache = new();
+    private static readonly Dictionary<Type, bool> UpgradeCostCache = new();
 
+    /// <summary>
+    /// 一张牌（可选升级态）的**能量费用**，X 费另外返回。
+    ///
+    /// ★ 2026-11-26（用户：「放血战第一回合的意图有误，全身撞击+ 是 0 费可以打出」）：
+    /// 以前这里恒按**未升级**取费用 ⇒ 升级后降费的牌在 wiki 里被错标成「没费」。
+    /// 为什么不能简单「实例化 + Upgrade()」：`CardModel` 上**没有** `Upgrade()`；
+    /// `UpgradeInternal(bool)` / `EnergyCost.UpgradeBy()` 都会先 `AssertMutable()`，而我们用
+    /// `Activator` 造的是 **canonical（模板）实例**，不可变 ⇒ 升级被吞掉；`ToMutable()` 又需要
+    /// ModelDb（离线 dump 时抛 `ModelNotFoundException: Model id=CARD.XXX not found`）。
+    ///
+    /// 所以改成**读这张牌自己的 `OnUpgrade()` IL**：StS2 里「升级降费」就是
+    /// `EnergyCost.UpgradeBy(-1)`，IL 里能扫到这个调用的就按 −1 记（不会低于 0）。
+    /// 一次扫描结果进缓存，导出性能不受影响。
+    /// </summary>
     private static (int Cost, bool XCost) CardCost(Type t, bool upgraded)
     {
         if (t == null) return (0, false);
@@ -928,30 +964,56 @@ internal static class WikiDump
             var inst = Activator.CreateInstance(t);
             if (inst != null)
             {
-                if (upgraded)
-                {
-                    try
-                    {
-                        var m = t.GetMethod("Upgrade", BindingFlags.Public | BindingFlags.Instance, null, Type.EmptyTypes, null);
-                        m?.Invoke(inst, null);
-                    }
-                    catch { /* 升级失败就用基础费用 */ }
-                }
-                // 属性本身在基类上，拿 PropertyInfo 不稳 ⇒ 直接调 getter 方法
                 int cost = 0;
                 bool x = false;
                 var mCost = t.GetMethod("get_CanonicalEnergyCost", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                var vCost = mCost.Invoke(inst, null);
+                var vCost = mCost?.Invoke(inst, null);
                 if (vCost is int c) cost = c;
                 var mX = t.GetMethod("get_HasEnergyCostX", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                var vX = mX.Invoke(inst, null);
+                var vX = mX?.Invoke(inst, null);
                 if (vX is bool bx) x = bx;
+
+                if (upgraded && !x && cost > 0 && OnUpgradeLowersCost(t))
+                    cost = Math.Max(0, cost - 1);
+
                 result = (cost, x);
             }
         }
         catch { /* 造不出来就按 0 费算 */ }
         CostCache[(t, upgraded)] = result;
         return result;
+    }
+
+    /// <summary>这张牌的 `OnUpgrade()` 里有没有 `EnergyCost.UpgradeBy(...)`（= 升级会改费用）。</summary>
+    private static bool OnUpgradeLowersCost(Type t)
+    {
+        if (UpgradeCostCache.TryGetValue(t, out var cached)) return cached;
+        bool lowers = false;
+        try
+        {
+            var m = t.GetMethod("OnUpgrade", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
+            var il = m?.GetMethodBody()?.GetILAsByteArray();
+            if (il != null && m != null)
+            {
+                var mod = m.Module;
+                for (int i = 0; i + 4 < il.Length && !lowers; i++)
+                {
+                    if (il[i] != 0x28 && il[i] != 0x6F) continue;      // call / callvirt
+                    int token = BitConverter.ToInt32(il, i + 1);
+                    try
+                    {
+                        var callee = mod.ResolveMethod(token);
+                        if (callee != null && callee.Name == "UpgradeBy"
+                            && string.Equals(callee.DeclaringType?.Name, "CardEnergyCost", StringComparison.Ordinal))
+                            lowers = true;
+                    }
+                    catch { /* 无效 token：那几字节只是别的指令的操作数 */ }
+                }
+            }
+        }
+        catch { /* 读不到就按「不影响费用」处理 */ }
+        UpgradeCostCache[t] = lowers;
+        return lowers;
     }
     private static string DesignName(string defKey, int act)
         => MainDesign.TryGetValue(defKey + "|" + act, out var v) ? v.Name : (defKey + " 第" + act + "幕");

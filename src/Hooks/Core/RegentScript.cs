@@ -30,7 +30,7 @@ public static class RegentScript
     {
         var turns = new List<BossTurn>
         {
-            Turn(2, "君王之剑（击剑指南在战斗开始就铸造并把剑放进他手里，所以本回合抽牌数不变）、群星斗篷（迷你储君 +1 力、佩尔的士兵给 14 格挡）；两张防御没费", 1,
+            Turn(2, "", 1,
                 C<SovereignBlade>(), C<CloakOfStars>(),
                 C<DefendRegent>(), C<DefendRegent>()),
 
@@ -41,7 +41,7 @@ public static class RegentScript
             Turn(2, "下砸、招架、陨星（易伤 + 力量）", 3,
                 C<CrushUnder>(), C<Parry>(), C<FallingStar>()),
 
-            Turn(2, "追踪之刃、汇流；剑圣+ 没费打不出（被汇流保留，第 5 回合才打，**只打一次**）", 4,
+            Turn(2, "", 4,
                 C<SeekingEdge>(), C<Convergence>(),
                 // 剑圣+ 这一回合**要显示在手里但打不出**（费不够，被汇流保留到第 5 回合）：
                 // 用展示牌的方式造进手牌、规划期跳过 → 亮/暗规则里它落进「暗」的那一类。
@@ -52,10 +52,10 @@ public static class RegentScript
             // 于是 剑圣+(1) + 打击(1) + 打击(1) = 3 正好打完，**防御没费**（留在手里、压暗）。
             // 另外必须用 FreeTop() 标上 FreePlayTopEntry —— 以前这里只写了 Show()，
             // 注释说着「回合结束免费打所向无敌」，实际没有任何标记，所以那句从来没发生过（用户实测）。
-            Show(FreeTop(Turn(3, "剑圣+、打击、锻打成型；防御没费（能量 2+1=3）。所向无敌在他回合结束时正好在抽牌堆顶 → 免费打出", 5,
+            Show(FreeTop(Turn(3, "所向无敌在他回合结束时正好在抽牌堆顶，免费打出。", 5,
                 C<SwordSage>(true), C<StrikeRegent>(), C<BeatIntoShape>(), C<DefendRegent>()))),
 
-            Turn(2, "洗牌：下砸、防御；第二张防御没费", 6,
+            Turn(2, "洗牌。", 6,
                 C<CrushUnder>(), C<DefendRegent>(), C<DefendRegent>()),
 
             Turn(2, "君王之剑（铸造已叠高）、群星斗篷（+1 力）；防御没费", 7,
@@ -182,10 +182,10 @@ public static class RegentScript
 
     /// <summary>第三幕用：不带能量覆盖的回合（能量按定义值 + 遗物算）。</summary>
     private static BossTurn T(string note, int turnIndex, params ScriptCard[] cards)
-        => new() { Note = $"{turnIndex}. {note}", Cards = new List<ScriptCard>(cards) };
+        => new() { Note = string.IsNullOrWhiteSpace(note) ? string.Empty : $"{turnIndex}. {note}", Cards = new List<ScriptCard>(cards) };
 
     private static BossTurn Turn(int energy, string note, int turnIndex, params ScriptCard[] cards)
-        => new() { Note = $"{turnIndex}. {note}", Cards = new List<ScriptCard>(cards), Energy = energy };
+        => new() { Note = string.IsNullOrWhiteSpace(note) ? string.Empty : $"{turnIndex}. {note}", Cards = new List<ScriptCard>(cards), Energy = energy };
 
     private static ScriptCard C<T>(bool upgraded = false, string from = "deck")
         where T : MegaCrit.Sts2.Core.Models.CardModel

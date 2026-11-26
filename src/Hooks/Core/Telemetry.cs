@@ -328,6 +328,12 @@ public static class Telemetry
                 ["ascension"] = SafeAscension(),
                 // 人数即「单人 / 多人」的判据（用户 2026-10-31：不需要额外的 mode 列）
                 ["players"] = SafePlayers(),
+                // ★ v0.2.960（用户 2026-11-26：「能不能筛选恐惧模式」「把快速模式也加入统计」）：
+                //   游戏模式（standard / daily / dread / blitz / custom）。以前只有人数列，
+                //   恐惧局和普通局在数据里长得一模一样 ⇒ 分不开。
+                //   取值用 `RunState.GameMode` 的**枚举名小写**，不写死成员名 ⇒ 107/111/113 都能编译
+                //   （`Dread` / `Blitz` 只有新版枚举里才有）。
+                ["mode"] = SafeGameMode(),
                 ["bossMaxHp"] = main.MaxHp,
                 ["bossHp"] = main.Hp,
                 ["turns"] = _fightBosses.Max(p => p.Info.Turns),
@@ -1446,7 +1452,7 @@ public static class Telemetry
             var skipped = new SortedSet<string>(StringComparer.Ordinal);
             var mapped = new List<(string Key, string Field)>();
             foreach (var key in new[] { "at", "kind", "mod", "role", "result", "act", "encounter", "lineup", "boss",
-                                        "ascension", "players", "bossMaxHp", "bossHp", "turns", "seed", "cfg", "line",
+                                        "ascension", "players", "mode", "bossMaxHp", "bossHp", "turns", "seed", "cfg", "line",
                                         "bossTotal", "bossesKilled", "maxHpTotal", "hpTotal", "bossList", "hpList",
                                         // v0.2.264：玩家侧血量证据
                                         "pMaxHp", "pHpStart", "pHpEnd", "pDmg", "pHeal", "pList",
@@ -1704,6 +1710,31 @@ public static class Telemetry
     private static int SafePlayers()
     {
         try { return BossLineups.PlayerCount(); } catch { return 1; }
+    }
+
+    /// <summary>
+    /// 本局的游戏模式，小写枚举名：`standard` / `daily` / `dread` / `blitz` / `custom` / `none`。
+    ///
+    /// ★ v0.2.960（用户 2026-11-26「能不能筛选恐惧模式」「把快速模式也加入统计」）：
+    /// 以前上传行里只有 `players`，恐惧局和普通多人局在表里**无法区分**，所以做不了按模式统计。
+    ///
+    /// 为什么不写成 `DreadMode.IsActive`：`GameMode.Dread`（恐惧）与 `GameMode.Blitz`（极速）
+    /// 只在 0.113+ 的枚举里存在，写死成员名会让 107 那条构建编不过。
+    /// 这里用 `ToString().ToLowerInvariant()` 拿**运行时枚举名**，三个版本同一份代码都能用；
+    /// 老版本遇到不认识的模式也只是多一种字符串，不会崩。
+    /// 读不到 RunState（例如还在读档）就写 `?`，与其它列的缺值口径一致。
+    /// </summary>
+    private static string SafeGameMode()
+    {
+        try
+        {
+            // 与 CharBossEncounters 的「本幕 Boss 决策」日志同一套取法（`DebugOnlyGetState()` 返回具体
+            // RunState，而 `MultiBossPlan.RunStateOrNull()` 是 IRunState 接口，不保证有 GameMode）。
+            var name = MegaCrit.Sts2.Core.Runs.RunManager.Instance?.DebugOnlyGetState()?.GameMode.ToString();
+            if (!string.IsNullOrWhiteSpace(name)) return name!.Trim().ToLowerInvariant();
+        }
+        catch { /* 忽略：读不到就当未知 */ }
+        return "?";
     }
 
     /// <summary>

@@ -46,7 +46,7 @@ public static class DefectRainbowScript
             //    碎片整理 → 模仿学习的换牌在 `MultiplayerCardSwap` 里（多人且人数 ≥2 才换）。
             new BossTurn
             {
-                Note = "1. 启动流程、彩虹+、碎片整理（单人）/ 模仿学习（多人）",
+                Note = "1. 多人时将碎片整理替换为模仿学习",
                 Cards = new List<ScriptCard>
                 {
                     C<BootSequence>(), C<Defragment>(), C<Rainbow>(true),   // 顺序：先彩虹+，再碎片整理/模仿学习（用户 2026-11-07）
@@ -189,7 +189,7 @@ public static class DefectRainbowScript
     private static BossTurn Turn(string note, int turnIndex, params ScriptCard[] cards)
         => new()
         {
-            Note = $"{turnIndex}. {note}",
+            Note = string.IsNullOrWhiteSpace(note) ? string.Empty : $"{turnIndex}. {note}",
             Cards = new List<ScriptCard>(cards),
             Energy = TurnEnergy,
         };

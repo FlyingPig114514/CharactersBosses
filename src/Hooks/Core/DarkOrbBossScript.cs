@@ -105,7 +105,7 @@ public static class DarkOrbBossScript
     };
 
     private static BossTurn Turn(string note, int turnIndex, int energy, params ScriptCard[] cards)
-        => new() { Note = $"{turnIndex}. {note}", Cards = new List<ScriptCard>(cards), Energy = energy };
+        => new() { Note = string.IsNullOrWhiteSpace(note) ? string.Empty : $"{turnIndex}. {note}", Cards = new List<ScriptCard>(cards), Energy = energy };
 
     /// <summary>剧本里的一张牌。<paramref name="blockOverride"/> = 写死格挡（遗传算法要 16）。</summary>
     private static ScriptCard C<T>(bool upgraded = false, int blockOverride = 0)

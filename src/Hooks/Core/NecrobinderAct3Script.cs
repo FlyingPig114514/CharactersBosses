@@ -80,7 +80,7 @@ public static class NecrobinderAct3Script
     };
 
     private static BossTurn T(string note, int turnIndex, params ScriptCard[] cards)
-        => new() { Note = $"{turnIndex}. {note}", Cards = new List<ScriptCard>(cards) };
+        => new() { Note = string.IsNullOrWhiteSpace(note) ? string.Empty : $"{turnIndex}. {note}", Cards = new List<ScriptCard>(cards) };
 
     private static ScriptCard C<T>(bool upgraded = false, string from = "deck")
         where T : MegaCrit.Sts2.Core.Models.CardModel

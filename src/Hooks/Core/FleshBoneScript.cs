@@ -60,7 +60,10 @@ public static class FleshBoneScript
             new BossTurn
             {
                 Note = "1. 血肉戏法(2)、鬼火(0，回 1 能量)、防御(1)",
-                Energy = TurnEnergy,
+                // ★ 2026-11-26（用户：「第一回合因为鬼火的加费防御应该是能打出来的」）：
+                //   规划期只按 `Energy` 记账，**不知道鬼火回的那 1 点** ⇒ 2−2−0=0 就把防御判成没费。
+                //   这里把鬼火那 1 点显式补进本回合能量（实际打起来是 2 起手、鬼火再回 1，三张都打得出去）。
+                Energy = TurnEnergy + 1,
                 Cards = Cards(Play<SleightOfFlesh>(2), Play<Wisp>(0), Play<DefendNecrobinder>(1)),
             },
 
@@ -69,21 +72,21 @@ public static class FleshBoneScript
             {
                 Note = "2. 吸引仇恨(2)（多人=骸骨军团）；摧残、打击（没费）",
                 Energy = TurnEnergy,
-                Cards = Cards(Play<PullAggro>(2), Hold<Debilitate>(1), Hold<StrikeNecrobinder>(1)),
+                Cards = Cards(Play<PullAggro>(2), Play<Debilitate>(1), Play<StrikeNecrobinder>(1)),
             },
 
             // 3：打击(1) + 恐惧+(1)；第二张打击没费
             new BossTurn
             {
-                Note = "3. 打击(1)、恐惧+(1)；打击（没费）",
+                Note = "",   // 2026-11-26 用户：这一回合的备注移除
                 Energy = TurnEnergy,
-                Cards = Cards(Play<StrikeNecrobinder>(1), Play<Fear>(1, upgraded: true), Hold<StrikeNecrobinder>(1)),
+                Cards = Cards(Play<StrikeNecrobinder>(1), Play<Fear>(1, upgraded: true), Play<StrikeNecrobinder>(1)),
             },
 
             // 4：违逆(1) + 防御(1) + 苦难(0)
             new BossTurn
             {
-                Note = "4. 违逆(1)、防御(1)、苦难(0)",
+                Note = "4. 违逆(1)、防御(1)、苦难(0)；多人模式时苦难会向非锁定者传递锁定者的debuff，并因为血肉戏法造成伤害",
                 Energy = TurnEnergy,
                 Cards = Cards(Play<Defy>(1), Play<DefendNecrobinder>(1), Play<Misery>(0)),
             },
@@ -93,7 +96,7 @@ public static class FleshBoneScript
             {
                 Note = "5. 护卫(1)、出击(1)；防御（没费）",
                 Energy = TurnEnergy,
-                Cards = Cards(Play<Bodyguard>(1), Play<Unleash>(1), Hold<DefendNecrobinder>(1)),
+                Cards = Cards(Play<Bodyguard>(1), Play<Unleash>(1), Play<DefendNecrobinder>(1)),
             },
 
             // 6：命运同担(0) + 防御(1) + 防御(1)
@@ -110,7 +113,7 @@ public static class FleshBoneScript
                 Note = "7. 吸引仇恨(2)（多人=骸骨军团）；打击×2（没费）",
                 Energy = TurnEnergy,
                 Cards = Cards(Play<PullAggro>(2),
-                               Hold<StrikeNecrobinder>(1), Hold<StrikeNecrobinder>(1)),
+                               Play<StrikeNecrobinder>(1), Play<StrikeNecrobinder>(1)),
             },
 
             // 8：摧残(1) + 防御(1)；第二张防御没费
@@ -118,21 +121,21 @@ public static class FleshBoneScript
             {
                 Note = "8. 摧残(1)、防御(1)；防御（没费）",
                 Energy = TurnEnergy,
-                Cards = Cards(Play<Debilitate>(1), Play<DefendNecrobinder>(1), Hold<DefendNecrobinder>(1)),
+                Cards = Cards(Play<Debilitate>(1), Play<DefendNecrobinder>(1), Play<DefendNecrobinder>(1)),
             },
 
             // 9：防御(1) + 恐惧+(1)；打击没费
             new BossTurn
             {
-                Note = "9. 防御(1)、恐惧+(1)；打击（没费）",
+                Note = "",   // 2026-11-26 用户：这一回合的备注移除
                 Energy = TurnEnergy,
-                Cards = Cards(Play<DefendNecrobinder>(1), Play<Fear>(1, upgraded: true), Hold<StrikeNecrobinder>(1)),
+                Cards = Cards(Play<DefendNecrobinder>(1), Play<Fear>(1, upgraded: true), Play<StrikeNecrobinder>(1)),
             },
 
             // 10：违逆(1) + 防御(1) + 苦难(0)
             new BossTurn
             {
-                Note = "10. 违逆(1)、防御(1)、苦难(0)",
+                Note = "10. 违逆(1)、防御(1)、苦难(0)；多人模式时苦难会向非锁定者传递锁定者的debuff，并因为血肉戏法造成伤害",
                 Energy = TurnEnergy,
                 Cards = Cards(Play<Defy>(1), Play<DefendNecrobinder>(1), Play<Misery>(0)),
             },
@@ -142,7 +145,7 @@ public static class FleshBoneScript
             {
                 Note = "11. 护卫(1)、出击(1)；防御（没费）",
                 Energy = TurnEnergy,
-                Cards = Cards(Play<Bodyguard>(1), Play<Unleash>(1), Hold<DefendNecrobinder>(1)),
+                Cards = Cards(Play<Bodyguard>(1), Play<Unleash>(1), Play<DefendNecrobinder>(1)),
             },
         };
 

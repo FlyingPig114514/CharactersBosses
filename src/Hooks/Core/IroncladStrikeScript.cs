@@ -54,7 +54,7 @@ public static class IroncladStrikeScript
             // 6：洗牌；打击（地狱狂徒）、打击（地狱狂徒）、旋风斩（2 费）
             new BossTurn
             {
-                Note = "6. 洗牌；打击（地狱狂徒）、打击（地狱狂徒）、旋风斩（2 费）",
+                Note = "6. 洗牌。由于地狱狂徒，这回合截肢后的打击牌都会被地狱狂徒自动打出",
                 ShuffleDrawPile = true,
                 Cards = new List<ScriptCard>
                 {
@@ -127,7 +127,7 @@ public static class IroncladStrikeScript
     private static BossTurn Turn(string note, int turnIndex, params ScriptCard[] cards)
         => new()
         {
-            Note = $"{turnIndex}. {note}",
+            Note = string.IsNullOrWhiteSpace(note) ? string.Empty : $"{turnIndex}. {note}",
             Cards = new List<ScriptCard>(cards),
             Energy = TurnEnergy,
         };

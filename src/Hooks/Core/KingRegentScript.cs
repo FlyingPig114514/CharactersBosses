@@ -72,7 +72,7 @@ public static class KingRegentScript
             //   所向无敌在回合结束正好躺在抽牌堆顶 → 免费打出（`FreePlayTopEntry`）。
             new()
             {
-                Note = "3. 王者之踢（2 费）、群星斗篷、打击（没费）；所向无敌在抽牌堆顶 → 回合结束免费打出",
+                Note = "3. 所向无敌在他回合结束时正好在抽牌堆顶，免费打出。",
                 Energy = 2,
                 FreePlayTopEntry = "I_AM_INVINCIBLE",
                 Cards = Cards(
@@ -115,7 +115,7 @@ public static class KingRegentScript
                 C<StrikeRegent>()),
 
             // 7（3 费：征召上前 1 + 星位序列 0 + 君王之剑 2）—— 回合开始洗牌（牌堆见底）
-            Turn(3, "洗牌。征召上前（铸造 8 + 把剑放进手牌）、星位序列、君王之剑", 7,
+            Turn(3, "洗牌。", 7,
                 C<SummonForth>(), C<Alignment>(), C<SovereignBlade>()),
 
             // 8（2 费：防御 + 防御）；打击没费
@@ -135,7 +135,7 @@ public static class KingRegentScript
             //    ⇒ 它正好躺在抽牌堆顶，回合结束免费打出。
             new()
             {
-                Note = "10. 宇宙冷漠（返顶王者之踢）、光子切割+（返顶所向无敌）、王者之踢（0 费）、打击×2（没费）；所向无敌回合结束免费打出",
+                Note = "10. 所向无敌在他回合结束时正好在抽牌堆顶，免费打出。",
                 Energy = 2,
                 FreePlayTopEntry = "I_AM_INVINCIBLE",
                 PickOrder = new List<Type> { typeof(KinglyKick), typeof(IAmInvincible) },
@@ -201,7 +201,7 @@ public static class KingRegentScript
     private static List<ScriptCard> Cards(params ScriptCard[] cards) => new(cards);
 
     private static BossTurn Turn(int energy, string note, int turnIndex, params ScriptCard[] cards)
-        => new() { Note = $"{turnIndex}. {note}", Cards = new List<ScriptCard>(cards), Energy = energy };
+        => new() { Note = string.IsNullOrWhiteSpace(note) ? string.Empty : $"{turnIndex}. {note}", Cards = new List<ScriptCard>(cards), Energy = energy };
 
     private static ScriptCard C<T>(bool upgraded = false) where T : CardModel
         => new() { Card = typeof(T), Upgraded = upgraded, From = "deck" };

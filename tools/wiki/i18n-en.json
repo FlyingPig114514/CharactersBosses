@@ -90,7 +90,8 @@
                     "打不出·诅咒或状态":  "unplayable (curse / status)",
                     "仅显示意图":  "intent only",
                     "留在手牌":  "kept in hand",
-                    "没抽到":  "not drawn"
+                    "没抽到":  "not drawn",
+                    "有费就打":  "would play it with energy"
                 },
     "extra":  {
                   "迂回":  "Follow-Up",
@@ -168,14 +169,14 @@
                   "点穴（第 6 / 11 回合）":  "Pressure Points (turns 6 / 11)"
               },
     "notes":  {
-        "神话形态、神话形态、神话形态（三张都是升级版）":  "Mythic Form, Mythic Form, Mythic Form (all three upgraded)",
-        "皇帝、神话形态、神话形态（升级版）":  "The Emperor, Mythic Form, Mythic Form (upgraded)",
-        "1. 神话形态、神话形态、神话形态（三张都是升级版）":  "1. Mythic Form, Mythic Form, Mythic Form (all three upgraded)",
-        "2. 皇帝、神话形态、神话形态（升级版）":  "2. The Emperor, Mythic Form, Mythic Form (upgraded)",
-        "3. 女祭司、星星、正义":  "3. The High Priestess, The Star, Justice",
-        "4. 战车、世界、皇后":  "4. The Chariot, The World, The Empress",
-        "5. 正义、女祭司、恶魔":  "5. Justice, The High Priestess, The Devil",
-        "16. 审判、世界、恶魔、煤灰 ×2（被消耗）":  "16. Judgement, The World, The Devil, 2x Soot (consumed)",
+                  "神话形态、神话形态、神话形态（三张都是升级版）":  "Mythic Form, Mythic Form, Mythic Form (all three upgraded)",
+                  "皇帝、神话形态、神话形态（升级版）":  "The Emperor, Mythic Form, Mythic Form (upgraded)",
+                  "1. 神话形态、神话形态、神话形态（三张都是升级版）":  "1. Mythic Form, Mythic Form, Mythic Form (all three upgraded)",
+                  "2. 皇帝、神话形态、神话形态（升级版）":  "2. The Emperor, Mythic Form, Mythic Form (upgraded)",
+                  "3. 女祭司、星星、正义":  "3. The High Priestess, The Star, Justice",
+                  "4. 战车、世界、皇后":  "4. The Chariot, The World, The Empress",
+                  "5. 正义、女祭司、恶魔":  "5. Justice, The High Priestess, The Devil",
+                  "16. 审判、世界、恶魔、煤灰 ×2（被消耗）":  "16. Judgement, The World, The Devil, 2x Soot (consumed)",
                   "洗牌（大抱抱 ⇒ 煤灰进她的抽牌堆，并给你也塞 1 张）、污秽攻击、强撑、防御（没费）":  "Shuffle. (Biiig Hug ⇒ Coal Ash goes into her draw pile and 1 into yours), Filthy Attack, Brace, Defend (no energy)",
                   "1. 打击、打击、完美打击（附魔皇室认证，没费不出）":  "1. Strike, Strike, Perfected Strike (enchanted Royally Approved, not played — no energy)",
                   "3. 预判(1)、闪避翻滚(2)；不出：斗篷与匕首(1)、笨拙、受伤、跟踪(3,保留)、子弹时间(3,保留)":  "3. Forethought (1), Dodge and Roll (2); not played: Cloak and Dagger (1), Clumsy, Injury, Pursuit (3, Retain), Bullet Time (3, Retain)",
@@ -252,7 +253,24 @@
                   "渐强、打击（进阶9起升级）、安宁":  "Crescendo, Strike (upgraded from Ascension 9), Tranquility",
                   "奇迹、心灵堡垒（进阶8起升级）、警惕、打击（没费）、惩恶+（没费）":  "Miracle, Mental Fortress (upgraded from Ascension 8), Vigilance, Strike (no energy), Smite+ (no energy)",
                   "洗牌（她重新洗牌）、改造现实（进阶9起升级）、化体为空、警惕、惩恶+（没费）":  "Shuffle (she reshuffles), Carve Reality (upgraded from Ascension 9), Empty Body, Vigilance, Smite+ (no energy)",
-                  "义愤填膺（进阶9起升级）、惩恶+、创世之柱（进阶8起升级）":  "Indignation (upgraded from Ascension 9), Smite+, Pillar of Creation (upgraded from Ascension 8)"
+                  "义愤填膺（进阶9起升级）、惩恶+、创世之柱（进阶8起升级）":  "Indignation (upgraded from Ascension 9), Smite+, Pillar of Creation (upgraded from Ascension 8)",
+                  "缓冲会被信号增强打出两次":  "Buffer is played twice thanks to Signal Boost",
+                  "洗牌。愤怒+是洗牌前好勇斗狠捞的":  "Shuffle. Anger+ is the copy Aggression retrieved before the shuffle",
+                  "洗牌。由于地狱狂徒，这回合截肢后的打击牌都会被地狱狂徒自动打出":  "Shuffle. Thanks to Hellraiser, every Strike card cut this turn is auto-played by Hellraiser",
+                  "洗牌。":  "Shuffle.",
+                  "闪亮口红触发；鞭打抽上来的打击没费":  "Shiny Lipstick triggers; the Strike drawn by Whip has no energy",
+                  "能量汲取（升级鞭打与死亡之门；玩家 +3 精神过载）、无处可逃；打击没费":  "Energy Drain (upgrades Whip and Death\u0027s Door; the player gains 3 Neurosurge), No Escape; Strike has no energy",
+                  "死亡使者（21 灾厄 + 1 虚弱；要到第 4 次能量汲取才升级）、打击；防御没费":  "Deathbringer (21 Doom + 1 Weak; only upgraded by the 4th Energy Drain), Strike; Defend has no energy",
+                  "无处可逃、打击、能量汲取（升级无处可逃与荒疫打击；进阶 9 起这一对已预升级 ⇒ 改为升级出击与护卫；玩家再 +3 精神过载）":  "No Escape, Strike, Energy Drain (upgrades No Escape and Blight Strike; from Ascension 9 that pair is already upgraded at combat start ⇒ it upgrades Unleash and Bodyguard instead; the player gains another 3 Neurosurge)",
+                  "违逆(1)、防御(1)、苦难(0)；多人模式时苦难会向非锁定者传递锁定者的debuff，并因为血肉戏法造成伤害":  "Defy (1), Defend (1), Misery (0); in multiplayer Misery passes the locked player\u0027s debuffs to the others, and Sleight of Flesh deals damage for each",
+                  "这张碰撞轨迹会在进阶9升级":  "This Collision Course is upgraded at Ascension 9",
+                  "洗牌。第二张碰撞轨迹会在进阶9升级":  "Shuffle. The second Collision Course is upgraded at Ascension 9",
+                  "唤醒后 B：群星斗篷、拳斗、金斧+、防御（没费）":  "After waking B: Cloak of Stars, Fisticuffs, Gold Axe+, Defend (no energy)",
+                  "多人：早有准备+（丢鬼祟+与翻越撑击）、鬼祟+（奇巧）、翻越撑击、打击、防御":  "Multiplayer: Prepared+ (discards Sneaky+ and Flick-Flack), Sneaky+ (Sly), Flick-Flack, Strike, Defend",
+                  "冰寒只计算玩家数量":  "Frost only counts the number of players",
+                  "多人时将冷却剂替换为一心化万":  "In multiplayer Coolant is replaced by All For One",
+                  "多人时将碎片整理替换为模仿学习":  "In multiplayer Defragment is replaced by Learn From Imitation",
+                  "所向无敌在他回合结束时正好在抽牌堆顶，免费打出。":  "Invincible sits exactly on top of the draw pile when his turn ends, so it is played for free."
               },
     "phrases":  {
                     "次":  "times",

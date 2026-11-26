@@ -131,7 +131,7 @@ public static class WatcherRetainScript
                 C(WatcherCards.Tranquility)),
 
             // ── 6 ── 洗牌 / 欺瞒现实 / 改造现实 / 时之沙(0) / 惩恶·平安（保留不出）   ← 6～9 循环起点   （2 费）
-            TurnEnergy(6, 2, "6. 洗牌。欺瞒现实、改造现实、时之沙(0)、惩恶（保留不出）、平安（保留不出）", true,
+            TurnEnergy(6, 2, "6. 洗牌。", true,
                 C(WatcherCards.DeceiveReality),
                 C(WatcherCards.CarveReality),
                 C(WatcherCards.SandsOfTime, cost: 0),
@@ -139,7 +139,7 @@ public static class WatcherRetainScript
                 Hold(WatcherCards.Safety, cost: -1)),
 
             // ── 7 ── 打击 / 坚韧·旋转打击·惩恶·平安（0费，保留不出）   （2 费）
-            Turn(7, 2, "7. 打击、坚韧·旋转打击·惩恶·平安（0费，保留不出）",
+            Turn(7, 2, "",
                 C(WatcherCards.Strike),
                 Hold(WatcherCards.Perseverance, cost: 0, block: PerseveranceFor(7)),
                 Hold(WatcherCards.WindmillStrike, cost: 0, damage: WindmillFor(7)),

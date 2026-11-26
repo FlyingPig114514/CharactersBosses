@@ -58,7 +58,7 @@ public static class SnakeEyesSilentScript
                 Hold<Slice>(2), Hold<SuckerPunch>(1), Hold<Tracking>(3, retain: true), Hold<BulletTime>(3, retain: true)),
 
             // 3：预判 1 + 闪避翻滚 2 = 3
-            Turn(3, "3. 预判(1)、闪避翻滚(2)；不出：斗篷与匕首(1)、笨拙、受伤、跟踪(3,保留)、子弹时间(3,保留)", 3,
+            Turn(3, "", 3,
                 Play<Anticipate>(1), Play<DodgeAndRoll>(2),
                 Hold<CloakAndDagger>(1), C<Clumsy>(), C<Injury>(),
                 Hold<Tracking>(3, retain: true), Hold<BulletTime>(3, retain: true)),
@@ -144,7 +144,7 @@ public static class SnakeEyesSilentScript
     // ── 小工具 ──────────────────────────────────────────────
 
     private static BossTurn Turn(int energy, string note, int turnIndex, params ScriptCard[] cards)
-        => new() { Note = $"{turnIndex}. {note}", Cards = new List<ScriptCard>(cards), Energy = energy };
+        => new() { Note = string.IsNullOrWhiteSpace(note) ? string.Empty : $"{turnIndex}. {note}", Cards = new List<ScriptCard>(cards), Energy = energy };
 
     private static List<ScriptCard> Cards(params ScriptCard[] cards) => new(cards);
 
