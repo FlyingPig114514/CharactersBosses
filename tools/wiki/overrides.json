@@ -35,7 +35,7 @@
     "DEFECT_RAINBOW": { "firstShuffleTurn": 8 },
     "IRONCLAD_BLOOD": {
       "turns": {
-        "2": { "note": "多人：「味道」替换为「肉盾」" }
+        "2": { "note": "多人：「时候未到」替换为「肉盾」" }
       }
     },
     "NECROBINDER_SOUL": {

@@ -203,6 +203,11 @@ public static class BossFrameTick
 
     public static void Tick(string source)
     {
+        // ★ v0.2.966（用户 2026-11-26：「你试试加诊断补丁」）：
+        //   观者局在骑士精英战里卡死两次（Windows 记 AppHangB1），卡死时**主线程日志全停**，
+        //   所以需要一个后台线程在「主线程不说话」时把现场落盘。这里只是每帧写一个 long（零分配），
+        //   后台线程自己判断停摆（Core/StallWatchdog.cs）。
+        try { Core.StallWatchdog.Beat(); } catch { /* 忽略 */ }
         var swTick = System.Diagnostics.Stopwatch.StartNew();
         // ★ v0.2.805：日志现在是缓冲写的（手机省电）⇒ 每帧顺手把到期的缓冲刷下去，
         //   免得「最后几行」一直躺在内存里（战斗结束时尤其明显）。

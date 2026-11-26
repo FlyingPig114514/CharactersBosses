@@ -239,6 +239,12 @@ internal static class BossKeys
     ["WATCHER_RETAIN"] = "保留观",      // 二层 2 号（观者 mod，用户 2026-11-17）
         ["WATCHER_RUSHDOWN"] = "红蓝观",   // 三层 3 号（观者 mod，用户 2026-11-18）
     ["WATCHER_FORESIGHT"] = "预见观",   // 一层 1 号（观者 mod，用户 2026-11-17）
+    // ★ 2026-11-26（用户截图：「设置里疾风观的显示有问题吧」）：
+    //   疾风观是 2026-11-23 新加的一层 2 号，但**这张表漏登记了它** ⇒ `DesignNameOf` 退回 Key，
+    //   配置界面的勾选格就显示成 `WATCHER_FLURRY`（被裁成「…FLURRY」）。
+    //   ⚠ 以后再加新设计，往 `All` 里加一条的同时**必须**在这里补中文名
+    //     （核对方法：`All` 的 Key 集合必须被这张表全覆盖，见 changelog v0.2.967）。
+    ["WATCHER_FLURRY"] = "疾风观",      // 一层 2 号（观者 mod，用户 2026-11-23）
 #endif
 #endif
         ["REGENT_BOMBARD"] = "轰击储",

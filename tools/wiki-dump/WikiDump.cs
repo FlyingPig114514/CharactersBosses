@@ -1,4 +1,4 @@
-﻿// wiki-dump：从编译好的模组 DLL 里把「每个 Boss 的真实数据」导成百科用的 JSON。
+// wiki-dump：从编译好的模组 DLL 里把「每个 Boss 的真实数据」导成百科用的 JSON。
 //
 // 为什么要这样：BossDefs.All / BossVariant / BossScript 都是运行时对象，剧本每一回合的
 // Note（作者手写的说明）+ ScriptCard 的 Card/Upgraded/Burned/… 全在对象里 —— 反射读出来
@@ -338,6 +338,160 @@ internal static class WikiDump
         return key;
     }
 
+    // ── 多人换牌 / 恐惧换牌（2026-11-26 用户：「有一些通用的多人替换没有被写到 wiki 里」）──
+    //
+    // 数据源有两处，全部**反射**读取（不复制一份表，避免和游戏里真正生效的那张表写叉）：
+    //   · `CharacterBosses.Core.MultiplayerCardSwap` 的私有静态表
+    //       `Table`（多人换牌：(幕0起, Boss 基类型, 原牌, 换上)）、
+    //       `UpgradeRows`（换上去顺便升级：(幕, Boss, 原牌, 起效进阶)）、
+    //       `DreadTable`（恐惧模式换牌，同上形状）；
+    //   · `CharacterBosses.Core.BossKeys.All`：设计 Key → (幕, 怪物基类型)。
+    //
+    // 匹配条件与运行时 `MultiplayerCardSwap.Resolve` 完全一致：**幕 + 怪物基类型 + 剧本里出现了那张原牌**。
+    // 所以同幕同角色的另一套设计只有它自己真的带那张牌时才会命中（例：一层亡灵里只有血肉骨的剧本有「吸引仇恨」）。
+    private static List<(int Act, string Boss, string From, string To, int MinAsc, bool Dread)>? _swapRows;
+    private static Dictionary<string, (int Act, string Monster)>? _designMap;
+
+    private static void EnsureSwapData(Assembly asm)
+    {
+        if (_swapRows != null && _designMap != null) return;
+
+        var swapType = FindType(asm, "CharacterBosses.Core.MultiplayerCardSwap");
+
+        // ① 先把「换牌 + 同时升级到几进阶」收成一张表
+        var minAsc = new Dictionary<string, int>(StringComparer.Ordinal);
+        foreach (var item in StaticArray(swapType, "UpgradeRows"))
+        {
+            if (item == null) continue;
+            var t = item.GetType();
+            int act = ToInt(t.GetField("Item1")?.GetValue(item));
+            string boss = (t.GetField("Item2")?.GetValue(item) as Type)?.Name ?? "";
+            string from = (t.GetField("Item3")?.GetValue(item) as Type)?.Name ?? "";
+            int asc = ToInt(t.GetField("Item4")?.GetValue(item));
+            if (boss.Length == 0 || from.Length == 0) continue;
+            minAsc[act + "|" + boss + "|" + from] = asc;
+        }
+
+        // ② 两张换牌表
+        var rows = new List<(int, string, string, string, int, bool)>();
+        foreach (var pair in new[] { ("Table", false), ("DreadTable", true) })
+        {
+            foreach (var item in StaticArray(swapType, pair.Item1))
+            {
+                if (item == null) continue;
+                var t = item.GetType();
+                int act = ToInt(t.GetField("Item1")?.GetValue(item));
+                string boss = (t.GetField("Item2")?.GetValue(item) as Type)?.Name ?? "";
+                string from = (t.GetField("Item3")?.GetValue(item) as Type)?.Name ?? "";
+                string to = (t.GetField("Item4")?.GetValue(item) as Type)?.Name ?? "";
+                if (from.Length == 0 || to.Length == 0) continue;
+                int asc = minAsc.TryGetValue(act + "|" + boss + "|" + from, out int a) ? a : 0;
+                rows.Add((act, boss, from, to, asc, pair.Item2));
+            }
+        }
+        _swapRows = rows;
+
+        // ③ 设计 Key → (幕, 怪物基类型)
+        var map = new Dictionary<string, (int, string)>(StringComparer.Ordinal);
+        foreach (var item in StaticArray(FindType(asm, "CharacterBosses.Core.BossKeys"), "All"))
+        {
+            if (item == null) continue;
+            var t = item.GetType();
+            string k = t.GetProperty("Key")?.GetValue(item) as string ?? "";
+            int act = ToInt(t.GetProperty("Act")?.GetValue(item));
+            string monster = (t.GetProperty("MonsterType")?.GetValue(item) as Type)?.Name ?? "";
+            if (k.Length == 0 || monster.Length == 0) continue;
+            map[k] = (act, monster);
+        }
+        _designMap = map;
+    }
+
+    private static Type? FindType(Assembly asm, string fullName)
+    {
+        try
+        {
+            var t = asm.GetType(fullName, false);
+            if (t != null) return t;
+            foreach (var candidate in asm.GetTypes())
+            {
+                if (string.Equals(candidate.FullName, fullName, StringComparison.Ordinal)) return candidate;
+            }
+        }
+        catch { /* 忽略 */ }
+        return null;
+    }
+
+    private static IEnumerable<object?> StaticArray(Type? t, string fieldName)
+    {
+        object? v = null;
+        try { v = t?.GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static)?.GetValue(null); }
+        catch { v = null; }
+        if (v is Array arr)
+        {
+            foreach (var item in arr) yield return item;
+        }
+    }
+
+    private static int ToInt(object? v) => v is int i ? i : 0;
+
+    /// <summary>主设计的「设计 Key」（`REGENT_BOSS|1` → `REGENT_DEBRIS`）；查不到就原样返回。</summary>
+    private static string DesignKeyOf(string key, int actNo)
+    {
+        return MainDesign.TryGetValue(key + "|" + actNo, out var info) ? info.Encounter : key;
+    }
+
+    /// <summary>这套设计用的怪物**基类型名**（换牌表按它匹配）；查不到就按角色名推（`Necrobinder` → `NecrobinderBoss`）。</summary>
+    private static string MonsterOf(string designKey, string characterName)
+    {
+        if (!string.IsNullOrEmpty(designKey) && _designMap != null
+            && _designMap.TryGetValue(designKey, out var info) && info.Monster.Length > 0)
+        {
+            return info.Monster;
+        }
+        return string.IsNullOrEmpty(characterName) ? "" : characterName + "Boss";
+    }
+
+    /// <summary>剧本里出现的卡**类型名**（用于和换牌表的「原牌」比对）。</summary>
+    private static IEnumerable<string> ScriptCardTypes(object script)
+    {
+        if (script == null) yield break;    // `Prop<T>` 会直接 GetType() ⇒ 空剧本必须先挡掉
+        foreach (var turn in AsEnumerable(Prop<object>(script, "Turns")))
+        {
+            if (turn == null) continue;
+            foreach (var c in AsEnumerable(Prop<object>(turn, "Cards")))
+            {
+                if (c == null) continue;
+                var ct = c.GetType().GetProperty("Card")?.GetValue(c) as Type;
+                if (ct != null) yield return ct.Name;
+            }
+        }
+    }
+
+    /// <summary>某个设计在多人 / 恐惧模式下会换掉哪些牌（形如 `吸引仇恨 → 骸骨军团`）。</summary>
+    private static List<string> SwapsFor(string designKey, int actIndex, string characterName, IEnumerable<string> cardTypes, bool dread)
+    {
+        var result = new List<string>();
+        if (_swapRows == null || _designMap == null) return result;
+
+        string monster = MonsterOf(designKey, characterName);
+        if (monster.Length == 0) return result;
+        var set = new HashSet<string>(cardTypes, StringComparer.Ordinal);
+
+        foreach (var row in _swapRows)
+        {
+            if (row.Item6 != dread) continue;
+            if (row.Item1 != actIndex) continue;
+            if (!string.Equals(row.Item2, monster, StringComparison.Ordinal)) continue;
+            if (!set.Contains(row.Item3)) continue;
+
+            string line = CardName(row.Item3) + " → " + CardName(row.Item4);
+            if (row.Item6) line += "（恐惧模式）";
+            if (row.Item5 > 0) line += "（进阶 " + row.Item5 + " 起升级）";
+            if (!result.Contains(line)) result.Add(line);
+        }
+        return result;
+    }
+
     // ── 定义 ───────────────────────────────────────────────
     private static Dictionary<string, object> DumpDefinition(string key, object def, Dictionary<string, string> infoTable)
     {
@@ -364,11 +518,19 @@ internal static class WikiDump
             foreach (var rn in TypeNames(Prop<object>(def, "Relics"))) if (rn.IndexOf("IceCream", StringComparison.Ordinal) >= 0) hasIceCream = true;
             foreach (var rn in TypeNames(ArrayAt(relicsByAct, act))) if (rn.IndexOf("IceCream", StringComparison.Ordinal) >= 0) hasIceCream = true;
             var script = DumpScript(ArrayAt(scriptByAct, act), IntAt(energy, act), IntAt(handSize, act), deck.Count, hasIceCream);
+
+            // 2026-11-26：多人 / 恐惧换牌（数据源 = MultiplayerCardSwap 的两张私有表）
+            EnsureSwapData(def.GetType().Assembly);
+            string designKey = DesignKeyOf(key, act + 1);
+            string characterTypeName = (GetField(def, "CharacterType") as Type)?.Name ?? "";
+            var swapTypes = new List<string>(TypeNames(ArrayAt(deckByAct, act)));
+            swapTypes.AddRange(ScriptCardTypes(ArrayAt(scriptByAct, act)));
+
             var variants = new List<object>();
             foreach (var v in CallEnumerable(def, "VariantsForAct", act))
             {
                 if (v == null) continue;
-                var dv = DumpVariant(v, IntAt(energy, act), IntAt(handSize, act));
+                var dv = DumpVariant(v, act, IntAt(energy, act), IntAt(handSize, act));
                 if (dv["script"] != null) variants.Add(dv);
             }
 
@@ -399,6 +561,9 @@ internal static class WikiDump
                 ["ascensionRelics"] = DumpAscensionForAct(def, act, relic: true),
                 // v0.2.875：主设计（如神格观）的**纯展示用**进阶名单
                 ["ascensionDisplay"] = StrList(GetField(def, "AscensionDisplay")),
+                // 2026-11-26：多人 / 恐惧模式下的换牌（用户：「通用的多人替换没写进 wiki」）
+                ["multiplayerSwaps"] = SwapsFor(designKey, act, characterTypeName, swapTypes, dread: false),
+                ["dreadSwaps"] = SwapsFor(designKey, act, characterTypeName, swapTypes, dread: true),
                 // v0.2.883：主设计的能力面板（key 是设计 key，如 IRONCLAD_ANGER ⇒ 由遭遇 id 去掉后缀得到）
                 ["info"] = InfoOf(infoTable, DesignEncounter(key, act + 1), null, def?.GetType().Assembly),
                 ["script"] = script,
@@ -442,11 +607,18 @@ internal static class WikiDump
         if (shuffleTurn > 0) return "按首次洗牌之前的回合统计（剧本标注：首次洗牌在第 " + shuffleTurn + " 回合）";
         return "按全部回合统计（剧本既没标洗牌、也没法推算）";
     }
-    private static Dictionary<string, object> DumpVariant(object v, int actEnergy, int actHandSize)
+    private static Dictionary<string, object> DumpVariant(object v, int actIndex, int actEnergy, int actHandSize)
     {
         bool hasIceCream = false;
         foreach (var rn in TypeNames(Prop<object>(v, "Relics"))) if (rn.IndexOf("IceCream", StringComparison.Ordinal) >= 0) hasIceCream = true;
         var script = DumpScript(Prop<object>(v, "Script"), actEnergy, actHandSize, TypeNames(Prop<object>(v, "Deck")).Count, hasIceCream);
+
+        // 2026-11-26：多人 / 恐惧换牌（变体的 Key 就是设计 Key ⇒ 幕与怪物基类型查 BossKeys）
+        string vKey = Prop<string>(v, "Key") ?? "";
+        EnsureSwapData(v.GetType().Assembly);
+        var swapTypes = new List<string>(TypeNames(Prop<object>(v, "Deck")));
+        swapTypes.AddRange(ScriptCardTypes(Prop<object>(v, "Script")));
+
         return new Dictionary<string, object>
         {
             ["key"] = Prop<string>(v, "Key"),
@@ -457,6 +629,8 @@ internal static class WikiDump
             ["specialDreadKey"] = Prop<string>(v, "SpecialLocDread"),
             ["specialDread"] = LocText(Prop<string>(v, "SpecialLocDread")),
             ["hpBonus"] = Prop<int>(v, "HpBonus"),
+            ["multiplayerSwaps"] = SwapsFor(vKey, actIndex, "", swapTypes, dread: false),
+            ["dreadSwaps"] = SwapsFor(vKey, actIndex, "", swapTypes, dread: true),
             ["deck"] = DeckFromScriptOrRegistered(script, Prop<object>(v, "Deck")),
             ["deckRegistered"] = TypeNames(Prop<object>(v, "Deck")).Select(CardName).ToList(),
             ["deckNote"] = DeckNote(script),
@@ -584,6 +758,8 @@ internal static class WikiDump
         {
             ["loopFrom"] = Prop<int>(script, "LoopFrom"),
             ["loopLength"] = Prop<int>(script, "LoopLength"),
+            // 2026-11-26：循环段标签偏移（轰击储 = 1 ⇒ 循环第一回合写成 x+1，因为它的 x 指「最后一次被击晕的回合」）
+            ["loopLabelOffset"] = Prop<int>(script, "LoopLabelOffset"),
             ["shuffleTurn"] = shuffleTurn,
             ["shuffleGuessed"] = guessed,
             ["deckFromScript"] = deck,

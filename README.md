@@ -3,8 +3,9 @@
 把《杀戮尖塔 2》**每一幕的 Boss 战换成由原版玩家角色扮演的 Boss**。灵感来自 1 代模组「崩坠（Downfall）」。
 
 - 创意工坊：**玩家角色Boss (Characters Bosses)** — 物品 id `3830639796`
+- **不走创意工坊 / 想装离线包**：从 [**GitHub Releases**](https://github.com/FlyingPig114514/CharactersBosses/releases/latest) 下载 `CharacterBosses-v*.zip`（每个版本都贴在那里）
 - 前置依赖：**[BaseLib](https://steamcommunity.com/sharedfiles/filedetails/?id=3737335127)**（设置界面用到，硬依赖）
-- 一个包同时支持 **正式版 v0.107** 与 **beta v0.111**（游戏只加载 11 KB 外壳，它探测版本后载入对应实现，你不需要管）
+- 一个包同时支持 **正式版 0.111.x** 与 **测试分支 0.113.x ~ 0.114.x**（游戏只加载 11 KB 外壳，它探测版本后载入对应实现，你不需要管）
 
 ## 这是什么
 
@@ -27,7 +28,11 @@
 
 **创意工坊（推荐）**：订阅本模组 + BaseLib，游戏内「模组」里勾上并重启。
 
-**离线包**：把 `CharacterBosses` 文件夹整个解压到 `<Steam>\steamapps\common\Slay the Spire 2\mods\`，
+**GitHub Releases（离线包）**：到 [Releases](https://github.com/FlyingPig114514/CharactersBosses/releases) 下载最新那版的
+`CharacterBosses-v*.zip`，把里面的 `CharacterBosses` 文件夹整个解压到
+`<Steam>\steamapps\common\Slay the Spire 2\mods\`，再装好 BaseLib 即可（同样要在游戏内「模组」里勾上）。
+
+**手动拼装**：把 `CharacterBosses` 文件夹整个解压到 `<Steam>\steamapps\common\Slay the Spire 2\mods\`，
 四个文件缺一不可（`CharacterBosses.dll` / `CharacterBosses.json` / `CharacterBosses.pck` / `CharacterBosses.Impl*.dll`）。
 详细说明见包内 `安装说明.txt`。
 

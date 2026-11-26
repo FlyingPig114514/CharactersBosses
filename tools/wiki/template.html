@@ -274,6 +274,8 @@ details.dread:not([open]) summary .tw::before{content:"展开 ▸"}
 }
 .chip.asc{color:#d9cfae;background:rgba(230,194,122,.05);border-color:#3d3223}
 .chip.dreadchip{color:#e0a9a0;background:rgba(184,68,58,.11);border-color:#4d2823}
+.chip.swap{color:#cfe0d0;background:rgba(120,190,140,.07);border-color:#2d4234}
+.chip.swap .ar{margin:0 .3em;opacity:.7}
 .chip .tg{display:inline-flex;flex-wrap:wrap;gap:3px;margin-left:2px}
 .chip .tg i{
   font-style:normal;font:400 10px/1.5 var(--sans);color:#9c9083;
@@ -602,6 +604,45 @@ window.BOSS_LOSS = /*__BOSS_LOSS__*/;
     return tags;
   }
 
+  /* 剧本里按张标的「进阶 N 起升级」→ `N: 牌名` 列表（与进阶表的格式一致，便于合并去重） */
+  function ascFromScript(s) {
+    var out = [], seen = {}, i, j;
+    if (!s || !s.turns) { return out; }
+    for (i = 0; i < s.turns.length; i++) {
+      var cards = (s.turns[i] && s.turns[i].cards) || [];
+      for (j = 0; j < cards.length; j++) {
+        var c = cards[j];
+        if (!c || !c.name) { continue; }
+        var lv = isNum(c.UpgradeMinAscension) ? c.UpgradeMinAscension : 0;
+        if (lv <= 0) { continue; }
+        var line = lv + ': ' + c.name;
+        if (!seen[line]) { seen[line] = 1; out.push(line); }
+      }
+    }
+    return out;
+  }
+
+  /* 换牌行 `原牌 → 换上（备注）` 渲染成「A → B」小标签 */
+  function swapChipsHTML(list) {
+    var out = [], i;
+    for (i = 0; i < (list || []).length; i++) {
+      var s = String(list[i] || '');
+      var seg = s.split('→');
+      if (seg.length !== 2) {
+        out.push('<span class="chip swap"><span class="nm">' + esc(s) + '</span></span>');
+        continue;
+      }
+      var left = seg[0].trim(), right = seg[1].trim(), note = '';
+      var cut = right.indexOf('（');
+      if (cut > 0) { note = right.slice(cut).replace(/[（）]/g, ''); right = right.slice(0, cut).trim(); }
+      var h = '<span class="chip swap" title="' + esc(s) + '">';
+      h += '<span class="nm">' + esc(left) + '</span><span class="ar">→</span><span class="nm">' + esc(right) + '</span>';
+      if (note) { h += '<span class="tg"><i>' + esc(note) + '</i></span>'; }
+      out.push(h + '</span>');
+    }
+    return out.join('');
+  }
+
   function chipHTML(name, cls, count, tags, extraTitle) {
     var h = '<span class="chip ' + cls + '"';
     var title = String(extraTitle || name) + (tags && tags.length ? '\n· ' + tags.join('\n· ') : '');
@@ -689,6 +730,12 @@ window.BOSS_LOSS = /*__BOSS_LOSS__*/;
       potions: isVariant ? [] : (actObj.potions || []),
       ascensionUpgrades: (variant && variant.ascensionUpgrades) || [],
       ascensionRelics: (variant && variant.ascensionRelics) || [],
+      /* 2026-11-26：剧本里按张标的「进阶 N 起升级」（`ScriptCard.UpgradeMinAscension`）——
+         这些不走 AscensionUpgrades 表，以前在「进阶升级」那一栏完全看不到（用户：碎屑储进阶 9 没写）。 */
+      ascensionCardUpgrades: ascFromScript(src.script),
+      /* 2026-11-26：多人 / 恐惧模式下的换牌（数据源 = 模组的 MultiplayerCardSwap 两张表） */
+      multiplayerSwaps: src.multiplayerSwaps || [],
+      dreadSwaps: src.dreadSwaps || [],
       dreadUpgrades: src.dreadUpgrades || [],
       hpBonus: isVariant ? (isNum(variant.hpBonus) ? variant.hpBonus : 0) : 0,
       script: src.script || null
@@ -796,14 +843,28 @@ window.BOSS_LOSS = /*__BOSS_LOSS__*/;
       h.push('</div></div>');
     }
     var extra = [];
-    if (design.ascensionUpgrades.length) {
-      extra.push('<div class="sect"><h3>进阶升级</h3><div class="chips">' + ascChipsHTML(design.ascensionUpgrades, 'asc') + '</div></div>');
+    /* 进阶升级 = 进阶表（`AscensionUpgrades` / `AscensionUpgradesByAct`）+ 剧本按张标的
+       `UpgradeMinAscension`。两者格式统一成 `N: 牌名`，去重后一起渲染。 */
+    var ascAll = (design.ascensionUpgrades || []).slice();
+    for (var ai = 0; ai < (design.ascensionCardUpgrades || []).length; ai++) {
+      if (ascAll.indexOf(design.ascensionCardUpgrades[ai]) < 0) { ascAll.push(design.ascensionCardUpgrades[ai]); }
+    }
+    if (ascAll.length) {
+      extra.push('<div class="sect"><h3>进阶升级</h3><div class="chips">' + ascChipsHTML(ascAll, 'asc') + '</div></div>');
     }
     if (design.ascensionRelics.length) {
       extra.push('<div class="sect"><h3>进阶遗物</h3><div class="chips">' + ascChipsHTML(design.ascensionRelics, 'asc') + '</div></div>');
     }
     if (design.dreadUpgrades.length) {
       extra.push('<div class="sect"><h3>恐惧模式额外升级</h3><div class="chips">' + plainChipsHTML(design.dreadUpgrades, 'dreadchip') + '</div></div>');
+    }
+    if (design.multiplayerSwaps.length) {
+      extra.push('<div class="sect"><h3>多人替换<span class="cnt">仅 2 人及以上</span></h3><div class="chips">'
+        + swapChipsHTML(design.multiplayerSwaps) + '</div></div>');
+    }
+    if (design.dreadSwaps.length) {
+      extra.push('<div class="sect"><h3>恐惧模式替换</h3><div class="chips">'
+        + swapChipsHTML(design.dreadSwaps) + '</div></div>');
     }
     return h.join('') + extra.join('');
   }
@@ -815,6 +876,7 @@ window.BOSS_LOSS = /*__BOSS_LOSS__*/;
     }
     var loopFrom = isNum(s.loopFrom) ? s.loopFrom : 0;
     var loopLength = isNum(s.loopLength) ? s.loopLength : 0;
+    var loopOffset = isNum(s.loopLabelOffset) ? s.loopLabelOffset : 0;
     var looping = loopFrom > 0 && loopLength > 0;
     var h = ['<div class="sect"><h3>逐回合剧本<span class="cnt">共 ' + s.turns.length + ' 回合</span></h3>'];
     if (looping) {
@@ -829,8 +891,13 @@ window.BOSS_LOSS = /*__BOSS_LOSS__*/;
         if (isOut(cards[c])) { out.push(cards[c]); } else { played.push(cards[c]); }
       }
       var turnNo = i + 1;
+      /* 循环段的回合号不写死数字（用户 2026-11-26：「轰击储的 3 和 4 应当写成 x+1 和 x+2」）：
+         从 loopFrom 起是同一套回合在重复，用 x / x+n 表示；偏移量由剧本的 `LoopLabelOffset` 给
+         （轰击储 = 1，因为它能力面板里的 x 指「最后一次被击晕的回合」；其它 Boss 默认 0 ⇒ 循环第一回合就是 x）。 */
+      var loopIdx = (looping && turnNo >= loopFrom) ? (loopOffset + (turnNo - loopFrom)) : -1;
+      var turnLabel = loopIdx < 0 ? String(turnNo) : (loopIdx === 0 ? 'x' : 'x+' + loopIdx);
       h.push('<tr' + (looping && turnNo >= loopFrom ? ' class="loop"' : '') + '>');
-      h.push('<td class="turn">' + turnNo +
+      h.push('<td class="turn">' + turnLabel +
         (isNum(turn.energy) ? '<span class="egy" title="本回合可用能量">⚡' + turn.energy + '</span>' : '') + '</td>');
       h.push('<td class="played">');
       if (!played.length) { h.push('<span class="dash">—</span>'); }
@@ -930,6 +997,9 @@ window.BOSS_LOSS = /*__BOSS_LOSS__*/;
     for (i = 0; i < design.dreadUpgrades.length; i++) { parts.push(design.dreadUpgrades[i]); }
     for (i = 0; i < design.ascensionUpgrades.length; i++) { parts.push(design.ascensionUpgrades[i]); }
     for (i = 0; i < design.ascensionRelics.length; i++) { parts.push(design.ascensionRelics[i]); }
+    for (i = 0; i < (design.ascensionCardUpgrades || []).length; i++) { parts.push(design.ascensionCardUpgrades[i]); }
+    for (i = 0; i < (design.multiplayerSwaps || []).length; i++) { parts.push(design.multiplayerSwaps[i]); }
+    for (i = 0; i < (design.dreadSwaps || []).length; i++) { parts.push(design.dreadSwaps[i]); }
     if (design.script && design.script.turns) {
       for (i = 0; i < design.script.turns.length; i++) {
         var cards = design.script.turns[i].cards || [];

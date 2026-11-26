@@ -317,6 +317,46 @@ function Loop-Text($script) {
     return 'no loop (stops on the last turn)'
 }
 
+# Per-card ascension upgrades (`ScriptCard.UpgradeMinAscension`) → `9: Collision Course`
+# 2026-11-26: these never appear in the ascension tables, so they are collected separately.
+function Asc-From-Script($script) {
+    $out = @()
+    if ($null -eq $script) { return $out }
+    if (-not ($script.PSObject.Properties.Name -contains 'turns')) { return $out }
+    foreach ($t in @($script.turns)) {
+        foreach ($c in @($t.cards)) {
+            if ($null -eq $c) { continue }
+            $lv = 0
+            if ($c.PSObject.Properties.Name -contains 'UpgradeMinAscension') { $lv = [int]$c.UpgradeMinAscension }
+            if ($lv -le 0) { continue }
+            $nm = N ([string]$c.name)
+            if (-not $nm) { continue }
+            $line = ([string]$lv + ': ' + $nm)
+            if ($out -notcontains $line) { $out += $line }
+        }
+    }
+    return $out
+}
+
+# `吸引仇恨 → 骸骨军团（进阶 9 起升级）` → `Provoke → Legion of Bone (upgrades from A9)`
+# 换牌行的中文名来自 data.json，英文名走同一张卡名表（N）。
+function Swap-En([string]$s) {
+    if (-not $s) { return '' }
+    $text = $s
+    $suffix = ''
+    $m = [regex]::Match($text, '（([^）]*)）\s*$')
+    if ($m.Success) {
+        $inner = $m.Groups[1].Value
+        $text = $text.Substring(0, $m.Index)
+        if ($inner -match '进阶\s*(\d+)') { $suffix = ' (upgrades from A' + $matches[1] + ')' }
+        elseif ($inner -match '恐惧') { $suffix = ' (dread mode)' }
+        else { $suffix = ' (' + (N $inner) + ')' }
+    }
+    $seg = $text -split '→'
+    if ($seg.Count -eq 2) { return ((N $seg[0].Trim()) + ' → ' + (N $seg[1].Trim()) + $suffix) }
+    return ((N $text.Trim()) + $suffix)
+}
+
 function Card-Label($c) {
     $label = N ([string]$c.name)
     if ($c.PSObject.Properties.Name -contains 'Upgraded') { $label = $label + '+' }
@@ -335,6 +375,10 @@ function Card-Label($c) {
     if ($c.PSObject.Properties.Name -contains 'AutoPlayed') { $label = $label + '[auto]' }
     if ($c.PSObject.Properties.Name -contains 'FreeThisTurn') { $label = $label + '[free]' }
     if ($c.PSObject.Properties.Name -contains 'SpendsAllEnergy') { $label = $label + '[spends all energy]' }
+    # 2026-11-26: per-card ascension upgrades (`ScriptCard.UpgradeMinAscension`) were invisible before
+    if (($c.PSObject.Properties.Name -contains 'UpgradeMinAscension') -and [int]$c.UpgradeMinAscension -gt 0) {
+        $label = $label + '[upgrades from A' + $c.UpgradeMinAscension + ']'
+    }
     return (MdText $label)
 }
 
@@ -443,12 +487,16 @@ foreach ($boss in $data.bosses) {
             foreach ($x in $act.ascensionRelics) { if ($x) { $mainExtras += (Extra-Text ('进阶 ' + $x)) } }
             foreach ($x in $act.dreadUpgrades) { if ($x) { $mainExtras += (Extra-Text ('恐惧升级 ' + $x)) } }
             foreach ($x in $act.ascensionDisplay) { foreach ($part in ([string]$x -split ',')) { if ($part.Trim()) { $mainExtras += (Extra-Text ('进阶 ' + $part.Trim())) } } }
+            foreach ($x in (Asc-From-Script $act.script)) { if ($mainExtras -notcontains (Extra-Text ('进阶 ' + $x))) { $mainExtras += (Extra-Text ('进阶 ' + $x)) } }
+            $mainSwaps = @(); foreach ($x in $act.multiplayerSwaps) { if ($x) { $mainSwaps += [string]$x } }
+            $mainDread = @(); foreach ($x in $act.dreadSwaps) { if ($x) { $mainDread += [string]$x } }
             $designs += [pscustomobject]@{
                 Act = $actNo; Char = [string]$boss.character; Name = [string]$act.name; Key = [string]$boss.key
                 Encounter = [string]$act.encounter; Hp = (Get-Hp $boss.key $actNo ([int]$act.baseHp) $firstBaseHp 0)
                 Energy = $act.energy; Hand = $act.handSize; DeckNote = [string]$act.deckNote
                 Deck = $act.deck; Relics = $act.relics; Special = $act.special; SpecialDread = $act.specialDread
                 SpecialKey = [string]$act.specialKey; SpecialDreadKey = [string]$act.specialDreadKey
+                MultiplayerSwaps = $mainSwaps; DreadSwaps = $mainDread
                 Extras = $mainExtras; Script = $act.script; Info = $(if ($act.info) { [string]$act.info } else { [string]$boss.info })
                 LossMessages = (Loss-Of ([string]$act.encounter))
             }
@@ -459,12 +507,16 @@ foreach ($boss in $data.bosses) {
             foreach ($x in $v.ascensionRelics) { if ($x -and ($x -notmatch ':\s*$')) { $extras += (Extra-Text ('进阶 ' + $x)) } }
             foreach ($x in $v.ascensionDisplay) { foreach ($part in ([string]$x -split ',')) { if ($part.Trim()) { $extras += (Extra-Text ('进阶 ' + $part.Trim())) } } }
             foreach ($x in $v.dreadUpgrades) { if ($x) { $extras += (Extra-Text ('恐惧升级 ' + $x)) } }
+            foreach ($x in (Asc-From-Script $v.script)) { if ($extras -notcontains (Extra-Text ('进阶 ' + $x))) { $extras += (Extra-Text ('进阶 ' + $x)) } }
+            $vSwaps = @(); foreach ($x in $v.multiplayerSwaps) { if ($x) { $vSwaps += [string]$x } }
+            $vDread = @(); foreach ($x in $v.dreadSwaps) { if ($x) { $vDread += [string]$x } }
             $designs += [pscustomobject]@{
                 Act = $actNo; Char = [string]$boss.character; Name = [string]$v.name; Key = [string]$v.key
                 Encounter = [string]$v.encounter; Hp = (Get-Hp $boss.key $actNo 0 $firstBaseHp ([int]$v.hpBonus))
                 Energy = $act.energy; Hand = $act.handSize; DeckNote = [string]$v.deckNote
                 Deck = $v.deck; Relics = $v.relics; Special = $v.special; SpecialDread = $v.specialDread
                 SpecialKey = [string]$v.specialKey; SpecialDreadKey = [string]$v.specialDreadKey
+                MultiplayerSwaps = $vSwaps; DreadSwaps = $vDread
                 Extras = $extras; Script = $v.script; Info = $(if ($v.info) { [string]$v.info } else { [string]$boss.info })
                 LossMessages = (Loss-Of ([string]$v.encounter))
             }
@@ -504,6 +556,8 @@ foreach ($a in @(1, 2, 3)) {
 [void]$sb.AppendLine('**Dominions** (Dread mode): [Dominion of each character](#dominions)')
 [void]$sb.AppendLine('')
 [void]$sb.AppendLine('**Ascension**: [Ascension upgrades at a glance](#ascension)')
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine('**Multiplayer swaps**: [Multiplayer swaps at a glance](#multiplayer)')
 [void]$sb.AppendLine('')
 [void]$sb.AppendLine('**Death message**: [Death message special cases](#loss-special)')
 [void]$sb.AppendLine('')
@@ -548,6 +602,14 @@ foreach ($d in $designs) {
             }
         }
     }
+    foreach ($x in (Asc-From-Script $d.Script)) {
+        $m3 = [regex]::Match([string]$x, '^(\d+):\s*(.+)$')
+        if (-not $m3.Success) { continue }
+        $lv3 = [string]$m3.Groups[1].Value
+        $nm3 = [string]$m3.Groups[2].Value
+        if (-not $byLevel.ContainsKey($lv3)) { $byLevel[$lv3] = @() }
+        if (@($byLevel[$lv3]) -notcontains $nm3) { $byLevel[$lv3] = @($byLevel[$lv3]) + $nm3 }
+    }
     if ([string]$d.Name -eq '神格观' -and $byLevel.Count -eq 0) {
         $byLevel['8'] = @((N '警惕'), (N '旋身'), (N '欺瞒现实'))
         $byLevel['9'] = @((N '手摇鼓'))
@@ -572,6 +634,40 @@ foreach ($r in $ascRows) {
 [void]$sb.AppendLine('> Blank cell = that boss has **no** extra upgrade/relic at that level. The full list also appears in each boss''s own section')
 [void]$sb.AppendLine('> (the "Ascension / Dread changes" line) — both come from the same `tools/wiki-dump` export.')
 [void]$sb.AppendLine('')
+
+# ── Multiplayer swaps at a glance (2026-11-26) ─────────────────────────
+$mpRows = @()
+$dreadRows = @()
+foreach ($d in $designs) {
+    foreach ($x in @($d.MultiplayerSwaps)) { if ($x) { $mpRows += [pscustomobject]@{ Act = $d.Act; Name = $d.Encounter; Swap = [string]$x } } }
+    foreach ($x in @($d.DreadSwaps)) { if ($x) { $dreadRows += [pscustomobject]@{ Act = $d.Act; Name = $d.Encounter; Swap = [string]$x } } }
+}
+if ($mpRows.Count -gt 0) {
+    [void]$sb.AppendLine('<a id="multiplayer"></a>')
+    [void]$sb.AppendLine('')
+    [void]$sb.AppendLine('## Multiplayer swaps (2+ players)')
+    [void]$sb.AppendLine('')
+    [void]$sb.AppendLine('In multiplayer some bosses swap one scripted card for a card that **only makes sense with several players**.')
+    [void]$sb.AppendLine('The swapped-in card always works **for the boss side** (never for the players) and **single player is completely unchanged**;')
+    [void]$sb.AppendLine('a swap only matches "act + boss + original card", so only designs whose script really contains that card are listed.')
+    [void]$sb.AppendLine('')
+    [void]$sb.AppendLine('| Act | Boss | Single → Multiplayer |')
+    [void]$sb.AppendLine('|:---:|---|---|')
+    foreach ($r in $mpRows) {
+        [void]$sb.AppendLine('| ' + $actNames[$r.Act] + ' | ' + (MdText $r.Name) + ' | ' + (MdText (Swap-En $r.Swap)) + ' |')
+    }
+    [void]$sb.AppendLine('')
+    if ($dreadRows.Count -gt 0) {
+        [void]$sb.AppendLine('**Dread mode swaps** (independent of player count — single player too):')
+        [void]$sb.AppendLine('')
+        [void]$sb.AppendLine('| Act | Boss | Single → Dread mode |')
+        [void]$sb.AppendLine('|:---:|---|---|')
+        foreach ($r in $dreadRows) {
+            [void]$sb.AppendLine('| ' + $actNames[$r.Act] + ' | ' + (MdText $r.Name) + ' | ' + (MdText (Swap-En $r.Swap)) + ' |')
+        }
+        [void]$sb.AppendLine('')
+    }
+}
 
 # ── Per-act sections ───────────────────────────────────────────────────
 foreach ($a in @(1, 2, 3)) {
@@ -635,6 +731,17 @@ foreach ($a in @(1, 2, 3)) {
             [void]$sb.AppendLine('')
         }
         if ($d.Extras.Count -gt 0) { [void]$sb.AppendLine('- **Ascension / Dread changes**: ' + (MdText ($d.Extras -join '; '))) }
+        # 2026-11-26: multiplayer / dread card swaps (source = the mod's MultiplayerCardSwap tables)
+        if (@($d.MultiplayerSwaps).Count -gt 0) {
+            $swapLines = @()
+            foreach ($s in @($d.MultiplayerSwaps)) { $swapLines += (Swap-En ([string]$s)) }
+            [void]$sb.AppendLine('- **Multiplayer swaps** (2+ players only): ' + (MdText ($swapLines -join '; ')))
+        }
+        if (@($d.DreadSwaps).Count -gt 0) {
+            $dreadLines = @()
+            foreach ($s in @($d.DreadSwaps)) { $dreadLines += (Swap-En ([string]$s)) }
+            [void]$sb.AppendLine('- **Dread mode swaps**: ' + (MdText ($dreadLines -join '; ')))
+        }
         [void]$sb.AppendLine('')
 
         # 特殊效果：优先用官方英文（按 specialKey 取），取不到才退回中文原文
@@ -678,9 +785,19 @@ foreach ($a in @(1, 2, 3)) {
             [void]$sb.AppendLine('| Turn | Plays | Not played | Note |')
             [void]$sb.AppendLine('|:---:|---|---|---|')
             $i = 0
+            $loopFrom = 0; $loopLength = 0; $loopOffset = 0
+            if ($d.Script.PSObject.Properties.Name -contains 'loopFrom') { $loopFrom = [int]$d.Script.loopFrom }
+            if ($d.Script.PSObject.Properties.Name -contains 'loopLength') { $loopLength = [int]$d.Script.loopLength }
+            if ($d.Script.PSObject.Properties.Name -contains 'loopLabelOffset') { $loopOffset = [int]$d.Script.loopLabelOffset }
+            $looping = ($loopFrom -gt 0 -and $loopLength -gt 0)
             foreach ($turn in $d.Script.turns) {
                 $i = $i + 1
-                [void]$sb.AppendLine('| ' + $i + ' | ' + (Played-Cards $turn.cards) + ' | ' + (NotPlayed-Cards $turn.cards) + ' | ' + (Note-Text ([string]$turn.note) $turn.cards) + ' |')
+                # 2026-11-26: loop turns are labelled x / x+n; the start offset comes from the script (`LoopLabelOffset`)
+                if ($looping -and $i -ge $loopFrom) {
+                    $loopIdx = $loopOffset + ($i - $loopFrom)
+                    $turnLabel = if ($loopIdx -eq 0) { 'x' } else { 'x+' + $loopIdx }
+                } else { $turnLabel = [string]$i }
+                [void]$sb.AppendLine('| ' + $turnLabel + ' | ' + (Played-Cards $turn.cards) + ' | ' + (NotPlayed-Cards $turn.cards) + ' | ' + (Note-Text ([string]$turn.note) $turn.cards) + ' |')
             }
             [void]$sb.AppendLine('')
         }

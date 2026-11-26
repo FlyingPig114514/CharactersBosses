@@ -291,7 +291,13 @@
                   "恐惧模式时将幻影之刃替换为精准+":  "In Dread mode Phantom Blades is replaced by Precision+",
                   "洗牌。炼制药水+（炼格挡药水）、扫腿、精确切击、生存者":  "Shuffle. Alchemize+ (brews a Block Potion), Leg Sweep, Precise Cut, Survivor",
                   "紧追不放(1)、重压(0，紧追不放让它免费)、猛晃(1)；吸引仇恨(1 费，书签减过，不出)":  "Clinging On (1), Heavy Press (0 — Clinging On makes it free), Shake (1); Pull Aggro (1 energy, discounted by the Bookmark, not played)",
-                  "7. 完美打击（附魔皇室认证，因地狱狂徒自动免费打出）、防御、防御":  "7. Perfected Strike (Royally Approved; auto-played free thanks to Hellraiser), Defend, Defend"
+                  "7. 完美打击（附魔皇室认证，因地狱狂徒自动免费打出）、防御、防御":  "7. Perfected Strike (Royally Approved; auto-played free thanks to Hellraiser), Defend, Defend",
+                  "第 1 张打击没有被变化成巨石，出现在第 5、8 回合":  "the 1st Strike is not turned into a boulder; it appears on turns 5 and 8",
+                  "多人：「时候未到」替换为「肉盾」":  "multiplayer: \"Not Yet\" is replaced with \"Tank\"",
+                  "多人：早有准备+ 改为丢「鬼祟+」与「翻越撑击」，鬼祟+（奇巧）随之打出，其余同单人":  "multiplayer: Prepared+ discards \"Sneaky+\" and \"Flick-Flack\" instead; Sneaky+ (Sly) is then played, everything else as in single player",
+                  "多人模式时苦难会向非锁定者传递锁定者的debuff，并因为血肉戏法造成伤害":  "in multiplayer Misery passes the locked player\u0027s debuffs to the other players, and Sleight of Flesh deals damage because of them",
+                  "宇宙冷漠是被「抉择，抉择」重复打出的，属于打出":  "Cosmic Indifference is replayed by \"Decisions, Decisions\" and therefore counts as played",
+                  "战术大师给的加费让第 8 回合的谋杀打得出":  "the extra energy from Tactician makes Murder playable on turn 8"
               },
     "phrases":  {
                     "次":  "times",
@@ -388,6 +394,8 @@
                     "进":  "into",
                     "出":  "out",
                     "去":  "away",
-                    "全":  "all"
+                    "全":  "all",
+                    "被变化为巨石":  "turned into a boulder",
+                    "漩涡":  "Spiral"
                 }
 }

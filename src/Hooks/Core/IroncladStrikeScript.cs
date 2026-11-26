@@ -64,7 +64,8 @@ public static class IroncladStrikeScript
             },
 
             // 7：完美打击（皇室认证，因地狱狂徒自动免费打出）、防御、防御
-            Turn("7. 完美打击（附魔皇室认证，因地狱狂徒自动免费打出）、防御、防御", 7,
+            // ★ 2026-11-26（用户：**移除第 7 回合的备注**）—— 意图本身就在「打出」栏里，不需要再复述一遍。
+            Turn("", 7,
                 Hell(RoyalPerfect()), C<DefendIronclad>(), C<DefendIronclad>()),
 
             // 8：打击（地狱狂徒）、打击（地狱狂徒）、防御

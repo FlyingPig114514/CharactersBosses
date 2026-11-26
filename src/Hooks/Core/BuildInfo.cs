@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.964 / 2026-11-26 (**百科：三层 16 套 Boss 的回合备注 + 六处意图/升级纠正**)—— 用户逐条给的订正（承接一层/二层那两批）。①能力机移除第 1、2 回合备注，第 8 回合改「洗牌。」；②状态机移除第 1 回合备注，第 6 回合改「洗牌：大～抱抱将一张煤灰加入它的抽牌堆，然后它也会给你加一张」；③塔罗愚第 16 回合那两张煤灰的「不出」原因由「被丢弃」改「被消耗」（新增 ScriptCard.ReasonOverride，只影响展示）；④易伤战移除第 3、8 回合备注，第 6 回合改「洗牌。」；⑤巨石战第 1 回合改「恐惧模式下会多出一张巨石+」、第 6 回合改「洗牌。恐惧模式下会多出一张巨石+」；⑥根除骨移除第 1、5 回合备注，第 4/7 回合只留「能量汲取（升级…）」；⑦养手骨：补上恐惧升级（钙化，换牌本身在 OstyKeeperScript.DreadTurn5Override），第 6/9 回合改「洗牌。」；⑧无色储第 1 回合改「光谱偏移（烦人机关盒印的，本回合0费）」；⑨辉星储移除第 2 回合备注、第 3/4 回合加恐惧换位备注、第 4 回合的七星改成「星不够」（不出），并补上第 3/4 回合的恐惧说明；⑩抉择储移除第 2、3、4 回合备注，第 1/5 回合换成完整版「抉择，抉择」说明；⑪刀猎移除第 1 回合备注，第 4 回合改「恐惧模式时将幻影之刃替换为精准+」，第 7 回合改「洗牌。」；⑫炼药猎第 3 回合按吊灯 +3 能量（3+3=6 ⇒ 七张全打得出）、备注里的药水名全部去掉（药水不属于她的卡组）；⑬华丽猎移除第 2 回合备注，第 7/10 回合改「洗牌。」；⑭神格观把标了「有费就打」的牌全部挪进「不出」列并显示「有费就打」；第 7 回合改「洗牌。」；⑮欧米伽观移除第 1、4、6、7、9、10 回合备注，第 8/12 回合改「洗牌。」；⑯红蓝观第 3/8/11 回合换新备注、第 12 回合备注改「若玩家打出了攻击牌，意图变成：（暴怒+、供奉、不惧妖邪）*4」。见 docs/plans/changelog-history.md";
+    public const string Tag = "v0.2.967 / 2026-11-26 (**修：设置界面里「疾风观」显示成 WATCHER_FLURRY**)—— 用户截图：模组配置 → 地图勾选格里疾风观那一行显示成 `WATCHER_FLURRY`（被裁成「…FLURRY」），名字与同排的「预见观」串在一起。根因：`BossKeys.DesignNames`（配置界面勾选格用的中文短名表）漏登记了 2026-11-23 新加的 `WATCHER_FLURRY`，`DesignNameOf` 按设计退回 Key 本身 ⇒ 格子里显示 Key。现在补上「疾风观」，并逐条核对：`BossKeys.All` 的 42 个 Key 现在被这张表**全覆盖**（以前 41/42，唯一缺的就是它）。同时把这条核对口径写进表上注释，以后加新设计不会再漏。见 docs/plans/changelog-history.md";
 
     private static bool _logged;
 
@@ -36,6 +36,10 @@ public static class BuildInfo
         try { CrashTrace.Mark("BuildInfo.LogOnce 开始（第一帧）"); } catch { /* 忽略 */ }
         try { StartupWatchdog.Install(); }
         catch { /* 忽略 */ }
+        // ★ v0.2.966（用户 2026-11-26：「你试试加诊断补丁」）：
+        //   主线程停摆看门狗的心跳 —— 挂 `SceneTree.process_frame`（主菜单也在跳，
+        //   不能只靠 BossFrameTick：那个只在战斗里有节点时才被调到）。
+        try { StallWatchdog.EnsureHooked(); } catch { /* 忽略 */ }
 
         try { Logger.Log($"[CharBoss] ===== CharacterBosses 构建：{Tag} ====="); }
         catch { /* 忽略 */ }

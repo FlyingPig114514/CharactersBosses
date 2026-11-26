@@ -4,6 +4,160 @@
 > 旧条目逐字来自 `git show HEAD:src/Hooks/Core/BuildInfo.cs` 的 Tag 常量（v0.2.871 及其之前，共 236 条）。
 > 最新版本（0.2.889）是当前 Tag，同时在各条 `workshop/changenote.txt` 里也有面向玩家的摘要。
 
+## v0.2.967（2026-11-26）：修「设置界面里疾风观显示成 WATCHER_FLURRY」
+
+用户截图：模组配置 → 某张地图的 Boss 勾选格，疾风观那一行显示成 `WATCHER_FLURRY`
+（被裁成「…FLURRY」），看上去像是和同一排的「预见观」串了名字。
+
+**根因**：勾选格的名字取自 `BossKeys.DesignNames`（Key → 中文短名），而这张表
+**漏登记了 2026-11-23 新加的一层 2 号 `WATCHER_FLURRY`** ⇒ `DesignNameOf` 按约定
+「未登记的 Key 原样返回」，于是格子里显示 Key 本身。同一排的「预见观」是登记过的，所以只有它正常。
+
+**核对（顺手把所有 Key 对了一遍）**：
+
+```powershell
+# BossKeys.All 里 new("KEY", …) 的 Key 集合  必须是  DesignNames 里 ["KEY"] = "中文名" 的子集
+# 修前：All 42 个，DesignNames 41 个，缺的正好是 WATCHER_FLURRY
+# 修后：42 / 42 全覆盖；也没有「表里有、All 里没有」的多余项
+```
+
+**修法**：在 `WATCHER_FORESIGHT`（预见观）下面补 `["WATCHER_FLURRY"] = "疾风观"`，
+并在表上注释里写明这条核对口径，避免以后加新设计又漏。
+（顶层名字、顶栏图标、死亡提示、历史记录用的都是本地化 `<KEY>_BOSS.name`，
+`content/localization/zhs/monsters.json` 里 `WATCHER_FLURRY_BOSS.name` 一直是「疾风观」，所以那几处从来没错。）
+
+## v0.2.966（2026-11-26）：诊断 —— 观者局「骑士精英战卡死」的手牌重复插入与主线程停摆
+
+用户：「我刚刚玩观者 mod 时崩溃了两次，你看看是啥问题？」→「你试试加诊断补丁」。
+本轮**只加诊断，不改任何游戏逻辑**。
+
+### 一、查到的现场
+
+不是崩溃，是**卡死**：Windows 应用程序日志两次都是 `Application Hang (1002)` / `AppHangB1`
+（19:48:33、19:55:23，「程序停止与 Windows 交互并已关闭」）；SilentFX 的会话 meta 也把 19:25–19:48 那段记成
+`WasInterrupted: true`。`godot.log` 里没有任何崩溃栈。
+
+两次的共同点：
+
+| 项 | 现象 |
+|---|---|
+| 战斗 | 第三幕骑士精英（`MECHA_KNIGHT_ELITE` / `KNIGHTS_ELITE`） |
+| 身份 | 玩家用观者（`Watcher` 0.10.20，清单 `min_game_version: 0.113.0`，而游戏是 **0.114.0**） |
+| 模式 | 恐惧模式（铁甲战士的支配在场） |
+| 死前最后一条引擎日志 | 原版那句 `Tried to add duplicate card CARD.WATCHER_MIRACLE (59626191) to hand! Holder already exists which has the same node. Ignoring.`，栈是 `NPlayerHand.Add` ← `CardPileCmd.<GetTweenForCardsChangingPiles>b__4` |
+| 之后 | 所有 mod 日志 + 我们每 120 帧一次的探针**同时停止** ⇒ 主线程被卡住 |
+
+反编译确认（`.refs/sts2_113.dll`）：`NPlayerHand.Add` 命中重复时**提前 return 旧 holder**，
+调用方那条「把牌挪进手牌」的补间拿到 holder 后就不再推进 —— 与「日志停在这里、之后什么都不发生」一致。
+扫了 144 个 mod DLL，**只有观者 mod 认识 `WatcherMiracle` / `WATCHER_MIRACLE`**。
+
+### 二、加的两个诊断
+
+1. `Patches/HandDuplicateDiagPatch.cs` —— 挂在 `NPlayerHand.Add` 的 Prefix：
+   先按**原版同一套判据**（同节点 / 同牌模型）预判这次会不会命中重复分支，**只有会命中时**才打印
+   （附完整调用栈 + 现有 holder 数 / 待入场数），限流 30 条；命中时同时记一条 `Mark`，
+   并把最后一条记录留给停摆报告。
+   （`Holders` 与 `_holdersAwaitingQueue` 在原版里是 internal/private ⇒ 全部反射只读，探一次缓存。）
+2. `Core/StallWatchdog.cs` —— 心跳挂在 **`SceneTree.process_frame`** 上（启动时由 `BuildInfo.LogOnce` 挂一次，
+   `BossFrameTick.Tick` 里再补挂），每帧写一个 `long`；后台线程每秒检查，心跳停 ≥12 秒且未报告过 ⇒
+   往游戏日志目录的 `characterbosses_stall.txt` 追加报告（`FileOptions.WriteThrough`，进程被强杀也留得住）：
+   停了多久 / 累计帧数 / 线程数 / GC 堆 / 最近 40 条 `Mark` / **最后一次重复插入的完整调用栈**；心跳恢复后自动复位。
+   > 踩过的坑：一开始只把 `BossFrameTick.Tick` 当心跳，可它只在「场上有带星/能量球/刀的节点」时才被调到
+   > ⇒ 主菜单挂机两分钟就被误报成停摆（20:30:35 / 20:36:09 两条假报告）。改挂 `process_frame` 后，
+   > 菜单挂机 70 秒零误报；并且后台线程**只在心跳确实挂上后才启动**。
+
+### 三、复现后怎么读
+
+看 `%APPDATA%\SlayTheSpire2\logs\characterbosses_stall.txt`：
+
+- 有报告 ⇒ 确认「主线程停住」，且时间点与 `mod_log.txt` 最后一行严格对得上；
+- 报告里的调用栈直接点名**是哪个 mod / 哪个方法在重复塞奇迹**；
+- 拿到点名结果再决定是给观者 mod 提 issue，还是在我们这边加兼容补丁（例如让那条补间自己收尾）。
+
+### 四、顺带记录的环境问题（未改）
+
+- 观者 mod 0.10.20 是按 **0.113** 编的，跑在 **0.114.0** 上；
+- PC 上 RitsuLib 是 **0.6.15**，而随机数预测 0.17.0 声明需要 **≥0.6.16**（手机上已是 0.6.16）；
+- `DanmakuSpire 1.2.2.1` 有 3 个补丁在 0.114 挂不上（`SelectCharacter(characterModel)` / `MerchantEntry`）；
+- `STS2_MCP` 的 `NFastModeHoverTip` setter 在 0.114 被删（`Property set method not found`，仅设置界面，无害）。
+
+## v0.2.965（2026-11-26）：百科第四批 —— 5 处回合备注 + 进阶「按张升级」与「多人替换」两项数据终于进表
+
+用户逐条给的订正（承接 v0.2.962 / v0.2.963 / v0.2.964 那三批）。其中两条不是备注文案，而是**导出/渲染缺口**。
+
+### 一、回合备注（改剧本源码）
+
+| Boss | 回合 | 改动 |
+|---|---|---|
+| 打击战 | T7 | 移除备注 |
+| 灾厄骨 | T8、T10 | 移除备注 |
+| 血肉骨 | T4、T10 | 备注只留「多人模式时苦难会向非锁定者传递锁定者的debuff，并因为血肉戏法造成伤害」，**不再复述本回合意图** |
+| 预见观 | T4、T7 | 移除备注 |
+
+### 二、碎屑储的「进阶 9 增强」为什么没写（数据缺口）
+
+碎屑储进阶 9 的升级是**按张**标的（`ScriptCard.UpgradeMinAscension = 9`，第 2 回合那张 + 第 5 回合第二张碰撞轨迹），
+不写进 `AscensionUpgrades` 表 —— 而 wiki 的「进阶升级」栏和进阶增强总表**只读表**，所以整条升级一个字都没出现。
+现在三处都补上：
+
+- `template.html`：`ascFromScript()` 把剧本卡上的 `UpgradeMinAscension` 收成 `N: 牌名` 并入「进阶升级」栏；
+- `make-markdown.ps1` / `make-markdown-en.ps1`：新增 `Asc-From-Script`，并进「进阶 / 恐惧改动」行与进阶增强总表；
+- 剧本卡面同时带〔进阶N起升级〕（中）/ `[upgrades from AN]`（英）标签。
+
+### 三、循环段的回合号改成 x / x+n（轰击储从 x+1 起）
+
+用户：「轰击储的回合不应该直接写成 1234」→「把那两个回合改成 x+1 和 x+2，能力面板不动」。
+网页与中英 markdown 的回合列统一按 `loopFrom / loopLength / loopLabelOffset` 计算：
+循环段写 `x`、之后 `x+1、x+2…`；起点偏移由剧本新增的 **`BossScript.LoopLabelOffset`**（纯展示字段，运行期无人读取）给。
+
+- **轰击储 = 1** ⇒ `1 被击晕、2 轰击、x+1 唤醒 A、x+2 唤醒 B`，与它能力面板里的
+  「循环：x+1~x+2 / 单体高压：2~x、x+2 / 群体高压：x+1」完全一致（x = 最后一次被击晕的回合，唤醒回合由玩家决定）；
+- 其它有固定循环起点的 Boss 保持 0 ⇒ 循环第一回合就是 `x`（碎屑储 = `1~4` + `x~x+3`）。
+
+### 四、多人替换一览（新数据通道）
+
+用户：「有一些通用的多人替换没有被写到 wiki 里，比如骸骨军团替换吸引仇恨、休眠替换冰川、刀刃交响曲替换斗篷与匕首」。
+
+数据源直接是模组运行时真正生效的两张私有表 —— **反射读**，不手抄：
+
+- `MultiplayerCardSwap.Table`（多人换牌）、`UpgradeRows`（换上顺带升级到几进阶）、`DreadTable`（恐惧换牌）；
+- `BossKeys.All`（设计 Key → 幕 / 怪物基类型）。
+
+匹配条件与 `MultiplayerCardSwap.Resolve` 一致：**幕 + 怪物基类型 + 剧本里真的出现那张原牌**，
+所以同幕同角色的另一套设计只有它自己带那张牌时才命中（一层亡灵里只有血肉骨命中「吸引仇恨」）。
+
+导出结果（`data.json` 新增 `multiplayerSwaps` / `dreadSwaps` 两个字段，主设计与变体都有）：
+
+| 幕 | Boss | 单人 → 多人 |
+|:---:|---|---|
+| 一层 | 黑球机 | 冰川 → 休眠 |
+| 二层 | 物理机 | 冷却剂 → 一心化万 |
+| 二层 | 彩虹机 | 冷却剂 → 一心化万 |
+| 二层 | 彩虹机 | 碎片整理 → 模仿学习 |
+| 三层 | 能力机 | 冰川 → 休眠 |
+| 三层 | 事件机 | 启动流程 → 能量涌动 |
+| 二层 | 放血战 | 时候未到 → 肉盾 |
+| 一层 | 血肉骨 | 吸引仇恨 → 骸骨军团 |
+| 三层 | 根除骨 | 吸引仇恨 → 骸骨军团 |
+| 三层 | 养手骨 | 吸引仇恨 → 骸骨军团 |
+| 一层 | 奇巧猎 | 余像 → 鬼祟 |
+| 三层 | 刀猎 | 斗篷与匕首 → 刀刃交响曲（进阶 9 起升级） |
+
+恐惧模式换牌：三层刀猎 幻影之刃 → 精准（与人数无关）。
+
+渲染落点：网页每只 Boss 的「多人替换 / 恐惧模式替换」小标签 + 每节一行「多人替换」；中英 markdown 同两处，并各出一个 `<a id="multiplayer">` 汇总表（目录里也加了入口）。
+
+### 五、顺带修正
+
+- `tools/wiki/overrides.json`：放血战第 2 回合那条备注的牌名写错了 —— 「味道」→「**时候未到**」（`NotYet`，就是这条换牌的原牌）。
+- `tools/wiki/i18n-en.json`：补齐 6 条备注英译 + 2 条短语（`被变化为巨石` / `漩涡`），英文版不再残留中文。
+
+### 验证
+
+- 三个构建目标 0 错误；`install-mod.bat` 已装。
+- wiki 全链路重跑：`wiki-dump` → `apply-overrides` → `build-site` → `make-markdown` → `make-bosses-md` → `make-markdown-en` → `make-xlsx`（42 套设计，页面 489.9 KB）。
+- 生成的 `index.html` 内联渲染 JS 过 `node --check`，并用 stub DOM 跑了一遍渲染冒烟测试（42 套设计全部渲染，11 套带多人替换、4 套带按张进阶升级）。
+
 ## v0.2.964（2026-11-26）：百科订正 —— 三层 16 套 Boss 的回合备注 + 六处意图/升级纠正
 
 用户逐条给的订正（承接 v0.2.962 / v0.2.963 的一层、二层那两批）。同样的做法：改**剧本源码** → 重跑导出 + 五个生成器。

@@ -82,7 +82,8 @@ public static class WatcherForesightScript
                 Hold(WatcherCards.Strike, cost: 1)),
 
             // ── 4 ── （先见之明弃 受伤/防御）/ 迂回 / 化体为空 / 斩破命运（弃 暴怒·贪婪）/ 迂回 / 防御 / 打击   （4 费）
-            Turn(4, "4. 先见之明弃 受伤·防御；迂回、化体为空、斩破命运（弃 暴怒·贪婪）、迂回、防御、打击",
+            // ★ 2026-11-26（用户：**移除第 4 回合的备注**）
+            Turn(4, "",
                 Scried(WatcherCards.Injury), Scried(WatcherCards.Defend),
                 Play(WatcherCards.Weave),
                 Play(WatcherCards.EmptyBody),
@@ -111,7 +112,8 @@ public static class WatcherForesightScript
                 Hold(WatcherCards.Strike, cost: 1)),
 
             // ── 7 ── （先见之明弃 受伤）/ 迂回 / 化体为空 / 斩破命运（弃 打击）/ 迂回 / 防御 / 碰撞连击   （4 费）
-            Turn(4, "7. 先见之明弃 受伤；迂回、化体为空、斩破命运（弃 打击）、迂回、防御、碰撞连击",
+            // ★ 2026-11-26（用户：**移除第 7 回合的备注**）
+            Turn(4, "",
                 Scried(WatcherCards.Injury),
                 Play(WatcherCards.Weave),
                 Play(WatcherCards.EmptyBody),

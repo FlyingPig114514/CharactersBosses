@@ -157,6 +157,11 @@ function Card-Label($c) {
     if ($c.PSObject.Properties.Name -contains 'AutoPlayed') { $label = $label + '〔自动〕' }
     if ($c.PSObject.Properties.Name -contains 'FreeThisTurn') { $label = $label + '〔免费〕' }
     if ($c.PSObject.Properties.Name -contains 'SpendsAllEnergy') { $label = $label + '〔吃掉全部能量〕' }
+    # ★ 2026-11-26（用户：「1 层碎屑储的进阶 9 增强怎么没写」）：剧本里**按张**标的
+    #   `UpgradeMinAscension`（不是进阶表，是「第 2/5 回合那张碰撞轨迹进阶 9 起升级」这种）以前在表里完全看不见。
+    if (($c.PSObject.Properties.Name -contains 'UpgradeMinAscension') -and [int]$c.UpgradeMinAscension -gt 0) {
+        $label = $label + '〔进阶' + $c.UpgradeMinAscension + '起升级〕'
+    }
     return (MdText $label)
 }
 
@@ -247,6 +252,27 @@ function Loop-Text($script) {
     return '不循环（打完停在最后一回合）'
 }
 
+# 剧本里**按张**标的进阶升级（`ScriptCard.UpgradeMinAscension`）→ `9: 碰撞轨迹`
+# 2026-11-26（用户：「1 层碎屑储的进阶 9 增强怎么没写」）：这类升级不在进阶表里，单独收一遍。
+function Asc-From-Script($script) {
+    $out = @()
+    if ($null -eq $script) { return $out }
+    if (-not ($script.PSObject.Properties.Name -contains 'turns')) { return $out }
+    foreach ($t in @($script.turns)) {
+        foreach ($c in @($t.cards)) {
+            if ($null -eq $c) { continue }
+            $lv = 0
+            if ($c.PSObject.Properties.Name -contains 'UpgradeMinAscension') { $lv = [int]$c.UpgradeMinAscension }
+            if ($lv -le 0) { continue }
+            $nm = [string]$c.name
+            if (-not $nm) { continue }
+            $line = ([string]$lv + ': ' + $nm)
+            if ($out -notcontains $line) { $out += $line }
+        }
+    }
+    return $out
+}
+
 # ── 收集设计（按幕分组）─────────────────────────────────
 $actNames = @{ 1 = '一层'; 2 = '二层'; 3 = '三层' }
 $designs = @()
@@ -270,6 +296,11 @@ foreach ($boss in $data.bosses) {
             foreach ($x in $act.ascensionRelics) { if ($x) { $mainExtras += ('进阶 ' + $x) } }
             foreach ($x in $act.dreadUpgrades) { if ($x) { $mainExtras += ('恐惧升级 ' + $x) } }
             foreach ($x in $act.ascensionDisplay) { foreach ($part in ([string]$x -split ',')) { if ($part.Trim()) { $mainExtras += ('进阶 ' + $part.Trim()) } } }
+            # 剧本里按张标的进阶升级也并进同一行（去重）
+            foreach ($x in (Asc-From-Script $act.script)) { if ($mainExtras -notcontains ('进阶 ' + $x)) { $mainExtras += ('进阶 ' + $x) } }
+            # 2026-11-26：多人 / 恐惧模式下的换牌（数据源 = 模组 MultiplayerCardSwap 的两张表）
+            $mainSwaps = @(); foreach ($x in $act.multiplayerSwaps) { if ($x) { $mainSwaps += [string]$x } }
+            $mainDread = @(); foreach ($x in $act.dreadSwaps) { if ($x) { $mainDread += [string]$x } }
             $designs += [pscustomobject]@{
                 Act = $actNo; Char = $boss.character; Name = [string]$act.name; Key = [string]$boss.key
                 Encounter = [string]$act.encounter; Hp = (Get-Hp $boss.key $actNo ([int]$act.baseHp) $firstBaseHp 0)
@@ -277,6 +308,7 @@ foreach ($boss in $data.bosses) {
                 Deck = $act.deck; Relics = $act.relics
                 DeckNote = $act.deckNote; DeckRegistered = $act.deckRegistered
                 Special = $act.special; SpecialDread = $act.specialDread
+                MultiplayerSwaps = $mainSwaps; DreadSwaps = $mainDread
                 Extras = $mainExtras; Script = $act.script; Info = $(if ($act.info) { [string]$act.info } else { [string]$boss.info })
                 LossMessages = (Loss-Of ([string]$act.encounter))
             }
@@ -288,6 +320,9 @@ foreach ($boss in $data.bosses) {
             foreach ($x in $v.ascensionRelics) { if ($x -and ($x -notmatch ':\s*$')) { $extras += ('进阶 ' + $x) } }
             foreach ($x in $v.ascensionDisplay) { foreach ($part in ([string]$x -split ',')) { if ($part.Trim()) { $extras += ('进阶 ' + $part.Trim()) } } }
             foreach ($x in $v.dreadUpgrades) { if ($x) { $extras += ('恐惧升级 ' + $x) } }
+            foreach ($x in (Asc-From-Script $v.script)) { if ($extras -notcontains ('进阶 ' + $x)) { $extras += ('进阶 ' + $x) } }
+            $vSwaps = @(); foreach ($x in $v.multiplayerSwaps) { if ($x) { $vSwaps += [string]$x } }
+            $vDread = @(); foreach ($x in $v.dreadSwaps) { if ($x) { $vDread += [string]$x } }
             $designs += [pscustomobject]@{
                 Act = $actNo; Char = $boss.character; Name = [string]$v.name; Key = [string]$v.key
                 Encounter = [string]$v.encounter; Hp = (Get-Hp $boss.key $actNo 0 $firstBaseHp ([int]$v.hpBonus))
@@ -295,6 +330,7 @@ foreach ($boss in $data.bosses) {
                 Deck = $v.deck; Relics = $v.relics
                 DeckNote = $v.deckNote; DeckRegistered = $v.deckRegistered
                 Special = $v.special; SpecialDread = $v.specialDread
+                MultiplayerSwaps = $vSwaps; DreadSwaps = $vDread
                 Extras = $extras; Script = $v.script; Info = $(if ($v.info) { [string]$v.info } else { [string]$boss.info })
                 LossMessages = (Loss-Of ([string]$v.encounter))
             }
@@ -334,6 +370,8 @@ foreach ($a in @(1, 2, 3)) {
 
 # ★ 用户 2026-11-22：「github 的 wiki 上好像没有写进阶增强」⇒ 目录里加一条，并单独出一节
 [void]$sb.AppendLine('**进阶**：[进阶增强一览](#ascension)')
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine('**多人替换**：[多人替换一览](#multiplayer)')
 [void]$sb.AppendLine('')
 [void]$sb.AppendLine('**死亡提示**：[死亡提示的特殊情况](#loss-special)')
 [void]$sb.AppendLine('')
@@ -387,6 +425,26 @@ foreach ($d in $designs) {
         }
     }
 
+    # ★ 2026-11-26（用户：「1 层碎屑储的进阶 9 增强怎么没写」）：
+    #   剧本里**按张**标的 `UpgradeMinAscension`（例：「第 2 回合那张碰撞轨迹进阶 9 起升级」）
+    #   既不在进阶表里、备注也不带「（进阶N起升级）」那种括号写法 ⇒ 以前整行都不出现。
+    #   这里直接读剧本卡上的字段，与进阶表合并去重（同名牌只列一次）。
+    if ($null -ne $d.Script) {
+        foreach ($t in @($d.Script.turns)) {
+            foreach ($c in @($t.cards)) {
+                if ($null -eq $c) { continue }
+                $ascLv = 0
+                if ($c.PSObject.Properties.Name -contains 'UpgradeMinAscension') { $ascLv = [int]$c.UpgradeMinAscension }
+                if ($ascLv -le 0) { continue }
+                $cardNm = [string]$c.name
+                if (-not $cardNm) { continue }
+                $lvKey = [string]$ascLv
+                if (-not $byLevel.ContainsKey($lvKey)) { $byLevel[$lvKey] = @() }
+                if (@($byLevel[$lvKey]) -notcontains $cardNm) { $byLevel[$lvKey] = @($byLevel[$lvKey]) + $cardNm }
+            }
+        }
+    }
+
     # ★ v0.2.875：神格观是 `Watcher` **主定义**（不是变体），而 dump 进程里观者卡类型全是 null
     #   ⇒ 按幕表的条目被 null 过滤掉、`AscensionDisplay` 也没跟着主设计导出来。
     #   这里只给这一只补上（数据本体在 BossDefs 的 AscensionUpgradesByAct / AscensionRelicsByAct）。
@@ -418,6 +476,39 @@ foreach ($r in $ascRows) {
 [void]$sb.AppendLine('> 表里空白 = 这只 Boss 在该档**没有**额外升级/遗物。每只 Boss 的详细升级名单也写在它自己那一节里')
 [void]$sb.AppendLine('> （「**进阶 / 恐惧改动**」一行），两处同源（同一次 `tools/wiki-dump` 导出）。')
 [void]$sb.AppendLine('')
+
+# ── 多人替换一览（2026-11-26 用户：「有一些通用的多人替换没有被写到 wiki 里」）─────
+$mpRows = @()
+$dreadRows = @()
+foreach ($d in $designs) {
+    foreach ($x in @($d.MultiplayerSwaps)) { if ($x) { $mpRows += [pscustomobject]@{ Act = $d.Act; Name = $d.Name; Swap = [string]$x } } }
+    foreach ($x in @($d.DreadSwaps)) { if ($x) { $dreadRows += [pscustomobject]@{ Act = $d.Act; Name = $d.Name; Swap = [string]$x } } }
+}
+if ($mpRows.Count -gt 0) {
+    [void]$sb.AppendLine('<a id="multiplayer"></a>')
+    [void]$sb.AppendLine('')
+    [void]$sb.AppendLine('## 多人替换（2 人及以上）')
+    [void]$sb.AppendLine('')
+    [void]$sb.AppendLine('多人局里部分 Boss 会把剧本里的某张牌换成**只有多人才能发挥作用的牌**。')
+    [void]$sb.AppendLine('换上去的牌收益一律落在 **Boss 侧**（不给玩家），**单人局完全不变**；换牌只看「幕 + Boss + 原牌」，所以只有剧本里真带那张牌的设计会命中。')
+    [void]$sb.AppendLine('')
+    [void]$sb.AppendLine('| 幕 | Boss | 单人 → 多人 |')
+    [void]$sb.AppendLine('|:---:|---|---|')
+    foreach ($r in $mpRows) {
+        [void]$sb.AppendLine('| ' + $actNames[$r.Act] + ' | ' + (MdText $r.Name) + ' | ' + (MdText $r.Swap) + ' |')
+    }
+    [void]$sb.AppendLine('')
+    if ($dreadRows.Count -gt 0) {
+        [void]$sb.AppendLine('**恐惧模式替换**（与人数无关，单人也会换）：')
+        [void]$sb.AppendLine('')
+        [void]$sb.AppendLine('| 幕 | Boss | 单人 → 恐惧模式 |')
+        [void]$sb.AppendLine('|:---:|---|---|')
+        foreach ($r in $dreadRows) {
+            [void]$sb.AppendLine('| ' + $actNames[$r.Act] + ' | ' + (MdText $r.Name) + ' | ' + (MdText $r.Swap) + ' |')
+        }
+        [void]$sb.AppendLine('')
+    }
+}
 
 foreach ($a in @(1, 2, 3)) {
     $inAct = @($designs | Where-Object { $_.Act -eq $a })
@@ -484,6 +575,13 @@ foreach ($a in @(1, 2, 3)) {
         if ($d.Extras.Count -gt 0) {
             [void]$sb.AppendLine('- **进阶 / 恐惧改动**：' + (MdText ($d.Extras -join '；')))
         }
+        # ★ 2026-11-26（用户：「有一些通用的多人替换没有被写到 wiki 里」）—— 数据源 = MultiplayerCardSwap 的两张表
+        if (@($d.MultiplayerSwaps).Count -gt 0) {
+            [void]$sb.AppendLine('- **多人替换**（2 人及以上，单人不变）：' + (MdText ($d.MultiplayerSwaps -join '；')))
+        }
+        if (@($d.DreadSwaps).Count -gt 0) {
+            [void]$sb.AppendLine('- **恐惧模式替换**：' + (MdText ($d.DreadSwaps -join '；')))
+        }
         [void]$sb.AppendLine('')
         if ($d.Special) {
             [void]$sb.AppendLine('**特殊效果**')
@@ -506,10 +604,21 @@ foreach ($a in @(1, 2, 3)) {
             [void]$sb.AppendLine('| 回合 | 打出 | 不出 | 备注 |')
             [void]$sb.AppendLine('|:---:|---|---|---|')
             $i = 0
+            $loopFrom = 0; $loopLength = 0; $loopOffset = 0
+            if ($d.Script.PSObject.Properties.Name -contains 'loopFrom') { $loopFrom = [int]$d.Script.loopFrom }
+            if ($d.Script.PSObject.Properties.Name -contains 'loopLength') { $loopLength = [int]$d.Script.loopLength }
+            if ($d.Script.PSObject.Properties.Name -contains 'loopLabelOffset') { $loopOffset = [int]$d.Script.loopLabelOffset }
+            $looping = ($loopFrom -gt 0 -and $loopLength -gt 0)
             foreach ($turn in $d.Script.turns) {
                 $i = $i + 1
+                # ★ 2026-11-26（用户：「把那两个回合改成 x+1 和 x+2」）：
+                #   循环段写 x / x+n；起点偏移由剧本的 `LoopLabelOffset` 给（轰击储 = 1 ⇒ x+1 / x+2）。
+                if ($looping -and $i -ge $loopFrom) {
+                    $loopIdx = $loopOffset + ($i - $loopFrom)
+                    $turnLabel = if ($loopIdx -eq 0) { 'x' } else { 'x+' + $loopIdx }
+                } else { $turnLabel = [string]$i }
                 $energyTxt = ' | '   # 能量已经在表头外统一说明；这里保持列数一致
-                [void]$sb.AppendLine('| ' + $i + ' | ' + (Played-Cards $turn.cards) + ' | ' + (NotPlayed-Cards $turn.cards) + ' | ' + (Note-IfUseful ([string]$turn.note) $turn.cards) + ' |')
+                [void]$sb.AppendLine('| ' + $turnLabel + ' | ' + (Played-Cards $turn.cards) + ' | ' + (NotPlayed-Cards $turn.cards) + ' | ' + (Note-IfUseful ([string]$turn.note) $turn.cards) + ' |')
             }
             [void]$sb.AppendLine('')
         }

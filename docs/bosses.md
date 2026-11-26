@@ -21,9 +21,9 @@
 | 储君 2 号 | 轰击储 | `REGENT_BOMBARD` | 环绕轨道 | `fight REGENT_BOMBARD_BOSS_ENCOUNTER` |
 | 铁甲 1 号 | 愤怒战 | `IRONCLAD_ANGER` | 群情激奋（全局） | `fight IRONCLAD_ANGER_BOSS_ENCOUNTER` |
 | 铁甲 2 号 | 打击战 | `IRONCLAD_STRIKE` | 痛击 | `fight IRONCLAD_STRIKE_BOSS_ENCOUNTER` |
-| 观者 1 号 | （本幕主设计） | `WATCHER_DIVINITY` | - | `fight WATCHER_DIVINITY_BOSS_ENCOUNTER` |
-| 观者 2 号 | 预见观 | `WATCHER_FORESIGHT` | 每当观者触发[gold]先见之明[/… | `fight WATCHER_FORESIGHT_BOSS_ENCOUNTER` |
-| 观者 3 号 | 疾风观 | `WATCHER_FLURRY` | 每当观者将[gold]疾风连击[/g… | `fight WATCHER_FLURRY_BOSS_ENCOUNTER` |
+| 观者 1 号 | （本幕主设计） | `WATCHER_DIVINITY` | 你每打出一张牌，观者获得 1 层真言… | `fight WATCHER_DIVINITY_BOSS_ENCOUNTER` |
+| 观者 2 号 | 预见观 | `WATCHER_FORESIGHT` | 每当观者触发先见之明时，你预见 2 … | `fight WATCHER_FORESIGHT_BOSS_ENCOUNTER` |
+| 观者 3 号 | 疾风观 | `WATCHER_FLURRY` | 每当观者将疾风连击返回手牌时，你也将… | `fight WATCHER_FLURRY_BOSS_ENCOUNTER` |
 
 ## 二层（14 个）
 
@@ -40,8 +40,8 @@
 | 储君 3 号 | 仆从储 | `REGENT_MINION` | 征召上前 | `fight REGENT_MINION_BOSS_ENCOUNTER` |
 | 铁甲 1 号 | 放血战 | `IRONCLAD_BLOOD` | 死亡收割 | `fight IRONCLAD_BLOOD_BOSS_ENCOUNTER` |
 | 铁甲 2 号 | 杂耍战 | `IRONCLAD_JUGGLER` | 燃烧契约 | `fight IRONCLAD_JUGGLER_BOSS_ENCOUNTER` |
-| 观者 1 号 | （本幕主设计） | `WATCHER_DIVINITY` | - | `fight WATCHER_DIVINITY_BOSS_ENCOUNTER` |
-| 观者 2 号 | 印牌观 | `WATCHER_CREATE` | 每当你在战斗中生成卡牌时，该牌会被[… | `fight WATCHER_CREATE_BOSS_ENCOUNTER` |
+| 观者 1 号 | （本幕主设计） | `WATCHER_DIVINITY` | 你每打出一张牌，观者获得 1 层真言… | `fight WATCHER_DIVINITY_BOSS_ENCOUNTER` |
+| 观者 2 号 | 印牌观 | `WATCHER_CREATE` | 每当你在战斗中生成卡牌时，该牌会被降… | `fight WATCHER_CREATE_BOSS_ENCOUNTER` |
 | 观者 3 号 | 保留观 | `WATCHER_RETAIN` | 在你的回合结束时，若你有耗能小于2的… | `fight WATCHER_RETAIN_BOSS_ENCOUNTER` |
 
 ## 三层（17 个）
@@ -62,7 +62,7 @@
 | 铁甲 1 号 | 易伤战 | `IRONCLAD_VULN` | 主宰 | `fight IRONCLAD_VULN_BOSS_ENCOUNTER` |
 | 铁甲 2 号 | 巨石战 | `IRONCLAD_BOULDER` | 原始力量 | `fight IRONCLAD_BOULDER_BOSS_ENCOUNTER` |
 | 愚者 1 号 | 塔罗愚 | `FOOL_TAROT` | 愚者 | `fight FOOL_TAROT_BOSS_ENCOUNTER` |
-| 观者 1 号 | 神格观 | `WATCHER_DIVINITY` | 你每打出一张牌，观者获得 1 层[g… | `fight WATCHER_DIVINITY_BOSS_ENCOUNTER` |
+| 观者 1 号 | 神格观 | `WATCHER_DIVINITY` | 你每打出一张牌，观者获得 1 层真言… | `fight WATCHER_DIVINITY_BOSS_ENCOUNTER` |
 | 观者 2 号 | 欧米伽观 | `WATCHER_OMEGA` | 欧米伽改为隔一回合触发 1 次。 | `fight WATCHER_OMEGA_BOSS_ENCOUNTER` |
 | 观者 3 号 | 红蓝观 | `WATCHER_RUSHDOWN` | 每当观者打出 12 张牌，她就会强制… | `fight WATCHER_RUSHDOWN_BOSS_ENCOUNTER` |
 

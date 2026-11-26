@@ -505,6 +505,17 @@ public sealed class BossScript
     public int LoopLength { get; init; }
 
     /// <summary>
+    /// **纯展示用**：循环段第一回合的标签偏移（默认 0 ⇒ wiki / 网页里写成 `x`，之后 `x+1`、`x+2`…）。
+    ///
+    /// 为什么需要单独一个字段：一层「轰击储」的唤醒回合由**玩家**决定（`BossOrbitalBombardPower.WakeTurn`），
+    /// 它的能力面板（`BossInfoTable`）里写的记法是「`x` = **最后一次被击晕**的回合，循环从 `x+1` 开始」
+    /// （用户 2026-11-26：「把那两个回合改成 x+1 和 x+2，能力面板不动」）。
+    /// 其它有固定循环起点的 Boss 保持 0 ⇒ 循环第一回合就写成 `x`。
+    /// ⚠ 运行期**没有任何代码读它**，只影响百科的回合列。
+    /// </summary>
+    public int LoopLabelOffset { get; init; }
+
+    /// <summary>
     /// 每一轮循环额外升级的牌（下标 0 = 第一轮循环，之后沿用最后一项）。
     /// 用户设计：第一轮循环升级出击+护卫，第二轮碎骨+死亡之门，再往后每次升级 1 对打击与防御。
     /// </summary>

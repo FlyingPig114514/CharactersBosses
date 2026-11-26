@@ -86,7 +86,8 @@ public static class FleshBoneScript
             // 4：违逆(1) + 防御(1) + 苦难(0)
             new BossTurn
             {
-                Note = "4. 违逆(1)、防御(1)、苦难(0)；多人模式时苦难会向非锁定者传递锁定者的debuff，并因为血肉戏法造成伤害",
+                // ★ 2026-11-26（用户：备注只留多人机制说明，**不要再把本回合的意图重复一遍**）
+                Note = "4. 多人模式时苦难会向非锁定者传递锁定者的debuff，并因为血肉戏法造成伤害",
                 Energy = TurnEnergy,
                 Cards = Cards(Play<Defy>(1), Play<DefendNecrobinder>(1), Play<Misery>(0)),
             },
@@ -135,7 +136,8 @@ public static class FleshBoneScript
             // 10：违逆(1) + 防御(1) + 苦难(0)
             new BossTurn
             {
-                Note = "10. 违逆(1)、防御(1)、苦难(0)；多人模式时苦难会向非锁定者传递锁定者的debuff，并因为血肉戏法造成伤害",
+                // ★ 2026-11-26（同第 4 回合：只留多人机制说明）
+                Note = "10. 多人模式时苦难会向非锁定者传递锁定者的debuff，并因为血肉戏法造成伤害",
                 Energy = TurnEnergy,
                 Cards = Cards(Play<Defy>(1), Play<DefendNecrobinder>(1), Play<Misery>(0)),
             },
