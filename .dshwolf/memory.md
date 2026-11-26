@@ -7310,3 +7310,4 @@ Chronological action log.
 | 2026-11-26 17:31 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherScript.cs` | ok | 0 |
 | 2026-11-26 17:31 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherScript.cs` | ok | 0 |
 | 2026-11-26 17:37 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/changelog-history.md` | ok | 0 |
+| 2026-11-26 17:49 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/make-phone-body-zip.ps1` | ok | 0 |
