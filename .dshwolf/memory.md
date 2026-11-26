@@ -7305,3 +7305,8 @@ Chronological action log.
 | 2026-11-26 16:48 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/wiki-dump/WikiDump.cs` | error | 0 |
 | 2026-11-26 16:48 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/wiki-dump/WikiDump.cs` | ok | 0 |
 | 2026-11-26 16:55 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/changelog-history.md` | ok | 0 |
+| 2026-11-26 17:02 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/tools/wiki-dump/WikiDump.cs` | error | 0 |
+| 2026-11-26 17:03 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BossDefs.cs` | ok | 0 |
+| 2026-11-26 17:31 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherScript.cs` | ok | 0 |
+| 2026-11-26 17:31 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/WatcherScript.cs` | ok | 0 |
+| 2026-11-26 17:37 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/changelog-history.md` | ok | 0 |

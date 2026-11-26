@@ -51,7 +51,7 @@ public static class WatcherOmegaScript
         var turns = new List<BossTurn>
         {
             // ── 1 ── 阿尔法+ / 点穴 / 防御        （3 费：1 + 1 + 1）
-            Turn(3, "1. 阿尔法+、点穴、防御（用户原稿写「防御（没费）」，按 3 费三张都打得出）",
+            Turn(3, "",
                 W(WatcherCards.Alpha, upgraded: true), W(WatcherCards.PressurePoints), W(WatcherCards.Defend)),
 
             // ── 2 ── 确立基础 / 冥想（捞点穴）/ 笨拙 / 奇迹（不出）   （2 费）
@@ -67,7 +67,7 @@ public static class WatcherOmegaScript
                 W(WatcherCards.Miracle, holdInstead: true)),
 
             // ── 4 ── 暴怒+ / 打击（进阶 9 起升级）/ 警惕 / 奇迹（不出）   （5 费：2 + 1 + 2）
-            Turn(5, "4. 暴怒+、打击（进阶9起升级）、警惕、奇迹（不出）",
+            Turn(5, "",
                 W(WatcherCards.Eruption, upgraded: true), W(WatcherCards.Strike),
                 W(WatcherCards.Vigilance), W(WatcherCards.Miracle, holdInstead: true)),
 
@@ -79,30 +79,30 @@ public static class WatcherOmegaScript
             // ── 6 ── 点穴 / 心灵堡垒（进阶 8 起升级）/ 欺瞒现实（没费）   （2 费）
             //   ★ v0.2.699（用户 2026-11-16）：「削弱，进阶9不再升级点穴，而是升级所有打击」
             //   ⇒ 点穴恢复为永不升级；进阶 9 改成升级剧本里**所有**「打击」。
-            Turn(2, "6. 点穴、心灵堡垒（进阶8起升级）、欺瞒现实（没费）",
+            Turn(2, "",
                 W(WatcherCards.PressurePoints),
                 W(WatcherCards.MentalFortress),
                 W(WatcherCards.DeceiveReality)),
 
             // ── 7 ── 渐强 / 打击（进阶 9 起升级）/ 安宁   （3 费）
-            Turn(3, "7. 渐强、打击（进阶9起升级）、安宁",
+            Turn(3, "",
                 W(WatcherCards.Crescendo), W(WatcherCards.Strike),
                 W(WatcherCards.Tranquility)),
 
             // ── 8 ── 洗牌 / 点穴 / 暴怒+ / 不惧妖邪   （4 费：1 + 2 + 1）
-            Turn(4, "8. 洗牌（她重新洗牌）、点穴、暴怒+、不惧妖邪",
+            Turn(4, "8. 洗牌。",
                 W(WatcherCards.PressurePoints), W(WatcherCards.Eruption, upgraded: true),
                 W(WatcherCards.FearNoEvil)),
 
             // ── 9 ── 打击（进阶 9 起升级）/ 冥想 / 防御（没费）   （2 费）  ← 9～12 循环起点
-            Turn(2, "9. 打击（进阶9起升级）、冥想、防御（没费）",
+            Turn(2, "",
                 W(WatcherCards.Strike), W(WatcherCards.Meditate), W(WatcherCards.Defend)),
 
             // ── 10 ── 点穴（0 费）/ 点穴（0 费）/ 警惕 / 打击（没费，进阶 9 起升级）   （2 费）
             //   ★ v0.2.693（用户 2026-11-16）：「让第 10 回合的第一张点穴在进阶 9 被升级，第二张不变」
             //   ★ v0.2.699（用户 2026-11-16）：「进阶9不再升级点穴，而是升级所有打击」⇒ 两张点穴都不再升级，
             //     这一回合的那张打击改成进阶 9 起升级。
-            Turn(2, "10. 点穴（0费）、点穴（0费）、警惕、打击（没费，进阶9起升级）",
+            Turn(2, "",
                 W(WatcherCards.PressurePoints, costOverride: 0),
                 W(WatcherCards.PressurePoints, costOverride: 0),
                 W(WatcherCards.Vigilance), W(WatcherCards.Strike)),
@@ -115,7 +115,7 @@ public static class WatcherOmegaScript
                 W(WatcherCards.EmptyBody), W(WatcherCards.DeceiveReality), W(WatcherCards.Safety)),
 
             // ── 12 ── 洗牌 / 点穴（0 费）/ 暴怒 / 不惧妖邪   （3 费：0 + 2 + 1）
-            Turn(3, "12. 洗牌（她重新洗牌）、点穴（0费）、暴怒、不惧妖邪",
+            Turn(3, "12. 洗牌。",
                 W(WatcherCards.PressurePoints, costOverride: 0),
                 W(WatcherCards.Eruption), W(WatcherCards.FearNoEvil)),
         };

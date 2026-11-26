@@ -71,7 +71,7 @@ public static class WatcherRushdownScript
                 Hold(WatcherCards.Miracle, cost: 0)),
 
             // ── 3 ── 义愤填膺 / 供奉 / 碰撞连击 / 打击 / 冥想（捞暴怒+）⇒ 节制满 12 张，回合结束   （4 费）
-            Turn(4, "3. 义愤填膺、供奉、碰撞连击、打击、冥想（捞暴怒+）⇒ 节制触发结束回合",
+            Turn(4, "3. 打出冥想时触发节制",
                 Play(WatcherCards.Indignation),
                 Play(WatcherCards.Consecrate),
                 Play(WatcherCards.BowlingBash),
@@ -126,7 +126,7 @@ public static class WatcherRushdownScript
 
             // ── 8 ── 洗牌；奇迹(+1) / 腾越 ⇒ 节制第二次满 12 张结束回合，但腾越给额外回合   （3 费）
             //   ★ v0.2.771：额外回合里的那张是**碰撞连击**（用户 2026-11-19），不是腰带抽打。
-            Turn(5, "8. 洗牌；奇迹、腾越（节制第二次满 12 张 ⇒ 结束回合，腾越给出额外回合）",
+            Turn(5, "8. 洗牌。打出腾越时触发节制，但腾越开启了额外回合",
                 shuffle: true,
                 cards: new[]
                 {
@@ -161,7 +161,7 @@ public static class WatcherRushdownScript
                 Hold(WatcherCards.FearNoEvil)),
 
             // ── 11 ── 洗牌；内心宁静 / 暴怒+ / 净化+（消耗 5 张）/ 警惕（触发节制结束回合）/ 不惧妖邪（没费不弃）   （3 费）
-            Turn(5, "11. 洗牌；内心宁静、暴怒+、净化+（消耗 腰带抽打·碰撞连击·当头棒喝·冥想·义愤填膺）、警惕（触发节制结束回合）、不惧妖邪（没费不弃）",
+            Turn(5, "11. 洗牌。净化+消耗腰带抽打、碰撞连击、当头棒和、冥想、义愤填膺",
                 shuffle: true,
                 cards: new[]
                 {
@@ -179,7 +179,7 @@ public static class WatcherRushdownScript
                 }),
 
             // ── 12+ 默认无限 ──（14 费）洗牌；暴怒+/供奉/内心宁静 ×3 组、暴怒+/供奉/警惕、暴怒+/供奉/警惕（第二个警惕触发节制）
-            Turn(14, "12+（默认）：洗牌；暴怒+、供奉、内心宁静 ×3 组、暴怒+、供奉、警惕（触发节制结束回合）、暴怒+、供奉、警惕、不惧妖邪（不出）、净化+（不出）",
+            Turn(14, "12. 若玩家打出了攻击牌，意图变成：（暴怒+、供奉、不惧妖邪）*4",
                 shuffle: true,
                 cards: new[]
                 {

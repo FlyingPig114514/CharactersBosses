@@ -27,10 +27,10 @@ public static class DefectScript
     {
         var turns = new List<BossTurn>
         {
-            Turn("开局：偏差认知+ 拿集中（永冻冰晶给 7 格挡）、冰川铺冰球；弹幕齐射没费",
+            Turn("",
                 C<BiasedCognition>(true), C<Glacier>(), C<Barrage>()),
 
-            Turn("子程序（能力牌 → 之后每张能力牌 +1 费）、冰雹风暴；双重释放激发电球两次（意图显示 14×2）",
+            Turn("",
                 C<Subroutine>(), C<Hailstorm>(), C<Dualcast>()),
 
             Turn("电击、碎片整理+、冷却剂（用户 2026-11-22 改：雷暴挪到第 5 回合）",
@@ -48,7 +48,7 @@ public static class DefectScript
             Turn("冰雹风暴（AI 印）、究极防御、飞跃、防御",
                 C<Hailstorm>(false, "ai"), C<UltimateDefend>(), C<Leap>(), C<DefendDefect>()),
 
-            Turn("洗牌。扩容（AI 印）、究极防御、充电、防御",
+            Turn("洗牌。",
                 C<Capacitor>(false, "ai"), C<UltimateDefend>(), C<ChargeBattery>(), C<DefendDefect>()),
 
             Turn("暴涨（AI 印）、冰川、寒流；打击没费",

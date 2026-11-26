@@ -32,11 +32,11 @@ public static class WatcherScript
             // 进阶 8 起的升级：**警惕 / 旋身 / 欺瞒现实**（用户 2026-11-16 订正；
             // 不再是「摆手」）。三张牌分别出现在第 1/8（警惕）、第 4/11（欺瞒现实）、第 5/9（旋身）回合。
             T("1. 许愿+（永生不死）、打击（有费就打）、警惕（有费就打）",
-                W(WatcherCards.Wish, upgraded: true), W(WatcherCards.Strike),
-                W(WatcherCards.Vigilance)),
+                W(WatcherCards.Wish, upgraded: true), W(WatcherCards.Strike, reasonOverride: @"有费就打"),
+                W(WatcherCards.Vigilance, reasonOverride: @"有费就打")),
 
             T("2. 光辉、防御、敬拜（有费就打）、奇迹（不出）",
-                W(WatcherCards.Brilliance), W(WatcherCards.Defend), W(WatcherCards.Worship),
+                W(WatcherCards.Brilliance), W(WatcherCards.Defend), W(WatcherCards.Worship, reasonOverride: @"有费就打"),
                 W(WatcherCards.Miracle, holdInstead: true)),
 
             T("3. 奇迹、聚能成刃（X 费）、供奉、贪婪",
@@ -45,34 +45,34 @@ public static class WatcherScript
 
             T("4. 化拳为空、摆手、欺瞒现实（有费就打）、平安（有费就打）",
                 W(WatcherCards.EmptyFist), W(WatcherCards.WaveOfTheHand),
-                W(WatcherCards.DeceiveReality), W(WatcherCards.Safety)),
+                W(WatcherCards.DeceiveReality, reasonOverride: @"有费就打"), W(WatcherCards.Safety, reasonOverride: @"有费就打")),
 
             T("5. 灭除之刃（段数 = 本回合 X 费）、虔信、旋身（有费就打）",
                 W(WatcherCards.Expunger), W(WatcherCards.Devotion),
-                W(WatcherCards.Swivel)),
+                W(WatcherCards.Swivel, reasonOverride: @"有费就打")),
 
             T("6. 打击、圣洁、结末（有费就打）",
-                W(WatcherCards.Strike), W(WatcherCards.Sanctity), W(WatcherCards.Conclude)),
+                W(WatcherCards.Strike), W(WatcherCards.Sanctity), W(WatcherCards.Conclude, reasonOverride: @"有费就打")),
 
             // 7～11 循环（LoopFrom = 7 / LoopLength = 5）。
             // 「洗牌」查不到 ⇒ 本回合实际从「光辉」开始，待用户确认后再补。
-            T("7. 洗牌（待确认）、光辉、敬拜（有费就打）、贪婪",
-                W(WatcherCards.Brilliance), W(WatcherCards.Worship), W(WatcherCards.Greed)),
+            T("7. 洗牌。",
+                W(WatcherCards.Brilliance), W(WatcherCards.Worship, reasonOverride: @"有费就打"), W(WatcherCards.Greed)),
 
             T("8. 打击、供奉、警惕（有费就打）",
                 W(WatcherCards.Strike), W(WatcherCards.Consecrate),
-                W(WatcherCards.Vigilance)),
+                W(WatcherCards.Vigilance, reasonOverride: @"有费就打")),
 
             T("9. 灭除之刃、防御、旋身（有费就打）",
                 W(WatcherCards.Expunger), W(WatcherCards.Defend),
-                W(WatcherCards.Swivel)),
+                W(WatcherCards.Swivel, reasonOverride: @"有费就打")),
 
             T("10. 打击、圣洁、结末（有费就打）",
-                W(WatcherCards.Strike), W(WatcherCards.Sanctity), W(WatcherCards.Conclude)),
+                W(WatcherCards.Strike), W(WatcherCards.Sanctity), W(WatcherCards.Conclude, reasonOverride: @"有费就打")),
 
             T("11. 化拳为空、摆手、欺瞒现实（有费就打）、平安（有费就打）",
                 W(WatcherCards.EmptyFist), W(WatcherCards.WaveOfTheHand),
-                W(WatcherCards.DeceiveReality), W(WatcherCards.Safety)),
+                W(WatcherCards.DeceiveReality, reasonOverride: @"有费就打"), W(WatcherCards.Safety, reasonOverride: @"有费就打")),
         };
 
         return new BossScript
@@ -120,6 +120,14 @@ public static class WatcherScript
     }
 
     // ── 剧本小工具 ─────────────────────────────────────────────────────────
+    /// <summary>
+    /// ★ 2026-11-26（用户：「神格观的很多牌都被直接放在了打出里，但实际上应该是放在不出那里，然后标上有费就打的」）：
+    /// 她**回合开始只有 2 费**（角色 3 − 涅奥的祝福 1），以前 `BossTurn.Energy` 留 0 ⇒ wiki 按定义的 3 费算账，
+    /// 于是标着「（有费就打）」的那些牌被算成了「打出」。现在显式写 2：
+    /// 真打起来本来就是 2，多出来的能量只来自「奇迹」与进神格，不需要靠这里补。
+    /// </summary>
+    private const int TurnEnergy = 2;
+
     private static BossTurn T(string note, params ScriptCard?[] cards)
     {
         var list = new List<ScriptCard>();
@@ -128,7 +136,8 @@ public static class WatcherScript
     }
 
     /// <summary>观者的牌：类型是运行期反射拿的，取不到就返回 null（这一格会被剔掉）。</summary>
-    private static ScriptCard? W(Type? card, bool upgraded = false, int upgradeMinAscension = 0, bool holdInstead = false)
+    private static ScriptCard? W(Type? card, bool upgraded = false, int upgradeMinAscension = 0, bool holdInstead = false,
+                                 string? reasonOverride = null)
     {
         if (card == null) return null;
         return new ScriptCard
@@ -138,6 +147,12 @@ public static class WatcherScript
             UpgradeMinAscension = upgradeMinAscension,   // 进阶 8 起升级：警惕 / 旋身 / 欺瞒现实（用户 2026-11-16）
             HoldInstead = holdInstead,                   // 有费也不出（留在手里）
             From = "deck",
+            // 2026-11-26（用户）：「排不进『打出』的牌要标成『有费就打』而不是『没费』」
+            //   —— 她这一套的牌**都是想打的**，只是这回合的钱不够。诅咒（贪婪/聚能成刃）走 cost<0 那条，不受影响。
+            WouldPlayIfEnergy = true,
+            // 「有费就打」的那几张：按用户 2026-11-26 的口径**一律显示在「不出」列**（她可能因为进神格拿到额外能量打出来，
+            // 但 wiki 这一列就按「有费就打」写）。
+            ReasonOverride = reasonOverride,
         };
     }
 }

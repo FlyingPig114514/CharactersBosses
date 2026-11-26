@@ -637,6 +637,8 @@ internal static class WikiDump
             if (p == null) continue;
             if (p.GetValue(c) is int i && i >= 0) card[num] = i;
         }
+        var reasonOvr = t.GetProperty("ReasonOverride")?.GetValue(c) as string;
+        if (!string.IsNullOrEmpty(reasonOvr)) card["ReasonOverride"] = reasonOvr;
         var from = t.GetProperty("From")?.GetValue(c) as string;
         if (!string.IsNullOrEmpty(from) && from != "deck") card["from"] = from;
 
@@ -728,6 +730,14 @@ internal static class WikiDump
             if (card == null) continue;
 
             if (card.ContainsKey("fromNote")) continue;   // Note 反解出来的牌：费用未知，按 Note 的标注为准
+
+            // ★ 2026-11-26：剧本可以用 `ReasonOverride` 直接写死这一列要显示的原因（优先级最高）。
+            if (card.TryGetValue("ReasonOverride", out var ovr) && ovr is string ovrText && ovrText.Length > 0)
+            {
+                card["played"] = false;
+                card["reason"] = ovrText;
+                continue;
+            }
 
             string notPlayedBy = null;
             if (card.ContainsKey("Burned")) notPlayedBy = "被烧掉";

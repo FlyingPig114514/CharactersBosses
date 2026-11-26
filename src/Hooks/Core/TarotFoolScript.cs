@@ -79,7 +79,7 @@ public static class TarotFoolScript
 
             T("15. 星星（2 次）、太阳（无效果）、月亮（塞 10 把小刀）", C<TheStar>(), C<TheSun>(), C<TheMoon>()),
 
-            T("16. 审判、世界、恶魔、煤灰 ×2（被消耗）", C<Judgement>(), C<TheWorld>(), C<TheDevil>(), Discard<Soot>(), Discard<Soot>()),
+            T("16. 审判、世界、恶魔、煤灰 ×2（被消耗）", C<Judgement>(), C<TheWorld>(), C<TheDevil>(), ExhaustSoot(), ExhaustSoot()),
         };
 
         return new BossScript
@@ -143,6 +143,19 @@ public static class TarotFoolScript
     private static ScriptCard C<T>(bool upgraded = false)
         where T : MegaCrit.Sts2.Core.Models.CardModel
         => new() { Card = typeof(T), Upgraded = upgraded, From = "deck" };
+
+    /// <summary>
+    /// 被前一张牌（恶魔）**消耗**掉的那张（煤灰）。
+    /// ★ 2026-11-26（用户：「塔罗愚第16回合不出的那两张煤灰应该是被消耗，而不是被丢弃」）：
+    /// 玩法上仍是「她自己处理掉、玩家不动它」，但 wiki 那一列要显示「被消耗」⇒ 用 `ReasonOverride` 写死文案。
+    /// </summary>
+    private static ScriptCard ExhaustSoot()
+        => new()
+        {
+            Card = typeof(Soot), From = "deck",
+            DiscardInstead = true,          // 游戏内行为保持不变（不进她的出牌队列）
+            ReasonOverride = "被消耗",       // 只改 wiki 的显示
+        };
 
     /// <summary>被前一张牌（恶魔）消耗掉的那张（煤灰）。</summary>
     private static ScriptCard Discard<T>()

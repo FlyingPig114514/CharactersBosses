@@ -111,7 +111,7 @@ public static class RegentScript
     {
         var turns = new List<BossTurn>
         {
-            T("光谱偏移（机关盒印的，本回合 0 费）、创世之柱（进阶 8 时升级）、流光溢彩+、超质量体", 1,
+            T("光谱偏移（烦人机关盒印的，本回合0费）", 1,
                 new ScriptCard { Card = typeof(SpectrumShift), From = "box", FreeThisTurn = true },
                 new ScriptCard { Card = typeof(PillarOfCreation), UpgradeMinAscension = 8 },
                 C<Glitterstream>(true), C<Supermassive>()),

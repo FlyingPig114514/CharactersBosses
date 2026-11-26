@@ -57,7 +57,7 @@ public static class GrandFinaleSilentScript
             //           = 夜魇+ 2 + 杂技 1 + 防御 1（铭记死亡是奇巧自动打出，不花能量）。
             new BossTurn
             {
-                Note = "2. 肾上腺素、夜魇+（复制杂技）、杂技（弃战术大师）、战术大师（奇巧）、隐秘匕首（弃防御和铭记死亡）、铭记死亡（奇巧）、防御",
+                Note = "",
                 Cards = new List<ScriptCard>
                 {
                     C<Adrenaline>(), C<Nightmare>(true), C<Acrobatics>(),
@@ -154,7 +154,7 @@ public static class GrandFinaleSilentScript
             //    防御（奇巧）、钢铁风暴（被必备工具丢弃）
             new BossTurn
             {
-                Note = "7. 洗牌；杂技（弃打击）、手上技法（给防御加奇巧）、打击、隐秘匕首（丢防御）、防御（奇巧）；钢铁风暴（被必备工具丢弃）",
+                Note = "7. 洗牌。",
                 ShuffleDrawPile = true,
                 Cards = new List<ScriptCard>
                 {
@@ -223,7 +223,7 @@ public static class GrandFinaleSilentScript
             //     防御（奇巧）、打击（被必备工具丢弃）
             new BossTurn
             {
-                Note = "10. 洗牌；杂技（弃防御）、手上技法（给防御加奇巧）、钢铁风暴（丢光剩下的 4 张）、防御（奇巧）；打击（被必备工具丢弃）",
+                Note = "10. 洗牌。",
                 ShuffleDrawPile = true,
                 Cards = new List<ScriptCard>
                 {

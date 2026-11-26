@@ -41,7 +41,7 @@ public static class SilentScript
             // 用户 2026-10-31：**第 1 回合按 3 费算**（基础 2 + 灯笼 +1；涅奥的祝福已经含在基础里）
             //   ⇒ 余像 1 + 斗篷与匕首 1（多人时换成刀刃交响曲 2／进阶9+ 升到 1 费）+ 中和 0 之后，
             //     还能打得出一张防御（以前两张防御都没费）。
-            Turn("余像、斗篷与匕首（6 格挡＋1 刀）、中和、防御；第二张防御没费", 1, 3, 
+            Turn("", 1, 3, 
                 C<Afterimage>(), C<CloakAndDagger>(), C<Neutralize>(),
                 C<DefendSilent>(), C<DefendSilent>()),
 
@@ -59,7 +59,7 @@ public static class SilentScript
             //   ⚠ 以前这里写的是 `PreciseCut`（精确切击）—— 那是**炼药猎**第 5 回合的牌，刀猎卡组里没有它；
             //     而且那是「恐惧模式」的改动，却写进了共用剧本 ⇒ 普通模式也被换掉了。两个错都在这。
             //   两张都是 1 费（幻影之刃 1 / 精准 1）⇒ 第 4 回合 4 费的能量账不变。
-            Turn("幻影之刃（恐惧模式换成精准+）、尖啸、隐秘匕首（0 费给 2 刀，当回合就打出去）", 4,
+            Turn("恐惧模式时将幻影之刃替换为精准+", 4,
                 C<PhantomBlades>(), C<PiercingWail>(), C<HiddenDaggers>()),
 
             Turn("刀扇（2 费能力：给 4 刀，且小刀改打全体）；铃铛的诅咒/防御没费", 5,
@@ -68,7 +68,7 @@ public static class SilentScript
             Turn("刀刃之舞（3 刀）、生存者（防御被它丢弃）", 6,
                 C<BladeDance>(), C<Survivor>(), C<DefendSilent>(discardInstead: true)),
 
-            Turn("洗牌：斗篷与匕首（6 格挡＋1 刀）、防御、中和", 7,
+            Turn("洗牌。", 7,
                 C<CloakAndDagger>(), C<DefendSilent>(), C<Neutralize>()),
 
             // 与第 10 回合对调：那张「没费出的防御」挪去第 10 回合，这里换成打击（2 费下它是打不出的那张）

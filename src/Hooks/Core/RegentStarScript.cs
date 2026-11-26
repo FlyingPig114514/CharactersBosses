@@ -56,7 +56,7 @@ public static class RegentStarScript
             //    花样百出会印出「万向斩」「究极防御」，究极防御这回合没费、打不出）
             new()
             {
-                Note = "2. 太阳打击+、防御、花样百出+（印万向斩/究极防御）、万向斩、王者之拳；究极防御没费不出",
+                Note = "",
                 Energy = TurnEnergy,
                 Cards = Cards(
                     C<SolarStrike>(true), C<DefendRegent>(), C<JackOfAllTrades>(true),
@@ -65,7 +65,7 @@ public static class RegentStarScript
             // 3（3 费：群星斗篷 0 + 剑雨 1 + 防御 1）
             new()
             {
-                Note = "3. 群星斗篷、剑雨、防御",
+                Note = "3. 恐惧模式下这张防御与下回合的隐秘藏品+调换位置",
                 Energy = TurnEnergy,
                 Cards = Cards(C<CloakOfStars>(), C<Salvo>(), C<DefendRegent>()),
             },
@@ -73,9 +73,13 @@ public static class RegentStarScript
             //    七星要 7 星 ⇒ 星不够时这张自然打不出（规划期就有星星记账）
             new()
             {
-                Note = "4. 隐秘藏品+、凡庸、七星（星不够出不了）",
+                Note = "4. 恐惧模式下，由于隐秘藏品+在上回合打出，这回合的七星有足够的辉星打出",
                 Energy = TurnEnergy,
-                Cards = Cards(C<HiddenCache>(true), C<Normality>(), C<SevenStars>()),
+                // ★ 2026-11-26（用户：「第四回合的意图有误，七星应当是不能被打出的」）：
+            //   七星要 7 辉星，这回合的记账不够 ⇒ 游戏里打不出；wiki 只按能量算账会把它写成「打出」，
+            //   所以这里用 `ReasonOverride` 把它钉在「不出（星不够）」那一列。
+            Cards = Cards(C<HiddenCache>(true), C<Normality>(),
+                          new ScriptCard { Card = typeof(SevenStars), From = "deck", ReasonOverride = "星不够" }),
             },
             // 5（3 费：辉光+ 1 + 汇流+ 1 + 究极防御 1 + 星界脉冲 0）—— 循环起点
             new()

@@ -91,7 +91,9 @@
                     "仅显示意图":  "intent only",
                     "留在手牌":  "kept in hand",
                     "没抽到":  "not drawn",
-                    "有费就打":  "would play it with energy"
+                    "有费就打":  "would play it with energy",
+                    "被消耗":  "exhausted",
+                    "星不够":  "not enough Stars"
                 },
     "extra":  {
                   "迂回":  "Follow-Up",
@@ -270,7 +272,26 @@
                   "冰寒只计算玩家数量":  "Frost only counts the number of players",
                   "多人时将冷却剂替换为一心化万":  "In multiplayer Coolant is replaced by All For One",
                   "多人时将碎片整理替换为模仿学习":  "In multiplayer Defragment is replaced by Learn From Imitation",
-                  "所向无敌在他回合结束时正好在抽牌堆顶，免费打出。":  "Invincible sits exactly on top of the draw pile when his turn ends, so it is played for free."
+                  "所向无敌在他回合结束时正好在抽牌堆顶，免费打出。":  "Invincible sits exactly on top of the draw pile when his turn ends, so it is played for free.",
+                  "储君打出抉择，抉择时，玩家从以下五张牌中选择一张让储君人将其打出三次：隐秘藏品、铸墙、星位序列、共鸣、震荡波（附魔灵魂之力）。若玩家选择星位序列，则天际钻头会被打出。恐惧模式下改为五选二。抉择，抉择会因为燃烧木棍留下一份复制品":  "The Regent plays Decisions, Decisions: the player picks one of these five skill cards for her to play three times — Hidden Cache, Bulwark, Alignment, Resonance, Shockwave (Soulbound). If the player picks Alignment, the Heavenly Drill is played too. In Dread mode it becomes pick two of five. Decisions, Decisions leaves a copy behind because of the Burning Stick.",
+                  "洗牌。储君打出抉择，抉择时，玩家从以下五张牌中选择一张让储君人将其打出三次：隐秘藏品、铸墙、星位序列、共鸣、震荡波（附魔灵魂之力）。恐惧模式下改为五选二":  "Shuffle. The Regent plays Decisions, Decisions: the player picks one of these five skill cards for her to play three times — Hidden Cache, Bulwark, Alignment, Resonance, Shockwave (Soulbound). In Dread mode it becomes pick two of five.",
+                  "打出冥想时触发节制":  "Playing Meditate triggers Temperance.",
+                  "洗牌。打出腾越时触发节制，但腾越开启了额外回合":  "Shuffle. Playing Vault triggers Temperance, but Vault opens an extra turn.",
+                  "洗牌。净化+消耗腰带抽打、碰撞连击、当头棒和、冥想、义愤填膺":  "Shuffle. Cleanse+ Exhausts Sash Whip, Bowling Bash, Wallop, Meditate and Indignation.",
+                  "洗牌：大～抱抱将一张煤灰加入它的抽牌堆，然后它也会给你加一张":  "Shuffle: Biiig Hug puts one Coal Ash into her draw pile and one into yours.",
+                  "夜魇（复制炼药）、炼制药水+（灵魂之力）、中和、防御（没费）":  "Nightmare (copies Alchemize), Alchemize+ (Soulbound), Neutralize, Defend (no energy)",
+                  "若玩家打出了攻击牌，意图变成：（暴怒+、供奉、不惧妖邪）*4":  "If the player plays an Attack, the intents become: (Eruption+, Consecrate, Fear No Evil) ×4",
+                  "恐惧模式下会多出一张巨石+":  "In Dread mode there is one extra Giant Rock+",
+                  "洗牌。恐惧模式下会多出一张巨石+":  "Shuffle. In Dread mode there is one extra Giant Rock+",
+                  "恐惧模式下这张防御与下回合的隐秘藏品+调换位置":  "In Dread mode this Defend and next turn\u0027s Hidden Cache+ swap places",
+                  "恐惧模式下，由于隐秘藏品+在上回合打出，这回合的七星有足够的辉星打出":  "In Dread mode, because Hidden Cache+ was played last turn, Seven Stars has enough Stars to be played this turn",
+                  "能量汲取（升级违逆和吸引仇恨）":  "Energy Drain (upgrades Defy and Pull Aggro)",
+                  "能量汲取（升级恐惧和戳击）":  "Energy Drain (upgrades Fear and Poke)",
+                  "光谱偏移（烦人机关盒印的，本回合0费）":  "Spectrum Shift (printed by the Annoying Gadget Box, 0 energy this turn)",
+                  "恐惧模式时将幻影之刃替换为精准+":  "In Dread mode Phantom Blades is replaced by Precision+",
+                  "洗牌。炼制药水+（炼格挡药水）、扫腿、精确切击、生存者":  "Shuffle. Alchemize+ (brews a Block Potion), Leg Sweep, Precise Cut, Survivor",
+                  "紧追不放(1)、重压(0，紧追不放让它免费)、猛晃(1)；吸引仇恨(1 费，书签减过，不出)":  "Clinging On (1), Heavy Press (0 — Clinging On makes it free), Shake (1); Pull Aggro (1 energy, discounted by the Bookmark, not played)",
+                  "7. 完美打击（附魔皇室认证，因地狱狂徒自动免费打出）、防御、防御":  "7. Perfected Strike (Royally Approved; auto-played free thanks to Hellraiser), Defend, Defend"
               },
     "phrases":  {
                     "次":  "times",

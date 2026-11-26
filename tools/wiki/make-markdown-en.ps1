@@ -378,11 +378,13 @@ function Note-Text([string]$note, $cards) {
             if ($nm.Length -ge 2) { $probe = $probe.Replace($nm, '') }
         }
     }
+    # ★ 2026-11-26：长括号（> 6 字）是有信息量的说明 ⇒ 保留备注（与中文版同一把尺子）
+    $keepByParen = $false
     $probe = [regex]::Replace($probe, '[（(【\[][^）)】\]]*[）)】\]]', '')
     $probe = [regex]::Replace($probe, '[\s\p{P}\p{S}0-9]', '')
     $keep = ($probe.Length -ge 2)
     if (-not $keep) {
-        foreach ($kw in @('洗牌', '循环', '额外回合', '重打', '复制', '进阶', '恐惧', '召唤', '生成', '升级')) {
+        foreach ($kw in @('洗牌', '循环', '额外回合', '重打', '复制', '进阶', '恐惧', '召唤', '生成', '升级', '本回合0费', '本回合 0 费', '免费')) {
             if ($clean.Contains($kw)) { $keep = $true; break }
         }
     }

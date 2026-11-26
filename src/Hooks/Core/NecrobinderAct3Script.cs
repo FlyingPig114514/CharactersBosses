@@ -23,7 +23,7 @@ public static class NecrobinderAct3Script
     {
         var turns = new List<BossTurn>
         {
-            T("戳击、恐惧、友谊", 1,
+            T("", 1,
                 C<Poke>(), C<Fear>(), C<Friendship>()),
 
             T("死亡之舞、吸引仇恨、根除（即使有费也不出，保留到下回合）", 2,
@@ -33,16 +33,16 @@ public static class NecrobinderAct3Script
                 new ScriptCard { Card = typeof(Calcify), EnchantSown = true }, C<Eradicate>(), C<Defy>(),
                 C<Cleanse>(true)),
 
-            T("出击、重压、能量汲取（升级违逆和吸引仇恨）", 4,
+            T("能量汲取（升级违逆和吸引仇恨）", 4,
                 C<Unleash>(), C<Flatten>(), C<DrainPower>()),
 
-            T("出击、违逆+、恐惧", 5,
+            T("", 5,
                 C<Unleash>(), C<Defy>(true), C<Fear>()),
 
             T("洁净+（烧大～抱抱塞的煤灰）、吸引仇恨+、根除（即使有费也不出，保留到下回合）", 6,
                 C<Cleanse>(true), C<PullAggro>(true), Hold<Eradicate>()),
 
-            T("戳击、根除、重压、能量汲取（升级恐惧和戳击）", 7,
+            T("能量汲取（升级恐惧和戳击）", 7,
                 C<Poke>(), C<Eradicate>(), C<Flatten>(), C<DrainPower>()),
         };
 

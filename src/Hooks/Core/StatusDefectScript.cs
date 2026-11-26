@@ -37,7 +37,7 @@ public static class StatusDefectScript
     {
         var turns = new List<BossTurn>
         {
-            Turn("烟囱（之后每生成一张牌 ⇒ 对全体玩家 5 点无来源伤害）、强撑、散射炮（没费，留在手里）", 1,
+            Turn("", 1,
                 false, C<Smokestack>(), C<FightThrough>(), C<FlakCannon>()),
 
             Turn("污秽攻击、高速脱离、防御", 2, false,
@@ -54,7 +54,7 @@ public static class StatusDefectScript
                 C<Chill>(), C<Zap>(), C<Hotfix>()),
 
             // ★ 第 6 回合：真的洗牌（触发大抱抱生成煤灰）+ 给玩家也塞一张
-            Turn("**洗牌**（大抱抱 ⇒ 煤灰进她的抽牌堆，并给你也塞 1 张）、污秽攻击、强撑、防御（没费）", 6, true,
+            Turn("洗牌：大～抱抱将一张煤灰加入它的抽牌堆，然后它也会给你加一张", 6, true,
                 C<GunkUp>(), C<FightThrough>(), C<DefendDefect>()),
 
             Turn("电击、高速脱离、防御", 7, false,

@@ -141,7 +141,7 @@ public static class OstyKeeperScript
             // 6：洗牌。护卫+ 1 + 出击+ 1 = 2；吸引仇恨+（2 费）没费、保留
             new()
             {
-                Note = "6. 洗牌。护卫+(1)、出击+(1)；吸引仇恨+(2 费，没费 ⇒ 带保留留手)",
+                Note = "6. 洗牌。",
                 Energy = 3,
                 Cards = Cards(
                     Play<Bodyguard>(1, upgraded: true), Play<Unleash>(1, upgraded: true),
@@ -172,7 +172,7 @@ public static class OstyKeeperScript
             // 9：洗牌。增生+ 0（书签 -1）+ 护卫+ 1 + 出击+ 1 = 2；吸引仇恨+（2 费）没费、保留
             new()
             {
-                Note = "9. 洗牌。增生+(0，书签减过)、护卫+(1)、出击+(1)；吸引仇恨+(2 费，没费 ⇒ 带保留留手)",
+                Note = "9. 洗牌。",
                 Energy = 3,
                 Cards = Cards(
                     Free<Spur>(0, upgraded: true),

@@ -37,7 +37,7 @@ public static class VulnIroncladScript
             Turn("拆卸（有易伤就打两次）、焚烧（群攻 2×4）、挑衅（6 格挡 + 1 易伤）", 2,
                 C<Dismantle>(), C<Conflagration>(), C<Taunt>()),
 
-            Turn("岿然不动（30 格挡）、主宰+灵魂之力（易伤换力量）、打击（没费）", 3,
+            Turn("", 3,
                 C<Impervious>(), Souls<Dominate>(), C<StrikeIronclad>()),
 
             Turn("打击、欺凌（0 费，每层易伤 +2）、闪电霹雳（群攻 4 + 1 易伤）", 4,
@@ -46,13 +46,13 @@ public static class VulnIroncladScript
             Turn("防御、痛击（8 伤 + 2 易伤）、防御（没费）", 5,
                 C<DefendIronclad>(), C<Bash>(), C<DefendIronclad>()),
 
-            Turn("洗牌。拆卸、打击、挑衅", 6,
+            Turn("洗牌。", 6,
                 C<Dismantle>(), C<StrikeIronclad>(), C<Taunt>()),
 
             Turn("焚烧、防御、闪电霹雳", 7,
                 C<Conflagration>(), C<DefendIronclad>(), C<Thunderclap>()),
 
-            Turn("欺凌（0 费）、防御、主宰+灵魂之力", 8,
+            Turn("", 8,
                 C<Bully>(), C<DefendIronclad>(), Souls<Dominate>()),
 
             Turn("打击、痛击、防御（没费）", 9,

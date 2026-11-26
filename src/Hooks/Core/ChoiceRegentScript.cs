@@ -33,8 +33,8 @@ public static class ChoiceRegentScript
             // 群星之子(1) + 崇拜(1) + 王国资产(1) = 3 费打完 ⇒ 抉择(0) 之后剩 0 费。
             // 抉择抉择+ 会把手里那 5 张技能牌摆出来让玩家挑一张打 3 次；
             // 「天际钻头」是 X 费牌 ⇒ 只有玩家选了「星位序列」（3 次 × +2 费 = +6）才打得出。
-            T(3, "1. 群星之子、崇拜、王国资产、抉择抉择+（王室认证）：让玩家在 5 张技能牌里挑一张打 3 次 ⇒ " +
-                 "天际钻头（只有选了星位序列才有费）、君王之剑（没费）",
+            T(3, "1. 储君打出抉择，抉择时，玩家从以下五张牌中选择一张让储君人将其打出三次：隐秘藏品、铸墙、星位序列、共鸣、震荡波（附魔灵魂之力）。" +
+                 "若玩家选择星位序列，则天际钻头会被打出。恐惧模式下改为五选二。抉择，抉择会因为燃烧木棍留下一份复制品",
                 new ScriptCard { Card = typeof(ChildOfTheStars), UpgradeMinAscension = 8 },
                 C<Venerate>(true),
                 C<Royalties>(),
@@ -48,7 +48,7 @@ public static class ChoiceRegentScript
                 C<SovereignBlade>()),
 
             // ── 2 ────────────────────────────────────────────────────────────────
-            T(3, "2. 大爆炸（+1 费）、辉光、收集光辉、辐射（本回合每获得 1 星打一次）、淬炼刀刃；抉择抉择+ 不出",
+            T(3, "",
                 C<BigBang>(), C<Glow>(),
                 new ScriptCard { Card = typeof(GatherLight), UpgradeMinAscension = 8 },
                 C<Radiate>(), C<RefineBlade>(),
@@ -56,7 +56,7 @@ public static class ChoiceRegentScript
 
             // ── 3 ────────────────────────────────────────────────────────────────
             // 用户 2026-11-10 第三轮订正：「3.招架、星尘、汇流+、防御、抉择抉择+（不出）」，3 费。
-            T(3, "3. 招架、星尘（花光所有星）、汇流+、防御；抉择抉择+ 不出",
+            T(3, "",
                 C<Parry>(), C<Stardust>(), C<Convergence>(true), C<DefendRegent>(),
                 Choice(hold: true)),
 
@@ -64,7 +64,7 @@ public static class ChoiceRegentScript
             // 用户 2026-11-10 第三轮订正：「4.君王之剑、隐秘藏品、防御（没费）、抉择抉择+（不出）」，3 费。
             // 2026-11-10 第四轮：「把 4、5、11 这三个回合中那张不出的**防御换成打击**，保持它不出」
             // （打击不是技能牌 ⇒ 不会多出一张「抉择，抉择」的候选）。
-            T(3, "4. 君王之剑、隐秘藏品、打击（没费）；抉择抉择+ 不出",
+            T(3, "",
                 C<SovereignBlade>(), C<HiddenCache>(), C<StrikeRegent>(),
                 Choice(hold: true)),
 
@@ -73,8 +73,7 @@ public static class ChoiceRegentScript
             // 天际钻头把这一回合所有能量（选了星位序列则是 2+6）全吃掉 ⇒ 后面的君王之剑/防御都没费。
             new BossTurn
             {
-                Note = "5. 洗牌。抉择抉择+（王室认证）：让玩家挑一张打 3 次 ⇒ 天际钻头（一定打出）、" +
-                       "君王之剑（没费）、打击（没费）",
+                Note = "5. 洗牌。储君打出抉择，抉择时，玩家从以下五张牌中选择一张让储君人将其打出三次：隐秘藏品、铸墙、星位序列、共鸣、震荡波（附魔灵魂之力）。恐惧模式下改为五选二",
                 Energy = 2,
                 ShuffleDrawPile = true,
                 Cards = new List<ScriptCard>

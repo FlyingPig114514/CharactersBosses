@@ -41,7 +41,7 @@ public static class SilentBrewerScript
             // 1
             new()
             {
-                Note = "1. 明晰提取物、明耀酊剂、敏捷药水｜扫腿、生存者（丢腐朽）、尖啸、精确切击、防御（没费）",
+                Note = "1. 扫腿、生存者（丢腐朽）、尖啸、精确切击、防御（没费）",
                 Energy = TurnEnergy + 1,   // 3 + 灯笼（第 1 回合 +1）
                 Potions = Potions<Clarity, RadiantTincture, DexterityPotion>(),
                 Cards = Cards(
@@ -55,7 +55,7 @@ public static class SilentBrewerScript
                 // 用户 2026-10-26 追加：第 2 回合的「尖啸」换成「中和」
                 // 用户 2026-10-26 追加：**瓶中船改到「炼制药水之后」喝** —— 这瓶是她这回合现炼出来的，
                 //   回合开始时栏位里根本没有它（日志里就有「剧本要喝 ShipInABottle，但栏位里没有 → 跳过」）。
-                Note = "2. 镣铐药水、爆炸药水｜夜魇（复制炼药）、炼制药水+（灵魂之力）→ 喝瓶中船、中和、防御（没费）",
+                Note = "2. 夜魇（复制炼药）、炼制药水+（灵魂之力）、中和、防御（没费）",
                 Energy = TurnEnergy,
                 Potions = Potions<ShacklingPotion, ExplosiveAmpoule>(),
                 Cards = Cards(
@@ -66,8 +66,10 @@ public static class SilentBrewerScript
             new()
             {
                 // 用户 2026-10-26：中和移到第 2 回合了，这里去掉
-                Note = "3. 瓶中船、罐装幽灵｜炼制药水+×3（格挡/复制/异鱼之油）、灵动步法、爆发、残影",
-                Energy = TurnEnergy,
+                Note = "3. 炼制药水+×3（格挡/复制/异鱼之油）、灵动步法、爆发、残影",
+                // ★ 2026-11-26（用户：「第三回合的意图有一大堆牌被错误的标成了没费，实际上因为吊灯都有费」）：
+                //   她第 3 件遗物是「吊灯 Chandelier」（第 3 回合开始 +3 能量）⇒ 这一回合预算 3+3=6。
+                Energy = TurnEnergy + 3,
                 Potions = Potions<ShipInABottle, GhostInAJar>(),
                 Cards = Cards(
                     C<SerpentForm>(),   // ★ v0.2.842：恐惧版的「升级」改走 BossVariant.DreadUpgrades（运行期通道）—— 在 Build() 里判 DreadMode.IsActive 恒为 false
@@ -79,7 +81,7 @@ public static class SilentBrewerScript
             // 4
             new()
             {
-                Note = "4. 格挡药水、异鱼之油、混沌药水｜预判、复制药水、坚韧之环×2、拳斗、偏折",
+                Note = "4. 预判、坚韧之环×2、拳斗、偏折",
                 Energy = TurnEnergy,
                 // ★ v0.2.869（用户 2026-11-21 削弱）：最后这瓶只有二阶段（精灵已消耗）才存在，
                 //   而且从「狡诈药水」改成 **流动铜液**（+3 荆棘）—— 不再生成小刀、也不再额外打出。
@@ -91,7 +93,7 @@ public static class SilentBrewerScript
             // 5
             new()
             {
-                Note = "5. 洗牌。明晰提取物、明耀酊剂、敏捷药水｜炼制药水+（炼格挡药水）、扫腿、精确切击、生存者",
+                Note = "5. 洗牌。炼制药水+（炼格挡药水）、扫腿、精确切击、生存者",
                 Energy = TurnEnergy,
                 Potions = Potions<Clarity, RadiantTincture, DexterityPotion>(),
                 Cards = Cards(
@@ -100,7 +102,7 @@ public static class SilentBrewerScript
             // 6
             new()
             {
-                Note = "6. 镣铐药水｜炼制药水+（瓶中船）、炼制药水+（异鱼之油）、防御、腐朽",
+                Note = "6. 炼制药水+（瓶中船）、炼制药水+（异鱼之油）、防御、腐朽",
                 Energy = TurnEnergy,
                 Potions = Potions<ShacklingPotion>(),
                 Cards = Cards(
@@ -110,7 +112,7 @@ public static class SilentBrewerScript
             // 7
             new()
             {
-                Note = "7. 瓶中船、罐装幽灵、爆炸药水｜中和、炼制药水+（复制药水）、爆发、残影",
+                Note = "7. 中和、炼制药水+（复制药水）、爆发、残影",
                 Energy = TurnEnergy,
                 Potions = Potions<ShipInABottle, GhostInAJar, ExplosiveAmpoule>(),
                 Cards = Cards(
@@ -119,7 +121,7 @@ public static class SilentBrewerScript
             // 8
             new()
             {
-                Note = "8. 格挡药水、异鱼之油、混沌药水、（二阶段：混沌补出的流动铜液 → 她获得 3 层荆棘）｜预判、复制药水、坚韧之环×2、拳斗、偏折",
+                Note = "8.（二阶段：混沌补出的流动铜液 → 她获得 3 层荆棘）预判、坚韧之环×2、拳斗、偏折",
                 Energy = TurnEnergy,
                 // ★ v0.2.869（用户 2026-11-21 削弱）：最后这瓶只有二阶段（精灵已消耗）才存在，
                 //   而且从「狡诈药水」改成 **流动铜液**（+3 荆棘）—— 不再生成小刀、也不再额外打出。

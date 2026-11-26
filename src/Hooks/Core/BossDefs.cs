@@ -828,6 +828,11 @@ public static class BossDefs
                 {
                     (8, typeof(IntimidatingHelmet)),
                 },
+                // ★ 2026-11-26（用户：「养手骨的恐惧增强好像没有写（第五回合的第一张来生更换为钙化+）」）：
+                //   换牌本身在 `OstyKeeperScript.DreadTurn5Override` 里（第 5 回合第一张「来生」→「钙化」）；
+                //   这里补上 `DreadUpgrades`，让 wiki 的「恐惧升级」那一行显示出来
+                //   （同名卡按类型升级 ⇒ 显示为「钙化」）。
+                DreadUpgrades = new List<Type> { typeof(Calcify) },
             },
             null,
         },

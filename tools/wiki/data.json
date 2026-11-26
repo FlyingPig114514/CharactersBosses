@@ -1,6 +1,6 @@
 {
   "generatedFrom": "CharacterBosses.Impl113.dll",
-  "generatedAt": "2026-11-26 16:53",
+  "generatedAt": "2026-11-26 17:34",
   "cardNameMisses": [],
   "bosses": [
     {
@@ -2507,7 +2507,7 @@
             ],
             "turns": [
               {
-                "note": "开局：偏差认知+ 拿集中（永冻冰晶给 7 格挡）、冰川铺冰球；弹幕齐射没费",
+                "note": "",
                 "energy": 3,
                 "shuffle": false,
                 "cards": [
@@ -2549,7 +2549,7 @@
                 ]
               },
               {
-                "note": "子程序（能力牌 → 之后每张能力牌 +1 费）、冰雹风暴；双重释放激发电球两次（意图显示 14×2）",
+                "note": "",
                 "energy": 3,
                 "shuffle": false,
                 "cards": [
@@ -2827,7 +2827,7 @@
                 ]
               },
               {
-                "note": "洗牌。扩容（AI 印）、究极防御、充电、防御",
+                "note": "洗牌。",
                 "energy": 3,
                 "shuffle": true,
                 "cards": [
@@ -3736,7 +3736,7 @@
                 ],
                 "turns": [
                   {
-                    "note": "1. 烟囱（之后每生成一张牌 ⇒ 对全体玩家 5 点无来源伤害）、强撑、散射炮（没费，留在手里）",
+                    "note": "",
                     "energy": 3,
                     "shuffle": false,
                     "cards": [
@@ -3986,7 +3986,7 @@
                     ]
                   },
                   {
-                    "note": "6. **洗牌**（大抱抱 ⇒ 煤灰进她的抽牌堆，并给你也塞 1 张）、污秽攻击、强撑、防御（没费）",
+                    "note": "6. 洗牌：大～抱抱将一张煤灰加入它的抽牌堆，然后它也会给你加一张",
                     "energy": 3,
                     "shuffle": true,
                     "cards": [
@@ -5927,8 +5927,9 @@
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
                     "UpgradeMinAscension": 0,
+                    "ReasonOverride": "被消耗",
                     "played": false,
-                    "reason": "被丢弃"
+                    "reason": "被消耗"
                   },
                   {
                     "name": "煤灰",
@@ -5940,8 +5941,9 @@
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
                     "UpgradeMinAscension": 0,
+                    "ReasonOverride": "被消耗",
                     "played": false,
-                    "reason": "被丢弃"
+                    "reason": "被消耗"
                   }
                 ]
               }
@@ -7918,7 +7920,7 @@
                 ]
               },
               {
-                "note": "3. 岿然不动（30 格挡）、主宰+灵魂之力（易伤换力量）、打击（没费）",
+                "note": "",
                 "energy": 3,
                 "shuffle": false,
                 "cards": [
@@ -8041,7 +8043,7 @@
                 ]
               },
               {
-                "note": "6. 洗牌。拆卸、打击、挑衅",
+                "note": "6. 洗牌。",
                 "energy": 3,
                 "shuffle": true,
                 "cards": [
@@ -8121,7 +8123,7 @@
                 ]
               },
               {
-                "note": "8. 欺凌（0 费）、防御、主宰+灵魂之力",
+                "note": "",
                 "energy": 3,
                 "shuffle": false,
                 "cards": [
@@ -8308,7 +8310,7 @@
                 ],
                 "turns": [
                   {
-                    "note": "1. 执迷、祭品+（王室认证）、腐化+（此后技能牌 0 费且消耗）、武装+、原始力量+（变化成打击×2/痛击）、巨石+×3（打 1 张，另两张没费不出；祭品+ 的 +2 能量已计入）",
+                    "note": "1. 恐惧模式下会多出一张巨石+",
                     "energy": 4,
                     "shuffle": false,
                     "cards": [
@@ -8579,7 +8581,7 @@
                     ]
                   },
                   {
-                    "note": "6. 洗牌；巨石+、巨石+、头槌",
+                    "note": "6. 洗牌。恐惧模式下会多出一张巨石+",
                     "energy": 3,
                     "shuffle": true,
                     "cards": [
@@ -11214,7 +11216,7 @@
             ],
             "turns": [
               {
-                "note": "1. 戳击、恐惧、友谊",
+                "note": "",
                 "energy": 4,
                 "shuffle": false,
                 "cards": [
@@ -11350,7 +11352,7 @@
                 ]
               },
               {
-                "note": "4. 出击、重压、能量汲取（升级违逆和吸引仇恨）",
+                "note": "4. 能量汲取（升级违逆和吸引仇恨）",
                 "energy": 4,
                 "shuffle": false,
                 "cards": [
@@ -11390,7 +11392,7 @@
                 ]
               },
               {
-                "note": "5. 出击、违逆+、恐惧",
+                "note": "",
                 "energy": 4,
                 "shuffle": false,
                 "cards": [
@@ -11476,7 +11478,7 @@
                 ]
               },
               {
-                "note": "7. 戳击、根除、重压、能量汲取（升级恐惧和戳击）",
+                "note": "7. 能量汲取（升级恐惧和戳击）",
                 "energy": 6,
                 "shuffle": false,
                 "cards": [
@@ -11597,7 +11599,9 @@
               ],
               "ascensionDisplay": [],
               "info": "循环：7~9\n单体能力：极强\n群攻能力：弱\n单体高压回合：2、6、7、9\n群体高压回合：无\n特殊效果类型：自身\n群体减益能力：强",
-              "dreadUpgrades": [],
+              "dreadUpgrades": [
+                "钙化"
+              ],
               "script": {
                 "loopFrom": 7,
                 "loopLength": 3,
@@ -11885,7 +11889,7 @@
                     ]
                   },
                   {
-                    "note": "6. 洗牌。护卫+(1)、出击+(1)；吸引仇恨+(2 费，没费 ⇒ 带保留留手)",
+                    "note": "6. 洗牌。",
                     "energy": 3,
                     "shuffle": true,
                     "cards": [
@@ -12042,7 +12046,7 @@
                     ]
                   },
                   {
-                    "note": "9. 洗牌。增生+(0，书签减过)、护卫+(1)、出击+(1)；吸引仇恨+(2 费，没费 ⇒ 带保留留手)",
+                    "note": "9. 洗牌。",
                     "energy": 3,
                     "shuffle": true,
                     "cards": [
@@ -14663,7 +14667,7 @@
             ],
             "turns": [
               {
-                "note": "1. 光谱偏移（机关盒印的，本回合 0 费）、创世之柱（进阶 8 时升级）、流光溢彩+、超质量体",
+                "note": "1. 光谱偏移（烦人机关盒印的，本回合0费）",
                 "energy": 3,
                 "shuffle": false,
                 "cards": [
@@ -15404,7 +15408,7 @@
                     ]
                   },
                   {
-                    "note": "2. 太阳打击+、防御、花样百出+（印万向斩/究极防御）、万向斩、王者之拳；究极防御没费不出",
+                    "note": "",
                     "energy": 3,
                     "shuffle": false,
                     "cards": [
@@ -15480,7 +15484,7 @@
                     ]
                   },
                   {
-                    "note": "3. 群星斗篷、剑雨、防御",
+                    "note": "3. 恐惧模式下这张防御与下回合的隐秘藏品+调换位置",
                     "energy": 3,
                     "shuffle": false,
                     "cards": [
@@ -15520,7 +15524,7 @@
                     ]
                   },
                   {
-                    "note": "4. 隐秘藏品+、凡庸、七星（星不够出不了）",
+                    "note": "4. 恐惧模式下，由于隐秘藏品+在上回合打出，这回合的七星有足够的辉星打出",
                     "energy": 3,
                     "shuffle": false,
                     "cards": [
@@ -15557,7 +15561,9 @@
                         "BlockOverride": 0,
                         "ExtraAoe": 0,
                         "UpgradeMinAscension": 0,
-                        "played": true
+                        "ReasonOverride": "星不够",
+                        "played": false,
+                        "reason": "星不够"
                       }
                     ]
                   },
@@ -15858,7 +15864,7 @@
                 ],
                 "turns": [
                   {
-                    "note": "1. 群星之子、崇拜、王国资产、抉择抉择+（王室认证）：让玩家在 5 张技能牌里挑一张打 3 次 ⇒ 天际钻头（只有选了星位序列才有费）、君王之剑（没费）",
+                    "note": "1. 储君打出抉择，抉择时，玩家从以下五张牌中选择一张让储君人将其打出三次：隐秘藏品、铸墙、星位序列、共鸣、震荡波（附魔灵魂之力）。若玩家选择星位序列，则天际钻头会被打出。恐惧模式下改为五选二。抉择，抉择会因为燃烧木棍留下一份复制品",
                     "energy": 3,
                     "shuffle": false,
                     "cards": [
@@ -16009,7 +16015,7 @@
                     ]
                   },
                   {
-                    "note": "2. 大爆炸（+1 费）、辉光、收集光辉、辐射（本回合每获得 1 星打一次）、淬炼刀刃；抉择抉择+ 不出",
+                    "note": "",
                     "energy": 3,
                     "shuffle": false,
                     "cards": [
@@ -16086,7 +16092,7 @@
                     ]
                   },
                   {
-                    "note": "3. 招架、星尘（花光所有星）、汇流+、防御；抉择抉择+ 不出",
+                    "note": "",
                     "energy": 3,
                     "shuffle": false,
                     "cards": [
@@ -16153,7 +16159,7 @@
                     ]
                   },
                   {
-                    "note": "4. 君王之剑、隐秘藏品、打击（没费）；抉择抉择+ 不出",
+                    "note": "",
                     "energy": 3,
                     "shuffle": false,
                     "cards": [
@@ -16209,7 +16215,7 @@
                     ]
                   },
                   {
-                    "note": "5. 洗牌。抉择抉择+（王室认证）：让玩家挑一张打 3 次 ⇒ 天际钻头（一定打出）、君王之剑（没费）、打击（没费）",
+                    "note": "5. 洗牌。储君打出抉择，抉择时，玩家从以下五张牌中选择一张让储君人将其打出三次：隐秘藏品、铸墙、星位序列、共鸣、震荡波（附魔灵魂之力）。恐惧模式下改为五选二",
                     "energy": 2,
                     "shuffle": true,
                     "cards": [
@@ -20244,7 +20250,7 @@
             ],
             "turns": [
               {
-                "note": "1. 余像、斗篷与匕首（6 格挡＋1 刀）、中和、防御；第二张防御没费",
+                "note": "",
                 "energy": 3,
                 "shuffle": false,
                 "cards": [
@@ -20388,7 +20394,7 @@
                 ]
               },
               {
-                "note": "4. 幻影之刃（恐惧模式换成精准+）、尖啸、隐秘匕首（0 费给 2 刀，当回合就打出去）",
+                "note": "4. 恐惧模式时将幻影之刃替换为精准+",
                 "energy": 2,
                 "shuffle": false,
                 "cards": [
@@ -20512,7 +20518,7 @@
                 ]
               },
               {
-                "note": "7. 洗牌：斗篷与匕首（6 格挡＋1 刀）、防御、中和",
+                "note": "7. 洗牌。",
                 "energy": 2,
                 "shuffle": true,
                 "cards": [
@@ -20824,7 +20830,7 @@
                 ],
                 "turns": [
                   {
-                    "note": "1. 明晰提取物、明耀酊剂、敏捷药水｜扫腿、生存者（丢腐朽）、尖啸、精确切击、防御（没费）",
+                    "note": "1. 扫腿、生存者（丢腐朽）、尖啸、精确切击、防御（没费）",
                     "energy": 4,
                     "shuffle": false,
                     "cards": [
@@ -20900,7 +20906,7 @@
                     ]
                   },
                   {
-                    "note": "2. 镣铐药水、爆炸药水｜夜魇（复制炼药）、炼制药水+（灵魂之力）→ 喝瓶中船、中和、防御（没费）",
+                    "note": "2. 夜魇（复制炼药）、炼制药水+（灵魂之力）、中和、防御（没费）",
                     "energy": 3,
                     "shuffle": false,
                     "cards": [
@@ -20954,8 +20960,8 @@
                     ]
                   },
                   {
-                    "note": "3. 瓶中船、罐装幽灵｜炼制药水+×3（格挡/复制/异鱼之油）、灵动步法、爆发、残影",
-                    "energy": 3,
+                    "note": "3. 炼制药水+×3（格挡/复制/异鱼之油）、灵动步法、爆发、残影",
+                    "energy": 6,
                     "shuffle": false,
                     "cards": [
                       {
@@ -21017,8 +21023,7 @@
                         "BlockOverride": 0,
                         "ExtraAoe": 0,
                         "UpgradeMinAscension": 0,
-                        "played": false,
-                        "reason": "没费"
+                        "played": true
                       },
                       {
                         "name": "爆发",
@@ -21029,8 +21034,7 @@
                         "BlockOverride": 0,
                         "ExtraAoe": 0,
                         "UpgradeMinAscension": 0,
-                        "played": false,
-                        "reason": "没费"
+                        "played": true
                       },
                       {
                         "name": "残影",
@@ -21041,13 +21045,12 @@
                         "BlockOverride": 0,
                         "ExtraAoe": 0,
                         "UpgradeMinAscension": 0,
-                        "played": false,
-                        "reason": "没费"
+                        "played": true
                       }
                     ]
                   },
                   {
-                    "note": "4. 格挡药水、异鱼之油、混沌药水｜预判、复制药水、坚韧之环×2、拳斗、偏折",
+                    "note": "4. 预判、坚韧之环×2、拳斗、偏折",
                     "energy": 3,
                     "shuffle": false,
                     "cards": [
@@ -21098,7 +21101,7 @@
                     ]
                   },
                   {
-                    "note": "5. 洗牌。明晰提取物、明耀酊剂、敏捷药水｜炼制药水+（炼格挡药水）、扫腿、精确切击、生存者",
+                    "note": "5. 洗牌。炼制药水+（炼格挡药水）、扫腿、精确切击、生存者",
                     "energy": 3,
                     "shuffle": true,
                     "cards": [
@@ -21151,7 +21154,7 @@
                     ]
                   },
                   {
-                    "note": "6. 镣铐药水｜炼制药水+（瓶中船）、炼制药水+（异鱼之油）、防御、腐朽",
+                    "note": "6. 炼制药水+（瓶中船）、炼制药水+（异鱼之油）、防御、腐朽",
                     "energy": 3,
                     "shuffle": false,
                     "cards": [
@@ -21207,7 +21210,7 @@
                     ]
                   },
                   {
-                    "note": "7. 瓶中船、罐装幽灵、爆炸药水｜中和、炼制药水+（复制药水）、爆发、残影",
+                    "note": "7. 中和、炼制药水+（复制药水）、爆发、残影",
                     "energy": 3,
                     "shuffle": false,
                     "cards": [
@@ -21260,7 +21263,7 @@
                     ]
                   },
                   {
-                    "note": "8. 格挡药水、异鱼之油、混沌药水、（二阶段：混沌补出的流动铜液 → 她获得 3 层荆棘）｜预判、复制药水、坚韧之环×2、拳斗、偏折",
+                    "note": "8.（二阶段：混沌补出的流动铜液 → 她获得 3 层荆棘）预判、坚韧之环×2、拳斗、偏折",
                     "energy": 3,
                     "shuffle": false,
                     "cards": [
@@ -21527,7 +21530,7 @@
                     ]
                   },
                   {
-                    "note": "2. 肾上腺素、夜魇+（复制杂技）、杂技（弃战术大师）、战术大师（奇巧）、隐秘匕首（弃防御和铭记死亡）、铭记死亡（奇巧）、防御",
+                    "note": "",
                     "energy": 2,
                     "shuffle": false,
                     "cards": [
@@ -21916,7 +21919,7 @@
                     ]
                   },
                   {
-                    "note": "7. 洗牌；杂技（弃打击）、手上技法（给防御加奇巧）、打击、隐秘匕首（丢防御）、防御（奇巧）；钢铁风暴（被必备工具丢弃）",
+                    "note": "7. 洗牌。",
                     "energy": 3,
                     "shuffle": true,
                     "cards": [
@@ -22219,7 +22222,7 @@
                     ]
                   },
                   {
-                    "note": "10. 洗牌；杂技（弃防御）、手上技法（给防御加奇巧）、钢铁风暴（丢光剩下的 4 张）、防御（奇巧）；打击（被必备工具丢弃）",
+                    "note": "10. 洗牌。",
                     "energy": 3,
                     "shuffle": true,
                     "cards": [
@@ -25105,6 +25108,7 @@
                     "cost": 3,
                     "cardType": "Skill",
                     "Upgraded": true,
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
@@ -25116,24 +25120,28 @@
                     "type": "WatcherStrike_P",
                     "cost": 1,
                     "cardType": "Attack",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
                     "UpgradeMinAscension": 0,
+                    "ReasonOverride": "有费就打",
                     "played": false,
-                    "reason": "没费"
+                    "reason": "有费就打"
                   },
                   {
                     "name": "警惕",
                     "type": "WatcherVigilance",
                     "cost": 2,
                     "cardType": "Skill",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
                     "UpgradeMinAscension": 0,
+                    "ReasonOverride": "有费就打",
                     "played": false,
-                    "reason": "没费"
+                    "reason": "有费就打"
                   }
                 ]
               },
@@ -25147,6 +25155,7 @@
                     "type": "WatcherBrilliance",
                     "cost": 1,
                     "cardType": "Attack",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
@@ -25158,6 +25167,7 @@
                     "type": "WatcherDefend_P",
                     "cost": 1,
                     "cardType": "Skill",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
@@ -25169,12 +25179,14 @@
                     "type": "WatcherWorship",
                     "cost": 2,
                     "cardType": "Skill",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
                     "UpgradeMinAscension": 0,
+                    "ReasonOverride": "有费就打",
                     "played": false,
-                    "reason": "没费"
+                    "reason": "有费就打"
                   },
                   {
                     "name": "奇迹",
@@ -25182,6 +25194,7 @@
                     "cost": 0,
                     "cardType": "Skill",
                     "HoldInstead": true,
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
@@ -25201,6 +25214,7 @@
                     "type": "WatcherMiracle",
                     "cost": 0,
                     "cardType": "Skill",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
@@ -25213,6 +25227,7 @@
                     "cost": -1,
                     "xCost": true,
                     "cardType": "Skill",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
@@ -25225,6 +25240,7 @@
                     "type": "WatcherConsecrate",
                     "cost": 0,
                     "cardType": "Attack",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
@@ -25236,6 +25252,7 @@
                     "type": "Greed",
                     "cost": -1,
                     "cardType": "Curse",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
@@ -25255,6 +25272,7 @@
                     "type": "WatcherEmptyFist",
                     "cost": 1,
                     "cardType": "Attack",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
@@ -25266,6 +25284,7 @@
                     "type": "WatcherWaveOfTheHand",
                     "cost": 1,
                     "cardType": "Skill",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
@@ -25277,23 +25296,28 @@
                     "type": "WatcherDeceiveReality",
                     "cost": 1,
                     "cardType": "Skill",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
                     "UpgradeMinAscension": 0,
-                    "played": true
+                    "ReasonOverride": "有费就打",
+                    "played": false,
+                    "reason": "有费就打"
                   },
                   {
                     "name": "平安",
                     "type": "WatcherSafety",
                     "cost": 1,
                     "cardType": "Skill",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
                     "UpgradeMinAscension": 0,
+                    "ReasonOverride": "有费就打",
                     "played": false,
-                    "reason": "没费"
+                    "reason": "有费就打"
                   }
                 ]
               },
@@ -25307,6 +25331,7 @@
                     "type": "WatcherExpunger",
                     "cost": 1,
                     "cardType": "Attack",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
@@ -25318,6 +25343,7 @@
                     "type": "WatcherDevotion",
                     "cost": 1,
                     "cardType": "Power",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
@@ -25329,12 +25355,14 @@
                     "type": "WatcherSwivel",
                     "cost": 2,
                     "cardType": "Skill",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
                     "UpgradeMinAscension": 0,
+                    "ReasonOverride": "有费就打",
                     "played": false,
-                    "reason": "没费"
+                    "reason": "有费就打"
                   }
                 ]
               },
@@ -25348,6 +25376,7 @@
                     "type": "WatcherStrike_P",
                     "cost": 1,
                     "cardType": "Attack",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
@@ -25359,6 +25388,7 @@
                     "type": "WatcherSanctity",
                     "cost": 1,
                     "cardType": "Skill",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
@@ -25370,16 +25400,19 @@
                     "type": "WatcherConclude",
                     "cost": 1,
                     "cardType": "Attack",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
                     "UpgradeMinAscension": 0,
-                    "played": true
+                    "ReasonOverride": "有费就打",
+                    "played": false,
+                    "reason": "有费就打"
                   }
                 ]
               },
               {
-                "note": "7. 洗牌（待确认）、光辉、敬拜（有费就打）、贪婪",
+                "note": "7. 洗牌。",
                 "energy": 3,
                 "shuffle": true,
                 "cards": [
@@ -25388,6 +25421,7 @@
                     "type": "WatcherBrilliance",
                     "cost": 1,
                     "cardType": "Attack",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
@@ -25399,17 +25433,21 @@
                     "type": "WatcherWorship",
                     "cost": 2,
                     "cardType": "Skill",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
                     "UpgradeMinAscension": 0,
-                    "played": true
+                    "ReasonOverride": "有费就打",
+                    "played": false,
+                    "reason": "有费就打"
                   },
                   {
                     "name": "贪婪",
                     "type": "Greed",
                     "cost": -1,
                     "cardType": "Curse",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
@@ -25429,6 +25467,7 @@
                     "type": "WatcherStrike_P",
                     "cost": 1,
                     "cardType": "Attack",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
@@ -25440,6 +25479,7 @@
                     "type": "WatcherConsecrate",
                     "cost": 0,
                     "cardType": "Attack",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
@@ -25451,11 +25491,14 @@
                     "type": "WatcherVigilance",
                     "cost": 2,
                     "cardType": "Skill",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
                     "UpgradeMinAscension": 0,
-                    "played": true
+                    "ReasonOverride": "有费就打",
+                    "played": false,
+                    "reason": "有费就打"
                   }
                 ]
               },
@@ -25469,6 +25512,7 @@
                     "type": "WatcherExpunger",
                     "cost": 1,
                     "cardType": "Attack",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
@@ -25480,6 +25524,7 @@
                     "type": "WatcherDefend_P",
                     "cost": 1,
                     "cardType": "Skill",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
@@ -25491,12 +25536,14 @@
                     "type": "WatcherSwivel",
                     "cost": 2,
                     "cardType": "Skill",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
                     "UpgradeMinAscension": 0,
+                    "ReasonOverride": "有费就打",
                     "played": false,
-                    "reason": "没费"
+                    "reason": "有费就打"
                   }
                 ]
               },
@@ -25510,6 +25557,7 @@
                     "type": "WatcherStrike_P",
                     "cost": 1,
                     "cardType": "Attack",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
@@ -25521,6 +25569,7 @@
                     "type": "WatcherSanctity",
                     "cost": 1,
                     "cardType": "Skill",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
@@ -25532,11 +25581,14 @@
                     "type": "WatcherConclude",
                     "cost": 1,
                     "cardType": "Attack",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
                     "UpgradeMinAscension": 0,
-                    "played": true
+                    "ReasonOverride": "有费就打",
+                    "played": false,
+                    "reason": "有费就打"
                   }
                 ]
               },
@@ -25550,6 +25602,7 @@
                     "type": "WatcherEmptyFist",
                     "cost": 1,
                     "cardType": "Attack",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
@@ -25561,6 +25614,7 @@
                     "type": "WatcherWaveOfTheHand",
                     "cost": 1,
                     "cardType": "Skill",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
@@ -25572,23 +25626,28 @@
                     "type": "WatcherDeceiveReality",
                     "cost": 1,
                     "cardType": "Skill",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
                     "UpgradeMinAscension": 0,
-                    "played": true
+                    "ReasonOverride": "有费就打",
+                    "played": false,
+                    "reason": "有费就打"
                   },
                   {
                     "name": "平安",
                     "type": "WatcherSafety",
                     "cost": 1,
                     "cardType": "Skill",
+                    "WouldPlayIfEnergy": true,
                     "DamageOverride": 0,
                     "BlockOverride": 0,
                     "ExtraAoe": 0,
                     "UpgradeMinAscension": 0,
+                    "ReasonOverride": "有费就打",
                     "played": false,
-                    "reason": "没费"
+                    "reason": "有费就打"
                   }
                 ]
               }
@@ -25695,7 +25754,7 @@
                 ],
                 "turns": [
                   {
-                    "note": "1. 阿尔法+、点穴、防御（用户原稿写「防御（没费）」，按 3 费三张都打得出）",
+                    "note": "",
                     "energy": 3,
                     "shuffle": false,
                     "cards": [
@@ -25855,7 +25914,7 @@
                     ]
                   },
                   {
-                    "note": "4. 暴怒+、打击（进阶9起升级）、警惕、奇迹（不出）",
+                    "note": "",
                     "energy": 5,
                     "shuffle": false,
                     "cards": [
@@ -25962,7 +26021,7 @@
                     ]
                   },
                   {
-                    "note": "6. 点穴、心灵堡垒（进阶8起升级）、欺瞒现实（没费）",
+                    "note": "",
                     "energy": 2,
                     "shuffle": false,
                     "cards": [
@@ -26003,7 +26062,7 @@
                     ]
                   },
                   {
-                    "note": "7. 渐强、打击（进阶9起升级）、安宁",
+                    "note": "",
                     "energy": 3,
                     "shuffle": false,
                     "cards": [
@@ -26043,7 +26102,7 @@
                     ]
                   },
                   {
-                    "note": "8. 洗牌（她重新洗牌）、点穴、暴怒+、不惧妖邪",
+                    "note": "8. 洗牌。",
                     "energy": 4,
                     "shuffle": true,
                     "cards": [
@@ -26084,7 +26143,7 @@
                     ]
                   },
                   {
-                    "note": "9. 打击（进阶9起升级）、冥想、防御（没费）",
+                    "note": "",
                     "energy": 2,
                     "shuffle": false,
                     "cards": [
@@ -26125,7 +26184,7 @@
                     ]
                   },
                   {
-                    "note": "10. 点穴（0费）、点穴（0费）、警惕、打击（没费，进阶9起升级）",
+                    "note": "",
                     "energy": 2,
                     "shuffle": false,
                     "cards": [
@@ -26232,7 +26291,7 @@
                     ]
                   },
                   {
-                    "note": "12. 洗牌（她重新洗牌）、点穴（0费）、暴怒、不惧妖邪",
+                    "note": "12. 洗牌。",
                     "energy": 3,
                     "shuffle": true,
                     "cards": [
@@ -26665,7 +26724,7 @@
                     ]
                   },
                   {
-                    "note": "3. 义愤填膺、供奉、碰撞连击、打击、冥想（捞暴怒+）⇒ 节制触发结束回合",
+                    "note": "3. 打出冥想时触发节制",
                     "energy": 4,
                     "shuffle": false,
                     "cards": [
@@ -27165,7 +27224,7 @@
                     ]
                   },
                   {
-                    "note": "8. 洗牌；奇迹、腾越（节制第二次满 12 张 ⇒ 结束回合，腾越给出额外回合）",
+                    "note": "8. 洗牌。打出腾越时触发节制，但腾越开启了额外回合",
                     "energy": 5,
                     "shuffle": true,
                     "cards": [
@@ -27465,7 +27524,7 @@
                     ]
                   },
                   {
-                    "note": "11. 洗牌；内心宁静、暴怒+、净化+（消耗 腰带抽打·碰撞连击·当头棒喝·冥想·义愤填膺）、警惕（触发节制结束回合）、不惧妖邪（没费不弃）",
+                    "note": "11. 洗牌。净化+消耗腰带抽打、碰撞连击、当头棒和、冥想、义愤填膺",
                     "energy": 5,
                     "shuffle": true,
                     "cards": [
@@ -27611,7 +27670,7 @@
                     ]
                   },
                   {
-                    "note": "12+（默认）：洗牌；暴怒+、供奉、内心宁静 ×3 组、暴怒+、供奉、警惕（触发节制结束回合）、暴怒+、供奉、警惕、不惧妖邪（不出）、净化+（不出）",
+                    "note": "12. 若玩家打出了攻击牌，意图变成：（暴怒+、供奉、不惧妖邪）*4",
                     "energy": 14,
                     "shuffle": true,
                     "cards": [
