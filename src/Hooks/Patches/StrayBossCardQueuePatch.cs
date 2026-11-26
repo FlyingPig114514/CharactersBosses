@@ -342,6 +342,16 @@ internal static class StrayBossCardQueuePatch
                                $"（scale={card.Scale} pos={card.GlobalPosition}）" +
                                "。这一行的路径就是原版把它挂在哪儿了（**只看不动手**：v0.2.854 起这里只报告，" +
                                "真正的回收交给 `PlayContainer` 直接子节点那条路，免得误伤我们自己的手牌栏）");
+                    // ★ v0.2.968（用户 2026-11-26：「如果没什么影响，做吧」）：
+                    //   把**装着这张滞留卡的容器**整棵子树 dump 一遍 —— 玩家反馈的卡死里，
+                    //   有一张打完之后 Model 已被清空的玩家卡面（WAH_BLAST）挂在 `CombatUi/@Control@61594`
+                    //   这种匿名容器里，只看那一行路径根本不知道是谁把它丢在那儿的。
+                    //   这里补一行「父节点类型/名字 + 最多 12 个子节点（含各自的 Model）」，
+                    //   下次就能一眼看出是哪个模组造的容器、里面还压着什么。
+                    Logger.Log($"[CharBoss]     └ 容器：{DescribeContainer(card.GetParent())}");
+                    Logger.Log($"[CharBoss]     └ 这张卡：Model={(card.Model == null ? "<已清>" : entry)}" +
+                               $" Visible={card.Visible} 子节点={card.GetChildCount()}" +
+                               $" 在树里={card.IsInsideTree()}");
                 }
                 // ★ v0.2.854：**只报告、不隐藏**。上一版在这里直接隐藏，
                 //   结果把她手牌栏里的 5 张卡面（正好是整手牌）当滞留卡面隐藏了
@@ -562,6 +572,77 @@ internal static class StrayBossCardQueuePatch
         if (nowUsec - _lastPcSweepMs < 1_000_000L) return;
         _lastPcSweepMs = nowUsec;
         ClearOurCardsFromPlayContainer("1Hz 兜底", 1_500L);
+    }
+
+    // ── 诊断用：把「装着滞留卡的那个容器」和「整个房间的卡面情况」说清楚（v0.2.968）──────
+
+    /// <summary>
+    /// 描述一个容器：类型 + 名字 + 前 12 个子节点（卡面带上它的 Model）。
+    /// 用途见 <see cref="SweepRoom"/> 里那条「卡面滞留」日志的下一行。
+    /// </summary>
+    private static string DescribeContainer(Godot.Node? parent)
+    {
+        if (parent == null) return "（父节点已为 null）";
+        try
+        {
+            var sb = new System.Text.StringBuilder();
+            sb.Append(parent.GetType().Name).Append('「').Append(parent.Name).Append("」")
+              .Append(" 子节点 ").Append(parent.GetChildCount()).Append(" 个：");
+            int n = 0;
+            foreach (var child in parent.GetChildren())
+            {
+                if (n++ >= 12) { sb.Append(" …"); break; }
+                sb.Append(" {").Append(child.GetType().Name).Append(':').Append(child.Name);
+                if (child is NCard nc)
+                {
+                    string model = "<已清>";
+                    try { model = nc.Model?.Id.Entry ?? "<已清>"; } catch { /* 忽略 */ }
+                    sb.Append(" model=").Append(model);
+                }
+                sb.Append('}');
+            }
+            return sb.ToString();
+        }
+        catch (Exception e) { return "（读子节点失败: " + e.Message + "）"; }
+    }
+
+    /// <summary>
+    /// 整个房间的卡面概况（1Hz 给「回合卡住」看门狗用）：总数 / 我方 / Model 已清 / 前几个可疑的。
+    /// 只读，不动手。
+    /// </summary>
+    internal static string RoomCardSummary()
+    {
+        try
+        {
+            var room = MegaCrit.Sts2.Core.Nodes.Rooms.NCombatRoom.Instance;
+            if (room == null || !GodotObject.IsInstanceValid(room)) return "房间=null";
+
+            var found = new System.Collections.Generic.List<NCard>();
+            var paths = new System.Collections.Generic.Dictionary<NCard, string>();
+            CollectRoomCards(room, 0, found, paths);
+
+            int ours = 0, modelGone = 0;
+            var samples = new System.Text.StringBuilder();
+            foreach (var card in found)
+            {
+                if (card == null || !GodotObject.IsInstanceValid(card)) continue;
+                bool isOurs = false, gone = false;
+                try { isOurs = IsOurBossCard(card); } catch { /* 忽略 */ }
+                try { gone = card.Model == null; } catch { gone = true; }
+                if (isOurs) ours++;
+                if (gone) modelGone++;
+                if ((isOurs || gone) && samples.Length < 220)
+                {
+                    string entry = "<Model 已清>";
+                    try { entry = card.Model?.Id.Entry ?? "<Model 已清>"; } catch { /* 忽略 */ }
+                    string path = paths.TryGetValue(card, out string? p) ? p : "?";
+                    samples.Append('[').Append(entry).Append(" @").Append(path).Append("] ");
+                }
+            }
+            return $"房内卡面={found.Count} 我方={ours} Model已清={modelGone}" +
+                   (samples.Length > 0 ? " 可疑=" + samples.ToString().Trim() : "");
+        }
+        catch (Exception e) { return "（扫描失败: " + e.Message + "）"; }
     }
 
     /// <summary>这张卡面是不是「我们 Boss 打出的牌」。</summary>

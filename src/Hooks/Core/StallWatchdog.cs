@@ -166,6 +166,9 @@ internal static class StallWatchdog
         sb.AppendLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] 主线程停摆报告（pid={SafePid()}）");
         sb.AppendLine($"  · 心跳已停 **{ageMs / 1000.0:0.0} 秒**（累计心跳 {Interlocked.Read(ref _beats)} 帧）");
         sb.AppendLine($"  · 线程数 {SafeThreads()} ｜ GC 堆 {SafeHeapMb():0.0} MB ｜ 进程已跑 {SafeUptime()}");
+        // ★ v0.2.968：帧回调的「步骤路标」—— 主线程卡住时只有后台线程还能写字，
+        //   这一行直接告诉我们最后进入的是哪个子步骤（或「Tick 结束」= 卡在帧回调之外）。
+        sb.AppendLine($"  · 帧回调最后一步：{Core.TickSteps.Describe()}");
 
         try
         {

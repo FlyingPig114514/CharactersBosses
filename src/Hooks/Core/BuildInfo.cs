@@ -17,7 +17,7 @@ namespace CharacterBosses.Core;
 public static class BuildInfo
 {
     /// <summary>构建指纹（日志/数据表里用）。每次改动都要 +0.0.1 并写一句改了什么。</summary>
-    public const string Tag = "v0.2.967 / 2026-11-26 (**修：设置界面里「疾风观」显示成 WATCHER_FLURRY**)—— 用户截图：模组配置 → 地图勾选格里疾风观那一行显示成 `WATCHER_FLURRY`（被裁成「…FLURRY」），名字与同排的「预见观」串在一起。根因：`BossKeys.DesignNames`（配置界面勾选格用的中文短名表）漏登记了 2026-11-23 新加的 `WATCHER_FLURRY`，`DesignNameOf` 按设计退回 Key 本身 ⇒ 格子里显示 Key。现在补上「疾风观」，并逐条核对：`BossKeys.All` 的 42 个 Key 现在被这张表**全覆盖**（以前 41/42，唯一缺的就是它）。同时把这条核对口径写进表上注释，以后加新设计不会再漏。见 docs/plans/changelog-history.md";
+    public const string Tag = "v0.2.968 / 2026-11-26 (**诊断增强：帧回调步骤路标 + 滞留卡面的容器 dump**)—— 玩家（安卓、v0.2.964）报卡死，现有日志只能看到「最后一条日志停在哪」，分不清是卡在我们的帧回调里还是卡在帧回调之外。本轮补两样纯诊断、零玩法影响的东西：①Core/TickSteps —— BossFrameTick.Tick / TickInner 每进入一个子步骤只写两个静态字段（一个常量字符串 + 一个 TickCount64，零分配零 IO），StallWatchdog 的后台线程在心跳停 12 秒时把「最后进入的步骤 + 距今多少毫秒」写进 characterbosses_stall.txt；于是能一眼分开「SweepRoom 等某个子步骤卡住」与「Tick 结束 = 我们的帧回调早就跑完、卡点在帧回调之外（原版/别的 mod）」。②StrayBossCardQueuePatch —— 命中「卡面滞留」时额外 dump 装着它的那个容器（类型/名字/前 12 个子节点含各自 Model）以及这张卡自身状态（Model 是否已清、Visible、子节点数、是否在树里）；并新增 RoomCardSummary，把「房内卡面总数 / 我方 / Model 已清 / 可疑那几张分别在哪个容器」并进「回合卡住看门狗」的 12 秒报告。背景：玩家日志里有一张打完的玩家卡面（WAH_BLAST，Model 已被原版清空）挂在 CombatUi 下的匿名容器里 3.4s，同时全场有 238 次「!is_inside_tree()」告警，怀疑与愚者特效模组（FoolMotion）搬动卡面节点有关。见 docs/plans/changelog-history.md";
 
     private static bool _logged;
 

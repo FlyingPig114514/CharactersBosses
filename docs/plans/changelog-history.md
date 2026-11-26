@@ -4,6 +4,50 @@
 > 旧条目逐字来自 `git show HEAD:src/Hooks/Core/BuildInfo.cs` 的 Tag 常量（v0.2.871 及其之前，共 236 条）。
 > 最新版本（0.2.889）是当前 Tag，同时在各条 `workshop/changenote.txt` 里也有面向玩家的摘要。
 
+## v0.2.968（2026-11-26）：诊断增强 —— 帧回调「步骤路标」+ 滞留卡面的容器 dump
+
+玩家（**安卓**，跑的是 v0.2.964）报卡死，交上来两份日志。0.964 的日志只能告诉我们「最后一条日志停在哪」，
+分不清是**卡在我们自己的帧回调里**，还是**卡在帧回调之外**（原版 / 别的模组）。用户：「如果没什么影响，做吧」
+⇒ 本轮补两样**纯诊断、零玩法影响**的东西。
+
+### 一、`Core/TickSteps.cs` —— 帧回调的步骤路标
+
+- `BossFrameTick.Tick` / `TickInner` 每进入一个子步骤（`日志缓冲刷盘` / `UI 会话自检` /
+  `WatchPlayQueue` / `SweepPlayContainer` / `SweepRoom` / `ProbeEndTurnButton` / `ProbeTurnStall` /
+  `TickInner` / **`Tick 结束`** …）只写两个静态字段：一个常量字符串 + 一个 `TickCount64`。
+  **零分配、零 IO**（每帧调十几次，不进日志文件）。
+- 真正落盘的是后台线程 `StallWatchdog`：心跳停 12 秒时在 `characterbosses_stall.txt` 里多写一行
+  `帧回调最后一步：SweepRoom（137 ms 前）`。
+- 于是下次卡死可以一眼分开两种情况：
+  - `Tick 结束（N ms 前）` ⇒ 我们这帧**早就跑完了**，卡点在帧回调之外（原版或别的模组）；
+  - `SweepRoom / TickInner …（N ms 前）` ⇒ 就卡在我们某个具体子步骤里。
+- 「回合卡住看门狗」（12 秒无推进）的周期性报告里也带上这一项。
+
+### 二、`StrayBossCardQueuePatch` —— 把装着滞留卡的容器 dump 出来
+
+玩家日志里有一条现成的线索：`⚠ 卡面滞留：WAH_BLAST … @Control@61594 已 3.4s`（**玩家**打出的愚者卡，
+`Model` 已被原版清空），而那个容器是 `CombatUi` 下一个**匿名** Control，光看路径不知道是谁把它丢在那儿的。
+所以命中这条日志时再打两行：
+
+```
+[CharBoss]     └ 容器：Control「@Control@61594」 子节点 3 个： {NCard:Card model=<已清>} {Control:@Control@…} …
+[CharBoss]     └ 这张卡：Model=<已清> Visible=true 子节点=2 在树里=false
+```
+
+另外新增 `RoomCardSummary()`（只读），把「房内卡面总数 / 我方 / Model 已清 / 可疑那几张分别在哪个容器」
+并进「回合卡住」的 12 秒报告，一次就能看出手牌/展示区里有没有坏节点。
+
+### 三、这次没做的事
+
+不改任何游戏逻辑、不改回收策略（`SweepRoom` 从 v0.2.854 起就只报告不动手），也不放宽回收条件 ——
+本版**只是让下次卡死能自证是「我们的哪一步」还是「别人的哪一步」**。
+
+> 现场判据（写进上面响应判断的依据）：该场战斗我们模组的「出牌展示区」回收动作 **0 次**
+> （`IsOurBossCard` 要求 `Model.Owner.Creature.Monster is CharBossMonster`，玩家牌恒 false），
+> 所以那张 `WAH_BLAST` 不是我们丢的；而同场有 **238 次** `Condition "!is_inside_tree()" is true`
+> （`Node.can_process`），每条都紧跟在一行 `Player 1 playing card X` 之后，配合 15 个
+> `FoolMotion_*` 特效节点与 fps 15 / `process=619.7ms` 的帧时间，指向「卡牌节点被特效模组搬动后没还原」。
+
 ## v0.2.967（2026-11-26）：修「设置界面里疾风观显示成 WATCHER_FLURRY」
 
 用户截图：模组配置 → 某张地图的 Boss 勾选格，疾风观那一行显示成 `WATCHER_FLURRY`

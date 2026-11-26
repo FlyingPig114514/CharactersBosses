@@ -208,13 +208,21 @@ public static class BossFrameTick
         //   所以需要一个后台线程在「主线程不说话」时把现场落盘。这里只是每帧写一个 long（零分配），
         //   后台线程自己判断停摆（Core/StallWatchdog.cs）。
         try { Core.StallWatchdog.Beat(); } catch { /* 忽略 */ }
+        // ★ v0.2.968（用户 2026-11-26：「如果没什么影响，做吧」）：
+        //   帧回调的**步骤路标**。每进入一个子步骤只写两个静态字段（零分配、零 IO），
+        //   主线程真的卡死时后台看门狗会把「最后进入的步骤」写进停摆报告 ——
+        //   于是能一眼分开「卡在我们某个子步骤」还是「我们这帧早就跑完了、卡在帧回调之外」。
+        try { Core.TickSteps.Enter("Tick 开始"); } catch { /* 忽略 */ }
         var swTick = System.Diagnostics.Stopwatch.StartNew();
         // ★ v0.2.805：日志现在是缓冲写的（手机省电）⇒ 每帧顺手把到期的缓冲刷下去，
         //   免得「最后几行」一直躺在内存里（战斗结束时尤其明显）。
+        try { Core.TickSteps.Enter("日志缓冲刷盘"); } catch { /* 忽略 */ }
         try { Patches.SafeLogPatch.FlushIfDue(); } catch { /* 忽略 */ }
         // 进新战斗房（斗蛐蛐连打第二场）时，把上一场留下的面板/层/翻侧计数全拆掉。
+        try { Core.TickSteps.Enter("UI 会话自检"); } catch { /* 忽略 */ }
         CharacterBosses.UI.BossUiSession.EnsureFresh();
         // 场景树导出器（按 F9 导出，幂等挂载；用户 2026-11-11 要「能看各种节点」）
+        try { Core.TickSteps.Enter("场景树/日志导出器挂载"); } catch { /* 忽略 */ }
         try { Core.SceneTreeDumper.Ensure(); } catch { /* 忽略 */ }
         // 最近日志导出器（按 F8，幂等挂载；v0.2.900 玩家报 bug 用：不用再发整份 mod_log）
         try { Core.RecentLogDumper.Ensure(); } catch { /* 忽略 */ }
@@ -223,16 +231,21 @@ public static class BossFrameTick
         //   `BuildInfo.LogOnce` 只在启动时跑一次 —— 那时观者 mod 可能还没加载
         //   ⇒ `TryInstall` 直接 return，之后**再也没有人调它**（`_tried` 也一直是 false）。
         //   现在每帧都试一次（内部 `_tried` 命中后就是一次 bool 判断，零开销）。
+        try { Core.TickSteps.Enter("观者运行期补丁"); } catch { /* 忽略 */ }
         try { Core.WatcherRuntimePatches.TryInstall(); } catch { /* 忽略 */ }
         // ★ v0.2.936：神格特效的兜底清理（生物死了 / 离场时把眼睛与紫雾收掉）
+        try { Core.TickSteps.Enter("神格特效清理"); } catch { /* 忽略 */ }
         try { Core.WatcherDivinityVfx.StopIfDead(); } catch { /* 忽略 */ }
         // ★ v0.2.927：收藏家（崩坠）兼容的安装也放慢车道重试（它自己 2 秒限流、没装崩坠就不锁死）
+        try { Core.TickSteps.Enter("收藏家兼容安装"); } catch { /* 忽略 */ }
         try { Core.DownfallCollectibleCompat.TryInstall(); } catch { /* 忽略 */ }
         // ★ v0.2.918（用户 2026-11-23 第二次：「A 版还是 2 张」奇迹）：
         //   至纯之水的奇迹有两个来源，模组那次是**异步**的、可能在我们注入之后才落手；
         //   而玩家第 1 回合就能看到她的手牌 ⇒ 在她的第 1 回合期间每帧兜底修剪一次
         //   （没有观者 Boss / 不是第 1 回合时只是一次空判断）。
+        try { Core.TickSteps.Enter("奇迹去重修剪"); } catch { /* 忽略 */ }
         try { Core.WatcherRuntimePatches.TrimDuplicateMiraclesTick(); } catch { /* 忽略 */ }
+        try { Core.TickSteps.Enter("TickInner"); } catch { /* 忽略 */ }
         try { TickInner(source); }
         finally
         {
@@ -256,6 +269,9 @@ public static class BossFrameTick
                 }
             }
             catch { /* 忽略 */ }
+            // ★ v0.2.968：走到这里说明这一帧我们**全部跑完了** ——
+            //   卡死报告里若显示「Tick 结束（N ms 前）」，就说明卡点不在我们的帧回调里。
+            try { Core.TickSteps.Enter("Tick 结束"); } catch { /* 忽略 */ }
         }
     }
 
@@ -539,11 +555,20 @@ public static class BossFrameTick
             }
             catch { /* 忽略 */ }
 
+            // ★ v0.2.968：再补两样「卡住时最想知道」的东西 ——
+            //   ① 帧回调最后走到哪一步（我们自己拆的路标）；
+            //   ② 房间里的卡面概况（总数 / 我方 / Model 已清 / 可疑的那几张在哪个容器）。
+            string tickStep = "?";
+            try { tickStep = Core.TickSteps.Describe(); } catch { /* 忽略 */ }
+            string roomCards = "?";
+            try { roomCards = CharacterBosses.Patches.StrayBossCardQueuePatch.RoomCardSummary(); } catch { /* 忽略 */ }
+
             CharacterBosses.Core.LogLoudness.Diag(
                 $"[CharBoss] ⚠ 战斗 {stuckMs / 1000} 秒没有任何推进（不是卡在玩家操作上）：" +
                 $"side={side} 玩家已点结束回合={ready} 结束回合按钮={buttonState} " +
                 $"她这一手停在「{Monsters.CharBossMonster.StageMarker}」 " +
                 $"场上 Boss：{bossBits.ToString().Trim()} " +
+                $"｜帧回调最后一步：{tickStep} ｜{roomCards} " +
                 "（这一行只用于定位，不改任何状态；请把它连同上下 20 行日志一起反馈）");
         }
         catch (Exception e)
@@ -715,17 +740,20 @@ public static class BossFrameTick
             //   之后连帧回调都没有 ⇒ 主线程卡住）。我们不猜原因，只在有卡面滞留在
             //   `NCardPlayQueue` 里超过 3 秒时打一行（谁的牌、什么牌、多久），下次直接看日志定位。
             //   ⚠ 放在 `boss == null` 早退之前 —— 普通小怪战（没有我们的 Boss）也要能看见。
+            try { Core.TickSteps.Enter("WatchPlayQueue 出牌队列看门狗"); } catch { /* 忽略 */ }
             try { WatchPlayQueue((long)now); } catch { /* 忽略 */ }
 
             // ①⓪⓪c ★ v0.2.853：玩家那张卡真正卡住的地方 —— `NCombatRoom/Ui/PlayContainer`
             //   （原版 `NCombatUi.AddToPlayContainer` 把打出去的卡面挂在这儿，靠「离开 play 堆」那步收走，
             //    而那一笔是替**本机玩家**的出牌准备的，不替影子玩家跑）。
+            try { Core.TickSteps.Enter("SweepPlayContainer 展示区回收"); } catch { /* 忽略 */ }
             try { CharacterBosses.Patches.StrayBossCardQueuePatch.SweepPlayContainer((long)now); } catch { /* 忽略 */ }
 
             // ①⓪⓪b ★ v0.2.852（用户 2026-11-21 截图：「碎屑储打出的碰撞轨迹还是会卡在天上」）：
             //   `Reap` 只扫原版出牌队列，而那张大卡根本不在队列里（日志里一条「已从队列里摘掉」都没有）
             //   ⇒ 补一条**房间级**兜底：1Hz 扫 `NCombatRoom`（跳过手牌容器与出牌队列），
             //   我方卡面滞留 ≥2.5s 就隐藏并打一行带节点路径的日志。
+            try { Core.TickSteps.Enter("SweepRoom 房间卡面扫描"); } catch { /* 忽略 */ }
             try { CharacterBosses.Patches.StrayBossCardQueuePatch.SweepRoom((long)now); } catch { /* 忽略 */ }
 
             // ①⓪c ★ v0.2.353（用户 2026-11-04：「事件机还是没有结束回合按钮」）：
@@ -737,9 +765,11 @@ public static class BossFrameTick
             //     · `RefreshEnabled` 里还会因为 `NCombatRoom.Mode != ActiveCombat`、
             //       战斗房不是当前 screen context、或 `Ui.Hand.IsInCardSelection` 而**藏掉**按钮。
             //   这些值一打出来就知道是哪一条不成立。
+            try { Core.TickSteps.Enter("ProbeEndTurnButton 结束回合按钮探针"); } catch { /* 忽略 */ }
             try { ProbeEndTurnButton((long)now); } catch { /* 忽略 */ }
 
             // ①⓪d ★ v0.2.872：「回合卡住」看门狗（纯日志）—— 见 ProbeTurnStall 的注释
+            try { Core.TickSteps.Enter("ProbeTurnStall 回合卡住看门狗"); } catch { /* 忽略 */ }
             try { ProbeTurnStall((long)now); } catch { /* 忽略 */ }
 
             // ①⓪b ★ v0.2.295：**战斗结束后**兜一次「出牌队列残留卡面」
@@ -747,6 +777,7 @@ public static class BossFrameTick
             //    那条自动出牌链被「战斗结束」截断，原版收卡面那一步不跑了；
             //    我们的 Reap 只收她自己打出的牌，玩家的这类残留没人清）。
             //   同样放在 `boss == null` 早退之前：战斗结束时她已经被释放了。
+            try { Core.TickSteps.Enter("SweepLeftoverCardsAfterCombat 战后残留卡面"); } catch { /* 忽略 */ }
             try { SweepLeftoverCardsAfterCombat((long)now); } catch { /* 忽略 */ }
 
             // ⚠ **同一帧只跑一次**：这个 Tick 有 3 个驱动源（辉星计数器 / 能量球 / 君王之剑），
@@ -781,6 +812,7 @@ public static class BossFrameTick
             // ①① BGM 战后延迟还原（用户 2026-10-30：三层 Boss 战没有胜利音效）。
             //     战斗结束后我们的曲目要再放几秒（让游戏的 `Progress=7` 胜利段落在它上面播完），
             //     到点且确实不在战斗里才 `StopCustomMusic()`。放在慢车道（4Hz）里跑。
+            try { Core.TickSteps.Enter("BossBgm 战后曲目还原"); } catch { /* 忽略 */ }
             try { CharacterBosses.Core.BossBgm.TickRestore((long)now); } catch { /* 忽略 */ }    // 慢帧计时锚点见 Seg()
 
             Seg(0);
@@ -1145,10 +1177,12 @@ public static class BossFrameTick
                 try { BossSovereignBlade.Ensure(each); } catch { /* 忽略 */ }
             }
             Seg(7);   // 收尾段结束
+            try { Core.TickSteps.Enter("TickInner 结束"); } catch { /* 忽略 */ }
         }
         catch (Exception e)
         {
             Logger.Log("[CharBoss] 帧驱动异常: " + e.Message);
+            try { Core.TickSteps.Enter("TickInner 抛异常退出"); } catch { /* 忽略 */ }
         }
     }
 
