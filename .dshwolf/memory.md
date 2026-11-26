@@ -7388,3 +7388,8 @@ Chronological action log.
 | 2026-11-26 20:41 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BuildInfo.cs` | ok | 0 |
 | 2026-11-26 20:41 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/changelog-history.md` | ok | 0 |
 | 2026-11-26 20:56 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/README.md` | ok | 0 |
+| 2026-11-26 20:56 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/README.md` | ok | 0 |
+| 2026-11-26 20:58 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/.tmp/create-release.mjs` | ok | 0 |
+| 2026-11-26 20:58 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/.tmp/release-notes.md` | ok | 0 |
+| 2026-11-26 20:59 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/.tmp/get-token.ps1` | ok | 0 |
+| 2026-11-26 21:00 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/docs/plans/changelog-history.md` | ok | 0 |

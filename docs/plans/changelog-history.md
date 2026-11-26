@@ -26,6 +26,23 @@
 （顶层名字、顶栏图标、死亡提示、历史记录用的都是本地化 `<KEY>_BOSS.name`，
 `content/localization/zhs/monsters.json` 里 `WATCHER_FLURRY_BOSS.name` 一直是「疾风观」，所以那几处从来没错。）
 
+### 发布（2026-11-26）
+
+用户：「打包，上传创意工坊和github，并且让玩家也能从github下载模组」。
+
+- 打包：`install-mod.bat pack` → `.dist\CharacterBosses-v0.2.967.zip`（18,512,882 B，6 个文件）；
+- 创意工坊：`ModUploader.exe upload -w workshop` 上传成功（条目 3830639796，`time_updated` = 20:57 本地时间）；
+  > 踩坑：直接跑 `bin\Debug\net8.0\ModUploader.exe` 报「You must install or update .NET」——
+  > 它按 net8.0 编的，本机只有 9.0.x 运行时；用 `$env:DOTNET_ROLL_FORWARD='Major'` 就能跑（不必重新编译）。
+- GitHub：`main` 推到 `227f273`，打 tag `v0.2.967`；**新建 Release** 并把 zip 作为资源挂上
+  （之前仓库里没有任何 Release/tag，`*.zip` 也在 `.gitignore` 里 ⇒ 玩家以前只能看源码）。
+  下载地址：`.../releases/download/v0.2.967/CharacterBosses-v0.2.967.zip`，
+  `releases/latest` 已指向 v0.2.967，README 的安装章节也加了这条路径。
+  > 绕坑记录：这个环境里 `git credential fill` 起不来（凭据助手是 shell 脚本，沙箱不给建命名管道），
+  > `Invoke-RestMethod` / `curl.exe` 走 schannel 报 `SEC_E_NO_CREDENTIALS`，node 默认 CA 又不认系统的 TLS 中间证书。
+  > 最终可行组合：**`CredRead` 直接读 Windows 凭据管理器里那条 `git:https://github.com`** 拿 token，
+  > 再用 **`node --use-system-ca`** 调 GitHub API（创建 release + 上传资源）。
+
 ## v0.2.966（2026-11-26）：诊断 —— 观者局「骑士精英战卡死」的手牌重复插入与主线程停摆
 
 用户：「我刚刚玩观者 mod 时崩溃了两次，你看看是啥问题？」→「你试试加诊断补丁」。
