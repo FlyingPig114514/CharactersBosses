@@ -4,6 +4,16 @@
 > 旧条目逐字来自 `git show HEAD:src/Hooks/Core/BuildInfo.cs` 的 Tag 常量（v0.2.871 及其之前，共 236 条）。
 > 最新版本（0.2.889）是当前 Tag，同时在各条 `workshop/changenote.txt` 里也有面向玩家的摘要。
 
+### 发布（2026-11-26）
+
+用户：「打包。上传创意工坊、github」。
+
+- 打包：`.dist\CharacterBosses-v0.2.968.zip`（18,517,467 B，6 个文件；`workshop\content` 与 `.dist` 三份二进制哈希逐一核对一致）；
+- 创意工坊：上传成功（条目 3830639796，`time_updated` = 23:14 本地时间，`file_size` 21,911,329）；
+- GitHub：`main` → `4735841`，tag `v0.2.968`；新建 **Release**（公开）并挂上 zip
+  （`.../releases/download/v0.2.968/CharacterBosses-v0.2.968.zip`，18,517,467 B，实测直链可下载），
+  `releases/latest` 已指向 v0.2.968（全站现在共 2 个 Release：v0.2.967 / v0.2.968）。
+
 ## v0.2.968（2026-11-26）：诊断增强 —— 帧回调「步骤路标」+ 滞留卡面的容器 dump
 
 玩家（**安卓**，跑的是 v0.2.964）报卡死，交上来两份日志。0.964 的日志只能告诉我们「最后一条日志停在哪」，
