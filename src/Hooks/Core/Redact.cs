@@ -68,7 +68,38 @@ internal static class Redact
 
     private static readonly Regex SteamId = new(@"\b7656\d{13}\b", RegexOptions.Compiled);
     private static readonly Regex NetIdEq = new(@"NetId=(\d{5,})", RegexOptions.Compiled);
-    private static readonly Regex UserPath = new(@"[A-Za-z]:\\Users\\[^\\\s]+", RegexOptions.Compiled);
+
+    /// <summary>
+    /// 路径里的 Windows 用户名。
+    ///
+    /// ★★ v0.2.980（用户 2026-11-27：「检查一下，目前本模组有没有什么其它地方写了隐私信息？」）：
+    /// 原来的写法是 `[A-Za-z]:\\Users\\[^\\\s]+` —— **只认反斜杠**。而 Godot 的
+    /// `OS.GetUserDataDir()` / `ProjectSettings.GlobalizePath("user://")` 返回的是**正斜杠**形式
+    /// （`C:/Users/<名字>/AppData/Roaming/...`），于是这类行**整条漏网**：
+    /// 实测 `characterbosses_recent.txt`（就是让玩家发出来的那份）里躺着 3 条
+    /// `C:/Users/<用户名>/AppData/Roaming/SlayTheSpire2\...`。
+    /// 现在两个方向的分隔符都认（也认混写），把 `C:/Users/<名字>` / `C:\Users\<名字>` 统一替换成 `&lt;userdir&gt;`。
+    /// </summary>
+    private static readonly Regex UserPath = new(@"[A-Za-z]:[\\/]+Users[\\/]+[^\\/\s]+", RegexOptions.Compiled);
+
+    /// <summary>
+    /// 这行**有没有可能**含隐私信息（便宜的预筛）。给「批量导出」用：
+    /// 6 万行日志逐行走正则太浪费，先看有没有特征串，可疑的才真正脱敏。
+    /// </summary>
+    internal static bool LooksSensitive(string? line)
+    {
+        if (string.IsNullOrEmpty(line)) return false;
+        try
+        {
+            return line!.Contains("7656", StringComparison.Ordinal)
+                || line.Contains("NetId=", StringComparison.Ordinal)
+                || line.Contains(":\\Users\\", StringComparison.OrdinalIgnoreCase)
+                || line.Contains(":/Users/", StringComparison.OrdinalIgnoreCase)
+                || line.Contains("\\Users\\", StringComparison.OrdinalIgnoreCase)
+                || line.Contains("/Users/", StringComparison.OrdinalIgnoreCase);
+        }
+        catch { return false; }
+    }
 
     /// <summary>对一行日志做脱敏（幂等，失败原样返回）。</summary>
     internal static string Text(string? message)

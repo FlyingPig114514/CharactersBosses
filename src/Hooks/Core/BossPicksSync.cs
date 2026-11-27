@@ -982,7 +982,7 @@ internal static class BossPicksSync
             // ★ v0.2.780（玩家 2026-11-18 三机联机日志）：**只认带结论的消息**。
             //   客人给客人发的上报里这三样都是空的，而以前它照样走一遍完整流程 ⇒
             //   `FromHost.Clear()` / `FromHostBosses.Clear()` 把房主刚发来的列表清空，
-            //   并把「0 条」当成房主的结论（日志实证：`勾选同步：已收到房主(NetId=76561198830124068)`
+            //   并把「0 条」当成房主的结论（日志实证：`勾选同步：已收到房主(NetId=7656…4068)`
             //   —— 那个 NetId 其实是**另一位客人**，房主是 …246781）。
             bool hostish = !string.IsNullOrEmpty(payload) || !string.IsNullOrEmpty(settings)
                            || !string.IsNullOrEmpty(bosses);

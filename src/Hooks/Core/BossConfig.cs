@@ -344,10 +344,14 @@ public static class BossConfig
         catch { return false; }
     }
 
-    /// <summary>给配置界面显示用：当前实际保存到哪个文件。</summary>
+    /// <summary>
+    /// 给配置界面显示用：当前实际保存到哪个文件。
+    /// ★ v0.2.979：过一遍 <see cref="PathDisplay.Mask"/> —— 界面上**不显示** `C:\Users\<玩家名>`，
+    /// 换成 `%APPDATA%\…`（一样能照着找，但玩家截图发出去不会把自己的用户名带出去）。
+    /// </summary>
     internal static string DescribeConfigPath()
     {
-        try { return FilePath; }
+        try { return PathDisplay.Mask(FilePath); }
         catch { return FileName; }
     }
 

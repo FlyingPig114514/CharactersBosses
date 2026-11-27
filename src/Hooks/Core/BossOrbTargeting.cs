@@ -135,49 +135,106 @@ internal static class BossOrbTargeting
 
     private static int DiagCount;
 
-    /// <summary>这颗球属于哪只我们的 Boss（`Owner` 为空时退回「正在行动的那只」/「场上唯一那只」）。</summary>
+    /// <summary>
+    /// 这颗球属于哪只我们的 Boss。**必须精确对号**，认不出就返回 null（= 一个字节都不改）。
+    ///
+    /// ★★ v0.2.981（用户 2026-11-27：「多人时玩家方故障机器人的黑球打队友了（对面 boss 有黑球机，
+    /// 是不是它的黑球索敌影响到玩家了）」——**猜得对**，就是这里）：
+    ///   v0.2.969 为了救「影子玩家的球偶尔 `Owner == null` ⇒ 不改写」，加了一条兜底：
+    ///   「`Owner` 认不出就问『当前正在行动的那只 Boss』」。可那条兜底**没有先排除真人玩家**——
+    ///   玩家自己的球（`Owner` 是真人 `Player`，其 `Creature.Monster` 为 null）也会掉进这条兜底，
+    ///   于是被当成「正行动的那只 Boss 的球」，改写成**那只 Boss 锁定的玩家** ⇒ 玩家的黑球去打了**队友**。
+    ///   日志铁证（本机 mod_log，22:24:26，`#5 轮次 3 侧=Player` = 玩家回合）：
+    ///   `黑球激发：静默猎手 的黑暗球 ⇒ 目标改为 P#c5d6a4`，紧接着 `P#c5d6a4：HP 52/80 → 35/80`；
+    ///   而那一场 `静默猎手` 身上只有群蛇形态/迅捷，**根本没有充能球**，黑暗球的主人是
+    ///   `DEFECT_BOSS`（orbs=D,F,F）或**那位故障机器人玩家**（`DEFECT_BOSS→Defect/NetId=P#c89a9c`），
+    ///   也就是说被改写的其实是玩家的球，还打到了 `SILENT_BOSS` 锁定的另一位玩家身上。
+    ///
+    /// 现在的判定（从强到弱，全都**证明得了才认**）：
+    ///   ① `Owner.Creature.Monster` 就是我们的 Boss（影子玩家的生物同时是 Player 和 Monster）⇒ 认它；
+    ///   ② `Owner` 是一位**真实玩家**（不是我们造出来的影子玩家）⇒ **立刻放弃**（玩家的球绝不改写）；
+    ///   ③ `Owner` 丢了/认不出 ⇒ 拿这颗球的**对象身份**去比「她影子玩家的球队列」，
+    ///      在谁那里就归谁（比「谁在行动」可靠得多，也不依赖时序）；
+    ///   ④ 还是认不出 ⇒ null（退回原版行为，宁可少一次「先打召唤物」，也不能改写别人的球）。
+    /// </summary>
     internal static CharBossMonster? BossOf(OrbModel? orb)
     {
         try
         {
-            var owner = orb?.Owner?.Creature;
-            if (owner?.Monster is CharBossMonster boss) return boss;
+            if (orb == null) return null;
 
-            // ★ v0.2.969（用户 2026-11-26：「电球和黑球还是不优先打奥斯提/瓦皮」）：
-            //   影子玩家的球在个别时机 `Owner` 会是 null（球刚生成、或队列被换过）。
-            //   以前这种时候只要场上**有多只**我们的 Boss 就直接放弃改写（怕打错人），
-            //   于是多人局里球的选靶会悄悄退回原版随机 —— 玩家看到的就是「还是不优先打召唤物」。
-            //   现在多一层：优先问「**当前正在行动的那只 Boss**」（`BossHandUi.CurrentBoss`），
-            //   球是它的回合里生成的，归属是确定的；问不到才退回「场上唯一那只」。
-            CharBossMonster? acting = null;
-            try { acting = CharacterBosses.UI.BossHandUi.CurrentBoss; } catch { acting = null; }
-            if (acting != null)
+            // ① 球的主人就是我们的 Boss
+            var ownerCreature = orb.Owner?.Creature;
+            if (ownerCreature?.Monster is CharBossMonster direct) return direct;
+
+            // ② 球的主人是一位**真实玩家** ⇒ 玩家自己的球，一个字节都不改
+            var ownerPlayer = orb.Owner;
+            if (ownerPlayer != null && !IsShadowPlayer(ownerPlayer))
             {
-                var combat0 = acting.CombatState;
-                if (combat0 != null && acting.Creature != null && acting.Creature.IsAlive && !acting.Creature.IsDead)
-                    return acting;
+                if (DiagCount++ < 30)
+                {
+                    Core.LogLoudness.Diag($"[CharBoss] 球目标：{Name(orb)} 的主人=真实玩家 " +
+                                          $"{SafeName(ownerPlayer.Creature)} ⇒ 玩家的球不动（原版行为）");
+                }
+                return null;
             }
 
-            var combat = orb?.Owner?.Creature?.CombatState;
-            if (combat == null)
+            // ③ 主人丢了 / 认不出 ⇒ 按「这颗球在谁的球槽里」精确对号
+            foreach (var boss in OurBosses(orb))
             {
-                try { combat = MegaCrit.Sts2.Core.Combat.CombatManager.Instance?.DebugOnlyGetState(); }
-                catch { combat = null; }
+                try
+                {
+                    var orbs = boss.Shadow?.PlayerCombatState?.OrbQueue?.Orbs;
+                    if (orbs == null) continue;
+                    foreach (var o in orbs)
+                    {
+                        if (ReferenceEquals(o, orb)) return boss;
+                    }
+                }
+                catch { /* 换下一只 */ }
             }
-            if (combat == null) return null;
-            CharBossMonster? only = null;
-            int count = 0;
-            foreach (var c in combat.Enemies)
-            {
-                if (c?.Monster is not CharBossMonster b) continue;
-                if (!c.IsAlive || c.IsDead) continue;
-                count++;
-                only = b;
-                if (count > 1) return null;
-            }
-            return count == 1 ? only : null;
+
+            return null;
         }
         catch { return null; }
+    }
+
+    /// <summary>是不是**我们造的影子玩家**（`ShadowPlayerFactory` 里 NetId 走 `0xFFFFFFFF_0000_xxxx` 段）。</summary>
+    internal static bool IsShadowPlayer(MegaCrit.Sts2.Core.Entities.Players.Player? player)
+    {
+        try
+        {
+            if (player == null) return false;
+            // 最强判据：影子玩家是「Player 与 Monster 合一」的生物（原版真人玩家没有 Monster）
+            if (player.Creature?.Monster != null) return true;
+            return (player.NetId >> 32) == 0xFFFF_FFFFUL;
+        }
+        catch { return false; }
+    }
+
+    /// <summary>场上的全部我们的 Boss（取本机视角的敌人列表；拿不到就空）。</summary>
+    private static IEnumerable<CharBossMonster> OurBosses(OrbModel? orb)
+    {
+        MegaCrit.Sts2.Core.Combat.ICombatState? combat = null;
+        try { combat = orb?.Owner?.Creature?.CombatState; } catch { combat = null; }
+        if (combat == null)
+        {
+            try { combat = MegaCrit.Sts2.Core.Combat.CombatManager.Instance?.DebugOnlyGetState(); }
+            catch { combat = null; }
+        }
+        if (combat == null) yield break;
+
+        List<CharBossMonster> found = new();
+        try
+        {
+            foreach (var c in combat.Enemies)
+            {
+                if (c?.Monster is CharBossMonster b) found.Add(b);
+            }
+        }
+        catch { /* 忽略 */ }
+
+        foreach (var b in found) yield return b;
     }
 
     private static string Name(OrbModel? orb)
@@ -260,6 +317,7 @@ internal static class DarkOrbEvokeTargetPatch
     private static System.Reflection.MethodInfo? _playEvokeSfx;
     private static bool _probed;
     private static int _logs;
+    private static int _playerGuardLogs;
 
     [HarmonyPrefix]
     public static bool Prefix(DarkOrb __instance, PlayerChoiceContext playerChoiceContext,
@@ -267,6 +325,43 @@ internal static class DarkOrbEvokeTargetPatch
     {
         try
         {
+            // ── ⓪ 玩家自己的黑暗球：**保证只打对手侧**（v0.2.981 防御性兜底）──────────
+            // 用户 2026-11-27 报的是「玩家方故障机器人的黑球打队友了」：主因是 `BossOf` 把玩家的球
+            // 误认成她（Boss）的球（已修）。这里再做一道**与机制无关**的兜底 —— 只要球的主人是
+            // **真人玩家**，目标就从 `GetOpponentsOf(主人)` 里按「血最少」取（= 原版 `DarkOrb.Evoke`
+            // 的语义），彻底杜绝「玩家的黑球落到玩家侧」这种结果（不管是翻侧残留、收窄残留还是将来别的写法）。
+            var orbOwner = __instance.Owner;
+            if (orbOwner != null && !BossOrbTargeting.IsShadowPlayer(orbOwner))
+            {
+                var me = orbOwner.Creature;
+                var combat = __instance.CombatState ?? me?.CombatState;
+                if (me != null && combat != null)
+                {
+                    Creature? lowest = null;
+                    try
+                    {
+                        foreach (var c in combat.GetOpponentsOf(me))
+                        {
+                            if (c == null || !c.IsAlive || c.IsDead || !c.IsHittable) continue;
+                            if (lowest == null || c.CurrentHp < lowest.CurrentHp) lowest = c;
+                        }
+                    }
+                    catch { lowest = null; }
+
+                    if (lowest != null)
+                    {
+                        __result = EvokeOnAsync(__instance, playerChoiceContext, lowest);
+                        if (_playerGuardLogs++ < 20)
+                        {
+                            Core.LogLoudness.Diag($"[CharBoss] 黑球激发：玩家自己的黑暗球 ⇒ 只打对手侧 " +
+                                                  $"{SafeName(lowest)}（原版「全场血最少」可能落到玩家侧）");
+                        }
+                        return false;
+                    }
+                }
+                return true;      // 对手侧没得打 ⇒ 交还原版（原版同样什么都不做）
+            }
+
             var boss = BossOrbTargeting.BossOf(__instance);
             if (boss == null) return true;                       // 不是我们的球 ⇒ 原版
             var want = BossOrbTargeting.Preferred(boss);

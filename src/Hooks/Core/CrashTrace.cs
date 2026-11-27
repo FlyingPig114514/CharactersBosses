@@ -219,6 +219,17 @@ internal static class CrashTrace
 
         try
         {
+            // ★★ v0.2.980（用户 2026-11-27：「检查一下，目前本模组有没有什么其它地方写了隐私信息？」）：
+            //   这个文件**以前完全没脱敏**，实测里面有 16 处 `C:\Users\<用户名>\…` 和 3 处 17 位 SteamID
+            //   （都来自游戏自己的异常消息，例如 `Could not find file 'C:\Users\<名字>\AppData\…'`、
+            //     `Save is invalid! … Local ID: 7656…9423`）。而 v0.2.976 起它会被
+            //   **打进玩家要发给作者的 zip** ⇒ 必须在这里过一遍 `Redact`（代号规则不变，照样能定位问题）。
+            line = Redact.Text(line);
+        }
+        catch { /* 脱敏失败也要落盘（宁可多一条真 ID，也不能丢面包屑） */ }
+
+        try
+        {
             lock (Gate)
             {
                 var dir = Path.GetDirectoryName(FilePath);

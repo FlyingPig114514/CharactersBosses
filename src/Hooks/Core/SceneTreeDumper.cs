@@ -32,6 +32,10 @@ internal sealed partial class SceneTreeDumper : Node
             if (Engine.GetMainLoop() is not SceneTree tree) return;
             _inst = new SceneTreeDumper { Name = "CharacterBossesTreeDumper" };
             tree.Root.AddChild(_inst);
+            // ★ v0.2.976：这三条只是**冗余通道**，真正判键/去重/派发在 `Core.HotkeyRouter`
+            //   （原来只开 `_UnhandledKeyInput`，实测一次都没被调到过 —— F8 那条同时失效）。
+            _inst.SetProcessInput(true);
+            _inst.SetProcessUnhandledInput(true);
             _inst.SetProcessUnhandledKeyInput(true);
             Logger.Log($"[CharBoss] 场景树导出：按 **F9** 导出到 {TargetPath()}（战斗房子树另存一条）");
         }
@@ -44,19 +48,10 @@ internal sealed partial class SceneTreeDumper : Node
     private static string TargetPath()
         => Path.Combine(OS.GetUserDataDir(), "scene_tree.txt");
 
-    public override void _UnhandledKeyInput(InputEvent @event)
-    {
-        try
-        {
-            if (@event is not InputEventKey key || !key.Pressed || key.Echo) return;
-            if (key.Keycode != Key.F9 && key.PhysicalKeycode != Key.F9) return;
-            DumpAll();
-        }
-        catch (Exception e)
-        {
-            Logger.Log("[CharBoss] 场景树导出失败: " + e.Message);
-        }
-    }
+    // ── 触发：统一交给 HotkeyRouter（v0.2.976 起它同时挂着游戏的 `NGame._Input`，见 HotkeyPatches.cs） ──
+    public override void _Input(InputEvent @event) => HotkeyRouter.Handle(@event, "tree.node._Input");
+    public override void _UnhandledInput(InputEvent @event) => HotkeyRouter.Handle(@event, "tree.node._UnhandledInput");
+    public override void _UnhandledKeyInput(InputEvent @event) => HotkeyRouter.Handle(@event, "tree.node._UnhandledKeyInput");
 
     /// <summary>导整棵树 + （有战斗时）战斗房子树。</summary>
     internal static void DumpAll()
@@ -67,7 +62,7 @@ internal sealed partial class SceneTreeDumper : Node
 
             var (text, lines) = Dump(tree.Root);
             var path = TargetPath();
-            File.WriteAllText(path, text, new UTF8Encoding(false));
+            File.WriteAllText(path, Mask(text), new UTF8Encoding(false));
             Logger.Log($"[CharBoss] 场景树已导出：{path}（{lines} 行）");
 
             var combat = NCombatRoom.Instance;
@@ -75,7 +70,7 @@ internal sealed partial class SceneTreeDumper : Node
             {
                 var (ctext, clines) = Dump(combat);
                 var cpath = Path.Combine(OS.GetUserDataDir(), "scene_tree_combat.txt");
-                File.WriteAllText(cpath, ctext, new UTF8Encoding(false));
+                File.WriteAllText(cpath, Mask(ctext), new UTF8Encoding(false));
                 Logger.Log($"[CharBoss] 战斗房子树已导出：{cpath}（{clines} 行）");
             }
         }
@@ -83,6 +78,16 @@ internal sealed partial class SceneTreeDumper : Node
         {
             Logger.Log("[CharBoss] 场景树导出（整体）失败: " + e.Message);
         }
+    }
+
+    /// <summary>
+    /// ★★ v0.2.980：落盘前统一脱敏。节点树里全是**界面上的文字**（`text="…"`），
+    /// 里面可能有玩家昵称 / 绝对路径 / Steam 目录名 ⇒ 玩家把 `scene_tree.txt` 发出来时不该带这些。
+    /// 脱敏失败就原样写（宁可多带一行，也不能让导出失败）。
+    /// </summary>
+    private static string Mask(string text)
+    {
+        try { return Redact.Text(text); } catch { return text; }
     }
 
     /// <summary>把一个节点子树写成缩进文本。</summary>

@@ -54,6 +54,9 @@ public sealed class BossConfigModConfig : SimpleModConfig
             optionContainer.AddChild(CreateDividerControl());
             BuildTelemetrySection(optionContainer);
             optionContainer.AddChild(CreateDividerControl());
+            // A7（用户 2026-11-27：「设置里加一个。手机端的日志会导到哪里？在设置那里写一下手机/电脑日志会保存到哪里」）
+            BuildLogSection(optionContainer);
+            optionContainer.AddChild(CreateDividerControl());
             // 用户 2026-11-08：斗蛐蛐专用的那一节，**只有装了怪物乱斗才出现**。
             if (CricketCompat.Installed)
             {
@@ -420,7 +423,122 @@ public sealed class BossConfigModConfig : SimpleModConfig
     }
 
     /// <summary>
-    /// A4 的状态文字。
+    /// **A7 · 日志在哪里 + 一键导出**（v0.2.978，用户 2026-11-27：
+    /// 「设置里加一个。手机端的日志会导到哪里？在设置那里写一下手机/电脑日志会保存到哪里，方便玩家找到发给我」）。
+    ///
+    /// 两件事：
+    ///   ① 把**本机实测的日志文件夹绝对路径**直接印在设置页上（PC / 手机各自不同，
+    ///      所以绝不写死 —— 一律现算 `SafeLogPatch.LogPath` 的目录，玩家照着找就行）；
+    ///   ② 一颗 **「导出」按钮** —— 手机没有键盘、按不了 F8，这是手机玩家的唯一入口；
+    ///      点完把**结果（行数 + txt 路径 + zip 路径）**直接显示在按钮下面那块文字里，
+    ///      玩家不用会看日志也能知道要发哪个文件。
+    ///
+    /// ⚠ BaseLib 排版那两个坑（见 <see cref="AddInlineRow"/> / <see cref="InfoLabel"/> 的注释）：
+    ///   行内控件用普通 `Button`（有文字就一定画得出来）、说明文字用 `InfoLabel`（`FitContent`，自己长高）。
+    /// </summary>
+    private void BuildLogSection(Control container)
+    {
+        container.AddChild(CreateSectionHeader("A7 · 日志在哪里 / 一键导出（报 bug 用）"));
+        container.AddChild(InfoLabel(LogWhereText()));
+        BuildLogExportRow(container);
+
+        try
+        {
+            Logger.Log($"[CharBoss] 配置界面：A7 日志区已构建（日志目录 {RecentLogDumper.LogDirectory()}）");
+        }
+        catch { /* 忽略 */ }
+    }
+
+    /// <summary>
+    /// 「日志存在哪儿」那段说明（内容按本机是电脑还是手机分开写）。
+    ///
+    /// ★ v0.2.979（用户 2026-11-27：「你这个写的怎么是我电脑上的路径，这不能让玩家看吧」）：
+    ///   路径是**运行时**在这台机器上算出来的（不是写死的），但**屏幕上绝不出现用户名** ——
+    ///   一律过 <see cref="PathDisplay.Mask"/>，把 `C:\Users\&lt;名字&gt;\AppData\Roaming` 换成 `%APPDATA%`。
+    ///   玩家照样能照着找（Win+R 粘 `%APPDATA%\SlayTheSpire2\logs` 就能打开），截图发出去也不会漏自己的名字。
+    /// </summary>
+    private static string LogWhereText()
+    {
+        string dir;
+        try { dir = RecentLogDumper.LogDirectoryFriendly(); }
+        catch { dir = "%APPDATA%\\SlayTheSpire2\\logs"; }
+
+        bool mobile;
+        try { mobile = LogLoudness.IsMobile; }
+        catch { mobile = false; }
+
+        var sb = new System.Text.StringBuilder();
+        if (mobile)
+        {
+            sb.Append("[b]日志就存在这个文件夹里（本机实测）[/b]\n");
+            sb.Append(dir).Append('\n');
+        }
+        else
+        {
+            sb.Append("[b]日志就存在这个文件夹里[/b]（下面这行粘到 Win+R 里就能打开）\n");
+            sb.Append(dir).Append('\n');
+        }
+
+        sb.Append("· [b]mod_log.txt[/b] —— 整份日志，会一直变大，[color=#8a8a8a]不用整份发[/color]\n");
+        sb.Append("· [b]characterbosses_recent.txt[/b] —— 最近约 1 小时的日志（按 F8 / 点下面的「导出」生成）\n");
+        sb.Append("· [b]characterbosses_report_日期_时间.zip[/b] —— 上面那份 + 崩溃面包屑 / 停摆 / 不同步报告，" +
+                  "[b]发这个最省事[/b]\n");
+
+        if (mobile)
+        {
+            sb.Append("\n[b]手机[/b]：没有键盘、按不了 F8 ⇒ 请用下面那颗「导出」按钮，点完这里会写出文件路径。\n");
+            sb.Append("上面那条路径就在游戏自己的数据目录里，Android 上一般是\n");
+            sb.Append("　内部存储/Android/data/《游戏包名》/files/.config/SlayTheSpire2/logs/\n");
+            sb.Append("[color=#8a8a8a]（不同启动器/打包版可能不一样，[/color][b]以本页上面那条为准[/b]" +
+                      "[color=#8a8a8a]；用文件管理器按它找，整个文件夹打包发我也行）[/color]");
+        }
+        else
+        {
+            sb.Append("\n[b]电脑[/b]：也是 %APPDATA%\\SlayTheSpire2\\logs —— \n");
+            sb.Append("Win+R → 粘贴 %APPDATA%\\SlayTheSpire2\\logs → 回车，直接打开这个文件夹。\n");
+            sb.Append("游戏里也可以随时按 [b]F8[/b] 导出最近日志（F9 是导出界面节点树，一般不用发）");
+        }
+
+        return sb.ToString();
+    }
+
+    /// <summary>「导出」按钮那一行 + 结果文字（结果里带绝对路径，玩家照着去找文件）。</summary>
+    private void BuildLogExportRow(Control container)
+    {
+        const string head = "导出最近日志（最近约 1 小时）+ 报告包";
+
+        var label = RowLabel(head);
+
+        var button = new Button
+        {
+            Text = "导出",
+            CustomMinimumSize = new Vector2(110, 44),
+            SizeFlagsVertical = Control.SizeFlags.ShrinkCenter,
+            FocusMode = Control.FocusModeEnum.All,
+        };
+
+        var result = InfoLabel("[color=#8a8a8a]（还没导出过：点左边的「导出」；电脑上也可以随时按 F8）[/color]");
+
+        button.Pressed += () =>
+        {
+            // Dump() 内部全包了 try/catch，这里再兜一层：按钮回调抛异常会打断整页 UI
+            try
+            {
+                string summary = CharacterBosses.Core.RecentLogDumper.Dump();
+                try { label.Text = head + "　[b]已导出[/b]"; } catch { /* 忽略 */ }
+                result.Text = summary;
+            }
+            catch (Exception e)
+            {
+                try { result.Text = "导出失败：" + e.Message; } catch { /* 忽略 */ }
+            }
+        };
+
+        AddInlineRow(container, button, label, "LogExportRow");
+        container.AddChild(result);
+    }
+
+    /// <summary>A4 的状态文字。
     /// ⚠ 用户 2026-10-29：「你这描述怎么前后矛盾？不勾应该是一定是角色 boss」
     /// —— 以前关的时候写成「勾了就一定是角色 Boss」，正好说反了。现在：
     ///   不勾 = **一定是角色 Boss**（就是完全替换）；勾上 = 原版 Boss 与角色 Boss 混抽。

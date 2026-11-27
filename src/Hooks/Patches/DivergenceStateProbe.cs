@@ -441,11 +441,19 @@ internal static class DivergenceStateProbe
         }
     }
 
-    /// <summary>把摘要追加进 `characterbosses_desync.txt`（失败一律忽略，绝不影响游戏）。</summary>
+    /// <summary>
+    /// 把摘要追加进 `characterbosses_desync.txt`（失败一律忽略，绝不影响游戏）。
+    ///
+    /// ★★ v0.2.980：**以前完全没脱敏**。实测这份文件里有 117 处 17 位 SteamID、40 处 `NetId=数字`
+    /// （摘要里到处是「玩家 7656119… / NetId=…」），而 v0.2.976 起它会被打进玩家发给作者的 zip
+    /// ⇒ 写之前先过 <see cref="Core.Redact.Text"/>（`P#xxxxxx` 代号规则不变，两端仍然对得上）。
+    /// </summary>
     private static void AppendToFile(string text)
     {
         try
         {
+            try { text = Core.Redact.Text(text); } catch { /* 脱敏失败也照旧写，不能丢报告 */ }
+
             string dir = System.IO.Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                 "SlayTheSpire2", "logs");

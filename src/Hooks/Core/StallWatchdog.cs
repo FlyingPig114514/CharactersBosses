@@ -192,13 +192,20 @@ internal static class StallWatchdog
         }
         sb.AppendLine("  提示：卡住期间后台线程仍在跑，所以这份报告能落盘；把整份文件发给作者即可。");
 
+        // ★★ v0.2.980（用户 2026-11-27 让我查隐私信息）：这份报告以前是**原样落盘**的，
+        //   里面既有各处的步骤路标（可能带玩家/路径），也有 `LastHandDuplicate` 的**完整调用栈**，
+        //   而 v0.2.976 起它会被打进玩家发给作者的 zip ⇒ 落盘前统一过一遍 `Redact.Text`。
+        string report;
+        try { report = Core.Redact.Text(sb.ToString()); }
+        catch { report = sb.ToString(); }        // 脱敏失败也要留报告
+
         try
         {
             string dir = Path.GetDirectoryName(path);
             if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
             using var fs = new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite,
                                           4096, FileOptions.WriteThrough);
-            byte[] bytes = new UTF8Encoding(false).GetBytes(sb.ToString());
+            byte[] bytes = new UTF8Encoding(false).GetBytes(report);
             fs.Write(bytes, 0, bytes.Length);
             fs.Flush(true);
         }

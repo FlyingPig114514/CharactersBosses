@@ -4,6 +4,7 @@ Learned preferences, project conventions, and corrections.
 
 ## Preferences
 
+- 【用户偏好·硬规矩】不要自己起游戏/驱动游戏做测试，除非用户明确说「去测试」。改完代码只需 3 份构建 0 错误 + install-mod.bat（[verify] OK），实机验证交给用户；他可以自己跑并回传 mod_log。另：不要用模拟鼠标/键盘/截图去操作他屏幕上的游戏（他会拒绝 danger-full-access），测试开关（charbosses_debug.txt / charbosses_open_config.txt）用完必须删掉。
 - 【用户 2026-11-19 明确要求】**不要在没说的时候打包 + 上传**：改完代码只做「双目标编译 0 错误 → 装机（install-mod）」并汇报；`pack-dist` / `upload-workshop` / `git push` 必须等用户明确说「打包」「上传」才做。（此前每轮自动发版，用户明确叫停。）
 - 角色第三人称（游戏内文案）：铁甲战士=他、储君=他（男）；静默猎手=她、亡灵契约师=她（女）；故障机器人=它（无性别）；愚者=杝（优先）/它（开发者说性别是树）。权威记录见 docs/plans/pronouns.md，含 power 键→角色的对照表。
 - 打包规则（用户 2026-11-06）：**只有用户明确说「打包」/「上传」时才生成 .dist 里那份 zip**；日常 `install-mod.bat` 不再自动打包（已改成要带 `pack` 参数）。中间版本全是 bug，留着没用，.dist 只保留已发布版本的 zip。
@@ -48,6 +49,8 @@ Learned preferences, project conventions, and corrections.
 - 本 mod 里 Boss 的影子 Player 也满足 Creature.IsPlayer（Creature.Player != null）⇒ 会出现在 CombatState.Players 里；凡「玩家」判定必须用 BossLockOn.RealPlayers（Creature.Monster == null 过滤），判断是否多人要用 MultiBossPlan.WantsSecondBoss（读 RunState.Players）。
 ## Do-Not-Repeat
 
+- 【Do-Not-Repeat】新增任何**落盘文件**（characterbosses_trace / _stall / _desync / scene_tree / 导出 zip 的附带文件）都必须在写之前过 `Core.Redact.Text`：`Redact` 只有两个调用点（LogRedactPatch 挂 Logger.Log + Telemetry），直接 File.WriteAllText/StreamWriter 的地方全都绕过它 —— v0.2.980 实测 trace.txt 有 16 处 C:\Users\<名字> + 3 处 SteamID、desync.txt 有 117 处 SteamID，而 F8 的 zip 会把这三份一起发给作者。另：`Redact` 的路径正则必须同时认反斜杠和正斜杠（Godot 的 OS.GetUserDataDir() 给 C:/Users/...），否则整条漏网。
+- 【Do-Not-Repeat】本模组里 new 出来的 Node（`partial class X : Node`，DLL 加载、无 res:// 脚本路径）收不到任何 Godot 虚回调：实测 `has_method("_input")=False`（虽然 `script=有`、`processInput=True`、节点在 /root 下）⇒ `_Input`/`_UnhandledKeyInput`/`_Process`/`Control.Resized` 全都不触发。要键盘热键就 Harmony 后缀挂游戏自己的输入入口（`NGame._Input(InputEvent)` / `NInputManager._UnhandledKeyInput(InputEvent)`，写死 typeof(InputEvent)，只旁听别 SetInputAsHandled），见 src/Hooks/Core/HotkeyPatches.cs + HotkeyRouter.cs（v0.2.977 实证可用）。
 - 地图图标里用户说的「飞镖」= **「飞镖」（Flechettes）卡图里那把飞刀**（`card_flechettes_big.png` → `tools/art/make-flechette-knife.ps1` 取亮部 + 只留最大连通块 → `refs/flechette_knife.png`），不是 `dart_tip45.png` 那对**蛇头柄匕首**。用 `Crop-Mask -KeepRight 0.52` 按比例裁 `dart_tip*` 会**切掉刀尖**（2026-11-21 来回改十几轮才发现）。另：白色形状垫在白色头像下面时，**长度小于头像宽度就完全被盖住**（实测刀宽 60~125 的产物墨点完全一致），这条几何约束决定尺寸下限。
 - 含中文的 .ps1 必须存成 UTF-8 **with BOM**：PS 5.1 遇到无 BOM 的 UTF-8 会按 ANSI(GBK) 解码，注释里的中文会变成乱码并可能吞掉下一行/吃掉引号，报「Missing closing '}'」这类假语法错。edit/write 工具写文件会**去掉 BOM** ⇒ 每次编辑含中文的 .ps1 之后都要用 `[System.IO.File]::WriteAllText($p,$t,UTF8Encoding($true))` 补回 BOM（注意用 .NET 读写，别用 Get-Content/Set-Content）。需要频繁改的脚本干脆只写 ASCII 注释。
 - PowerShell 变量名不区分大小写：局部变量绝不能与参数同名不同大小写（`$band` vs 参数 `$Band`、`$names` vs 参数 `$Names`）—— 前者赋值 byte[] 会报「Cannot convert System.Object[] to System.Int32」，后者 `$names = @()` 直接把参数清空、循环一次都不跑（2026-11-21 两个脚本各踩一次）。

@@ -32,7 +32,11 @@ public static class SafeLogPatch
     /// <summary>主线程与后台写手之间交换「待落盘行」的锁（只在内存里倒手，不做任何 IO）。</summary>
     private static readonly object Gate = new();
 
-    private static readonly string LogPath = Path.Combine(
+    /// <summary>
+    /// 日志本体路径。**唯一权威**：`RecentLogDumper`（F8 导出）按它读磁盘尾巴，
+    /// 不要在两处各算一遍路径（`OS.GetUserDataDir()` 与 `%APPDATA%` 在手机/不同平台上不一定一致）。
+    /// </summary>
+    internal static string LogPath { get; } = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
         "SlayTheSpire2", "logs", "mod_log.txt");
 

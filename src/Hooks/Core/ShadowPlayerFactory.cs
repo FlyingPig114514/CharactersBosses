@@ -306,47 +306,4 @@ public static class ShadowPlayerFactory
     /// <summary>影子 Player 的判定：既是 Player 又是 Monster 的 Creature。</summary>
     public static bool IsShadowBound(Creature? creature)
         => creature != null && creature.Player != null && creature.Monster != null;
-
-    /// <summary>
-    /// 让影子 Player 的「是否参与钩子广播」跟着生死走（**每帧调一次，只在翻转时做事**）。
-    ///
-    /// 为什么需要（用户 2026-11-27 联机卡死，见 <c>Patches/HookIterateNullCombatStatePatch</c>）：
-    /// 原版 <c>CombatState.IterateHookListeners</c> 里，**遗物/药水/球/卡**的入场门槛只有
-    /// <c>model.Owner.IsActiveForHooks</c>（能力的门槛才是 <c>Owner.CombatState != null</c>），
-    /// 而原版尸体身上根本不可能有遗物。我们的 Boss 把玩家那一套挂在怪物身上 ⇒
-    /// Boss 一死，它那十几件遗物仍然参与**每一次**钩子广播（佩尔的泪在敌方回合开始还要给能量，
-    /// 直接空引用炸掉整个回合循环）。这里把「她已死 ⇒ 关；她又活了 ⇒ 开」同步上去，
-    /// 让尸体不再冒充活的监听者。玩法侧零影响：我们没有任何逻辑读这个字段。
-    /// </summary>
-    internal static void SyncHookActivation(CharBossMonster boss)
-    {
-        try
-        {
-            var creature = boss.Creature;
-            var player = creature?.Player;
-            if (creature == null || player == null) return;
-
-            bool shouldBeActive = creature.IsAlive;
-            if (player.IsActiveForHooks == shouldBeActive) return;
-
-            // 用原版自己的开关（`Player.DeactivateHooks/ActivateHooks` 就是写这个字段），
-            // 保持「活 ⇒ 参与、死 ⇒ 不参与」这条原版口径。
-            if (shouldBeActive) player.ActivateHooks();
-            else player.DeactivateHooks();
-            Logger.Log($"[CharBoss] {boss.Def?.Key} 影子玩家的钩子参与权：IsActiveForHooks → {shouldBeActive}" +
-                       (shouldBeActive
-                           ? "（她又活了 ⇒ 遗物/能力重新参与广播）"
-                           : "（已死亡 ⇒ 遗物/能力不再参与钩子广播；原版尸体身上本来就没有遗物）"));
-        }
-        catch (Exception e)
-        {
-            // 每帧调用，失败后不要刷屏：只在第一次记一行
-            if (_hookSyncFailed) return;
-            _hookSyncFailed = true;
-            try { Logger.Log("[CharBoss] 影子玩家钩子参与权同步失败（后续静默）: " + e.Message); }
-            catch { /* 忽略 */ }
-        }
-    }
-
-    private static bool _hookSyncFailed;
 }

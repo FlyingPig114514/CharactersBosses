@@ -1664,6 +1664,13 @@
       "fix": "BossSlotReplacer.ReplaceOne 有「槽里已经是我们的一律跳过」的早退，观者模组卸掉后槽里留下的 WATCHER_* 永远不会被换掉；而恐惧模式的本幕支配只在「真的发生替换」时才对齐。修法：ReplaceOne 开头先过 BossKeys.FixUnavailableEncounter(vanilla, act) 换成本幕替补（读档校验/生成房间两个切点生效），ReplaceAll 末尾无条件调 DreadDominionSync.EnsureCurrentAct 重算支配。",
       "file": "src/Hooks/Patches/BossSlotPatches.cs",
       "at": "2026-11-25T06:13:43.232Z"
+    },
+    {
+      "id": "bug-255-mwz3a9om",
+      "error_message": "多人局：玩家自己的黑暗球（故障机器人）打到队友身上。日志 `黑球激发：静默猎手 的黑暗球 ⇒ 目标改为 P#c5d6a4`，而静默猎手身上根本没有充能球，且当时是玩家回合（侧=Player），受害者血量 52→35。",
+      "fix": "v0.2.981：BossOrbTargeting.BossOf 的 v0.2.969 兜底「Owner 认不出就问 BossHandUi.CurrentBoss」没有先排除真人玩家（真人 Player 的 Creature.Monster 为 null ⇒ 掉进兜底）⇒ 玩家的球被当成那只 Boss 的球并改写成它锁定的玩家。现在只有「Owner.Creature.Monster 就是我们的 Boss」或「这颗球在它影子玩家的 OrbQueue 里（对象身份比对）」才认领，主人是真人玩家一律放弃；另外给玩家自己的黑暗球加了一道与机制无关的兜底：目标只从 GetOpponentsOf(主人) 里按血最少取，永远打不到玩家侧。",
+      "file": "src/Hooks/Core/BossOrbTargeting.cs",
+      "at": "2026-11-27T14:41:18.982Z"
     }
   ]
 }

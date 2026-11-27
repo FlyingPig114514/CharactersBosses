@@ -926,13 +926,28 @@ public static class BossFrameTick
                 try
                 {
                     BossShadowPets.RemoveOnBossDeath(each);          // 内部：主人没死立刻返回
-                    // ★ v0.2.974：影子玩家的「钩子参与权」跟着生死走（死亡 ⇒ 关；她又活了 ⇒ 开）。
-                    //   原版 `CombatState.IterateHookListeners` 里遗物/药水/球/卡的门槛只有
-                    //   `Owner.IsActiveForHooks`，而原版尸体身上本来**没有遗物**；我们的 Boss 挂着玩家那一套，
-                    //   一死就成了「尸体还在每次钩子广播里发遗物效果」⇒「佩尔的泪」在敌方回合开始给能量时
-                    //   `player.Creature.CombatState` 已是 null ⇒ 原版 NRE ⇒ **回合循环整个死掉、只能重开房间**。
-                    //   本方法只在布尔值翻转时写一次属性 + 打一行日志（每帧成本 = 一次属性读 + 比较）。
-                    CharacterBosses.Core.ShadowPlayerFactory.SyncHookActivation(each);
+                    // ⚠⚠ v0.2.975：**绝对不要在这里把影子玩家的 `IsActiveForHooks` 关掉**
+                    //   （v0.2.974 试过「Boss 死 ⇒ DeactivateHooks()」，当天就出事故，见下）。
+                    //
+                    //   当时的目的：原版 `CombatState.Contains` 里遗物/药水/球/卡的门槛只有
+                    //   `Owner.IsActiveForHooks`，尸体挂着遗物就会在每次广播里继续发效果
+                    //   （「佩尔的泪」在敌方回合开始给能量 ⇒ `Creature.CombatState` 已是 null ⇒ 原版 NRE）。
+                    //
+                    //   但同一个开关**也管着能力（Power）**：`Contains(power)` =
+                    //   `Owner.CombatState != null && (Owner.Player?.IsActiveForHooks ?? true)`。
+                    //   而死亡钩子是这么分发的（反编译实证）：
+                    //     `CreatureCmd.KillWithoutCheckingWinCondition`：
+                    //       InvokeDiedEvent() → ShouldCreatureBeRemovedFromCombatAfterDeath →
+                    //       StartDeathAnim → await Hook.AfterDeath(...) → 之后才 RemoveCreature
+                    //     `Hook.AfterDeath` 走的是 `RunState.IterateHookListeners(combatState)`：
+                    //       先把**运行级**监听者（遗物/卡组/修正）逐个 await 完，
+                    //       **最后**才 `childCombatState.IterateHookListeners()` 建战斗级列表。
+                    //   ⇒ 我们一关掉影子玩家的钩子，尸体身上的 Power 就被 `Contains` 过滤掉，
+                    //     `ImpaledPower.AfterDeath`（「愚者的箭」扎在被打死的敌人身上时要松脱回收）
+                    //     根本不会被调用 ⇒ **箭矢永远不返还**（用户 2026-11-27 当天实测截图）。
+                    //   ⇒ 现在改回：影子玩家全程保持「参与钩子」。
+                    //   尸体遗物引发的那个 NRE 由 `Patches/HookIterateNullCombatStatePatch`
+                    //   与 `GainEnergyWithoutCombatStatePatch` 两处兜底挡住，不需要动这个开关。
                     CharacterBosses.Core.BossOsty.EnsureDeathHook(each);   // 一次性：挂「死→带走奥斯提」
                     CharacterBosses.Core.BossOsty.RemoveOnBossDeath(each);
                     // 无界命匣的「战斗开始召唤 5」：战斗真的开始了的第一帧补一次（用户 2026-11-04）

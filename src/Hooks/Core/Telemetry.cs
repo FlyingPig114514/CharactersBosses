@@ -918,13 +918,16 @@ public static class Telemetry
     }
 
 
-    /// <summary>配置界面显示用：一句话说明文件在哪。</summary>
+    /// <summary>
+    /// 配置界面显示用：一句话说明文件在哪。
+    /// ★ v0.2.979：过 <see cref="PathDisplay.Mask"/>，界面上不显示 `C:\Users\<玩家名>`。
+    /// </summary>
     internal static string DescribePath()
     {
         try
         {
             string path = FilePath;
-            return string.IsNullOrEmpty(path) ? "（拿不到配置目录）" : path;
+            return string.IsNullOrEmpty(path) ? "（拿不到配置目录）" : PathDisplay.Mask(path);
         }
         catch { return "（拿不到配置目录）"; }
     }

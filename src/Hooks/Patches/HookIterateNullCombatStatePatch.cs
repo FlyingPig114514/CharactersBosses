@@ -48,6 +48,20 @@ namespace CharacterBosses.Patches;
 ///
 /// 战斗状态为 null ⇒ 这次广播没有任何合法监听者可查 ⇒ 返回**空序列**（原版本来也只会 NRE）。
 /// 非 null 一律原样放行，玩法零改动；日志节流，避免刷屏。
+///
+/// ## ⚠ 别走的那条近路（v0.2.974 试过，v0.2.975 回滚）
+///
+/// 想过「Boss 一死就 `Player.DeactivateHooks()`，让尸体不再冒充活的监听者」。**不行**：
+/// 同一个 `IsActiveForHooks` 也管着**能力（Power）**——
+/// `CombatState.Contains(power)` = `Owner.CombatState != null &amp;&amp; (Owner.Player?.IsActiveForHooks ?? true)`。
+/// 而死亡钩子是「先跑运行级监听者、最后才建战斗级列表」：
+/// `CreatureCmd.KillWithoutCheckingWinCondition → InvokeDiedEvent → StartDeathAnim →
+/// await Hook.AfterDeath → (之后才 RemoveCreature)`，其中
+/// `Hook.AfterDeath` 用 `RunState.IterateHookListeners(combatState)`，它把
+/// `childCombatState.IterateHookListeners()` 放在**所有运行级监听者 await 完之后**才建。
+/// ⇒ 我们在死亡后的下一帧关掉影子玩家的钩子，尸体的 Power 就被过滤掉，
+/// `ImpaledPower.AfterDeath`（把「愚者的箭」从被打死的敌人身上松脱回收）不再被调用
+/// ⇒ **箭矢永久失踪**（用户 2026-11-27 实测）。所以这条路彻底封死，只保留本文件的两处兜底。
 /// </summary>
 [HarmonyPatch(typeof(Hook), "IterateCombatHookListeners")]
 internal static class HookIterateNullCombatStatePatch
