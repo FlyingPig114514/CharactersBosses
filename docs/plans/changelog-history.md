@@ -14,6 +14,287 @@
   （`.../releases/download/v0.2.968/CharacterBosses-v0.2.968.zip`，18,517,467 B，实测直链可下载），
   `releases/latest` 已指向 v0.2.968（全站现在共 2 个 Release：v0.2.967 / v0.2.968）。
 
+## v0.2.974（2026-11-27）：修「联机里一个 Boss 被毒死之后整场卡死」（原版回合循环 NRE）
+
+用户：「所有玩家选择回合结束，有一个 boss 被毒死，然后就卡住了」，附 `godot (47).log` / `godot (48).log`
+/ `mod_log (69).txt` / `mod_log (70).txt`（四人联机，房主 + 客人各一份）。
+
+### 铁证（两份 godot.log 各一次，内容完全一致）
+
+```
+[ERROR] Combat #18 turn loop died while its combat is in progress;
+        the combat is stuck until the room is restarted:
+System.NullReferenceException
+   at MegaCrit.Sts2.Core.Hooks.Hook.IterateCombatHookListeners(ICombatState combatState)+MoveNext()
+   at MegaCrit.Sts2.Core.Hooks.Hook.ModifyEnergyGain(ICombatState, Player, Decimal, IEnumerable`1&)
+   at MegaCrit.Sts2.Core.Commands.PlayerCmd.GainEnergy(Decimal, Player)
+   at MegaCrit.Sts2.Core.Models.Relics.PaelsTears.AfterSideTurnStart(CombatSide, IReadOnlyList`1, ICombatState)
+   at MegaCrit.Sts2.Core.Hooks.Hook.AfterSideTurnStart(ICombatState, CombatSide, IReadOnlyList`1)
+   at MegaCrit.Sts2.Core.Combat.CombatManager.StartTurn(CombatTurnState, Func`1)
+   ...   at MegaCrit.Sts2.Core.Models.Powers.PoisonPower.Trigger()  ...
+```
+
+对应 mod_log 的时刻：19:55:01「`FOOL_TAROT_BOSS 已死：移除 1 只装饰性随从`」→「`数据记录：FOOL_BOSS 已结束（死=True）`」
+→ 之后 54 秒只有看门狗在报「`战斗 N 秒没有任何推进（不是卡在玩家操作上）：side=Enemy … 她这一手停在「回合收尾完成(第4回合)」`」
+→ 19:55:56 玩家放弃（`StopMusic ← CloseToMenu`）。`死亡诊断` 里那只 Boss 的 powers 含 `POISON_POWER` ✓。
+
+### 根因（反编译实证）
+
+1. 敌方回合开始的钩子广播 `Hook.AfterSideTurnStart` 里**毒先生效**（`PoisonPower.AfterSideTurnStart → Trigger → Cmd.Wait`），
+   把带毒的「塔罗愚」打死（遗物清单实测：`FOOL_BOSS 遗物清单（12 件）：[…PAELS_TEARS…]`）；
+2. 那一次广播的监听者快照是**死亡之前**取好的（`CombatState.IterateHookListeners` 先建整个 List 再逐个 yield）
+   ⇒ 死掉的 Boss 身上 12 件遗物**照旧被调用**（原版尸体身上不可能有遗物，所以原版永远碰不到这个组合）；
+3. 「佩尔的泪」(`PaelsTears`) 判定 `participants.Contains(Owner.Creature) && HadLeftoverEnergy` 成立
+   ⇒ `PlayerCmd.GainEnergy(2, Owner)` ⇒ `<GainEnergy>` 第一行 `ICombatState combatState = player.Creature.CombatState;`
+   —— 而这只 Boss 已经死了（`CombatState.RemoveCreature` 会把 `Creature.CombatState` 置 null）
+   ⇒ `Hook.ModifyEnergyGain(null, …)` ⇒ `IterateCombatHookListeners(null)` ⇒ **NRE**；
+4. 这个异常把**整条回合循环**打死（原版自己打出 `the combat is stuck until the room is restarted`）
+   ⇒ 除重开房间没有任何恢复办法。
+
+### 修法（两层）
+
+- **兜底**（`Patches/HookIterateNullCombatStatePatch.cs`，新文件，两处）：
+  ① 广播收口 `Hook.IterateCombatHookListeners(ICombatState)` 前缀 —— 战斗状态为 null 就返回空序列
+  （本来也没有任何合法监听者可查）；
+  ② `PlayerCmd.GainEnergy(amount, player)` 前缀 —— `player.Creature.CombatState == null`（Boss 尸体）直接跳过，
+  因为这条链路在 `ModifyEnergyGain` 之后还有 `AfterModifyingEnergyGain` 与 `PlayerCombatState.GainEnergy`
+  两步，对尸体同样会炸。
+  两处都节流日志（前 3 次 + 每 10 秒一条）、广播那处前两次打调用栈；非 null 一律原样放行，玩法零改动。
+- **根因侧**（`Core/ShadowPlayerFactory.SyncHookActivation`，由 `BossFrameTick` 每帧调、只在翻转时动手）：
+  Boss 死 ⇒ `Player.DeactivateHooks()`、她又活了 ⇒ `ActivateHooks()`。
+  原版 `CombatState.Contains` 里遗物/药水/球/卡的门槛只有 `Owner.IsActiveForHooks`，
+  尸体挂着遗物就会在**之后每一次**广播里继续发效果，早关掉早干净。
+
+新增日志：`钩子广播兜底：战斗状态为 null ⇒ …（累计 N 次）`、
+`{KEY} 影子玩家的钩子参与权：IsActiveForHooks → False（已死亡 ⇒ 遗物/能力不再参与钩子广播）`。
+
+## v0.2.973（2026-11-27）：修「切视角后 Boss 单体攻击意图还是显示 0」
+
+用户：「切换操控的角色时 boss 的意图**不会跟着变**（我是指 boss 的单体攻击，比如玩家 A 被 boss A 锁定，
+我从玩家 B 切换到玩家 A，显示这个 boss 的单体攻击意图伤害还是 **0**，而没有正常显示）。」
+
+**原因**：意图里的伤害数字是**规划期按"当时的本机玩家"算好并缓存的** —— `BossIntentBuilder` 里有一条明确规则：
+
+```csharp
+// 这张牌的单体/随机攻击如果打的是**别人**，那对本地玩家来说它这一手就是 0 伤害
+// → 攻势意图显示 0（用户口径：不会打到我的意图对我显示 0）。
+Logger.Log($"[CharBoss] 意图按人清零：{entry} 打的是别人 → 对本地玩家显示 0");
+```
+
+v0.2.972 只重建了**面板**（把缓存里的意图节点重新排一遍），**没重算数值** ⇒ 面板上还是那份按旧视角算的 0。
+
+**修法**：`BossUiSession.EnsurePerspective` 在检测到 `LocalContext.NetId` 变化时，先对场上每只活着的我们的 Boss 调
+`CharBossMonster.RefreshPlannedIntents()`（这正是「能力变化自动重算意图」用的那个入口：无球 Boss 走
+`BladesGrowth.RecomputeAll(planTime:false)`，有球 Boss 走 `BossOrbSim` 逐张重算），**再**收面板 + `RequestRebuild`；
+「面板失踪自愈」那条兜底路径也顺带重算。
+
+日志：
+
+```
+[CharBoss] 本机操控的玩家变了：P#1 → P#101（切视角的模组改的是 LocalContext.NetId）⇒ 重算意图 + 重建 Boss 面板
+[CharBoss] 视角切换：已按新的本机玩家（P#101）重算 4 只 Boss 的意图数值
+[CharBoss] UI 会话重建请求：视角切换 P#1 → P#101
+```
+
+## v0.2.972（2026-11-27）：修「统帅模式切视角后所有 Boss 意图消失」
+
+用户截图：「使用统帅模式 mod 进入 Boss 战后，如果切换操控的玩家，**所有 Boss 的意图都会消失**。」
+
+### 原因
+
+我们这几套 Boss 界面（手牌栏面板 + 每个格子的意图行）挂在战斗房 UI 的 `%PlayContainer` 下面
+（`UI/BossHandUi.EnsurePanel`、`UI/BossHudLayer`）。而「切视角」的模组改 `LocalContext.NetId` 之后
+会把战斗 UI **重新绑定/替换**一遍（`CommanderMode.RebindCombat` → `Replace(old, fresh)`）⇒
+我们的面板跟着旧父节点一起被丢掉；而面板重建只在「她回合开始 / 数据变化」时才触发 ⇒ **整场都不再有意图**。
+（原版那条意图条我们本来就藏掉了（`HideVanillaBossIntentPatch`），所以看起来就是"一个意图都没有"。）
+
+### 修法
+
+新增 `UI/BossUiSession.EnsurePerspective()`（`BossFrameTick.Tick` 每帧调一次，只读一个 `ulong?`）：
+
+- 缓存 `LocalContext.NetId`；变了（且仍在战斗房里）就：
+  `BossHandUi.Clear()` → `BossSpecialUi.HideAll()` → `BossExtraStatusRow.HideAll()` → `BossHudLayer.Release()`
+  → `RequestRebuild("视角切换 P#A → P#B")`；
+- 帧驱动照原样消费这个请求（`ConsumeRebuildRequest` → 每帧重建 1 只 ⇒ `BossHandUi.RefreshForce`），
+  面板与意图行就重新挂回当前可见的父节点上；
+- 单人 / 普通联机时 `LocalContext.NetId` 不会变 ⇒ 这里一个字节都不做。
+
+日志：
+
+```
+[CharBoss] 本机操控的玩家变了：P#1 → P#101（切视角的模组改的是 LocalContext.NetId）⇒ 收掉旧面板并重建 Boss 面板与意图
+[CharBoss] UI 会话重建请求：视角切换 P#1 → P#101
+[CharBoss] UI 会话重建：N 只 Boss 的面板分 N 帧重新挂上（避免进房那一帧一次性卡顿）
+```
+
+另外补一条**面板失踪自愈**（`BossFrameTick.EnsurePanelsAttached`，1Hz 兜底）：每秒核一次
+「每只**活着**的 Boss 的手牌面板是否还在场景树里」，掉了就 `RequestRebuild` —— 这样即使对方换的是别的机制
+（不是改 `LocalContext.NetId`）也能自愈。日志：
+
+```
+[CharBoss] 面板失踪自愈：<Boss> 的手牌面板不在场景树里（切视角/战斗 UI 被重新绑定）⇒ 请求重建
+```
+
+## v0.2.971（2026-11-27）：修 v0.2.970 没生效 —— 宝箱投票改用 `LocalContext.NetId` 判据
+
+用户实测 v0.2.970 **没修好**。日志给出的线索很明确：
+
+```
+[13:03:39] [CharBoss] 尖塔搭子兼容：已就绪（统帅模式下宝箱遗物按「当前操控的座位」投票）
+（之后没有任何「宝箱那一票记在**当前操控的座位**」——一次都没接管）
+```
+
+### 第一版为什么没接管
+
+判据用的是 `AiTeammate.CommanderMode.Active` + `.Selected`。反编译看清了这两者的性质：
+
+```csharp
+internal static bool Active { get {
+    if (DuoSession.Current == null) { if (Enabled || DeveloperControl.Manual) return AiSession.Active; return false; }
+    return true; } }
+internal static Player? Selected => LocalContext.GetMe((IPlayerCollection)RunManager.Instance.DebugOnlyGetState());
+```
+
+`Selected` 只是 `LocalContext.GetMe` 的包装，而 `Active` 依赖它自己的会话/菜单状态 —— 在**宝箱房那一刻**
+这两个条件没同时成立，于是我们每次都 `return true` 交还原版。
+
+### 真正该比的两个 id（新判据）
+
+**① `TreasureRoomRelicSynchronizer.LocalPlayer` 是构造时定死的：**
+
+```csharp
+private readonly ulong _localPlayerId;
+private Player LocalPlayer => _runState.GetPlayer(_localPlayerId);
+```
+
+**② 「切视角」改的是游戏的 `LocalContext.NetId`：**
+
+```csharp
+public static Player? GetMe(IPlayerCollection? c) => NetId.HasValue && c != null ? c.GetPlayer(NetId.Value) : null;
+```
+
+⇒ **`LocalContext.NetId`（现在认为的"我"）≠ `_localPlayerId`（原版把票记给谁）时接管**，
+把票记到 `LocalContext.NetId` 那位名下；两者相同（单人 / 普通联机 / 视角就在 1 号位）⇒ `return true`，一个字节不改。
+这个判据与任何模组的内部状态无关，顺带对别的「切视角」类模组也成立；仍然只在装了 `AiTeammate` 时启用。
+
+### 同时加的两处诊断
+
+1. 解析结果一行：`_runState / _localPlayerId / _actionQueueSynchronizer / _currentRound / _predictedVote /
+   _currentRelics / VotesChanged / PlayerVote / PickRelicAction` 各自找到没（反射失败会立刻看出来）；
+2. **每次点击**一行探针（限流 20）：
+
+```
+[CharBoss] 宝箱投票探针：index=1｜LocalContext.NetId=101 ≠ _localPlayerId=1 ⇒ 接管，记到 P#101
+[CharBoss] 宝箱投票兼容：这一票记到 P#101（index=1，轮次 0；原版会记在本机玩家名下）
+```
+
+或 `两者相同（1）⇒ 原版` / `读不到 id（…）⇒ 原版` / `判据异常: …` —— 下次一看就知道是哪一种。
+
+## v0.2.970（2026-11-27）：兼容「穷仔的尖塔搭子」统帅模式下的宝箱遗物投票
+
+用户：「刚下了个本地多人的模组（和昨天的 AI 不一样，这次所有玩家都由我自己操控），然后又卡在宝箱那里了。
+只要非 1 号位的玩家选遗物，1 号位的就会跟着选，然后换玩家那个遗物又变成只剩 1 号位选了。」
+
+### 根因：原版那一票写死在本机玩家身上
+
+`godot.log`（Debug 级别）里两次不同座位的点击都是：
+
+```
+Relic index 1 (RELIC.HORN_CLEAT) is being picked by local player 1
+Sending message to clients to enqueue action NetPickRelicAction for player 1 index 1 round 0
+[Commander] perspective=101; transport=1        ← 视角已经切到 101 号座位了
+Relic index 0 (RELIC.VAJRA) is being picked by local player 1
+```
+
+反编译 `.refs/sts2_113.dll`：
+
+```csharp
+public void PickRelicLocally(int? index)
+{
+    _predictedVote = new PlayerVote { index = index, voteReceived = true };
+    _actionQueueSynchronizer.RequestEnqueue(new PickRelicAction(LocalPlayer, index, _currentRound));  // ← 写死 LocalPlayer
+    VotesChanged?.Invoke();
+}
+public void SkipRelicLocally() => PickRelicLocally(null);
+```
+
+`LocalPlayer` = **本机玩家**。统帅模式只切了视角/输入归属，没接管这一处 ⇒
+① 非 1 号位一点，票记到 1 号位（"1 号位跟着选"）；② 其他座位从未投票（"换回来只剩 1 号位选了"）；
+③ 同轮内 1 号位的票被反复覆盖 ⇒ 票凑不齐，宝箱就卡住。
+
+### 本地多人的那个模组是谁
+
+`mods\AiTeammate`（穷仔的尖塔搭子 0.2.1，`id=AiTeammate`）：它的「统帅模式」＝一台机器操控 2–4 席（最多 16）、
+按键/侧键切视角、关掉自动决策。反编译确认它暴露了 `AiTeammate.CommanderMode.Active` / `.Selected`（当前操控的座位），
+但它**没有**碰 `TreasureRoomRelicSynchronizer` 的投票。
+
+### 修法（本版已落地，`src/Hooks/Compat/AiTeammateTreasureCompat.cs`）
+
+- 宝箱开始投票时（`BeginRelicPicking` Postfix）反射解析 `AiTeammate.CommanderMode`，拿不到就永久静默；
+- `PickRelicLocally` 的 Prefix：**只在「装了 AiTeammate + 统帅模式活跃 + 当前操控的座位 ≠ 本机玩家」时接管**，
+  按原版一模一样的顺序重建那一票 —— `RequestEnqueue(new PickRelicAction(当前座位, index, _currentRound))`
+  → 设 `_predictedVote` → 触发 `VotesChanged`；其余情况 `return true`（一个字节都不改）；
+- `SkipRelicLocally` 原版就是 `PickRelicLocally(null)` ⇒ 放弃选遗物也一并修好，不用额外挂钩子；
+- 日志验证点：`[CharBoss] 尖塔搭子兼容：宝箱那一票记在**当前操控的座位** <名字>（index=N，轮次 0；原版会记在 1 号位）`。
+
+同时写了一份可直接转给作者的报告：`docs/plans/report-ai-teammate-treasure.md`
+（含反编译片段与建议补丁；作者在 `AiTeammate` 内修好后，我们这份会自动让位）。
+
+## v0.2.969（2026-11-26）：修电球/黑球不优先打「奥斯提·瓦皮」
+
+用户多人联机实测（截图：主 Boss 灵魂骨、彩虹机把一名玩家打死）：
+「故障机器人 boss 的电球和黑球好像还是不是优先攻击奥斯提/瓦皮」。
+
+查下来是**两个独立的原因**：
+
+**(a) 黑球的激发从来没有接管过。** v0.2.919 删掉过一个 `DarkOrbBossTargetPatch`，因为把目标塞给
+`DarkOrb.Passive` 会抛 `InvalidOperationException: Dark orbs cannot target creatures.`，而且那是
+「未观察的任务异常」，会在 finalizer 线程重抛、把整个进程打掉。但**被动**和**激发**是两回事：
+
+```csharp
+// DarkOrb.Evoke —— 真正造成伤害的地方（反编译 .refs/sts2_113.dll）
+var hittableEnemies = base.CombatState.HittableEnemies;
+if (hittableEnemies.Count == 0) return Array.Empty<Creature>();
+PlayEvokeSfx();
+Creature weakestEnemy = hittableEnemies.MinBy(c => c.CurrentHp);   // ← 全场血最少的敌人
+ActivateEvoke(new[] { weakestEnemy });
+await CreatureCmd.Damage(ctx, weakestEnemy, EvokeVal, ValueProp.Unpowered, base.Owner.Creature);
+```
+
+⇒ 新增 `DarkOrbEvokeTargetPatch`（`BossOrbTargeting.cs` 末尾）：只对「球的主人是我们的 Boss」把目标换成
+`BossOrbTargeting.Preferred(...)`（**先被锁定玩家的召唤物、没有才打玩家本人**），
+其余步骤（激发音效 / `ActivateEvoke` / `CreatureCmd.Damage` 的 `EvokeVal` 与 `ValueProp.Unpowered`）**逐字照抄原版**；
+被动仍然**不**塞目标（那条禁令不变）；不是我们的球 ⇒ `return true` 交还原版。
+
+**(b) 电球那条补丁在多人局里会悄悄放弃改写。** `BossOrbTargeting.BossOf()` 以前只要
+「球的 `Owner` 读不到 + 场上有多只我们的 Boss」就 `return null`（怕打错人）⇒ 选靶退回原版随机。
+现在多一层：先问「**当前正在行动的那只 Boss**」（`BossHandUi.CurrentBoss`，球是它回合里生成的），
+问不到才退回「场上唯一那只」。
+
+**(c) 宠物判据放宽。** 以前只认 `Creature.IsPet == true`；而**瓦皮（`MONSTER.WUPPY`，原版宠物）**
+这类只设了 `PetOwner` 的会被漏掉。现在「`PetOwner` 指向被锁定的那位玩家」即算召唤物（`IsPet` 只作附加确认）。
+另加限流诊断：`[CharBoss] 球目标：<Boss> 锁定=<玩家> ⇒ 优先打它的召唤物 <X>（场上候选 N 只）`
+／ `黑球激发：<Boss> 的黑暗球 ⇒ 目标改为 <X>（原版是「全场血最少的敌人」）`。
+
+> 顺带澄清一个容易误会的地方：**瓦皮的忠诚（`WUPPYS_LOYALTY_POWER`，原版）只吸收"攻击伤害"**，
+> 而电球/黑球的伤害是 `ValueProp.Unpowered`（不是攻击）⇒ 就算打在玩家身上瓦皮也不会替挡。
+> 所以「优先打瓦皮」只能靠**直接把它选成目标**，也就是上面这条规则。
+
+### 附：死亡提示「boss 名字写成亡灵契约师」—— 核对后**不是 bug**，改动已还原
+
+同一轮反馈里还有一条：「死亡提示是彩虹机的（这是对的）但是 boss 名字写的是亡灵契约师，这里应该是故障机器人」。
+
+核对结论：逻辑本来就没问题 ——
+- `BossLossMessageKillerPatch` 用的是**打死你的那只** Boss 的遭遇（`BossKillerTracker.KillerOf(character)`），
+  所以那屏拿到的确实是彩虹机的文案；
+- `{character}` 填的是**死者**的角色名，不是 Boss 名（那屏显示 `0/66`，亡灵契约师基础血正好 66
+  ⇒ 死者当时玩的就是亡灵契约师，于是读起来像「boss 是亡灵契约师」）。
+
+我一度把 4 条「把 Boss 放在句首」的中文文案改成「{character} 被[gold]Boss[/gold]…」的语序（彩虹机 / 灾厄骨 /
+抉择储 / 预见观），**用户随后指出原版本身也有很多语序颠倒的死亡提示、是我看错了** ⇒
+`content/localization/zhs/encounters.json` 已整体还原（`git diff` 与该文件 HEAD 完全一致），
+本版不含任何文案改动。
+
 ## v0.2.968（2026-11-26）：诊断增强 —— 帧回调「步骤路标」+ 滞留卡面的容器 dump
 
 玩家（**安卓**，跑的是 v0.2.964）报卡死，交上来两份日志。0.964 的日志只能告诉我们「最后一条日志停在哪」，

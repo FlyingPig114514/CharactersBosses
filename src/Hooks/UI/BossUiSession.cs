@@ -81,9 +81,95 @@ internal static class BossUiSession
         try { BossHudLayer.Release(); } catch { /* 忽略 */ }
     }
 
-    /// <summary>把上一场留下的面板 / 层 / 计数 / 锁定全部拆掉。</summary>
-    public static void Reset(string why)
+    /// <summary>「本机操控的玩家」上一次的 NetId（见 <see cref="EnsurePerspective"/>）。</summary>
+    private static ulong? _lastNetId;
+
+    /// <summary>请求一次面板重建（由帧驱动消费，见 <see cref="ConsumeRebuildRequest"/>）。</summary>
+    public static void RequestRebuild(string why)
     {
+        _rebuildRequested = true;
+        try { Logger.Log("[CharBoss] UI 会话重建请求：" + why); } catch { /* 忽略 */ }
+    }
+
+    /// <summary>
+    /// **每帧一次：本机操控的玩家变了就重建面板**（用户 2026-11-27 截图：「统帅模式下进入 Boss 战，
+    /// 一切换操控的玩家，**所有 Boss 的意图都会消失**」）。
+    ///
+    /// 为什么会消失：我们这几套 Boss 界面（手牌栏面板 + 每个格子的意图行）是挂在战斗房 UI
+    /// `%PlayContainer` 下面的（见 `BossHandUi.EnsurePanel` / `BossHudLayer`）。
+    /// 而「一台机器操控多个座位」的模组切视角时会改游戏的 `LocalContext.NetId`，并且会把战斗 UI
+    /// 重新绑定/替换一遍（`CommanderMode.RebindCombat` → `Replace(old, fresh)`）——
+    /// 我们的面板跟着旧父节点一起被丢掉，而面板重建只在「她回合开始 / 数据变化」时才触发
+    /// ⇒ **整场都不再有意图**。
+    ///
+    /// 判据与 <c>Compat/AiTeammateTreasureCompat</c> 一致：只看 `LocalContext.NetId`（游戏现在认为的"我"），
+    /// 变了就：收掉旧面板与自建层 → 请求一次重建（帧驱动会按「每帧 1 只」把它们重新挂回去）。
+    /// 单人 / 普通联机时 `LocalContext.NetId` 不会变 ⇒ 这里一个字节都不做。
+    /// </summary>
+    public static void EnsurePerspective()
+    {
+        try
+        {
+            ulong? now = null;
+            try { now = MegaCrit.Sts2.Core.Context.LocalContext.NetId; } catch { now = null; }
+            if (now == _lastNetId) return;
+
+            ulong? prev = _lastNetId;
+            _lastNetId = now;
+            if (prev == null || now == null) return;                       // 首次记录 / 离场：不算切换
+            if (NCombatRoom.Instance == null) return;                      // 不在战斗房：交给 EnsureFresh
+
+            Logger.Log($"[CharBoss] 本机操控的玩家变了：P#{prev} → P#{now}" +
+                       "（切视角的模组改的是 LocalContext.NetId）⇒ 重算意图 + 重建 Boss 面板");
+
+            // ★ v0.2.973（用户 2026-11-27：「切换操控的角色时 boss 的意图不会跟着变 —— 我从玩家 B 切到
+            //   玩家 A，boss A 的单体攻击意图伤害还是 0」）：
+            //   意图里的伤害数字是**规划期按「当时的本机玩家」算好并缓存的**（`BossIntentBuilder` 里
+            //   「她锁的不是本地玩家 ⇒ 对本地显示 0」那套规则）⇒ 视角换了必须**重算**，光重建面板没用
+            //   （面板只是把缓存里的意图节点重新排一遍）。这里先按新的本机玩家重算，再重建面板。
+            int refreshed = 0;
+            foreach (var boss in LiveBosses())
+            {
+                try { boss.RefreshPlannedIntents(); refreshed++; } catch { /* 单只失败不影响其它 */ }
+            }
+            if (refreshed > 0)
+            {
+                Logger.Log($"[CharBoss] 视角切换：已按新的本机玩家（P#{now}）重算 {refreshed} 只 Boss 的意图数值");
+            }
+
+            try { BossHandUi.Clear(); } catch { /* 忽略 */ }
+            try { BossSpecialUi.HideAll(); } catch { /* 忽略 */ }
+            try { BossExtraStatusRow.HideAll(); } catch { /* 忽略 */ }
+            try { BossHudLayer.Release(); } catch { /* 忽略 */ }
+
+            RequestRebuild($"视角切换 P#{prev} → P#{now}");
+        }
+        catch (Exception e)
+        {
+            Logger.Log("[CharBoss] 视角切换检查失败（忽略）: " + e.Message);
+        }
+    }
+
+    /// <summary>场上**还活着**的、我们模组的 Boss（视角切换后要重算它们各自缓存的意图数值）。</summary>
+    private static System.Collections.Generic.IEnumerable<Monsters.CharBossMonster> LiveBosses()
+    {
+        MegaCrit.Sts2.Core.Combat.CombatState? state = null;
+        try { state = MegaCrit.Sts2.Core.Combat.CombatManager.Instance?.DebugOnlyGetState(); }
+        catch { state = null; }
+        if (state == null) yield break;
+
+        foreach (var creature in state.Enemies)
+        {
+            if (creature?.Monster is not Monsters.CharBossMonster boss) continue;
+            bool alive = false;
+            try { alive = creature.IsAlive && !creature.IsDead; } catch { alive = false; }
+            if (!alive) continue;
+            yield return boss;
+        }
+    }
+
+    /// <summary>把上一场留下的面板 / 层 / 计数 / 锁定全部拆掉。</summary>
+    public static void Reset(string why)    {
         try
         {
             BossHandUi.Clear();

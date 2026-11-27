@@ -221,6 +221,11 @@ public static class BossFrameTick
         // 进新战斗房（斗蛐蛐连打第二场）时，把上一场留下的面板/层/翻侧计数全拆掉。
         try { Core.TickSteps.Enter("UI 会话自检"); } catch { /* 忽略 */ }
         CharacterBosses.UI.BossUiSession.EnsureFresh();
+        // ★ v0.2.972（用户 2026-11-27：「统帅模式进 Boss 战，一切换操控的玩家，所有 Boss 的意图都会消失」）：
+        //   切视角的模组改的是 `LocalContext.NetId`，并且会把战斗 UI 重新绑定一遍 ⇒ 我们挂在
+        //   `%PlayContainer` 下的面板与意图行会跟着旧父节点丢掉。这里每帧比一次 NetId，
+        //   变了就收掉旧面板并请求重建（帧驱动按「每帧 1 只」重新挂回来）。
+        try { CharacterBosses.UI.BossUiSession.EnsurePerspective(); } catch { /* 忽略 */ }
         // 场景树导出器（按 F9 导出，幂等挂载；用户 2026-11-11 要「能看各种节点」）
         try { Core.TickSteps.Enter("场景树/日志导出器挂载"); } catch { /* 忽略 */ }
         try { Core.SceneTreeDumper.Ensure(); } catch { /* 忽略 */ }
@@ -274,6 +279,56 @@ public static class BossFrameTick
             try { Core.TickSteps.Enter("Tick 结束"); } catch { /* 忽略 */ }
         }
     }
+
+    /// <summary>
+    /// **面板失踪自愈**（v0.2.972，1Hz）：某只活着的 Boss 的手牌面板不在场景树里 ⇒ 请求重建。
+    ///
+    /// 为什么需要：切视角的模组会把战斗 UI 重新绑定/替换一遍，我们挂在 `%PlayContainer` 下的面板
+    /// 会连同旧父节点一起丢掉（用户 2026-11-27：「统帅模式切操控的玩家后所有 Boss 意图消失」）。
+    /// `EnsurePerspective` 只在 `LocalContext.NetId` 变化时触发；这一条不挑机制，任何原因导致面板掉了都能自愈。
+    /// </summary>
+    private static void EnsurePanelsAttached(List<Monsters.CharBossMonster>? bosses, long nowUsec)
+    {
+        if (bosses == null || bosses.Count == 0) return;
+        if (nowUsec - _lastPanelWatchdogUsec < 1_000_000L) return;
+        _lastPanelWatchdogUsec = nowUsec;
+
+        try
+        {
+            var state = MegaCrit.Sts2.Core.Combat.CombatManager.Instance?.DebugOnlyGetState();
+            if (state == null) return;
+
+            foreach (var each in bosses)
+            {
+                if (each == null) continue;
+                var creature = each.Creature;
+                if (creature == null) continue;
+                bool alive = false;
+                try { alive = creature.IsAlive && !creature.IsDead; } catch { alive = false; }
+                if (!alive) continue;
+
+                var panel = CharacterBosses.UI.BossHandUi.PanelFor(each);
+                bool attached = false;
+                try { attached = panel != null && GodotObject.IsInstanceValid(panel) && panel.IsInsideTree(); }
+                catch { attached = false; }
+                if (attached) continue;
+
+                if (_panelWatchdogLogs++ < 12)
+                {
+                    Logger.Log($"[CharBoss] 面板失踪自愈：{each.SafeEntryName()} 的手牌面板不在场景树里" +
+                               "（切视角/战斗 UI 被重新绑定）⇒ 请求重建");
+                }
+                // 顺便按「当前的本机玩家」重算它缓存的意图数值（单体攻击"对本地显示 0"那条规则依赖它）
+                try { each.RefreshPlannedIntents(); } catch { /* 忽略 */ }
+                CharacterBosses.UI.BossUiSession.RequestRebuild("面板失踪自愈");
+                return;
+            }
+        }
+        catch { /* 忽略 */ }
+    }
+
+    private static long _lastPanelWatchdogUsec;
+    private static int _panelWatchdogLogs;
 
     // ── 出牌队列卡死看门狗（诊断用，1Hz） ──────────────────────
 
@@ -847,6 +902,12 @@ public static class BossFrameTick
                 catch (Exception e) { Logger.Log("[CharBoss] 会话重建面板失败: " + e.Message); }
             }
 
+            // ★★ v0.2.972：**面板失踪自愈**（1Hz，兜底）。
+            //   切视角的模组如果换的是别的机制（不是改 LocalContext.NetId），上面那条就不会触发；
+            //   这里每秒核一次「每只活着的 Boss 的面板是否还在场景树里」，掉了就请求重建。
+            //   只在战斗进行中、且 Boss 活着时判 ⇒ 战斗结束/她阵亡时面板正常被收掉不会误判。
+            try { EnsurePanelsAttached(everyBoss, (long)now); } catch { /* 忽略 */ }
+
             // 药水真正变了（喝掉 / 炼出来 / 混沌药水补满）→ 立刻刷面板。
             // 有了这条，「哪段代码忘了调 Refresh」都不影响实时性：BossPotions.Version 是唯一真相。
             // 用 Refresh（增量）而不是 RefreshForce：只重画状态条与变了的格子，不整排清空。
@@ -865,6 +926,13 @@ public static class BossFrameTick
                 try
                 {
                     BossShadowPets.RemoveOnBossDeath(each);          // 内部：主人没死立刻返回
+                    // ★ v0.2.974：影子玩家的「钩子参与权」跟着生死走（死亡 ⇒ 关；她又活了 ⇒ 开）。
+                    //   原版 `CombatState.IterateHookListeners` 里遗物/药水/球/卡的门槛只有
+                    //   `Owner.IsActiveForHooks`，而原版尸体身上本来**没有遗物**；我们的 Boss 挂着玩家那一套，
+                    //   一死就成了「尸体还在每次钩子广播里发遗物效果」⇒「佩尔的泪」在敌方回合开始给能量时
+                    //   `player.Creature.CombatState` 已是 null ⇒ 原版 NRE ⇒ **回合循环整个死掉、只能重开房间**。
+                    //   本方法只在布尔值翻转时写一次属性 + 打一行日志（每帧成本 = 一次属性读 + 比较）。
+                    CharacterBosses.Core.ShadowPlayerFactory.SyncHookActivation(each);
                     CharacterBosses.Core.BossOsty.EnsureDeathHook(each);   // 一次性：挂「死→带走奥斯提」
                     CharacterBosses.Core.BossOsty.RemoveOnBossDeath(each);
                     // 无界命匣的「战斗开始召唤 5」：战斗真的开始了的第一帧补一次（用户 2026-11-04）
