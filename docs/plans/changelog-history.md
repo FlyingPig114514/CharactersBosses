@@ -4,6 +4,21 @@
 > 旧条目逐字来自 `git show HEAD:src/Hooks/Core/BuildInfo.cs` 的 Tag 常量（v0.2.871 及其之前，共 236 条）。
 > 最新版本（0.2.889）是当前 Tag，同时在各条 `workshop/changenote.txt` 里也有面向玩家的摘要。
 
+### 发布（2026-11-27 · v0.2.981）
+
+用户：「打包，上传创意工坊和github」。
+
+- 打包：`.dist\CharacterBosses-v0.2.981.zip`（**18,549,928 B**，6 个文件，17.69 MB）；
+  游戏 `mods\CharacterBosses`、`workshop\content\CharacterBosses`、`.dist\CharacterBosses` 三份的
+  5 个二进制 SHA256 逐一核对**一致**（dll `B4D63E7B1922` / Impl111 `596628C7C2C0` / Impl113 `B1E7C4998D4A` /
+  pck `CD71FF929D5E` / json `870E7C3105C8`），两份 Impl 的版本串都是 `v0.2.981`；
+- 创意工坊：上传成功（`Successfully uploaded` / `UPLOAD OK`；条目 **3830639796**，
+  `time_updated` = 2026-11-27 22:45:20 本地时间，`file_size` = 21,991,204，visibility=0 公开、banned=0）；
+- GitHub：`main` → `a28a48e`，tag `v0.2.981`；新建 **Release**（公开，id 460736498）并挂上 zip
+  （`.../releases/download/v0.2.981/CharacterBosses-v0.2.981.zip`，18,549,928 B），
+  `releases/latest` 已指向 v0.2.981（全站现在共 4 个 Release：v0.2.967 / v0.2.968 / v0.2.974 / v0.2.981）；
+- 工坊 `changenote.txt` 面向玩家的摘要覆盖 0.2.975 ~ 0.2.981（F8 导出 / 设置页 A7 / 隐私脱敏 / 两个修复）。
+
 ### 发布（2026-11-27）
 
 用户：「打包，上传创意工坊和github」。
