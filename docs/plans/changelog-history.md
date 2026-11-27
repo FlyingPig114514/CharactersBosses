@@ -4,6 +4,18 @@
 > 旧条目逐字来自 `git show HEAD:src/Hooks/Core/BuildInfo.cs` 的 Tag 常量（v0.2.871 及其之前，共 236 条）。
 > 最新版本（0.2.889）是当前 Tag，同时在各条 `workshop/changenote.txt` 里也有面向玩家的摘要。
 
+### 发布（2026-11-27）
+
+用户：「打包，上传创意工坊和github」。
+
+- 打包：`.dist\CharacterBosses-v0.2.974.zip`（18,528,502 B，6 个文件；游戏 `mods\CharacterBosses`、
+  `workshop\content\CharacterBosses`、`.dist\CharacterBosses` 三份的 5 个二进制 SHA256 逐一核对**一致**）；
+- 创意工坊：上传成功（条目 3830639796，`time_updated` = 2026-11-27 20:28:42，`file_size` = 21,946,145，
+  visibility=0 公开、banned=0）；
+- GitHub：`main` → `19f876d`，tag `v0.2.974`；新建 **Release**（公开）并挂上 zip
+  （`.../releases/download/v0.2.974/CharacterBosses-v0.2.974.zip`，18,528,502 B，直链实测 HTTP 200），
+  `releases/latest` 已指向 v0.2.974（全站现在共 3 个 Release：v0.2.967 / v0.2.968 / v0.2.974）。
+
 ### 发布（2026-11-26）
 
 用户：「打包。上传创意工坊、github」。
