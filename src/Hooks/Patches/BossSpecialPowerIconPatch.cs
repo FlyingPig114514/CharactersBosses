@@ -95,6 +95,33 @@ public static class BossSpecialPowerIconPatch
             return false;
         }
 
+#if STS2_111
+        // ★ v0.2.999（用户 2026-11-28）：「红蓝观恐惧模式下的时间扭曲并没有使用塔1的该buff的贴图，
+        //   描述也有问题。这个buff应该和塔1的时间扭曲完全相同」
+        //   ⇒ 图标 = **塔1 的时间扭曲那张**（金怀表）。从 `SlayTheSpire/desktop-1.0.jar` 的
+        //   `powers/powers.atlas` 里裁出 `128/time` 区域（xy 92,390 size 86,87，orig 128×128），
+        //   摆进 128×128 画布（偏移 21,20）→ `tools\art\import_proj\...\images\powers\time_warp.png`
+        //   → `tools\art\pck_extras.txt` 打进 PCK。
+        //
+        //   ⚠ 塔1 的触发特效 `TimeWarpTurnEndEffect` 用的就是**同一张图**
+        //   （反编译常量池：`AbstractPower.atlas.findRegion("128/time")`），
+        //   所以这里的图标和那边屏幕中央飞出来的大钟是**同一份资源**，不会出现「两个钟」。
+        if (__instance is Powers.BossTimeWarpPower)
+        {
+            const string warp = "res://CharacterBosses/images/powers/time_warp.png";
+            try
+            {
+                if (Godot.ResourceLoader.Exists(warp))
+                {
+                    __result = warp;
+                    return false;
+                }
+                Logger.Log("[CharBoss] 时间扭曲图标：PCK 里没有 " + warp + " ⇒ 退回好奇灯泡");
+            }
+            catch { /* 取不到就走下面的通用规则 */ }
+        }
+#endif
+
         // ★ 2026-11-23（用户「疾风观」）：「力竭」的图标就用**崩坠里力竭那张**（用户原话：
         //   「让力竭的图标就用崩坠中的力竭的图标」）。已经从 `Downfall.pck` 的
         //   `res://Awakened/images/powers/drained_power.png` 解出来、导入并打进我们的 PCK

@@ -260,17 +260,59 @@ public static partial class BossHandCard
         try
         {
             if (boss == null || row == null || !GodotObject.IsInstanceValid(row)) return;
-            if (AliveBossCount(boss) < 4) return;              // ≥4 只才启用
 
-            int plannedCards = 0;
-            try { plannedCards = boss.Plan?.Count ?? 0; } catch { plannedCards = 0; }
-            if (plannedCards <= 3) return;                      // 只糊「这一回合打 4 张以上」的 Boss
+            int bossCount = AliveBossCount(boss);
+            if (bossCount < 4) return;                          // ≥4 只才启用
 
-            if (IsLeftmostBoss(boss)) return;                   // 最左侧那只不受限
+            // ★★ v0.2.998（用户 2026-11-28：「我之前提的意图卡牌满足一定条件半透明似乎没有实现」）：
+            //   上一版用 `boss.Plan.Count > 3` 当判据 —— **`Plan` 在显示阶段常常已经空了**
+            //   （面板真正画的是 `DisplayPlays`：`BossHandPanel.Rebuild` 里那句
+            //    `boss.Plan.FirstOrDefault(...) ?? boss.DisplayPlays.FirstOrDefault(...)`）。
+            //   ⇒ `Plan.Count` 是 0 ⇒ 永远不满足 ⇒ 一次都没糊过。
+            //   现在取两者的**较大值**（她要打几张牌 = 计划 + 展示牌），再看是否 > 3。
+            int cards = Math.Max(SafeCount(boss.Plan), SafeCount(boss.DisplayPlays));
+            if (cards <= 3)
+            {
+                DiagOnce(boss, bossCount, cards, false, "牌数≤3");
+                return;
+            }
+
+            bool leftmost = IsLeftmostBoss(boss);
+            if (leftmost)
+            {
+                DiagOnce(boss, bossCount, cards, true, "最左侧不受限");
+                return;
+            }
 
             row.Modulate = new Color(1f, 1f, 1f, 0.45f);
+            DiagOnce(boss, bossCount, cards, false, "已设为半透明 0.45");
         }
         catch { /* 纯表现层，出问题就按原样显示 */ }
+    }
+
+    private static int SafeCount(System.Collections.Generic.List<PlannedPlay>? list)
+    {
+        try { return list?.Count ?? 0; } catch { return 0; }
+    }
+
+    /// <summary>每只 Boss 只打一次诊断（用户报「似乎没实现」时，这行能直接说明卡在哪一步）。</summary>
+    private static readonly System.Collections.Generic.HashSet<int> _fadeLogged = new();
+
+    private static void DiagOnce(CharBossMonster boss, int bossCount, int cards, bool leftmost, string what)
+    {
+        try
+        {
+            int id = System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(boss);
+            if (!_fadeLogged.Add(id)) return;
+            Logger.Log($"[CharBoss] 意图半透明：Boss={SafeName(boss)}（场上 {bossCount} 只、本回合 {cards} 张牌、" +
+                       $"最左={leftmost}）⇒ {what}");
+        }
+        catch { /* 纯诊断 */ }
+    }
+
+    private static string SafeName(CharBossMonster? boss)
+    {
+        try { return boss?.Id.Entry ?? "?"; } catch { return "?"; }
     }
 
     /// <summary>场上**活着的**我们的 Boss 有几只（拿不到返回 0 ⇒ 不启用半透明）。</summary>

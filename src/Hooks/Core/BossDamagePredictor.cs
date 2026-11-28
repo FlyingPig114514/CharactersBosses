@@ -1111,6 +1111,14 @@ public static class BossDamagePredictor
             decimal value = CharacterBosses.Core.GameCompat.ModifyDamage(run, combat, victim, dealer, baseDamage,
                 ValueProp.Move, cardSource,
                 ModifyDamageHookType.All, CardPreviewMode.None, out _);
+
+            // ★ v0.2.1002（用户 2026-11-28：「让施加易伤意图后的后续 boss 的攻击考虑新施加的易伤」）：
+            //   原版管道只知道「现在」的能力状态 ⇒ 同一个敌方回合里排在前面的 Boss 待会儿先挂上的易伤
+            //   它看不见，于是后面那记群攻的预览偏低（养手骨第 4 回合「击掌」群体易伤 + 巨石战「彼岸咆哮」群攻）。
+            //   这里在**没取整之前**乘上前瞻倍率（1.0 / 1.5 / 摧残时 2.0），详见 Core.VulnerableLookahead。
+            try { value *= CharacterBosses.Core.VulnerableLookahead.MultiplierFor(dealer, victim, cardSource); }
+            catch { /* 前瞻失败绝不影响原数字 */ }
+
             int result = Math.Max(0, FloorToInt(value));
 
             string entry = cardSource != null ? SafeEntryOf(cardSource) : "(无卡源)";

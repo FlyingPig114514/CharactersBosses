@@ -161,11 +161,13 @@
     "BOSS_ESTABLISHMENT_POWER.description_dread":  "あなたのターン終了時、あなたが保留したカードのコストをこの戦闘中1増やす。",
     "BOSS_OMNISCIENCE_POWER.title":  "全知",     "BOSS_OMNISCIENCE_POWER.description": "Whenever the Watcher triggers [gold]Foresight[/gold], you Scry 2.",     "BOSS_OMNISCIENCE_POWER.description_dread": "Whenever the Watcher triggers [gold]Foresight[/gold], discard a random card from your draw pile.",
 "BOSS_TEMPERANCE_POWER.title": "Temperance",
-"BOSS_TEMPERANCE_POWER.description": "Whenever the Watcher plays 12 cards, she forcibly ends her own turn and she and her other allies gain 2 Strength.\nWarning: the Watcher starts her infinite loop on turn 12.",
-"BOSS_TEMPERANCE_POWER.description_dread": "Whenever the Watcher plays 12 cards, she forcibly ends her own turn and she and her other allies gain 2 Strength. In addition, [gold]Time Warp[/gold] counts your cards: every 12 cards you play, the Watcher forcibly ends your turn.\nWarning: the Watcher starts her infinite loop on turn 12.",
+"BOSS_TEMPERANCE_POWER.description": "Whenever the Watcher plays 12 cards, she forcibly ends her own turn, and at the start of the players' next turn she and her other allies gain 2 Strength.\nWarning: the Watcher starts her infinite loop on turn 12.",
+"BOSS_TEMPERANCE_POWER.description_dread": "Whenever the Watcher plays 12 cards, she forcibly ends her own turn, and at the start of the players' next turn she and her other allies gain 2 Strength. In addition, [gold]Time Warp[/gold] counts your cards: every 12 cards you play, the Watcher forcibly ends your turn.\nWarning: the Watcher starts her infinite loop on turn 12.",
     "BOSS_FLURRY_POWER.title":  "ボウリングバッシュ",
     "BOSS_FLURRY_POWER.description":  "ウォッチャーが[gold]連打[/gold]を手札に戻すたび、あなたも捨て札からランダムなカード1枚を手札に戻す。彼女の「断食」によって、彼女がターン開始時にエネルギーを失うことはない。",
     "BOSS_FLURRY_POWER.description_dread":  "ウォッチャーが[gold]連打[/gold]を手札に戻すたび、あなたも捨て札からランダムなカード1枚を手札に戻す。\n彼女の「断食」によって、彼女がターン開始時にエネルギーを失うことはない。",
     "FLURRY_DRAINED_POWER.title":  "枯渇",
-    "FLURRY_DRAINED_POWER.description":  "次のターン、{Amount}[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]を失う。"
+    "FLURRY_DRAINED_POWER.description":  "次のターン、{Amount}[img]res://images/packed/sprite_fonts/watcher_energy_icon.png[/img]を失う。",
+    "BOSS_TIME_WARP_POWER.title": "Time Warp",
+    "BOSS_TIME_WARP_POWER.description": "Whenever you play 12 cards, your turn is forcibly ended."
 }

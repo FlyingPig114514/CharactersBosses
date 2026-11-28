@@ -72,6 +72,282 @@
   （`.../releases/download/v0.2.968/CharacterBosses-v0.2.968.zip`，18,517,467 B，实测直链可下载），
   `releases/latest` 已指向 v0.2.968（全站现在共 2 个 Release：v0.2.967 / v0.2.968）。
 
+## v0.2.1002（2026-11-28）：节制力量延后到玩家回合开始 / 时间扭曲不再给力量 / 意图预览吃「前面 Boss 先挂的易伤」
+
+用户三条：
+
+1. 「让观者的时间扭曲不会在强制终止玩家回合时让所有 boss 获得 2 力量」；
+2. 「特殊效果节制改为（只是改了获得力量的时机，恐惧模式下仍会获得时间扭曲）：每当观者打出 12 张牌，
+   她就会强制结束自己的回合**并在玩家的下回合开始时**使她和她的其他友方获得 2 点力量。警告：观者会在第12回合开始无限。」；
+3. 「让施加易伤意图后的后续 boss 的攻击考虑新施加的易伤」。
+
+### ① 时间扭曲不再给力量
+
+`BossTimeWarpPower` 触发时只做两件事：**强制结束被锁定玩家的回合** + 塔1 那套特效（金边闪光 / 钟 / 音效）。
+`StrengthPower` 那一段整个删掉（塔1 原版确实会给怪 +2，但在本模组里那等于**全场 Boss 一起变强**）。
+16 语言的 `BOSS_TIME_WARP_POWER.description` 同步改成：
+
+- zhs：「你每打出 12 张牌，观者就会强制结束你的回合。」
+- eng：`Whenever you play 12 cards, your turn is forcibly ended.`
+
+### ② 节制：力量改成「玩家的下回合开始时」到账
+
+`BossTemperancePower.TriggerAsync` 不再当场 `PowerCmd.Apply<StrengthPower>`，改成把
+`_pendingStrengthGrants++`（欠账计数），由新重写的
+`AfterSideTurnStart(CombatSide side, …)` 在 **`side == Player`** 时结算：她 + 她的其他友方各 +2。
+（用 `AfterSideTurnStart` 而不是 `AfterPlayerTurnStart`：后者是**每个玩家**各派发一次，多人局要去重；
+前者正好是「玩家这一方回合开始」一次。）
+
+文案（16 语言全覆盖）：`BOSS_TEMPERANCE_POWER.description` / `.description_dread` 与 monsters 表的
+`WATCHER_RUSHDOWN_BOSS.temperance` / `temperance_dread` 都改成「…强制结束自己的回合，并在玩家的下回合开始时…」。
+
+### ③ 意图预览：把「同回合排在前面那只 Boss 先挂的易伤」算进来（新增 `Core/VulnerableLookahead.cs`）
+
+**问题**（用户口径）：原版所有会施加易伤的怪都排在最后一个行动，就是为了避免「假意图」；但我们的 Boss
+每个都可能打易伤牌，有的还是群体易伤 ⇒ 排在后面的 Boss 那记攻击的预览没算上刚被挂上的易伤，数字偏低。
+用户的例子：**养手骨**第 4 回合「击掌」（奥斯提对所有敌人 11 伤 + 2 层易伤）+ **巨石战**「彼岸咆哮」（群攻）。
+
+**算法**（在 `BossDamagePredictor.FinalDamageFor` 里、**floor 之前**乘倍率）：
+
+```
+现场状态：已经带易伤的真人玩家先记进集合
+for Boss in 行动次序（CombatState.Enemies 顺序）里排在我前面的每一只：
+    for 它本回合计划要打的每一张牌：
+        · 苦难（MISERY）：把「被它锁定的那位」身上的负面逐种复制给其他玩家
+                          ⇒ 被锁定那位此时会带易伤的话，其他人也会被「传染」
+        · 会挂易伤的牌：DynamicVars.Vulnerable 存在 且 TargetType != Self
+            - TargetType.AllEnemies（击掌这类）⇒ 所有玩家都会带上
+            - 单体（痛击这类）        ⇒ 只有它计划打的那个目标会带上
+结论：目标玩家「现在没有易伤」但「轮到它出手时会有」⇒ 预览 ×1.5（目标带摧残 DEBILITATE 时 ×2）
+```
+
+**判据来源（反编译 `.refs\\sts2_111.dll` 实证，不是牌名清单）**：
+
+- `Bash`（痛击）：`PowerCmd.Apply<VulnerablePower>(ctx, cardPlay.Target, DynamicVars.Vulnerable.BaseValue, …)`，
+  `new PowerVar<VulnerablePower>(2m)` ⇒ **动态变量的键名就是 `Vulnerable`**；
+- `HighFive`（击掌）：`Apply<VulnerablePower>(ctx, CombatState.HittableEnemies, …)`，`TargetType.AllEnemies`；
+- `HowlFromBeyond`（彼岸咆哮）：`DamageCmd.Attack(...).TargetingAllOpponents(...)`，`TargetType.AllEnemies`（群攻）。
+
+**刻意不碰的**：无来源伤害（球 / 灾厄 / 血肉戏法）根本不走这条管道；目标**现在就有易伤**时不乘（原版管道已算）；
+召唤物 / Boss 的影子玩家；dealer 不是我们的 Boss（原版怪物一个字节都不动）。
+每次生效会记一行诊断：`易伤前瞻：<牌> 的伤害预览 ×1.5（P/NetId=… 现在没有易伤，但排在 <Boss> 前面的 Boss 会先给它挂上；摧残=False）`。
+
+### 未验证（等你实机）
+
+- 恐惧模式：你打满 12 张 / 她打满 12 张都只结束回合、**不再加力量**；
+- 节制触发后：她的下一个「结束自己回合」→ **玩家侧回合开始时**她与友方 +2（日志 `节制：玩家的回合开始 ⇒ 她与友方 +2 力量到账`）；
+- 多人：养手骨「击掌」在先、巨石战「彼岸咆哮」在后时，**彼岸咆哮的预览应当比之前高 50%**（有摧残则是 100%）。
+
+## v0.2.1001（2026-11-28）：版本号口径改回 0.2.x 四位数 + 时间扭曲只记「被她锁定」那位玩家的出牌
+
+用户两条：
+
+1. 「把版本号改回 0.2.1001 这个样子，先不升大版本」；
+2. 「确保恐惧模式多人联机时时间扭曲只记录被其锁定的玩家的出牌」。
+
+### ① 版本号口径
+
+从本版起版本串写成 **`0.2.NNNN`**（`0.2.999` 之后**不再进 0.3.x**），下一版是 `0.2.1002`。
+上文两条原本写作 `v0.3.000` / `v0.3.001` 的未发布版本，现读作 **`0.2.1000` 的两步**（已在标题里标注）。
+
+### ② 时间扭曲的记账（`BossTimeWarpPower.AfterCardPlayed`）
+
+多人局以前只用 `BossLockOn.PureVictim` 的结果跟出牌者比**引用**，两个隐患：
+
+- `PureVictim` 在「花名册还没到齐」时会返回 `null` ⇒ 那段时间**一张都不记**（和记错人一样是 bug）；
+- `Player` 实例在 `RunState` / `CombatState` / `CardModel.Owner` 里**未必是同一个对象**（SL 与联机同步后尤其如此）
+  ⇒ 引用比较可能把本该记的那位判掉，或反过来谁都判不住。
+
+现在：
+
+1. 锁定目标用**全项目统一入口** `BossLockOn.TargetFor(boss)`（内部已处理单人 / 多人纯函数 / 被锁玩家死亡重派 /
+   SL 换生物实例），取不到再退 `PureVictim`，再取不到而场上只有**一位**真人时就用那一位（单人兜底）；
+2. 玩家身份比较改成 **「引用相同 或 `NetId` 相同」**（`SamePlayer`）—— 跨实例也认得出是同一个人；
+3. **影子玩家的牌一律不算**：`shooter.Creature.Monster != null` 直接返回
+   （她自己的影子、以及**别的 Boss** 的影子玩家都会被这一条挡住，以前只挡了她自己那份）；
+4. 记 / 不记都留一行带 `NetId` 的诊断（日志里昵称常是 `[unknown]`，只有 NetId 能分清是谁）：
+   ```
+   时间扭曲：记 圣职者/NetId=114514 的第 3/12 张（锁定目标=圣职者/NetId=114514）
+   时间扭曲：不记 猎人/NetId=2233 的牌（她锁定的是 圣职者/NetId=114514）
+   ```
+
+⚠ 与「节制」的分工没变：节制只数**她自己**打出的牌；时间扭曲只数**被她锁定那位玩家**打出的牌。
+
+## v0.2.1000 → 修订（2026-11-28，原记作 v0.3.001）：钟再调 —— 中间那下「卡了一下」和尺寸偏大
+
+用户：「钟在屏幕中间转的时候卡了一下，并且钟的大小似乎有点大」
+
+- **卡顿的真因**：上一版（0.2.1000 第一步）的旋转 tween 在悬停段写的是 `TweenInterval(HoldSeconds)` ——
+  位置和缩放停住是想要的效果，但**旋转也被一起停住了整整 0.40s**，看起来就是「转着转着卡一下」。
+  现在旋转三段全部 `Linear` **匀速**（4.7 rad/s ≈ 0.75 圈/秒，0.42+0.40+0.62s 合计约 1 圈）：
+  `-0.55 → 1.42 → 3.30 → 6.22 rad`，中间不停。
+- 顺手去掉位移/缩放到达时的 `Back` 回弹（回弹本身也容易被看成第二下停顿），改用 `Cubic Out`；
+  悬停段改成「上浮 10px 再落回」（`Sine InOut`），整段没有一帧是完全静止的。
+- **尺寸**：0.40 屏短边 → **0.30 屏短边**（1920×1080 下贴图矩形 345px，可见怀表约 230px；
+  贴图 128×128 里怀表本身只占 86px，四周是透明留白）。
+
+## v0.2.1000（2026-11-28，原记作 v0.3.000）：时间扭曲特效按实机反馈重做 —— 黄光换成塔1 那张 borderGlow2，钟以前根本没出现
+
+用户：「触发的时候你那个黄光很明显和1代的不一样，并且也没有钟的动画出现」
+
+日志实证（`mod_log.txt` 16:48:06 / 16:48:24 两次触发）：`时间扭曲特效：…` 两行都在，
+`音效播放失败` / `辉光失败` / `时钟特效失败` / `PCK 里没有 …` **一条都没有**
+⇒ 代码确实跑到了，节点也建出来了，只是**屏幕上只看得见黄光、看不见钟**。
+
+### ① 黄光为什么不像（v0.2.999 是我自己拼的）
+
+塔1 `BorderFlashEffect` 用的是 `ImageMaster.BORDER_GLOW_2` —— 一张 **1280×720 的满屏「四周辉光」图**
+（`vfx/vfx.atlas` 的 `borderGlow2`，`xy 2,604 size 1280,720`；白图 + alpha：四角 A≈214、边中 A≈167、
+中间 A=0，往里递减），再用 `Gdx.gl.glBlendFunc(GL_ONE, GL_ONE)` **叠加** + `Color.GOLD` 着色。
+而我 0.2.999 是拼了 4 条纯色 `ColorRect`（硬边、无渐变）⇒ 观感完全是两回事。
+
+现在是同一份图：裁出来 ⇒ `res://CharacterBosses/images/vfx/border_glow_2.png`
+（`tools\art\pck_extras.txt` 3 行，现共 161 行）⇒ 铺满全屏 + `CanvasItemMaterial{BlendMode=Add}`
+叠加混合 + `(1, 0.82, 0.32)` 金色着色；淡入 0.10s、淡出 0.50s（塔1 约 0.5s）。
+
+### ② 钟为什么一个像素都没有
+
+0.2.999 的实现是 `Sprite2D` + **一条**复合 Tween：
+`SetParallel(true)` → 4 个属性 → `Chain().SetParallel(true)` → … → `Chain().TweenCallback`，
+初始状态 = 位置在屏幕下方、`modulate.a = 0`。
+而**同一次触发里黄光的 tween 是好的**（它是一条最朴素的顺序 tween）⇒ 分水岭就是
+`SetParallel` / `Chain` 那套复合写法：钟那条 tween 没有推进，节点一直停在「屏幕外 + 全透明」。
+
+改法（三重保险）：
+
+1. 钟改用 **`TextureRect`（Control）** —— 金边那条路已经证明 Control 在这个宿主里能正常渲染；
+2. **四条最简单的顺序 Tween**（`position` / `rotation` / `scale` / `modulate:a` 各一条），
+   全程不出现 `SetParallel` / `Chain`；
+3. **初始状态就可见**：不透明、满尺寸、贴在屏幕底边露出一截 ——
+   万一 tween 又不推进，屏幕上会留下一个静止的金怀表（一眼看得出），而不是又一片空白。
+
+动作仍是用户点名的「从屏幕下方飞上来 → 旋转悬停 → 掉下去淡出」：
+`RiseSeconds=0.42`（`Back Out`，冲过头再回弹）/ `HoldSeconds=0.40` / `FallSeconds=0.62`，
+旋转 `-0.55 → 0.55π → 1.75π`，缩放 `0.62× → 1×(≈0.40 屏短边) → 0.60×`。
+
+### ③ 新增诊断（下一轮日志能直接定位）
+
+- `时间扭曲：辉光已铺满全屏（图 1280×720 ⇒ 屏幕 WxH，叠加混合，tween 有效=True）`
+- `时间扭曲：钟已创建（贴图 128×128，缩放 x.xx×，宿主 CanvasLayer，inTree=True，屏幕 WxH，
+  起点 …，中央 …，tween 有效=True/True/True/True）`
+- `时间扭曲：钟的动画跑完了`
+
+### 未验证（等你实机）
+
+恐惧模式打满 12 张 / 她的「节制」触发时：**四周软金色辉光（塔1 那张图的边缘渐变）→ 钟从下方升上来
+旋转一圈 → 掉下去淡出**，配塔1 音效。若还是只有光没有钟，请把上面那三行诊断发我。
+
+## v0.2.999（2026-11-28）：红蓝观恐惧模式「时间扭曲」补齐塔1 那一套 —— 图标 / 描述 / 钟与金边闪光 / +2 力量
+
+用户：「目前红蓝观恐惧模式下的时间扭曲并没有使用塔1的该buff的贴图，描述也有问题。这个buff应该和塔1的时间扭曲完全相同。
+另外不论是她的特殊效果节制打满12张牌强制结束她的回合，还是玩家打满12张牌回合被她强制结束，
+都应该有塔1时间扭曲触发时的那个钟的特效（一个钟从屏幕下方飞上来旋转一下再掉下去，我记得是这样，你去查查）」
+
+### ① 塔1 到底长什么样（反编译 `D:\SteamLibrary\steamapps\common\SlayTheSpire\desktop-1.0.jar`，不是猜的）
+
+```java
+// com/megacrit/cardcrawl/powers/TimeWarpPower.class  ⇒ onAfterUseCard，计数归零那一刻
+AbstractDungeon.actionManager.callEndTurnEarlySequence();               // 你的回合强制结束
+AbstractDungeon.effectsQueue.add(new BorderFlashEffect(Color.GOLD));    // ① 屏幕四周金色闪光
+AbstractDungeon.topLevelEffectsQueue.add(new TimeWarpTurnEndEffect());  // ② 屏幕中央那个大钟
+for (AbstractMonster m : AbstractDungeon.getMonsters().monsters)
+    addToBot(new ApplyPowerAction(m, m, new StrengthPower(m, STR_AMT), STR_AMT)); // ③ 力量 +2
+
+// com/megacrit/cardcrawl/vfx/combat/TimeWarpTurnEndEffect.class
+img = AbstractPower.atlas.findRegion("128/time");   // ← 钟 = 「时间扭曲」能力图标那张金怀表
+// 插值：Interpolation.swingIn（弹一下放大）+ Interpolation.fade（淡出），Settings.scale 缩放
+```
+
+结论：**塔1 的钟不是另画的美术，就是把能力图标放大到屏幕中间**（同一份像素），
+并且只有「金边闪一下 + 弹出来」，jar 里并没有「从下方飞上来再掉下去」的位移
+（那是用户的记忆；用户点名要这个动作，所以按他的口径做成「上升 → 旋转悬停 → 落下淡出」，
+贴图仍是塔1 那张 ⇒ 两边看到的是同一个钟）。
+
+文本（jar 内 `localization/<lang>/powers.json` → `Time Warp`）：
+
+- eng：`Time Warp` / `Whenever you play 12 cards, ends your turn and gains 2 Strength.`
+- zhs：`时间扭曲` / `每当你打出 12 张牌，你的回合会强制结束，并且时间吞噬者获得 2 点力量。`
+
+### ② 图标（以前根本没有 —— 落到「好奇灯泡」）
+
+- 从 `powers/powers.atlas` 的 `128/time` 区域（`xy 92,390 size 86,87 orig 128×128`）裁出，摆进
+  128×128 画布偏移 `21,20` ⇒ `tools\art\import_proj\CharacterBosses\images\powers\time_warp.png`；
+- 跑 `Godot_v4.5.1-stable_mono_win64_console.exe --headless --path tools\art\import_proj --import`
+  生成 `.import` + `.godot/imported/time_warp.png-1af44ac5cfa495b3cceacbdbda46e1cb.ctex`；
+- `tools\art\pck_extras.txt` 追加 3 行（png / .import / ctex，现共 158 行）；
+- `BossSpecialPowerIconPatch` 里给 `Powers.BossTimeWarpPower` 指定
+  `res://CharacterBosses/images/powers/time_warp.png`（资源不存在时打一行日志再退回灯泡）。
+
+### ③ 描述（以前 powers 表里**一条 `BOSS_TIME_WARP_POWER` 都没有** ⇒ 提示框直接显示原始 key）
+
+16 语言（`zhs`/`zht` 中文，其余 14 种沿用本项目一贯的英文）：
+
+- `BOSS_TIME_WARP_POWER.title` = `时间扭曲` / `Time Warp`
+- `BOSS_TIME_WARP_POWER.description` = 「每当你打出 12 张牌，你的回合会强制结束，并且观者获得 2 点力量。」
+
+顺带把「节制」恐惧版文案（`BOSS_TEMPERANCE_POWER.description_dread`）与遭遇说明
+（`monsters.json` 的 `WATCHER_RUSHDOWN_BOSS.temperance_dread`）里
+「时间扭曲只结束你的回合」那半句补成「**并 +2 力量**」，与塔1 的行为对齐（16 语言全覆盖）。
+
+### ④ 行为：塔1 那三件事全搬
+
+`src\Hooks\Powers\BossTemperancePower.cs` 的 `BossTimeWarpPower.AfterCardPlayed`：
+
+1. 计**被这只 Boss 锁定玩家**的出牌，满 12 张 ⇒ `PlayerCmd.EndTurn(该玩家)`（原本就有）；
+2. `PowerCmd.Apply<StrengthPower>(ctx, Owner, 2, Owner)` ⇒ **她 +2 力量**（塔1 的 `STR_AMT`）；
+3. `Core.TimeWarpFx.Play(...)` ⇒ 金边闪光 + 那个钟 + 音效。
+
+「节制」（她打满 12 张结束她自己的回合）在 `BossTemperancePower.TriggerAsync` 里调同一个 `TimeWarpFx`。
+
+### ⑤ 特效实现：一行虚函数都不用
+
+`src\Hooks\Core\TimeWarpFx.cs` 重写（旧版是程序化画表盘、而且**从来没被调用过**）：
+
+- 贴图 `res://CharacterBosses/images/powers/time_warp.png`，音效
+  `res://CharacterBosses/audio/STS_SFX_TimeWarp.ogg`（与 jar 内 `audio/sound/STS_SFX_TimeWarp_v2.ogg`
+  **逐字节一致**，24105 B）；
+- 三段动作（合计 ≈1.5 s，与塔1 的 `duration` 同量级）：
+  `RiseSeconds=0.42`（`Back Out` 冲过头再回弹，最接近塔1 的 `swingIn`）、
+  `HoldSeconds=0.44`（旋转悬停）、`FallSeconds=0.62`（掉回屏幕下方 + 淡出）；
+  旋转 `-0.8π → 0.75π → 1.35π → 2.15π`，缩放 `0.35×→1×(≈0.36 屏短边)→0.94×→0.55×`；
+- 金边闪光：满屏容器 + 上下左右 4 条 `ColorRect`，`modulate:a` 0→0.85（0.09 s）→0（0.5 s），
+  颜色 `(1, 0.78, 0.28)`（塔1 的 `Color.GOLD`）；
+- ⚠ **本模组自己 `new` 出来的节点收不到 `_Process` / `_Draw` / `_Ready`**（实机量过
+  `has_method("_input")=False`）⇒ 全程只用原版内建节点（`Sprite2D` / `ColorRect`）+
+  引擎自己的 `Tween` 改 `position` / `rotation` / `scale` / `modulate:a`，收尾用 `TweenCallback`。
+  同款写法见 `UI/BossHandPlayFx`（出牌动画）。
+
+### 未验证（等你实机）
+
+- 恐惧模式下打满 12 张：应当看到**金边一闪 → 钟从下方升上来转一圈 → 掉下去**，同时听到塔1 那个音效，
+  她的力量 +2，你的回合结束；她自己的「节制」触发时是同一套；
+- Buff 栏的「时间扭曲」图标应当变成那张**金怀表**（不再是好奇灯泡），悬浮提示是
+  「每当你打出 12 张牌，你的回合会强制结束，并且观者获得 2 点力量。」
+
+## v0.2.998（2026-11-28）：意图半透明「似乎没实现」—— 判据用 `Plan`，而显示阶段 `Plan` 常已清空
+
+用户：「我之前提的 boss 意图卡牌满足一定条件半透明似乎没有实现」
+
+### 真因
+
+上一版（0.2.994）的判据是 `boss.Plan.Count > 3`。但面板**真正画的是 `DisplayPlays`**：
+
+```csharp
+// BossHandPanel.Rebuild（原地刷新那一段）
+var planned = stunned ? null : (boss.Plan.FirstOrDefault(p => ReferenceEquals(p.Card, cell.Card))
+                               ?? boss.DisplayPlays.FirstOrDefault(p => ReferenceEquals(p.Card, cell.Card)));
+```
+
+`Plan` 在显示阶段常常已经清空（或只剩还没打的那几张）⇒ `Plan.Count` 是 0 ⇒ **永远不满足** ⇒
+一次都没糊过（这与上一轮「用 `Plan.FindIndex` 查不到卡」是同一个原因，我当时只修了「按第几张判」那一半）。
+
+### 改法（`BossHandCard.ApplyCrowdedIntentFade`）
+
+- 牌数改成 `Math.Max(boss.Plan.Count, boss.DisplayPlays.Count)`（她要打几张 = 计划 + 展示牌）；
+- 每只 Boss 打**一行诊断**（HashSet 去重，一局一次）：
+  `意图半透明：Boss=<key>（场上 N 只、本回合 K 张牌、最左=是/否）⇒ 已设为半透明 0.45 / 牌数≤3 / 最左侧不受限`
+  —— 下次「还是没糊」时，这行能直接指出卡在哪一步（是 Boss 数不够、牌数不够、还是被判成最左）。
+
 ## v0.2.997（2026-11-28）：统帅模式下抉择储的选牌界面出不来 —— 弹界面前先把视角切到被锁定的玩家
 
 用户：「使用统帅模式 mod 操控多名玩家时，如果回合结束时没有切换到被抉择储锁定的玩家，抉择储就会自己选择
@@ -3850,4 +4126,3 @@ PS（触发时机）：「观者疾风连击的返回手牌时机：**当观者�
 ### v0.2.616 
 
 2026-11-13 (**dread: 炼药猎 = SerpentForm upgraded; 调制 unchanged (rollback v0.2.615)**) / 2026-11-13 (**dread: 炼药猎 调制 block absorb free**) / 2026-11-13 (**dread: 涂毒贼 poison unblockable**) / 2026-11-13 (**dread: 蛇眼猎 Murder scales on any draw**) / 2026-11-13 (**dread: 蛇咬猎 player shuffle 3 Snakebites**) / 2026-11-13 (**dread: 奇巧猎 命运同担 discard 2**) / 2026-11-13 (**dread: 巨石战 turns 1/7 extra Giant Rock+ (Enthralled -1 cost)**) / 2026-11-13 (**dread: Giant Rock doubled strength/plating**) / 2026-11-13 (**dread: 易伤战 主宰 2 weak + 2 frail**) / 2026-11-13 (**dread: 杂耍战 player strikes boost Perfected Strike**) / 2026-11-13 (**dread: 放血战 heal includes blocked damage**) / 2026-11-13 (**dread: 打击战 痛击 +1 per strike card**) / 2026-11-13 (**dread: 愤怒战 Orichalcum relic**) / 2026-11-13 (**dread: 事件机 turns 4/9 extra FeedingFrenzy+**) / 2026-11-13 (**dread: 能力机 免疫偏差认知**) / 2026-11-13 (**dread: 电球机 暴风雨+ at turns 3/10 + intent math**) / 2026-11-13 (**dread: 电球机 引雷针 3->5 cards, once per turn**) / 2026-11-13 (**恐惧批次：黑球机恐惧版 —— 冷光两张变手牌一张**) / 另含 2026-11-13（**恐惧批次：状态机恐惧版（同名「状态机」，效果与现状一致）**）／另含 v0.2.597 / 2026-11-13（**恐惧批次 4/5：彩虹机恐惧版（每 5 球 +2 集中）** —— 按用户规则「恐惧模式沿用普通模式的名字」，落地第 2 只：彩虹机「**彩虹**」。正常模式每 5 个充能球 +1 集中；恐惧模式 **+2**（`BossRainbowPower` 里按 `DreadMode.IsActive` 选 `focusGain`，Power 仍是同一个类，所以 `SpecialPowerDread` 不需要另指），文案 `DEFECT_BOSS.rainbow_dread`（16 语言，标题「彩虹」与正常模式逐字相同，正文 + 玻璃充能球的无来源警告）；`BossDefs` 的 `DEFECT_RAINBOW` 变体上填 `SpecialLocDread`。另含 v0.2.596 / 2026-11-13（**恐惧批次 3/5：第一只恐惧版特殊效果（物理机·人工合成 3→5）** —— 用户定的规则：「每个 boss 都用特殊效果，也都有特殊效果的名字；恐惧症模式下所有特殊效果都用和普通模式一样的名字」⇒ 恐惧版 = **同名**、效果更强。本轮落地第 1 只：物理机（`DEFECT_BOSS` 第二幕）「**人工合成**」——正常 3 层人工制品，恐惧模式 **5 层**：新增 `Powers/SynthesisDreadPower`（照 `SynthesisPower` 那套 `AfterApplied` 给 `ArtifactPower`，只是层数 5），并在 `DEFECT_BOSS` 的 `SpecialLocDreadByAct[1]` / `SpecialPowerDreadByAct[1]` 上接线；文案 `DEFECT_BOSS.synthesis_dread`（16 语言，标题行与正常模式逐字相同）。下一轮继续按角色推进其余 27 只。另含 v0.2.595 / 2026-11-13（**恐惧批次 2/5：辉星储升级黑洞 + 辉星收支核算** —— ①第 1 回合的「黑洞」改成**升级版**（用户「升级黑洞」）。②按用户要求核算「第 4 回合能不能打出七星」，反编译 0.113 取到的收支是：起始 3 星（天赋君权 `StarsVar(3)`）、辉光+ **+2**、汇流+ **下回合 +2**、太阳打击+ **+1**、隐秘藏品+ **+1**、其余（万向斩/王者之拳/剑雨/星界脉冲/花样百出）**无星费也无得星**，而七星的星费是 `CanonicalStarCost = 7` ⇒ 到第 4 回合手上是 **3+2+2+1+1 = 9 ≥ 7**，**七星本来就打得出**。所以「替换第 3 回合防御 / 第 4 回合隐秘藏品+」这两处**没有按原口径实施**，等用户确认是否仍要换（换的话还需要指定换成哪张）。另含 v0.2.594 / 2026-11-13（**恐惧批次 1/5：恐惧版特殊效果的地基 + 4 处普通模式改动** —— ①地基：`BossDefinition` 新增 `SpecialLocDreadByAct`/`SpecialPowerDreadByAct`、`BossVariant` 新增 `SpecialLocDread`/`SpecialPowerDread`，`SpecialLocForAct`/`SpecialPowerForAct` 在 `DreadMode.IsActive` 时优先取恐惧版（取不到退回正常版）⇒ 后续每只 Boss 只需补「恐惧版 Power + 两个字段 + 16 语言文案」。②刀猎第 4 回合：幻影之刃 → **精准+**（0 费；幻影之刃在 0.113 已被削到 8 点）。③养手骨第 5 回合：第一张来生 → **钙化+**（取消 v0.2.367 那张第二张来生，能量账仍是 3）。④蛇眼猎：普通模式特殊效果（`SILENT_BOSS.well_laid`）按用户要求补上「抱抱先生属于无来源伤害，带『为你而死』的召唤物不会替你承受」的警告（16 语言）。⑤仆从储「俯冲仆从」**无需改动**：0.113 已把 `MinionDiveBomb` 从 13 削到 **11**，而 `BossDefs` 里进阶 9 本来就 `UpgradeValueBy(2)` ⇒ 正好 11 / 进阶 9 起 13，与用户口径一致（已核对反编译）。⑥辉星储（升级黑洞 + 换第 3/4 回合让第 4 回合七星出得来）留到下一轮 —— 需要先精确算出各卡的辉星收支。另含 v0.2.593 / 2026-11-13（**恐惧模式（Dread）适配第一步：5 个角色支配 + 遭遇接线** —— 用户「适配恐惧模式，添加对应支配（不影响其他模式）」，并确认按「本幕 Boss 是哪个原版角色」挂。反编译确认机制：`DreadRunModel.ApplyCurrentDominion()` 取 `Act.BossEncounter ?? SecondBossEncounter` 的 `EncounterModel.GetDominion()` 塞进 `RunState.Dominion`，进 Boss 房时由 `RemoveDominionIfRoomIsBoss` 清掉 ⇒ 支配只在**本幕普通房间**生效；我们替换了每一幕 Boss 遭遇 ⇒ 以前恐惧模式会报 `... which doesn't have any dominion set!`。本轮：①新增 `Core/CharDominions.cs`：`DreadMode.IsActive`（`GameMode.Dread`）+ 5 个 `DominionModel` 子类 —— 铁甲战士（战斗开始给所有敌人 1 层恶魔形态）、静默猎手（战斗开始玩家 −1 力量 +1 虚弱）、储君（敌人攻击你 ⇒ 用原版 `MonarchsGazeStrengthDownPower` 本回合 −1 力量）、亡灵契约师（玩家回合开始随机一张手牌本回合 +1 费，走 `EnergyCost.AddThisCombat`）、故障机器人（玩家回合结束按敌人数 ×3 点伤害）；②`CharBossEncounterBase.GetDominion()` 按 `BossKeys.CharacterOf` 返回对应支配；③新增 16 语言的 `content/localization/<lang>/ascension.json`（`DREAD.<角色>.description`，与游戏 `ascension` 表的键式一致）。恐惧模式是 0.113.0 才有的类型（107 的 `GameMode` 里没有 Dread）⇒ 全部支配代码与 `GetDominion()` 覆盖都只在 `STS2_111` 构建里。注：28 只 Boss 的恐惧版特殊效果（同名加强）与 4 处普通模式剧本/数值改动留到下一轮。）另含 v0.2.592 / 2026-11-13（**文案「第九回合」→「第9回合」+ 幻影之刃削弱核对** —— ①用户要求把特殊效果文案里的中文数字改成阿拉伯数字：`BOSS_SUPPRESSION_POWER.description` / `.description_v113` / monsters 的 `SILENT_BOSS.suppression` 三处、zhs+zht 共 6 处「第九回合」→「第9回合」。②0.113.0 把「幻影之刃」从 9（升级 12）削到 **8（升级 11）**（反编译新 `PhantomBlades.CanonicalVars` = `PowerVar<PhantomBladesPower>(8m)`，`OnUpgrade` 仍 +3）。核对结论：**我们的意图预览没有任何写死的数字**，两处来源都是实时读 —— 已挂在身上时走 `PhantomShivs.AmountOf` → `GetPowerAmount<PhantomBladesPower>()`；还在手里时走 `BladesGrowth` 的 `VarInt(card, 『PhantomBladesPower』)` → 牌面 `DynamicVars` ⇒ 新版本上刀猎的第一把小刀预览会自动少 1 点，无需改逻辑；顺带确认 `Shiv` 本身仍是 4 点伤害（`ShivBaseDamage = 4` 依旧正确），并把这几个注释里过时的「9 / 12」标注成「0.111/107 的旧值」。）另含 v0.2.591 / 2026-11-13（**华丽猎特殊效果描述补首行** —— 用户给了新文案：「静默猎手将在第九回合首次打出华丽收场。每当静默猎手打出华丽收场时，将一张虚空放入所有玩家的抽牌堆顶部。警告：静默猎手的铭记死亡会攻击生命值最少的玩家（忽略召唤物），而不一定是被她锁定的玩家。」⇒ 三处文本都补上首行「第九回合首次打出华丽收场」：powers 表的 `BOSS_SUPPRESSION_POWER.description`（107 用）、`.description_v113`（0.113 用，仍在末尾保留警告）与 monsters 表的 `SILENT_BOSS.suppression`，16 种语言全齐；本地化检查通过。）另含 v0.2.590 / 2026-11-13（**适配 0.113.0 + 铭记死亡重做** —— 游戏今天更新到 v0.113.0（commit 16ac0fe3），原版把「铭记死亡」重做成：3 费、**奇巧**、`TargetType.RandomEnemy`、「对**生命值最低的敌人**造成 19(23) 点伤害」（反编译 `MementoMori.CanonicalVars` 只剩一个 `DamageVar(19m, Move)`，`OnUpgrade` +4 ⇒ 23；旧的「每弃一张 +4」整段删除）。据此改：①**0.113 的 API 适配**（编译实测）：`MultiplayerScalingModel` 从 `Models.Singleton.*` 挪到 `Models.*`；`RelicModel.IsAllowed` 改成非 virtual（新版覆盖 `IsAllowedInternal`）；`CardSelectCmd.PushSelector / SuspendSelectorForTest` 删除 ⇒ 新增 `Core/SelectionCompat`（新版走 `RunManager.Instance.CardSelectorStack.PushSelector(player, selector)`，摘选择器改成压一个 null）。②**奇巧猎**：卡组移除铭记死亡（用户：「本来现在也不在剧本中出现」）。③**华丽猎第 2 / 9 回合**（仅 `STS2_111`，107 仍是旧意图 —— 用户：「适配旧版本的部分不更改华丽猎的意图」）：第 2 回合改成 肾上腺素、夜魇+（复制杂技）、杂技（弃战术大师）、战术大师（奇巧）、隐秘匕首（弃防御**和铭记死亡**）、铭记死亡（奇巧免费打出）、防御，不出：防御（被弃）、防御（保留没费）、华丽收场（保留，抽牌堆非空）；第 9 回合改成 杂技（弃铭记死亡）、铭记死亡（奇巧）、中和、防御、防御、华丽收场，不出：打击（被必备工具丢弃）、防御 / 打击（保留没费）。④**多人**：新增 `Patches/MementoMoriLowestHpPatch`（前缀接管 `MementoMori.OnPlay`，只对我们的 Boss 生效）—— 目标改成 `BossLockOn.LowestHpRealPlayer`（**只数真人玩家、忽略奥斯提等召唤物**），仍走原版 `DamageCmd.Attack(...).FromCard(...).Targeting(...).WithHitFx(...)` 管线；意图侧 `BossIntentBuilder` 对 `MEMENTO_MORI` 改按「生命值最低的玩家」清零（那只玩家看得到伤害、其他人 0），其它牌仍按锁定关系（用户：「其它牌仍以锁定的玩家为目标，别影响其它牌和boss」）。⑤**特殊效果文案**：`BossSuppressionPower.Description` 在 0.113 构建里改读新键 `BOSS_SUPPRESSION_POWER.description_v113`（原文 + 空行 + 警告），16 种语言已补齐。⑥`BossDamagePredictor.MementoMoriDamage` 在 0.113 构建里直接读牌面伤害。) 另含 v0.2.589 / 2026-11-12（**彗星改成原版「失去生命」+ 血肉戏法意图不再显示成群体** —— 用户实测两条：①「碎屑储的特殊效果让玩家打出碎屑可以让所有敌人失去10生命…但你是不是直接在代码层面把他们的血减少了10？他们都没有受击动画，而且所有奥斯提（包括血肉骨用骸骨军团召唤出来的）血都减成0了还在那站着。这里应该用原版的减少生命方法」—— 根因：`CometBossPower.AfterCardPlayed` 里直接调 `Creature.LoseHpInternal(...)`，反编译那个方法只有三行（`CurrentHp = Max(CurrentHp-num,0)` + 返回 DamageResult），**只改数字**：不播受击动画、不弹伤害、不跑 `WasTargetKilled` 的死亡处理 ⇒ 奥斯提被扣到 0 还站着。现在改成原版「失去生命」的公共出口：`CreatureCmd.Damage(ctx, 所有存活敌方, 10, Unblockable|Unpowered, dealer=null)`（和 `PoisonPower.Trigger` 同一套写法，不吃格挡/力量/易伤，但受击/死亡流程完整）。注意用 **5 参数重载**（107 的 `CreatureCmd.Damage` 没有 7 参数版，编译实测 CS1501）。②「血肉骨所有的血肉戏法伤害似乎都被错误的显示成群体伤害，但实际上血肉戏法本身是单体的，而当她使用苦难时才会变成群体（除了被亡灵契约师锁定的玩家外显示苦难基础伤害+被她锁定玩家的负面效果种类*9，被她锁定的玩家只显示苦难的基础伤害。记得考虑在本回合刚施加的负面效果）」—— 以前 `hasDebuff` 就无条件 `new RawAttackIntent(sleight)`，每个玩家的手牌栏都显示自己会挨 ⇒ 像群攻。现在：单体减益牌只有**被锁定的那位**看得到（`LiveDelegateSingleAttackIntent` 逐帧判 `BossLockOn.TargetFor`），群体减益牌（`TargetType.AllEnemies`）才显示给所有人，每笔 = 该牌负面**种类数** × 血肉戏法（原版触发点是 `AfterPowerAmountChanged`，一种类型一次）；苦难（MISERY）那一笔**并进牌面伤害**成**一个数**：`MiserySleightPerHit` 分支用 `FinalDamage(牌面) + 种类数×9`，只给没被锁的玩家加，被锁玩家只显示牌面；种类数改走新的 `FleshBone.LockedPlayerDebuffKinds(boss, upToCard)` —— 除了当前身上的负面，还把「她本回合还没打出、但排在苦难之前的牌会给玩家上的负面」按类型一并计入（用户「记得考虑在本回合刚施加的负面效果」）。) 另含 v0.2.588 / 2026-11-11（**兼容「CVC-跨版本兼容补丁」** —— 用户「本模组似乎和 CVC-跨版本兼容补丁 冲突。进行兼容」。CVC 是加载前先跑一遍 Mono.Cecil 的 IL 改写器，它会把 mod 目录里**每一个 .dll** 都当成一个模组实现去做版本指纹（报告写到 %APPDATA%/SlayTheSpire2/cross_version_compat_report.txt）。它报告里我们这条的坏味道是：`CharacterBosses 99/100 [clean]`、0 处 findings/repairs/will-throw，但目标版本被推断成 `0.107 [medium] … older→newer`。根因是我们双版本外壳同时带 Impl107/Impl111 两份实现，扫描器把**休眠的那份 107** 也读进去了 ⇒ 它一边把整个模组判成「目标 0.107」，一边准备去改写一份根本不会被加载的 DLL。三处改动：①两份实现改以 `CharacterBosses.Impl107.dll.bin` / `.Impl111.dll.bin` 的名义发布 —— `loader/Loader.cs` 新增 `FindImpl`，按「.dll → .dll.bin」顺序找，`AssemblyLoadContext.LoadFromAssemblyPath` 不看扩展名所以行为完全等价；扫描器从此看不见它们。`install-mod.bat` / `tools/pack-dist.ps1` 同步改名，并**主动删除**旧版留下的 `.dll`（否则升级后两份并存、又被扫到；打包护栏也认两种扩展名）；②`PowerModel::get_PackedIconPath` / `get_ResolvedBigIconPath` 两个 postfix 改成**非破坏性** —— 先看原返回值，只有它为空或资源不存在时才写我们的候选路径（这两个是报告里和 BaseLib / RitsuLib / SteamRandomMatchMod 共用的 patch 点，以前无条件覆盖会顶掉排在前面的那家的图标）；③清单补 `min_game_version: 0.107.1`，版本过低的游戏直接拒载而不是崩。注：CVC 的 IL 改写本身没有改坏我们的代码（0 findings / 0 repairs / 0 will-throw），这次改的是「别让它误判我们」）另含v0.2.587 / 2026-11-11（**BaseLib 从硬依赖改成软依赖** —— 玩家反馈：①「把其它模组都去掉以后进第一场战斗就崩」= 把前置 BaseLib 一起删了（清单原来把 BaseLib 声明成 `dependencies`，且 `BossPicksSync` 直接 `using BaseLib.Abstracts`）；②「装完后主界面按钮全没了」= 类型加载期 `ReflectionTypeLoadException` 发生在 Harmony 之前，我们的 catch 拦不到。改动：①清单去掉 `dependencies`；②新增 `Core/BaseLibPresence`（探测 BaseLib 在不在），所有碰 BaseLib 类型的代码先问它、且真正碰类型的部分放进 `NoInlining` 方法（否则 JIT 调用方时就抛 TypeLoadException）；③`loader/Loader.cs` 用 `ReflectionTypeLoadException.Types` 拿**部分结果**登记模型 ⇒ 没装 BaseLib 时 Boss 依然存在（以前会一个都登记不上）；④没装 BaseLib **只是少两项功能**（游戏内模组配置界面、多人以房主为准的勾选同步），主菜单会用**原版弹窗**提醒一次（`UI/BaseLibMissingNotice`，16 语言文案，点掉后写 `baseLibWarned` 不再打扰）。另含 v0.2.586 / 2026-11-11（**联机「共用匹配池」不同步修复** —— 玩家反馈「联机时开和原版 boss 混合匹配会不同步」。根因：`SharePoolForGameplay` 为了修 v0.2.468 的配置分叉把**客人端写死成 false** ⇒ `ForVanillaBoss` 里「按种子抽这一场要不要保留原版 Boss」那段在客人端**整段被跳过** ⇒ 房主抽到「保留原版」时客人照样替换成角色 Boss ⇒ 进 Boss 房立刻分叉（反过来，房主关掉某张原版图的替换时客人也照样替换）。现在**房主把「决定上哪个 Boss」的玩法设置随勾选消息一起广播**（`BossPicksMessage` 新增 `Settings`：共用匹配池 / 进阶10一场原本 / 每张地图替换开关），客人直接用房主的值（还没收到时共用匹配池按「开」算并打日志）；房主改设置后立刻重播。协议变了 ⇒ 两端必须同一版本）。另含 v0.2.585 / 2026-11-11（**5 人联机适配** —— 用户「适配一下 5 人联机（原版的联机上限是四，但是有模组可以提高这个上限）。5 个 boss 的站位是 w 型…每一场 boss 战的 5 个 boss 分别是那 5 个原版角色，不重复也不少」。①`BossLineups.MaxPlayersPerFight = 5`，`PlayersPerFight()` 夹到 1～5，`MultiBossPlan.wantPartners` 引用**同一个常量**（否则会「阵容算 5 只、只造 4 只」）；②`Build` 在 need≥5 时补构成自检日志（打印 5 只分属哪个角色，重复/不足会喊 ⚠）；③`BossEnemySpreadPatch` 新增 5 只的 **W 型站位**（左上/左下/中上/右下/右上，Y=上下上下上，X 在可用宽度内等距，相邻≈240），仍按行动次序从左到右；④战场缩放不动（5 个点占 ~960px，与 4 只的 ~900px 同量级，再拉远原版背景会露黑边）。1～4 人行为不变。计划见 docs/plans/five-player-mp.md）。另含 v0.2.584 / 2026-11-11（**彩虹机特殊效果补标题行** —— 13 种非中文语言的 `DEFECT_BOSS.rainbow` 只有说明、缺「彩虹」标题行（本地化检查报「换行数不一致」的最后一处）；按各语言 `RAINBOW.title` 补上（Regenbogen / Arcoíris / Arc-en-ciel / Pelangi / Arcobaleno / レインボー / 무지개 / Tęcza / Arco-íris / Радуга / สายรุ้ง / Gökkuşağı）。本地化检查从 39 处 → **0 处**）。另含 v0.2.583 / 2026-11-11（**新 Boss 的本地化缺口全部补齐** —— 用户「都补」。①**血肉骨/虚无骨/抉择储 的怪物条目整个没写**（`<KEY>_BOSS.name` / `.title` / `.moves.CHARBOSS_PLAY.title`，16 语言全缺）：中文用设计名、其余 13 语言按既有约定给英文名（Flesh / Ethereal Necrobinder、Choice Regent）；②**蛇咬猎「群蛇形态」文案**（`SILENT_BOSS.snake_form` + `BOSS_SNAKE_FORM_POWER.title/.description`，此前 16 语言/13 语言全缺）按用户给的原文补齐，13 语言各写译文；③**打击战的「痛击」文案**（`IRONCLAD_BOSS.bash` + `BOSS_BASH_POWER.*`，缺 13 语言）补齐译文；④顺带修 `IRONCLAD_BOSS.bash` 里写成 `\\n` 的双反斜杠（说明框会把 `\n` 当字面量显示）。审计脚本 `.tmp/audit_boss*.ps1` 复跑结果：怪物三件套 / 特殊效果文案 / powers 三张表**全部齐备**）。另含 v0.2.582 / 2026-11-11（**华丽猎/血肉骨/虚无骨 三个遭遇补登记进 TierEncounters** —— 用户「现在第二个 boss 有可能显示原版的 boss 图标。这个 boss 是华丽猎，是因为没有让她用角色剪影做 boss 图标吗？是不是还有新 boss 也是这样？」。根因：这三个遭遇**类早就存在**、`BossKeys.EncounterOf` 也认得，但漏登记在 `CharBossEncounters.TierEncounters` 这张表里；而 `OurEncounterIconPaths.IsOurEncounter()` 正是遍历这张表建白名单 ⇒ 它们被判成「不是我们的遭遇」⇒ `BossMapPointCharacterIconPatch` 直接 return（地图徽章保持原版 TheKinBoss 占位图 = 用户看到的「原版图标」）、`EncounterIconPathPatch.Fix` 也不接管（顶栏/结算/历史同理）。现在补齐三条：`SilentGrandFinaleBossEncounter`（走 silent_shiv 专属图）、`NecrobinderFleshBossEncounter` / `NecrobinderEtherealBossEncounter`（不覆写 BossNodePath ⇒ 用亡灵契约师角色剪影）。**受影响的正是这 3 只，其余 31 只图标一直是好的**）。另含 v0.2.581 / 2026-11-11（**储君一族名字统一成「X储」** —— 用户「把这四个的“君”也去掉」。zhs/zht 的 `monsters.json` 各改 8 处（`.name` + `.title`）：碎屑储君→碎屑储、轰击储君→轰击储、仆从储君→仆从储、辉星储君→辉星储；连上一版的铸剑储/无色储，储君一族 7 个短名现在是「碎屑储 / 轰击储 / 仆从储 / 铸剑储 / 无色储 / 辉星储 / 王储」。`BossKeys.DesignNames` 本来就是这套短名 ⇒ 代码注释以外无需改动。顺带把 zht 里唯一还是简体的「王储」转成「王儲」）。另含 v0.2.580 / 2026-11-11（**储君两个变体名改短** —— 用户「把“铸剑储君”和“无色储君”改成“铸剑储”和“无色储”，统一格式」。只动本地化里的显示名，`BossKeys.DesignNames` 本来就是短的（`铸剑储`/`无色储`）⇒ 现在历史悬浮框、图鉴、Boss 名三处一致。zhs 改 `REGENT_FORGE_BOSS.name/.title`、`REGENT_COLORLESS_BOSS.name/.title` 共 4 处；zht 同 4 处并写成繁体（`鑄劍儲`/`無色儲`）。另注：`碎屑储君`/`轰击储君`/`仆从储君`/`辉星储君` 仍是长格式，等用户口径）。另含 v0.2.579 / 2026-11-11（**历史记录显示变体名** —— 用户「能不能在历史记录这里额外显示出来该 boss 是哪个变体（如黑球机）？局内最上方仍显示储君、静默猎手这样」。那一行读的是遭遇的 `.title`（反编译 `NMapPointHistoryHoverTip._Ready`：`ModelTitle = EncounterOrDeprecated(First(Rooms).ModelId).Title`），而我们的遭遇 `.title` 为修 v0.2.578 的「显示成原始键名」一律写成了**角色名**，且局内顶栏也用它 ⇒ 不能改文案。新增 `Patches/RunHistoryBossVariantPatch`（Postfix 到 `NMapPointHistoryHoverTip._Ready`）：遭遇 id → `BossKeys.KeyOfEncounterEntry` → `<KEY>_BOSS.name`（monsters.json 里各语言自带的设计名，zhs 黑球机 / eng Dark Orb Defect），覆盖 `ModelTitle` 后重渲染；取不到本地化名（如 zhs 的 NECROBINDER_FLESH_BOSS.name 是空的）退回 `BossKeys.DesignNameOf`。非档位遭遇（基础遭遇等）`KeyOfEncounterEntry` 返 null ⇒ 原版行为不动）。另含 v0.2.578 / 2026-11-11（**补齐 8 个遭遇的 `.title`** —— 用户：「华丽猎等新 Boss 在最上方一栏的名字显示不正确」，截图里直接显示成 `encounters.SILENT_GRAND_FINALE_BOSS_ENCOUNTER.title`。根因与死亡提示那批同源：新加的遭遇只写了 `.loss` 没写 `.title`（遭遇本地化只有这两个键）。本轮按「同角色已有遭遇的 title」逐语言复制补齐：`SILENT_GRAND_FINALE`（华丽猎）/`DEFECT_THUNDER`（电球机）/`DEFECT_STATUS`（状态机）/`REGENT_BOMBARD`（轰击储君）/`REGENT_MINION`（仆从储君）5 个 16 语言全缺，另有 13 种非中文语言缺 `IRONCLAD_STRIKE`（打击战）与 `SILENT_SNAKEBITE`（蛇咬猎）的 title、zht 缺 `DEFECT_RAINBOW`（彩虹机）的 title ⇒ 一并补上。校验：**16 语言 × 34 个档位遭遇的 title 现在全部齐备**）。另含 v0.2.577 / 2026-11-11（**死亡提示：其它 13 语言全部补齐 + 仆从储改文案** —— ①仆从储改为「{character} 被储君和他的仆从们围殴致死。」（zhs/zht/eng 及另 13 语言同步）；②13 种非中文语言（deu/esp/fra/ind/ita/jpn/kor/pol/ptb/rus/spa/tha/tur）此前各缺 7 条（电球机/轰击储君/打击战/蛇咬猎/仆从储君/华丽猎/状态机），另有 4 条仍是英文占位（血肉骨/虚无骨/养手骨）、2 条是旧措辞（彩虹机/放血战）⇒ 本轮每语言补/改 12 条，术语全部取自游戏自带各语言卡名（雷暴/轰击/仆从打击/华丽收场/散射炮/血肉戏法/蛇咬/完美打击）与角色名（OSTY 也用各语言的宠物名）。至此 **16 种语言 × 34 只档位 Boss = 544 条死亡提示全部齐备**（校验脚本逐条核过）。泰语缺 REGENT 角色名与 Flak Cannon / Sleight of Flesh 卡名标题 ⇒ 这几处按游戏自身的英文回落写）。另含 v0.2.576 / 2026-11-11（**死亡提示大改** —— 用户给了 6 条新文案（血肉骨/打击战/彩虹机/虚无骨/放血战/养手骨），另按现有句式**新写 5 条**补齐此前完全没写的那 5 只（电球机/轰击储君/仆从储君/华丽猎/状态机）。至此 34 只档位 Boss 在 zhs / zht / eng 三份 `encounters.json` 里**全部**有 `<KEY>_BOSS_ENCOUNTER.loss`（此前 zhs/eng 各 42 条里缺 5 条档位键、zht 还缺 1 个键）。血肉骨的英文按用户 PS 要求同时含 flesh + sleight（对应「血肉戏法」`SleightOfFlesh` 的两半）；顺带把 zht 里原本是英文占位的「养手骨」那条翻成繁体。另含 v0.2.575 / 2026-11-11（**轰击储「环绕轨道」文案统一** —— 用户「我记得我让你改过…文案，怎么还是这个？」。根因：这个特殊效果在本地化里有**两份**，`monsters.json` 的 `REGENT_BOSS.orbital`（带标题行，Boss 信息用）和 `powers.json` 的 `BOSS_ORBITAL_BOMBARD_POWER.description`（战斗中那个「特殊效果说明框」读的是这一份），上次只改了前者 ⇒ 界面没变。按用户口径「用 monsters.json 那份（短句版）覆盖 powers.json」：16 语言的 powers description 全部换成各自 monsters 的正文（去掉标题行），两份从此一致；顺带修 zht 的 `BOSS_ORBITAL_BOMBARD_POWER.title`（原来是简体「环绕轨道」→「環繞軌道」））。另含 v0.2.574 / 2026-11-11（**拦掉状态机「火箭飞拳」自带的抽 1 张** —— 用户「拦掉火箭飞拳的抽牌，因为我已经提前在剧本里写好了」。反编译 `RocketPunch.OnPlay` = 13 点伤害 + `CardPileCmd.Draw(ctx, Cards=1, Owner)`；那一抽把她抽牌堆里的状态牌（大抱抱的煤灰、烟囱/污秽攻击生成的 WOUND/SLIMED/DAZED）抽上手，mod_log 21:16:46 实证：`PLAY ROCKET_PUNCH` 紧接 `回合开始抽牌 →（SOOT）`，手牌变成 [DEFEND_DEFECT,COMPACT,DOUBT,SOOT]。新增 `Patches/RocketPunchNoDrawPatch`（与全息影像同一套窗口写法：`OnPlay` 前后置开窗口 + `CardPileCmd.Draw` 前置返回空任务），伤害照常结算；这些状态牌现在留给她第 1/4/9 回合的「散射炮」一次性烧掉。另：全息影像的拦截本身没问题 —— 日志里 BURN / DUALCAST 的返手都被拦下了，煤灰是火箭飞拳抽上来的）。另含 v0.2.573 / 2026-11-11（①**能量汲取的升级进度每场清零** —— 用户「根除骨的恐惧和戳击怎么在第一回合就升级了？」。日志钉住：20:58 那场第 4 回合升了 FEAR/POKE，21:00 那场**第 1 回合**手牌就是 [POKE+,FEAR+,FRIENDSHIP+]，而当时卡组 `deck(12): POKE,FEAR,FRIENDSHIP+,…` 并未升级 ⇒ 不是进阶效果、是残留状态：怪物 Model 在同一次运行里被复用，`_persistentlyUpgraded` 与 `DrainUpgradeStep` 从来没清过。现在在 `AfterAddedToRoom`（和 `CombatStartFired / TurnNumber / NextTurnEnergyBonus` 同一处）一起清掉；②**蛇咬猎死亡提示**「蛇群」→「蛇咬」（zhs/zht；英文那行仍是 serpents））。另含 v0.2.572 / 2026-11-11（新增**游戏内 F9 导出 Godot 场景树**（`Core/SceneTreeDumper.cs`）：任意界面按 F9 → `%APPDATA%/SlayTheSpire2/scene_tree.txt`（整棵树：路径/类名/可见性/尺寸/文本）+ 有战斗时另存 `scene_tree_combat.txt`（只导战斗房那棵子树），日志里有「场景树已导出：…（N 行）」，用来替 Godot 编辑器找节点路径。另含 v0.2.571 / 2026-11-11（藏品补齐两处：①**蛇咬猎 → 群蛇形态**（`SerpentForm`，用户 2026-11-11 指定）—— 它原本没有专属分支，会和同幕「奇巧猎」落在同一格（掉落表按「角色+幕」索引）从而错误地掉「余像」；②**炼药猎 → 炼制药水**（`Alchemize`，用户 2026-10-26 早就指定过，但代码里一直没有分支，实际掉的是刀猎的「墨之刃」）。另：34 只 Boss 现在**全部**有藏品（变体走 ①变体 key / ②遭遇 id，主设计走 ③`LootTable[(角色, 幕)]`），之前我说「16 只没有藏品」是只扫了 switch、漏了掉落表兜底，属误判）。另含 v0.2.570 / 2026-11-11（①**愤怒战**「群情激奋」的描述早就是按人数动态的（`BOSS_RAGE_POWER.description` 用 `{Loss}`，`IroncladRagePower.Description` 现算 单人3/双人2/三四人1 ⇒ 界面只显示当前那一个数字，图标数字走 `DisplayAmount`）；本轮把 `monsters.json` 的 `IRONCLAD_BOSS.anger` 里写死的「3 点」也换成 `{Loss}`（16 语言），消灭最后一处硬编码。②**巨石战**按用户要求统一代码与描述：「巨石」破防改回**给该玩家 1 层虚弱**（`BossPrimalForcePower` 里原来的「该玩家抽 1 张牌」已删），每次巨石仍是 **+1 力量、+3 覆甲**；`BOSS_PRIMAL_FORCE_POWER.description` 与 `IRONCLAD_BOSS.boulder` 16 语言同步改成「+3 覆甲 / 未被格挡 ⇒ 你获得 1 层虚弱」）。另含 v0.2.569 / 2026-11-11（按用户口径修两处：①**打击战的完美打击全部附魔王室认证** —— `IRONCLAD_STRIKE` 剧本第 6~9 回合由「地狱狂徒」免费打出的那几张以前经 `Hell()` 复制时丢了 `EnchantRoyallyApproved`，现在原样带上；②**彩虹机第 8 回合不再有 30 点无来源群伤** —— 节拍器早已从遗物里移除，剧本那个 `ExtraAoe = 30` 一并去掉，手牌栏不再标那一条。另：Boss 意图表核查结论更正 —— 之前列的 10 条「表格 vs 游戏内差异」里有 8 条是我的基线写错了（拿 2026-11-07 的 intent-dump 当现状），当前代码本来就和表格一致）。另含 v0.2.568 / 2026-11-10（抉择储：按用户「把 4、5、11 这三个回合中那张不出的防御换成打击，保持它不出」——第 4 / 5 / 11 回合原本压暗的那张「防御」改成「打击」（仍是打不出、压暗），这样它**不是技能牌** ⇒ 第 5 回合「抉择，抉择」的候选仍然正好是那 5 张；卡组里同时补两张打击）。另含 v0.2.567 / 2026-11-10（抉择储：新增**铸造对账日志** —— 用户「怎么感觉铸造有问题？…君王之剑第四回合应该是 10+10+8+5=33，我看到的是 37」。君王之剑伤害 = 卡面 10 + 本场铸造之和；37 = 33 + 4 正好是「淬炼刀刃」进阶 9 升级后的铸造 12（`ForgeVar(8)` + `UpgradeValueBy(4)`，未升级才是 8）。为了让下次一眼对账，`PlayOne` 每打出一张带 `Forge` 变量的牌就打一行 `铸造：<牌>（升级=…）铸了 N ⇒ 君王之剑当前伤害 M`，配合既有的 `击剑指南：战斗开始铸造 10…` 就能逐笔核出 M。另含 v0.2.566 / 2026-11-10（抉择储剧本第三轮订正（用户）：第 3 回合 = 招架、星尘、汇流+、防御（3 费）；第 4 回合 = 君王之剑、隐秘藏品、防御（没费）（3 费）；第 5 回合只有 **2 费**（天际钻头 X=2；选了星位序列则 X=8 ⇒ 16 段，星位序列下面的预告也随之变成 8×14））。另含 v0.2.565 / 2026-11-10（抉择储：「第一回合选隐秘藏品的情况下，第二回合的辐射没有计算隐秘藏品在回合开始时给的星」—— 「下回合 +N 辉星」（`StarNextTurnPower`）是**她回合开始时**到账的，对本回合而言就是「本回合获得过的辉星」⇒ 规划期现在把它**同时**算进星预算 `stars` 与 `starsGainedThisTurn`（辐射的段数口径）；星尘的星数口径也一并包含它）。另含 v0.2.564 / 2026-11-10（抉择储：①**星尘/辐射的段数现在真的生效了** —— 用户「辐射仍没有提前计算本回合会获得的辉星数。星尘仍然没有正确显示段数」：上一版只把 `starHits` 传给规划期那一处，而 `PrepareTurn` 规划完**紧接着**就调 `BladesGrowth.RecomputeAll` 重算、出牌期每张牌前还会再重算 ⇒ 全被「历史口径」覆盖回 1 段。现在把它定死存进 `PlannedPlay.StarHits`，两条重算路径（`BladesGrowth.RecomputeAll` / `CharBossMonster.RefreshPlannedIntents`）都原样再用（和 `SmokePerHit`/`LetterOpenerHit` 同一套做法）；②**进阶 9 不再升级共鸣**（用户订正）——`BossDefs` 的进阶表与第 11 回合剧本那张都改回未升级）。另含 v0.2.563 / 2026-11-10（抉择储意图/资源四处修正：①**星尘**（X 星费，把身上所有辉星花光 ⇒ 一星一段）与**辐射**（段数 = 本回合获得过的辉星数）现在按剧本顺序把星数递进 `BossIntentBuilder.IntentsFor(starHits:)`（规划期历史是空的，原来恒显示 1 段）；②规划期新增 `starsGainedThisTurn` 记账；③**汇流/淬炼刀刃的「下回合 +1 能量」不再当成立刻到手**（`DeferredEnergyCard`），修第 9/10 回合最后那张本该死费的隐秘藏品被画成还能打；④天际钻头 <<把这一回合剩余能量全部花光>> 改由剧本 `ScriptCard.SpendsAllEnergy` 明说（不再靠 `EnergyCost.CostsX` 猜），修第 5 回合「君王之剑」被画成能打；⑤`XHitBonus` 改成**规划期算出的 cost 优先**（以前优先读已捕获的 X，可能残留上一张牌的值 ⇒ 第 13 回合只剩 1 费却画 2 段），并给天际钻头补上「X≥4 翻倍」；⑥天钻 X=0/星尘辐射 0 段时不再画一条 0 点攻击意图。另含 v0.2.562 / 2026-11-10（抉择储：「抉择，抉择」不再被提前打断 —— 用户「如果我选的太慢，他的这个回合会结束并使我的下个回合开始。应该让储君的这张牌不会被提前打断，玩家选完之前所有其他进程都应该停着。也不要因为这张牌卡了很久就把它当bug（只让抉择抉择受到这些豁免）」。两处一起改：①`PlayOne` 那个 5 秒 AutoPlay 兜底对它**不计时**（一直 await 到玩家选完，期间她整个回合停在这一句，其它 Boss/玩家回合都排在后面）；②`StrayBossCardQueuePatch.Reap()` 在等待期间**暂停**（新增 `HoldReap`）—— 慢车道 4Hz 会把它当成「怪物打出的残留卡面」从出牌队列里摘掉，等于提前打断她这一手；③`BossFrameTickPatch.WatchPlayQueue` 不再对 DECISIONS_DECISIONS 报「⚠ 出牌队列滞留」（和数据收集里那条「玩家自己在选牌」的豁免同一性质）。另含 v0.2.561 / 2026-11-10（抉择储：星位序列那条「天际钻头会多打多少」改用**原版意图节点**（`MultiAttackIntent` → `NIntent`，与其它意图同一套图标/字体），不再是我自造的 Label（用户「你用原版的，别自己瞎搞」）；它仍然**不放进 `PlannedPlay.Intents`** ⇒ 不进原版 `MoveState.Intents`，薄荷尖塔不会重复统计（用户「只改一下不让薄荷尖塔记录就行了」）。顺带：第 5 回合的钻头是常驻的、没有 `OnlyIfChosenCard`，`FindChoiceDrill` 现在按「X 费牌」也认得出它，所以那一手也会画预告。另含 v0.2.560 / 2026-11-10（抉择储第二轮：①第 6 回合按用户订正改成 2 费「辉光、辐射、淬炼刀刃、收集光辉（没费）」；②那 5 张候选技能牌**压暗但画意图** —— 铸墙=守势+强化、隐秘藏品=强化、共鸣=策略+强化、震荡波=策略（`ScriptCard.ForceIntents` + `PlannedPlay.DimWhenShown`，手牌栏 `Bright` 不再只看「在不在 DisplayPlays 里」）；星位序列那一栏标出「选它会多打多少」（如第一回合 8×12 = 天际钻头 8×6 不变、选后 8×12，即多 6 段），这条是**标签不是意图** ⇒ 不进原版 MoveState.Intents，薄荷尖塔的伤害统计不会算它（`PlannedPlay.DrillPerHit/DrillGainHits` + `BossHandCard.AddDrillGainLabel`）；③震荡波本身带「消耗」，给它附魔「灵魂之力」（候选那张与第 12 回合那张都加）。另含 v0.2.559 / 2026-11-10（三层储君 3 号「抉择储」（用户设计）：特殊效果「指导」= 她打「抉择，抉择」时**由玩家**（多人时是被他锁定的那位）替他挑那张要被重复打出 3 次的牌 —— 用知识恶魔那套 CardSelectCmd.FromChooseACardScreen，选完他才继续打后面的牌（Patches/ChoiceRegentPickPatch 接管 CardSelectCmd.FromHand；选牌前用 SuspendSelectorForTest 把自动选择器摘掉，否则界面根本不会出现；挑中的那张记进 Core/ChoiceRegent）。13 回合剧本、9～13 循环（Core/ChoiceRegentScript）；遗物 = 天赋君权/涅奥的祝福/准备背包/燃烧木棍/玻璃眼珠/击剑指南/王室印章/钗/灯笼（锚→灯笼、胜券在王→王国资产、崇拜全难度升级）；逐回合写死能量（1、2、3、5、7、8、10、11 = 3 费，12 = 4 费，其余 2 费）；第 1 回合「天际钻头」只有玩家选了星位序列（3 次 ×+2 费）才打得出去（ScriptCard.OnlyIfChosenCard + CharBossMonster.RunChoiceFollowUpsAsync 在选择落地后补打），第 5 回合的钻头一定打出（X = 出手时的剩余能量，X≥4 翻倍照原版）；16 语言文案 + 藏品天际钻头 + 能力面板占位）。另含 v0.2.558 / 2026-11-10（顶栏两个 Boss 头像一样：用户「剪影是一个亡灵契约师和一个储君，顶栏却两个亡灵契约师」—— 两颗图标各自按**遭遇**解析角色，而第二槽的遭遇很容易解析回第一槽那只角色（第二槽复用第一槽遭遇 / `SecondBossEncounter` 读取兜底没换成伙伴那套）。现在两颗解析出同一只角色时，第二颗改用**我们阵容里的第二只设计**（多人同场 = 本场阵容 partner；进阶 10 = 该幕第 2 场阵容主角色），`BossLineups.LineupNow()` 是新加的 UI 用包装。另含 v0.2.557：，日志直接指出的：`power.Applier` 不能当判据 —— 日志 22:56:25 显示 `STRENGTH_POWER −2 → 目标=玩家 钩子施加者=… power.Applier=…(是我=False)`；原因是 `StrengthPower` **复用已有实例**（玩家早先给自己 +1 力量时建的那份，实例上的 Applier 一直是玩家自己），而虚弱/易伤每次都新建实例所以一直正常。现在判据改成「钩子参数 applier 是她」为主，只有 applier 为空时才回退到 `power.Applier` 且要求 amount > 0（这样衰减 −1 不会被误判成她给负面）。诊断行把两个施加者分开打印。另含 v0.2.556：：日志证明钩子**确实被派发**（`吞噬生命钩子：power=STRENGTH_POWER amount=-2 …`），而 `VULNERABLE +2`/`WEAK +1` 都能正常打出 9 点 ⇒ 掐在「是不是负面」这一步：`GetTypeForAmount(-2)` 对 `STRENGTH_POWER` 认不出负面。现在与 `BossIntentBuilder.ClassifyPowers` 同一把尺子：`harmful = kind == Debuff || amount < 0`。并把诊断行扩成一次打全（目标 side/Monster、施加者是否是她、GetTypeForAmount 结果、是否 ITemporaryPower），下次一眼定位。另含 v0.2.555：改由**吞噬生命**（她必然带着的特殊效果）结算 —— 原来放在 `SleightOfFleshBossPatch` 里接管她身上那层 `SleightOfFleshPower` 的回调，实测有一次那次派发整段没走到（22:42 的 `STRENGTH_POWER −2` 连日志都没有）⇒ 9 点整条丢了；现在 `BossDevourLifePower` 里一次性做「+4 格挡 + 有血肉戏法就对该玩家补 Amount 点无来源伤害」，那条 patch 只保留「压掉原版，免得她自伤」+ 加了一行钩子诊断日志。②**Boss 的随从（奥斯提）不吃任何负面效果**（`BossPetNoStrengthLossPatch`）：以前只在「施加者是真人玩家」时才拦，于是她自己/她的牌给的负面（王储的临时减力量等）照样落到随从身上；现在改成「负面效果一律拦（任何来源）+ 真人玩家的正面效果也拦」。另含 v0.2.554：：查「玩家给 Boss 上负面时，头上不浮图标、也没有施加音效」。反编译 `NCreature.OnPowerIncreased` 第一行是 `if (silent || !CombatManager.IsInProgress) return;`（图标+音效一起没），而音效另外还要求 `power.ShouldPlayVfx`（= `Owner.IsAlive && IsInProgress && IsVisible`，`IsVisible` = `Target==null || IsMe(Target) || Target.IsEnemy`）。新增 `BossPowerApplyTracePatch`：只在 `PowerCmd.Apply` 的目标是 CharacterBosses 的 Boss 时打一行 `PowerApply 诊断：<power> <amount> → <她>（施加者=… silent=… IsInProgress=… ShouldPlayVfx=… IsMe=… Side=…）`（限 40 行）。复现一次把那几行发回来就能定位是哪一条被掐。另含 v0.2.553：：血肉戏法/吞噬生命判定「负面」时写成了 `amount <= 0`，而「失去力量」这类负面是**负数**送进来的（`PowerCmd.Apply<StrengthPower>(…, -2, …)` ⇒ amount = -2）⇒ 命运同担那条 9 点被整条挡掉、她也不加格挡。原版判据本就是 `amount != 0`，现在两处都改成「只排除 0，是不是负面交给 `GetTypeForAmount`」。另：血肉骨的能力面板按用户给的数据补齐（单体强/群攻强/单体高压 3、5、11/群体高压 4、10/特殊效果类型：自身/群体减益极强/群体增益弱）。另含 v0.2.552：改成**策略 + 牺牲**：它的两个变量 `PlayerStrengthLoss`/`EnemyStrengthLoss` 都是普通 `DynamicVar` 而不是 `PowerVar<>` ⇒ `ClassifyPowers` 什么都认不出来，会掉到「技能牌兜底 = 强化」上（蓝色上箭头）。现在把 `SHARED_FATE` 同时加进 `ForceDebuffCards`（给敌人扣力量 = 策略/红下箭头）与 `SacrificeCards`（自己也扣力量 = 牺牲/蓝下箭头）；顺带它既然算「策略」，血肉戏法那 +9 也会跟着显示（它确实会给那个玩家上负面）。另含 v0.2.551：：①**招架盾 → 锚**（战斗开始 10 格挡），特殊效果警告文案同步去掉「招架盾」；②11 回合剧本再重排 —— 1 血肉戏法+鬼火+防御 / 2 吸引仇恨+摧残 / 3 打击+恐惧+ / 4 违逆+防御+苦难 / 5 护卫+出击+防御(没费) / 6 命运同担+防御×2 / 7 吸引仇恨 / 8 摧残+防御+防御(没费) / 9 防御+恐惧+ / 10 违逆+防御+苦难 / 11 护卫+出击+防御(没费)，循环仍 7～11；③**摧残在玩家身上改成与虚弱/易伤同步**（`DebilitateTicksWithWeakPatch`）—— 反编译：`VulnerablePower` 是 `side == Enemy ⇒ TickDownDuration`，而 `DebilitatePower` 是「持有者自己这一侧回合结束 ⇒ Decrement」⇒ 玩家身上摧残玩家回合一结束就掉 1，少撑一个回合；现在玩家身上的摧残也只在**敌方**回合结束掉 1。另含 v0.2.550：：**撕碎 → 玷污**（`Defile`，1 费 13 伤，升级 17）—— 第 4、11 回合各换一张，能量账不变；卡组里对应替换。另含 v0.2.549：：①**进阶 9 = 只升级摧残**（去掉恐惧）；②剧本重排 —— 2 出击+恐惧+(没费打击) / 3 违逆+防御+苦难 / 5 吸引仇恨(不升级)+摧残 / 6 打击+防御+命运同担 / 7 吸引仇恨 / 9 防御+恐惧+ / 10 违逆+防御+苦难 / 11 撕碎+护卫+防御，循环仍 7～11；③卡组按单回合最大张数重算（14 张：防御×2、打击×2，其余各 1）。另含 v0.2.548：：`UNLEASH` 的伤害是 `CalculationBase + ExtraDamage × 奥斯提当前生命`，而意图数字只在**面板重建**时算 —— 玩家在她回合外打掉/治好奥斯提、或奥斯提被召唤/死亡时，能力层数一个都没变 ⇒ `RefreshIntentsIfPowersChanged` 的指纹不变 ⇒ 不重建 ⇒ 数字停在旧值。现在把**她的奥斯提**（存活 + 当前生命 + 最大生命）也拼进那个每帧比对的指纹，一变就 `IntentsDirty` ⇒ 下一帧按新血量重算；并加了一行限流日志 `意图重算（能力/奥斯提变化）：… → …` 便于验证。另含 v0.2.547：（用户「更改部分意图和进阶效果」）：11 回合剧本按新稿重排 —— 2 出击+防御+防御 / 3 违逆+恐惧+苦难 / 4 撕碎+防御+防御 / 5 吸引仇恨+ / 9 恐惧+防御+苦难 / 10 撕碎+护卫+防御 / 11 防御+违逆+打击，循环仍是 7～11；**进阶 9 改成升级恐惧、摧残**（之前误写成苦难/出击/摧残）；卡组按单回合最大张数重算（护卫×2、防御×2、出击×2、违逆×2、恐惧×2、苦难×2、撕碎×2、打击×2，吸引仇恨/摧残/命运同担各 1）。另含 v0.2.546：：①多人时招架盾只打她锁定的那位玩家（原版是 `HittableEnemies` 里随机一个，会打到没被锁的人）——`ParryingShieldBossPatch` 按原版条件结算、目标固定成 `BossLockOn.TargetFor`；②命运同担不再打到自己 —— 反编译该卡除了让目标掉力量还会**让她自己掉力量**，而她自己的生物 `Side==Enemy` 正好满足原版血肉戏法的 `power.Owner.IsEnemy` ⇒ 她给自己上负面时被自己的血肉戏法打 9 点；现在 `SleightOfFleshBossPatch` 对「持有者是我们 Boss」的情况**整条接管**，只对真人玩家结算；③进阶 9 不再升级出击（保留苦难、摧残）；④招架盾预测修正 —— 以前无条件把她**当前**格挡算进去，而格挡在她自己回合开始会清空 ⇒ 玩家回合里那份是上回合剩下的、马上就没，现在只在「她回合内」才计入；并加了一行预测明细日志（当前格挡/牌/骇人头盔/吞噬生命各自贡献）。另含 v0.2.545：NECROBINDER_FLESH —— 11 回合剧本 + 7～11 循环，遗物缚魂命匣/涅奥的祝福/骇人头盔/招架盾，特殊效果「吞噬生命」（她每给玩家一个负面就 +4 格挡，`BossDevourLifePower`）；①`SleightOfFleshBossPatch` 让血肉戏法对她生效（原版条件是 `power.Owner.IsEnemy`＝绝对阵营，玩家是 Side.Player ⇒ 对影子玩家永远 false）；②会施加减益的牌，意图里补上血肉戏法的 9 点（无来源）；③回合结束格挡预测 ≥10 时，在独立意图位（电球/炸弹那一行）显示招架盾的 6 点（`FleshBone.EndOfTurnBlock` 算了 plan 里的格挡 + 骇人头盔 + 吞噬生命）；④多人「苦难」把被锁玩家负面传给其他玩家 ⇒ 其他玩家意图显示 血肉戏法×种类数；⑤多人把吸引仇恨换成骸骨军团（`MultiplayerCardSwap` act0 行）；⑥16 语言文案（特殊效果含「无来源伤害 / 为你而死不挡」警告）+ 藏品命运同担 + 能力面板。另含 v0.2.544：：`BossStatusRow.Fill` 里能量球是按影武者缓存的节点，旧代码只在「已挂在本行」和「完全没有父节点」两种情况把它排进 `target`，一旦它挂在**另一条（残留的/备用/不可见的）状态栏**上就既不搬运也不登记 ⇒ 这一行没有能量球、`EnergyCenterX` 一路返回 0（14:07 的 mod_log 里 `独立意图定位：能量中心 x=0` 反复出现，且同帧有 `rowChildren=5/5` 与 `4/4` 两条 Fill）。现在：①「可复用」判定再按影武者缓存兜一层，避免把行里那颗正在用的球当垃圾清掉；②父节点已失效/排队销毁/**不可见**时搬过来；③主面板（`primaryRow`，可见）一律抢过来，只有备用行才「别抢还活着的那条」。另含 v0.2.543：：`PlaceExtraIntents` 原来只用「能量栏中心 − 行宽/2」，而它和卡面下方那排意图**同一高度**，牌少或这一行偏宽时左缘会滑进卡牌意图区（用户「第二回合电球被动过于偏左，和扫荡射线叠在一起」）⇒ 现在先逐格测量所有卡牌意图行的真实右缘（意图行在卡片内部且整体左移过、内容还可能比卡面宽，不能拿卡面右缘当边界），再让这一行左缘至少落在它右边 Gap 处；彩虹机的整体左移算在 max 之前。另含 v0.2.542：改成走「超能光束」那层原版 buff：每满 3 张牌给她 1 层 `HyperbeamFocusDownPower`（基类 `TemporaryFocusPower`，IsPositive=false）—— 应用时原版立刻 −1 集中、她自己回合结束时原版移除该层并把集中全数还回来、且它是 debuff 所以人工制品能挡，图标文案也是原版那套；107 没有这个类型（107 的超能光束是直接 −3、不返还）⇒ 用 `#if STS2_111 / #else` 保持老写法自己扣自己还。另含 v0.2.541 四项：①语音音量 -4dB → -0.5dB（振幅 ×1.5，用户「有点小，调大 50%」）；②预借时间不再统计**自动打出**的牌（`CardPlay.IsAutoPlay` 或 `Resources.EnergySpent == 0` ⇒ 没花能量不计），修「历史书打出攻击牌会错误增加预借时间计数」；③引雷针计数改存字段、图标数字钳在 1..3（还差几张），修「打三张牌集中不掉」—— 根因是玩家回合开始时 `Apply(-Amount)` 把数量减到 0，原版 `PowerCmd.ModifyAmount` 见 `ShouldRemoveDueToAmount()` 直接**把整条 power 移除**了；④电球机暴风雨的激发意图闪一下就没了（另记）；另含 v0.2.540：按用户第二轮要求改：①**时机延后** —— 不在出牌前播，改在 `Hook.AfterDamageGiven`（伤害真正落地那一刻）才播；②**不再每张攻击牌都喊** —— 只认 8 张：痛击 BASH / 完美打击 PERFECTED_STRIKE / 突破 BREAKTHROUGH / 全身撞击 BODY_SLAM / 巨石 GIANT_ROCK / 彼岸咆哮 HOWL_FROM_BEYOND / 闪电霹雳 THUNDERCLAP / 欺凌 BULLY；③每回合最多一次，多段牌只在第一段响（`CardCmd.AutoPlay` 前缀挂待播标记 + 上述伤害钩子配音清标记，两版本签名一致）；④彼岸咆哮那种回合结束从消耗堆自动打出的也算，因为挂在 AutoPlay 而不是我们的 PlayOne 上。上一版 v0.2.539 首次加入：：一代崩坠那 6 句 VO_IRONCLAD_1a/1b/1c/2a/2b/2c 已打进我们自己的 PCK —— ①每回合**首次打出攻击牌**时随机喊 1a/1b/1c（`CharBossMonster.PlayOne` 在 AutoPlay 之前播，`AttacksPlayed==0` 即本回合首张，与出牌同时出声）；②**死亡**时随机喊 2a/2b/2c（`HasDeathSfx` 覆写成 false 压掉原版那条 FMOD 事件 + `NCreature.StartDeathAnim` 后置播我们的 ogg，同生物只喊一次）；③覆盖所有 IroncladBoss 子类（怒/打击/出血/杂耍/易伤/巨石）。另含 v0.2.538 的亡魂牵引段数与致死性顺序修正（用户实测预览 7×3、真实 6×4）：①**段数**补上「本回合还没打出去的虚无牌」—— 致死性是虚无牌而它排在亡魂牵引前面，规划期战斗历史里还没有它，改由 `BossIntentBuilder.PlannedEtherealBefore` 按 `boss.Plan` 自己数（三条重算路径自动一致，打完即从 Plan 摘掉⇒不会双算、也不会漏传参）；②致死性 +50% 的**顺序**改成「先走完原版伤害管道（力量/虚弱/易伤）→ 再乘倍率 → 向下取整」，与真实结算同序（(5+力量−1)×1.5=6）；旧写法先把牌面 ×1.5 再减力量会多 1 点。另含 v0.2.537 的虚无骨四处收口：①女妖之嚎不再多画「强化」意图（`NoBuffIntentCards` 点名 BANSHEES_CRY）⇒ 第 4 回合 = 攻势+策略、第 7 回合 = 只有攻势；②亡魂牵引的段数补上「本回合已打出的虚无牌」—— 致死性本身是虚无牌，规划期历史里还没有它（`BossScriptPlanner.etherealPlanned` 按剧本顺序累加，只给 PULL_FROM_BELOW）；③致死性的 +% 以前只给「奥斯提那几张」手工补，现在**她身上还没这层 power** 的普通攻击牌（正是规划期）也补一次，power 真上身之后走原版管道不双份；④配置界面补上虚无骨的能力面板（循环 7～10 / 单体极强 / 群攻很强 / 单体高压 4、7、9 / 群体高压 4、7 / 全局））
-
