@@ -4,6 +4,24 @@
 > 旧条目逐字来自 `git show HEAD:src/Hooks/Core/BuildInfo.cs` 的 Tag 常量（v0.2.871 及其之前，共 236 条）。
 > 最新版本（0.2.889）是当前 Tag，同时在各条 `workshop/changenote.txt` 里也有面向玩家的摘要。
 
+### 发布（2026-11-28 20:06 · v0.2.1002）
+
+用户：「打包，装手机，上传创意工坊和github」。
+
+- 打包：`.dist\CharacterBosses-v0.2.1002.zip` = **19,026,153 B**（zip 内顶层 `CharacterBosses\`）；
+  `CharacterBosses.pck` = 18,866,404 B；`workshop\content\CharacterBosses` 与 `.dist\CharacterBosses` 各 6 个文件同源，
+  两份 Impl 的版本串都是 `v0.2.1002`（`pack-dist` 输出实证）；
+- 创意工坊：上传成功（`Successfully uploaded … id 3830639796` + `UPLOAD OK`；工坊 API 本轮被网络挡住，未能二次查询字段）；
+- GitHub：`main` → `dab089b`，tag **`v0.2.1002`**；新建 **Release**（公开，`v0.2.1002`）并挂上 zip
+  （`releases/download/v0.2.1002/CharacterBosses-v0.2.1002.zip`，19,026,153 B），`releases/latest` 实测已指向 **v0.2.1002**；
+  面向玩家的下载页：`https://github.com/FlyingPig114514/CharactersBosses/releases/latest`
+- 手机：安装包已备好 —— `.tools\phone-stage-mods.tar.gz`（18,977,494 B，tar 内是 `mods/` + 5 个文件：
+  外壳 `CharacterBosses.dll`、`Impl111.dll.bin`（net9 手机版）、`Impl113.dll.bin`、`CharacterBosses.json`、`CharacterBosses.pck`），
+  但**设备这一轮连不上**：`ping 10.60.178.25` 不通（本机在 192.168.3.7/24，不在同一网段）、`adb devices` 空、
+  `adb mdns services` 也没发现 ⇒ 等用户开无线调试/插 USB 后再跑 `.tools\upload-b64.ps1` + `push-and-extract.bat`；
+- `workshop\changenote.txt` 已改成 0.2.1002 版（覆盖 0.2.998 ~ 0.2.1002 的玩家可见改动），
+  `workshop.json` 用 `tools\mk-workshop-json.ps1` 重新生成过。
+
 ### 发布（2026-11-28 · v0.2.997）
 
 用户：「打包，上传创意工坊和github，并告诉我应该给玩家用于在github上下载本模组的网址」。

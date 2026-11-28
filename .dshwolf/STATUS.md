@@ -1,41 +1,36 @@
 # CharacterBosses — 交接状态
 
-> 更新：2026-11-28（**本机已装机 v0.2.1002**；工坊 / GitHub 仍停在 v0.2.997，未上传）。
-> · 工坊条目 3830639796 更新于 11-28 15:58:17（file_size 22,043,428，visibility=0 公开）；
-> · GitHub `main` = `ab92ebe` → `6c3556e`，tag `v0.2.997`，Release id 461396250（zip 18,572,715 B），
->   `releases/latest` 指向 v0.2.997；给玩家的下载页：
->   https://github.com/FlyingPig114514/CharactersBosses/releases/latest
-> · **v0.2.998 ~ v0.2.1002 全都没提交、没打包、没上传**（工作区有未提交改动）。
+> 更新：2026-11-28 20:06（**v0.2.1002 已发布**：已打包 / 已上传工坊 / 已推 GitHub；**手机未装**，设备连不上）。
+> · 创意工坊条目 **3830639796** 已更新（上传器输出 `Successfully uploaded` + `UPLOAD OK`）；
+> · GitHub `main` = `dab089b`，tag **`v0.2.1002`**，Release 挂 zip **19,026,153 B**，`releases/latest` 实测 = v0.2.1002；
+> · 给玩家的下载页：https://github.com/FlyingPig114514/CharactersBosses/releases/latest
+> · 手机安装包已备：`.tools\phone-stage-mods.tar.gz`（18,977,494 B，内含 `mods/` + 5 文件）
+>   ⇒ 设备一能连上就跑 `.tools\upload-b64.ps1`（或 `push-and-extract.bat`）。
+>   ⚠ 本轮连不上：`ping 10.60.178.25` 不通（本机 192.168.3.7/24，不同网段）、`adb devices` 空、mDNS 无发现。
 >
-> 版本号口径（用户 2026-11-28 定）：0.2.999 之后写 0.2.NNNN，不再进 0.3.x（下一版 0.2.1003）。
+> 版本号口径：`0.2.999` 之后一律 `0.2.NNNN`（下一版 `0.2.1003`），不再进 0.3.x。
 
 ## 🚀 Next phase
 
-> ### ⏳ v0.2.1002（本会话最后一版，**等用户实机复验**）
+> ### ⏳ v0.2.1002 已发布，等实机复验（用户还没在我这边确认过玩法）
 >
-> 1. **时间扭曲不再给力量**（用户：不要在强制终止玩家回合时让所有 boss 获得 2 力量）——
->    `BossTimeWarpPower` 触发只做「结束被锁定玩家的回合 + 塔1 特效」，16 语言说明同步改成「只结束回合」。
-> 2. **节制力量延后到玩家回合开始**（用户新口径：强制结束自己的回合 + 玩家下回合开始时她与友方 +2）——
->    `TriggerAsync` 只记 `_pendingStrengthGrants++`，`AfterSideTurnStart(side==Player)` 结算；
->    文案（powers 表 + monsters 表，16 语言）已同步。
-> 3. **意图预览吃「前面 Boss 先挂的易伤」**（新增 `src/Hooks/Core/VulnerableLookahead.cs`）：
->    按 `CombatState.Enemies` 的行动次序正向模拟前面每只 Boss 的计划牌；挂易伤判据 = `DynamicVars.Vulnerable`
->    （反编译实证 Bash/HighFive 都是 `PowerVar<VulnerablePower>`）；`TargetType.AllEnemies` 算给所有玩家、
->    单体算给它计划打的目标；苦难 MISERY 的「传染」也算；只在「目标现在没有易伤」时乘 1.5（目标带摧残 2.0），
->    乘在 floor 之前。无来源伤害不走这条管道，召唤物/影子玩家/原版怪物一律 1.0。
+> 1. **时间扭曲不再给力量**；2. **节制 +2 力量延后到玩家回合开始**；
+> 3. **意图预览吃「同回合前面 Boss 先挂的易伤」**（`src/Hooks/Core/VulnerableLookahead.cs`，日志 `易伤前瞻：…`）；
+> 4. 修好 ≥4 只 Boss 时超长意图行半透明。
+> 详细口径见 `docs/plans/changelog-history.md` 的 `## v0.2.1002` 与发布记录。
 >
-> **等着验的点**：① 恐惧模式两处 12 张都只结束回合、不加力量；② 节制触发后玩家侧回合开始才 +2
-> （日志 `节制：玩家的回合开始 ⇒ 她与友方 +2 力量到账`）；③ 养手骨「击掌」在先 + 巨石战「彼岸咆哮」在后时，
-> 彼岸咆哮的预览应比之前高 50%（有摧残 100%），日志有 `易伤前瞻：<牌> 的伤害预览 ×1.5（…）`。
+> ### ⚠ 手机安装（下一件事）
+> 1. 手机开**无线调试**（或插 USB）；2. `adb devices` 能看到设备后：
+>    `powershell -File .tools\upload-b64.ps1` → 再 `cmd /c .tools\push-and-extract.bat`（tar 内是 `mods/`，解到 `files/` 下）；
+> 3. 验版本：`adb -s <serial> shell "run-as com.megacrit.sts2re cat files/mods/CharacterBosses.json"` 应为 `0.2.1002`；
+> 4. 手机运行时装的是 **net9** ⇒ `CharacterBosses.Impl111.dll.bin` 必须来自 `src\bin\Release-111-phone\`（本包已是）。
 >
-> ### ⏳ 仍在等实机验证（更早几版）
-> · v0.2.1001：多人时时间扭曲只记被锁定玩家的牌（日志 `时间扭曲：记 X 的第 n/12 张（锁定目标=Y）`）；
-> · v0.2.1000：时间扭曲特效（塔1 的 borderGlow2 金边 + 那个钟，尺寸 0.30 屏短边、旋转匀速）；
-> · v0.2.997/0.2.998：6 只站位与次序、≥4 只意图半透明、勤学精进、以手拒之返还、统帅模式切视角。
+> ### 仍在等实机验证（更早）
+> · v0.2.1001：多人时时间扭曲只记被锁定玩家；v0.2.1000：塔1 金边辉光 + 那个钟（尺寸 0.30 屏短边、匀速旋转）；
+> · v0.2.997/0.2.998：6 只站位与次序、勤学精进、以手拒之返还、统帅模式切视角。
 >
 > ### 可能再改的点
-> · `VulnerableLookahead` 的「摧残 ×2」是按“效果翻倍”推的（虚弱 ×0.75→×0.5 同理），若实机发现是 ×1.5 再调；
-> · 只处理「前面的 Boss 挂易伤」；遗物/玩家自身产生的易伤不在前瞻范围内。
+> · `VulnerableLookahead` 的「摧残 ×2」是按“效果翻倍”推的；只处理「前面的 Boss 挂易伤」，遗物/玩家自身产生的易伤不在范围内。
 >
 ## 环境与硬规矩（沿用）
 

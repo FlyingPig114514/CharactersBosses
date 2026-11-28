@@ -7683,3 +7683,4 @@ Chronological action log.
 | 2026-11-28 19:55 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/.tmp/fix-timewarp-text-1002.ps1` | ok | 0 |
 | 2026-11-28 19:55 | edit | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/src/Hooks/Core/BuildInfo.cs` | ok | 0 |
 | 2026-11-28 20:01 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/workshop/changenote.txt` | ok | 0 |
+| 2026-11-28 20:04 | write | `D:/Sts2ModProject/Downfall Expansion Vanilla Characters as Bosses/.tmp/release-notes-0.2.1002.md` | ok | 0 |
