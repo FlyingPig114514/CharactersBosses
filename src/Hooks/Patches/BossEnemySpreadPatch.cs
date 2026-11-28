@@ -78,8 +78,11 @@ public static class BossEnemySpreadPatch
             }
             float centerX = (minX + maxX) * 0.5f;
             float baseY = ours[0].GlobalPosition.Y;
-            float upY = baseY - SpreadY * 0.65f;
-            float downY = baseY + SpreadY * 0.65f;
+            // ★ v0.2.993：6 只分 3 行，上下各 ±0.65×SpreadY 只有 91px，三行挤在一起（用户截图「全堆在一起」）
+            //   ⇒ 6 只时把上下幅度放大到 ±0.95（≈133），三行间距和 5 只局的上/下间距（145）同量级。
+            float yFactor = ours.Count >= 6 ? 0.95f : 0.65f;
+            float upY = baseY - SpreadY * yFactor;
+            float downY = baseY + SpreadY * yFactor;
 
             // 视口宽度（用来把最外侧那两只夹回屏幕内 —— 上一次直接外扩把 x 顶到 2110 出屏了）
             float viewW = 0f;
@@ -92,6 +95,31 @@ public static class BossEnemySpreadPatch
             var slotY = SlotY(ours.Count, upY, downY);
 
             var parts = new List<string>();
+            // ★ v0.2.994（用户 2026-11-28：「空间还是有些小，大于等于 6 人时进一步扩大场地
+            //   （让角色和 boss 在画面中变小）」）：
+            //   ≥6 只时把**每只 Boss 的节点整体缩到 0.80**（`NCreature` 是 Control，`Scale` 直接生效），
+            //   相当于腾出 20% 的横向/纵向空间；位置仍由下面那套站位表决定 ⇒ 只是「人和怪都变小一点、场地变大」。
+            //   1~5 只不缩放（零回归）。缩放失败不影响站位。
+            bool shrink = ours.Count >= 6;
+            for (int i = 0; i < ours.Count; i++)
+            {
+                if (!shrink) break;
+                try
+                {
+                    var n = ours[i];
+                    if (n == null || !GodotObject.IsInstanceValid(n)) continue;
+                    if (n.Scale != new Vector2(0.8f, 0.8f)) n.Scale = new Vector2(0.8f, 0.8f);
+                }
+                catch { /* 缩放失败不影响站位 */ }
+            }
+            // ★ v0.2.992：站位表比 Boss 少时**绝不能悄悄绕回 0 号位**（那就是两只完全重合）。
+            //   真发生了就记一行 ⚠，下次一眼看出是 SlotX/SlotY 少给了几个点。
+            if (ours.Count > slotX.Length || ours.Count > slotY.Length)
+            {
+                Logger.Log($"[CharBoss] ⚠ 站位点不够：Boss {ours.Count} 只，但只算到 " +
+                           $"X={slotX.Length} 个 / Y={slotY.Length} 个 ⇒ 多出来的会重叠" +
+                           "（检查 SlotX / SlotY 的分支顺序与数量）");
+            }
             for (int i = 0; i < ours.Count; i++)
             {
                 var node = ours[i];
@@ -171,6 +199,52 @@ public static class BossEnemySpreadPatch
     /// </summary>
     private static float[] SlotX(int count, float minX, float maxX, float centerX, float viewW)
     {
+        // ★★ v0.2.992（用户 2026-11-28 截图：「观者和猎人叠在一起了」）——
+        //   **分支顺序写错**：原来 `if (count >= 5)` 写在 `if (count >= 6)` 前面，
+        //   6 只永远匹配到 5 只那条 ⇒ 只算出 5 个站位 ⇒ 第 6 只被下面那句 `i % slotX.Length` 绕回 0 号位
+        //   ⇒ 和第一只**完全重合**。实测日志（两者坐标一模一样）：
+        //     `多 Boss 站位（6 只）：… SILENT_BOSS@(839.99994, 607.2) … WATCHER_FORESIGHT_BOSS@(839.99994, 607.2)`
+        //   `SlotY` 那边顺序是对的（6 只在前），所以 Y 分了 3 档、X 却只有 5 档 —— 看着就是「叠在一起」。
+        //   ⇒ 6 只的分支必须排在 `>= 5` **之前**。
+        if (count >= 6)
+        {
+            // 两列（间距 g = 1.5*SpreadX，和 4 人局同一套中心距），每下一行整体斜移 g/2
+            // ⇒ 第 3 行第一个（索引 3）的 X 正好等于第 1 行第二个（索引 2）的 X。
+            //
+            // ★★ v0.2.993（用户 2026-11-28 截图：「怎么全堆在一起了（和玩家叠在一起），右边空了一大块。
+            //   整体往右挪并分散」）：
+            //   上一版（2026-11-21 写、直到 0.2.992 才第一次真的跑到）把起点写死成 `left6 = 视口宽×0.17`
+            //   —— 1920 的屏幕上就是 x=326 起步、总共只跨 `2g = 600`（326…926）
+            //   ⇒ 6 只全挤在**玩家区那半边**，右边 1000 多像素空着。
+            //   现在和 4/5 只那一套用同样的边界规则：
+            //     · 最右那只贴右缘（视口宽 − 0.75×SpreadX，与 5 只局同一处，实测 1920 下是 1770）；
+            //     · 相邻站位步长固定 `1.5×SpreadX`（≈300，正好一个意图面板宽，不压住邻居）；
+            //     · 总跨度 = 4 个步长（≈1200），不够宽就退回「从玩家区右边界起算」。
+            //   1920 下算出来是 570 / 870 / 1170 / 1170 / 1470 / 1770（中间那个 1170 出现两次，
+            //   对应设计里的「第 3 行第一个在 第 1 行第二个正下方」，靠 Y 分层区分）。
+            // ★★ v0.2.994（用户 2026-11-28：「最左边的猎人已经跑到玩家那了，再整体往右挪。不过空间还是有些小」）：
+            //   左边界从 `视口宽 × 0.17`（1920 ⇒ 326，正好压在玩家区）推到 **`视口宽 × 0.34`**（⇒ 653），
+            //   右缘仍是 5 只局那条（视口宽 − 0.75×SpreadX ⇒ 1770）；
+            //   6 个站位把 [左边界, 右缘] **等距铺满**（g = 跨度/2，步长 = g/2）。
+            //   1920 下：653 / 932 / 1211 / 1211 / 1489 / 1770（中间 1211 两次 = 第 3 行第一个在
+            //   第 1 行第二个正下方，靠 Y 分层区分）。
+            float right = viewW > 600f ? viewW - SpreadX * 0.75f : maxX + SpreadX * 0.75f;
+            float lo = viewW > 600f ? viewW * 0.34f : minX;
+            float step = SpreadX * 1.5f;                      // 最小步长（≈300，一个意图面板宽）
+            float g = Mathf.Max((right - lo) * 0.5f, step);     // g = 跨度/2 ⇒ 6 个点铺满 [lo, right]
+            if (lo + g * 2f > right) g = Mathf.Max(step, (right - lo) * 0.5f);
+            float left6 = right - g * 2f;
+            if (left6 < lo) left6 = lo;
+            return new[]
+            {
+                left6,             // 0: 行1 左
+                left6 + g * 0.5f,  // 1: 行2 左
+                left6 + g,         // 2: 行1 右
+                left6 + g,         // 3: 行3 左（= 2 号正下方）
+                left6 + g * 1.5f,  // 4: 行2 右
+                left6 + g * 2f,    // 5: 行3 右
+            };
+        }
         if (count >= 5)
         {
             // ★ v0.2.585（5 人联机）：5 只在可用宽度里**等距**摆开（相邻 ≈ 1.2×SpreadX ≈ 240），
@@ -195,25 +269,7 @@ public static class BossEnemySpreadPatch
                 right,
             };
         }
-        if (count >= 6)
-        {
-            // 两列（间距 g = 1.5*SpreadX，和 4 人局同一套中心距），每下一行整体斜移 g/2
-            // ⇒ 第 3 行第一个（索引 3）的 X 正好等于第 1 行第二个（索引 2）的 X。
-            float g = SpreadX * 1.5f;
-            float left6 = viewW > 600f ? viewW * 0.17f : minX - SpreadX * 0.75f;
-            // 最右不能越过 4 人局那条右缘（视口宽 - 0.75*SpreadX）
-            float rightLimit = viewW > 600f ? viewW - SpreadX * 0.75f : maxX + SpreadX * 0.75f;
-            if (left6 + g * 2f > rightLimit) left6 = Mathf.Max(minX - SpreadX * 0.5f, rightLimit - g * 2f);
-            return new[]
-            {
-                left6,             // 0: 行1 左
-                left6 + g * 0.5f,  // 1: 行2 左
-                left6 + g,         // 2: 行1 右
-                left6 + g,         // 3: 行3 左（= 2 号正下方）
-                left6 + g * 1.5f,  // 4: 行2 右
-                left6 + g * 2f,    // 5: 行3 右
-            };
-        }        if (count >= 4)
+        if (count >= 4)
         {
             // 用户 2026-10-29 第三次反馈：「右边还有那么大空间呢，再往右错一些」。
             // 上一版把右侧夹在 `视口宽 - 310`，1920 的视口只用到 1610 ⇒ 右边空了 300 多。

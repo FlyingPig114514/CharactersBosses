@@ -121,6 +121,10 @@ internal static class BossUiSession
 
             Logger.Log($"[CharBoss] 本机操控的玩家变了：P#{prev} → P#{now}" +
                        "（切视角的模组改的是 LocalContext.NetId）⇒ 重算意图 + 重建 Boss 面板");
+            // ★ v0.2.997（用户 2026-11-28：「统帅模式下抉择储的选牌界面应该跳到对应玩家的视角」）：
+            //   观察到视角自己在变 ⇒ 本机确实能操控多个座位 ⇒ 以后遇到要「指定玩家来选牌」的界面，
+            //   我们才敢自己把视角切过去（见 Core/SeatSwitch.cs）。
+            try { Core.SeatSwitch.NotePerspectiveChanged(); } catch { /* 忽略 */ }
 
             // ★ v0.2.973（用户 2026-11-27：「切换操控的角色时 boss 的意图不会跟着变 —— 我从玩家 B 切到
             //   玩家 A，boss A 的单体攻击意图伤害还是 0」）：

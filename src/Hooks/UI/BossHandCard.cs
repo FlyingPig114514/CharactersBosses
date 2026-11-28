@@ -236,9 +236,95 @@ public static partial class BossHandCard
         try { AddDrillGainIntent(boss, planned, targets, row); }
         catch (Exception e) { Logger.Log("[CharBoss] 天际钻头预告意图失败: " + e.Message); }
         try { ApplyIntentShift(boss, row); } catch { /* 忽略 */ }
+        try { ApplyCrowdedIntentFade(boss, planned, row); } catch { /* 忽略 */ }
 
         // 激发球的意图（攻势 / `伤害×次数` / 守势）已经在计划阶段由 BossOrbSim 算好并塞进 Intents，
         // 这里不再自己拼 —— 顺序才是对的（先牌本身的意图，再激发的意图）。
+    }
+
+    /// <summary>
+    /// **Boss ≥ 4 只时，本回合要打 4 张以上牌的 Boss，其意图行半透明**（用户 2026-11-28 二次订正）：
+    /// > 「大于等于 4 个 boss 时，除了最左侧 boss，其它 boss 的**意图中的牌数量大于 3** 时**卡牌**应该半透明」
+    ///
+    /// ⇒ 判据（不是「第 4 张及以后」，而是**整只 Boss 的意图行**）：
+    ///   1. 场上活着的我们的 Boss **≥ 4 只**（原来我写成 >4，错了）；
+    ///   2. 这只 Boss 本回合计划**超过 3 张牌**（`boss.Plan.Count > 3`），
+    ///      —— 原来我用「这一格对应第几张牌」判，而意图行常常来自 `DisplayPlays`（所向无敌等），
+    ///         `Plan` 里找不到那张牌 ⇒ index = -1 ⇒ **一次都没生效**（用户：「似乎没有实现」）；
+    ///   3. **最左侧那只 Boss 不做**（用户要求）；
+    ///   4. 半透明作用在该 Boss **所有**意图行上（每张牌下面那一行都设 alpha 0.45）。
+    /// 只在重建意图行时算一次，不是每帧。
+    /// </summary>
+    internal static void ApplyCrowdedIntentFade(CharBossMonster boss, PlannedPlay? planned, Control row)
+    {
+        try
+        {
+            if (boss == null || row == null || !GodotObject.IsInstanceValid(row)) return;
+            if (AliveBossCount(boss) < 4) return;              // ≥4 只才启用
+
+            int plannedCards = 0;
+            try { plannedCards = boss.Plan?.Count ?? 0; } catch { plannedCards = 0; }
+            if (plannedCards <= 3) return;                      // 只糊「这一回合打 4 张以上」的 Boss
+
+            if (IsLeftmostBoss(boss)) return;                   // 最左侧那只不受限
+
+            row.Modulate = new Color(1f, 1f, 1f, 0.45f);
+        }
+        catch { /* 纯表现层，出问题就按原样显示 */ }
+    }
+
+    /// <summary>场上**活着的**我们的 Boss 有几只（拿不到返回 0 ⇒ 不启用半透明）。</summary>
+    private static int AliveBossCount(CharBossMonster boss)
+    {
+        try
+        {
+            var combat = boss.CombatState;
+            if (combat == null) return 0;
+            int n = 0;
+            foreach (var c in combat.Enemies)
+            {
+                if (c?.Monster is not CharBossMonster) continue;
+                if (!c.IsAlive || c.IsDead) continue;
+                n++;
+            }
+            return n;
+        }
+        catch { return 0; }
+    }
+
+    /// <summary>这只 Boss 是不是场上**最靠左**的那只（按生物节点的屏幕 X）。</summary>
+    private static bool IsLeftmostBoss(CharBossMonster boss)
+    {
+        try
+        {
+            float? mine = ScreenX(boss.Creature);
+            if (mine == null) return false;                    // 量不到 ⇒ 当成「不是最左」（保守：宁可半透明）
+
+            var combat = boss.CombatState;
+            if (combat == null) return true;
+            foreach (var c in combat.Enemies)
+            {
+                if (c?.Monster is not CharBossMonster other) continue;
+                if (ReferenceEquals(other, boss)) continue;
+                if (!c.IsAlive || c.IsDead) continue;
+                float? x = ScreenX(c);
+                if (x != null && x.Value < mine.Value - 1f) return false;
+            }
+            return true;
+        }
+        catch { return false; }
+    }
+
+    private static float? ScreenX(Creature? creature)
+    {
+        try
+        {
+            if (creature == null) return null;
+            var node = MegaCrit.Sts2.Core.Nodes.Rooms.NCombatRoom.Instance?.GetCreatureNode(creature);
+            if (node == null || !GodotObject.IsInstanceValid(node)) return null;
+            return node.GlobalPosition.X;
+        }
+        catch { return null; }
     }
 
     /// <summary>这一回合的意图栏整体左移（用户 2026-11-07：彩虹机第 7/12 回合意图太多被屏幕边缘切掉）。</summary>

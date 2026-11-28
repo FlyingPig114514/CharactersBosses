@@ -1,8 +1,13 @@
 # CharacterBosses — 交接状态
 
-> 更新：2026-11-27（**v0.2.981 已装机 + 已打包 + 已上传工坊 + 已推 GitHub**）。
-> ✅ 0.2.975 → 0.2.981 已全部发布：工坊条目 3830639796 更新于 22:45:20（21,991,204 B）；
-> GitHub `main` = `a28a48e`，tag `v0.2.981`，Release 460736498（zip 18,549,928 B，latest 已指向它）。
+> 更新：2026-11-27 深夜（**v0.2.987 已装机 + 已打包，未上传**）。
+> · 上次发布仍是 **v0.2.981**：工坊条目 3830639796 更新于 22:45:20（21,991,204 B）；
+>   GitHub `main` = `a28a48e`→`c57582c`（发布记录），tag `v0.2.981`，Release 460736498。
+> · 本地已备好 **v0.2.987**：`.dist\CharacterBosses-v0.2.987.zip`（18,554,853 B），
+>   `workshop\changenote.txt` 与 `workshop.json` 都已改好 ⇒ 用户说上传即可（`tools\upload-workshop.ps1`）。
+> · 工作区 0.2.982~0.2.987 的改动**未提交**（等发布会话一起 commit + tag + push）。
+> · v0.2.987 内容：给观者模组「勤学精进」做整段接管（原实现调了改签名的 `CardModel.UpgradeInternal()`，
+>   斩杀时 MissingMethodException 把整场卡死）；效果按原实现 = 砍伤害 + **卡组**里随机升级一张可升级牌。
 
 ## 🚀 Next phase
 

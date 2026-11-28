@@ -548,6 +548,8 @@ internal static class BossPicksSync
     /// <summary>房主算出来的「观者可以出现吗」。</summary>
     private static bool _watcherOk;
 
+
+
     /// <summary>房主是否已经算过一次结论。</summary>
     private static bool _watcherDecided;
 
@@ -571,12 +573,26 @@ internal static class BossPicksSync
 #if STS2_111
         try
         {
-            // ⚠ 房主**每次都重算**（不是「算一次就锁」）：开局早期 `RunState` 可能还读不到，
-            //   那时会算出「单人 ⇒ 可以放观者」；等人数真的读到 2、或客人上报到齐之后必须纠正。
-            //   重算很便宜（几个字典查表），而且结论没变时立刻 return，不会反复刷日志/清缓存。
             if (NetRole.IsHostOrSolo) return RecomputeWatcherAllowed("询问");
-            return HostWatcherOk == true;
+
+            // ★★ v0.2.991（用户 2026-11-28 的口径）：
+            //   「你应该只需要检测主机有没有观者 mod 就行了，因为观者 mod 阻塞联机，
+            //     能成功联机说明肯定所有玩家都装了同一个观者 mod」
+            //   ⇒ 客人端：房主广播的结论优先；**还没收到广播时按本机自己的探测算**（同一套 mod ⇒ 结论相同），
+            //     这样即使广播丢了/来晚了，两端算出来的候补表也一致（不会因为「等消息」而少一个角色）。
+            return HostWatcherOk ?? OwnWatcherUsable();
         }
+        catch { return false; }
+#else
+        return false;
+#endif
+    }
+
+    /// <summary>本机自己装的观者 mod 能不能用（= 房主判定用的同一条判据）。</summary>
+    private static bool OwnWatcherUsable()
+    {
+#if STS2_111
+        try { return WatcherModPresence.Usable && !string.IsNullOrEmpty(WatcherCards.ProviderId); }
         catch { return false; }
 #else
         return false;
@@ -591,27 +607,42 @@ internal static class BossPicksSync
         {
             if (!NetRole.IsHostOrSolo) return false;
             string mine = WatcherCards.ProviderId;
-            int expected = Math.Max(0, BossLineups.PlayerCount() - 1);
+            int players = BossLineups.PlayerCount();
 
-            bool ok;
-            if (expected == 0) ok = true;                       // 单人：只看本机
-            else if (string.IsNullOrEmpty(mine)) ok = false;    // 房主自己没装 ⇒ 不放
-            else if (PeerCaps.Count < expected) ok = false;      // 还有客人没上报 ⇒ 先不放（保守）
-            else
+            // ★★ v0.2.991（用户 2026-11-28 定的口径，**去掉「等客人上报」这一整套**）：
+            //   > 「你应该只需要检测主机有没有观者 mod 就行了，因为观者 mod 阻塞联机，
+            //   >   能成功联机说明肯定所有玩家都装了同一个观者 mod」
+            //   用户说得对：观者 mod 会阻塞联机（mod 不一致根本进不了同一个房间），
+            //   所以「房间能开起来」本身就等价于「所有人装的观者 mod 一样」⇒ 只看本机就够。
+            //   原来那套「必须收到玩家数−1 份上报且逐份一致」在测试房/同机座位上永远收不齐
+            //   （实测 `期待 5 份、已收到 0 份`），把 6 人局硬压成 5 只 Boss。
+            //   ⚠ 仍然保留 PeerCaps 的**诊断**：万一真有人的实现与本机不同（A 版 vs B 版），
+            //     日志会打一行 ⚠ 提醒，但**不再阻塞**（那是两个不同工坊条目，游戏本身不会拦）。
+            bool ok = WatcherModPresence.Usable && !string.IsNullOrEmpty(mine) && players >= 1;
+
+            string extra = string.Empty;
+            if (PeerCaps.Count > 0)
             {
-                ok = true;
+                int mismatch = 0;
                 foreach (var kv in PeerCaps)
                 {
-                    if (!string.Equals(kv.Value, mine, StringComparison.Ordinal)) { ok = false; break; }
+                    if (!string.Equals(kv.Value, mine, StringComparison.Ordinal)) mismatch++;
+                }
+                if (mismatch > 0)
+                {
+                    extra = $"；⚠ 有 {mismatch} 位客人上报的观者实现与本机（{mine}）不同 ⇒ 仍按本机放行，" +
+                            "但两端观者 Boss 的卡组/遗物可能不同（建议所有人统一用同一个观者 mod）";
                 }
             }
 
             if (_watcherDecided && ok == _watcherOk) return _watcherOk;
             _watcherOk = ok;
             _watcherDecided = true;
-            Logger.Log($"[CharBoss] 观者 Boss：房主判定「可以出现」={ok}（{why}）—— 本机实现={(string.IsNullOrEmpty(mine) ? "未装" : mine)}、" +
-                       $"期待客人上报 {expected} 份、已收到 {PeerCaps.Count} 份" +
-                       (ok ? "；全端一致 ⇒ 观者进三层候补表" : "；不全一致 ⇒ 观者**不进**三层候补表（避免两端阵容不同步）"));
+            Logger.Log($"[CharBoss] 观者 Boss：房主判定「可以出现」={ok}（{why}）—— " +
+                       $"本机实现={(string.IsNullOrEmpty(mine) ? "未装" : mine)}、可用={WatcherModPresence.Usable}、" +
+                       $"房间人数={players}（只按房主本机判定：观者 mod 不一致根本联不进同一个房间）" + extra +
+                       (ok ? "；⇒ 观者进候补表（逐幕：一层预见观 / 二层印牌观 / 三层神格观·Ω观）"
+                           : "；⇒ 观者**不进**候补表（本机没有可用的观者 mod）"));
             BossLineups.InvalidateCache();
             BroadcastIfHost();
             return _watcherOk;

@@ -226,10 +226,16 @@ public static class MultiBossPlan
                 if (ch >= 0) usedChars.Add(ch);
             }
 
+            // ★★ v0.2.990（用户 2026-11-28 明确口径）：「目前如果不装观者 mod 上限应该还是 5 人，
+            //   **不应该打破『每个角色最多一只』的限制**」。
+            //   ⇒ 这里恢复 v0.2.799 的硬约束：伙伴不得与主 Boss 或已有伙伴**同角色**，凑不满就少出。
+            //   6 人局要出 6 只，前提是第 6 个角色**真的可用**（观者）—— 那件事由观者闸门负责
+            //   （`BossPicksSync.RecomputeWatcherAllowed`，v0.2.990 同时修了它「一个上报都没有也判 False」的问题）。
             if (order.Count < wantPartners)
             {
                 Logger.Log($"[CharBoss] 伙伴名额 {wantPartners} 只、实际只凑到 {order.Count} 只 ⇒ **少出**" +
-                           "（硬约束：伙伴不得与主 Boss 或已有伙伴同角色；宁可少一只，也不要场上一模一样的两个）" +
+                           "（硬约束：伙伴不得与主 Boss 或已有伙伴同角色；宁可少一只，也不要场上有两只同角色）" +
+                           (mainChar < 0 ? "" : $"（主角色「{BossKeys.CharacterName(mainChar)}」已占）") +
                            (rejected.Count > 0 ? $"；被挡下的候选=[{string.Join(" | ", rejected)}]" : ""));
             }
 

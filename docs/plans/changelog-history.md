@@ -4,6 +4,19 @@
 > 旧条目逐字来自 `git show HEAD:src/Hooks/Core/BuildInfo.cs` 的 Tag 常量（v0.2.871 及其之前，共 236 条）。
 > 最新版本（0.2.889）是当前 Tag，同时在各条 `workshop/changenote.txt` 里也有面向玩家的摘要。
 
+### 打包（2026-11-27 · v0.2.987，**未上传**）
+
+用户：「打包，不上传」。
+
+- `.dist\CharacterBosses-v0.2.987.zip` = **18,554,853 B**（17.7 MB，6 个文件，zip 内顶层 `CharacterBosses\`）；
+- 游戏 `mods` / `workshop\content` / `.dist` 三份的 5 个二进制 SHA256 逐一**一致**
+  （dll `C7A8469B1968` / Impl111 `FC662C69202B` / Impl113 `D93EBB36C017` / pck `CD71FF929D5E` / json `A06046926B1C`），
+  两份 Impl 的版本串都是 `v0.2.987`；
+- `workshop\changenote.txt` 已改成 0.2.987 版（覆盖 0.2.982~0.2.987：观者「勤学精进」卡死的修复），
+  `workshop.json` 已用 `tools\mk-workshop-json.ps1` 重新生成 ⇒ 下次说上传时直接可用；
+- **没有**上传创意工坊（条目 3830639796 仍是 **v0.2.981**）、**没有**推 GitHub（`main` 仍是 `c57582c`），
+  工作区改动也**没有提交**。
+
 ### 发布（2026-11-27 · v0.2.981）
 
 用户：「打包，上传创意工坊和github」。
@@ -40,6 +53,568 @@
 - GitHub：`main` → `4735841`，tag `v0.2.968`；新建 **Release**（公开）并挂上 zip
   （`.../releases/download/v0.2.968/CharacterBosses-v0.2.968.zip`，18,517,467 B，实测直链可下载），
   `releases/latest` 已指向 v0.2.968（全站现在共 2 个 Release：v0.2.967 / v0.2.968）。
+
+## v0.2.997（2026-11-28）：统帅模式下抉择储的选牌界面出不来 —— 弹界面前先把视角切到被锁定的玩家
+
+用户：「使用统帅模式 mod 操控多名玩家时，如果回合结束时没有切换到被抉择储锁定的玩家，抉择储就会自己选择
+抉择的目标（默认为隐秘藏品和铸墙）。应该让玩家像其它出现选牌界面时那样**跳到对应玩家的视角**进行选择」
+
+### 铁证（活日志）
+
+```
+指导：储君打出「抉择，抉择」⇒ 让 P#d7d5b7 从 5 张里挑一张（HIDDEN_CACHE,BULWARK,ALIGNMENT,RESONANCE,SHOCKWAVE）
+指导：选择界面出错，退回第一张: Cannot focus selection owner
+指导：玩家没给出选择 ⇒ 退回第一张 HIDDEN_CACHE
+（恐惧模式第二次：退回第一张 BULWARK）
+```
+
+`HIDDEN_CACHE` = 隐秘藏品、`BULWARK` = 铸墙 —— 正是玩家看到的「默认挑了隐秘藏品和铸墙」。
+所以不是「没接管」，而是**接管了但界面弹不出来**：`LocalContext.IsMe(chooser)` 为假（视角停在别的座位），
+原版选择界面在第一句就抛 `Cannot focus selection owner` ⇒ 我们只能退回 `candidates[0]`。
+
+### 改法（新增 `src/Hooks/Core/SeatSwitch.cs`）
+
+- `SeatSwitch.SwitchTo(player, why)`：把 `LocalContext.NetId`（游戏认为的「我」）设成那位玩家 ——
+  和统帅模式切视角用的是**同一个开关**（`BossUiSession.EnsurePerspective` 一直在监听它的变化）；
+- **只在「本机确实能操控多个座位」时才动手**，判据两条取或：
+  ① 观察到过 `LocalContext.NetId` 自己变过（= 有切视角的模组在跑；`BossUiSession` 顺手记下）；
+  ② 进程里有 `AiTeammate` 程序集（统帅模式的宿主）；
+  两条都不满足 ⇒ 绝不切（普通联机里不会去抢别人的座位）；
+- `ChoiceRegentPickPatch.ChooseAsync`：`SuspendForUi` + 弹界面**之前**先 `SwitchTo(chooser)`，
+  切不动就记一行（提示玩家在那个座位按结束回合），其余流程不变。
+
+⚠ 未实机验证。日志确认行：`选牌视角切换：… → <玩家>(NetId=…) 因为这次「抉择，抉择」要由他来选（已生效）`。
+
+## v0.2.996（2026-11-28）：观者「以手拒之」的格挡返还错给 Boss —— **是影子玩家引起的，只有我们的多 Boss 局会碰到**
+
+用户：「好像有bug，观者mod的以手拒之给敌方boss上的debuff格挡返还好像会让被上debuff的boss受击时也起甲。你看看是不是有这个问题，是和本模组有关吗？」
+
+### 反编译（A 版 Boninall `WatcherMod.BlockReturnPower.<AfterDamageGiven>d__4.MoveNext`）
+
+```csharp
+if (target == Owner && dealer != null && dealer != Owner && cardSource != null
+    && cardSource.Type == Attack && props.IsPoweredAttack() && result.TotalDamage > 0)
+{
+    object obj = dealer.Player;                    // ① 攻击者自己有 Player 就用它
+    if (obj == null) obj = dealer.PetOwner;        // ② 攻击者的主人
+    if (obj == null) obj = Owner.Applier?.Player;  // ③ 兜底：施加 debuff 的那位玩家
+    Player p = (Player)obj;
+    if (p != null) await CreatureCmd.GainBlock(p.Creature, Amount, (ValueProp)4, null, false);
+}
+```
+
+### 为什么是「与本模组有关」——影子玩家
+
+**我们的 Boss 是影子玩家**（`ShadowPlayerFactory`）：同一只 `Creature` **既是 Monster 又是 Player**
+（`ShadowPlayerFactory.IsShadowBound` = `Player != null && Monster != null`）。
+原版游戏的敌人 `Creature.Player` **永远是 null** ⇒ ① 永远不成立，必然走 ③（返还给施加者 = 玩家）。
+而我们这边只要发生「**某只 Boss 打中了带 debuff 的另一只 Boss**」（多 Boss 同场时球/AoE/召唤物打到自己人
+——`BossOrbTargeting` 那个 bug 就是同一根源），① 立刻命中：`dealer.Player` = 那只 Boss 的**影子玩家**
+⇒ **格挡返还给了那只 Boss**。玩家自己打被 debuff 的 Boss 时返还仍然正确
+（日志实证是 `效果追踪 BLK Watcher +3` 这种，返给玩家）。
+
+### 改法（`src/Hooks/Core/WatcherBlockReturnFix.cs`，新增）
+
+运行期反射挂 `BlockReturnPower.AfterDamageGiven` 的**前缀**：
+
+- 把 dealer 按原实现的两级解析成 `Player`（`dealer.Player ?? dealer.PetOwner`）；
+- **只有解析出来的那位是我们影子玩家**时才接管 ⇒ 直接完成、**不返还任何格挡**
+  （卡面原文是「**你**攻击该敌人时获得格挡」，Boss 打 Boss 不算「你」），并留一行诊断日志；
+- 其余情况（真玩家 / 玩家宠物 / 施加者兜底）**一律 `return true` 交还原实现** —— 行为零变化。
+
+⚠ B 版（lamali 3747492505）的同名 power 用的是 `AfterAttack(ctx, AttackCommand)`，签名不同，暂未覆盖
+（当前用的是 A 版 boninall）。
+
+## v0.2.995（2026-11-28）：多人 Boss 站位/行动次序按用户新口径重排（观者、愚者提到第 3/第 4 位）
+
+用户（逐字）：
+
+> 改成这个样子：
+> 1、2 幕：**猎机观愚骨战储**（尽管目前 1、2 幕还没有愚者 boss）
+> 3 幕：**猎机观愚骨储战**
+
+### 改动：`CharBossEncounters.StationRank`
+
+| 幕 | 旧次序 | **新次序** |
+| --- | --- | --- |
+| 1、2 幕 | 猎 → 骨 → 机 → 战 → 储 →（观/愚 落兜底档、永远最右） | **猎 → 机 → 观 → 愚 → 骨 → 战 → 储** |
+| 3 幕 | 猎 → 机 → 骨 → 储 → 战 →（观/愚 落兜底档、永远最右） | **猎 → 机 → 观 → 愚 → 骨 → 储 → 战** |
+
+- 观者、愚者从原来的 `_ => 5` 兜底档**提到第 3 / 第 4 位**；
+- 判据用**基类** `WatcherBoss` / `FoolBoss`（6 个观者变体、塔罗愚都直接继承这两个基类 ⇒ 一并命中）；
+- `FoolBoss` 只在 `#if STS2_113` 里存在（愚者是 0.113 才有的角色）⇒ 那两个分支用 `#if` 包住，
+  111 构建里愚者档位自动消失（次序仍是 猎→机→观→骨→战→储）；
+- 这一行同时决定**站位顺序**（`BossEnemySpreadPatch.PlacementRank` 取 `Enemies` 下标）与**行动顺序**。
+
+⚠ 未实机验证。日志确认行：`多 Boss 行动顺序（按职业次序 + 同角色按编号，第 N 幕）：静默猎手 → 故障机器人 → 观者 → …`
+
+## v0.2.994（2026-11-28）：6 只再往右挪并铺满右半场 + ≥6 人整场缩小 + 意图半透明按你的口径重做
+
+用户：「最左边的猎人已经跑到玩家那了，再整体往右挪。不过空间还是有些小，这样吧，大于等于 6 人时进一步扩大场地（让角色和 boss 在画面中变小）；另外我说的大于等于 4 个 boss 时除了最左侧 boss 其它 boss 的意图中的牌数量大于 3 时卡牌应该半透明似乎没有实现；还有站位顺序观者不是在最后一个。」
+
+### ① 6 只站位：左边界推离玩家区 + 铺满右半场
+
+| | 原来（0.2.993） | 现在（0.2.994） |
+| --- | --- | --- |
+| 左边界 | `视口宽×0.17`（1920 ⇒ 326，压在玩家区） | **`视口宽×0.34`**（⇒ 653） |
+| 跨度 | 固定 1200（右对齐后仍偏左） | `g = (右缘−左边界)/2` ⇒ **铺满** [653, 1770] |
+| 1920 下的 6 个 X | 570 / 870 / 1170 / 1170 / 1470 / 1770 | **653 / 932 / 1211 / 1211 / 1489 / 1770** |
+
+（中间那个重复值是设计本身：第 3 行第一个在 第 1 行第二个正下方，靠 Y 分层。）
+
+### ② ≥6 人「扩大场地」：每只 Boss 节点缩到 0.80
+
+`NCreature` 是 `Control`，`Scale` 直接生效 ⇒ 在 `BossEnemySpreadPatch.Postfix` 里，
+当 `ours.Count >= 6` 时把每只 Boss 缩到 `(0.8, 0.8)`，等于腾出 20% 的空间；1~5 只不缩放（零回归）。
+
+### ③ 意图半透明：按你二次订正的口径重做（原来那条**一次都没生效**）
+
+你现在的口径：「**≥4 个 Boss** 时，除最左侧 Boss，其它 Boss 的**意图中的牌数量 > 3** 时卡牌半透明」。
+
+旧实现两个错：
+1. 阈值写成 `> 4`（5 只以上才启用）—— 应该是 `≥ 4`；
+2. 用「这一格对应第几张牌」判（`boss.Plan.FindIndex(该卡)`），而意图行常常来自 `DisplayPlays`
+   （所向无敌那类展示牌）⇒ `Plan` 里找不到 ⇒ `index = -1` ⇒ **永远不满足**（这就是你看到的「似乎没有实现」）。
+
+现在：`AliveBossCount >= 4` 且该 Boss 本回合 `Plan.Count > 3` ⇒ **该 Boss 所有意图行**设 alpha 0.45；
+最左侧那只（按生物节点屏幕 X 判）不受限。
+
+### ④ 站位顺序：仓库里只找到这两条规则（没有「观者排第几」的记录）
+
+- **站位顺序 = 行动顺序 = 这只 Boss 在 `CombatState.Enemies` 里的下标**（用户 2026-10-29：
+  「站位顺序和行动顺序不一致了」⇒ `PlacementRank` 改成取 `Enemies` 下标）；
+- 6 只的**槽位形状** = 平行四边形 3 行 2 列（用户 2026-11-21）。
+
+所以观者落在最后一格，是因为它在**行动顺序里排最后**（遭遇里最后被加进去的伙伴），
+不是因为「观者必须最后」。**具体想让它排第几，需要你给一句口径**（例如「按 猎→机→骨→储→战→观者 固定排」），
+我按那句话把排序改成确定性的即可（两端仍一致）。
+
+## v0.2.993（2026-11-28）：6 只全堆在玩家区、右边空一大块 —— 6 只的 X 跨度只有 600px 且从 0.17 屏宽起步
+
+用户截图：「怎么全堆在一起了（和玩家叠在一起），右边空了一大块。整体往右挪并分散」
+
+### 真因
+
+v0.2.992 让 6 只终于走到「平行四边形」那条分支，但那段是 2026-11-21 写的、**从来没被跑过**，
+里面的 X 起止是写死的：
+
+```csharp
+float g = SpreadX * 1.5f;                                        // 300
+float left6 = viewW > 600f ? viewW * 0.17f : …;                  // 1920 ⇒ 326
+float rightLimit = viewW - SpreadX * 0.75f;                      // 1770
+if (left6 + g * 2f > rightLimit) …                               // 326+600=926 ≤ 1770 ⇒ 不修正
+```
+
+⇒ 6 个站位落在 **326 … 926**（总跨度只有 600px，正好是玩家区那半边），右侧 1770 附近空着 800 多像素
+⇒ 观感就是「全堆在一起、和玩家叠着、右边一片空」。
+
+### 改法（和 4/5 只同一套边界规则）
+
+```csharp
+float step   = SpreadX * 1.5f;          // ≈300：相邻站位步长（= 一个意图面板宽，不压邻居）
+float g      = step * 2f;               // ≈600：两列间距
+float right  = viewW - SpreadX * 0.75f; // 贴右缘（与 5 只局同一处，1920 ⇒ 1770）
+float lo     = viewW * 0.17f;           // 玩家区右边界（≈326）
+float left6  = right - g * 2f;          // 总跨度 ≈1200
+```
+
+1920 下算出来：**570 / 870 / 1170 / 1170 / 1470 / 1770**
+（中间 1170 出现两次 = 设计里的「第 3 行第一个在 第 1 行第二个正下方」，靠 Y 分层区分）。
+
+另外 **Y 也放宽**：6 只分 3 行，原来上下只有 ±0.65×SpreadY（91px）⇒ 三行挤在一起；
+现在 6 只时用 ±0.95（≈133），与 5 只局上/下间距（145）同量级。
+
+## v0.2.992（2026-11-28）：观者和猎人**叠在一起** —— `SlotX` 分支顺序写错，6 只只拿到 5 个站位
+
+用户：「观者和猎人叠在一起了。我记得我之前应该说过六人 boss 的站位（平行四边形）」
+
+### 你之前的定案（在代码里，一直是对的）
+
+`BossEnemySpreadPatch.PlacementNames` / `SlotY` 里写着（用户 2026-11-21）：
+
+> 6 只（6 人联机）：**平行四边形 3 行 2 列**，索引 = 出手顺序（从左到右）
+> 站位名：`行1左 / 行2左 / 行1右 / 行3左 / 行2右 / 行3右`
+> X 两列间距 `g = 1.5×SpreadX`，每下一行整体斜移 `g/2`（第 3 行第一个 = 第 1 行第二个的正下方）
+> Y：`上 / 中 / 上 / 下 / 中 / 下`
+
+### 真正的 bug：`SlotX` 里 6 只的分支排在 5 只**后面**
+
+```csharp
+private static float[] SlotX(int count, ...)
+{
+    if (count >= 5) { ...return 5 个点... }   // ← 6 只也匹配这条！
+    if (count >= 6) { ...return 6 个点... }   // ← 永远到不了
+```
+
+⇒ 6 只只算出 **5 个 X**，而落位那句是 `slot = i % slotX.Length` ⇒ 第 6 只（下标 5）绕回 **0 号位**
+⇒ 和第一只**完全同一个坐标**。实测日志铁证（两者坐标一模一样）：
+
+```
+多 Boss 站位（6 只）：… SILENT_BOSS@(839.99994, 607.2) …
+                      WATCHER_FORESIGHT_BOSS@(839.99994, 607.2)
+```
+
+`SlotY` 那边顺序是对的（`>= 6` 在前），所以 Y 分了 3 档、X 只有 5 档 —— 看着就是「观者站在猎人身上」。
+
+### 改法
+
+1. `SlotX`：把 6 只的分支**挪到 `>= 5` 之前**（附带一段注释写清为什么顺序要紧）；
+2. 落位前加一道自检：`ours.Count > slotX.Length / slotY.Length` 时打一行 ⚠
+   —— 这类「站位点不够 ⇒ 悄悄绕回 0 号位」的 bug 以后一眼就能看见。
+
+## v0.2.991（2026-11-28）：观者闸门**只检测房主本机**（用户口径：观者 mod 阻塞联机，能联机就说明大家装的一样）
+
+用户：「你应该只需要检测主机有没有观者 mod 就行了，因为观者 mod 阻塞联机，能成功联机说明肯定所有玩家都装了同一个观者 mod」
+
+### 改法
+
+原来 `BossPicksSync.RecomputeWatcherAllowed` 要求「收到 玩家数−1 份客人上报且逐份一致」，
+测试房/同机座位永远收不齐（实测 `期待 5 份、已收到 0 份`）⇒ 6 人局被硬压成 5 只 Boss。
+现在按用户口径简化：
+
+```csharp
+// 房主：只看本机
+bool ok = WatcherModPresence.Usable && ProviderId 非空 && 房间人数 >= 1;
+// 客人：房主广播的 wok 优先；还没收到就按本机自己的探测算（同一套 mod ⇒ 结论相同）
+return HostWatcherOk ?? OwnWatcherUsable();
+```
+
+- 「等客人上报」那套逻辑（含 v0.2.990 的 20 秒宽限）**整套删掉**；
+- `PeerCaps` 只留**诊断**：若有客人上报的实现与本机不同（A 版 boninall vs B 版 lamali —— 两个不同工坊条目，
+  游戏本身不会拦），日志打一行 ⚠ 提醒，但**不再阻塞**（阻塞的代价是 6 人局只有 5 只 Boss）；
+- 客人端不再依赖「先收到消息」：`HostWatcherOk ?? 本机探测` ⇒ 广播丢了/来晚了也不会少一个角色。
+
+⇒ 6 人 + 观者 mod ⇒ 6 只（第 6 个角色是观者，逐幕：一层预见观 / 二层印牌观 / 三层神格观·Ω观）；
+没装观者 ⇒ 上限仍是 5 人，「每个角色最多一只」照旧。
+
+## v0.2.990（2026-11-28）：**撤销** v0.2.989 的「同角色补满」（口径：每个角色最多一只不能破），改为修观者闸门
+
+用户：「你说『6 人必须出 6 只（就允许同角色的另一套设计补满）』这不是我希望的，目前如果不装观者 mod
+上限应该还是 5 人，**不应该打破「每个角色最多一只」的限制**。」
+
+### 撤销
+
+`MultiBossPlan` 里 v0.2.989 加的那段「凑不满就放宽角色去重补满」**整段删掉**，恢复 v0.2.799 的硬约束：
+伙伴不得与主 Boss 或已有伙伴**同角色**，凑不满就少出（并打日志说明被谁挡住）。
+
+### 真修：闸门把「不会说话的座位」当成必须上报的真实客户端
+
+`BossPicksSync.RecomputeWatcherAllowed` 原来的判据：
+
+```csharp
+int expected = PlayerCount() - 1;
+else if (PeerCaps.Count < expected) ok = false;     // ← 一有座位没上报就永远 False
+```
+
+实测（6 人测试房）：`期待客人上报 5 份、已收到 0 份` ⇒ 永远 False ⇒ 观者进不了候补表
+⇒ 第 6 个角色不存在 ⇒ 6 人只能出 5 只。可那 5 个座位**根本不会跟我们的同步消息说话**
+（同机座位 / 测试房占位），它们与本案共用同一套 mod ⇒ 观者实现必然一致，判 False 是**误伤**。
+
+现在：
+
+| 情况 | 结论 |
+| --- | --- |
+| 单人 | 只看本机 |
+| 房主自己没装观者 | 不放 |
+| **全部客人**都上报了 | 逐份比对，全一致才放 |
+| **一个都没上报**、且已等 ≥ 20 秒 | **按「那些座位不是真实客户端」放行**（日志写明原因） |
+| 有客人上报但没到齐 | 仍保守不放 |
+
+为什么 20 秒安全：真实远端客人只要装了本模组，`SendCaps` 每 5 秒一次 caps 心跳（含 `hello` 重播机制），
+20 秒内必然到齐；到时一个都没有 ⇒ 那些座位与本案同机/非真实客户端 ⇒ 共用同一套 mod，观者实现一致。
+
+⇒ 结果：**6 人 + 观者 mod ⇒ 第 6 个角色是观者（一层预见观 / 二层印牌观 / 三层神格观·Ω观），6 只各不相同**；
+**没装观者 ⇒ 上限仍是 5 人**，`每个角色最多一只` 照旧。
+
+## v0.2.989（2026-11-28）：还是 5 只 —— 观者被闸门挡住后第 6 条是「同角色」，又被伙伴去重挡了一次；另加「长意图半透明」
+
+用户：「还是只有5个。另外加一个功能：当角色boss的数量＞4时，让所有意图超过三张卡牌的意图卡牌都会半透明（防止有些 boss 的某些意图过长，遮挡其他 boss 的意图）；处于最左侧的 boss 不受这个限制」
+
+### 6 只没出来的完整链路（v0.2.988 之后的活日志）
+
+```
+[11:30:01] 观者 Boss：房主判定「可以出现」=False（询问）—— 本机实现=boninall、期待客人上报 5 份、已收到 0 份；
+           不全一致 ⇒ 观者**不进**候补表（避免两端阵容不同步）
+[11:30:01] 6 人联机 + 观者 mod 可用 ⇒ 这一场要上 **6 只** Boss        ← 上限已生效
+[11:30:01] 阵容补齐：第 1 层第 1 场少一只 ⇒ 补上「1 层 铁甲 1 号（IRONCLAD_ANGER）」
+[11:30:03] 伙伴名额 5 只、实际只凑到 4 只 ⇒ **少出**（伙伴不得与主 Boss 或已有伙伴同角色）
+```
+
+1. 观者那道闸门（`BossPicksSync.WatcherAllowedHere`：要求「玩家数 − 1」份客人上报且实现一致）**没过**
+   —— 这一局期待 5 份上报、收到 **0** 份（测试房 / 另外几桌没回报），于是观者被排除在候补表外；
+2. `Build()` 凑到 6 条，但第 6 条只能是**同角色的另一套设计**（铁甲 1 号 vs 铁甲 2 号）；
+3. `MultiBossPlan` 的 v0.2.799 硬约束「伙伴不得与已有 Boss 同角色」把它挡掉 ⇒ 场上 5 只。
+
+### 改法
+
+- `MultiBossPlan`：凑不满时**放宽「每个角色最多一只」**，用「同角色但**不同 Key**」的设计补满
+  ——「Boss 数 = 玩家数」是硬规则，而 v0.2.799 真正要防的是**同一个 Key 出现两次**（场上两个一模一样的），
+  这条**仍然严格禁止**。日志会写明是被放宽补满的。
+  ⇒ 观者闸门过了 → 第 6 只是观者；没过 → 第 6 只是同角色的另一套设计；两种都是 6 只。
+
+### 新功能：长意图半透明（`BossHandCard.ApplyCrowdedIntentFade`）
+
+- **触发**：场上活着的我们的 Boss **> 4 只**；
+- **对象**：该 Boss 本回合计划里**第 4 张及以后**的牌，它们的意图行设为 `Modulate.A = 0.45`（半透明）
+  —— 前 3 张保持完全不透明（最要紧的信息不糊）；
+- **例外**：**最靠左那只 Boss** 一律不半透明（它往右延伸的意图行不会压住别人）；判据用生物节点的屏幕 X
+  （与站位/手牌栏同一个锚点），量不到就按「不是最左」保守处理；
+- 只在**重建意图行**时算一次（出牌时原地刷新也会重新判定），不是每帧，开销可忽略。
+
+⚠ 未实机验证（用户要求不要自己起游戏测试）。
+
+## v0.2.988（2026-11-28）：6 人联机只出 5 只 Boss —— 上限被写死成 5，6 只的代码全部走不到
+
+用户：「我记得我说过装了观者 mod 后要支持 6 人联机的，怎么还是 5 个 boss？」
+
+### 铁证（活日志）
+
+```
+[11:24:35] 多人(6 人)：这一幕同时上 5 只 Boss —— 我=REGENT_BOMBARD，
+           伙伴=IRONCLAD_STRIKE | DEFECT_THUNDER | NECROBINDER_DOOM | SILENT_SNAKEBITE
+[11:24:36] 跟踪锁定：DEFECT_BOSS → …（花名册 6 人 / 5 只 Boss，NetId 顺序取模）
+```
+
+### 真因
+
+`BossLineups.MaxPlayersPerFight` 是**写死的常量 5**（v0.2.585 抬到 5 人联机之后就停了）：
+
+```csharp
+internal const int MaxPlayersPerFight = 5;
+internal static int PlayersPerFight() => Math.Clamp(PlayerCount(), 1, MaxPlayersPerFight);
+```
+
+而「6 只 Boss」的代码其实**早就写好了，只是永远走不到**：
+
+- `BossFrameTickPatch.SixBossFight()` 判的是 `PlayersPerFight() >= 6`（用来放宽手机每帧预算 + 慢车道间隔）——永远 false；
+- `BossEnemySpreadPatch` 里 6 只的「**平行四边形 3 行 2 列**」站位（用户 2026-11-21 定的）——永远用不上；
+- `MultiBossPlan` 的 `Math.Min(lineup.Length, MaxPlayersPerFight) - 1` 也跟着卡在 4 个伙伴。
+
+为什么 6 只必须靠观者 mod：Boss 数 = 玩家数，且**同一场每个角色最多一只**，原版只有 5 个角色
+⇒ 第 6 只必须是第 6 个角色 = **观者**（`BossKeys.RosterFor` 的 `WatcherRosterAct1/2/3` 只在
+`WatcherModPresence.Usable` 为真时才进候选表：一层预见观、二层印牌观、三层神格观 / Ω观）。
+
+### 改法
+
+```csharp
+#if STS2_111
+    internal static int MaxPlayersPerFight => WatcherModPresence.Usable ? 6 : 5;
+#else
+    internal const int MaxPlayersPerFight = 5;      // 没有观者 Boss 的构建仍是 5
+#endif
+```
+
+- 装了**可用**的观者 mod（`Usable`：卡牌层 + ProviderId + 角色类型三样齐）⇒ 6 人房出 6 只，站位自动走平行四边形；
+- 没装 / 装了但用不了 ⇒ 仍是 5（第 6 位玩家只受群攻与锁定影响，没有专属 Boss —— 与以前一致）；
+- `Build()` 里加了一行日志：`6 人联机 + 观者 mod 可用 ⇒ 这一场要上 **6 只** Boss…`；
+- 两端仍然一致：房主把 `pc=` 与「每场最终遭遇」广播给客人（`BossPicksSync`），客人照抄。
+
+⚠ 未实机验证（用户要求不要自己起游戏测试）。
+
+## v0.2.987（2026-11-27）：**我的错** —— 升级来源写成了手牌，原效果是「卡组里随机一张」
+
+用户：「？？？升级手牌是什么鬼，她是升级卡组中的牌啊！你能不能不要改本来的效果？？！！」
+
+### 我错在哪
+
+观者原实现里那一段是：
+
+```csharp
+List<CardModel> upgradable = PileTypeExtensions.GetPile((PileType)6, owner).Cards.Where(c => c.IsUpgradable).ToList();
+```
+
+我从 0.2.984 起一直按「手牌」理解这个 `(PileType)6`（还照着写了 `PileType.Hand`），
+**等于偷偷把这张牌的效果改成了「升级手牌」**。核对枚举：
+
+```
+PileType: None=0 / Draw=1 / Hand=2 / Discard=3 / Exhaust=4 / Play=5 / **Deck=6**
+```
+
+⇒ `(PileType)6` 是 **Deck（卡组）**。用户说得对。**教训：反编译里出现 `(PileType)N` 这种强制转换，
+一定要去数枚举值，不能靠“看起来像”。**
+
+### 改法
+
+1. 升级来源改成 `PileType.Deck.GetPile(owner).Cards.Where(IsUpgradable)` —— 和原实现同一个堆；
+2. 补回原实现里被我省掉的两处**表现层**（反射调用 + try/catch，拿不到就跳过）：
+   `WatcherCardVfx.BeginLesson(target)`（本机操控者、出牌前）、
+   `WatcherCardVfx.ResolveLessonLearned(pick)` 失败时退回 `ShowUpgradePopup(pick)`；
+3. 补回原实现的「本节点升级历史」记录：`CurrentMapPointHistoryEntry.GetEntry(NetId).UpgradedCards.Add(pick.Id)`；
+4. 现在逐条对照观者原实现：目标 → 致命判定 → Lesson 起手特效 → `DamageCmd.Attack(...).WithHitFx("vfx/vfx_starry_impact")`
+   → `WasTargetKilled` → 卡组里随机可升级的牌（`RunState.Rng.Niche`，两端同种子）→ 历史记录 → 升级 → 演出。
+   **唯一保留的偏差**：目标为空时兜底选一个（原版会 `ThrowIfNull` 抛异常并把整场卡死）。
+
+## v0.2.986（2026-11-27）：「还是不敲牌」—— `CardCmd.Upgrade` 第一行就是「战斗一旦在收尾就直接 return」
+
+用户：「还是不敲牌」（v0.2.985 实测）。日志这次把话说全了：
+
+```
+[23:25:36] 勤学精进：目标=树枝史莱姆（小） 伤害=10 致命允许=True 斩杀=True（伤害结果组=1）
+[23:25:36] 勤学精进：斩杀成功 ⇒ 升级了手里随机一张 WATCHER_DEFEND_P（可升级候选 2 张）
+[23:25:41] （紧接着就是战斗收尾 / 回主菜单）
+```
+
+⇒ 我们的**斩杀判据对了、升级调用也发出去了**，但 `CardCmd.Upgrade` 静默没做事。反编译它：
+
+```csharp
+public static void Upgrade(IEnumerable<CardModel> cards, CardPreviewStyle style)
+{
+    if (CombatManager.Instance.IsEnding) return;      // ← 战斗一进入收尾就整段跳过
+    ...
+    current.UpgradeInternal();                        // ← 靠默认参数（0.113/0.114 为 (bool silent = false)）
+    current.FinalizeUpgradeInternal();
+    if (!LocalContext.IsMine(current)) continue;      // 之后才是本机的预览/特效
+}
+```
+
+而「斩杀」这件事**天然就是打死最后一只怪**（尤其小怪）⇒ 那一刻 `IsEnding` 已经为真 ⇒ 官方命令什么都不做。
+（顺带解释了 0.2.984 那个 `MissingMethodException`：观者模组编译时它还是无参版本。）
+
+### 改法（`WatcherLessonLearnedSafePatch.TryUpgradeNow`）
+
+反射**按运行时版本挑对重载**，不经过那道 `IsEnding` 门：
+
+1. 先试 `UpgradeInternal(bool silent=false)`（0.113/0.114），再试 `UpgradeInternal()`（0.111），
+   成功判定**以 `card.IsUpgraded` 状态为准**（不用「有没有抛异常」，避免「加了一级才抛」被当成失败再升一次）；
+2. 然后 `FinalizeUpgradeInternal()`；都不行才退回 `CardCmd.Upgrade`（只当兜底）；
+3. 诊断行升级成：`斩杀成功 ⇒ 已升级/⚠ 升级失败 … （可升级候选 N 张；战斗收尾中=是/否）`
+   —— 下次一眼就能看出是不是又被 `IsEnding` 挡了。
+
+## v0.2.985（2026-11-27）：「勤学精进」斩杀不升级 —— 我把斩杀判据写错了（用生物 IsDead，而死亡是延迟处理的）
+
+用户：「这勤学精进斩杀怎么不敲牌？」（v0.2.984 装机后实测：伤害与斩杀都正常、**不卡了**，但手牌没被升级，日志里连一行都没有）
+
+### 真因：判据用错对象
+
+| | 观者原实现 | 我的 v0.2.984 |
+| --- | --- | --- |
+| 斩杀判据 | 伤害结果里任一 `DamageResult.WasTargetKilled` | `target.IsDead \|\| !target.IsAlive` |
+
+STS2 里**死亡是延迟处理的**（先播死亡动画，之后才 `RemoveCreature`），`Execute` 返回那一刻生物通常还没被标记成死
+⇒ 我那个判据**永远为 false** ⇒ 斩杀也不升级。已核对签名（`.refs\sts2_113.dll`）：
+`AttackCommand.Results` = `IEnumerable<List<DamageResult>>`，`DamageResult.WasTargetKilled` 是 bool。
+
+### 改法（`src/Hooks/Core/WatcherLessonLearnedSafePatch.cs`）
+
+1. 用 `atk.Results` 里任一 `WasTargetKilled` 判斩杀（与原实现一致），生物状态只作兜底；
+2. 补三行诊断（各限流 10 次），下次一眼看出是哪一步没走：
+   - `勤学精进：目标=<X> 伤害=<d> 致命允许=<b> 斩杀=<b>（伤害结果组=<n>）`
+   - `勤学精进：斩杀成功 ⇒ 升级了手里随机一张 <牌>（可升级候选 N 张）`
+   - `勤学精进：斩杀成功但手里没有可升级的牌 ⇒ 不升级（手牌 N 张）`
+
+## v0.2.984（2026-11-27）：勤学精进卡死 **真因**（观者模组调了改名/改签名的 API）—— 改成整段接管
+
+用户：「还是卡着」（v0.2.983 装机后再试）。这次从**活日志**里抓到了异常原文，真因彻底清楚：
+
+```
+[23:13:53] ⚠ 启动期异常#39: MissingMethodException: Method not found:
+             'Void MegaCrit.Sts2.Core.Models.CardModel.UpgradeInternal()'.
+[23:13:53] ⚠ 启动期异常#40: （同上，第二次）
+```
+
+### 为什么炸：游戏把 `UpgradeInternal` 改了签名
+
+| | `CardModel.UpgradeInternal` |
+| --- | --- |
+| 观者模组编译时（0.111 时代的参照库 `.refs\sts2_111.dll`） | `void UpgradeInternal()` |
+| 本机现版本游戏（`.refs\sts2_113.dll` / 运行时 `data_sts2_windows_x86_64\sts2.dll`） | `void UpgradeInternal(bool silent)` |
+
+观者那张牌的状态机里写死了旧签名 ⇒ **JIT 编译 `MoveNext` 时就解析不到方法** ⇒ `MissingMethodException`
+**从 `OnPlay` 同步抛出**（不是塞进 Task）。而 STS2 出牌是 `PlayCardAction` 里 `await card.OnPlay(...)`：
+这条调用抛出去，动作永远完不成，动作队列一直排在它前面 ⇒ 结束回合按了没反应、整场卡住（实测 249 秒）。
+B 版（lamali）也一样：反编译里同样是 `val3.UpgradeInternal(); val3.FinalizeUpgradeInternal();`。
+
+### 为什么 v0.2.982/0.983 那版没修好
+
+那版是**Postfix 把返回的 Task 包一层守卫**（`__result = GuardAsync(inner)`）。可是这里
+**连 Task 都没生成就抛了**（异常在 state machine 的 JIT/启动阶段），Postfix 压根不执行
+—— 日志里确实没有那行「出牌内部抛异常」。教训：**「给返回的 Task 加守卫」只对「方法体能跑起来」的情况有效。**
+
+### 现在的做法（v0.2.984）：前缀直接接管 `OnPlay`，用现版本 API 重做
+
+1. **目标**：`cardPlay.Target`；为空就兜底「血最少的可命中敌人」（空目标在多人/切视角/目标刚死时都可能出现）；
+2. **致命判定**：目标身上所有 Power 的 `ShouldOwnerDeathTriggerFatal()` 都为真（与观者原实现逐字一致）；
+3. **伤害**：`DamageCmd.Attack(牌面伤害).FromCard(...).Targeting(...).WithHitFx("vfx/vfx_starry_impact")`
+   —— 和观者原实现同一条链，力量 / 易伤 / 虚弱 / 格挡全部照常；
+4. **斩杀**：从手里挑可升级的牌，`RunState.Rng.Niche` 随机取一张（两端同种子 ⇒ 多人一致），
+   用 **`CardCmd.Upgrade(card, CardPreviewStyle.None)`** 升级 —— 刻意**不**直接调 `UpgradeInternal`：
+   它正是两个版本签名不一致的那个方法；`CardCmd.Upgrade` 两个版本签名相同（已核对 111 与 113 参照库）。
+5. 全程 try/catch + `Finalizer` 兜底 ⇒ 这个 Task **一定会完成**，再也不会卡死。
+
+日志确认行：`观者补丁：勤学精进（…）**已整段接管** —— 原因：观者模组调的 CardModel.UpgradeInternal() 在现版本变成了 UpgradeInternal(bool)…`
+斩杀成功时还会有 `勤学精进：斩杀成功 ⇒ 升级了手里随机一张 <牌>`。
+
+### 边界（如实）
+
+- 只修**这一张牌**。观者模组若还有别的牌调了「被改名/改签名」的游戏 API，同样会炸 —— 那要靠它自己更新；
+- 我们的重做**不改数值**（伤害读牌面 `DynamicVars.Damage.BaseValue`，升级仍然只升「随机一张可升级手牌」），
+  但表现层细节（观者原来那套 Lesson 飞卡动画）换成了现版本 `CardCmd.Upgrade` 自带的升级弹窗；
+- 仍未实机验证（用户要求不要自己起游戏测试）。
+
+## v0.2.982（2026-11-27）：给观者模组的「勤学精进」打补丁 —— 它一出牌就把整场卡死
+
+用户：「观者mod有bug，打勤学精进会卡住。帮我修修，打个补丁（虽然应该和本模组没问题）」
+（**判断正确**：这确实不是本模组的问题，但可以在我们这边兜住。）
+
+### 铁证（本机活日志，不是猜）
+
+```
+[22:51:38] 本机操控的玩家变了：P#103 → P#104 → P#105 → P#1 → P#101   ← 切视角，场上有 6 个座位
+[22:51:43] 结束回合按钮探针：… inCardPlay=True …                      ← 出牌开始
+[22:51:55] （之后近 4 分钟没有任何“推进”）
+[22:55:03] 结束回合按钮状态：Enabled → Disabled → Enabled（玩家狂点结束回合，没用）
+[22:55:07] 音乐调用 StopMusic（← <CloseToMenu>，玩家退回主菜单）
+[22:55:08] 原版回合结束步骤：AwaitTurnEndAndSwitchSides = 249546ms     ← 卡了 249 秒
+```
+
+症状不是崩溃，是 **`PlayCardAction` 里那句 `await card.OnPlay(...)` 永远等不到完成** ——
+后面「结束回合 / 下一个玩家回合」全在动作队列里排队，看起来就是整场卡死。
+
+### 反编译：两个观者版本都在 async 里必出事
+
+A 版（Boninall 3747526116）`WatcherMod.WatcherLessonLearned.OnPlay` 的**第一句**：
+
+```csharp
+ArgumentNullException.ThrowIfNull(cardPlay.Target, "cardPlay.Target");   // 目标为空直接抛
+... await DamageCmd.Attack(...).FromCard(this, cardPlay).Targeting(cardPlay.Target).Execute(choiceContext);
+```
+
+B 版（lamali 3747492505）`Watcher.Code.Cards.Rare.LessonLearned.OnPlay`：
+
+```csharp
+bool shouldTriggerFatal = cardPlay.Target.Powers.All(p => p.ShouldOwnerDeathTriggerFatal());  // 空引用
+... await Cmd.Wait(0.5f, false);   // 斩杀后还会再等半秒
+```
+
+两处都在 **async 方法内部**失败 ⇒ 异常被塞进返回的 Task，调用方（出牌动作）没兜住 ⇒ 队列卡死。
+而「出牌没有目标」在**多人 / 切视角 / 目标刚被别的效果打死**的时序里完全可能发生
+（我们自己的选靶收窄也会在结算期间改动「可命中敌人」列表）。
+
+### 补丁（`src/Hooks/Core/WatcherLessonLearnedSafePatch.cs`，新增；两个版本都覆盖）
+
+运行期用反射找类型（不编译期引用观者程序集），Harmony 挂 `OnPlay`：
+
+1. **前缀 ── 空目标兜底**：`cardPlay.Target == null` 时用 `GetOpponentsOf(owner)` 里「血最少的可命中敌人」
+   补进 `CardPlay.Target`（`init` 属性，反射写 backing field）；一个可打的都没有就原样放行。
+2. **后缀 ── 异常不致命**：把原 Task 包一层守卫，内部抛任何异常只记一行日志，动作队列照常收到「完成」。
+3. **超时解脱**：守卫等 8 秒还没完成 ⇒ 记一行 ⚠（带牌 / 出牌者 / 目标现场）并让动作队列继续
+   （卡住的协程本来就不会恢复，继续等只会把整场一起拖住）。
+
+安装点：`BossFrameTickPatch.Tick` 里紧跟「观者运行期补丁」，内部 5 秒限流重试（观者模组可能比我们晚加载）。
+日志确认：`观者补丁：勤学精进（…）已挂 —— 空目标会兜底 / 出牌内部报错不再拖死动作队列 / 超时 8 秒自动放行`。
+
+⚠ 只改「失败时怎么收场」，数值与正常流程逐字不变。
+⚠ 未实机验证（用户要求不要自己起游戏测试）：需要用户下次用这张牌确认 ——
+若仍卡，请把 F8 导出的 zip 发我，里面有那行 ⚠ 现场（牌 / 出牌者 / 目标 / 是超时还是异常）。
+
+### 0.2.983：安装时机提前（不再依赖战斗）
+
+第一版（0.2.982）唯一调用点是 `BossFrameTick.Tick`，而它挂在三个**战斗 HUD 节点**的 `_Process` 上
+（`NStarCounter` / `NEnergyCounter` / `NSovereignBladeVfx`）⇒ 只有进战斗之后才会被驱动。
+虽然「勤学精进」只能在战斗里打出（实战够用），但「修别人 bug」不该依赖我们自己别的补丁有没有在跑。
+现在改成挂 `SceneTree.process_frame`（主菜单也在跳，与 `StallWatchdog` 同一套写法），
+并在 `BuildInfo.LogOnce()`（启动第一帧）与 `BossFrameTick.Tick` 各兜一次 ⇒ **游戏一起来就开始找，找到立刻挂上**。
+日志确认行：`观者补丁：勤学精进（…）已挂 —— 空目标会兜底 / 出牌内部报错不再拖死动作队列 / 超时 8 秒自动放行`。
 
 ## v0.2.981（2026-11-27）：多人时「玩家自己的黑暗球打队友」—— 我们把玩家的球当成了 Boss 的球
 

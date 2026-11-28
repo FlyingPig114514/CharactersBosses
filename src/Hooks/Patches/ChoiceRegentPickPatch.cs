@@ -132,6 +132,21 @@ internal static class ChoiceRegentPickPatch
         CardModel? picked = null;
         try
         {
+            // ★★ v0.2.997（用户 2026-11-28：「统帅模式下如果回合结束时没切到被抉择储锁定的玩家，
+            //   抉择储就会自己选（默认隐秘藏品 + 铸墙）。应该像其它选牌界面那样**跳到对应玩家的视角**」）：
+            //   实测日志（就是因为没切视角）：
+            //     `指导：选择界面出错，退回第一张: Cannot focus selection owner`
+            //     `指导：玩家没给出选择 ⇒ 退回第一张 HIDDEN_CACHE`（第二次 BULWARK = 铸墙）
+            //   ⇒ 弹界面之前先把本机视角切到那位玩家（`Core.SeatSwitch`；只有「本机能操控多座位」时才动手，
+            //     普通联机绝不会去抢别人的座位）。切成功了 `LocalContext.IsMe(chooser)` 才为真，
+            //     原版界面才不会抛 `Cannot focus selection owner`。
+            bool onOwner = Core.SeatSwitch.SwitchTo(chooser, "这次「抉择，抉择」要由他来选");
+            if (!onOwner)
+            {
+                Logger.Log("[CharBoss] 指导：本机不在被锁定玩家的座位上、也无法切过去 ⇒ 界面可能弹不出来" +
+                           "（统帅模式下请在那个座位按结束回合，或者让我们切视角）");
+            }
+
             // ⚠ 她出牌期间栈顶压着自动选择器：原版每个选牌入口开头都是
             //   `if (Selector != null) ⇒ 用选择器`，不摘下来界面根本不会出现。摘完记得还回去。
             //

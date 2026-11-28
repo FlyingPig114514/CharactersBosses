@@ -238,6 +238,16 @@ public static class BossFrameTick
         //   现在每帧都试一次（内部 `_tried` 命中后就是一次 bool 判断，零开销）。
         try { Core.TickSteps.Enter("观者运行期补丁"); } catch { /* 忽略 */ }
         try { Core.WatcherRuntimePatches.TryInstall(); } catch { /* 忽略 */ }
+        // ★ v0.2.982（用户 2026-11-27：「观者mod有bug，打勤学精进会卡住」）：
+        //   给观者模组的「勤学精进（Lesson Learned）」挂安全补丁 —— 空目标兜底 + 出牌内部异常不拖死
+        //   动作队列 + 超时 8 秒放行。它内部 5 秒限流重试（观者模组可能比我们晚加载 / 两个版本都试）。
+        try { Core.TickSteps.Enter("勤学精进出牌安全补丁"); } catch { /* 忽略 */ }
+        // v0.2.983：EnsureHooked 会挂到 SceneTree.process_frame（主菜单也开始装），这里只是兜一次
+        try { Core.WatcherLessonLearnedSafePatch.EnsureHooked(); } catch { /* 忽略 */ }
+        try { Core.WatcherLessonLearnedSafePatch.TryInstall(); } catch { /* 忽略 */ }
+        // ★ v0.2.996（用户 2026-11-28：「以手拒之的格挡返还让被上 debuff 的 Boss 也起甲」）
+        try { Core.WatcherBlockReturnFix.EnsureHooked(); } catch { /* 忽略 */ }
+        try { Core.WatcherBlockReturnFix.TryInstall(); } catch { /* 忽略 */ }
         // ★ v0.2.936：神格特效的兜底清理（生物死了 / 离场时把眼睛与紫雾收掉）
         try { Core.TickSteps.Enter("神格特效清理"); } catch { /* 忽略 */ }
         try { Core.WatcherDivinityVfx.StopIfDead(); } catch { /* 忽略 */ }

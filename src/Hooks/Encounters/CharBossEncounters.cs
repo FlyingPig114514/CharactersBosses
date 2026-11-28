@@ -437,9 +437,16 @@ public abstract class CharBossEncounterBase<TMonster> : EncounterModel, Core.IBo
         // ⚠ 用户 2026-10-29：「我记得 2 层行动顺序不是 猎 骨 机 战 储 吗？怎么现在战士在故障机器人前面？」
         //   原因是以前按**左右分组**排（`LeftRank`：静默/亡灵/铁甲 = 左、故障/储君 = 右）——
         //   铁甲被算进「左组」，于是无论剧本怎么排，**战士永远在故障机器人前面**。
-        //   现在改成**按职业的固定次序**（用户口径）：
-        //     一层 / 二层：猎(静默) → 骨(亡灵) → 机(故障) → 战(铁甲) → 储(储君)
-        //     三层：猎 → 机 → 骨 → 储 → 战（保留「易伤战永远最右」这条老设计）
+        //   现在改成**按职业的固定次序**。
+        //
+        // ★★ v0.2.995（用户 2026-11-28 定的新次序，逐字）：
+        //     1、2 幕：**猎 → 机 → 观 → 愚 → 骨 → 战 → 储**
+        //     3 幕  ：**猎 → 机 → 观 → 愚 → 骨 → 储 → 战**
+        //   与旧版相比：故障机器人提到亡灵契约师前面；**观者、愚者从「其它」档提到第三/第四位**
+        //   （以前它们落在 `_ => 5` 兜底档、永远排最右，用户明确说那样不对）；
+        //   3 幕保留「易伤战在储君后面」这条老设计。
+        //   ⚠ 观者/愚者的判断用**基类**（`WatcherBoss` / `FoolBoss`），这样 6 个观者变体、
+        //     塔罗愚都能一并命中（它们的派生类都直接继承这两个基类）。
         if (list.Count >= 2)
         {
             try
@@ -505,27 +512,38 @@ public abstract class CharBossEncounterBase<TMonster> : EncounterModel, Core.IBo
         {
             if (act >= 2)
             {
+                // 3 幕：猎 → 机 → 观 → 愚 → 骨 → 储 → 战（用户 2026-11-28）
                 return monster switch
                 {
                     SilentBoss => 0,
                     DefectBoss => 1,
-                    NecrobinderBoss => 2,
-                    RegentBoss => 3,
-                    IroncladBoss => 4,
-                    _ => 5,
+                    WatcherBoss => 2,
+#if STS2_113
+                    FoolBoss => 3,          // 愚者是 0.113 才有的角色 ⇒ 只有 113 构建有这类
+#endif
+                    NecrobinderBoss => 4,
+                    RegentBoss => 5,
+                    IroncladBoss => 6,
+                    _ => 7,
                 };
             }
+            // 1、2 幕：猎 → 机 → 观 → 愚 → 骨 → 战 → 储（用户 2026-11-28；
+            // 目前 1、2 幕还没有愚者 Boss，次序先留着，以后加了自动就位）
             return monster switch
             {
                 SilentBoss => 0,
-                NecrobinderBoss => 1,
-                DefectBoss => 2,
-                IroncladBoss => 3,
-                RegentBoss => 4,
-                _ => 5,
+                DefectBoss => 1,
+                WatcherBoss => 2,
+#if STS2_113
+                FoolBoss => 3,              // 同上：愚者只存在于 113 构建
+#endif
+                NecrobinderBoss => 4,
+                IroncladBoss => 5,
+                RegentBoss => 6,
+                _ => 7,
             };
         }
-        catch { return 5; }
+        catch { return 7; }
     }
 }
 

@@ -387,7 +387,30 @@ internal static class BossLineups
     /// ⚠ 这个常量必须和 <see cref="Core.MultiBossPlan.PartnersForWithKeys"/> 里用的上限**是同一个**，
     ///   否则会出现「阵容按 5 只算、实际只造了 4 只」的半截状态。
     /// </summary>
+#if STS2_111
+    /// <summary>
+    /// 这一场最多上几只 Boss（= 有几个「不同角色」可用，因为同一场里**每个角色最多一只**）。
+    ///
+    /// ★★ v0.2.988（用户 2026-11-27：「我记得我说过装了观者mod后要支持6人联机的，怎么还是5个boss？」）：
+    ///   这个上限以前是**写死的常量 5**（v0.2.585 抬到 5 人联机之后就停了）⇒ 6 人房只出 5 只 Boss，
+    ///   而「6 只 Boss」的代码其实**早就写好了**：`BossFrameTickPatch.SixBossFight()`（判 `PlayersPerFight() >= 6`，
+    ///   用来放宽手机上的每帧预算与慢车道间隔）、`BossEnemySpreadPatch` 里 6 只的「**平行四边形 3 行 2 列**」站位
+    ///   —— 因为这里永远返回 ≤5，**它们一次都没被走到过**（面板本身是按只数逐只挂的，没有写死 5）。
+    ///
+    ///   为什么 6 只要靠观者 mod：Boss 数 = 玩家数、**同一场每个角色最多一只**，而原版只有 5 个角色
+    ///   ⇒ 第 6 只必须是第 6 个角色 = **观者**（`BossKeys.RosterFor` 里的 `WatcherRosterAct1/2/3`
+    ///   只在 <see cref="WatcherModPresence.Usable"/> 为真时才进候选表）。
+    ///   所以：观者 mod 可用 ⇒ 上限 6；没装 / 装了但用不了 ⇒ 仍是 5。
+    ///   （6 人但没装观者时，多出来的那位玩家只会被群攻和锁定影响，没有专属 Boss —— 与以前一致。）
+    ///
+    /// ⚠ 这个值必须和 <see cref="Core.MultiBossPlan.PartnersForWithKeys"/> 里用的上限**是同一个**，
+    ///   否则会出现「阵容按 6 只算、实际只造了 5 只」的半截状态。
+    /// </summary>
+    internal static int MaxPlayersPerFight => WatcherModPresence.Usable ? 6 : 5;
+#else
+    /// <summary>非 0.113 构建没有观者 Boss ⇒ 上限仍是 5（原版 5 个角色）。</summary>
     internal const int MaxPlayersPerFight = 5;
+#endif
 
     /// <summary>
     /// 这一场同时上几只 Boss = **玩家数（1～<see cref="MaxPlayersPerFight"/>）**。
@@ -398,6 +421,21 @@ internal static class BossLineups
     /// 至于「同角色不复用」「两场不重复」这些约束，下面的 ⑥/② 遍会自动让步（极端情况才降级）。
     /// </summary>
     internal static int PlayersPerFight() => Math.Clamp(PlayerCount(), 1, MaxPlayersPerFight);
+
+    private static bool _loggedSix;
+
+    /// <summary>6 人联机（+ 观者 mod）时打一行，方便一眼确认走的是 6 只那条路。</summary>
+    private static void NoteSixBosses(int need)
+    {
+        if (need < 6 || _loggedSix) return;
+        _loggedSix = true;
+        try
+        {
+            Logger.Log($"[CharBoss] 6 人联机 + 观者 mod 可用 ⇒ 这一场要上 **{need} 只** Boss" +
+                       "（第 6 个角色用观者；站位走 6 只的「平行四边形 3 行 2 列」）");
+        }
+        catch { /* 忽略 */ }
+    }
 
     /// <summary>
     /// 生成某一幕某一场的阵容（Boss 标识数组，`[0]` = 站位/行动里的第 1 只，也就是**主 Boss**）。
@@ -417,6 +455,7 @@ internal static class BossLineups
     private static string[] Build(int act, int fight)
     {
         int need = PlayersPerFight();
+        NoteSixBosses(need);
 
         // ★ v0.2.453（A2 改成「每张地图的 Boss 勾选」）：
         //   · **主 Boss** 从「房主勾选过的候补」里抽；
