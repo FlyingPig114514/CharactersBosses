@@ -4,6 +4,24 @@
 > 旧条目逐字来自 `git show HEAD:src/Hooks/Core/BuildInfo.cs` 的 Tag 常量（v0.2.871 及其之前，共 236 条）。
 > 最新版本（0.2.889）是当前 Tag，同时在各条 `workshop/changenote.txt` 里也有面向玩家的摘要。
 
+### 发布（2026-11-28 · v0.2.997）
+
+用户：「打包，上传创意工坊和github，并告诉我应该给玩家用于在github上下载本模组的网址」。
+
+- 打包：`.dist\CharacterBosses-v0.2.997.zip` = **18,572,715 B**（17.71 MB，6 个文件）；
+  游戏 `mods` / `workshop\content` / `.dist` 三份的 5 个二进制 SHA256 逐一**一致**
+  （dll `C7A8469B1968` / Impl111 `EE59C4DB4FF4` / Impl113 `E9011825EFB9` / pck `CD71FF929D5E` / json `1B96A58A7552`），
+  两份 Impl 版本串都是 `v0.2.997`；
+- 创意工坊：上传成功（`Successfully uploaded` / `UPLOAD OK`；条目 **3830639796**，
+  `time_updated` = 2026-11-28 15:58:17 本地时间，`file_size` = 22,043,428，visibility=0 公开）；
+- GitHub：`main` → `ab92ebe`，tag `v0.2.997`；新建 **Release**（公开，id 461396250）并挂上 zip
+  （`.../releases/download/v0.2.997/CharacterBosses-v0.2.997.zip`，18,572,715 B，HEAD 实测 302 → CDN 正常），
+  `releases/latest` 已指向 v0.2.997（全站 5 个 Release：967 / 968 / 974 / 981 / 997）；
+- 面向玩家的下载页（给玩家发的就是这两个）：
+  · 最新版总入口：`https://github.com/FlyingPig114514/CharactersBosses/releases/latest`
+  · 本版直链：`https://github.com/FlyingPig114514/CharactersBosses/releases/download/v0.2.997/CharacterBosses-v0.2.997.zip`
+- 工坊 `changenote.txt` 已改为 0.2.997 版（覆盖 0.2.982 ~ 0.2.997 的全部玩家可见改动）。
+
 ### 打包（2026-11-27 · v0.2.987，**未上传**）
 
 用户：「打包，不上传」。
