@@ -1,13 +1,14 @@
 # CharacterBosses — 交接状态
 
-> 更新：2026-11-27 深夜（**v0.2.987 已装机 + 已打包，未上传**）。
-> · 上次发布仍是 **v0.2.981**：工坊条目 3830639796 更新于 22:45:20（21,991,204 B）；
->   GitHub `main` = `a28a48e`→`c57582c`（发布记录），tag `v0.2.981`，Release 460736498。
-> · 本地已备好 **v0.2.987**：`.dist\CharacterBosses-v0.2.987.zip`（18,554,853 B），
->   `workshop\changenote.txt` 与 `workshop.json` 都已改好 ⇒ 用户说上传即可（`tools\upload-workshop.ps1`）。
-> · 工作区 0.2.982~0.2.987 的改动**未提交**（等发布会话一起 commit + tag + push）。
-> · v0.2.987 内容：给观者模组「勤学精进」做整段接管（原实现调了改签名的 `CardModel.UpgradeInternal()`，
->   斩杀时 MissingMethodException 把整场卡死）；效果按原实现 = 砍伤害 + **卡组**里随机升级一张可升级牌。
+> 更新：2026-11-28（**v0.2.997 已装机 + 已打包 + 已上传工坊 + 已推 GitHub**）。
+> · 工坊条目 3830639796 更新于 **11-28 15:58:17**（file_size 22,043,428，visibility=0 公开）；
+> · GitHub `main` = `ab92ebe`（发布提交）→ `6c3556e`（发布记录），tag `v0.2.997`，
+>   Release id 461396250（zip **18,572,715 B**），`releases/latest` 已指向 v0.2.997。
+> · 给玩家的下载页（发这个就行）：
+>   https://github.com/FlyingPig114514/CharactersBosses/releases/latest
+> · v0.2.997 内容：6 人联机真的出 6 只 Boss（观者只按房主判定）/ 6 只平行四边形站位 + ≥6 人整体缩小 0.80 /
+>   ≥4 只 Boss 时第 4 张起的意图半透明 / 站位次序 1·2 幕 猎机观愚骨战储、3 幕 猎机观愚骨储战 /
+>   修观者「勤学精进」斩杀卡死与「以手拒之」格挡返还错给 Boss / 统帅模式抉择储选牌自动切视角。
 
 ## 🚀 Next phase
 
