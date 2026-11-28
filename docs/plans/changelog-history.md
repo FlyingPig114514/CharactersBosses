@@ -15,10 +15,11 @@
 - GitHub：`main` → `dab089b`，tag **`v0.2.1002`**；新建 **Release**（公开，`v0.2.1002`）并挂上 zip
   （`releases/download/v0.2.1002/CharacterBosses-v0.2.1002.zip`，19,026,153 B），`releases/latest` 实测已指向 **v0.2.1002**；
   面向玩家的下载页：`https://github.com/FlyingPig114514/CharactersBosses/releases/latest`
-- 手机：安装包已备好 —— `.tools\phone-stage-mods.tar.gz`（18,977,494 B，tar 内是 `mods/` + 5 个文件：
-  外壳 `CharacterBosses.dll`、`Impl111.dll.bin`（net9 手机版）、`Impl113.dll.bin`、`CharacterBosses.json`、`CharacterBosses.pck`），
-  但**设备这一轮连不上**：`ping 10.60.178.25` 不通（本机在 192.168.3.7/24，不在同一网段）、`adb devices` 空、
-  `adb mdns services` 也没发现 ⇒ 等用户开无线调试/插 USB 后再跑 `.tools\upload-b64.ps1` + `push-and-extract.bat`；
+- 手机：**已装 v0.2.1002**（serial `A3TE026721000487`，BKQ-AN90，包 `com.megacrit.sts2re`）—— 落点 `files/mods/CharacterBosses/`，
+  5 个文件（外壳 / Impl111 net9 / Impl113 / json / pck）md5 与本地构建逐一相同，`version` 实测 `0.2.1002`；
+  装法：`adb push` 到 `/data/local/tmp/cb` → `run-as com.megacrit.sts2re cp` + `chmod 666`；
+  ⚠ 踩坑：`adb shell "run-as … sh -c 'cat > file'"` 做流式传输只写进 **4 字节**（`push-and-extract.bat` 那条路已不可用），
+  `adb push` + `run-as cp` 才是对的；暂存包留在 `.tools\phone-stage-mods.tar.gz`（`mods/CharacterBosses/` 布局）；
 - `workshop\changenote.txt` 已改成 0.2.1002 版（覆盖 0.2.998 ~ 0.2.1002 的玩家可见改动），
   `workshop.json` 用 `tools\mk-workshop-json.ps1` 重新生成过。
 

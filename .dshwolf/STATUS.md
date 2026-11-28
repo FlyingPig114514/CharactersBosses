@@ -1,12 +1,14 @@
 # CharacterBosses — 交接状态
 
-> 更新：2026-11-28 20:06（**v0.2.1002 已发布**：已打包 / 已上传工坊 / 已推 GitHub；**手机未装**，设备连不上）。
+> 更新：2026-11-28 20:09（**v0.2.1002 已发布并已装手机**：打包 / 工坊 / GitHub / 手机四项全齐）。
 > · 创意工坊条目 **3830639796** 已更新（上传器输出 `Successfully uploaded` + `UPLOAD OK`）；
 > · GitHub `main` = `dab089b`，tag **`v0.2.1002`**，Release 挂 zip **19,026,153 B**，`releases/latest` 实测 = v0.2.1002；
 > · 给玩家的下载页：https://github.com/FlyingPig114514/CharactersBosses/releases/latest
-> · 手机安装包已备：`.tools\phone-stage-mods.tar.gz`（18,977,494 B，内含 `mods/` + 5 文件）
->   ⇒ 设备一能连上就跑 `.tools\upload-b64.ps1`（或 `push-and-extract.bat`）。
->   ⚠ 本轮连不上：`ping 10.60.178.25` 不通（本机 192.168.3.7/24，不同网段）、`adb devices` 空、mDNS 无发现。
+> · 手机：**已装 v0.2.1002**（USB + adb，serial `A3TE026721000487`，设备 BKQ-AN90 / 包名 `com.megacrit.sts2re`）。
+>   落点 `files/mods/CharacterBosses/`（注意：手机上是**子目录**，不是散装在 `mods/` 根），5 个文件 md5 与本地构建逐一相同，
+>   `CharacterBosses.json` 里 version=`0.2.1002`。装法：`adb push` 到 `/data/local/tmp/cb` → `run-as … cp` + `chmod 666`
+>   （⚠ `adb shell "cat > file"` 流式传输实测只写进 4 字节，别再用那招；`/data/local/tmp` 反而是通的）。
+>   暂存包留在 `.tools\phone-stage-mods.tar.gz`（`mods/CharacterBosses/` 布局）。
 >
 > 版本号口径：`0.2.999` 之后一律 `0.2.NNNN`（下一版 `0.2.1003`），不再进 0.3.x。
 
